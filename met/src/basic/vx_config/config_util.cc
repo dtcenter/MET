@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -32,6 +32,89 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
+GaussianInfo::GaussianInfo()
+: weights(0)
+{
+   clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GaussianInfo::clear() {
+   weight_sum = 0.0;
+   if (weights) {
+      delete weights;
+      weights = (double *)0;
+   }
+   max_r = weight_cnt = 0;
+   radius = dx = bad_data_double;
+   trunc_factor = default_trunc_factor;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int GaussianInfo::compute_max_r() {
+   max_r = nint(radius / dx * trunc_factor);
+   return max_r;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Compute the Gaussian filter
+// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void GaussianInfo::compute() {
+   double weight, distance_sq;
+   const double g_sigma = radius / dx;
+   const double g_sigma_sq = g_sigma * g_sigma;
+   const double f_sigma_exp_divider = (2 * g_sigma_sq);
+   const double f_sigma_divider = (2 * M_PI * g_sigma_sq);
+   const double max_r_sq = pow((g_sigma * trunc_factor), 2);
+
+   validate();
+   if (0 < max_r && weights) delete weights;
+   compute_max_r();
+
+   int index = 0;
+   int g_nx = max_r * 2 + 1;
+   weight_cnt = 0;
+   weight_sum = 0.0;
+   weights = new double[g_nx*g_nx];
+   for(int idx_x=-max_r; idx_x<=max_r; idx_x++) {
+      for(int idx_y=-max_r; idx_y<=max_r; idx_y++) {
+         weight = 0.0;
+         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
+         if (distance_sq <= max_r_sq) {
+            weight_cnt++;
+            weight = exp(-(distance_sq) / f_sigma_exp_divider) / f_sigma_divider;
+            weight_sum += weight;
+         }
+         weights[index++] = weight;
+      } // end for idx_y
+   } // end for idx_x
+
+   mlog << Debug(7) << "GaussianInfo::compute() max_r: "  << max_r << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GaussianInfo::validate() {
+   if (is_eq(radius, bad_data_double) || is_eq(radius, 0.)) {
+      mlog << Error << "\nGaussianInfo::validate() -> "
+           << "gaussian raduis is missing\n\n";
+      exit(1);
+   }
+   if (is_eq(dx, bad_data_double) || is_eq(dx, 0.)) {
+      mlog << Error << "\nGaussianInfo::validate() -> "
+           << "gaussian dx is missing\n\n";
+      exit(1);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void RegridInfo::clear() {
    enable = false;
    field = FieldType_None;
@@ -39,9 +122,11 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
-   gaussian_dx = bad_data_double;
-   gaussian_radius = bad_data_double;
+   gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
+   convert_fx.clear();
+   censor_thresh.clear();
+   censor_val.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,7 +141,8 @@ void RegridInfo::validate() {
 
    // Check for unsupported regridding options
    if(method == InterpMthd_Best ||
-      method == InterpMthd_Geog_Match) {
+      method == InterpMthd_Geog_Match ||
+      method == InterpMthd_Gaussian) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -72,7 +158,8 @@ void RegridInfo::validate() {
       method != InterpMthd_Upper_Right &&
       method != InterpMthd_Lower_Right &&
       method != InterpMthd_Lower_Left &&
-      method != InterpMthd_AW_Mean) {
+      method != InterpMthd_AW_Mean &&
+      method != InterpMthd_MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
@@ -109,14 +196,47 @@ void RegridInfo::validate() {
    }
 
    // Check the Gaussian filter
-   if(method == InterpMthd_Gaussian) {
-      if (gaussian_radius < gaussian_dx) {
-         mlog << Error << "\n"
-              << "The radius of influence (" << gaussian_radius
-              << ") is less than the delta distance (" << gaussian_dx
+   if(method == InterpMthd_MaxGauss) {
+      if(gaussian.radius < gaussian.dx) {
+         mlog << Error << "\nRegridInfo::validate() -> "
+              << "The radius of influence (" << gaussian.radius
+              << ") is less than the delta distance (" << gaussian.dx
               << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
          exit(1);
       }
+   }
+
+   // Check for equal number of censor thresholds and values
+   if(censor_thresh.n() != censor_val.n()) {
+      mlog << Error << "\nRegridInfo::validate() -> "
+           << "The number of censor thresholds in \""
+           << conf_key_censor_thresh << "\" (" << censor_thresh.n()
+           << ") must match the number of replacement values in \""
+           << conf_key_censor_val << "\" (" << censor_val.n() << ").\n\n";
+      exit(1);
+   }
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void RegridInfo::validate_point() {
+
+   // Check for unsupported regridding options
+   if(method != InterpMthd_Max &&
+      method != InterpMthd_Min &&
+      method != InterpMthd_Median &&
+      method != InterpMthd_UW_Mean) {
+      mlog << Warning << "\nRegridInfo::validate_point() -> "
+           << "Resetting the regridding method from \""
+           << interpmthd_to_string(method) << "\" to \""
+           << interpmthd_uw_mean_str << ".\n"
+           << "\tAvailable methods: "
+           << interpmthd_to_string(InterpMthd_UW_Mean) << ", "
+           << interpmthd_to_string(InterpMthd_Max) << ", "
+           << interpmthd_to_string(InterpMthd_Min) << ", "
+           << interpmthd_to_string(InterpMthd_Median) << ".\n\n";
+      method = InterpMthd_UW_Mean;
    }
 
 }
@@ -216,7 +336,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
 map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
                                  const STATLineType *line_type, int n_lty) {
    map<STATLineType,STATOutputType> output_map;
-   STATOutputType t;
+   STATOutputType t = STATOutputType_None;
    ConcatString cs;
    int i, v;
 
@@ -330,7 +450,7 @@ int parse_conf_n_vx(Dictionary *dict) {
       lvl = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
 
       // Increment count by the length of the level array
-      total += (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
+      total += (lvl.n() > 0 ? lvl.n() : 1);
    }
 
    return(total);
@@ -367,7 +487,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
       // Get the level array, which may or may not be defined.
       // If defined, use its length.  If not, use a length of 1.
       lvl    = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
-      n_lvl  = (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
+      n_lvl  = (lvl.n() > 0 ? lvl.n() : 1);
       total += n_lvl;
 
       // Check if we're in the correct entry
@@ -377,7 +497,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
          i_dict = *((*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
-         if(lvl.n_elements() > 0) {
+         if(lvl.n() > 0) {
             entry.set_string(conf_key_level, lvl[index-(total-n_lvl)].c_str());
             i_dict.store(entry);
          }
@@ -387,6 +507,34 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    } // end for i
 
    return(i_dict);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
+   StringArray sa;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_tc_model() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   sa = dict->lookup_string_array(conf_key_model);
+
+   // Print a warning if AVN appears in the model list
+   for(int i=0; i<sa.n(); i++) {
+      if(sa[i].find("AVN") != string::npos) {
+         mlog << Warning << "\nparse_conf_tc_model() -> "
+              << "Requesting tropical cyclone model name \""  << sa[i]
+              << "\" will yield no results since \"AVN\" is automatically "
+              << "replaced with \"GFS\" when reading ATCF inputs. Please use "
+              << "\"GFS\" in the \"" << conf_key_model << "\" entry of the "
+              << "configuration file to read/process \"AVN\" entries.\n\n";
+      }
+   }
+
+   return(sa);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -403,7 +551,7 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
    sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one message type is provided
-   if(error_out && sa.n_elements() == 0) {
+   if(error_out && sa.n() == 0) {
       mlog << Error << "\nparse_conf_message_type() -> "
            << "At least one message type must be provided.\n\n";
       exit(1);
@@ -414,30 +562,30 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_sid_exc(Dictionary *dict) {
-   StringArray sa, cur, sid_exc_sa;
+StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
+   StringArray sa, cur, sid_sa;
    ConcatString mask_name;
    int i;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_sid_exc() -> "
+      mlog << Error << "\nparse_conf_sid_list() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   sa = dict->lookup_string_array(conf_key_sid_exc);
+   sa = dict->lookup_string_array(conf_key);
 
    // Parse station ID's to exclude from each entry
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
      parse_sid_mask(string(sa[i]), cur, mask_name);
-      sid_exc_sa.add(cur);
+      sid_sa.add(cur);
    }
 
-   mlog << Debug(4) << "parse_conf_sid_exc() -> "
-        << "Station ID exclusion list contains "
-        << sid_exc_sa.n_elements() << " entries.\n";
+   mlog << Debug(4) << "parse_conf_sid_list() -> "
+        << "Station ID \"" << conf_key << "\" list contains "
+        << sid_sa.n() << " entries.\n";
 
-   return(sid_exc_sa);
+   return(sid_sa);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -495,7 +643,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       in.close();
 
       mlog << Debug(4) << "parse_sid_mask() -> "
-           << "parsed " << mask_sid.n_elements() << " station ID's for the \""
+           << "parsed " << mask_sid.n() << " station ID's for the \""
            << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
    }
    // Process list of strings
@@ -527,12 +675,12 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       sa = mask_sid_str.split(":");
 
       // One elements means no colon was specified
-      if(sa.n_elements() == 1) {
+      if(sa.n() == 1) {
          mask_sid.add_css(sa[0]);
-         mask_name = ( mask_sid.n_elements() == 1 ? mask_sid[0] : "MASK_SID" );
+         mask_name = ( mask_sid.n() == 1 ? mask_sid[0] : "MASK_SID" );
       }
       // Two elements means one colon was specified
-      else if(sa.n_elements() == 2) {
+      else if(sa.n() == 2) {
          mask_name = sa[0];
          mask_sid.add_css(sa[1]);
       }
@@ -652,7 +800,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    na = dict->lookup_num_array(conf_key_ci_alpha);
 
    // Check that at least one alpha value is provided
-   if(na.n_elements() == 0) {
+   if(na.n() == 0) {
       mlog << Error << "\nparse_conf_ci_alpha() -> "
            << "At least one confidence interval alpha value must be "
            << "specified.\n\n";
@@ -660,7 +808,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    }
 
    // Check that the values for alpha are between 0 and 1
-   for(i=0; i<na.n_elements(); i++) {
+   for(i=0; i<na.n(); i++) {
       if(na[i] <= 0.0 || na[i] >= 1.0) {
          mlog << Error << "\nparse_conf_ci_alpha() -> "
               << "All confidence interval alpha values ("
@@ -688,7 +836,7 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    na = dict->lookup_num_array(conf_key_eclv_points);
 
    // Check that at least one value is provided
-   if(na.n_elements() == 0) {
+   if(na.n() == 0) {
       mlog << Error << "\nparse_conf_eclv_points() -> "
            << "At least one \"" << conf_key_eclv_points
            << "\" entry must be specified.\n\n";
@@ -696,12 +844,12 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    }
 
    // Intrepet a single value as the step size
-   if(na.n_elements() == 1) {
+   if(na.n() == 1) {
       for(i=2; i*na[0] < 1.0; i++) na.add(na[0]*i);
    }
 
    // Range check cost/loss ratios
-   for(i=0; i<na.n_elements(); i++) {
+   for(i=0; i<na.n(); i++) {
       if(na[i] <= 0.0 || na[i] >= 1.0) {
          mlog << Error << "\nparse_conf_eclv_points() -> "
               << "All cost/loss ratios (" << na[i]
@@ -711,72 +859,6 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    }
 
    return(na);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
-   NumArray na;
-   ThreshArray cdf_thresh;
-   int i;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   na = dict->lookup_num_array(conf_key_climo_cdf_bins);
-
-   // Check that at least one value is provided
-   if(na.n_elements() == 0) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "At least one \"" << conf_key_climo_cdf_bins
-           << "\" entry must be specified.\n\n";
-      exit(1);
-   }
-
-   // Interpret a single value as the number of equal-area bins
-   if(na.n_elements() == 1) {
-      if(na[0] <= 0) {
-         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-              << "The \"" << conf_key_climo_cdf_bins << "\" entry ("
-              << na[0] << ") must be greater than zero.\n\n";
-         exit(1);
-      }
-      for(i=0; i*1.0/na[0] <= 1.0; i++) {
-         cdf_thresh.add(i*1.0/na[0], thresh_ge);
-      }
-   }
-   // Otherwise, the user has specified the actual CDF areas
-   else {
-      for(i=0; i<na.n_elements(); i++) {
-         cdf_thresh.add(na[i], thresh_ge);
-      }
-   }
-
-   // Sanity check the CDF area thresholds
-   if(!is_eq(cdf_thresh[0].get_value(), 0.0) ||
-      !is_eq(cdf_thresh[cdf_thresh.n_elements()-1].get_value(), 1.0)) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "The \"" << conf_key_climo_cdf_bins << "\" entries must "
-           << "start with 0 and end with 1.\n\n";
-      exit(1);
-   }
-   for(i=0; i<cdf_thresh.n_elements(); i++) {
-      if(cdf_thresh[i].get_value() < 0 ||
-         cdf_thresh[i].get_value() > 1.0) {
-         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-              << "The \"" << conf_key_climo_cdf_bins << "\" entries ("
-              << na[i] << ") must be between 0 and 1.\n\n";
-         exit(1);
-      }
-   }
-
-   // Should be monotonically increasing
-   cdf_thresh.check_bin_thresh();
-
-   return(cdf_thresh);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1077,7 +1159,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
 
    // Parse to_grid as an integer
-   v = regrid_dict->lookup_int(conf_key_to_grid, false);
+   v = regrid_dict->lookup_int(conf_key_to_grid, false, false);
 
    // If integer lookup successful, convert to FieldType.
    if(regrid_dict->last_lookup_status()) {
@@ -1112,10 +1194,23 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
 
    // Conf: gaussian dx and radius
    double conf_value = regrid_dict->lookup_double(conf_key_gaussian_dx, false);
-   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   info.gaussian.dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
    conf_value = regrid_dict->lookup_double(conf_key_gaussian_radius, false);
-   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
+   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
+   if (info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
 
+   // Conf: convert
+   info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
+
+   // Conf: censor_thresh
+   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false);
+
+   // Conf: censor_val
+   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false);
+
+   // Validate the settings
    info.validate();
 
    return(info);
@@ -1129,6 +1224,7 @@ void InterpInfo::clear() {
    n_interp = 0;
    method.clear();
    width.clear();
+   gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -1148,7 +1244,9 @@ void InterpInfo::validate() {
          methodi  != InterpMthd_Upper_Left &&
          methodi  != InterpMthd_Upper_Right &&
          methodi  != InterpMthd_Lower_Right &&
-         methodi  != InterpMthd_Lower_Left) {
+         methodi  != InterpMthd_Lower_Left &&
+         methodi  != InterpMthd_Gaussian &&
+         methodi  != InterpMthd_MaxGauss) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
@@ -1183,11 +1281,12 @@ void InterpInfo::validate() {
       }
 
       // Check the Gaussian filter
-      if(methodi == InterpMthd_Gaussian) {
-         if (gaussian_radius < gaussian_dx) {
+      if(methodi == InterpMthd_Gaussian ||
+         methodi == InterpMthd_MaxGauss) {
+         if (gaussian.radius < gaussian.dx) {
             mlog << Error << "\n"
-                 << "The radius of influence (" << gaussian_radius
-                 << ") is less than the delta distance (" << gaussian_dx
+                 << "The radius of influence (" << gaussian.radius
+                 << ") is less than the delta distance (" << gaussian.dx
                  << ") for regridding method \"" << method[i] << "\".\n\n";
             exit(1);
          }
@@ -1214,7 +1313,7 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-InterpInfo parse_conf_interp(Dictionary *dict) {
+InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
    InterpInfo info;
@@ -1231,7 +1330,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    }
 
    // Conf: interp
-   interp_dict = dict->lookup_dictionary(conf_key_interp);
+   interp_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
@@ -1247,7 +1346,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_key_interp << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1265,9 +1364,11 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 
    // Conf: gaussian dx and radius
    double conf_value = interp_dict->lookup_double(conf_key_gaussian_dx, false);
-   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   info.gaussian.dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
    conf_value = interp_dict->lookup_double(conf_key_gaussian_radius, false);
-   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   conf_value = interp_dict->lookup_double(conf_key_trunc_factor, false);
+   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
@@ -1305,7 +1406,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       }
 
       // Loop over the methods
-      for(j=0; j<mthd_na.n_elements(); j++) {
+      for(j=0; j<mthd_na.n(); j++) {
 
          // Store interpolation method as a string
          method = int_to_interpmthd(mthd_na[j]);
@@ -1320,7 +1421,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          }
 
          // Loop over the widths
-         for(k=0; k<wdth_na.n_elements(); k++) {
+         for(k=0; k<wdth_na.n(); k++) {
 
             // Store the current width
             width = nint(wdth_na[k]);
@@ -1331,17 +1432,152 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
             info.width.add(width);
 
          } // end for k
+
+         if(method == InterpMthd_Gaussian || method == InterpMthd_MaxGauss) {
+            info.gaussian.compute();
+         }
       } // end for j
    } // end for i
 
    // Check for at least one interpolation method
    if(info.n_interp == 0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "Must define at least one interpolation method in the config file.\n\n";
+           << "Must define at least one interpolation method in the config "
+           << "file.\n\n";
       exit(1);
    }
 
    info.validate();
+
+   return(info);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void ClimoCDFInfo::clear() {
+   flag = false;
+   n_bin = 0;
+   cdf_ta.clear();
+   write_bins = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo() {
+   clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
+   Dictionary *cdf_dict = (Dictionary *) 0;
+   ClimoCDFInfo info;
+   NumArray bins;
+   bool center;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: climo_cdf
+   cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
+
+   // Conf: cdf_bins
+   bins = cdf_dict->lookup_num_array(conf_key_cdf_bins);
+
+   // Conf: center_bins
+   center = cdf_dict->lookup_bool(conf_key_center_bins);
+
+   // Conf: write_bins
+   info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins);
+
+   // Check that at least one value is provided
+   if(bins.n() == 0) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "At least one \"" << conf_key_cdf_bins
+           << "\" entry must be specified.\n\n";
+      exit(1);
+   }
+
+   // The bins are explicitly defined
+   if(bins.n() > 1) {
+      for(i=0; i<bins.n(); i++) info.cdf_ta.add(bins[i], thresh_ge);
+   }
+   // Interpret a single value as the number of bins
+   else {
+
+      // Must be greater than 0
+      if(bins[0] <= 0) {
+         mlog << Error << "\nparse_conf_climo_cdf() -> "
+              << "The \"" << conf_key_cdf_bins << "\" entry (" << bins[0]
+              << ") must be greater than zero.\n\n";
+         exit(1);
+      }
+
+      // Even number of bins cannot be centered
+      if(nint(bins[0])%2 == 0 && center) {
+         mlog << Warning << "\nparse_conf_climo_cdf() -> "
+              << "Resetting \"" << conf_key_center_bins
+              << "\" to false since the \"" << conf_key_cdf_bins
+              << "\" entry (" << bins[0] << ") is even.\n\n";
+         center = false;
+      }
+
+      // For a single bin, set center to false
+      if(is_eq(bins[0], 1.0)) center = false;
+
+      // Add the first threshold for 0.0
+      info.cdf_ta.add(0.0, thresh_ge);
+
+      double cdf_inc = (center ? 1.0/(bins[0] - 1.0) : 1.0/bins[0]);
+      double cdf_val = (center ? cdf_inc/2           : cdf_inc    );
+
+      // Add thresholds between 0.0 and 1.0
+      while(cdf_val < 1.0 && !is_eq(cdf_val, 1.0)) {
+         info.cdf_ta.add(cdf_val, thresh_ge);
+         cdf_val += cdf_inc;
+      }
+
+      // Add the last threshold for 1.0
+      info.cdf_ta.add(1.0, thresh_ge);
+
+      mlog << Debug(4) << "parse_conf_climo_cdf() -> "
+           << "For \"" << conf_key_cdf_bins << "\" (" << bins[0] << ") and \""
+           << conf_key_center_bins << "\" (" << bool_to_string(center)
+           << "), defined climatology CDF thresholds: "
+           << write_css(info.cdf_ta) << "\n";
+   }
+
+   // Sanity check the end points
+   if(!is_eq(info.cdf_ta[0].get_value(), 0.0) ||
+      !is_eq(info.cdf_ta[info.cdf_ta.n()-1].get_value(), 1.0)) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "The \"" << conf_key_cdf_bins << "\" entries must "
+           << "start with 0 and end with 1.\n\n";
+      exit(1);
+   }
+
+   // Sanity check the interior points
+   for(i=0; i<info.cdf_ta.n(); i++) {
+      if(info.cdf_ta[i].get_value() < 0 ||
+         info.cdf_ta[i].get_value() > 1.0) {
+         mlog << Error << "\nparse_conf_climo_cdf() -> "
+              << "The \"" << conf_key_cdf_bins << "\" entries ("
+              << info.cdf_ta[i].get_value()
+              << ") must be between 0 and 1.\n\n";
+         exit(1);
+      }
+   }
+
+   // Should be monotonically increasing
+   info.cdf_ta.check_bin_thresh();
+
+   // Set the number of bins and the flag
+   info.n_bin = info.cdf_ta.n() - 1;
+   info.flag  = (info.n_bin > 1);
 
    return(info);
 }
@@ -1358,7 +1594,7 @@ void NbrhdInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
+NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    Dictionary *nbrhd_dict = (Dictionary *) 0;
    NbrhdInfo info;
    int i, v;
@@ -1370,7 +1606,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: nbrhd
-   nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
+   nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = nbrhd_dict->lookup_int(conf_key_field, false);
@@ -1385,7 +1621,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "The \"" << conf_key_nbrhd << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1395,14 +1631,14 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    info.width = nbrhd_dict->lookup_num_array(conf_key_width);
 
    // Check that at least one neighborhood width is provided
-   if(info.width.n_elements() == 0) {
+   if(info.width.n() == 0) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
            << "At least one neighborhood width must be provided.\n\n";
       exit(1);
    }
 
    // Check for valid widths
-   for(i=0; i<info.width.n_elements(); i++) {
+   for(i=0; i<info.width.n(); i++) {
 
       if(info.width[i] < 1 || info.width[i]%2 == 0) {
          mlog << Error << "\nparse_conf_nbrhd() -> "
@@ -1423,17 +1659,10 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: cov_thresh
-   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
-
-   // Check that at least one neighborhood coverage threshold is provided
-   if(info.cov_ta.n_elements() == 0) {
-      mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "At least one neighborhood coverage threshold must be provided.\n\n";
-      exit(1);
-   }
+   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh, false);
 
    // Check for valid coverage thresholds
-   for(i=0; i<info.cov_ta.n_elements(); i++) {
+   for(i=0; i<info.cov_ta.n(); i++) {
 
       if(info.cov_ta[i].get_value() < 0.0 ||
          info.cov_ta[i].get_value() > 1.0) {
@@ -1454,6 +1683,7 @@ void HiRAInfo::clear() {
    width.clear();
    vld_thresh = bad_data_double;
    cov_ta.clear();
+   prob_cat_ta.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -1501,14 +1731,14 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    info.width = hira_dict->lookup_num_array(conf_key_width);
 
    // Check that at least one width is provided
-   if(info.width.n_elements() == 0) {
+   if(info.width.n() == 0) {
       mlog << Error << "\nparse_conf_hira() -> "
            << "At least one HiRA width must be provided.\n\n";
       exit(1);
    }
 
    // Check for valid widths
-   for(i=0; i<info.width.n_elements(); i++) {
+   for(i=0; i<info.width.n(); i++) {
 
       if(info.width[i] < 1) {
          mlog << Error << "\nparse_conf_hira() -> "
@@ -1528,7 +1758,6 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
 
-
    // Conf: cov_thresh
    info.cov_ta = hira_dict->lookup_thresh_array(conf_key_cov_thresh);
 
@@ -1538,13 +1767,16 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    // Error check the coverage (probability) thresholds
    check_prob_thresh(info.cov_ta);
 
+   // Conf: prob_cat_thresh
+   info.prob_cat_ta = hira_dict->lookup_thresh_array(conf_key_prob_cat_thresh);
+
    return(info);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
-   GridWeightType t;
+   GridWeightType t = GridWeightType_None;
    int v;
 
    if(!dict) {
@@ -1573,7 +1805,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   DuplicateType t;
+   DuplicateType t = DuplicateType_None;
    int v;
 
    if(!dict) {
@@ -1590,8 +1822,8 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
    else if(v == conf_const.lookup_int(conf_val_single)) {
      mlog << Error << "\nparse_conf_duplicate_flag() -> "
-	  << "duplicate_flag = SINGLE has been deprecated\n"
-	  << "Please use obs_summary = NEAREST;\n\n";
+          << "duplicate_flag = SINGLE has been deprecated\n"
+          << "Please use obs_summary = NEAREST;\n\n";
      exit(1);
    }
    else {
@@ -1607,7 +1839,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ObsSummary parse_conf_obs_summary(Dictionary *dict) {
-   ObsSummary t;
+   ObsSummary t = ObsSummary_None;
    int v;
 
    if(!dict) {
@@ -1686,8 +1918,9 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
            << tmp_dir_path << "\n\n";
       exit(1);
    }
-
-   if(odir != NULL) met_closedir(odir);
+   else {
+      met_closedir(odir);
+   }
 
    return(tmp_dir_path);
 }
@@ -1695,7 +1928,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
-   GridDecompType t;
+   GridDecompType t = GridDecompType_None;
    int v;
 
    if(!dict) {
@@ -1725,7 +1958,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 WaveletType parse_conf_wavelet_type(Dictionary *dict) {
-   WaveletType t;
+   WaveletType t = WaveletType_None;
    int v;
 
    if(!dict) {
@@ -1813,7 +2046,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    ta = dict->lookup_thresh_array(conf_key_filter_attr_thresh);
 
    // Check for equal number of names and thresholds
-   if(sa.n_elements() != ta.n_elements()) {
+   if(sa.n() != ta.n()) {
       mlog << Error << "\nparse_conf_filter_attr_map() -> "
            << "The \"" << conf_key_filter_attr_name << "\" and \""
            << conf_key_filter_attr_thresh
@@ -1838,7 +2071,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    }
 
    // Process each array entry
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
 
       // Add threshold to existing map entry
      if(m.count(string(sa[i])) >= 1) {
@@ -1938,7 +2171,7 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpMthd int_to_interpmthd(int i) {
-   InterpMthd m;
+   InterpMthd m = InterpMthd_None;
 
         if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
    else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
@@ -1959,6 +2192,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
    else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
@@ -1977,7 +2211,7 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
-   for(i=0; i<ta.n_elements()-1; i++) {
+   for(i=0; i<ta.n()-1; i++) {
 
       if(ta[i].get_value() >  ta[i+1].get_value() ||
          ta[i].get_type()  != ta[i+1].get_type()  ||
@@ -1999,12 +2233,13 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool check_fo_thresh(const double f, const SingleThresh &ft,
-                     const double o, const SingleThresh &ot,
+bool check_fo_thresh(const double f,   const double o,
+                     const double cmn, const double csd,
+                     const SingleThresh &ft, const SingleThresh &ot,
                      const SetLogic type) {
    bool status = true;
-   bool fcheck = ft.check(f);
-   bool ocheck = ot.check(o);
+   bool fcheck = ft.check(f, cmn, csd);
+   bool ocheck = ot.check(o, cmn, csd);
    SetLogic t  = type;
 
    // If either of the thresholds is NA, reset the logic to intersection
@@ -2046,7 +2281,6 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_sal1l2):       s = stat_sal1l2_str;  break;
       case(stat_vl1l2):        s = stat_vl1l2_str;   break;
       case(stat_val1l2):       s = stat_val1l2_str;  break;
-
       case(stat_vcnt):         s = stat_vcnt_str;    break;
 
       case(stat_fho):          s = stat_fho_str;     break;
@@ -2056,16 +2290,13 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_mcts):         s = stat_mcts_str;    break;
 
       case(stat_cnt):          s = stat_cnt_str;     break;
-
       case(stat_pct):          s = stat_pct_str;     break;
       case(stat_pstd):         s = stat_pstd_str;    break;
       case(stat_pjc):          s = stat_pjc_str;     break;
       case(stat_prc):          s = stat_prc_str;     break;
 
       case(stat_eclv):         s = stat_eclv_str;    break;
-
       case(stat_mpr):          s = stat_mpr_str;     break;
-
       case(stat_nbrctc):       s = stat_nbrctc_str;  break;
       case(stat_nbrcts):       s = stat_nbrcts_str;  break;
       case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
@@ -2074,17 +2305,18 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_dmap):         s = stat_dmap_str;    break;
       case(stat_isc):          s = stat_isc_str;     break;
       case(stat_wdir):         s = stat_wdir_str;    break;
-
       case(stat_ecnt):         s = stat_ecnt_str;    break;
+
+      case(stat_rps):          s = stat_rps_str;     break;
       case(stat_rhist):        s = stat_rhist_str;   break;
       case(stat_phist):        s = stat_phist_str;   break;
       case(stat_orank):        s = stat_orank_str;   break;
       case(stat_ssvar):        s = stat_ssvar_str;   break;
+
       case(stat_relp):         s = stat_relp_str;    break;
-
       case(stat_header):       s = stat_header_str;  break;
-
       case(no_stat_line_type): s = stat_na_str;      break;
+
       default:                 s = (const char *) 0; break;
    }
 
@@ -2109,7 +2341,6 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_sal1l2_str) == 0) t = stat_sal1l2;
    else if(strcasecmp(s, stat_vl1l2_str)  == 0) t = stat_vl1l2;
    else if(strcasecmp(s, stat_val1l2_str) == 0) t = stat_val1l2;
-
    else if(strcasecmp(s, stat_vcnt_str)   == 0) t = stat_vcnt;
 
    else if(strcasecmp(s, stat_fho_str)    == 0) t = stat_fho;
@@ -2119,16 +2350,13 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_mcts_str)   == 0) t = stat_mcts;
 
    else if(strcasecmp(s, stat_cnt_str)    == 0) t = stat_cnt;
-
    else if(strcasecmp(s, stat_pct_str)    == 0) t = stat_pct;
    else if(strcasecmp(s, stat_pstd_str)   == 0) t = stat_pstd;
    else if(strcasecmp(s, stat_pjc_str)    == 0) t = stat_pjc;
    else if(strcasecmp(s, stat_prc_str)    == 0) t = stat_prc;
 
    else if(strcasecmp(s, stat_eclv_str)   == 0) t = stat_eclv;
-
    else if(strcasecmp(s, stat_mpr_str)    == 0) t = stat_mpr;
-
    else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
    else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
    else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
@@ -2137,14 +2365,15 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_dmap_str)   == 0) t = stat_dmap;
    else if(strcasecmp(s, stat_isc_str)    == 0) t = stat_isc;
    else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
-
    else if(strcasecmp(s, stat_ecnt_str)   == 0) t = stat_ecnt;
+
+   else if(strcasecmp(s, stat_rps_str)    == 0) t = stat_rps;
    else if(strcasecmp(s, stat_rhist_str)  == 0) t = stat_rhist;
    else if(strcasecmp(s, stat_phist_str)  == 0) t = stat_phist;
    else if(strcasecmp(s, stat_orank_str)  == 0) t = stat_orank;
    else if(strcasecmp(s, stat_ssvar_str)  == 0) t = stat_ssvar;
-   else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
 
+   else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
    else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
 
    else                                         t = no_stat_line_type;
@@ -2155,7 +2384,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 FieldType int_to_fieldtype(int v) {
-   FieldType t;
+   FieldType t = FieldType_None;
 
    // Convert integer to enumerated FieldType
         if(v == conf_const.lookup_int(conf_val_none)) t = FieldType_None;
@@ -2174,11 +2403,15 @@ FieldType int_to_fieldtype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
-   GridTemplateFactory::GridTemplates t;
+   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplate_Square;
 
    // Convert integer to enumerated FieldType
-   if(v == conf_const.lookup_int(conf_val_square)) t = GridTemplateFactory::GridTemplate_Square;
-   else if(v == conf_const.lookup_int(conf_val_circle)) t = GridTemplateFactory::GridTemplate_Circle;
+   if(v == conf_const.lookup_int(conf_val_square)) {
+      t = GridTemplateFactory::GridTemplate_Square;
+   }
+   else if(v == conf_const.lookup_int(conf_val_circle)) {
+      t = GridTemplateFactory::GridTemplate_Circle;
+   }
    else {
       mlog << Error << "\nint_to_gridtemplate() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2212,7 +2445,7 @@ ConcatString fieldtype_to_string(FieldType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic int_to_setlogic(int v) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert integer to enumerated SetLogic
         if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic_None;
@@ -2231,7 +2464,7 @@ SetLogic int_to_setlogic(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic string_to_setlogic(const char *s) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert string to enumerated SetLogic
         if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic_None;
@@ -2324,7 +2557,7 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // If not equal, select the non-default logic type
         if(t1 == t2)            t = t1;
@@ -2345,7 +2578,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType int_to_tracktype(int v) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert integer to enumerated TrackType
         if(v == conf_const.lookup_int(conf_val_none))  t = TrackType_None;
@@ -2364,7 +2597,7 @@ TrackType int_to_tracktype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType string_to_tracktype(const char *s) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert string to enumerated TrackType
         if(strcasecmp(s, conf_val_none)  == 0) t = TrackType_None;
@@ -2404,7 +2637,7 @@ ConcatString tracktype_to_string(TrackType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type int_to_interp12type(int v) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert integer to enumerated Interp12Type
         if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type_None;
@@ -2422,7 +2655,7 @@ Interp12Type int_to_interp12type(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type string_to_interp12type(const char *s) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert string to enumerated Interp12Type
         if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type_None;
@@ -2460,7 +2693,7 @@ ConcatString interp12type_to_string(Interp12Type type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MergeType int_to_mergetype(int v) {
-   MergeType t;
+   MergeType t = MergeType_None;
 
    // Convert integer to enumerated MergeType
         if(v == conf_const.lookup_int(conf_val_none))   t = MergeType_None;
@@ -2527,7 +2760,7 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MatchType int_to_matchtype(int v) {
-   MatchType t;
+   MatchType t = MatchType_None;
 
    // Convert integer to enumerated MatchType
         if(v == conf_const.lookup_int(conf_val_none))       t = MatchType_None;
@@ -2567,7 +2800,7 @@ ConcatString matchtype_to_string(MatchType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType int_to_disttype(int v) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert integer to enumerated DistType
         if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
@@ -2589,7 +2822,7 @@ DistType int_to_disttype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType string_to_disttype(const char *s) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert string to enumerated DistType
         if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;

@@ -12,13 +12,16 @@ use Data::Dumper;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Getopt::Long;
 
+
 sub usage {
-  print "usage: $0 [-log {log_file}] [-cmd] [-noexit] {test_xml}
+  print "usage: $0 [-log {log_file}] [-cmd] [-memchk] [-callchk] [-noexit] {test_xml}
 
   where:
         log: if present, write output from each test to the specified file
         cmd: if present, print the test commands but do not run them, 
                overrides -log
+     memchk: if present, activate valgrind with memcheck
+    callchk: if present, activate valgrind with callcheck
      noexit: if present, the unit tester will continue executing subsequent
                tests when a test fails
    test_xml: file containing the unit test(s) to perform
@@ -27,8 +30,9 @@ sub usage {
 }
 
 # parse the input options
-my ($mgnc, $mpnc, $file_log, $cmd_only, $noexit);
-GetOptions("log=s" => \$file_log, "cmd" => \$cmd_only, "noexit" => \$noexit)
+my ($mgnc, $mpnc, $file_log, $cmd_only, $noexit, $memchk, $callchk);
+GetOptions("log=s" => \$file_log, "cmd" => \$cmd_only, "noexit" => \$noexit,
+           "memchk" => \$memchk, "callchk" => \$callchk)
   or die "ERROR: parsing input options";
 
 # parse the input test xml file parameter
@@ -61,6 +65,9 @@ $name_wid < length($_->{"name"}) and $name_wid = length($_->{"name"}) for @tests
 
 # default return value
 my $ret_val = 0;
+my $VALGRIND_OPT_MEM ="--leak-check=full --show-leak-kinds=all --error-limit=no -v";
+my $VALGRIND_OPT_CALL ="--tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes";
+
 
 # run each test
 for my $test (@tests){
@@ -81,10 +88,16 @@ for my $test (@tests){
   # build the text command
   my ($cmd, $ret_ok, $out_ok) = ($test->{"exec"} . $test->{"param"});
   $cmd =~ s/[ \n\t]+$//m;
+  if ($memchk) {
+    $cmd = "valgrind ".$VALGRIND_OPT_MEM." ".$cmd;
+  }
+  elsif ($callchk) {
+    $cmd = "valgrind ".$VALGRIND_OPT_CALL." ".$cmd;
+  }
   
   # if writing a command file, print the environment and command, then loop
   if( $cmd_only ){
-    print "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
+    print "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
     print "$cmd\n\n";
     next;
   }
@@ -129,7 +142,7 @@ for my $test (@tests){
 
   # build a list of environment variable exports for reporting
   my @envs;
-  push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
+  push @envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
 
   # if the log file is activated, print the test information
   if( $file_log ){

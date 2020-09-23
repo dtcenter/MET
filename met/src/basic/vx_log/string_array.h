@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -54,8 +54,6 @@ class StringArray {
 
       void clear();
 
-      // void extend(int);
-
       void dump(std::ostream &, int depth = 0) const;
 
       const std::string operator[](int) const;
@@ -79,9 +77,9 @@ class StringArray {
 
       int length(int) const;
 
-      bool has(const std::string) const;
+      bool has(const std::string, bool forward=true) const;
 
-      bool has(const std::string, int & index) const;
+      bool has(const std::string, int & index, bool forward=true) const;
 
          //
          //  parse delimited strings
@@ -125,7 +123,7 @@ class StringArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int StringArray::n_elements() const { return ( s.size() ); }
+inline int StringArray::n_elements() const { return ( (int) (s.size()) ); }
 
 inline int StringArray::n         () const { return ( s.size() ); }
 

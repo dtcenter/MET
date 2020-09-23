@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,6 +19,8 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
+#include <limits.h>
 #include <cmath>
 #include <regex.h>
 
@@ -261,12 +263,11 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    //  compile the regex pattern
    int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
    regex_t *re = new regex_t;
-   // regex_t * re = (regex_t *) malloc(sizeof(regex_t));
    regmatch_t pmatch[num_pmat];
-   if( 0 != (rc = regcomp(re, pat, REG_EXTENDED)) ){
-      regfree(re);  re = 0;
+   if(0 != (rc = regcomp(re, pat, REG_EXTENDED))){
+      regfree(re);
+      if( re ) { delete re; re = 0; }
       mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
-      if ( re )  { delete re;  re = 0; }
       exit(1);
    }
 
@@ -303,8 +304,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    }
 
    regfree(re);
-   if ( re )  { delete re;  re = 0; }
-   re = 0;
+   if( re ) { delete re; re = 0; }
    return num_act;
 }
 
@@ -378,7 +378,7 @@ ConcatString str_trim(const ConcatString str){
 ////////////////////////////////////////////////////////////////////////
 
 int parse_thresh_index(const char *col_name) {
-   int i;
+   int i = 0;
    const char *ptr = (const char *) 0;
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);

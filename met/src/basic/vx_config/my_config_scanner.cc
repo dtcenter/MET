@@ -781,7 +781,8 @@ while ( n < max_id_length )  {
 
    if ( (n + 1) >= max_id_length )  {
 
-      cerr << "\n\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
+      mlog << Error << "\ndo_quoted_string() -> "
+           << "string too long! ... c = \"" << c << "\"\n\n";
 
       exit ( 1 );
 
@@ -802,7 +803,7 @@ while ( replace_env(s) )  {
 
 if ( s.length() >= max_id_length )  {
 
-   mlog << Error 
+   mlog << Error << "\ndo_quoted_string() -> "
         << "string \"" << s << "\" too long!\n\n";
 
    exit ( 1 );
@@ -882,7 +883,7 @@ void do_cpp_comment()
 
 {
 
-int c;
+int c = 0;
 
 reading_comment = true;
 
@@ -915,7 +916,9 @@ void putback(int c)
 
 if ( n_putback_chars >= max_putback_chars )  {
 
-   cerr << "\n\n   backchar(int) -> can't have more than " << max_putback_chars << " putback chars!\n\n";
+   mlog << Error << "\nbackchar(int) -> "
+        << "can't have more than " << max_putback_chars
+        << " putback chars!\n\n";
 
    exit ( 1 );
 
@@ -927,7 +930,8 @@ putback_chars[n_putback_chars++] = c;
 
 if ( pos <= 0 )  {
 
-   cerr << "\n\n   putback(int) -> can't putback char before beginning of lexeme!\n\n";
+   mlog << Error << "\nputback(int) -> "
+        << "can't putback char before beginning of lexeme!\n\n";
 
    exit ( 1 );
 
@@ -953,7 +957,8 @@ int pop_from_putback()
 
 if ( n_putback_chars <= 0 )  {
 
-   cerr << "\n\n  pop_from_putback() -> no putback chars!\n\n";
+   mlog << Error << "\npop_from_putback() -> "
+        << "no putback chars!\n\n";
 
    exit ( 1 );
 
@@ -1025,7 +1030,9 @@ if ( c == '$' )  {
 
    if ( cc != L_curly )  {
 
-      cerr << "\n\n  unexpected \"$\" in line " << LineNumber << " of config file\n\n";
+      mlog << Error << "\nnextchar() -> "
+           << "unexpected \"$\" in line " << LineNumber
+           << " of config file\n\n";
 
       exit ( 1 );
 
@@ -1043,7 +1050,9 @@ if ( c == '$' )  {
 
    if ( !e )  {
 
-      cerr << "can't get value of environment variable \"" << env_name << "\"\n\n";
+      mlog << Error << "\nnextchar() -> "
+           << "can't get value of environment variable \""
+           << env_name << "\"\n\n";
 
       exit ( 1 );
 
@@ -1080,7 +1089,9 @@ int my_put(int c)
 
 if ( pos >= max_id_length )  {
 
-   cerr << "\n\n  my_put() -> lexeme too long! ... partial lexeme = \"" << configtext << "\"\n\n";
+   mlog << Error << "\nmy_put() -> "
+        << "lexeme too long! ... partial lexeme = \"" << configtext
+        << "\"\n\n";
 
    exit ( 1 );
 
@@ -1119,7 +1130,7 @@ int do_comp()
 
 // if ( verbose )  cout << "\n\n   ... in do_comp()\n\n" << flush;
 
-int return_value;
+int return_value = 0;
 
 Column += strlen(configtext);
 
@@ -1134,9 +1145,8 @@ else if ( strcmp(configtext, na_str) == 0 )  { configlval.cval = thresh_na;  ret
 
 else {
 
-   mlog << Error
-        << "\ndo_comp() -> bad comparison operator ... \""
-        << configtext << "\"\n\n";
+   mlog << Error << "\ndo_comp() -> "
+        << "bad comparison operator ... \"" << configtext << "\"\n\n";
 
    exit ( 1 );
 
@@ -1365,9 +1375,8 @@ if ( (pos1 = s.find("${", 0, 2)) == string::npos )  return ( false );
 
 if ( (pos2 = s.find('}', pos)) == string::npos )  {
 
-   mlog << Error
-        << "replace_env() -> can't closing brackent in string \""
-        << cs << "\"\n\n";
+   mlog << Error << "\nreplace_env() -> "
+        << "can't closing brackent in string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -1383,8 +1392,8 @@ env_value = getenv(env.c_str());
 
 if ( ! env_value )  {
 
-   mlog << Error
-        << "\n\n  replace_env() -> unable to get value for environment variable \""
+   mlog << Error << "\nreplace_env() -> "
+        << "unable to get value for environment variable \""
         << (env.c_str()) << "\"\n\n";
 
    exit ( 1 );
@@ -1445,8 +1454,7 @@ int do_simple_perc_thresh()
 
 int j, k;
 int index = -1;
-double value;
-
+double value = bad_data_double;
 
 for (j=0; j<n_perc_thresh_infos; ++j)  {
 
@@ -1467,9 +1475,8 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
 
 if ( index < 0 )   {
 
-   mlog << Error
-         << "\n\n  do_simple_perc_thresh() -> unable to parse string \""
-        << configtext << "\"\n\n";
+   mlog << Error << "\ndo_simple_perc_thresh() -> "
+        << "unable to parse string \"" << configtext << "\"\n\n";
 
    exit ( 1 );
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,15 +21,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-StringArray parse_file_list(const StringArray&, const GrdFileType);
-
-void get_series_data(int, VarInfo*, DataPlane&);
-
 void get_series_entry(int, VarInfo*, const StringArray&,
-    const GrdFileType, StringArray&, DataPlane&, Grid&);
+                      const GrdFileType, DataPlane&, Grid&);
 
-bool read_single_entry(VarInfo*, const ConcatString&,
-    const GrdFileType, DataPlane&, Grid&);
+bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
+                       DataPlane&, Grid&);
 
 ////////////////////////////////////////////////////////////////////////
 

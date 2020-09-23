@@ -1,11 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -59,18 +58,14 @@ using namespace std;
 #include "data_plane_plot.h"
 
 #ifdef WITH_PYTHON
-#include "global_python.h"
+#include "data2d_python.h"
 #endif
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static ConcatString program_name = (string)"plot_data_plane";
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
@@ -80,9 +75,7 @@ static ConcatString TitleString;
 
 static double PlotRangeMin = 0.0, PlotRangeMax = 0.0;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static void process_command_line(int, char **);
 static void usage();
@@ -92,16 +85,11 @@ static void set_title_string(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-int main(int argc, char * argv[])
-{
-
+int main(int argc, char * argv[]) {
 
    program_name = get_short_name(argv[0]);
-
 
    Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
    Met2dDataFileFactory m_factory;
@@ -114,6 +102,8 @@ int main(int argc, char * argv[])
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
+
+   std::ios::sync_with_stdio(true);
 
    //
    // set the default color table
@@ -149,20 +139,18 @@ int main(int argc, char * argv[])
    mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
    met_ptr = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
 
-   if (!met_ptr)
-   {
+   if(!met_ptr) {
       mlog << Error << "\n" << program_name << " -> file \""
            << InputFilename << "\" not a valid data file\n\n";
-      exit (1);
+      exit(1);
    }
 
    var_ptr = v_factory.new_var_info(met_ptr->file_type());
 
-   if (!var_ptr)
-   {
+   if(!var_ptr) {
       mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
            << InputFilename << "\"\n\n";
-      exit (1);
+      exit(1);
    }
 
    //
@@ -175,11 +163,10 @@ int main(int argc, char * argv[])
    //
    status = met_ptr->data_plane(*var_ptr, data_plane);
 
-   if ( ! status )
-   {
+   if(!status) {
       mlog << Error << "\n" << program_name << " -> trouble getting field \""
            << FieldString << "\" from file \"" << InputFilename << "\"\n\n";
-      exit (1);
+      exit(1);
    }
 
    //
@@ -193,9 +180,8 @@ int main(int argc, char * argv[])
    //
    color_table.read(replace_path(ColorTableName).c_str());
 
-   if (is_eq(color_table.data_min(bad_data_double), 0.0) &&
-       is_eq(color_table.data_max(bad_data_double), 1.0))
-   {
+   if(is_eq(color_table.data_min(bad_data_double), 0.0) &&
+      is_eq(color_table.data_max(bad_data_double), 1.0)) {
       //
       // Need to rescale. First get the min and max values of the data.
       //
@@ -204,8 +190,7 @@ int main(int argc, char * argv[])
       //
       // Next check if the user has given a data range to use.
       //
-      if (!is_eq(PlotRangeMin, 0.0) || !is_eq(PlotRangeMax, 0.0))
-      {
+      if(!is_eq(PlotRangeMin, 0.0) || !is_eq(PlotRangeMax, 0.0)) {
          data_min = PlotRangeMin;
          data_max = PlotRangeMax;
       }
@@ -221,34 +206,27 @@ int main(int argc, char * argv[])
                    color_table, &config, data_plane);
 
    //
-   // done
+   // clean up
    //
+   if(met_ptr) { delete met_ptr;  met_ptr = 0; }
+   if(var_ptr) { delete var_ptr;  var_ptr = 0; }
 
+   #ifdef  WITH_PYTHON
+      GP.finalize();
+   #endif
 
-if ( met_ptr )  { delete met_ptr;  met_ptr = 0; }
-if ( var_ptr )  { delete var_ptr;  var_ptr = 0; }
-
-#ifdef  WITH_PYTHON
-   GP.finalize();
-#endif
-
-   exit (0);
-
+   return(0);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void process_command_line(int argc, char **argv)
-{
+void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    //
    // check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if(argc == 1) usage();
 
    //
    // parse the command line into tokens
@@ -285,8 +263,7 @@ void process_command_line(int argc, char **argv)
    // the input filename, the output filename, and the magic
    // string.
    //
-   if (cline.n() != 3)
-      usage();
+   if(cline.n() != 3) usage();
 
    //
    // store the filenames and magic string.
@@ -295,14 +272,13 @@ void process_command_line(int argc, char **argv)
    OutputFilename = cline[1];
    FieldString    = cline[2];
 
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void usage() {
 
-void usage()
-{
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
@@ -342,66 +318,43 @@ void usage()
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
-   exit (1);
+   exit(1);
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_colortable_name(const StringArray & a)
-{
+void set_colortable_name(const StringArray & a) {
    ColorTableName = a[0];
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_title_string(const StringArray & a)
-{
+void set_title_string(const StringArray & a) {
    TitleString = a[0];
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_plot_range(const StringArray & a)
-{
+void set_plot_range(const StringArray & a) {
    PlotRangeMin = atof(a[0].c_str());
    PlotRangeMax = atof(a[1].c_str());
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_logfile(const StringArray & a)
-{
+void set_logfile(const StringArray & a) {
    ConcatString filename;
 
    filename = a[0];
 
    mlog.open_log_file(filename);
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_verbosity(const StringArray & a)
-{
+void set_verbosity(const StringArray & a) {
    mlog.set_verbosity_level(atoi(a[0].c_str()));
-
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
-

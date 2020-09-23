@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,7 +76,8 @@ static const char **txt_columns[n_txt] = {
    sl1l2_columns,  sal1l2_columns, vl1l2_columns,
    val1l2_columns, pct_columns,    pstd_columns,
    pjc_columns,    prc_columns,    ecnt_columns,
-   eclv_columns,   mpr_columns,    vcnt_columns
+   rps_columns,    eclv_columns,   mpr_columns,
+   vcnt_columns
 };
 
 // Length of header columns
@@ -86,7 +87,8 @@ static const int n_txt_columns[n_txt] = {
    n_sl1l2_columns,  n_sal1l2_columns, n_vl1l2_columns,
    n_val1l2_columns, n_pct_columns,    n_pstd_columns,
    n_pjc_columns,    n_prc_columns,    n_ecnt_columns,
-   n_eclv_columns,   n_mpr_columns,    n_vcnt_columns
+   n_rps_columns,    n_eclv_columns,   n_mpr_columns,
+   n_vcnt_columns
 };
 
 // Text file abbreviations
@@ -96,7 +98,8 @@ static const char *txt_file_abbr[n_txt] = {
    "sl1l2",  "sal1l2", "vl1l2",
    "val1l2", "pct",    "pstd",
    "pjc",    "prc",    "ecnt",
-   "eclv",   "mpr",    "vcnt"
+   "rps",    "eclv",   "mpr",
+   "vcnt"
 };
 
 ////////////////////////////////////////////////////////////////////////

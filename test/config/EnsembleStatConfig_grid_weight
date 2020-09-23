@@ -50,10 +50,38 @@ ens = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
    message_type = [ "APDSFC" ];
+   sid_inc      = [];
    sid_exc      = [];
    field        = tmp_field;
 }
@@ -94,6 +122,12 @@ obs_error = {
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
+//
+// Categorical thresholds to define ensemble probabilities
+// May be set separately in each "fcst.field" entry
+//
+prob_cat_thresh = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -111,9 +145,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +202,7 @@ interp = {
 //
 output_flag = {
    ecnt  = STAT;
+   rps   = NONE;
    rhist = STAT;
    phist = STAT;
    orank = NONE;
@@ -191,6 +225,8 @@ ensemble_flag = {
    range     = FALSE;
    vld_count = FALSE;
    frequency = FALSE;
+   nep       = FALSE;
+   nmep      = FALSE;
    rank      = FALSE;
    weight    = TRUE;
 }
@@ -209,6 +245,6 @@ rng = {
 
 grid_weight_flag = ${GRID_WEIGHT};
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V9.0";
+version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

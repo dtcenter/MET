@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,8 +36,6 @@ typedef MtdIntFile Object;
 
 class SingleAtt2D {
 
-      friend SingleAtt2D calc_single_atts(const Object & mask_2d, const int obj_number);   //  1-based
-
    public:
 
       void init_from_scratch();
@@ -61,6 +59,9 @@ class SingleAtt2D {
       double Ptile_50;
       double Ptile_75;
       double Ptile_90;
+
+      int    Ptile_Value;
+      double Ptile_User;
 
       int TimeIndex;
 
@@ -134,6 +135,9 @@ class SingleAtt2D {
       double ptile_75() const;
       double ptile_90() const;
 
+      int    ptile_value() const;
+      double ptile_user()  const;
+
       int time_index () const;
 
       bool is_fcst () const;
@@ -188,6 +192,9 @@ inline double SingleAtt2D::ptile_50() const { return ( Ptile_50 ); }
 inline double SingleAtt2D::ptile_75() const { return ( Ptile_75 ); }
 inline double SingleAtt2D::ptile_90() const { return ( Ptile_90 ); }
 
+inline int    SingleAtt2D::ptile_value() const { return ( Ptile_Value ); }
+inline double SingleAtt2D::ptile_user()  const { return ( Ptile_User  ); }
+
 inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
 inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
 
@@ -202,7 +209,7 @@ inline int      SingleAtt2D::lead_time  () const { return ( Lead_Time ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const DataPlane & raw_2d, const int obj_number);   //  1-based
+extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const DataPlane & raw_2d, const int obj_number, const int ptile_value);   //  1-based
 
 
 ////////////////////////////////////////////////////////////////////////

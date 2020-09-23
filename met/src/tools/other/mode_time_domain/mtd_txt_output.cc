@@ -1,6 +1,6 @@
 // ** National Center for Atmospheric Research (NCAR)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
@@ -92,7 +92,19 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_3d_single_cols; ++j)  {
 
-   table.set_entry(r, c++, att_3d_single_cols[j]);
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+    
+      table.set_entry(r, c++, att_3d_single_cols[j]);
+
+   }
 
 }
 
@@ -195,8 +207,20 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 }
 
 for (j=0; j<n_3d_single_cols; ++j)  {
+    
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
 
-   table.set_entry(r, c++, att_3d_single_cols[j]);
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_3d_single_cols[j]);
+
+   }
 
 }
 
@@ -215,8 +239,6 @@ for (j=0; j<Nobj; ++j)  {
    //
    //  overwrite the obs valid entry in the header columns
    //
-
-// const int  obs_valid_column = 6;   //  0-based
 
 r = 0;
 
@@ -428,8 +450,20 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 }
 
 for (j=0; j<n_2d_cols; ++j)  {
+    
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
 
-   table.set_entry(r, c++, att_2d_cols[j]);
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_2d_cols[j]);
+
+   }
 
 }
 
@@ -615,7 +649,19 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_2d_cols; ++j)  {
 
-   table.set_entry(r, c++, att_2d_cols[j]);
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_2d_cols[j]);
+
+   }
 
 }
 

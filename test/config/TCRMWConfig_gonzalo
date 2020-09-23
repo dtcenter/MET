@@ -1,0 +1,108 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// TC-RMW configuration file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filter input data down to a single storm track
+//
+
+//
+// Model
+//
+model = "HCLT";
+
+//
+// Storm identifier
+//
+storm_id = "";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Cyclone number
+//
+cyclone = "";
+
+//
+// Storm name (only for BEST tracks)
+//
+storm_name = "";
+
+//
+// Model initialization time
+//
+init_inc = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Subset the single track down to individual points
+//
+
+//
+// Subset by the valid time
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Subset by the valid hour and lead time.
+//
+valid_hour = [];
+lead       = [ "00", "06", "12", "18", "24" ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+
+//
+// Data fields
+//
+data = {
+   level = [ "P850", "P700", "P500", "P300" ];
+   field = [
+      { name = "PRMSL"; level = [ "L0" ]; },
+      { name = "TMP";  },
+      { name = "RH";   },
+      { name = "UGRD"; },
+      { name = "VGRD"; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Regridding options
+//
+regrid = {
+   method     = BILIN;
+   width      = 2;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+//
+// Range-Azimuth grid parameters
+//
+n_range        = 50;
+n_azimuth      = 90;
+max_range_km   = 1000.0;
+delta_range_km = 10.0;
+rmw_scale      = 0.2;
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V9.1";
+
+////////////////////////////////////////////////////////////////////////////////

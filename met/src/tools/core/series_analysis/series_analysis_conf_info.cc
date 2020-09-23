@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -132,6 +132,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    int i, n;
    ConcatString s;
    StringArray sa;
+   ThreshArray cur_ta;
    VarInfoFactory info_factory;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
@@ -162,7 +163,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    // Count the number of statistics requested
    for(i = 0, it = output_stats.begin(); it != output_stats.end(); it++) {
-      i += it->second.n_elements();
+      i += it->second.n();
    } // end for it
 
    // Check for at least one output statistics
@@ -171,6 +172,20 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
            << "At least one output statistic must be requested.\n\n";
       exit(1);
    }
+
+   // Set flags
+   bool do_cat = (output_stats[stat_fho].n()    +
+                  output_stats[stat_ctc].n()    +
+                  output_stats[stat_cts].n()    +
+                  output_stats[stat_mctc].n()   +
+                  output_stats[stat_mcts].n()   +
+                  output_stats[stat_pct].n()    +
+                  output_stats[stat_pstd].n()   +
+                  output_stats[stat_pjc].n()    +
+                  output_stats[stat_prc].n()) > 0;
+   bool do_cnt = (output_stats[stat_sl1l2].n()  +
+                  output_stats[stat_sal1l2].n() +
+                  output_stats[stat_cnt].n()) > 0;
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -206,6 +221,14 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) 0;
    for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) 0;
 
+   // Conf: fcst.cat_thresh and obs.cat_thresh
+   fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
+   ocat_ta = odict->lookup_thresh_array(conf_key_cat_thresh);
+
+   // Conf: fcst.cnt_thresh and obs.cnt_thresh
+   fcnt_ta = fdict->lookup_thresh_array(conf_key_cnt_thresh);
+   ocnt_ta = odict->lookup_thresh_array(conf_key_cnt_thresh);
+
    // Parse the fcst field information
    for(i=0; i<n_fcst; i++) {
 
@@ -231,6 +254,28 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
               << "the wind direction field may not be verified "
               << "using series_analysis.\n\n";
          exit(1);
+      }
+
+      // Sanity check cat_thresh
+      if(do_cat) {
+         cur_ta = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
+         if(!(cur_ta == fcat_ta)) {
+            mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
+                 << "\"" << conf_key_cat_thresh << "\" should be specified "
+                 << "in the top level of the fcst dictionary, not within each "
+                 << "fcst.field array entry!\n\n";
+         }
+      }
+
+      // Sanity check cnt_thresh
+      if(do_cnt) {
+         cur_ta = i_fdict.lookup_thresh_array(conf_key_cnt_thresh);
+         if(!(cur_ta == fcnt_ta)) {
+           mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
+                << "\"" << conf_key_cnt_thresh << "\" should be specified "
+                << "in the top level of the fcst dictionary, not within each "
+                << "fcst.field array entry!\n\n";
+         }
       }
    } // end for i
 
@@ -267,6 +312,28 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
               << "The observation field cannot contain probabilities.\n\n";
          exit(1);
       }
+
+      // Sanity check cat_thresh
+      if(do_cat) {
+         cur_ta = i_odict.lookup_thresh_array(conf_key_cat_thresh);
+         if(!(cur_ta == ocat_ta)) {
+            mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
+                 << "\"" << conf_key_cat_thresh << "\" should be specified "
+                 << "in the top level of the obs dictionary, not within each "
+                 << "obs.field array entry!\n\n";
+         }
+      }
+
+      // Sanity check cnt_thresh
+      if(do_cnt) {
+         cur_ta = i_odict.lookup_thresh_array(conf_key_cnt_thresh);
+         if(!(cur_ta == ocnt_ta)) {
+           mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
+                << "\"" << conf_key_cnt_thresh << "\" should be specified "
+                << "in the top level of the obs dictionary, not within each "
+                << "obs.field array entry!\n\n";
+         }
+      }
    } // end for i
 
    // Conf: block_size
@@ -290,21 +357,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    }
 
    // Sanity check categorical thresholds
-   if((output_stats[stat_fho].n_elements()  +
-       output_stats[stat_ctc].n_elements()  +
-       output_stats[stat_cts].n_elements()  +
-       output_stats[stat_mctc].n_elements() +
-       output_stats[stat_mcts].n_elements() +
-       output_stats[stat_pct].n_elements()  +
-       output_stats[stat_pstd].n_elements() +
-       output_stats[stat_pjc].n_elements()  +
-       output_stats[stat_prc].n_elements()) > 0) {
-
-      // Conf: fcst.cat_thresh
-      fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
-
-      // Conf: obs.cat_thresh
-      ocat_ta = odict->lookup_thresh_array(conf_key_cat_thresh);
+   if(do_cat) {
 
       mlog << Debug(5)
            << "Parsed forecast categorical thresholds: "
@@ -319,7 +372,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Verifying non-probability fields
       if(!fcst_info[0]->is_prob() &&
-         fcat_ta.n_elements() != ocat_ta.n_elements()) {
+         fcat_ta.n() != ocat_ta.n()) {
 
          mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
               << "The number of thresholds in \"fcst.cat_thresh\" must "
@@ -329,23 +382,19 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Verifying with multi-category contingency tables
       if(!fcst_info[0]->is_prob() &&
-         (output_stats[stat_mctc].n_elements() > 0 ||
-          output_stats[stat_mcts].n_elements() > 0)) {
+         (output_stats[stat_mctc].n() > 0 ||
+          output_stats[stat_mcts].n() > 0)) {
          check_mctc_thresh(fcat_ta);
          check_mctc_thresh(ocat_ta);
       }
-   } // end if categorical
+   } // end if do_cat
 
    // Sanity check continuous thresholds
-   if((output_stats[stat_sl1l2].n_elements()  +
-       output_stats[stat_sal1l2].n_elements() +
-       output_stats[stat_cnt].n_elements()) > 0) {
+   if(do_cnt) {
 
-      // Conf: fcst.cnt_thresh
-      fcnt_ta = fdict->lookup_thresh_array(conf_key_cnt_thresh);
-
-      // Conf: obs.cnt_thresh
-      ocnt_ta = odict->lookup_thresh_array(conf_key_cnt_thresh);
+      // Process the percentile threshold bins
+      fcnt_ta = process_perc_thresh_bins(fcnt_ta);
+      ocnt_ta = process_perc_thresh_bins(ocnt_ta);
 
       // Conf: cnt_logic
       cnt_logic = check_setlogic(
@@ -355,12 +404,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       mlog << Debug(5)
            << "Parsed forecast continuous thresholds: "  << fcnt_ta.get_str() << "\n"
            << "Parsed observed continuous thresholds: "  << ocnt_ta.get_str() << "\n"
-           << "Parsed continuous threshold logic: "       << setlogic_to_string(cnt_logic) << "\n";
+           << "Parsed continuous threshold logic: "      << setlogic_to_string(cnt_logic) << "\n";
 
       // Add default continuous thresholds until the counts match
-      n = max(fcnt_ta.n_elements(), ocnt_ta.n_elements());
-      while(fcnt_ta.n_elements() < n) fcnt_ta.add(na_str);
-      while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
+      n = max(fcnt_ta.n(), ocnt_ta.n());
+      while(fcnt_ta.n() < n) fcnt_ta.add(na_str);
+      while(ocnt_ta.n() < n) ocnt_ta.add(na_str);
 
    } // end if continuous
 

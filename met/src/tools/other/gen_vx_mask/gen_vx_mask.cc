@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,7 @@
 //   005    04/08/17  Halley Gotway   Add lat/lon masking types.
 //   006    07/09/18  Bullock         Add shapefile masking type.
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
+//   008    04/06/20  Halley Gotway   Generalize input_grid option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,19 +56,9 @@ using namespace std;
 #include "shp_file.h"
 #include "grid_closed_poly.h"
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-static void get_shapefile_outline(ShpPolyRecord & shape);
-
-
-////////////////////////////////////////////////////////////////////////
-
-int main(int argc, char *argv[])
-
-{
-
+int main(int argc, char *argv[]) {
    static DataPlane dp_data, dp_mask, dp_out;
 
    // Set handler to be called for memory allocation error
@@ -76,8 +67,8 @@ int main(int argc, char *argv[])
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the data file and extract the grid information
-   process_input_file(dp_data);
+   // Process the input grid
+   process_input_grid(dp_data);
 
    // Process the mask file
    process_mask_file(dp_mask);
@@ -145,13 +136,13 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 3) usage();
 
    // Store the arguments
-   input_filename = cline[0];
+   input_gridname = cline[0];
    mask_filename  = cline[1];
    out_filename   = cline[2];
 
    // List the input files
    mlog << Debug(1)
-        << "Input File:\t\t" << input_filename << "\n"
+        << "Input Grid:\t\t" << input_gridname << "\n"
         << "Mask File:\t\t"  << mask_filename  << "\n";
 
    return;
@@ -159,7 +150,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_input_file(DataPlane &dp) {
+void process_input_grid(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
@@ -170,31 +161,56 @@ void process_input_file(DataPlane &dp) {
       ftype = parse_conf_file_type(&config);
    }
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename.c_str(), ftype);
-   if(!mtddf_ptr) {
-      mlog << Error << "\nprocess_input_file() -> "
-           << "can't open input file \"" << input_filename << "\"\n\n";
-      exit(1);
-   }
+   // Parse info.name as a white-space separated string
+   StringArray sa;
+   sa.parse_wsss(input_gridname);
 
-   // Extract the grid
-   grid = mtddf_ptr->grid();
-
-   // Read the input data plane, if requested
-   if(input_field_str.length() > 0) {
-      get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
+   // Search for a named grid
+   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+      mlog << Debug(3)
+           << "Use the grid named \"" << input_gridname << "\".\n";
    }
-   // Check for the output of a previous call to this tool
-   else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
+   // Parse grid definition
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3)
+           << "Use the grid defined by string \"" << input_gridname
+           << "\".\n";
    }
-   // Otherwise, fill the input data plane with zeros
+   // Extract the grid from a gridded data file
    else {
+
+      mlog << Debug(3)
+           << "Use the grid defined by file \"" << input_gridname
+           << "\".\n";
+
+      // Attempt to open the data file
+      mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_gridname.c_str(), ftype);
+      if(!mtddf_ptr) {
+         mlog << Error << "\nprocess_input_grid() -> "
+              << "can't open input file \"" << input_gridname << "\"\n\n";
+         exit(1);
+      }
+
+      // Read the input data plane, if requested
+      if(input_field_str.length() > 0) {
+         get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
+      }
+      // Check for the output of a previous call to this tool
+      else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
+      }
+
+      // Extract the grid
+      grid = mtddf_ptr->grid();
+   }
+
+   // If not yet set, fill the input data plane with zeros
+    if(dp.is_empty()) {
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
 
    mlog << Debug(2)
-        << "Parsed Data Grid:\t" << grid.name()
+        << "Parsed Input Grid:\t" << grid.name()
         << " (" << grid.nx() << " x " << grid.ny() << ")\n";
 
    // Clean up
@@ -203,24 +219,17 @@ void process_input_file(DataPlane &dp) {
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void process_mask_file(DataPlane &dp)
-
-{
-
+void process_mask_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
 
-      // Initialize
-
+   // Initialize
    solar_ut = (unixtime) 0;
 
-      // Process the mask file as a lat/lon polyline file
-
+   // Process the mask file as a lat/lon polyline file
    if(mask_type == MaskType_Poly   ||
       mask_type == MaskType_Box    ||
       mask_type == MaskType_Circle ||
@@ -234,11 +243,8 @@ void process_mask_file(DataPlane &dp)
            << " containing " << poly_mask.n_points() << " points\n";
    }
 
-      //
-      //  process the mask from a shapefile
-      //
-
-   else if ( mask_type == MaskType_Shape )  {
+   // Process the mask from a shapefile
+   else if(mask_type == MaskType_Shape) {
 
       get_shapefile_outline(shape);
 
@@ -279,6 +285,11 @@ void process_mask_file(DataPlane &dp)
          exit(1);
       }
 
+      // Read mask_field, if specified
+      if(mask_field_str.length() > 0) {
+         get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
+      }
+
       // Extract the grid
       grid_mask = mtddf_ptr->grid();
 
@@ -289,17 +300,15 @@ void process_mask_file(DataPlane &dp)
       // Check for matching grids
       if(mask_type == MaskType_Data && grid != grid_mask) {
          mlog << Error << "\nprocess_mask_file() -> "
-              << "The data grid and mask grid must be identical for "
+              << "The input grid and mask grid must be identical for "
               << "\"data\" masking.\n"
               << "Data Grid -> " << grid.serialize() << "\n"
               << "Mask Grid -> " << grid_mask.serialize() << "\n\n";
          exit(1);
       }
-
-   }  //  else
+   }
 
    // For solar masking, parse the valid time from gridded data
-
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
       if(mask_field_str.length() == 0) {
@@ -309,33 +318,23 @@ void process_mask_file(DataPlane &dp)
               << "\"solar_azi\" masking.\n\n";
          exit(1);
       }
-      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
       solar_ut = dp.valid();
       dp.clear();
 
-      mlog << Debug(2)
-           << "Solar File Time:\t"
+      mlog << Debug(2) << "Solar File Time:\t"
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
-
-   }   //  if
-
-   // Read mask_field for data masking
-
-   if(mask_type == MaskType_Data) {
-
-      if(mask_field_str.length() == 0) {
-         mlog << Error << "\nprocess_mask_file() -> "
-              << "use \"-mask_field\" to specify the field for "
-              << "\"data\" masking.\n\n";
-         exit(1);
-      }
-      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
-
-   } else { // Otherwise, initialize the masking data
-
-      dp.set_size(grid.nx(), grid.ny());
-
    }
+
+   // Check that mask_field has been set for data masking
+   if(mask_type == MaskType_Data && mask_field_str.length() == 0) {
+      mlog << Error << "\nprocess_mask_file() -> "
+           << "use \"-mask_field\" to specify the field for "
+           << "\"data\" masking.\n\n";
+      exit(1);
+   }
+
+   // Initialize the masking field, if needed
+   if(dp.is_empty()) dp.set_size(grid.nx(), grid.ny());
 
    // Construct the mask
    switch(mask_type) {
@@ -472,10 +471,49 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_poly_mask(DataPlane & dp)
+void get_shapefile_outline(ShpPolyRecord & cur_shape) {
+   const char * const shape_filename = mask_filename.c_str();
+   ShpFile f;
+   ShpPolyRecord & pr = cur_shape;
 
-{
+   // Open shapefile
+   if(!(f.open(shape_filename))) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "unable to open shape file \"" << shape_filename
+           << "\"\n\n";
+      exit(1);
+   }
 
+   // Make sure it's a polygon file, and not some other type
+   if(f.shape_type() != shape_type_polygon) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "shape file \"" << shape_filename
+           << "\" is not a polygon file\n\n";
+      exit(1);
+   }
+
+   // Skip through un-needed records
+   for(int i=0; i<shape_number; i++) {
+      if(f.at_eof()) break;
+      f >> pr;
+   }
+
+   if(f.at_eof()) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "hit eof before reading specified record\n\n";
+      exit(1);
+   }
+
+   // Get the target record
+   f >> pr;
+   pr.toggle_longitudes();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_poly_mask(DataPlane & dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon;
@@ -982,96 +1020,74 @@ void apply_lat_lon_mask(DataPlane &dp) {
    }
 
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void apply_shape_mask(DataPlane & dp) {
+   int x, y, n_in;
+   int j, k, n;
+   int start, stop;
+   double dx, dy, lat, lon;
+   bool status = false;
+   GridClosedPoly p;
+   GridClosedPolyArray a;
 
-void apply_shape_mask(DataPlane & dp)
+   // Load up array
+   for(j=0; j<(shape.n_parts); j++) {
 
-{
+      p.clear();
 
-int x, y, n_in;
-int j, k, n;
-int start, stop;
-double dx, dy, lat, lon;
-bool status = false;
-GridClosedPoly p;
-GridClosedPolyArray a;
+      start = shape.start_index(j);
+      stop  = shape.stop_index(j);
 
-   //
-   //  load up array
-   //
+      n = stop - start + 1;
 
-for (j=0; j<(shape.n_parts); ++j)  {
+      for(k=0; k<n; ++k) {
 
-   p.clear();
+         lat = shape.lat(start + k);
+         lon = shape.lon(start + k);
 
-   start = shape.start_index(j);
-   stop  = shape.stop_index(j);
+         lon = -lon;   //  west is positive for us
 
-   n = stop - start + 1;
+         grid.latlon_to_xy(lat, lon, dx, dy);
 
-   for (k=0; k<n; ++k)  {
+         x = nint(dx);
+         y = nint(dy);
 
-      lat = shape.lat(start + k);
-      lon = shape.lon(start + k);
+         p.add_point(x, y);
+      } // for k
 
-      lon = -lon;   //  west is positive for us
+      a.add(p);
 
-      grid.latlon_to_xy(lat, lon, dx, dy);
+   } // for j
 
-      x = nint(dx);
-      y = nint(dy);
+   // Check grid points
+   for(x=0, n_in=0; x<(grid.nx()); x++) {
+      for (y=0; y<(grid.ny()); y++) {
 
-      p.add_point(x, y);
+         status = a.is_inside(x, y);
 
-   }   //  for k
+         // Check the complement
+         if(complement) status = !status;
 
-   a.add(p);
+         if(status) n_in++;
 
-}   //  for j
+         dp.set( (status ? 1.0 : 0.0 ), x, y);
+      } // for y
+   } // for x
 
+   if(complement) {
+      mlog << Debug(3)
+           << "Applying complement of the shapefile mask.\n";
+   }
 
-
-   //
-   //  check grid points
-   //
-
-for (x=0, n_in=0; x<(grid.nx()); ++x)  {
-
-   for (y=0; y<(grid.ny()); ++y)  {
-
-      status = a.is_inside(x, y);
-
-      // Check the complement
-      if(complement) status = !status;
-
-      if(status)  n_in++;
-
-      dp.set( (status ? 1.0 : 0.0 ), x, y);
-
-   }   //  for y
-
-}   //  for x
-
-if(complement) {
+   // List number of points inside the mask
    mlog << Debug(3)
-        << "Applying complement of the shapefile mask.\n";
-}
+        << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
+        << " points inside\n";
 
-   //
-   //  done
-   //
-
-// List number of points inside the mask
-mlog << Debug(3)
-     << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-     << " points inside\n";
-
-return;
-
+   return;
 }
 
 
@@ -1173,7 +1189,6 @@ void write_netcdf(const DataPlane &dp) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
       exit(1);
@@ -1268,7 +1283,7 @@ bool is_solar_masktype(MaskType t) {
 ////////////////////////////////////////////////////////////////////////
 
 MaskType string_to_masktype(const char *s) {
-   MaskType t;
+   MaskType t = MaskType_None;
 
         if(strcasecmp(s, "poly")      == 0) t = MaskType_Poly;
    else if(strcasecmp(s, "box")       == 0) t = MaskType_Box;
@@ -1322,7 +1337,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tinput_file\n"
+        << "\tinput_grid\n"
         << "\tmask_file\n"
         << "\tout_file\n"
         << "\t[-type string]\n"
@@ -1340,49 +1355,76 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"input_file\" is a gridded data file which specifies the grid definition (required).\n"
-        << "\t\t   If output from " << program_name << ", automatically read mask data as the \"input_field\".\n"
+        << "\twhere\t\"input_grid\" is a named grid, the path to a "
+        << "gridded data file, or an explicit grid specification "
+        << "string (required).\n"
+        << "\t\t   If set to a " << program_name << " output file, "
+        << "automatically read mask data as the \"input_field\".\n"
 
-        << "\t\t\"mask_file\" defines the masking information, see below (required).\n"
-        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" masking, specify an ASCII Lat/Lon file.\n"
-        << "\t\t   For \"grid\" and \"data\" masking, specify a gridded data file.\n"
-        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]] format.\n"
-        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" needed, simply repeat the path for \"input_file\".\n"
-        << "\t\t   For \"shape\" masking, specify a shapefile (suffix \".shp\").\n"
+        << "\t\t\"mask_file\" defines the masking information "
+        << "(required).\n"
+        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" "
+        << "masking, specify an ASCII Lat/Lon file.\n"
+        << "\t\t   For \"grid\" masking, specify a named grid, the "
+        << "path to a gridded data file, or an explicit grid "
+        << "specification.\n"
+        << "\t\t   For \"data\" masking specify a gridded data file.\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
+        << "specify a gridded data file or a timestring in "
+        << "YYYYMMDD[_HH[MMSS]] format.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" "
+        << "needed, simply repeat \"input_grid\".\n"
+        << "\t\t   For \"shape\" masking, specify a shapefile "
+        << "(suffix \".shp\").\n"
 
-        << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
+        << "\t\t\"out_file\" is the output NetCDF mask file to be "
+        << "written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
-        << masktype_to_string(default_mask_type) << ") (optional):\n"
-        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" or \"shape\"\n"
+        << masktype_to_string(default_mask_type) << ") (optional)\n"
+        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
+        << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
+        << "or \"shape\"\n"
 
-        << "\t\t\"-input_field string\" reads existing mask data from \"input_file\" (optional).\n"
+        << "\t\t\"-input_field string\" reads existing mask data from "
+        << "the \"input_grid\" gridded data file (optional).\n"
 
-        << "\t\t\"-mask_field string\" (optional)\n"
-        << "\t\t   For \"data\" masking, define the field from \"mask_file\" to be used.\n"
+        << "\t\t\"-mask_field string\" (optional).\n"
+        << "\t\t   For \"data\" masking, define the field from "
+        << "\"mask_file\" to be used.\n"
 
-        << "\t\t\"-complement\" to compute the complement of the area defined by \"mask_file\" (optional).\n"
+        << "\t\t\"-complement\" computes the complement of the current "
+        << "mask (optional).\n"
 
-        << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
-        << "masks from \"input_file\" and \"mask_file\" (optional).\n"
+        << "\t\t\"-union | -intersection | -symdiff\" specify how "
+        << "to combine the \"input_field\" data with the current mask "
+        << "(optional).\n"
 
-        << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
-        << "\t\t   For \"circle\" and \"track\" masking, threshold the distance (km).\n"
-        << "\t\t   For \"data\" masking, threshold the values of \"mask_field\".\n"
-        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, threshold the computed solar values.\n"
-        << "\t\t   For \"lat\" and \"lon\" masking, threshold the latitude and longitude values.\n"
 
-        << "\t\t\"-height n\" and \"-width n\" (optional)\n"
-        << "\t\t   For \"box\" masking, specify these dimensions in grid units.\n"
+        << "\t\t\"-thresh string\" defines the threshold to be applied "
+        << "(optional).\n"
+        << "\t\t   For \"circle\" and \"track\" masking, threshold the "
+        << "distance (km).\n"
+        << "\t\t   For \"data\" masking, threshold the values of "
+        << "\"mask_field\".\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
+        << "threshold the computed solar values.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, threshold the "
+        << "latitude and longitude values.\n"
 
-        << "\t\t\"-shapeno n\" (optional)\n"
-        << "\t\t   For \"shape\" masking, specify the shape number (0-based) to be used.\n"
+        << "\t\t\"-height n\" and \"-width n\" (optional).\n"
+        << "\t\t   For \"box\" masking, specify these dimensions in grid "
+        << "units.\n"
 
-        << "\t\t\"-value n\" overrides the default output mask data value ("
-        << default_mask_val << ") (optional).\n"
+        << "\t\t\"-shapeno n\" (optional).\n"
+        << "\t\t   For \"shape\" masking, specify the shape number "
+        << "(0-based) to be used.\n"
 
-        << "\t\t\"-name string\" specifies the output variable name for the mask"
-        << " (optional).\n"
+        << "\t\t\"-value n\" overrides the default output mask data "
+        << "value (" << default_mask_val << ") (optional).\n"
+
+        << "\t\t\"-name string\" specifies the output variable name "
+        << "for the mask (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -1390,8 +1432,9 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << config.nc_compression() << ") (optional).\n\n"
+        << "\t\t\"-compress level\" overrides the compression level of "
+        << "NetCDF variable (" << config.nc_compression()
+        << ") (optional).\n\n"
 
         << flush;
 
@@ -1401,7 +1444,16 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_type(const StringArray & a) {
+   if(type_is_set) {
+      mlog << Error << "\n" << program_name << " -> "
+           << "the -type command line option can only be used once!\n"
+           << "To apply multiple masks, run this tool multiple times "
+           << "using the output of one run as the input to the next."
+           << "\n\n"; 
+      exit(1);
+   }
    mask_type = string_to_masktype(a[0].c_str());
+   type_is_set = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1494,110 +1546,17 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_shapeno(const StringArray & a) {
 
-void set_shapeno(const StringArray & a)
+   shape_number = atoi(a[0].c_str());
 
-{
+   if(shape_number < 0) {
+      mlog << Error << "\n" << program_name << " -> "
+           << "bad shapeno ... " << shape_number << "\n\n";
+      exit(1);
+   }
 
-shape_number = atoi(a[0].c_str());
-
-if ( shape_number < 0 )  {
-
-   mlog << Error
-        << program_name << ": bad shapeno ... " << shape_number << "\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-
-void get_shapefile_outline(ShpPolyRecord & cur_shape)
-
-{
-
-
-int j;
-const char * const shape_filename = mask_filename.c_str();
-ShpFile f;
-ShpPolyRecord & pr = cur_shape;
-
-
-   //
-   //  open shapefile
-   //
-
-if ( ! (f.open(shape_filename)) )  {
-
-   mlog << Error
-        << program_name << ": unable to open shape file \""
-        << shape_filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  make sure it's a polygon file, and not some other type
-   //
-
-if ( f.shape_type() != shape_type_polygon )  {
-
-   mlog << Error
-        << "\n" << program_name << ": shape file \""
-        << shape_filename << "\" is not a polygon file\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  skip through un-needed records
-   //
-
-for (j=0; j<shape_number; ++j)  {
-
-   if ( f.at_eof() )  break;
-
-   f >> pr;
-
-}   //  for j
-
-
-if ( f.at_eof() )  {
-
-   mlog << Error
-        << program_name << ": get_shapefile_outline() -> hit eof before reading specified record\n\n";
-
-   exit ( 1 );
-
-}
-
-
-   //
-   //  get the target record
-   //
-
-f >> pr;
-
-
-   //
-   //  done
-   //
-
-pr.toggle_longitudes();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-

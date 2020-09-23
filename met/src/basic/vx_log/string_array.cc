@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -108,11 +108,11 @@ bool StringArray::operator==(const StringArray & a) const
 
 {
 
-if ( s.size() != a.s.size() )  return ( false );
+if ( n() != a.n() )  return ( false );
 
 int j;
 
-for (j=0; j<s.size(); ++j)  {
+for (j=0; j<n(); ++j)  {
 
   if ( s[j] != a.s[j] )  return ( false );
 
@@ -148,6 +148,7 @@ return;
 void StringArray::clear()
 
 {
+
 s.clear();
 
 return;
@@ -187,7 +188,7 @@ out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
 
 int j;
 
-for (j=0; j<s.size(); ++j)  {
+for (j=0; j<n(); ++j)  {
 
    out << prefix2 << "Element # " << j << " = \"" << s[j] << "\"\n";
 
@@ -212,14 +213,13 @@ const std::string StringArray::operator[](int len) const
 
 {
 
-  if ( (len < 0) || (len >= s.size()) )  {
+if ( (len < 0) || (len >= n()) )  {
 
-    mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
+   mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
 
    exit ( 1 );
 
 }
-
 
 
 return ( s[len] );
@@ -264,7 +264,7 @@ void StringArray::add(const StringArray & a)
 
 {
 
-if ( a.s.size() == 0 )  return;
+if ( a.n() == 0 )  return;
 
 s.insert(s.end(), a.s.begin(), a.s.end());
  
@@ -312,7 +312,7 @@ void StringArray::set(int i, const std::string text)
 
 {
 
-  if ( (i < 0) || (i >= s.size()) )  {
+  if ( (i < 0) || (i >= n()) )  {
 
    mlog << Error << "\nStringArray::set(int, const string) -> range check error\n\n";
 
@@ -334,7 +334,7 @@ void StringArray::insert(int i, const char * text)
 
 {
 
-  if ( (i < 0) || (i > s.size()) )  {
+  if ( (i < 0) || (i > n()) )  {
 
     mlog << Error << "\nStringArray::insert(int, const char *) -> range check error\n\n";
 
@@ -352,13 +352,13 @@ void StringArray::insert(int i, const char * text)
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text) const
+bool StringArray::has(const std::string text, bool forward) const
 
 {
 
   int index;
 
-  return ( has(text, index) );
+  return ( has(text, index, forward) );
 
 }
 
@@ -366,41 +366,73 @@ bool StringArray::has(const std::string text) const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text, int & index) const
+bool StringArray::has(const std::string text, int & index, bool forward) const
 
 {
-
+  bool found = false;
   index = -1;
 
-  std::string str = text;
-
-  std::vector<std::string>::const_iterator it;
-  int count = 0;
-
-  for(it = s.begin(); it != s.end(); it++, count++) {
-    if ( IgnoreCase ) {
-      std::string lower_s = *it;
-      transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-      std::string lower_text = text;
-      transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
-      if ( lower_s == lower_text) {
-	//      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
-        index = count;
-	break;
+  if (!s.empty()) {
+    int count;
+    std::string lower_text = text;
+    std::vector<std::string>::const_iterator it;
+    if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+    
+    if (forward) {
+      count = 0;
+      for(it = s.begin(); it != s.end(); it++, count++) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          if ( lower_s == lower_text) {
+            //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
+            found = true;
+            break;
+          }
+        }
+        else {
+          if ( *it == text ) {
+            found = true;
+            break;
+          }
+        }
       }
     }
     else {
-      if ( *it == text ) {
-        index = count;
-	break;
+      count = s.size() - 1;
+      it = s.end();
+      for(it--; it != s.begin(); it--, count--) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          if ( lower_s == lower_text) {
+            found = true;
+            break;
+          }
+        }
+        else {
+          if ( *it == text ) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found && it == s.begin()) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          found = ( lower_s == lower_text );
+        }
+        else found = ( *it == text );
       }
     }
+    if (found) index = count;
   }
+  //mlog << Debug(9) << " StringArray::has() size=" << s.size()
+  //     << " for " << text << ", found: " << (found ? "true" : "false")
+  //     << ", forward: " << (forward ? "yes" : "no") << "\n";
 
-  if (it != s.end()) {
-    return true;
-  }
-  return false;
+  return found;
 
 }
 
@@ -466,7 +498,7 @@ void StringArray::shift_down(int pos, int shift)
 
 {
 
-if ( (pos < 0) || (pos >= s.size()) )  {
+if ( (pos < 0) || (pos >= n()) )  {
 
    mlog << Error << "\nStringArray::shift_down() -> bad value for pos\n\n";
 
@@ -474,7 +506,7 @@ if ( (pos < 0) || (pos >= s.size()) )  {
 
 }
 
-if ( (shift <= 0) || ((pos + shift) > s.size()) )  {
+if ( (shift <= 0) || ((pos + shift) > n()) )  {
 
    mlog << Error << "\nStringArray::shift_down() -> bad value for shift\n\n";
 
@@ -500,7 +532,7 @@ index = -1;
 
 int j;
 
-for (j=0; j<s.size(); ++j)  {
+for (j=0; j<n(); ++j)  {
 
    if ( s[j][0] == '-' )  {
 
@@ -525,11 +557,11 @@ bool StringArray::reg_exp_match(const char * text) const
 
 {
 
-if ( s.size() == 0 || !text )  return ( false );
+if ( n() == 0 || !text )  return ( false );
 
 int j;
 
- for (j=0; j<s.size(); ++j)  {
+ for (j=0; j<n(); ++j)  {
 
    if ( check_reg_exp(s[j].c_str(), text) )  { return ( true ); }
 
@@ -551,7 +583,7 @@ int StringArray::length(int k) const
 
 {
 
-if ( (k < 0) || (k >= s.size()) )  {
+if ( (k < 0) || (k >= n()) )  {
 
    mlog << Error << "\nStringArray::length(int) const -> range check error\n\n";
 
@@ -571,7 +603,7 @@ void StringArray::sort()
 
 {
 
-if ( s.size() <= 1 )  return;
+if ( n() <= 1 )  return;
 
  std::sort(s.begin(), s.end());
  

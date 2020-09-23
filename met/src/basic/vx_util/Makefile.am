@@ -8,6 +8,13 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+OPT_PYTHON_SOURCES =
+
+if ENABLE_PYTHON
+LDFLAGS += -lvx_python3_utils
+OPT_PYTHON_SOURCES += python_line.h python_line.cc
+endif
+
 # The library
 
 noinst_LIBRARIES = libvx_util.a
@@ -41,6 +48,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                file_linecount.cc file_linecount.h \
                filename_suffix.cc filename_suffix.h \
                data_plane.cc data_plane.h \
+               data_cube.cc data_cube.h \
                data_plane_util.cc data_plane_util.h \
                interp_mthd.cc interp_mthd.h \
                interp_util.cc interp_util.h \
@@ -60,7 +68,8 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                GridPoint.h GridPoint.cc \
                GridOffset.h GridOffset.cc \
                observation.h observation.cc \
-               RectangularTemplate.h RectangularTemplate.cc
+               stat_column_defs.h \
+               RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 

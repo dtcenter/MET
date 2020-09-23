@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@
 //   008    06/09/17  Halley Gotway   Add RELP line type.
 //   009    10/09/17  Halley Gotway   Add GRAD line type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
+//   011    01/24/20  Halley Gotway   Add RPS line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,7 +108,7 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    // Fi_Oj
    for(i=0; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
-         sprintf(col_str, "F%i_O%i", i+1, j+1);
+         snprintf(col_str, sizeof(col_str), "F%i_O%i", i+1, j+1);
          ct.set_entry(i, j, atoi(l.get_item(col_str)));
       }
    }
@@ -151,22 +152,22 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    for(i=0; i<n-1; i++) {
 
       // THRESH_i
-      sprintf(col_str, "THRESH_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "THRESH_%i", i+1);
       thresh[i] = atof(l.get_item(col_str));
 
       // OY_i
-      sprintf(col_str, "OY_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "OY_%i", i+1);
       oy = atoi(l.get_item(col_str));
       pct.set_entry(i, nx2_event_column, oy);
 
       // ON_i
-      sprintf(col_str, "ON_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "ON_%i", i+1);
       on = atoi(l.get_item(col_str));
       pct.set_entry(i, nx2_nonevent_column, on);
    }
 
    // THRESH_n
-   sprintf(col_str, "THRESH_%i", n);
+   snprintf(col_str, sizeof(col_str), "THRESH_%i", n);
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
@@ -365,6 +366,34 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void parse_rps_line(STATLine &l, RPSInfo &r_info) {
+
+   r_info.fthresh.add_css(l.get_item("FCST_THRESH", false));
+   r_info.othresh.set(l.get_item("OBS_THRESH", false));
+
+   r_info.n_pair    = atoi(l.get_item("TOTAL"));
+   r_info.n_prob    = atof(l.get_item("N_PROB"));
+
+   r_info.rps_rel   = atof(l.get_item("RPS_REL"));
+   r_info.rps_res   = atof(l.get_item("RPS_RES"));
+   r_info.rps_unc   = atof(l.get_item("RPS_UNC"));
+
+   r_info.rps       = atof(l.get_item("RPS"));
+   r_info.rpss      = atof(l.get_item("RPSS"));
+   r_info.rpss_smpl = atof(l.get_item("RPSS_SMPL"));
+
+   if(!is_bad_data(r_info.rpss)) {
+      r_info.rpscl = r_info.rps / (1.0 - r_info.rpss);
+   }
+   else {
+      r_info.rpscl = bad_data_double;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    int i;
    char col_str[max_str_len];
@@ -376,7 +405,7 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
 
    // Parse out RANK_i
    for(i=0; i<r_data.n_rank; i++) {
-      sprintf(col_str, "RANK_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "RANK_%i", i+1);
       r_data.rhist_na.add(atoi(l.get_item(col_str)));
    }
 
@@ -397,7 +426,7 @@ void parse_phist_line(STATLine &l, PHISTData &p_data) {
 
    // Parse out BIN_i
    for(i=0; i<p_data.n_bin; i++) {
-      sprintf(col_str, "BIN_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "BIN_%i", i+1);
       p_data.phist_na.add(atoi(l.get_item(col_str)));
    }
 
@@ -417,7 +446,7 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
 
    // Parse out RELP_i
    for(i=0; i<r_data.n_ens; i++) {
-      sprintf(col_str, "RELP_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "RELP_%i", i+1);
       r_data.relp_na.add(atof(l.get_item(col_str)));
    }
 
@@ -448,7 +477,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    // Parse out ENS_i
    o_data.ens_na.clear();
    for(i=0; i<o_data.n_ens; i++) {
-      sprintf(col_str, "ENS_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "ENS_%i", i+1);
       o_data.ens_na.add(atof(l.get_item(col_str)));
    }
 

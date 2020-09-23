@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,7 +18,7 @@ using namespace std;
 #include <cmath>
 
 #include "data2d_python.h"
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 #include "data2d_utils.h"
 #include "grdfiletype_to_string.h"
 
@@ -153,7 +153,7 @@ bool MetPythonDataFile::open(const char * cur_command)
 
 close();
 
-ConcatString full_path, path_name, file_name;
+ConcatString full_path, file_name;
 int i, file_argc;
 char **file_argv = (char **) 0; // allocated
 StringArray sa;
@@ -187,22 +187,7 @@ if ( file_argc > 0 )  {
 
 full_path = sa[0];
 
-sa = full_path.split("/");
-
-if ( sa.n_elements() <= 1 )  {
-   path_name = ".";
-}
-else {
-   for ( i=0; i<sa.n_elements()-1; i++ )  path_name << "/" << sa[i];
-}
-
-file_name = sa[sa.n_elements() - 1];
-
-   //
-   //  Set the PYTHONPATH
-   //
-
-setenv("PYTHONPATH", path_name.c_str(), 1);
+file_name = full_path;
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
@@ -357,7 +342,21 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   status = open(vinfo.req_name().c_str());
+   ConcatString cur_req_name = vinfo.req_name();
+
+   //
+   //  replace MET_PYTHON_INPUT_ARG constant with the current environment
+   //  variable value
+   //
+
+   ConcatString cur_env_val;
+   if ( get_env(met_python_input_arg, cur_env_val) )  {
+
+      cur_req_name.replace(met_python_input_arg, cur_env_val.c_str(), false);
+
+   }
+
+   status = open(cur_req_name.c_str());
 
 }
 
@@ -402,7 +401,21 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   status = open(vinfo.req_name().c_str());
+   ConcatString cur_req_name = vinfo.req_name();
+
+   //
+   //  replace MET_PYTHON_INPUT_ARG constant with the current environment
+   //  variable value
+   //
+
+   ConcatString cur_env_val;
+   if ( get_env(met_python_input_arg, cur_env_val) )  {
+
+      cur_req_name.replace(met_python_input_arg, cur_env_val.c_str(), false);
+
+   }
+
+   status = open(cur_req_name.c_str());
 
 }
 
@@ -478,3 +491,4 @@ return ( 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
+

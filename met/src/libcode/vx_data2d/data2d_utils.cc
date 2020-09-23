@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -33,7 +33,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
 
    mlog << Debug(3)
         << "Deriving wind direction from U and V wind components.\n";
-   
+
    //
    // Check that the dimensions match
    //
@@ -214,7 +214,7 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
 
    mlog << Debug(3)
         << "Rotating U and V wind components from grid-relative to earth-relative.\n";
-   
+
    //
    // Check that the dimensions match
    //
@@ -274,6 +274,51 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    } // end for x
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_attrs(const VarInfo *info, DataPlane &dp) {
+
+   if(!info) return;
+
+   //
+   // Update attributes, if requested
+   //
+
+   // init_time
+   if(info->init_attr() != (unixtime) 0) {
+      mlog << Debug(3) << "Resetting initialization time from "
+           << unix_to_yyyymmdd_hhmmss(dp.init()) << " to "
+           << unix_to_yyyymmdd_hhmmss(info->init_attr()) << ".\n";
+      dp.set_init(info->init_attr());
+   }
+
+   // valid_time
+   if(info->valid_attr() != (unixtime) 0) {
+      mlog << Debug(3) << "Resetting valid time from "
+           << unix_to_yyyymmdd_hhmmss(dp.valid()) << " to "
+           << unix_to_yyyymmdd_hhmmss(info->valid_attr()) << ".\n";
+      dp.set_valid(info->valid_attr());
+   }
+
+   // lead_time
+   if(!is_bad_data(info->lead_attr())) {
+      mlog << Debug(3) << "Resetting lead time from "
+           << sec_to_hhmmss(dp.lead()) << " to "
+           << sec_to_hhmmss(info->lead_attr()) << ".\n";
+      dp.set_lead(info->lead_attr());
+   }
+
+   // accum_time
+   if(!is_bad_data(info->accum_attr())) {
+      mlog << Debug(3) << "Resetting accumulation interval from "
+           << sec_to_hhmmss(dp.accum()) << " to "
+           << sec_to_hhmmss(info->accum_attr()) << ".\n";
+      dp.set_lead(info->accum_attr());
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -174,19 +174,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::extend(int len)
+void NumArray::extend(int len, bool exact)
 
 {
 
 if ( Nalloc >= len )  return;
 
-int k;
+if ( ! exact )  {
 
-k = len/num_array_alloc_inc;
+   int k;
 
-if ( len%num_array_alloc_inc )  ++k;
+   k = len/num_array_alloc_inc;
 
-len = k*num_array_alloc_inc;
+   if ( len%num_array_alloc_inc )  ++k;
+
+   len = k*num_array_alloc_inc;
+
+}
 
 double * u = (double *) 0;
 
@@ -194,7 +198,7 @@ u = new double [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid NumArray::extend(int) -> "
+   mlog << Error << "\nvoid NumArray::extend(int, bool) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
@@ -285,11 +289,11 @@ return ( e[i] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int NumArray::has(int k) const
+int NumArray::has(int k, bool forward) const
 
 {
 
-return(has((double) k));
+return(has((double) k, forward));
 
 }
 
@@ -297,19 +301,31 @@ return(has((double) k));
 ////////////////////////////////////////////////////////////////////////
 
 
-int NumArray::has(double d) const
+int NumArray::has(double d, bool forward) const
 
 {
 
 int j;
+int found = 0;
 
-for (j=0; j<Nelements; ++j)  {
-
-   if ( is_eq(e[j], d) )  return ( 1 );
-
+if (forward) {
+   for (j=0; j<Nelements; ++j) {
+      if ( is_eq(e[j], d) ) {
+          found = 1;
+          break;
+      }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j) {
+      if ( is_eq(e[j], d) ) {
+          found = 1;
+          break;
+      }
+   }
 }
 
-return ( 0 );
+return ( found );
 
 }
 
@@ -337,7 +353,7 @@ void NumArray::add(double d)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = d;
 
@@ -362,6 +378,54 @@ int j;
 for (j=0; j<(a.Nelements); ++j)  {
 
    e[Nelements++] = a.e[j];
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::add_const(double v, int n)
+
+{
+
+extend(Nelements + n);
+
+int j;
+
+for (j=0; j<n; ++j)  {
+
+   e[Nelements++] = v;
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::add_seq(int beg, int end)
+
+{
+
+extend(Nelements + (end - beg + 1));
+
+int j;
+
+for (j=beg; j<=end; ++j)  {
+
+   e[Nelements++] = j;
 
 }
 
@@ -602,7 +666,7 @@ double NumArray::percentile_array(double t)
 
 {
 
-double v = bad_data_double;
+double v;
 
 //
 // Ensure that the array is sorted before computing the percentile.
@@ -666,7 +730,7 @@ return(v);
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::compute_mean_stdev(double &mn, double &stdev) const
+void NumArray::compute_mean_variance(double &mn, double &var) const
 
 {
 
@@ -675,7 +739,7 @@ double s, s_sq;
 
 if(Nelements == 0) {
 
-   mn = stdev = bad_data_double;
+   mn = var = bad_data_double;
 
    return;
 }
@@ -696,14 +760,31 @@ else           mn = s/count;
 if(count > 1) {
 
    // Check for slightly negative precision error
-   double d = (s_sq - s*s/(double) count)/((double) (count - 1));
-   if(is_eq(d, 0.0)) d = 0;
-   stdev = sqrt(d);
+   var = (s_sq - s*s/(double) count)/((double) (count - 1));
+   if(is_eq(var, 0.0)) var = 0;
 
 }
 else {
-   stdev = bad_data_double;
+   var = bad_data_double;
 }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::compute_mean_stdev(double &mn, double &stdev) const
+
+{
+
+double var;
+
+compute_mean_variance(mn, var);
+
+stdev = square_root(var);
 
 return;
 
@@ -742,8 +823,7 @@ double NumArray::mode() const
 
 int j, k, max_n, max_j;
 NumArray uniq_v, uniq_n;
-
-double v = bad_data_double;
+double v;
 
 for(j=0; j<Nelements; j++) {
 
@@ -970,12 +1050,10 @@ double NumArray::mean_sqrt() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
-wgt.extend(Nelements);
-for(j=0; j<Nelements; j++) wgt.add(1);
+wgt.add_const(1.0, Nelements);
 
 return(wmean_sqrt(wgt));
 
@@ -989,12 +1067,10 @@ double NumArray::mean_fisher() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
-wgt.extend(Nelements);
-for(j=0; j<Nelements; j++) wgt.add(1);
+wgt.add_const(1.0, Nelements);
 
 return(wmean_fisher(wgt));
 

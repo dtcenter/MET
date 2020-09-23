@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,6 +30,7 @@ static const int LonTenthsOffset       = 7;
 //
 // Offsets specific to the ADECK and BDECK track lines
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+// Offsets for columns common to ATCFLineType_Track and ATCFLineType_GenTrack
 //
 
 static const int VMaxOffset            = 8;
@@ -46,6 +47,10 @@ static const int Radius4Offset         = 16;
 static const int IsobarPressureOffset  = 17;
 static const int IsobarRadiusOffset    = 18;
 static const int MaxWindRadiusOffset   = 19;
+
+//
+// Offsets for columns specific to the ATCFLineType_Track
+//
 
 static const int GustsOffset           = 20;
 static const int EyeDiameterOffset     = 21;
@@ -64,6 +69,30 @@ static const int SeasRadius1Offset     = 31;
 static const int SeasRadius2Offset     = 32;
 static const int SeasRadius3Offset     = 33;
 static const int SeasRadius4Offset     = 34;
+
+static const int UserDefinedOffset     = 35;
+static const int WarmCoreOffset        = 39;
+
+static const char ThermoParams_Str[]   = "THERMO PARARMS";
+
+//
+// Offsets for columns specific to the ATCFLineType_GenTrack
+// Reference: https://dtcenter.org/HurrWRF/users/docs/users_guide/HWRF-UG-2018.pdf
+//
+
+static const int GenStormIdOffset        = 2;
+
+static const int GenParameterBOffset     = 21;
+static const int GenThermWindLowerOffset = 22;
+static const int GenThermWindUpperOffset = 23;
+static const int GenWarmCoreOffset       = 24;
+static const int GenStormDirectionOffset = 25;
+
+static const int GenStormSpeedOffset     = 26;
+static const int GenMean850VortOffset    = 27;
+static const int GenMax850VortOffset     = 28;
+static const int GenMean700VortOffset    = 29;
+static const int GenMax700VortOffset     = 30;
 
 //
 // Offsets specific to the EDECK probability lines
@@ -87,6 +116,7 @@ static const int ProbRIRWEndOffset       = 13; // RIRW stop time
 //
 
 static const int MinATCFTrackElements    = 8;
+static const int MinATCFGenTrackElements = 9;
 static const int MinATCFProbRIRWElements = 14;
 
 ////////////////////////////////////////////////////////////////////////

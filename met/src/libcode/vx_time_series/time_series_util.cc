@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -153,7 +153,7 @@ bool compute_swing_ramps(const char *name,
                          const double width, const SingleThresh &thresh,
                          NumArray &ramps, NumArray &slopes) {
    int i;
-   bool ramp;
+   bool ramp = false;
 
    // Initialize
    ramps.clear();

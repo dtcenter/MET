@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -209,24 +209,25 @@ void TCPolyArray::assign(const TCPolyArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPolyArray::extend(int n) {
+void TCPolyArray::extend(int n, bool exact) {
    int i;
 
    if(NAlloc >= n) return;
 
-   int k = n/tc_poly_array_alloc_inc;
+   if(!exact) {
+      int k = n/tc_poly_array_alloc_inc;
 
-   if(n%num_array_alloc_inc) k++;
+      if(n%num_array_alloc_inc) k++;
 
-   n = k*tc_poly_array_alloc_inc;
+      n = k*tc_poly_array_alloc_inc;
+   }
 
    TCPoly * p = (TCPoly *) 0;
 
    p = new TCPoly [n];
 
    if(!p) {
-      mlog << Error
-           << "\nvoid TCPolyArray::extend(int) -> "
+      mlog << Error << "\nvoid TCPolyArray::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -260,7 +261,7 @@ TCPoly TCPolyArray::operator[](int n) const {
 
 void TCPolyArray::add(const TCPoly & p) {
 
-   extend(NPolys + 1);
+   extend(NPolys + 1, false);
    
    Poly[NPolys++] = p;
 
@@ -278,8 +279,7 @@ bool TCPolyArray::add_file(const char *filename) {
    in.open(filename);
 
    if(!in) {
-      mlog << Error
-           << "\nTCPolyArray::add_file(const char *) -> "
+      mlog << Error << "\nTCPolyArray::add_file(const char *) -> "
            << "can't open land region file \"" << filename
            << "\" for reading\n\n";
       exit(1);
@@ -389,8 +389,7 @@ bool operator>>(istream & in, TCPoly & p) {
    }
    
    if(p.LatLon.n_points < 2) {
-      mlog << Error
-           << "bool operator>>(istream & in, Polyline & p) -> "
+      mlog << Error << "bool operator>>(istream & in, Polyline & p) -> "
            << "region \"" << p.Name
            << "\" must have at least 2 points.\n\n";
       exit(1);

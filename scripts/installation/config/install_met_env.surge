@@ -1,0 +1,27 @@
+module load PrgEnv-intel/5.2.82
+module load craype
+module switch craype craype-sandybridge
+module load intelpython/3.6.8
+module load bufr-intel/11.3.0
+module load g2c-intel/1.5.0
+module load jasper-gnu-sandybridge/1.900.1
+module load png-intel-sandybridge/1.2.44
+module load zlib-intel-sandybridge/1.2.7
+export TEST_BASE=/gpfs/hps3/emc/global/noscrub/Julie.Prestopnik/met/9.0
+export COMPILER=PrgEnv-intel_5.2.82
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=met-9.0.20200315.tar.gz
+export USE_MODULES=TRUE
+export PYTHON_MODULE=intelpython_3.6.8
+export MET_PYTHON=/opt/intel/intelpython3
+export MET_PYTHON_CC=-I/opt/intel/intelpython3/include/python3.6m\ -I/opt/intel/intelpython3/include/python3.6m
+export MET_PYTHON_LD=-L/opt/intel/intelpython3/lib\ -lpython3.6m\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -Xlinker\ -export-dynamic
+export MET_BUFRLIB=/gpfs/hps/nco/ops/nwprod/lib/bufr/v11.3.0/intel
+export MET_GRIB2CLIB=/gpfs/hps/nco/ops/nwprod/lib/g2c/v1.5.0/intel
+export MET_GRIB2CINC=/gpfs/hps/nco/ops/nwprod/lib/g2c/v1.5.0/src
+export BUFRLIB_NAME=-lbufr_v11.3.0_4_64
+export GRIB2CLIB_NAME=-lg2c_v1.5.0_4
+export LIB_JASPER=/usrx/local/prod/jasper/1.900.1/gnu/sandybridge/lib
+export LIB_LIBPNG=/usrx/local/prod/png/1.2.44/intel/sandybridge/lib
+export LIB_Z=/usrx/local/prod/zlib/1.2.7/intel/sandybridge/lib
+export SET_D64BIT=TRUE

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -156,10 +156,6 @@ t.outline_table(0.2, black);
 choose_font(31, 11.0);
 
 Vtab = Vtab_2 - 1.0*TextSep;
-Htab = Hmargin;
-
-dx = 3.0*TextSep;
-dy = 10.0;
 
    //
    // Plot the column headers
@@ -185,59 +181,6 @@ write_header_cell(t, c++,   "TOT", "INTR");
 
 roman();
 
-/*
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "CLUS");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "PAIR");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "CEN");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "DIST");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "ANG");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "DIFF");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "FCST");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "AREA");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "OBS");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "AREA");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "INTER");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "AREA");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "UNION");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "AREA");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "SYM");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "DIFF");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "FCST");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INT50");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "OBS");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INT50");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "FCST");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INT90");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "OBS");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INT90");
-Htab += dx;
-
-write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "TOT");
-write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INTR");
-Htab += dx;
-*/
 Vtab -= (TextSep + 10.0);
 
    //
@@ -338,7 +281,7 @@ for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
    }
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, label);
-   Htab += dx;
+   // Htab += dx;
 
    Vtab -= TextSep;
 

@@ -40,13 +40,17 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-cnt_logic     = UNION;
-wind_thresh   = [ NA ];
-wind_logic    = UNION;
-eclv_points   = 0.05;
+censor_thresh       = [];
+censor_val          = [];
+cat_thresh          = [];
+cnt_thresh          = [ NA ];
+cnt_logic           = UNION;
+wind_thresh         = [ NA ];
+wind_logic          = UNION;
+eclv_points         = 0.05;
+nc_pairs_var_name   = "";
+nc_pairs_var_suffix = "";
+rank_corr_flag      = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -191,6 +195,7 @@ nc_pairs_flag = {
    raw          = TRUE;
    diff         = TRUE;
    climo        = TRUE;
+   climo_cdp    = FALSE;
    weight       = FALSE;
    nbrhd        = FALSE;
    fourier      = FALSE;
@@ -202,9 +207,8 @@ nc_pairs_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V9.0";
+version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -67,6 +67,8 @@ void TCPairsConfInfo::clear() {
    Cyclone.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitMaskName.clear();
@@ -91,6 +93,7 @@ void TCPairsConfInfo::clear() {
    DLandFile.clear();
    WatchWarnFile.clear();
    WatchWarnOffset = bad_data_int;
+   BasinMap.clear();
    Version.clear();
 
    return;
@@ -132,7 +135,7 @@ void TCPairsConfInfo::process_config() {
    Desc = parse_conf_string(&Conf, conf_key_desc);
 
    // Conf: Model
-   Model = Conf.lookup_string_array(conf_key_model);
+   Model = parse_conf_tc_model(&Conf);
 
    // Conf: StormId
    StormId = Conf.lookup_string_array(conf_key_storm_id);
@@ -283,6 +286,9 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: WatchWarnOffset
    WatchWarnOffset = dict->lookup_int(conf_key_time_offset);
+
+   // Conf: BasinMap
+   BasinMap = parse_conf_key_value_map(dict, conf_key_basin_map);
 
    return;
 }

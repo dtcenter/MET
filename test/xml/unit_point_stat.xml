@@ -356,47 +356,47 @@
     </output>
   </test>
 
-  <test name="point_stat_SID_EXC">
+  <test name="point_stat_SID_INC_EXC">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
       <pair><name>CENSOR_THRESH</name>  <value></value></pair>
       <pair><name>CENSOR_VAL</name>     <value></value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>SID_EXC</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SID_INC_EXC</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
-      &CONFIG_DIR;/PointStatConfig_sid_exc \
+      &CONFIG_DIR;/PointStatConfig_sid_inc_exc \
       -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
-  <test name="point_stat_SID_EXC_CENSOR">
+  <test name="point_stat_SID_INC_EXC_CENSOR">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
       <pair><name>CENSOR_THRESH</name>  <value>lt-3.0, gt3.0</value></pair>
       <pair><name>CENSOR_VAL</name>     <value>  -3.0,   3.0</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>SID_EXC_CENSOR</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SID_INC_EXC_CENSOR</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
-      &CONFIG_DIR;/PointStatConfig_sid_exc \
+      &CONFIG_DIR;/PointStatConfig_sid_inc_exc \
       -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_CENSOR_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_CENSOR_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_CENSOR_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_CENSOR_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 

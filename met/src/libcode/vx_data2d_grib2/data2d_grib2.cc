@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -937,14 +937,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
-   double d;
+   double d, r_km;
    int ResCompFlag;
    char hem = 0;
 
    Raw_Grid = new Grid();
 
    //  determine the radius of the earth
-   double r_km = -1;
    switch( gfld->igdtmpl[0] ){
       case 0:     r_km = 6367.470;  break;
       //  parse earth radius from header
@@ -975,6 +974,13 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       ScanMode    = gfld->igdtmpl[18];
       ResCompFlag = gfld->igdtmpl[13];
 
+      //  check if ydir is set wrong in the scan mode and fix it
+      if ( ( (ScanMode & 64) && gfld->igdtmpl[11] > gfld->igdtmpl[14] ) ||
+           (!(ScanMode & 64) && gfld->igdtmpl[11] < gfld->igdtmpl[14] ) ) {
+         //  toggle the 6-th bit
+         ScanMode ^= (1u << 6);
+      }
+
       //  build a LatLonData struct with the projection information
       LatLonData data;
       data.name         = latlon_proj_type;
@@ -983,6 +989,13 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
       data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
 
+      //  check for thinned lat/lon grid
+      if( data.Nlon == -1 ){
+         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+              << "Thinned Lat/Lon grids are not supported for GRIB version 2.\n\n";
+         exit(1);
+      }
+      
       //  latitudinal increment.  If not given, compute from lat1 and lat2
       if( ResCompFlag & 16 ) {
          data.delta_lat = (double)gfld->igdtmpl[17] / 1000000.0;
@@ -1274,7 +1287,6 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
    //  attempt to read the record
    gribfield *gfld;
-   unsigned char *cgrib;
    g2int numfields;
    float v, v_miss[2];
    int n_miss, i;
@@ -1313,7 +1325,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
       for(int y=0; y < n_y; y++){
 
          //  determine the data index, depending on the scan mode
-         int idx_data;
+         int idx_data = 0;
          switch(ScanMode){
          case 0:   /* 0000 0000 */ idx_data = (n_y - y - 1)*n_x + x;               break;
          case 128: /* 1000 0000 */ idx_data = (n_y - y - 1)*n_x + (n_x - x - 1);   break;
@@ -1384,6 +1396,9 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    //  the following code was lifted and modified from:
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
 
+   //  custom out of memory function for GRIB2
+   set_new_handler(oom_grib2);
+
    //  g2c fields
    g2int listsec0[3], listsec1[13], numlocal, lskip, lgrib;
 
@@ -1406,6 +1421,9 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
    //  cleanup
    if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+
+   //  reset to default out of memory handler
+   set_new_handler(oom);
 
    //  return the offset of the next record
    return lskip + lgrib;

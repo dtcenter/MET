@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,29 +36,26 @@ class TCRMWConfInfo {
         // TCRMW configuration object
         MetConfig Conf;
 
-        // Track filtering criteria
-        ConcatString Model;     // Model name
-        ConcatString Basin;     // Basin name
-        ConcatString StormName; // Storm name
-        ConcatString StormId;   // Storm id
+        // Track line filtering criteria
+        ConcatString Model;
+        ConcatString StormId;
+        ConcatString Basin;
+        ConcatString Cyclone;
+        unixtime     InitInc;
+        unixtime     ValidBeg, ValidEnd;
+        TimeArray    ValidInc, ValidExc;
+        NumArray     ValidHour;
+        NumArray     LeadTime;
 
-        int Cyclone;  // Cyclone number
-
-        // Timing information
-        unixtime  InitTime;
-        NumArray  LeadTimes;
-
-        int n_range;
-        int n_azimuth;
+        // Range/Azimuth information
+        int    n_range;
+        int    n_azimuth;
         double max_range_km;
         double delta_range_km;
         double rmw_scale;
 
         // Variable information
         VarInfo** data_info;
-
-        // Config file version
-        ConcatString Version;
 
         TCRMWConfInfo();
         ~TCRMWConfInfo();

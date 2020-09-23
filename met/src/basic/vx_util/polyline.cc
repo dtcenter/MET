@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -237,8 +237,6 @@ void Polyline::extend_points(int n) {
 
 int Polyline::is_closed() const {
    int closed;
-
-   closed = 1;
 
    // Consider an empty Polyline closed
    if(n_points == 0) {

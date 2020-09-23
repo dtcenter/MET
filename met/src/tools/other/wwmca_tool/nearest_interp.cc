@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -181,27 +181,15 @@ double u, v;
 int ix, iy, n;
 InterpolationValue I;
 
-
-
 u = x + Wm1o2;
 v = y + Wm1o2;
 
 ix = nint(floor(u + 0.5));
 iy = nint(floor(v + 0.5));
 
-
-// if ( (ix < 0) || (ix >= Width) || (iy < 0) || (iy >= Width) )  {
-// 
-//    mlog << Error << "\nNearest_Interp::operator()(double x, double y) const -> range check error\n\n";
-// 
-//    exit ( 1 );
-// 
-// }
-
 n = two_to_one(ix, iy);
 
 I = Data[n];
-
 
    //
    //  done

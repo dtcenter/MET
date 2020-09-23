@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@
 //   013    09-21-15  Prestopnik     Add Aeronet observations.
 //   014    07-23-18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   015    03-20-19  Fillmore       Add aeronetv2 and aeronetv3 options.
+//   016    01-30-20  Bullock        Add python option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -81,6 +82,11 @@ using namespace netCDF;
 #include "wwsis_handler.h"
 #include "aeronet_handler.h"
 
+#ifdef ENABLE_PYTHON
+#include "global_python.h"
+#include "python_handler.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 // Constants
@@ -99,7 +105,8 @@ enum ASCIIFormat {
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
    ASCIIFormat_Aeronet_v2,
-   ASCIIFormat_Aeronet_v3
+   ASCIIFormat_Aeronet_v3, 
+   ASCIIFormat_Python, 
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -134,6 +141,8 @@ static void set_mask_poly(const StringArray &);
 static void set_mask_sid(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
+
+static void setup_wrapper_path();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -202,8 +211,7 @@ int main(int argc, char *argv[]) {
    // the command line.  If one wasn't specified, we'll look in the
    // first file to guess the format.
    //
-   FileHandler *file_handler = create_file_handler(ascii_format,
-                                                   asfile_list[0]);
+   FileHandler *file_handler = create_file_handler(ascii_format, asfile_list[0]);
 
    if(file_handler == 0) return(0);
 
@@ -247,12 +255,17 @@ int main(int argc, char *argv[]) {
    if(!status) return(1);
 
    return(0);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format,
-                                 const ConcatString &ascii_filename) {
+FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename) {
+
+   #ifdef ENABLE_PYTHON
+   PythonHandler * ph = 0;
+   #endif
+
    //
    // If the ASCII format was specified, just create the appropriate
    // object and return it.  If it wasn't specified, look in the
@@ -286,6 +299,13 @@ FileHandler *create_file_handler(const ASCIIFormat format,
          handler->setFormatVersion(3);
          return((FileHandler *) handler);
       }
+      #ifdef ENABLE_PYTHON
+      case ASCIIFormat_Python: {
+         setup_wrapper_path();
+         ph = new PythonHandler(program_name, ascii_filename.text());
+         return((FileHandler *) ph);
+      }
+      #endif
 
       default: {
         return(determine_ascii_format(ascii_filename));
@@ -424,8 +444,14 @@ void usage() {
         << SurfradHandler::getFormatString() << "\", \""
         << WwsisHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString_v2() << "\", or \""
-        << AeronetHandler::getFormatString_v3() << "\" (optional).\n"
+        << AeronetHandler::getFormatString_v2() << "\", \""
+        << AeronetHandler::getFormatString_v3() << "\"";
+
+   #ifdef ENABLE_PYTHON
+   cout << ", \"" << PythonHandler::getFormatString() << "\"";
+   #endif
+
+   cout << " (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -495,6 +521,11 @@ void set_format(const StringArray & a) {
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v3;
    }
+   #ifdef ENABLE_PYTHON
+   else if(PythonHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_Python;
+   }
+   #endif
    else {
       mlog << Error << "\nset_format() -> "
            << "unsupported ASCII observation format \""
@@ -591,6 +622,28 @@ void set_verbosity(const StringArray & a) {
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_wrapper_path() {
+
+   #ifdef ENABLE_PYTHON
+   ConcatString command;
+
+   GP.initialize();
+
+   run_python_string("import sys");
+
+   command << cs_erase
+           << "sys.path.append(\""
+           << replace_path(wrappers_dir)
+           << "\")";
+
+   run_python_string(command.text());
+   #endif
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -174,14 +174,6 @@ for (j=0; j<ny_half; ++j)  {
 
 }
 
-// cout << "///////////////////////////////////////////////////////////////////\n";
-// 
-// for (j=0; j<Ny; ++j)  {
-// 
-//    cout << "Latitudes[" << j << "] = " << Latitudes[j] << '\n';
-// 
-// }
-
    //
    //  done
    //
@@ -195,13 +187,6 @@ for (j=0; j<ny_half; ++j)  {
 void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
 
 {
-
-// mlog << Error 
-//      << "\nGaussianGrid::latlon_to_xy() not implemented!\n\n";
-// 
-// exit ( 1 );
-
-
 
 int j;
 const double lat_top = Latitudes[Ny - 1];
@@ -283,7 +268,7 @@ if ( (iy < 0) || (iy >= Ny) )  {
 
 lat = Latitudes[iy];
 
-lon = Lon_Zero - ix*Delta_Lon;
+lon = Lon_Zero + ix*Delta_Lon;
 
 return;
 
@@ -390,20 +375,25 @@ return;
 ConcatString GaussianGrid::serialize() const
 
 {
+    
+ConcatString a;
+char junk[256];
 
-mlog << Error << "\nGaussianGrid::serialize() -> not yet implemented\n\n";
+a << "Projection: Gaussian";
 
-exit ( 1 );
+snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
 
    //
    //  done
    //
 
-ConcatString a;
-
 return ( a );
 
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -474,6 +464,8 @@ GridRep * GaussianGrid::copy() const
 {
 
 GaussianGrid * p = new GaussianGrid (Data);
+
+p->Name = Name;
 
 return ( p );
 

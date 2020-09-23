@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@
 //   009    03/01/18  Halley Gotway   Update summary job type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
 //   011    04/01/19  Fillmore        Add FCST and OBS units.
+//   012    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,6 +52,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
+#include "ens_stats.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -131,13 +133,13 @@ struct AggrWindInfo {
    StatHdrInfo hdr;
    VL1L2Info vl1l2_info;
    StringArray hdr_sa;
-   NumArray uf_na, vf_na, uo_na, vo_na;
+   PairDataPoint pd_u, pd_v;
 };
 
 struct AggrMPRInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
-   NumArray f_na, o_na, cmn_na, csd_na, cdf_na;
+   PairDataPoint pd;
 };
 
 struct AggrISCInfo {
@@ -151,6 +153,11 @@ struct AggrENSInfo {
    PairDataEnsemble ens_pd;
    NumArray crps_climo_na;
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
+};
+
+struct AggrRPSInfo {
+   StatHdrInfo hdr;
+   RPSInfo rps_info;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -243,6 +250,11 @@ extern void aggr_isc_lines(
 extern void aggr_ecnt_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrENSInfo> &,
+               int &, int &);
+
+extern void aggr_rps_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrRPSInfo> &,
                int &, int &);
 
 extern void aggr_rhist_lines(

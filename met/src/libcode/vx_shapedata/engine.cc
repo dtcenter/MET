@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,10 @@ using namespace std;
 #include "engine.h"
 #include "mode_columns.h"
 #include "vx_util.h"
+
+///////////////////////////////////////////////////////////////////////
+
+static const int print_interest_log_level = 5;
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -921,7 +925,9 @@ void ModeFuzzyEngine::do_match_merge() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
+         info_singles[n].interest_value = total_interest(conf_info,
+                                             pair_single[n], j+1, k+1,
+                                             true);
 
       }
    }
@@ -1671,7 +1677,9 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
+         info_singles[n].interest_value = total_interest(conf_info,
+                                             pair_single[n], j+1, k+1,
+                                             true);
 
       }
    }
@@ -1846,7 +1854,9 @@ void ModeFuzzyEngine::do_match_only() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
+         info_singles[n].interest_value = total_interest(conf_info,
+                                             pair_single[n], j+1, k+1,
+                                             true);
       }
    }
 
@@ -2082,7 +2092,9 @@ void ModeFuzzyEngine::do_cluster_features() {
       info_clus[j].fcst_number    = (j+1);
       info_clus[j].obs_number     = (j+1);
       info_clus[j].pair_number    = j;
-      info_clus[j].interest_value = total_interest(conf_info, 0, pair_cluster[j]);
+      info_clus[j].interest_value = total_interest(conf_info,
+                                       pair_cluster[j], j+1, j+1,
+                                       false);
    }
 
    //
@@ -2183,22 +2195,8 @@ int ModeFuzzyEngine::get_unmatched_obs(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest(ModeConfInfo &mc, int dist_flag,
-                      const PairFeature &p) {
-   double t;
-   ostream *out = (ostream *) 0;
-
-   if(mlog.verbosity_level() >= 5) out = &cout;
-
-   t = total_interest_print(mc, dist_flag, p, out);
-
-   return(t);
-}
-
-///////////////////////////////////////////////////////////////////////
-
-double total_interest_print(ModeConfInfo &mc, int dist_flag,
-                            const PairFeature &p, ostream *out) {
+double total_interest(ModeConfInfo &mc, const PairFeature &p,
+                      int fcst_num, int obs_num, bool is_single) {
    double attribute;
    double interest, weight;
    double confidence;
@@ -2207,6 +2205,21 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    double term, sum, weight_sum;
    double total;
 
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+
+      ConcatString cs;
+      if(is_single) {
+         cs.format("single pair F%03d_O%03d", fcst_num, obs_num);
+      }
+      else {
+         cs.format("cluster pair CF%03d_CO%03d", fcst_num, obs_num);
+      }
+
+      mlog << Debug(print_interest_log_level)
+           << "\n" << sep_str << "\n\n"
+           << "Computing total interest for " << cs << ".\n\n";
+   }
+
    ////////////////////////////////////////////////////////////////////
    //
    // If the distance flag is set and the centroid distance is too
@@ -2214,14 +2227,15 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    //
    ////////////////////////////////////////////////////////////////////
 
-   if(dist_flag && p.centroid_dist > mc.max_centroid_dist) {
+   if(is_single && p.centroid_dist > mc.max_centroid_dist) {
       total = bad_data_double;
 
-      if(out) {
-         (*out) << "Total Interest = " << total << "\n"
-                << "Centroid Distance (" << p.centroid_dist
-                << ") > Max Centroid Distance ("
-                << mc.max_centroid_dist << ")\n";
+      if(mlog.verbosity_level() >= print_interest_log_level) {
+         mlog << Debug(print_interest_log_level)
+              << "Total Interest = " << total << "\n"
+              << "Centroid Distance (" << p.centroid_dist
+              << ") > Max Centroid Distance ("
+              << mc.max_centroid_dist << ")\n";
       }
       return(total);
    }
@@ -2243,15 +2257,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Centroid Distance:\n"
-             << "------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Centroid Distance:\n"
+           << "------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2268,15 +2283,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Boundary Distance:\n"
-             << "------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Boundary Distance:\n"
+           << "------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2293,15 +2309,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Convex Hull Distance:\n"
-             << "---------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Convex Hull Distance:\n"
+           << "---------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2322,15 +2339,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Angle Difference:\n"
-             << "-----------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Angle Difference:\n"
+           << "-----------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2347,15 +2365,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Aspect Ratio Difference:\n"
-             << "------------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Aspect Ratio Difference:\n"
+           << "------------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2372,15 +2391,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Area Ratio:\n"
-             << "-----------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Area Ratio:\n"
+           << "-----------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2397,15 +2417,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Intersection/Area Ratio:\n"
-             << "------------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Intersection/Area Ratio:\n"
+           << "------------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2422,15 +2443,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Curvature Ratio:\n"
-             << "----------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Curvature Ratio:\n"
+           << "----------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2447,15 +2469,16 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Complexity Ratio:\n"
-             << "-----------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Complexity Ratio:\n"
+           << "-----------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2472,16 +2495,17 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(out) {
-      (*out) << "Percentile (" << mc.inten_perc_value
-             << "th) Intensity Ratio:\n"
-             << "--------------------\n"
-             << "   Value      = " << attribute  << "\n"
-             << "   Interest   = " << interest   << "\n"
-             << "   Confidence = " << confidence << "\n"
-             << "   Weight     = " << weight     << "\n"
-             << "   Term       = " << term       << "\n"
-             << "\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Percentile (" << mc.inten_perc_value
+           << "th) Intensity Ratio:\n"
+           << "--------------------\n"
+           << "   Value      = " << attribute  << "\n"
+           << "   Interest   = " << interest   << "\n"
+           << "   Confidence = " << confidence << "\n"
+           << "   Weight     = " << weight     << "\n"
+           << "   Term       = " << term       << "\n"
+           << "\n";
    }
 
    ////////////////////////////////////////////////////////////////////
@@ -2492,10 +2516,11 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
    total = sum/weight_sum;
 
-   if(out) {
-      (*out) << "Total Interest = (sum of terms)/(sum of weights*confidence)\n\n"
-             << "               = " << sum << "/" << weight_sum << "\n\n"
-             << "               = " << total << "\n\n";
+   if(mlog.verbosity_level() >= print_interest_log_level) {
+      mlog << Debug(print_interest_log_level)
+           << "Total Interest = (sum of terms)/(sum of weights*confidence)\n\n"
+           << "               = " << sum << "/" << weight_sum << "\n\n"
+           << "               = " << total << "\n\n";
    }
 
    return(total);
@@ -2806,27 +2831,27 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 eng.conf_info.Obs->conv_thresh.get_str());
 
    // Forecast Variable Name
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->name());
+   s = check_hdr_str(eng.conf_info.fcst_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->units(), true);
+   s = check_hdr_str(eng.conf_info.fcst_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->level_name());
+   s = check_hdr_str(eng.conf_info.fcst_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   s = check_hdr_str(eng.conf_info.Obs->var_info->name());
+   s = check_hdr_str(eng.conf_info.obs_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   s = check_hdr_str(eng.conf_info.Obs->var_info->units(), true);
+   s = check_hdr_str(eng.conf_info.obs_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(eng.conf_info.Obs->var_info->level_name());
+   s = check_hdr_str(eng.conf_info.obs_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation type
@@ -3512,7 +3537,6 @@ void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    //
    for(i=0; i<eng.collection.n_sets; i++) {
       comp = select(*eng.fcst_clus_split, i+1);
-      // cout << "=================== Fcst " << i << "\n";
       poly = comp.convex_hull();
       poly.bounding_box(bb);
 

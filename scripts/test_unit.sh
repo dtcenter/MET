@@ -6,19 +6,19 @@
 # This test_unit.sh script will check out the specified revision of MET,
 # compile the code, and run the unit tests.
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/test_unit.sh name
 #
 # Usage: test_unit.sh name
 #    Test the specified branched version of MET:
-#       test_unit.sh master_v8.1
+#       test_unit.sh {branch name}
 #    Test the specified tagged version of MET:
-#       test_unit.sh met-8.1
+#       test_unit.sh {tag name}
 #
 #=======================================================================
 
 # Constants
-GIT_REPO="https://github.com/NCAR/MET"
+GIT_REPO="https://github.com/dtcenter/MET"
 CXX_COMPILER=/usr/bin/g++
 F77_COMPILER=/usr/bin/gfortran
 

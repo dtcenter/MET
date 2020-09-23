@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -254,15 +254,15 @@ NcType::ncType hdf_type_to_nc_type(int hdf_type)
 
 {
 
-NcType::ncType t;
+NcType::ncType t = NcType::nc_CHAR;
 
 switch ( hdf_type )  {
 
    case DFNT_CHAR8:    t =  NcType::nc_CHAR;   break;   // 8-bit character type
    case DFNT_UCHAR8:   t =  NcType::nc_BYTE;   break;   // 8-bit unsigned character type
 
-   // case DFNT_INT8:     t =  NcType::nc_SHORT;  break;   // 8-bit integer type
-   // case DFNT_UINT8:    t =  NcType::nc_SHORT;  break;   // 8-bit unsigned integer type
+   // case DFNT_INT8:  t =  NcType::nc_SHORT;  break;   // 8-bit integer type
+   // case DFNT_UINT8: t =  NcType::nc_SHORT;  break;   // 8-bit unsigned integer type
 
    case DFNT_INT16:    t = NcType::nc_SHORT;   break;   // 16-bit integer type
    case DFNT_UINT16:   t = NcType::nc_USHORT;  break;   // 16-bit unsigned integer type

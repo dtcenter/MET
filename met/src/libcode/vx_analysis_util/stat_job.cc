@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1742,7 +1742,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    // Loop through the output line types and determine the number of
    // output columns
    //
-   for(i=0, n_col=0; i<out_sa.n_elements(); i++) {
+   for(i=0, c=0, n_col=0; i<out_sa.n_elements(); i++) {
       cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
          case stat_sl1l2:  c = n_sl1l2_columns;        break;
@@ -1769,6 +1769,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_isc:    c = n_isc_columns;          break;
          case stat_wdir:   c = n_job_wdir_columns;     break;
          case stat_ecnt:   c = n_ecnt_columns;         break;
+         case stat_rps:    c = n_rps_columns;          break;
          case stat_rhist:  c = get_n_rhist_columns(n); break;
          case stat_phist:  c = get_n_phist_columns(n); break;
          case stat_relp:   c = get_n_relp_columns(n);  break;
@@ -1827,6 +1828,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
       case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
       case stat_ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
+      case stat_rps:    write_header_row       (rps_columns, n_rps_columns, 1,           stat_at, 0, 0); break;
       case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;

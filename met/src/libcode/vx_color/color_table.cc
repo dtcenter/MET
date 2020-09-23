@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -505,8 +505,6 @@ for (j=0; j<Nentries; ++j)  {
    //
    //  must be in-between
    //
-
-k = 0;
 
 for (j=0; j<(Nentries - 1); ++j)  {
 

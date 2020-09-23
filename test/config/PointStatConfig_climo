@@ -42,6 +42,7 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
+   sid_inc    = [];
    sid_exc    = [];
    cat_thresh = [];
    message_type = [ "ADPSFC" ];
@@ -63,6 +64,11 @@ fcst = {
         level        = [ "Z2" ];
         desc         = "FAHRENHEIT";
         convert(x)   = K_to_F(x);
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "BAD_CLIMO";
       },
       {
         name         = "TMP";
@@ -93,7 +99,7 @@ obs = fcst;
 climo_mean = fcst;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
       method     = BILIN;
@@ -102,14 +108,13 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = ${MATCH_MONTH};
-   match_day          = ${MATCH_DAY};
-   time_step          = 21600;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "${CLIMO_STDEV_FILE}" ];
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 
    field = [
       {
@@ -131,6 +136,13 @@ climo_stdev = {
         convert(x)   = 1.8 * x;
       },
       {
+        name          = "TMP";
+        level         = [ "Z2" ];
+        // Set some values to bad data to make sure Point-Stat skips them.
+        censor_thresh = [ >5 ];
+        censor_val    = [ -9999 ];
+      },
+      {
         name         = "TMP";
         level        = [ "P500" ];
         message_type = [ "ADPUPA" ];
@@ -150,7 +162,14 @@ climo_stdev = {
    ];
 }
 
-climo_cdf_bins = 1;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -211,10 +230,12 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +260,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   rps    = NONE;
    eclv   = NONE;
    mpr    = BOTH;
 }
@@ -250,6 +272,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

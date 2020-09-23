@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -254,6 +254,7 @@ void GridStatConfInfo::process_flags() {
       if(vx_opt[i].nc_info.do_raw)          nc_info.do_raw          = true;
       if(vx_opt[i].nc_info.do_diff)         nc_info.do_diff         = true;
       if(vx_opt[i].nc_info.do_climo)        nc_info.do_climo        = true;
+      if(vx_opt[i].nc_info.do_climo_cdp)    nc_info.do_climo_cdp    = true;
       if(vx_opt[i].nc_info.do_weight)       nc_info.do_weight       = true;
       if(vx_opt[i].nc_info.do_nbrhd)        nc_info.do_nbrhd        = true;
       if(vx_opt[i].nc_info.do_fourier)      nc_info.do_fourier      = true;
@@ -488,7 +489,8 @@ void GridStatVxOpt::clear() {
    // Initialize values
 
    desc.clear();
-   var_str.clear();
+   var_name.clear();
+   var_suffix.clear();
 
    fcat_ta.clear();
    ocat_ta.clear();
@@ -507,7 +509,7 @@ void GridStatVxOpt::clear() {
 
    eclv_points.clear();
 
-   climo_cdf_ta.clear();
+   cdf_info.clear();
 
    ci_alpha.clear();
 
@@ -582,8 +584,26 @@ void GridStatVxOpt::process_config(
    // Conf: desc
    desc = parse_conf_string(&odict, conf_key_desc);
 
-   // Conf: nc_pairs_var_str
-   var_str = parse_conf_string(&odict, conf_key_nc_pairs_var_str, false);
+   // Conf: nc_pairs_var_name
+   var_name = parse_conf_string(&odict, conf_key_nc_pairs_var_name, false);
+
+   // Check to see if the deprecated nc_pairs_var_str has been used
+
+   // Conf: nc_pairs_var_str (deprecated)
+   var_suffix = odict.lookup_string(conf_key_nc_pairs_var_str, false, false);
+
+   // If found, print a warning.
+   if(odict.last_lookup_status()) {
+      mlog << Warning << "\nGridStatVxOpt::process_config() -> \""
+           << conf_key_nc_pairs_var_str << "\" (" << var_suffix
+           << ") is deprecated and replaced by \""
+           << conf_key_nc_pairs_var_suffix << "\".\n\n";
+   }
+   // Otherwise, parse the new option
+   else {
+      // Conf: nc_pairs_var_suffix
+      var_suffix = parse_conf_string(&odict, conf_key_nc_pairs_var_suffix, false);
+   }
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
@@ -596,8 +616,10 @@ void GridStatVxOpt::process_config(
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
 
    // Conf: cnt_thresh
-   fcnt_ta = fdict.lookup_thresh_array(conf_key_cnt_thresh);
-   ocnt_ta = odict.lookup_thresh_array(conf_key_cnt_thresh);
+   fcnt_ta = process_perc_thresh_bins(
+                fdict.lookup_thresh_array(conf_key_cnt_thresh));
+   ocnt_ta = process_perc_thresh_bins(
+                odict.lookup_thresh_array(conf_key_cnt_thresh));
 
    // Conf: cnt_logic
    cnt_logic = check_setlogic(
@@ -605,8 +627,10 @@ void GridStatVxOpt::process_config(
       int_to_setlogic(odict.lookup_int(conf_key_cnt_logic)));
 
    // Conf: wind_thresh
-   fwind_ta = fdict.lookup_thresh_array(conf_key_wind_thresh);
-   owind_ta = odict.lookup_thresh_array(conf_key_wind_thresh);
+   fwind_ta = process_perc_thresh_bins(
+                 fdict.lookup_thresh_array(conf_key_wind_thresh));
+   owind_ta = process_perc_thresh_bins(
+                 odict.lookup_thresh_array(conf_key_wind_thresh));
 
    // Conf: wind_logic
    wind_logic = check_setlogic(
@@ -671,8 +695,8 @@ void GridStatVxOpt::process_config(
    // Conf: eclv_points
    eclv_points = parse_conf_eclv_points(&odict);
 
-   // Conf: climo_cdf_bins
-   climo_cdf_ta = parse_conf_climo_cdf_bins(&odict);
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&odict);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);
@@ -681,7 +705,7 @@ void GridStatVxOpt::process_config(
    boot_info = parse_conf_boot(&odict);
 
    // Conf: interp
-   interp_info = parse_conf_interp(&odict);
+   interp_info = parse_conf_interp(&odict, conf_key_interp);
 
    // Loop through interpolation options
    for(i=0; i<interp_info.n_interp; i++) {
@@ -709,7 +733,7 @@ void GridStatVxOpt::process_config(
    } // end for i
 
    // Conf: nbrhd
-   nbrhd_info = parse_conf_nbrhd(&odict);
+   nbrhd_info = parse_conf_nbrhd(&odict, conf_key_nbrhd);
 
    // Conf: fourier
    Dictionary * d = odict.lookup_dictionary(conf_key_fourier);
@@ -824,6 +848,7 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
    nc_info.do_raw          = d->lookup_bool(conf_key_raw_flag);
    nc_info.do_diff         = d->lookup_bool(conf_key_diff_flag);
    nc_info.do_climo        = d->lookup_bool(conf_key_climo_flag);
+   nc_info.do_climo_cdp    = d->lookup_bool(conf_key_climo_cdp_flag);
    nc_info.do_weight       = d->lookup_bool(conf_key_weight);
    nc_info.do_nbrhd        = d->lookup_bool(conf_key_nbrhd);
    nc_info.do_fourier      = d->lookup_bool(conf_key_fourier);
@@ -846,11 +871,11 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
    //
    // The following do not impact matched pairs:
-   //    desc, var_str,
+   //    desc, var_name, var_suffix,
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
-   //    eclv_points, climo_cdf_ta, ci_alpha
+   //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,
    //    rank_corr_flag, output_flag, nc_info
@@ -868,9 +893,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
-                                    const NumArray &o_na,
-                                    const NumArray &cmn_na) {
+void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
 
    //
    // Compute percentiles for forecast and observation thresholds,
@@ -882,9 +905,9 @@ void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
    //
    // Sort the input arrays
    //
-   NumArray fsort = f_na;
-   NumArray osort = o_na;
-   NumArray csort = cmn_na;
+   NumArray fsort = pd.f_na;
+   NumArray osort = pd.o_na;
+   NumArray csort = pd.cmn_na;
    fsort.sort_array();
    osort.sort_array();
    csort.sort_array();
@@ -903,7 +926,8 @@ void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n = 0;
+   int n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -917,6 +941,15 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
 
    bool prob_flag = fcst_info->is_prob();
    bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());
+
+   // Determine row multiplier for climatology bins
+   if(cdf_info.write_bins) {
+      n_bin = get_n_cdf_bin();
+      if(n_bin > 1) n_bin++;
+   }
+   else {
+      n_bin = 1;
+   }
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -954,19 +987,20 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_cnt):
          // Number of CNT lines =
          //    Masks * (Smoothing Methods + Fourier Waves) *
-         //    Thresholds * Alphas
+         //    Thresholds * Climo Bins * Alphas
          n = (prob_flag ? 0 :
               get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
-              get_n_cnt_thresh() * get_n_ci_alpha());
+              get_n_cnt_thresh() * n_bin * get_n_ci_alpha());
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
          // Number of SL1L2 or SAL1L2 lines =
-         //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds
+         //    Masks * (Smoothing Methods + Fourier Waves) *
+         //    Thresholds * Climo Bins
          n = (prob_flag ? 0 :
               get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
-              get_n_cnt_thresh());
+              get_n_cnt_thresh() * n_bin);
          break;
 
       case(i_vl1l2):
@@ -1011,7 +1045,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Masks * Smoothing Methods * Thresholds * Climo Bins
          n = (!prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-              get_n_cdf_bin());
+              n_bin);
          break;
 
       case(i_pstd):
@@ -1020,7 +1054,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Climo Bins
          n = (!prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-              get_n_ci_alpha() * get_n_cdf_bin());
+              get_n_ci_alpha() * n_bin);
          break;
 
       case(i_eclv):
@@ -1035,7 +1069,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Max Forecast Probability Thresholds * Climo Bins
          n += (!prob_flag ? 0 :
                get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-               get_n_fprob_thresh() * get_n_cdf_bin());
+               get_n_fprob_thresh() * n_bin);
          break;
 
       case(i_grad):
@@ -1123,10 +1157,10 @@ void GridStatNcOutInfo::clear() {
 
 bool GridStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon      || do_raw     || do_diff         ||
-                 do_climo       || do_weight  || do_nbrhd        ||
-                 do_fourier     || do_gradient|| do_distance_map ||
-                 do_apply_mask;
+   bool status = do_latlon       || do_raw        || do_diff     ||
+                 do_climo        || do_climo_cdp  || do_weight   ||
+                 do_nbrhd        || do_fourier    || do_gradient ||
+                 do_distance_map || do_apply_mask;
 
    return(!status);
 }
@@ -1139,6 +1173,7 @@ void GridStatNcOutInfo::set_all_false() {
    do_raw          = false;
    do_diff         = false;
    do_climo        = false;
+   do_climo_cdp    = false;
    do_weight       = false;
    do_nbrhd        = false;
    do_fourier      = false;
@@ -1157,6 +1192,7 @@ void GridStatNcOutInfo::set_all_true() {
    do_raw          = true;
    do_diff         = true;
    do_climo        = true;
+   do_climo_cdp    = true;
    do_weight       = true;
    do_nbrhd        = true;
    do_fourier      = true;

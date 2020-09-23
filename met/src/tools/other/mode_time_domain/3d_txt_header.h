@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,8 +29,12 @@ static const char * header_3d_cols [] = {
    "OBS_LEAD",
    "OBS_VALID",
    "T_DELTA",
+   "FCST_T_BEG",
+   "FCST_T_END",
    "FCST_RAD",
    "FCST_THR",
+   "OBS_T_BEG",
+   "OBS_T_END",
    "OBS_RAD",
    "OBS_THR",
    "FCST_VAR",

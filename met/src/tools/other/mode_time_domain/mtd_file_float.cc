@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -120,7 +120,9 @@ if ( Data )  { delete [] Data;  Data = 0; }
 
 DataMin = DataMax = 0;
 
-Radius = -1;
+Spatial_Radius = -1;
+
+TimeBeg = TimeEnd = bad_data_int;
 
 
    //
@@ -146,7 +148,11 @@ base_assign(f);
 DataMin = f.DataMin;
 DataMax = f.DataMax;
 
-Radius = f.Radius;
+Spatial_Radius = f.Spatial_Radius;
+
+TimeBeg = f.TimeBeg;
+
+TimeEnd = f.TimeEnd;
 
 const int n = Nx*Ny*Nt;
 
@@ -180,12 +186,15 @@ Indent prefix(depth);
 
 MtdFileBase::dump(out, depth);
 
-if ( Radius >= 0 )  {
+if ( Spatial_Radius >= 0 )  {
 
-   out << prefix << "Radius = " << Radius << '\n';
+   out << prefix << "Spatial_Radius = " << Spatial_Radius << '\n';
 
 }
 
+out << prefix << "TimeBeg = " << TimeBeg << '\n';
+
+out << prefix << "TimeEnd = " << TimeEnd << '\n';
 
    //
    //  done
@@ -237,19 +246,43 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MtdFloatFile::set_radius(int r)
+void MtdFloatFile::set_spatial_radius(int spatial_r)
 
 {
 
-if ( r < 0 )  {
+if ( spatial_r < 0 )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::set_radius(int) -> bad value ... " << r << "\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::set_spatial_radius(int) -> bad value ... " << spatial_r << "\n\n";
 
    exit ( 1 );
 
 }
 
-Radius = r;
+Spatial_Radius = spatial_r;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::set_time_window(int beg, int end)
+
+{
+
+if ( end < beg )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::set_time_window(int) -> bad values ... " << beg << " and " << end << "\n\n";
+
+   exit ( 1 );
+
+}
+
+TimeBeg = beg;
+
+TimeEnd = end;
 
 return;
 
@@ -478,7 +511,9 @@ ival = ( got_some ? 1 : 0 );
 
 out.set_data_minmax(0, ival);
 
-out.set_radius(Radius);
+out.set_radius(Spatial_Radius);
+
+out.set_time_window(TimeBeg, TimeEnd);
 
 out.set_threshold(T);
 
@@ -545,7 +580,9 @@ ival = ( got_some ? 1 : 0 );
 
 out.set_data_minmax(0, ival);
 
-out.set_radius(Radius);
+out.set_radius(Spatial_Radius);
+
+out.set_time_window(TimeBeg, TimeEnd);
 
 out.set_threshold(-9999.0);
 
@@ -698,13 +735,18 @@ snprintf(junk, sizeof(junk), format, DataMax);
 
 add_att(&f, max_value_att_name, junk);
 
-   //  Radius
+   //  Spatial_Radius
 
-if ( Radius >= 0 )  {
+if ( Spatial_Radius >= 0 )  {
 
-   add_att(&f, radius_att_name, Radius);
+   add_att(&f, radius_att_name, Spatial_Radius);
 
 }
+
+add_att(&f, time_beg_att_name, TimeBeg);
+
+add_att(&f, time_end_att_name, TimeEnd);
+
 
    //  Data
 
@@ -816,7 +858,11 @@ f.DeltaT = 0;
 
 f.StartValidTime = StartValidTime + t*DeltaT;
 
-f.Radius = Radius;
+f.Spatial_Radius = Spatial_Radius;
+
+f.TimeBeg = TimeBeg;
+
+f.TimeEnd = TimeEnd;
 
 f.Data = new float [Nx*Ny];
 

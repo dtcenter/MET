@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,12 @@
 #include <cstdio>
 #include <string>
 #include <time.h>
+
+#include "config.h"
+
+#ifdef ENABLE_PYTHON
+#include "vx_python3_utils.h"
+#endif   /*  ENABLE_PYTHON  */
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,6 +53,19 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const string &var_name = "");
+
+////////////////////////
+#ifdef ENABLE_PYTHON
+
+  Observation();
+  Observation(const Python3_List &);
+
+  void set(const Python3_List &);
+  void set(PyObject *);
+
+#endif   /*  ENABLE_PYTHON  */
+////////////////////////
+
 
   virtual ~Observation();
 
@@ -108,6 +127,11 @@ public:
   int getGribCode() const
   {
     return varCode;
+  }
+
+  void setVarCode(int v)
+  {
+    varCode = v;
   }
 
   int getVarCode() const
@@ -201,10 +225,11 @@ protected:
 
     char time_string[80];
 
-    sprintf(time_string, "%04d%02d%02d_%02d%02d%02d",
-            time_struct->tm_year + 1900, time_struct->tm_mon + 1,
-            time_struct->tm_mday,        time_struct->tm_hour,
-            time_struct->tm_min,         time_struct->tm_sec);
+    snprintf(time_string, sizeof(time_string),
+             "%04d%02d%02d_%02d%02d%02d",
+             time_struct->tm_year + 1900, time_struct->tm_mon + 1,
+             time_struct->tm_mday,        time_struct->tm_hour,
+             time_struct->tm_min,         time_struct->tm_sec);
 
     return string(time_string);
   }
@@ -217,8 +242,9 @@ protected:
 
     char time_string[80];
 
-    sprintf(time_string, "%s-%s",
-            start_time_string.c_str(), end_time_string.c_str());
+    snprintf(time_string, sizeof(time_string),
+             "%s-%s",
+             start_time_string.c_str(), end_time_string.c_str());
 
     return string(time_string);
   }
@@ -233,5 +259,3 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

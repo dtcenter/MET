@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -170,8 +170,7 @@ double LatLonGrid::calc_area(int x, int y) const
 
 {
 
-double area = 0.0;
-double lat_bottom, lon_left;
+double area, lat_bottom, lon_left;
 double delta_lon_rad = delta_lon/deg_per_rad;
 double lat_top_rad, lat_bottom_rad;
 
@@ -396,6 +395,8 @@ GridRep * LatLonGrid::copy() const
 {
 
 LatLonGrid * p = new LatLonGrid (Data);
+
+p->Name = Name;
 
 return ( p );
 

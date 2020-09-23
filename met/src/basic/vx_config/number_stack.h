@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,7 +58,7 @@ class NumberStack {
       NumberStack(const NumberStack &);
       NumberStack & operator=(const NumberStack &);
 
-      void clear();
+      void clear(bool initialize = true);
 
       void dump(ostream &, int = 0) const;
 

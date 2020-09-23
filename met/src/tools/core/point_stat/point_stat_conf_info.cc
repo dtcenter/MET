@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -294,7 +294,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -312,7 +312,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -330,7 +330,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
 
          // Process new station ID mask
          if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
@@ -607,7 +607,7 @@ void PointStatVxOpt::clear() {
 
    eclv_points.clear();
 
-   climo_cdf_ta.clear();
+   cdf_info.clear();
 
    ci_alpha.clear();
 
@@ -643,7 +643,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
-   //    eclv_points, climo_cdf_ta, ci_alpha
+   //    eclv_points, cdf_info, ci_alpha
    //    boot_info, hira_info, rank_corr_flag,
    //    output_flag
    //
@@ -750,8 +750,10 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
 
    // Conf: cnt_thresh
-   fcnt_ta = fdict.lookup_thresh_array(conf_key_cnt_thresh);
-   ocnt_ta = odict.lookup_thresh_array(conf_key_cnt_thresh);
+   fcnt_ta = process_perc_thresh_bins(
+                fdict.lookup_thresh_array(conf_key_cnt_thresh));
+   ocnt_ta = process_perc_thresh_bins(
+                odict.lookup_thresh_array(conf_key_cnt_thresh));
 
    // Conf: cnt_logic
    cnt_logic = check_setlogic(
@@ -759,8 +761,10 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       int_to_setlogic(odict.lookup_int(conf_key_cnt_logic)));
 
    // Conf: wind_thresh
-   fwind_ta = fdict.lookup_thresh_array(conf_key_wind_thresh);
-   owind_ta = odict.lookup_thresh_array(conf_key_wind_thresh);
+   fwind_ta = process_perc_thresh_bins(
+                 fdict.lookup_thresh_array(conf_key_wind_thresh));
+   owind_ta = process_perc_thresh_bins(
+                 odict.lookup_thresh_array(conf_key_wind_thresh));
 
    // Conf: wind_logic
    wind_logic = check_setlogic(
@@ -788,7 +792,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Check for equal threshold length for non-probability fields
    if(!vx_pd.fcst_info->is_prob() &&
-      fcat_ta.n_elements() != ocat_ta.n_elements()) {
+      fcat_ta.n() != ocat_ta.n()) {
 
       mlog << Error << "\nPointStatVxOpt::process_config() -> "
            << "The number of thresholds for each field in \"fcst."
@@ -799,14 +803,14 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    }
 
    // Add default continuous thresholds until the counts match
-   n = max(fcnt_ta.n_elements(), ocnt_ta.n_elements());
-   while(fcnt_ta.n_elements() < n) fcnt_ta.add(na_str);
-   while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
+   n = max(fcnt_ta.n(), ocnt_ta.n());
+   while(fcnt_ta.n() < n) fcnt_ta.add(na_str);
+   while(ocnt_ta.n() < n) ocnt_ta.add(na_str);
 
    // Add default wind speed thresholds until the counts match
-   n = max(fwind_ta.n_elements(), owind_ta.n_elements());
-   while(fwind_ta.n_elements() < n) fwind_ta.add(na_str);
-   while(owind_ta.n_elements() < n) owind_ta.add(na_str);
+   n = max(fwind_ta.n(), owind_ta.n());
+   while(fwind_ta.n() < n) fwind_ta.add(na_str);
+   while(owind_ta.n() < n) owind_ta.add(na_str);
 
    // Verifying with multi-category contingency tables
    if(!vx_pd.fcst_info->is_prob() &&
@@ -837,8 +841,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: eclv_points
    eclv_points = parse_conf_eclv_points(&odict);
 
-   // Conf: climo_cdf_bins
-   climo_cdf_ta = parse_conf_climo_cdf_bins(&odict);
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&odict);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);
@@ -847,7 +851,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    boot_info = parse_conf_boot(&odict);
 
    // Conf: interp
-   interp_info = parse_conf_interp(&odict);
+   interp_info = parse_conf_interp(&odict, conf_key_interp);
 
    // Conf: hira
    hira_info = parse_conf_hira(&odict);
@@ -870,8 +874,11 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc).c_str());
 
+   // Conf: sid_inc
+   vx_pd.set_sid_inc_filt(parse_conf_sid_list(&odict, conf_key_sid_inc));
+
    // Conf: sid_exc
-   vx_pd.set_sid_exc_filt(parse_conf_sid_exc(&odict));
+   vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
 
    // Conf: obs_qty
    vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
@@ -883,8 +890,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
 void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    int i, n;
-   int n_msg_typ = msg_typ.n_elements();
-   int n_mask    = mask_name.n_elements();
+   int n_msg_typ = msg_typ.n();
+   int n_mask    = mask_name.n();
    int n_interp  = interp_info.n_interp;
    ConcatString cs;
    StringArray sa;
@@ -962,36 +969,36 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    for(i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
-      if(sa.n_elements() == 0) sa.add(msg_typ[i]);
+      if(sa.n() == 0) sa.add(msg_typ[i]);
       vx_pd.set_msg_typ_vals(i, sa);
    }
 
    // Define the masking information: grid, poly, sid, point
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n_elements(); i++) {
+   for(i=0; i<mask_grid.n(); i++) {
       n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n_elements(); i++) {
-      n = i + mask_grid.n_elements();
+   for(i=0; i<mask_poly.n(); i++) {
+      n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n_elements(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements();
+   for(i=0; i<mask_sid.n(); i++) {
+      n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
    for(i=0; i<(int) mask_llpnt.size(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
+      n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
@@ -1044,7 +1051,8 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n = 0;
+   int n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -1062,24 +1070,31 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
    int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
+   // Determine row multiplier for climatology bins
+   if(cdf_info.write_bins) {
+      n_bin = get_n_cdf_bin();
+      if(n_bin > 1) n_bin++;
+   }
+   else {
+      n_bin = 1;
+   }
+
    // Switch on the index of the line type
    switch(i_txt_row) {
 
       case(i_fho):
       case(i_ctc):
          // Number of FHO or CTC lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh());
          break;
 
       case(i_cts):
          // Number of CTS lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh() * get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
+              get_n_ci_alpha());
          break;
 
       case(i_mctc):
@@ -1090,35 +1105,31 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_mcts):
          // Number of MCTS lines =
-         //    Message Types * Masks * Interpolations *
-         //    Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_ci_alpha());
          break;
 
       case(i_cnt):
          // Number of CNT lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cnt_thresh() * get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins * Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin *
+              get_n_ci_alpha());
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
          // Number of SL1L2 and SAL1L2 lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cnt_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin);
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
       case(i_vcnt):
          // Number of VL1L2 or VAL1L2 lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
+         //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
          break;
@@ -1127,46 +1138,45 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_pjc):
       case(i_prc):
          // Number of PCT, PJC, or PRC lines possible =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Climo Bins
-         n = (!prob_flag ? 0 : n_pd *
-              get_n_oprob_thresh() * get_n_cdf_bin());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (!prob_flag ? 0 : n_pd * get_n_oprob_thresh() * n_bin);
 
          // Number of HiRA PCT, PJC, or PRC lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * HiRA widths
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    HiRA widths
          if(hira_info.flag) {
-            n += (prob_flag ? 0 : n_pd *
-                  get_n_cat_thresh() * hira_info.width.n_elements());
+            n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
+                  hira_info.width.n());
          }
 
          break;
 
       case(i_pstd):
          // Number of PSTD lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas * Climo Bins
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas * Climo Bins
          n = (!prob_flag ? 0 : n_pd *
-              get_n_oprob_thresh() * get_n_ci_alpha() * get_n_cdf_bin());
+              get_n_oprob_thresh() * get_n_ci_alpha() * n_bin);
 
          // Number of HiRA PSTD lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * HiRA widths * Alphas
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    HiRA widths * Alphas
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd *
-                  get_n_cat_thresh() * hira_info.width.n_elements() *
+                  get_n_cat_thresh() * hira_info.width.n() *
                   get_n_ci_alpha());
          }
 
          break;
 
       case(i_ecnt):
-         // Number of HiRA ECNT lines =
-         //    Message Types * Masks * Interpolations *
-         //    HiRA widths * Alphas
+      case(i_rps):
+         // Number of HiRA ECNT and RPS lines =
+         //    Message Types * Masks * Interpolations * HiRA widths *
+         //    Alphas
          if(hira_info.flag) {
-            n = n_pd * hira_info.width.n_elements() *
-                get_n_ci_alpha();
+            n = n_pd * hira_info.width.n() * get_n_ci_alpha();
          }
          else {
             n = 0;
@@ -1176,18 +1186,16 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_eclv):
          // Number of CTC -> ECLV lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() * n_bin);
 
          // Number of PCT -> ECLV lines =
          //    Message Types * Masks * Interpolations *
          //    Observation Probability Thresholds *
          //    Forecast Probability Thresholds * Climo Bins
          n += (!prob_flag ? 0 : n_pd *
-               get_n_oprob_thresh() * get_n_fprob_thresh() *
-               get_n_cdf_bin());
+               get_n_oprob_thresh() * get_n_fprob_thresh() * n_bin);
 
          break;
 
@@ -1201,7 +1209,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          if(hira_info.flag) {
             n += (prob_flag ? 0 :
                   vx_pd.get_n_pair() * get_n_cat_thresh() *
-                  hira_info.width.n_elements());
+                  hira_info.width.n());
          }
 
          break;
@@ -1221,35 +1229,35 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
 int PointStatVxOpt::get_n_cnt_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcnt_ta.n_elements());
+          0 : fcnt_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_cat_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+          0 : fcat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_wind_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fwind_ta.n_elements());
+          0 : fwind_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_fprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+          0 : fcat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_oprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : ocat_ta.n_elements());
+          0 : ocat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////

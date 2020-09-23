@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -3779,7 +3779,8 @@ void TCStatJobProbRIRW::process_pair(ProbRIRWPairInfo &pair) {
 void TCStatJobProbRIRW::do_output(ostream &out) {
    map<ConcatString,ProbRIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
-   int n, i, j, lt_cols, r, c;
+   int n, i, j, r, c;
+   int lt_cols = 0;
    AsciiTable out_at;
    STATLineType out_lt;
    ConcatString cs;
@@ -3915,7 +3916,8 @@ void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
 
 ConcatString build_map_key(const char *prefix, const TCStatLine &l,
                            const StringArray &case_cols) {
-   int i, lead;
+   int i;
+   int lead = 0;
    ConcatString key, cur;
 
    // Initialize the map key with prefix

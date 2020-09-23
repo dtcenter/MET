@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,8 +36,11 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 {
 
    int j, k, bms_flag, accum, lower, upper;
-   int ptv, center, subcenter, vinfo_ptv, vinfo_center, vinfo_subcenter, ens_application, ens_type, ens_number, vinfo_ens_type, vinfo_ens_number;
-   unixtime ut, init_ut, valid_ut ;
+   int ptv, center, subcenter;
+   int vinfo_ptv, vinfo_center, vinfo_subcenter;
+   int ens_application, ens_type, ens_number, vinfo_ens_type;
+   int vinfo_ens_number;
+   unixtime ut, init_ut, valid_ut;
 
    int p_code, code_for_lookup= vinfo.field_rec ();
    double p_thresh_lo, p_thresh_hi;
@@ -119,7 +122,6 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       isEnsMatch = ( vinfo_ens_type == ens_type && vinfo_ens_number == ens_number );
 
    }
-
 
    // Check for matching parameters
    if ( vinfo_ptv       != ptv       ||
@@ -264,7 +266,7 @@ if ( k >= 0 && k != ( valid_ut - init_ut) )  return ( false );
 if ( vinfo.level().type() == LevelType_Accum ) {
 
       //
-      //  time range indicator
+      //  time range indicator of 4 for accumulation
       //
 
    if ( pds->tri != 4 )  return ( false );
@@ -275,6 +277,12 @@ if ( vinfo.level().type() == LevelType_Accum ) {
 
    if ( lower != accum || upper != accum )  return ( false );
 }
+
+   //
+   //  time range indicator
+   //
+
+if ( !is_bad_data(vinfo.tri()) && pds->tri != vinfo.tri() )  return ( false );
 
    //
    //  probability info
@@ -298,7 +306,7 @@ if ( vinfo.p_flag() &&
    if ( vinfo.p_code() != p_code )  return ( false );
 
       //
-      //  lower probility threshold
+      //  lower probabiility threshold
       //
 
    if ( !is_bad_data ( p_thresh_lo ) &&
@@ -550,7 +558,7 @@ return ( true );
 
 void read_pds(const GribRecord &r, int &bms_flag,
               unixtime &init_ut, unixtime &valid_ut, int &accum) {
-   double sec_per_fcst_unit;
+   double sec_per_fcst_unit = 0.0;
    unsigned char pp1[2];
    Section1_Header *pds = (Section1_Header *) 0;
 

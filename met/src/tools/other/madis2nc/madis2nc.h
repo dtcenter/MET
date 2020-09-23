@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -150,7 +150,7 @@ static NcObsOutputData nc_out_data;
 
 static bool do_summary;
 static bool save_summary_only = false;
-static SummaryObs *summary_obs;
+static SummaryObs *summary_obs = 0;
 
 #endif   //  __MADIS2NC_H__
 

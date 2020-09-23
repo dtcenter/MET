@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Default madis2nc configuration file
+// MADIS2NC configuration file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -31,4 +31,4 @@ time_summary = {
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V9.0";
+version = "V9.1";

@@ -63,6 +63,7 @@ fcst = {
 }
 
 obs = {
+   sid_inc      = [];
    sid_exc      = [];
    message_type = [ "ADPSFC" ];
 
@@ -90,7 +91,7 @@ obs = {
 climo_mean = obs;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
       method     = BILIN;
@@ -99,9 +100,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = ${MATCH_DAY};
-   time_step          = 21600;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = 6;
 }
 
 //
@@ -109,10 +109,17 @@ climo_mean = {
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-  file_name = [ "${CLIMO_STDEV_FILE}" ];
+  file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
-climo_cdf_bins = 10;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 11;
+   center_bins = TRUE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -173,10 +180,12 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +210,7 @@ output_flag = {
    pjc    = BOTH;
    prc    = BOTH;
    ecnt   = NONE;
+   rps    = NONE;
    eclv   = BOTH;
    mpr    = BOTH;
 }
@@ -212,6 +222,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

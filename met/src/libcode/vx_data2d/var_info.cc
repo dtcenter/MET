@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,11 @@ using namespace std;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_set_attr_string(Dictionary &dict, const char *key, bool check_ws=false);
+int          parse_set_attr_flag  (Dictionary &dict, const char *key);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -81,33 +86,57 @@ void VarInfo::init_from_scratch() {
 void VarInfo::assign(const VarInfo &v) {
 
    // Copy
-   MagicStr  = v.magic_str();
-   ReqName   = v.req_name();
-   Name      = v.name();
-   LongName  = v.long_name();
-   Units     = v.units();
-   Level     = v.level();
+   MagicStr  = v.MagicStr;
+   ReqName   = v.ReqName;
+   Name      = v.Name;
+   Units     = v.Units;
+   Level     = v.Level;
+   LongName  = v.LongName;
+   Ensemble  = v.Ensemble;
 
-   PFlag     = v.p_flag();
-   PName     = v.p_name();
-   PUnits    = v.p_units();
-   PThreshLo = v.p_thresh_lo();
-   PThreshHi = v.p_thresh_hi();
-   PAsScalar = v.p_as_scalar();
+   PFlag     = v.PFlag;
+   PName     = v.PName;
+   PUnits    = v.PUnits;
+   PThreshLo = v.PThreshLo;
+   PThreshHi = v.PThreshHi;
+   PAsScalar = v.PAsScalar;
 
-   UVIndex   = v.uv_index();
+   UVIndex   = v.UVIndex;
 
-   Init      = v.init();
-   Valid     = v.valid();
-   Lead      = v.lead();
-   Ensemble  = v.ens ();
+   Init      = v.Init;
+   Valid     = v.Valid;
+   Lead      = v.Lead;
 
    ConvertFx = v.ConvertFx;
 
-   CensorThresh = v.censor_thresh();
-   CensorVal    = v.censor_val();
+   CensorThresh = v.CensorThresh;
+   CensorVal    = v.CensorVal;
 
-   Regrid    = v.Regrid;
+   nBins = v.nBins;
+   Range = v.Range;
+
+   Regrid = v.Regrid;
+
+   SetAttrName = v.SetAttrName;
+   SetAttrUnits = v.SetAttrUnits;
+   SetAttrLevel = v.SetAttrLevel;
+   SetAttrLongName = v.SetAttrLongName;
+
+   SetAttrGrid = v.SetAttrGrid;
+
+   SetAttrInit = v.SetAttrInit;
+   SetAttrValid = v.SetAttrValid;
+   SetAttrLead = v.SetAttrLead;
+   SetAttrAccum = v.SetAttrAccum;
+
+   SetAttrIsPrecipitation = v.SetAttrIsPrecipitation;
+   SetAttrIsSpecificHumidity = v.SetAttrIsSpecificHumidity;
+   SetAttrIsUWind = v.SetAttrIsUWind;
+   SetAttrIsVWind = v.SetAttrIsVWind;
+   SetAttrIsGridRelative = v.SetAttrIsGridRelative;
+   SetAttrIsWindSpeed = v.SetAttrIsWindSpeed;
+   SetAttrIsWindDirection = v.SetAttrIsWindDirection;
+   SetAttrIsProb = v.SetAttrIsProb;
 
    return;
 }
@@ -143,7 +172,31 @@ void VarInfo::clear() {
    CensorThresh.clear();
    CensorVal.clear();
 
+   nBins = 0;
+   Range.clear();
+
    Regrid.clear();
+
+   SetAttrName.clear();
+   SetAttrUnits.clear();
+   SetAttrLevel.clear();
+   SetAttrLongName.clear();
+
+   SetAttrGrid.clear();
+
+   SetAttrInit = (unixtime) 0;
+   SetAttrValid = (unixtime) 0;
+   SetAttrLead = bad_data_int;
+   SetAttrAccum = bad_data_int;
+
+   SetAttrIsPrecipitation = bad_data_int;
+   SetAttrIsSpecificHumidity = bad_data_int;
+   SetAttrIsUWind = bad_data_int;
+   SetAttrIsVWind = bad_data_int;
+   SetAttrIsGridRelative = bad_data_int;
+   SetAttrIsWindSpeed = bad_data_int;
+   SetAttrIsWindDirection = bad_data_int;
+   SetAttrIsProb = bad_data_int;
 
    return;
 }
@@ -178,6 +231,8 @@ void VarInfo::dump(ostream &out) const {
        << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
        << "  CensorThresh = " << CensorThresh.get_str() << "\n"
        << "  CensorVal    = " << CensorVal.serialize() << "\n"
+       << "  nBins        = " << nBins << "\n"
+       << "  Range        = " << Range.serialize() << "\n"
        << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
 
    Level.dump(out);
@@ -334,6 +389,20 @@ void VarInfo::set_censor_val(const NumArray &a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_n_bins(const int &n) {
+   nBins = n;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_range(const NumArray &a) {
+   Range = a;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_regrid(const RegridInfo &ri) {
    Regrid = ri;
    return;
@@ -361,7 +430,8 @@ void VarInfo::set_dict(Dictionary &dict) {
    ThreshArray ta;
    NumArray na;
    ConcatString s;
-   bool f;
+   bool b;
+   int n;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
@@ -376,12 +446,14 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s.c_str()));
 
    // Parse prob as a boolean, if present
-   f = dict.lookup_bool(conf_key_prob, false);
-   if(dict.last_lookup_status()) set_p_flag(f);
+   const DictionaryEntry * e = dict.lookup(conf_key_prob);
+   if(e) {
+      if(e->type() == BooleanType) set_p_flag(e->b_value());
+   }
 
    // Parse prob_as_scalar, if present
-   f = dict.lookup_bool(conf_key_prob_as_scalar, false);
-   if(dict.last_lookup_status()) set_p_as_scalar(f);
+   b = dict.lookup_bool(conf_key_prob_as_scalar, false);
+   if(dict.last_lookup_status()) set_p_as_scalar(b);
 
    // Lookup conversion function, if present
    ConvertFx.set(dict.lookup(conf_key_convert));
@@ -404,8 +476,76 @@ void VarInfo::set_dict(Dictionary &dict) {
       exit(1);
    }
 
+   // Parse n_bins, if present
+   n = dict.lookup_int(conf_key_n_bins, false);
+   if(dict.last_lookup_status()) set_n_bins(n);
+
+   // Parse range, if present
+   na = dict.lookup_num_array(conf_key_range_flag, false);
+   if(dict.last_lookup_status()) set_range(na);
+
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);
+
+   // Parse set_attr strings
+   SetAttrName =
+      parse_set_attr_string(dict, conf_key_set_attr_name, true);
+   SetAttrUnits =
+      parse_set_attr_string(dict, conf_key_set_attr_units, true);
+   SetAttrLevel =
+      parse_set_attr_string(dict, conf_key_set_attr_level, true);
+   SetAttrLongName =
+      parse_set_attr_string(dict, conf_key_set_attr_long_name);
+
+   // Parse set_attr grid
+   s = parse_set_attr_string(dict, conf_key_set_attr_grid);
+   if(s.nonempty()) {
+
+      // Parse as a white-space separated string
+      StringArray sa;
+      sa.parse_wsss(s);
+
+      // Search for a named grid
+      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrGrid)) {
+      }
+      // Parse grid definition
+      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrGrid)) {
+      }
+      else {
+         mlog << Warning << "\nVarInfo::set_dict() -> "
+              << "unsupported " << conf_key_set_attr_grid
+              << " definition string (" << s
+              << ")!\n\n";
+      }
+   }
+
+   // Parse set_attr times
+   s = parse_set_attr_string(dict, conf_key_set_attr_init);
+   if(s.nonempty()) SetAttrInit = timestring_to_unix(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_valid);
+   if(s.nonempty()) SetAttrValid = timestring_to_unix(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_lead);
+   if(s.nonempty()) SetAttrLead = timestring_to_sec(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_accum);
+   if(s.nonempty()) SetAttrAccum = timestring_to_sec(s.c_str());
+
+   // Parse set_attr flags
+   SetAttrIsPrecipitation =
+      parse_set_attr_flag(dict, conf_key_is_precipitation);
+   SetAttrIsSpecificHumidity =
+      parse_set_attr_flag(dict, conf_key_is_specific_humidity);
+   SetAttrIsUWind =
+      parse_set_attr_flag(dict, conf_key_is_u_wind);
+   SetAttrIsVWind =
+      parse_set_attr_flag(dict, conf_key_is_v_wind);
+   SetAttrIsWindSpeed =
+      parse_set_attr_flag(dict, conf_key_is_wind_speed);
+   SetAttrIsWindDirection =
+      parse_set_attr_flag(dict, conf_key_is_wind_direction);
+   SetAttrIsGridRelative =
+      parse_set_attr_flag(dict, conf_key_is_grid_relative);
+   SetAttrIsProb =
+      parse_set_attr_flag(dict, conf_key_is_prob);
 
    return;
 }
@@ -417,8 +557,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    ConcatString field_level = dict.lookup_string(conf_key_level, false);
    LevelType lt;
    string lvl_type, lvl_val1, lvl_val2;
-   double lvl1 = -1, lvl2 = -1;
-
+   double lvl1;
+   double lvl2 = -1;
 
    //  if the level string is specified, use it
    if( ! field_level.empty() ){
@@ -581,8 +721,51 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_prob(){
+bool VarInfo::is_prob() {
+
+   //
+   // Check set_attr entry
+   //
+   if(!is_bad_data(SetAttrIsProb)) {
+      return(SetAttrIsProb != 0);
+   }
+
    return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_set_attr_string(Dictionary &dict, const char *key,
+                                    bool check_ws) {
+   ConcatString cs;
+
+   cs = dict.lookup_string(key, false);
+   if(cs.nonempty()) {
+      mlog << Debug(3) << "Parsed " << key << " = \"" << cs << "\"\n";
+      if(check_ws && check_reg_exp(ws_reg_exp, cs.c_str())) {
+         mlog << Error << "\nparse_set_attr_string() -> "
+              << "the \"" << key << "\" config file entry (" << cs
+              << ") cannot contain embedded whitespace!\n\n";
+         exit(1);
+      }
+   }
+
+   return(cs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int parse_set_attr_flag(Dictionary &dict, const char *key) {
+   int v = bad_data_int;
+
+   bool b = dict.lookup_bool(key, false);
+   if(dict.last_lookup_status()) {
+      mlog << Debug(3) << "Parsed " << key << " = \""
+           << bool_to_string(b) << "\"\n";
+      v = (int) b;
+   }
+
+   return(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

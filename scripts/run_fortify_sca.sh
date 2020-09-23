@@ -8,20 +8,20 @@
 # go to the directory where you would like the SCA output written and
 # then run:
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/run_fortify_sca.sh name
 #
 # Usage: run_fortify_sca.sh name
 #    Test the specified branched version of MET:
-#       run_fortify_sca.sh master_v8.1
+#       run_fortify_sca.sh {branch name}
 #    Test the specified tagged version of MET:
-#       run_fortify_sca.sh met-8.1
+#       run_fortify_sca.sh {tag name}
 #
 #=======================================================================
 
 # Constants
-GIT_REPO="https://github.com/NCAR/MET"
-FORTIFY_BIN=/d3/projects/Fortify/Fortify_SCA_and_Apps_18.10/bin
+GIT_REPO="https://github.com/dtcenter/MET"
+FORTIFY_BIN=/d3/projects/Fortify/19.2.0/Fortify_SCA_and_Apps_19.2.0/bin
 
 function usage {
         echo

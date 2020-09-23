@@ -1,0 +1,82 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point2Grid configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// NetCDF output variable timing information:
+//   - valid_time in YYYYMMDD[_HH[MMSS]] format
+//
+valid_time = "";
+
+//
+// Observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+//
+// Observation message type
+//
+message_type = [];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Mapping of input variable names to output variables names.
+//
+var_name_map = [
+   { key = "1";     val = "PRES"; },        // GRIB: Pressure
+   { key = "2";     val = "PRMSL"; },       // GRIB: Pressure reduced to MSL
+   { key = "7";     val = "HGT"; },         // GRIB: Geopotential height
+   { key = "11";    val = "TMP"; },         // GRIB: Temperature
+   { key = "15";    val = "TMAX"; },        // GRIB: Max Temperature
+   { key = "16";    val = "TMIN"; },        // GRIB: Min Temperature
+   { key = "17";    val = "DPT"; },         // GRIB: Dewpoint
+   { key = "20";    val = "VIS"; },         // GRIB: Visibility
+   { key = "31";    val = "WDIR"; },        // GRIB: Wind direction
+   { key = "32";    val = "WIND"; },        // GRIB: Wind speed
+   { key = "33";    val = "UGRD"; },        // GRIB: u-component of wind
+   { key = "34";    val = "VGRD"; },        // GRIB: v-component of wind
+   { key = "52";    val = "RH"; },          // GRIB: Relative humidity
+   { key = "61";    val = "APCP"; },        // GRIB: Total precipitation
+   { key = "66";    val = "SNOD"; },        // GRIB: Snow Cover/Depth
+   { key = "111";   val = "NETSOLAR"; },    // SRAD: Surface Radiation
+   { key = "112";   val = "NETIR"; },       // SRAD: Surface Radiation
+   { key = "117";   val = "TOTALNET"; },    // SRAD: Surface Radiation
+   //{ key = "129";   val = "AOT"; },         // AeroNet:
+   { key = "161";   val = "DIRECT"; },      // SRAD: Surface Radiation
+   { key = "167";   val = "DIFFUSE"; },     // SRAD: Surface Radiation
+   { key = "180";    val = "GUST"; },       // GRIB: Wind Gust
+   { key = "204";   val = "DW_PSP"; },      // SRAD: Surface Radiation
+   { key = "205";   val = "DW_PIR"; },      // SRAD: Surface Radiation
+   { key = "211";   val = "UW_PSP"; },      // SRAD: Surface Radiation
+   { key = "212";   val = "UW_PIR"; },      // SRAD: Surface Radiation
+   { key = "0";     val = "WWSIS"; },       // WWSIS: Western Wind and Solar Integration Study
+   { key = "-1";    val = "DW_CASETEMP"; }, // SRAD: Surface Radiation
+   { key = "-2";    val = "DW_DOMETEMP"; }, // SRAD: Surface Radiation
+   { key = "-3";    val = "UW_CASETEMP"; }, // SRAD: Surface Radiation
+   { key = "-4";    val = "UW_DOMETEMP"; }, // SRAD: Surface Radiation
+   { key = "-5";    val = "UVB"; },         // SRAD: Surface Radiation
+   { key = "-6";    val = "PAR"; }          // SRAD: Surface Radiation
+   //{ key = "";    val = ""; },          // GRIB: 
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+quality_mark_thresh = 2;
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir = "/tmp";
+version = "V9.1";
+
+////////////////////////////////////////////////////////////////////////////////

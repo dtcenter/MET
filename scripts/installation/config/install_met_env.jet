@@ -1,0 +1,15 @@
+module load intel/18.0.5.274
+module load intelpython/3.6.5
+module load netcdf/4.6.1
+module load hdf5/1.10.4
+export TEST_BASE=/contrib/met/9.0
+export COMPILER=intel_18.0.5.274
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=met-9.0.1.20200423.tar.gz
+export USE_MODULES=TRUE
+export PYTHON_MODULE=intelpython_3.6.5
+export MET_PYTHON=/apps/intel/intelpython3
+export MET_PYTHON_CC=-I/apps/intel/intelpython3/include/python3.6m
+export MET_PYTHON_LD=-L/apps/intel/intelpython3/lib\ -lpython3.6m\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -Xlinker\ -export-dynamic
+export MET_NETCDF=/apps/netcdf/4.6.1/intel/18.0.5.274
+export MET_HDF5=/apps/hdf5/1.10.4/intel/18.0.5.274

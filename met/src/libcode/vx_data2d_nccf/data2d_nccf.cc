@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,12 +90,12 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
    NcVarInfo *first_data_var = NULL;
    // Store the name of the first data variable
    for (int i = 0; i < _file->Nvars; ++i) {
-      if (is_nc_unit_time(_file->Var[i].units_att.c_str()) ||
-          is_nc_unit_longitude(_file->Var[i].units_att.c_str()) ||
+      if (is_nc_unit_time(_file->Var[i].units_att.c_str()) || 
+          is_nc_unit_longitude(_file->Var[i].units_att.c_str()) || 
           is_nc_unit_latitude(_file->Var[i].units_att.c_str()) ||
           _file->get_time_var_info() == &_file->Var[i]
          ) continue;
-
+     
       if (strcmp(_file->Var[i].name.c_str(), nccf_lat_var_name) != 0 &&
           strcmp(_file->Var[i].name.c_str(), nccf_lon_var_name) != 0) {
          first_data_var = &(_file->Var[i]);
@@ -180,7 +180,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   LongArray dimension = vinfo_nc->dimension();
   long time_cnt = (long)_file->ValidTime.n_elements();
   long time_threshold_cnt = (time_cnt + 1000) * 1000;
-
+  
   data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
   if (NULL != data_var) {
     time_dim_slot = data_var->t_slot;
@@ -193,7 +193,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
         if (time_as_value && time_offset > time_threshold_cnt)   // convert the unixtime to offset
           time_offset = convert_time_to_offset(time_offset);
       }
-
+      
       if ((0 <= time_offset) && (time_offset < time_cnt))
         dimension[time_dim_slot] = time_offset;
       else {
@@ -201,7 +201,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
         if (time_offset > time_threshold_cnt)   // is from time string (yyyymmdd_hh)
           mlog << Warning << "\n" << method_name << "the requested time "
                << unix_to_yyyymmdd_hhmmss(time_offset) << " for \""
-               << vinfo.req_name() << "\" variable does not exist ("
+               << vinfo.req_name() << "\" variable does not exist (" 
                << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
                << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
         else if (org_time_offset == bad_data_int)
@@ -325,7 +325,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
       NcVarInfo *data_var = find_first_data_var();
       if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
    }
-
+   
    LongArray time_offsets =  collect_time_offsets(vinfo);
    if (0 < time_offsets.n_elements()) {
       LevelInfo level = vinfo.level();
@@ -337,7 +337,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
         time_lower = level.lower();
         time_upper = level.upper();
       }
-
+       
       int debug_level = 7;
       for (int idx=0; idx<time_offsets.n_elements(); idx++) {
          _time_dim_offset = time_offsets[idx];
@@ -346,7 +346,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
             n_rec++;
          }
       }
-
+      
       if (mlog.verbosity_level() >= debug_level) {
          for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
             mlog << Debug(debug_level) << method_name << "time: "
@@ -372,7 +372,12 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
 
    // Check for variable not found
-   if(!info) return(time_offsets);
+   if(!info) {
+      mlog << Warning << "\n" << method_name
+           << "can't find NetCDF variable \"" << vinfo_nc->req_name()
+           << "\" in file \"" << Filename << "\".\n\n";
+      return(time_offsets);
+   }
 
    double time_lower = bad_data_double;
    double time_upper = bad_data_double;
@@ -385,7 +390,6 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    bool time_as_value = !level.is_time_as_offset();
    
    long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
-   long time_value = (time_as_value ? dim_offset : -1);
    bool include_all_times = (dim_offset == vx_data2d_star);
 
    int idx;
@@ -397,7 +401,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    }
    else if (is_time_range) {
       double time_inc = level.increment();
-
+      
       time_lower = level.lower();
       time_upper = level.upper();
       if (time_as_value) {
@@ -416,7 +420,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
             }
             break;
          }
-
+         
          if (0 > next_offset) error_code = error_code_missing_time_values;
          else if (0 > time_inc) error_code = error_code_bad_increment;
          else if (0 == time_inc) {   // no increment configuration
@@ -470,7 +474,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
             mlog << Debug(9) << method_name << " added index " << idx << "\n";
          }
       }
-
+      
       int missing_count = missing_times.n_elements();
       if (0 < missing_count) {
          for (idx = 0; idx<missing_count; idx++) {
@@ -497,7 +501,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                                     : error_code_missing_time_offsets;
       }
    }
-
+   
    // Handling error code
    if (error_code > error_code_no_error) {
       ConcatString log_msg;
@@ -534,6 +538,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                  << " (0 <= offset < " << time_dim_size << ")";
       }
       else if (error_code == error_code_missing_time_value) {
+         long time_value = (time_as_value ? dim_offset : -1);
          log_msg << "does not have the matching time "
                  << unix_to_yyyymmdd_hhmmss(time_value) << " ["
                  << unix_to_yyyymmdd_hhmmss(_file->ValidTime.min()) << " and "
@@ -550,6 +555,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
 
    return(time_offsets);
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 

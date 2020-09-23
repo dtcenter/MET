@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,7 +66,7 @@ bool is_netcdf_file(const char * filename)
 
    n_read = read(fd, buf, netcdf_magic_len);
 
-   close(fd);  fd = -1;
+   close(fd);
 
    if ( n_read != netcdf_magic_len )  return ( false );
 

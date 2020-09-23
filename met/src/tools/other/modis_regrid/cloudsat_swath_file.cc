@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,7 +30,6 @@ using namespace std;
 static const bool do_shuffle = false;
 
 static const int buf_size = 65536;
-// static const int buf_size = 15000000;
 
 static unsigned char buf[buf_size];
 
@@ -493,8 +492,6 @@ Bytes = n;
 
 Nvalues = 0;
 
-bytes_per_sample = 0;
-
 switch ( Numbertype )  {
 
    case nt_char_8:
@@ -506,11 +503,6 @@ switch ( Numbertype )  {
 
    case nt_int_8:
       bytes_per_sample = 1;
-      // if ( Bytes%bytes_per_sample )  {
-      //    mlog << Error
-      //         << "\n\n  SatAttribute::set_value() -> bad short size ... " << Bytes << "\n\n";
-      //    exit ( 1 ); 
-      // }
       Nvalues = Bytes/bytes_per_sample;
       Ival = new int [Nvalues];
       for (j=0; j<Nvalues; ++j)  {
@@ -1988,10 +1980,6 @@ CloudsatSwathFile::CloudsatSwathFile(const CloudsatSwathFile &)
 
 {
 
-// init_from_scratch();
-// 
-// assign(f);
-
 mlog << Error
      << "\n\n  CloudsatSwathFile::CloudsatSwathFile(const CloudsatSwathFile &) -> should never be called!\n\n";
 
@@ -2006,11 +1994,6 @@ exit ( 1 );
 CloudsatSwathFile & CloudsatSwathFile::operator=(const CloudsatSwathFile &)
 
 {
-
-// if ( this == &f )  return ( * this );
-// 
-// assign(f);
-
 
 mlog << Error
      << "\n\n  CloudsatSwathFile::operator=(const CloudsatSwathFile &) -> should never be called!\n\n";

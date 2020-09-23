@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -102,6 +102,7 @@ struct GridStatNcOutInfo {
    bool do_raw;
    bool do_diff;
    bool do_climo;
+   bool do_climo_cdp;
    bool do_weight;
    bool do_nbrhd;
    bool do_fourier;
@@ -140,7 +141,9 @@ class GridStatVxOpt {
       VarInfo *        obs_info;         // obs VarInfo pointer (allocated)
 
       ConcatString     desc;             // Description string
-      ConcatString     var_str;          // nc_pairs_var_str string
+      ConcatString     var_name;         // nc_pairs_var_name string
+      ConcatString     var_suffix;       // nc_pairs_var_suffix string
+                                         // nc_pairs_var_str is deprecated
 
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds
@@ -160,7 +163,7 @@ class GridStatVxOpt {
 
       NumArray         eclv_points;      // ECLV points
 
-      ThreshArray      climo_cdf_ta;     // Climo CDF thresh array
+      ClimoCDFInfo     cdf_info;         // Climo CDF info
 
       NumArray         ci_alpha;         // Alpha value for confidence intervals
 
@@ -197,7 +200,7 @@ class GridStatVxOpt {
       void parse_nc_info(Dictionary &);
       bool is_uv_match(const GridStatVxOpt &) const;
 
-      void set_perc_thresh(const NumArray &, const NumArray &, const NumArray &);
+      void set_perc_thresh(const PairDataPoint &);
 
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
@@ -226,7 +229,7 @@ class GridStatVxOpt {
 inline int  GridStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());         }
 inline int  GridStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);           }
 inline int  GridStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());       }
-inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);  }
+inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);                 }
 inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return(nbrhd_info.width.n_elements());  }
 inline int  GridStatVxOpt::get_n_cov_thresh()  const { return(nbrhd_info.cov_ta.n_elements()); }
 inline int  GridStatVxOpt::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());       }

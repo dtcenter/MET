@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -441,44 +441,9 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "parsing the command line arguments as a list of "
            << "files.\n";
 
-      //
-      // If one input file was specified, check for an ascii file list.
-      //
-      if(cline.n() == 2) {
-         Met2dDataFileFactory mtddf_factory;
-         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-         config.read_string(parse_config_str(req_field_list[0].c_str()).c_str());
-         GrdFileType type = parse_conf_file_type(&config);
-
-         //
-         // Attempt to read the first file as a gridded data file.
-         // If the read was successful, store the file name.
-         // Otherwise, process as an ascii file list.
-         //
-         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0].c_str(),
-                                                        type))) {
-            file_list.add(cline[0]);
-         }
-         else {
-            mlog << Debug(1)
-                 << "Parsing input file names from ASCII file list: "
-                 << cline[0] << "\n";
-            file_list = parse_ascii_file_list(cline[0].c_str());
-         }
-
-         //
-         // Cleanup.
-         //
-         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-      }
-      //
-      // Otherwise, store list of multiple input files.
-      //
-      else {
-         for(i=0; i<(cline.n()-1); i++) {
-            file_list.add(cline[i]);
-         }
-      }
+      StringArray sa;
+      for(i=0; i<(cline.n()-1); i++) sa.add(cline[i]);
+      file_list = parse_file_list(sa);
    }
    //
    // If the -field command line option was not used, process remaining
@@ -758,7 +723,8 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    // Find the files matching the specified regular expression with
    // the correct valid and accumulation times.
    //
-   if((dp = met_opendir(cur_dir)) == NULL ) {
+   dp = met_opendir(cur_dir);
+   if(!dp) {
       mlog << Error << "\nsearch_pcp_dir() -> "
            << "cannot open search directory: " << cur_dir << "\n\n";
       exit(1);
@@ -844,15 +810,12 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
          //  check for a valid match
          if( -1 != i_rec ) { met_closedir(dp);  break; }
-	 
+
       } // end if
 
    } // end while
 
-   if( dp != 0 ) {
-      met_closedir(dp);
-      dp = 0;
-   }
+   if(dp) met_closedir(dp);
 
    return(i_rec);
 }
@@ -941,8 +904,11 @@ void do_sub_command() {
    // Update value for each grid point.
    //
    for(i=0, nxy=grid1.nx()*grid1.ny(); i<nxy; i++) {
-      if(!is_bad_data( diff.data()[i]) &&
-         !is_bad_data(minus.data()[i])) {
+      if(is_bad_data( diff.data()[i]) ||
+         is_bad_data(minus.data()[i])) {
+         diff.buf()[i] = bad_data_double;
+      }
+      else {
          diff.buf()[i] -= minus.data()[i];
       }
    }
@@ -965,9 +931,16 @@ void do_derive_command() {
    DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
-   int i, j, n, nxy, nc_accum, nc_accum_sum;
+   int nc_accum, nc_accum_sum;
+   int i, j, n, nxy;
    ConcatString derive_list_css;
    double v;
+
+   //
+   // Initialize
+   //
+   nc_init_time = nc_valid_time = (unixtime) 0;
+   nc_accum = nc_accum_sum = nxy = 0;
 
    //
    // List of all requested field derivations.
@@ -1373,8 +1346,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       // special characters.
       //
       if(nc_accum == 0) {
-         var_str = var_info->name();
-         cs      = var_info->level_name();
+         var_str = var_info->name_attr();
+         cs      = var_info->level_attr();
          if(!check_reg_exp("[\\(\\*\\,\\)]", cs.c_str())) var_str << "_" << cs;
       }
       //
@@ -1385,7 +1358,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
          //
          // Use the name prior to the first underscore.
          //
-         cs      = var_info->name();
+         cs      = var_info->name_attr();
          sa      = cs.split("_");
          var_str = sa[0];
 
@@ -1426,7 +1399,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    add_att(&nc_var, "name",  var_str.c_str());
    if(run_command == der) cs = long_name_prefix;
    else                   cs.clear();
-   cs << var_info->long_name();
+   cs << var_info->long_name_attr();
    add_att(&nc_var, "long_name", cs.c_str());
 
    // Ouput level string.
@@ -1437,11 +1410,11 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
          var_str << cs_erase << 'A' << sec_to_hhmmss(nc_accum);
       }
    } else {
-      var_str << cs_erase << var_info->level().name();
+      var_str << cs_erase << var_info->level_attr();
    }
 
    add_att(&nc_var, "level", var_str.c_str());
-   add_att(&nc_var, "units", var_info->units().c_str());
+   add_att(&nc_var, "units", var_info->units_attr().c_str());
    add_att(&nc_var, "_FillValue", bad_data_float);
 
    //

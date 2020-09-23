@@ -1,0 +1,138 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// TC-Pairs configuration file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// ATCF file format reference:
+//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//
+
+//
+// Models
+//
+model = [];
+
+//
+// Description
+//
+desc = "NA";
+
+//
+// Storm identifiers
+//
+storm_id = [];
+
+//
+// Basins
+//
+basin = [];
+
+//
+// Cyclone numbers
+//
+cyclone = [];
+
+//
+// Storm names
+//
+storm_name = [];
+
+//
+// Model initialization time windows to include or exclude
+//
+init_beg = "";
+init_end = "";
+init_inc = [];
+init_exc = [];
+
+//
+// Valid model time window
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// Model initialization hours
+//
+init_hour = [];
+
+//
+// lat/lon polylines defining masking regions
+//
+init_mask  = "";
+valid_mask = "";
+
+//
+// Select tracks which contain all required lead times.
+//
+lead_req = [];
+
+//
+// Specify if the code should check for duplicate ATCF lines
+//
+check_dup = TRUE;
+
+//
+// Specify special processing to be performed for interpolated models.
+// Set to NONE, FILL, or REPLACE.
+//
+interp12 = NONE;
+
+//
+// Specify how consensus forecasts should be defined
+//
+consensus = [];
+
+//
+// Forecast lag times
+//
+lag_time = [];
+
+//
+// CLIPER/SHIFOR baseline forecasts to be derived from the BEST
+// and operational (CARQ) tracks.
+//
+best_baseline = [ "BCLP" ];
+oper_baseline = [ "OCLP" ];
+
+//
+// Specify if only those track points common to both the ADECK and BDECK
+// tracks be written out.
+//
+match_points = FALSE;
+
+//
+// Specify the NetCDF output of the gen_dland tool containing a gridded
+// representation of the minimum distance to land.
+//
+dland_file = "${MET_TEST_OUTPUT}/tc_dland/tc_dland_half_deg.nc";
+
+//
+// Specify watch/warning information:
+//   - Input watch/warning filename
+//   - Watch/warning time offset in seconds
+//
+watch_warn = {
+   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
+   time_offset = -14400;
+}
+
+//
+// Modify basin names to make them consistent across ATCF input files.
+//
+basin_map = [
+   { key = "SI"; val = "SH"; },
+   { key = "SP"; val = "SH"; },
+   { key = "AU"; val = "SH"; },
+   { key = "AB"; val = "IO"; },
+   { key = "BB"; val = "IO"; },
+   { key = "AL"; val = "ATLANTIC"; }
+];
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V9.1";

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -248,7 +248,7 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeLine::is_ok() const
+bool ModeLine::is_ok() const
 
 {
 
@@ -260,7 +260,7 @@ return ( DataLine::is_ok() );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeLine::is_header() const
+bool ModeLine::is_header() const
 
 {
 

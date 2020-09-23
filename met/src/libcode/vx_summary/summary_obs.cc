@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -174,6 +174,14 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    for (time_interval = time_intervals.begin();
         time_interval != time_intervals.end(); ++time_interval)
    {
+      mlog << Debug(3) << "Computing "
+           << unix_to_yyyymmdd_hhmmss(time_interval->getBaseTime())
+           << " time summary from "
+           << unix_to_yyyymmdd_hhmmss(time_interval->getStartTime())
+           << " to "
+           << unix_to_yyyymmdd_hhmmss(time_interval->getEndTime())
+           << ".\n";
+
       // Initialize the map used to sort observations in this time period
       // into their correct summary groups
       map< SummaryKey, NumArray* > summary_values;

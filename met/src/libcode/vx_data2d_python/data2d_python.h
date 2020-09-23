@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,7 +27,6 @@
 #include "grid_from_python_dict.h"
 
 #include "global_python.h"
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,7 +73,7 @@ class MetPythonDataFile : public Met2dDataFile {
 
       bool data_ok       (int x, int y) const;
 
-      void data_minmax(double & data_min, double & data_max) const;
+      void data_minmax   (double & data_min, double & data_max) const;
 
          //
          //  do stuff
@@ -85,13 +84,13 @@ class MetPythonDataFile : public Met2dDataFile {
       void close();
 
 
-      void dump(ostream &, int depth = 0) const;
+      void dump (ostream &, int depth = 0) const;
 
       bool data_plane(VarInfo &, DataPlane &);
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int  data_plane_array(VarInfo &, DataPlaneArray &);
 
-      int index(VarInfo &);
+      int  index(VarInfo &);
 
       bool data_plane(DataPlane &);
 
@@ -112,5 +111,4 @@ inline GrdFileType MetPythonDataFile::file_type ()                const { return
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

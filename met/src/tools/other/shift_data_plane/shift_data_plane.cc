@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -172,7 +172,7 @@ void process_data_file() {
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = config.nc_compression();
-   
+
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
 
@@ -256,8 +256,8 @@ void process_data_file() {
 
    mlog << Debug(2) << shift_cs << "\n";
 
-   // Shift the data   
-   
+   // Shift the data
+
    dp_shift = dp_in;
    for(x=0; x<dp_shift.nx(); x++) {
       for(y=0; y<dp_shift.ny(); y++) {
@@ -310,13 +310,13 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    // Define output variable and attributes
-   cs << cs_erase << vinfo->name();
+   cs << cs_erase << vinfo->name_attr();
    if(vinfo->level().type() != LevelType_Accum &&
       ftype != FileType_NcMet &&
       ftype != FileType_General_Netcdf &&
       ftype != FileType_NcPinterp &&
       ftype != FileType_NcCF) {
-      cs << "_" << vinfo->level_name();
+      cs << "_" << vinfo->level_attr();
    }
 
    int deflate_level = compress_level;
@@ -324,14 +324,14 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
    NcVar data_var = add_var(f_out, (string)cs, ncFloat, lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)cs);
-   add_att(&data_var, "long_name", (string)vinfo->long_name());
-   add_att(&data_var, "level", (string)vinfo->level_name());
-   add_att(&data_var, "units", (string)vinfo->units());
+   add_att(&data_var, "long_name", (string)vinfo->long_name_attr());
+   add_att(&data_var, "level", (string)vinfo->level_attr());
+   add_att(&data_var, "units", (string)vinfo->units_attr());
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
    add_att(&data_var, "smoothing_method", (string)interpmthd_to_string(Method));
    add_att(&data_var, "smoothing_neighborhood", Width*Width);
-   
+
    GridTemplateFactory gtf;
    add_att(&data_var, "smoothing_shape", gtf.enum2String(Shape));
 
@@ -355,8 +355,8 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
    // Clean up
    if(data)  {                 delete [] data; data  = (float *)  0; }
-   if(f_out) { 
-      delete f_out;   f_out = (NcFile *) 0; 
+   if(f_out) {
+      delete f_out;   f_out = (NcFile *) 0;
    }
 
    // List the output file
@@ -381,7 +381,7 @@ void usage() {
         << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-	      << "\t[-shape SHAPE]\n"	 
+	      << "\t[-shape SHAPE]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -412,7 +412,7 @@ void usage() {
         << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
         << "(optional).\n"
 
-	   
+
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"

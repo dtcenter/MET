@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -211,7 +211,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
       // Parse entries and store as regular expressions
       sa.parse_css(dl[0]);
-      for(int i=0; i<sa.n_elements(); i++) {
+      for(int i=0; i<sa.n(); i++) {
          cs << cs_erase << "^" << sa[i] << "$";
          var_name.add(cs);
       }
@@ -467,7 +467,7 @@ void ObsErrorTable::initialize() {
    // Search for file input file names
    file_names = get_filenames(path, "obs_error", ".txt", true);
 
-   for(int i=0; i<file_names.n_elements(); i++) {
+   for(int i=0; i<file_names.n(); i++) {
 
       mlog << Debug(1)
            << "Reading " << desc << " file: " << file_names[i] << "\n";

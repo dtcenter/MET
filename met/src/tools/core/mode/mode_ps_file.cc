@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -208,7 +208,7 @@ mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
    // data_min and data_max values
    //
 
-if ( (ConfInfo->Fcst->var_info->name() == ConfInfo->Obs->var_info->name()) &&
+if ( (ConfInfo->fcst_info->name_attr() == ConfInfo->obs_info->name_attr()) &&
       is_eq( FcstRawCtable.data_min (bad_data_double), 0.0) &&
       is_eq( FcstRawCtable.data_max (bad_data_double), 1.0) &&
       is_eq(  ObsRawCtable.data_min (bad_data_double), 0.0) &&
@@ -546,10 +546,10 @@ const MergeType  obs_merge_flag = ConfInfo->Obs->merge_flag;
 ConcatString s;
 
 s << cs_erase
-  << "MODE: " << ConfInfo->Fcst->var_info->name() << " at "
-  << ConfInfo->Fcst->var_info->level_name() << " vs "
-  << ConfInfo->Obs->var_info->name() << " at "
-  << ConfInfo->Obs->var_info->level_name();
+  << "MODE: " << ConfInfo->fcst_info->name_attr() << " at "
+  << ConfInfo->fcst_info->level_attr() << " vs "
+  << ConfInfo->obs_info->name_attr() << " at "
+  << ConfInfo->obs_info->level_attr();
 
  plot_engine(*Engine, FOEng, s.c_str());
 
@@ -1139,9 +1139,6 @@ for (i=0; i<eng.collection.n_sets; i++) {
 
    if ( fcst ) poly = eng.pair_cluster[i].Fcst[0].convex_hull;
    else        poly = eng.pair_cluster[i].Obs[0].convex_hull;
-
-   // cout << "========= " << (fcst ? "fcst" : "obs") << " " << i << "\n" << flush;
-   // poly.dump(cout);
 
    draw_polyline(poly, HullColor, false);
 

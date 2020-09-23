@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -196,10 +196,7 @@ void process_binary() {
    }
 
    // Close the input file
-   if(fd >= 0) {
-      ::close(fd);
-      fd = -1;
-   }
+   if(fd >= 0) ::close(fd);
 
    // Write data for each climo bin
    for(i=0; i<(n_bin-1); i++) {

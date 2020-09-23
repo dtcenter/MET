@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -128,6 +128,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TimeArray::erase()
+
+{
+
+Nelements = 0;
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void TimeArray::assign(const TimeArray & a)
 
 {
@@ -159,19 +175,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TimeArray::extend(int n)
+void TimeArray::extend(int n, bool exact)
+
 
 {
 
 if ( Nalloc >= n )  return;
 
-int k;
+if ( ! exact )  {
 
-k = n/time_array_alloc_inc;
+   int k;
 
-if ( n%time_array_alloc_inc )  ++k;
+   k = n/time_array_alloc_inc;
 
-n = k*time_array_alloc_inc;
+   if ( n%time_array_alloc_inc )  ++k;
+
+   n = k*time_array_alloc_inc;
+
+}
 
 unixtime * u = (unixtime *) 0;
 
@@ -179,7 +200,8 @@ u = new unixtime [n];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid TimeArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid TimeArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -305,7 +327,7 @@ void TimeArray::add(unixtime u)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = u;
 
@@ -377,7 +399,8 @@ void TimeArray::set(int n, unixtime u)
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\nTimeArray::set(int, unixtime) -> range check error\n\n";
+   mlog << Error << "\nTimeArray::set(int, unixtime) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -475,7 +498,7 @@ if ( Nelements == 0 )  return;
 // Use first point to begin first segment
 beg.add(e[0]);
 
-for(i=1, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
+for(i=1, prv_dt=0, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
    cur_dt = e[i] - e[i-1];
    if(new_ts) {
       prv_dt = cur_dt;

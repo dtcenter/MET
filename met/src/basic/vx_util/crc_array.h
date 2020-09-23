@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -99,7 +99,7 @@ class CRC_Array {
 
       void clear();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -123,8 +123,8 @@ class CRC_Array {
          //  do stuff
          //
 
-      bool has(const T &) const;
-      bool has(const T &, int & index) const;
+      bool has(const T &, bool forward=true) const;
+      bool has(const T &, int & index, bool forward=true) const;
 
       void add(const T &);
       void add(const CRC_Array <T> &);
@@ -267,19 +267,23 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::extend(int len)
+void CRC_Array<T>::extend(int len, bool exact)
 
 {
 
 if ( Nalloc >= len )  return;
 
-int k;
+if ( ! exact )  {
 
-k = len/crc_array_alloc_inc;
+   int k;
 
-if ( len%crc_array_alloc_inc )  ++k;
+   k = len/crc_array_alloc_inc;
 
-len = k*crc_array_alloc_inc;
+   if ( len%crc_array_alloc_inc )  ++k;
+
+   len = k*crc_array_alloc_inc;
+
+}
 
 T * u = (T *) 0;
 
@@ -287,7 +291,7 @@ u = new T [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid CRC_Array::extend(int) -> "
+   mlog << Error << "\nvoid CRC_Array::extend(int, bool) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
@@ -440,19 +444,30 @@ return ( e[i] );
 
 template <typename T>
 
-bool CRC_Array<T>::has(const T & k) const
+bool CRC_Array<T>::has(const T & k, bool forward) const
 
 {
 
 int j;
-
-for (j=0; j<Nelements; ++j)  {
-
-   if ( e[j] == k )  return ( true );
-
+bool found = false;
+if (forward) {
+   for (j=0; j<Nelements; ++j)  {
+      if ( e[j] == k ) {
+          found = true;
+          break;
+      }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j)  {
+      if ( e[j] == k ) {
+          found = true;
+          break;
+      }
+   }
 }
 
-return ( false );
+return ( found );
 
 }
 
@@ -462,21 +477,27 @@ return ( false );
 
 template <typename T>
 
-bool CRC_Array<T>::has(const T & k, int & index) const
+bool CRC_Array<T>::has(const T & k, int & index, bool forward) const
 
 {
 
 int j;
+bool found = false;
 
 index = -1;
 
-for (j=0; j<Nelements; ++j)  {
-
-   if ( e[j] == k )  { index = j;  return ( true ); }
-
+if (forward) {
+   for (j=0; j<Nelements; ++j)  {
+      if ( e[j] == k )  { index = j; found = true; break; }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j)  {
+      if ( e[j] == k )  { index = j; found = true; break; }
+   }
 }
 
-return ( false );
+return ( found );
 
 }
 
@@ -490,7 +511,7 @@ void CRC_Array<T>::add(const T & k)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = k;
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -47,6 +47,8 @@ static const char start_time_att_name [] = "StartTime";
 static const char    delta_t_att_name [] = "DeltaT";
 static const char     radius_att_name [] = "Radius";
 static const char  threshold_att_name [] = "Threshold";
+static const char   time_beg_att_name [] = "Time_Beg";
+static const char   time_end_att_name [] = "Time_End";
 static const char  min_value_att_name [] = "MinDataValue";
 static const char  max_value_att_name [] = "MaxDataValue";
 static const char   is_split_att_name [] = "is_split";

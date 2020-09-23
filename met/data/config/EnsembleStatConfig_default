@@ -65,6 +65,33 @@ ens = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -84,6 +111,7 @@ obs = fcst;
 // May be set separately in each "obs.field" entry
 //
 message_type   = [ "ADPUPA" ];
+sid_inc        = [];
 sid_exc        = [];
 obs_thresh     = [ NA ];
 obs_quality    = [];
@@ -108,7 +136,7 @@ obs_error = {
 }
 
 //
-// Mapping of message type group name to comma-separated list of values.
+// Mapping of message type group name to comma-separated list of values
 //
 message_type_group_map = [
    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
@@ -124,10 +152,16 @@ message_type_group_map = [
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
+//
+// Categorical thresholds to define ensemble probabilities
+// May be set separately in each "fcst.field" entry
+//
+prob_cat_thresh = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = {
 
@@ -142,9 +176,22 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +248,7 @@ interp = {
 //
 output_flag = {
    ecnt  = NONE;
+   rps   = NONE;
    rhist = NONE;
    phist = NONE;
    orank = NONE;
@@ -224,6 +272,8 @@ ensemble_flag = {
    range     = TRUE;
    vld_count = TRUE;
    frequency = TRUE;
+   nep       = FALSE;
+   nmep      = FALSE;
    rank      = TRUE;
    weight    = FALSE;
 }
@@ -242,6 +292,6 @@ rng = {
 
 grid_weight_flag = NONE;
 output_prefix    = "";
-version          = "V9.0";
+version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

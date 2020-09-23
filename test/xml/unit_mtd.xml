@@ -18,11 +18,15 @@
     <exec>&MET_BIN;/mtd</exec>
     <env>
        <pair><name>OUTPUT_PREFIX</name> <value>BASIC</value></pair>
+       <pair><name>FCST_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>FCST_CONV_TIME_END</name> <value>1</value></pair>
+       <pair><name>OBS_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>OBS_CONV_TIME_END</name> <value>1</value></pair>
     </env>
     <param> \
       -fcst    &DATA_DIR;/fcst_files/*.grb \
       -obs     &DATA_DIR;/obs_files/*.grb \
-      -config  &CONFIG_DIR;/MTD_config_simple  \
+      -config  &CONFIG_DIR;/MTDConfig_simple  \
       -outdir  &OUTPUT_DIR;/mtd -v 1
     </param>
 
@@ -32,7 +36,33 @@
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_simple.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_single_cluster.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_cluster.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</exist>
+      <grid_nc>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="mtd_conv_time">
+    <exec>&MET_BIN;/mtd</exec>
+    <env>
+       <pair><name>OUTPUT_PREFIX</name> <value>CONV_TIME</value></pair>
+       <pair><name>FCST_CONV_TIME_BEG</name> <value>-2</value></pair>
+       <pair><name>FCST_CONV_TIME_END</name> <value>3</value></pair>
+       <pair><name>OBS_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>OBS_CONV_TIME_END</name> <value>1</value></pair>
+    </env>
+    <param> \
+      -fcst    &DATA_DIR;/fcst_files/*.grb \
+      -obs     &DATA_DIR;/obs_files/*.grb \
+      -config  &CONFIG_DIR;/MTDConfig_simple  \
+      -outdir  &OUTPUT_DIR;/mtd -v 1
+    </param>
+
+    <output>
+      <exist>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_3d_single_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_3d_pair_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_3d_single_cluster.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_3d_pair_cluster.txt</exist>
+      <grid_nc>&OUTPUT_DIR;/mtd/mtd_CONV_TIME_20100517_010000V_obj.nc</grid_nc>
     </output>
   </test>
 
@@ -40,20 +70,22 @@
     <exec>&MET_BIN;/mtd</exec>
     <env>
        <pair><name>OUTPUT_PREFIX</name> <value>SINGLE</value></pair>
+       <pair><name>FCST_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>FCST_CONV_TIME_END</name> <value>1</value></pair>
+       <pair><name>OBS_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>OBS_CONV_TIME_END</name> <value>1</value></pair>
     </env>
     <param> \
       -single  &DATA_DIR;/fcst_files/*.grb \
-      -config  &CONFIG_DIR;/MTD_config_simple  \
+      -config  &CONFIG_DIR;/MTDConfig_simple  \
       -outdir  &OUTPUT_DIR;/mtd -v 1
     </param>
 
     <output>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_2d.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_3d_single_simple.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</exist>
+      <grid_nc>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</grid_nc>
     </output>
   </test>
 
 </met_test>
-
-

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,7 +157,6 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       if( !isdigit(data_line[6][i]) )  {
         int var_index;
         use_var_id = true;
-        grib_code = bad_data_int;
         if (!obs_names.has(data_line[6], var_index)) {
            obs_names.add(data_line[6]);
            obs_names.has(data_line[6], var_index);

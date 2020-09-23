@@ -133,13 +133,6 @@ version = "V6.0";
 model  = [];
 
 //
-// The "desc" entry specifies a user-specified description for each verification
-// task.  This string is written to the DESC column of the ASCII output
-// generated.
-//
-desc = "NA";
-
-//
 // Specify whether the code should check for duplicate ATCF lines when
 // building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 //
@@ -244,6 +237,39 @@ watch_warn = {
    time_offset = -14400;
 }
 
+//
+// The basin_map entry defines a mapping of input names to output values.
+// Whenever the basin string matches "key" in the input ATCF files, it is
+// replaced with "val". This map can be used to modify basin names to make them
+// consistent across the ATCF input files.
+//
+// Many global modeling centers use ATCF basin identifiers based on region
+// (e.g., 'SP' for South Pacific Ocean, etc.), however the best track data
+// provided by the Joint Typhoon Warning Center (JTWC) use just one basin
+// identifier 'SH' for all of the Southern Hemisphere basins. Additionally,
+// some modeling centers may report basin identifiers separately for the Bay
+// of Bengal (BB) and Arabian Sea (AB) whereas JTWC uses 'IO'.
+//
+// The basin mapping allows MET to map the basin identifiers to the expected
+// values without having to modify your data. For example, the first entry
+// in the list below indicates that any data entries for 'SI' will be matched
+// as if they were 'SH'. In this manner, all verification results for the
+// Southern Hemisphere basins will be reported together as one basin.
+//
+// An empty list indicates that no basin mapping should be used. Use this if
+// you are not using JTWC best tracks and you would like to match explicitly
+// by basin or sub-basin. Note that if your model data and best track do not
+// use the same basin identifier conventions, using an empty list for this
+// parameter will result in missed matches.
+//
+basin_map = [
+   { key = "SI"; val = "SH"; },
+   { key = "SP"; val = "SH"; },
+   { key = "AU"; val = "SH"; },
+   { key = "AB"; val = "IO"; },
+   { key = "BB"; val = "IO"; }
+];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // TCStatConfig_default
@@ -260,11 +286,6 @@ watch_warn = {
 //
 amodel = [];
 bmodel = [];
-
-//
-// Stratify by the DESC column.
-//
-desc = [];
 
 //
 // Stratify by the VALID times.
@@ -505,6 +526,18 @@ out_valid_mask = "";
 //          "-init_thresh        name thresh"
 //          "-init_str           name string"
 //
+//          Additional filtering options that may be used only when -line_type
+//          has been listed only once. These options take two arguments: the name
+//          of the data column to be used and the min, max, or exact value for
+//          that column. If multiple column eq/min/max/str options are listed,
+//          the job will be performed on their intersection:
+//
+//          "-column_min col_name value"  e.g. -column_min TK_ERR 100.00
+//          "-column_max col_name value"
+//          "-column_eq  col_name value"
+//          "-column_str col_name string" separate multiple filtering strings
+//                                        with commas
+//
 //          Required Args: -dump_row
 //
 //       "summary"
@@ -589,10 +622,172 @@ out_valid_mask = "";
 //       e.g.
 //       jobs = [
 //          "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
-//          "-job filter -column_thresh TK_ERR gt100.000 \
+//          "-job filter -column_min TK_ERR 100.000 \
 //           -dumprow ./tc_filter_job.tcst",
 //          "-job summary -line_type TCMPR -column AC \
 //           -dumprow  ./tc_summary_job.tcst",
 //          "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
 //
 jobs = [];
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TCGenConfig_default
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Model initialization frequency in hours, starting at 0.
+//
+init_freq = 6;
+
+//
+// Lead times in hours to be searched for genesis events.
+//
+lead_window = {
+   beg = 24;
+   end = 120;
+}
+
+//
+// Minimum track duration for genesis event in hours.
+//
+min_duration = 12;
+
+//
+// Forecast genesis event criteria.  Defined as tracks reaching the specified
+// intensity category, maximum wind speed threshold, and minimum sea-level
+// pressure threshold.  The forecast genesis time is the valid time of the first
+// track point where all of these criteria are met.
+//
+fcst_genesis = {
+   vmax_thresh = NA;
+   mslp_thresh = NA;
+}
+
+//
+// BEST track genesis event criteria.  Defined as tracks reaching the specified
+// intensity category, maximum wind speed threshold, and minimum sea-level
+// pressure threshold.  The BEST track genesis time is the valid time of the
+// first track point where all of these criteria are met.
+//
+best_genesis = {
+   technique   = "BEST";
+   category    = [ "TD", "TS" ];
+   vmax_thresh = NA;
+   mslp_thresh = NA;
+}
+
+//
+// Operational track genesis event criteria.  Defined as tracks reaching the
+// specified intensity category, maximum wind speed threshold, and minimum
+// sea-level pressure threshold.  The operational track genesis time is valid
+// time of the first track point where all of these criteria are met.
+//
+oper_genesis = {
+   technique   = "CARQ";
+   category    = [ "DB", "LO", "WV" ];
+   vmax_thresh = NA;
+   mslp_thresh = NA;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Track filtering options which may be specified separately in each filter
+// array entry.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filter is an array of dictionaries containing the track filtering options
+// listed below.  If empty, a single filter is defined using the top-level
+// settings.
+//
+filter = [];
+
+//
+// Description written to output DESC column
+//
+desc = "NA";
+
+//
+// Forecast ATCF ID's
+// If empty, all ATCF ID's found will be processed.
+// Statistics will be generated separately for each ATCF ID.
+//
+model = [];
+
+//
+// BEST and operational track storm identifiers
+//
+storm_id = [];
+
+//
+// BEST and operational track storm names
+//
+storm_name = [];
+
+//
+// Forecast and operational initialization time window
+//
+init_beg = "";
+init_end = "";
+
+//
+// Forecast, BEST, and operational valid time window
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// Forecast and operational initialization hours
+//
+init_hour = [];
+
+//
+// Forecast and operational lead times in hours
+//
+lead = [];
+
+//
+// Spatial masking region (path to gridded data file or polyline file)
+//
+vx_mask = "";
+
+//
+// Distance to land threshold
+//
+dland_thresh = NA;
+
+//
+// Genesis matching time window, in hours relative to the forecast genesis time
+//
+genesis_window = {
+   beg = -24;
+   end =  24;
+}
+
+//
+// Genesis matching search radius in km.
+//
+genesis_radius = 300;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Global settings.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval alpha value
+//
+ci_alpha = 0.05;
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = NONE;
+   ctc    = BOTH;
+   cts    = BOTH;
+}

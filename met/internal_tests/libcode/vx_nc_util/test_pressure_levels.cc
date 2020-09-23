@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,10 +58,10 @@ int main(int argc, char *argv[]) {
     }
     cout << endl;
 
-    // set<float> pressure_levels
+    // set<double> pressure_levels
     //     = get_pressure_levels(variable_levels);
 
-    // for (set<float>::iterator i = pressure_levels.begin();
+    // for (set<double>::iterator i = pressure_levels.begin();
     //     i != pressure_levels.end(); ++i) {
     //         cout << *i << " ";
     // }
@@ -76,19 +76,19 @@ int main(int argc, char *argv[]) {
     }
     cout << endl << endl;
 
-    set<float> pressure_levels
+    set<double> pressure_levels
         = get_pressure_levels(pressure_level_strings);
 
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
             cout << *i << " ";
     }
     cout << endl << endl;
 
-    map<float, int> pressure_level_indices
+    map<double, int> pressure_level_indices
         = get_pressure_level_indices(pressure_levels);
 
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
             cout << *i << " : " << pressure_level_indices[*i] << endl;
     }

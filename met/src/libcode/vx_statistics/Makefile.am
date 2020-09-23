@@ -17,7 +17,9 @@ libvx_statistics_a_SOURCES = \
                contable.cc contable.h \
                contable_stats.cc \
                contable_nx2.cc \
+               compute_stats.cc compute_stats.h \
                met_stats.cc met_stats.h \
+               ens_stats.cc ens_stats.h \
                pair_base.cc pair_base.h \
                pair_data_point.cc pair_data_point.h \
                pair_data_ensemble.cc pair_data_ensemble.h \

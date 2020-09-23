@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -40,7 +40,6 @@ if ( filenames.n() < 2 )  {
 }
 
 int j;
-// Dictionary * dict = 0;
 Met2dDataFile * data_2d_file = 0;
 Met2dDataFileFactory factory;
 DataPlane plane;
@@ -97,10 +96,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
 }   //  for j
 
-// varinfo.set_lead
-// varinfo.set_init
 varinfo.set_valid(valid_times[0]);
-
 
    //
    //  check the time intervals

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 
 #include "mask_poly.h"
 
@@ -106,6 +107,9 @@ class TCPairsConfInfo {
 
       // Watch/warnings time offset
       int WatchWarnOffset;
+
+      // Basin Map
+      map<ConcatString,ConcatString> BasinMap;
 
       // Config file version
       ConcatString Version;

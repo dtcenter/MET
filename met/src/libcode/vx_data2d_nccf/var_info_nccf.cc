@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -228,7 +228,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   if (ptr_inc != NULL) *ptr_inc++ = 0;
                   mlog << Debug(7) << method_name
                        << " start: " << ptr2 << ", end: " << ptr3 << "\n";
-                       
+
                   bool datestring_start = is_datestring(ptr2);
                   bool datestring_end   = is_datestring(ptr3);
                   unixtime time_lower = datestring_start
@@ -244,7 +244,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                     }
                     else increment = atoi(ptr_inc);
                   }
-                  
+
                   Dimension.add(range_flag);
                   Level.set_lower(time_lower);
                   Level.set_upper(time_upper);
@@ -259,14 +259,20 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             else
             {
                // Single level
-               int level = atoi(ptr2);
+               int level = 0;
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);
-                  // Put unix time (from yyyymmdd[_hhmmss])
-                  //if (unix_time > 0) {
-                    level = unix_time;
-                  //}
+                  level = unix_time;
                   as_offset = false;
+               }
+               else if (is_number(ptr2)) {
+                  level = atoi(ptr2);
+               }
+               else {
+                  mlog << Error << "\n" << method_name
+                       << "trouble parsing NetCDF dimension value \""
+                       << ptr2 << "\"!\n\n";
+                  exit(1);
                }
                Dimension.add(level);
             }
@@ -311,6 +317,13 @@ void VarInfoNcCF::set_dict(Dictionary &dict){
 bool VarInfoNcCF::is_precipitation() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsPrecipitation)) {
+      return(SetAttrIsPrecipitation != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any precipitation variables.
    //
@@ -324,6 +337,13 @@ bool VarInfoNcCF::is_precipitation() const {
 bool VarInfoNcCF::is_specific_humidity() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+      return(SetAttrIsSpecificHumidity != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any specific humidity variables.
    //
@@ -335,24 +355,56 @@ bool VarInfoNcCF::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcCF::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsUWind)) {
+      return(SetAttrIsUWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, ugrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcCF::is_v_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsVWind)) {
+      return(SetAttrIsVWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, vgrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcCF::is_wind_speed() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindSpeed)) {
+      return(SetAttrIsWindSpeed != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wind_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcCF::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindDirection)) {
+      return(SetAttrIsWindDirection != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wdir_grib_code));
 }
 

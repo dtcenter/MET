@@ -1,0 +1,29 @@
+module load ips/18.0.5.274
+module load python/3.6.3
+module load NetCDF/4.5.0
+module load HDF5-serial/1.8.20
+module load bufr/11.3.0
+module load g2c/1.5.0
+module load zlib/1.2.11
+module load jasper/1.900.1
+module load libpng/1.2.59
+export TEST_BASE=/gpfs/dell2/emc/verification/noscrub/Julie.Prestopnik/met/test_modules
+export COMPILER=ips_18.0.5.274
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=met-9.0.20200315.tar.gz
+export USE_MODULES=TRUE
+export PYTHON_MODULE=python_3.6.3
+export MET_PYTHON=/usrx/local/prod/packages/python/3.6.3/
+export MET_PYTHON_CC=-I/usrx/local/prod/packages/python/3.6.3/include/python3.6m\ -I/usrx/local/prod/packages/python/3.6.3/include/python3.6m 
+export MET_PYTHON_LD=-L/usrx/local/prod/packages/python/3.6.3/lib/\ -lpython3.6m\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
+export MET_NETCDF=/usrx/local/prod/packages/ips/18.0.1/netcdf/4.5.0
+export MET_HDF5=/usrx/local/prod/packages/ips/18.0.1/hdf5/1.8.20
+export MET_BUFRLIB=/gpfs/dell1/nco/ops/nwprod/lib/bufr/v11.3.0/ips/18.0.1
+export MET_GRIB2CLIB=/gpfs/dell1/nco/ops/nwprod/lib/g2c/v1.5.0/ips/18.0.1
+export MET_GRIB2CINC=/gpfs/dell1/nco/ops/nwprod/lib/g2c/v1.5.0/src
+export BUFRLIB_NAME=-lbufr_v11.3.0_4_64
+export GRIB2CLIB_NAME=-lg2c_v1.5.0_4
+export LIB_JASPER=/usrx/local/prod/packages/gnu/4.8.5/jasper/1.900.1/lib
+export LIB_LIBPNG=/usrx/local/prod/packages/gnu/4.8.5/libpng/1.2.59/lib
+export LIB_Z=/usrx/local/prod/packages/ips/18.0.1/zlib/1.2.11/lib
+export SET_D64BIT=TRUE

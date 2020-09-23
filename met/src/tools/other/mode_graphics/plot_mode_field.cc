@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -430,7 +430,7 @@ Cgraph plot;
 Ppm image;
 Box whole_box, map_box, anno_box;
 bool is_object_field = false;
-int n_fcst, n_obs, n;
+int n_fcst=0, n_obs=0, n;
 
 mlog << Debug(1)
      << "Reading MODE file: " << mode_nc_filename << "\n";
@@ -1002,7 +1002,7 @@ void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Diction
 
 ifstream in;
 MapRegion r;
-double map_linewidth = 1.0;
+double map_linewidth;
 ConcatString s;
 ConcatString map_filename;
 Color map_color;
@@ -1107,7 +1107,6 @@ for (j=1; j<(r.n_points); ++j)  {   //  j starts at one, here
    } else  plot.lineto(x_page_2, y_page_2);
 
    x_page_1 = x_page_2;
-   y_page_1 = y_page_2;
 
 }   //  for j
 

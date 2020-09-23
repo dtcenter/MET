@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,8 +18,6 @@
 //   001    06/03/14  Halley Gotway  Add PHIST line type.
 //   002    05/10/16  Halley Gotway  Add grid weighting.
 //
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __ENSEMBLE_STAT_H__
@@ -67,20 +65,22 @@ static const char * default_config_filename =
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "ecnt",  "rhist", "phist",
+   "ecnt",  "rps",   "rhist", "phist",
    "orank", "ssvar", "relp"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   ecnt_columns,  rhist_columns, phist_columns,
-   orank_columns, ssvar_columns, relp_columns
+   ecnt_columns,  rps_columns,   rhist_columns,
+   phist_columns, orank_columns, ssvar_columns,
+   relp_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_ecnt_columns,  n_rhist_columns, n_phist_columns,
-   n_orank_columns, n_ssvar_columns, n_relp_columns
+   n_ecnt_columns,  n_rps_columns,   n_rhist_columns,
+   n_phist_columns, n_orank_columns, n_ssvar_columns,
+   n_relp_columns
 };
 
 // Maximum number of GRIB records
@@ -176,6 +176,7 @@ static int          i_txt_row[n_txt];
 
 // Grid variables
 static Grid grid;
+static int nxy = 0;
 
 // Weight for each grid point
 static DataPlane wgt_dp;
@@ -188,7 +189,8 @@ static StatHdrColumns shc;
 
 // Arrays to store running sums and counts
 static NumArray count_na, min_na, max_na, sum_na, sum_sq_na;
-static NumArray *thresh_count_na = (NumArray *) 0;
+static NumArray *thresh_count_na = (NumArray *) 0; // [n_thresh]
+static NumArray **thresh_nbrhd_count_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

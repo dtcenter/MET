@@ -83,6 +83,21 @@
     </output>
   </test>
 
+  <test name="tc_pairs_BASIN_MAP">
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <param> \
+      -edeck &DATA_DIR;/edeck/*2015*.dat \
+      -bdeck &DATA_DIR;/bdeck/*2015*.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_BASIN_MAP \
+      -out &OUTPUT_DIR;/tc_pairs/alal2015_BASIN_MAP \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_BASIN_MAP.log \
+      -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2015_BASIN_MAP_PROBRIRW.tcst</stat>
+    </output>
+  </test>
+
   <test name="tc_pairs_LEAD_REQ">
     <env>
       <pair><name>LEAD_REQ</name> <value>"96","108"</value></pair>

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "compute_ci.h"
+#include "compute_stats.h"
 
 #include "vx_gsl_prob.h"
 #include "vx_util.h"
@@ -267,19 +268,19 @@ void compute_hk_ci(double hk, double alpha, double vif,
 // the random number generator and number of replicates specified.
 // Arguments:
 //    gsl_rng is a pointer to the random number generator to be used.
-//    f_na and o_na are the arrays to be bootstrapped.
+//    pd is the PairDataPoint object with data to be bootstrapped.
 //    b is the number of replicates to be used when bootstrapping.
 //    CTSInfo is the object for holding the stats.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
-                              const NumArray &f_na,
-                              const NumArray &o_na,
+                              const PairDataPoint &pd,
                               int b, CTSInfo *&cts_info, int n_cts,
-                              int cts_flag, int rank_flag,
+                              bool cts_flag, bool rank_flag,
                               const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -295,27 +296,27 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_cts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute categorical stats from the raw data for each threshold
    // with the normal_ci flag set
    //
    for(i=0; i<n_cts; i++) {
-      compute_ctsinfo(f_na, o_na, i_na, cts_flag, 1, cts_info[i]);
+      compute_ctsinfo(pd, i_na, cts_flag, true, cts_info[i]);
    }
 
    //
@@ -336,7 +337,6 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
-
    }
 
    //
@@ -371,19 +371,17 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
             //
             // Attempt to delete temp files
             //
-      for(i=0; i<n_cts; i++) {
-         remove_temp_file(cts_i_file[i]);
-         remove_temp_file(cts_r_file[i]);
-      }
+            for(i=0; i<n_cts; i++) {
+               remove_temp_file(cts_i_file[i]);
+               remove_temp_file(cts_r_file[i]);
+            }
 
-      // deallocate memory
-      if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
-      if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
-      if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
-      if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
-      if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
-
-	    
+            // deallocate memory
+            if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
+            if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
+            if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
+            if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
+            if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
             throw(1);
          }
       }
@@ -394,7 +392,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       for(i=0; i<n_cts; i++) {
          for(j=0; j<n; j++) {
-            compute_i_ctsinfo(f_na, o_na, j, 0, cts_tmp[i]);
+            compute_i_ctsinfo(pd, j, false, cts_tmp[i]);
             write_ctsinfo(cts_i_out[i], cts_tmp[i]);
          }
       } // end for i
@@ -406,13 +404,12 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
 
          ran_sample(rng_ptr, i_na, ir_na, n);
 
-
          //
          // Compute categorical stats for each replicate with the
          // cts_flag set and the normal_ci_flag unset
          //
          for(j=0; j<n_cts; j++) {
-            compute_ctsinfo(f_na, o_na, ir_na, 1, 0, cts_tmp[j]);
+            compute_ctsinfo(pd, ir_na, true, false, cts_tmp[j]);
             write_ctsinfo(cts_r_out[j], cts_tmp[j]);
          } // end for j
       }
@@ -685,8 +682,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_cts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
 
       exit(i_err);
@@ -726,12 +722,12 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
-                               const NumArray &f_na,
-                               const NumArray &o_na,
+                               const PairDataPoint &pd,
                                int b, MCTSInfo &mcts_info,
-                               int mcts_flag, int rank_flag,
+                               bool mcts_flag, bool rank_flag,
                                const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -745,26 +741,26 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_mcts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute mulit-category stats from the raw data for each threshold
    // with the normal_ci flag set
    //
-   compute_mctsinfo(f_na, o_na, i_na, mcts_flag, 1, mcts_info);
+   compute_mctsinfo(pd, i_na, mcts_flag, true, mcts_info);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -810,7 +806,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_mctsinfo(f_na, o_na, i, 0, mcts_tmp);
+         compute_i_mctsinfo(pd, i, false, mcts_tmp);
          write_mctsinfo(mcts_i_out, mcts_tmp);
       } // end for i
 
@@ -821,12 +817,11 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
 
          ran_sample(rng_ptr, i_na, ir_na, n);
 
-
          //
          // Compute categorical stats for each replicate with the
          // cts_flag set and the normal_ci_flag unset
          //
-         compute_mctsinfo(f_na, o_na, ir_na, 1, 0, mcts_tmp);
+         compute_mctsinfo(pd, ir_na, true, false, mcts_tmp);
          write_mctsinfo(mcts_r_out, mcts_tmp);
       }
 
@@ -933,14 +928,12 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
-                              const NumArray &f_na,
-                              const NumArray &o_na,
-                              const NumArray &c_na,
-                              const NumArray &w_na,
-                              int precip_flag, int rank_flag,
+                              const PairDataPoint &pd,
+                              bool precip_flag, bool rank_flag,
                               int b, CNTInfo &cnt_info,
                               const char *tmp_dir) {
-   int n, i, c;
+   int n =0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CNTInfo cnt_tmp;
@@ -954,27 +947,26 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_cnt_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, c_na, w_na, i_na,
-                   precip_flag, rank_flag, 1, cnt_info);
+   compute_cntinfo(pd, i_na, precip_flag, rank_flag, true, cnt_info);
 
    //
    // Do not compute bootstrap CI's if n<=1 or b==0
@@ -1014,8 +1006,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_cntinfo(f_na, o_na, c_na, w_na,
-                           i, precip_flag, 0, 0, cnt_tmp);
+         compute_i_cntinfo(pd, i, precip_flag, false, false, cnt_tmp);
          write_cntinfo(cnt_i_out, cnt_tmp);
       }
 
@@ -1030,8 +1021,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute continuous stats for each replicate with the
          // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, c_na, w_na, ir_na,
-                         precip_flag, 0, 0, cnt_tmp);
+         compute_cntinfo(pd, ir_na, precip_flag, false, false, cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
 
@@ -1142,6 +1132,18 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.alpha[i],
                               cnt_info.rmsoa.v_bcl[i],
                               cnt_info.rmsoa.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for anom_corr_uncntr
+      //
+      s = cnt_info.anom_corr_uncntr.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.anom_corr_uncntr.v_bcl[i],
+                              cnt_info.anom_corr_uncntr.v_bcu[i]);
 
       //
       // Compute bootstrap interval for me
@@ -1343,8 +1345,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_cnt_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp files
@@ -1373,13 +1374,13 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
-                               const NumArray &f_na,
-                               const NumArray &o_na,
+                               const PairDataPoint &pd,
                                int b, double m_prop,
                                CTSInfo *&cts_info, int n_cts,
-                               int cts_flag, int rank_flag,
+                               bool cts_flag, bool rank_flag,
                                const char *tmp_dir) {
-   int n, i, j, m, c;
+   int n = 0;
+   int i, j, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -1393,14 +1394,14 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_cts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
@@ -1411,14 +1412,14 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute categorical stats from the raw data for each threshold
    // with the normal_ci flag set
    //
    for(i=0; i<n_cts; i++) {
-      compute_ctsinfo(f_na, o_na, i_na, cts_flag, 1, cts_info[i]);
+      compute_ctsinfo(pd, i_na, cts_flag, true, cts_info[i]);
    }
 
    //
@@ -1487,7 +1488,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // cts_flag set and the normal_ci_flag unset
          //
          for(j=0; j<n_cts; j++) {
-            compute_ctsinfo(f_na, o_na, ir_na, 1, 0, cts_tmp[j]);
+            compute_ctsinfo(pd, ir_na, true, false, cts_tmp[j]);
             write_ctsinfo(cts_r_out[j], cts_tmp[j]);
          } // end for j
       }
@@ -1737,8 +1738,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_cts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       exit(i_err);
    } // end catch block
@@ -1769,13 +1769,13 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
-                                const NumArray &f_na,
-                                const NumArray &o_na,
+                                const PairDataPoint &pd,
                                 int b, double m_prop,
                                 MCTSInfo &mcts_info,
-                                int mcts_flag, int rank_flag,
+                                bool mcts_flag, bool rank_flag,
                                 const char *tmp_dir) {
-   int n, i, m, c;
+   int n = 0;
+   int i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -1789,14 +1789,14 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_mcts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
@@ -1807,13 +1807,13 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute categorical stats from the raw data for each threshold
    // with the normal_ci flag set
    //
-   compute_mctsinfo(f_na, o_na, i_na, mcts_flag, 1, mcts_info);
+   compute_mctsinfo(pd, i_na, mcts_flag, true, mcts_info);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -1860,7 +1860,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute multi-category stats for each replicate with the
          // mcts_flag set and the normal_ci_flag unset
          //
-         compute_mctsinfo(f_na, o_na, ir_na, 1, 0, mcts_tmp);
+         compute_mctsinfo(pd, ir_na, true, false, mcts_tmp);
          write_mctsinfo(mcts_r_out, mcts_tmp);
       }
 
@@ -1926,8 +1926,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_mcts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp file
@@ -1954,14 +1953,12 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
-                               const NumArray &f_na,
-                               const NumArray &o_na,
-                               const NumArray &c_na,
-                               const NumArray &w_na,
-                               int precip_flag, int rank_flag,
+                               const PairDataPoint &pd,
+                               bool precip_flag, bool rank_flag,
                                int b, double m_prop, CNTInfo &cnt_info,
                                const char *tmp_dir) {
-   int n, i, m, c;
+   int n = 0;
+   int i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    CNTInfo cnt_tmp;
@@ -1975,14 +1972,14 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_cnt_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
@@ -1993,14 +1990,13 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, c_na, w_na, i_na,
-                   precip_flag, rank_flag, 1, cnt_info);
+   compute_cntinfo(pd, i_na, precip_flag, rank_flag, true, cnt_info);
 
    //
    // Do not compute bootstrap CI's if n<=1 or b== 0
@@ -2041,8 +2037,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute continuous stats for each replicate with the
          // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, c_na, w_na, ir_na,
-                         precip_flag, 0, 0, cnt_tmp);
+         compute_cntinfo(pd, ir_na, precip_flag, false, false, cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
 
@@ -2144,6 +2139,17 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.alpha[i],
                                cnt_info.rmsoa.v_bcl[i],
                                cnt_info.rmsoa.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for anom_corr_uncntr
+      //
+      s = cnt_info.anom_corr_uncntr.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.anom_corr_uncntr.v_bcl[i],
+                               cnt_info.anom_corr_uncntr.v_bcu[i]);
 
       //
       // Compute bootstrap interval for me
@@ -2329,8 +2335,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_cnt_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp files
@@ -2351,12 +2356,12 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
-                                 const NumArray &f_na,
-                                 const NumArray &o_na,
+                                 const PairDataPoint &pd,
                                  int b, NBRCTSInfo *&nbrcts_info,
-                                 int n_nbrcts, int nbrcts_flag,
+                                 int n_nbrcts, bool nbrcts_flag,
                                  const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) 0;
@@ -2370,27 +2375,27 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_nbrcts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute categorical stats from the raw data for each threshold
    // with the normal_ci flag set
    //
    for(i=0; i<n_nbrcts; i++) {
-      compute_ctsinfo(f_na, o_na, i_na, nbrcts_flag, 1,
+      compute_ctsinfo(pd, i_na, nbrcts_flag, true,
                       nbrcts_info[i].cts_info);
    }
 
@@ -2445,7 +2450,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                  << "can't open one or more temporary files for writing:\n"
                  << nbrcts_i_file[i] << "\n"
                  << nbrcts_r_file[i] << "\n\n";
-	    //
+
+            //
             // Attempt to delete temp files
             //
             for(i=0; i<n_nbrcts; i++) {
@@ -2470,7 +2476,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       for(i=0; i<n_nbrcts; i++) {
          for(j=0; j<n; j++) {
-            compute_i_ctsinfo(f_na, o_na, j, 0, nbrcts_tmp[i].cts_info);
+            compute_i_ctsinfo(pd, j, false, nbrcts_tmp[i].cts_info);
             write_ctsinfo(nbrcts_i_out[i], nbrcts_tmp[i].cts_info);
          }
       } // end for i
@@ -2487,7 +2493,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // nbrcts_flag flag set and the normal_ci_flag unset
          //
          for(j=0; j<n_nbrcts; j++) {
-            compute_ctsinfo(f_na, o_na, ir_na, 1, 0,
+            compute_ctsinfo(pd, ir_na, true, false,
                             nbrcts_tmp[j].cts_info);
             write_ctsinfo(nbrcts_r_out[j], nbrcts_tmp[j].cts_info);
          } // end for j
@@ -2761,9 +2767,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_nbrcts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
-      
+           << ".  Deleting temp files before exiting.\n\n";
+
       exit(i_err);
    } // end catch block
 
@@ -2790,13 +2795,13 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
-                                 const NumArray &f_na, const NumArray &o_na,
-                                 const NumArray &f_thr_na, const NumArray &o_thr_na,
-                                 const NumArray &w_na,
+                                 const PairDataPoint &pd,
+                                 const PairDataPoint &pd_thr,
                                  int b, NBRCNTInfo &nbrcnt_info,
-                                 int nbrcnt_flag,
+                                 bool nbrcnt_flag,
                                  const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
@@ -2810,26 +2815,25 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_nbrcnt_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, i_na,
-                      nbrcnt_info, nbrcnt_flag);
+   compute_nbrcntinfo(pd, pd_thr, i_na, nbrcnt_info, nbrcnt_flag);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -2870,8 +2874,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na,
-                              i, nbrcnt_tmp);
+         compute_i_nbrcntinfo(pd, pd_thr, i, nbrcnt_tmp);
          write_nbrcntinfo(nbrcnt_i_out, nbrcnt_tmp);
       }
 
@@ -2885,8 +2888,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, ir_na,
-                            nbrcnt_tmp, 1);
+         compute_nbrcntinfo(pd, pd_thr, ir_na, nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }
 
@@ -2982,8 +2984,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_nbrcnt_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp files
@@ -3006,13 +3007,13 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
-                                  const NumArray &f_na,
-                                  const NumArray &o_na,
+                                  const PairDataPoint &pd,
                                   int b, double m_prop,
                                   NBRCTSInfo *&nbrcts_info,
-                                  int n_nbrcts, int nbrcts_flag,
+                                  int n_nbrcts, bool nbrcts_flag,
                                   const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) 0;
@@ -3026,27 +3027,27 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_nbrcts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute categorical stats from the raw data for each threshold
    // with the normal_ci flag set
    //
    for(i=0; i<n_nbrcts; i++) {
-      compute_ctsinfo(f_na, o_na, i_na, nbrcts_flag, 1,
+      compute_ctsinfo(pd, i_na, nbrcts_flag, true,
                       nbrcts_info[i].cts_info);
    }
 
@@ -3104,7 +3105,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
          if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
          if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
-	 
+
             throw(1);
          }
       }
@@ -3121,7 +3122,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // nbrcts_flag set and the normal_ci_flag unset
          //
          for(j=0; j<n_nbrcts; j++) {
-            compute_ctsinfo(f_na, o_na, ir_na, 1, 0,
+            compute_ctsinfo(pd, ir_na, true, false,
                             nbrcts_tmp[j].cts_info);
             write_ctsinfo(nbrcts_r_out[j], nbrcts_tmp[j].cts_info);
          } // end for j
@@ -3231,7 +3232,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   nbrcts_info[i].cts_info.far.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for csicompute_mean_stdev
+         // Compute bootstrap interval for csi
          //
          s = nbrcts_info[i].cts_info.csi.v;
          read_ldf(nbrcts_r_file[i], c++, sr_na);
@@ -3372,8 +3373,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_nbrcts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       exit(i_err);
    } // end catch block
@@ -3398,14 +3398,14 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
-                                  const NumArray &f_na, const NumArray &o_na,
-                                  const NumArray &f_thr_na, const NumArray &o_thr_na,
-                                  const NumArray &w_na,
+                                  const PairDataPoint &pd,
+                                  const PairDataPoint &pd_thr,
                                   int b, double m_prop,
                                   NBRCNTInfo &nbrcnt_info,
-                                  int nbrcnt_flag,
+                                  bool nbrcnt_flag,
                                   const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
@@ -3419,26 +3419,25 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_nbrcnt_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, i_na,
-                      nbrcnt_info, nbrcnt_flag);
+   compute_nbrcntinfo(pd, pd_thr, i_na, nbrcnt_info, nbrcnt_flag);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -3479,8 +3478,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, ir_na,
-                            nbrcnt_tmp, 1);
+         compute_nbrcntinfo(pd, pd_thr, ir_na, nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }
 
@@ -3569,8 +3567,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_nbrcnt_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp files
@@ -3602,14 +3599,14 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
    //
    // Get the number of values in the array
    //
-   n = v_na.n_elements();
+   n = v_na.n();
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
-   compute_mean_stdev(v_na, i_na, 1, alpha, mean_ci, stdev_ci);
+   compute_mean_stdev(v_na, i_na, true, alpha, mean_ci, stdev_ci);
 
    //
    // Do not compute bootstrap CI's if n<=1 or the number of
@@ -3622,7 +3619,7 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
    // with the i-th data point removed
    //
    for(i=0; i<n; i++) {
-      compute_i_mean_stdev(v_na, 0, alpha, i,
+      compute_i_mean_stdev(v_na, false, alpha, i,
                            mean_tmp, stdev_tmp);
 
       //
@@ -3642,8 +3639,7 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
       //
       // Compute the mean and standard deviation for each replicate
       //
-      compute_mean_stdev(v_na, ir_na, 0, alpha,
-                         mean_tmp, stdev_tmp);
+      compute_mean_stdev(v_na, ir_na, false, alpha, mean_tmp, stdev_tmp);
 
       //
       // Store the mean and standard deviation for this replicate
@@ -3681,14 +3677,14 @@ void compute_mean_stdev_ci_perc(const gsl_rng *rng_ptr,
    //
    // Get the number of values in the array
    //
-   n = v_na.n_elements();
+   n = v_na.n();
 
    //
    // Setup the index array
    //
-   for(i=0; i<n; i++) i_na.add(i);
+   i_na.add_seq(0, n-1);
 
-   compute_mean_stdev(v_na, i_na, 1, alpha, mean_ci, stdev_ci);
+   compute_mean_stdev(v_na, i_na, true, alpha, mean_ci, stdev_ci);
 
    //
    // Do not compute bootstrap CI's if n<=1 or the number of
@@ -3706,7 +3702,7 @@ void compute_mean_stdev_ci_perc(const gsl_rng *rng_ptr,
       //
       // Compute the mean and standard deviation for each replicate
       //
-      compute_mean_stdev(v_na, ir_na, 0, alpha, mean_tmp, stdev_tmp);
+      compute_mean_stdev(v_na, ir_na, false, alpha, mean_tmp, stdev_tmp);
 
       //
       // Store the mean and standard deviation for this replicate
@@ -3753,8 +3749,8 @@ void compute_bca_interval(double s, NumArray &si_na,
    double cv_l, cv_u;
    double a_hat, z_hat, si_bar, p, diff, sum, num, den, a1, a2;
 
-   n = si_na.n_elements();
-   b = sr_na.n_elements();
+   n = si_na.n();
+   b = sr_na.n();
    if(n == 0 || b == 0) {
       s_bcl = bad_data_double;
       s_bcu = bad_data_double;
@@ -3828,7 +3824,7 @@ void compute_perc_interval(double s, NumArray &sr_na,
                            double alpha, double &s_bcl, double &s_bcu) {
    double a1, a2;
 
-   if(sr_na.n_elements() == 0) {
+   if(sr_na.n() == 0) {
       s_bcl = bad_data_double;
       s_bcu = bad_data_double;
 
@@ -3859,13 +3855,14 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
    char line[max_line_len];
 
    snprintf(line, max_line_len,
-           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
-           c.fbar.v,    c.fstdev.v,    c.obar.v,    c.ostdev.v,
-           c.pr_corr.v, c.anom_corr.v, c.rmsfa.v,   c.rmsoa.v,
-           c. me.v,     c.me2.v,       c.estdev.v,  c.mbias.v,
-           c.mae.v,     c.mse.v,       c.msess.v,   c.bcmse.v,
-           c.rmse.v,    c.e10.v,       c.e25.v,     c.e50.v,
-           c.e75.v,     c.e90.v,       c.eiqr.v,    c.mad.v);
+           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           c.fbar.v,    c.fstdev.v,    c.obar.v,          c.ostdev.v,
+           c.pr_corr.v, c.anom_corr.v,
+           c.rmsfa.v,   c.rmsoa.v,     c.anom_corr_uncntr.v,
+           c.me.v,      c.me2.v,       c.estdev.v,        c.mbias.v,
+           c.mae.v,     c.mse.v,       c.msess.v,         c.bcmse.v,
+           c.rmse.v,    c.e10.v,       c.e25.v,           c.e50.v,
+           c.e75.v,     c.e90.v,       c.eiqr.v,          c.mad.v);
 
    tmp_out << line << "\n";
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,6 +36,7 @@ extern DataPlane met_regrid_generic       (const DataPlane & in, const Grid & fr
 extern DataPlane met_regrid_budget        (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 extern DataPlane met_regrid_area_weighted (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 extern DataPlane met_regrid_force         (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
+extern DataPlane met_regrid_maxgauss      (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -37,8 +37,6 @@ extern StringArray get_filenames_from_dir(const char * directory_path,
 
 extern bool        check_prefix_suffix(const char * path,
                       const char * prefix, const char * suffix);
-
-extern StringArray parse_ascii_file_list(const char * path);
 
 
 ////////////////////////////////////////////////////////////////////////

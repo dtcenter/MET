@@ -73,6 +73,7 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
+sid_inc        = [];
 sid_exc        = [];
 obs_quality    = [];
 duplicate_flag = NONE;
@@ -96,9 +97,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,10 +168,11 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +196,8 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE;
+   ecnt   = NONE; // Only for HiRA
+   rps    = NONE; // Only for HiRA
    eclv   = BOTH;
    mpr    = BOTH;
 }
@@ -205,6 +207,6 @@ output_flag = {
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

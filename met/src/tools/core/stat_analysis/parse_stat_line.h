@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,9 +24,8 @@
 //   006    06/09/17  Halley Gotway   Add RELP line type.
 //   008    10/09/17  Halley Gotway   Add GRAD line type.
 //   009    04/25/18  Halley Gotway   Add ECNT line type.
+//   010    01/24/20  Halley Gotway   Add RPS line type.
 //
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __PARSE_STAT_LINE_H__
@@ -119,6 +118,7 @@ extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
 extern void parse_grad_line    (STATLine &, GRADInfo &);
 
 extern void parse_ecnt_line    (STATLine &, ECNTData &);
+extern void parse_rps_line     (STATLine &, RPSInfo &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
 extern void parse_phist_line   (STATLine &, PHISTData &);
 extern void parse_relp_line    (STATLine &, RELPData &);

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -161,6 +161,9 @@ class TrackPoint {
       // Watch/Warning status
       WatchWarnType WatchWarn;
 
+      // Warm Core status
+      bool WarmCore;
+
       // Wind Radii
       QuadInfo      Wind[NWinds];
 
@@ -199,6 +202,7 @@ class TrackPoint {
       void set_direction(const double);
       void set_speed(const double);
       void set_depth(SystemsDepth);
+      void set_warm_core(bool);
       void set_watch_warn(WatchWarnType);
       void set_watch_warn(WatchWarnType, unixtime);
 
@@ -208,6 +212,7 @@ class TrackPoint {
 
       const QuadInfo & operator[](int) const;
       unixtime         valid()         const;
+      int              valid_hour()    const;
       int              lead()          const;
       double           lat()           const;
       double           lon()           const;
@@ -222,6 +227,7 @@ class TrackPoint {
       double           direction()     const;
       double           speed()         const;
       SystemsDepth     depth()         const;
+      bool             warm_core()     const;
       WatchWarnType    watch_warn()    const;
 
          //
@@ -251,9 +257,11 @@ inline void TrackPoint::set_eye(const double v)         { Eye       = v; }
 inline void TrackPoint::set_direction(const double v)   { Direction = v; }
 inline void TrackPoint::set_speed(const double v)       { Speed     = v; }
 inline void TrackPoint::set_depth(SystemsDepth t)       { Depth     = t; }
+inline void TrackPoint::set_warm_core(bool v)           { WarmCore  = v; }
 inline void TrackPoint::set_watch_warn(WatchWarnType t) { WatchWarn = t; }
 
 inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
+inline int           TrackPoint::valid_hour() const { return(unix_to_sec_of_day(ValidTime)); }
 inline int           TrackPoint::lead()       const { return(LeadTime);  }
 inline double        TrackPoint::lat()        const { return(Lat);       }
 inline double        TrackPoint::lon()        const { return(Lon);       }
@@ -268,6 +276,7 @@ inline double        TrackPoint::eye()        const { return(Eye);       }
 inline double        TrackPoint::direction()  const { return(Direction); }
 inline double        TrackPoint::speed()      const { return(Speed);     }
 inline SystemsDepth  TrackPoint::depth()      const { return(Depth);     }
+inline bool          TrackPoint::warm_core()  const { return(WarmCore);  }
 inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn); }
 
 ////////////////////////////////////////////////////////////////////////

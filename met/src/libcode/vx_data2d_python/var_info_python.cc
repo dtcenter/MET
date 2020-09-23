@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   var_info_grib.cc
+//   Filename:   var_info_python.cc
 //
 //   Description:
 //
@@ -126,11 +126,9 @@ void VarInfoPython::dump(ostream &out) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_file_type(const GrdFileType t)
+void VarInfoPython::set_file_type(const GrdFileType t) {
 
-{
-
-   if ( (t == FileType_Python_Numpy) || (t == FileType_Python_Xarray) ) {
+   if ( is_python_grdfiletype(t) ) {
 
       Type = t;
 
@@ -175,7 +173,109 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
    ReqName = dict.lookup_string(conf_key_name, true);
 
+   //
+   //  hard-code the magic string as PYTHON
+   //
+
+   MagicStr << cs_erase << "PYTHON";
+
    return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_precipitation() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsPrecipitation)) {
+     return(SetAttrIsPrecipitation != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_specific_humidity() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+     return(SetAttrIsSpecificHumidity != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_u_wind() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsUWind)) {
+    return(SetAttrIsUWind != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_v_wind() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsVWind)) {
+    return(SetAttrIsVWind != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_wind_speed() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsWindSpeed)) {
+    return(SetAttrIsWindSpeed != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_wind_direction() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrIsWindDirection)) {
+    return(SetAttrIsWindDirection != 0);
+  }
+
+  return ( false );
 }
 
 

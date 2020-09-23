@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -169,14 +169,13 @@ void StatHdrColumns::set_fcst_var(const ConcatString s) {
 
 void StatHdrColumns::set_fcst_units(const ConcatString s) {
    fcst_units = check_hdr_str(s, true);
-   mlog << Debug(4) << "set FCST_UNITS:" << fcst_units << "\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_lev(const char *s) {
-   fcst_lev = check_hdr_str((string)s);
+   fcst_lev = check_hdr_str((string)s, true);
    return;
 }
 
@@ -191,14 +190,13 @@ void StatHdrColumns::set_obs_var(const ConcatString s) {
 
 void StatHdrColumns::set_obs_units(const ConcatString s) {
    obs_units = check_hdr_str(s, true);
-   mlog << Debug(4) << "set OBS_UNITS:" << obs_units << "\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_lev(const char *s) {
-   obs_lev = check_hdr_str((string)s);
+   obs_lev = check_hdr_str((string)s, true);
    return;
 }
 

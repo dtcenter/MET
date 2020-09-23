@@ -17,5 +17,6 @@ C*
 C*      Close the file.
 C*
         CALL CLOSBF  ( FID )
+        CLOSE ( UNIT = FID )
 C*
         END

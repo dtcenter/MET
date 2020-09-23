@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -55,12 +55,22 @@ void TCRMWConfInfo::init_from_scratch() {
 void TCRMWConfInfo::clear() {
 
     Model.clear();
-    Basin.clear();
-    StormName.clear();
     StormId.clear();
-    // InitTime = (unixtime) 0;
-    // LeadTimes.clear();
-    Version.clear();
+    Basin.clear();
+    Cyclone.clear();
+
+    InitInc = (unixtime) 0;
+    ValidBeg = ValidEnd = (unixtime) 0;
+    ValidInc.clear();
+    ValidExc.clear();
+    ValidHour.clear();
+    LeadTime.clear();
+
+    n_range        = bad_data_int;
+    n_azimuth      = bad_data_int;
+    max_range_km   = bad_data_double;
+    delta_range_km = bad_data_double;
+    rmw_scale      = bad_data_double;
 
     // Clear data_info
     if(data_info) {
@@ -99,38 +109,53 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    int i, j;
+    int i;
     StringArray sa;
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;
 
-    // Conf: Version
-    Version = Conf.lookup_string(conf_key_version);
-    check_met_version(Version.c_str());
+    // Conf: version
+    check_met_version(Conf.lookup_string(conf_key_version).c_str());
 
-    // Conf: Model
+    // Conf: model
     Model = Conf.lookup_string(conf_key_model);
 
-    // Conf: Basin
-    Basin = Conf.lookup_string(conf_key_basin);
-
-    // Conf: StormName
-    StormName = Conf.lookup_string(conf_key_storm_name);
-
-    // Conf: StormId
+    // Conf: storm_id
     StormId = Conf.lookup_string(conf_key_storm_id);
 
-    // Conf: Cyclone
-    Cyclone = Conf.lookup_int(conf_key_cyclone);
+    // Conf: basin
+    Basin = Conf.lookup_string(conf_key_basin);
 
-    // Conf: InitTime
-    // InitTime = Conf.lookup_unixtime(conf_key_init_time);
+    // Conf: cyclone
+    Cyclone = Conf.lookup_string(conf_key_cyclone);
 
-    // Conf: LeadTimes
-    // sa = Conf.lookup_string_array(conf_key_lead_time);
-    // for(i=0; i<sa.n_elements(); i++){
-    //     LeadTimes.add(timestring_to_sec(sa[i].c_str()));
-    // }
+    // Conf: init_inc
+    InitInc = Conf.lookup_unixtime(conf_key_init_inc);
+
+    // Conf: valid_beg, valid_end
+    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
+    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
+
+    // Conf: valid_inc
+    sa = Conf.lookup_string_array(conf_key_valid_inc);
+    for(i=0; i<sa.n(); i++)
+       ValidInc.add(timestring_to_unix(sa[i].c_str()));
+
+    // Conf: valid_exc
+    sa = Conf.lookup_string_array(conf_key_valid_exc);
+    for(i=0; i<sa.n(); i++)
+       ValidExc.add(timestring_to_unix(sa[i].c_str()));
+
+    // Conf: valid_hour
+    sa = Conf.lookup_string_array(conf_key_valid_hour);
+    for(i=0; i<sa.n(); i++)
+       ValidHour.add(timestring_to_sec(sa[i].c_str()));
+
+    // Conf: lead
+    sa = Conf.lookup_string_array(conf_key_lead);
+    for(i=0; i<sa.n(); i++) {
+       LeadTime.add(timestring_to_sec(sa[i].c_str()));
+    }
 
     // Conf: n_range
     n_range = Conf.lookup_int(conf_key_n_range);
@@ -153,7 +178,8 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Determine number of fields (name/level)
     n_data = parse_conf_n_vx(fdict);
 
-    mlog << Debug(2) << "n_data:" << n_data << "\n";
+    mlog << Debug(2) << "Found " << n_data << " variable/level fields "
+         << "requested in the configuration file.\n";
 
     // Check for empty data settings
     if(n_data == 0) {
@@ -166,12 +192,12 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     data_info = new VarInfo*[n_data];
 
     // Initialize pointers
-    for(int i = 0; i < n_data; i++) {
+    for(i=0; i<n_data; i++) {
         data_info[i] = (VarInfo*) 0;
     }
 
     // Parse data field information
-    for(int i = 0; i < n_data; i++) {
+    for(i=0; i<n_data; i++) {
 
         // Allocate new VarInfo objects
         data_info[i] = info_factory.new_var_info(ftype);
@@ -182,12 +208,10 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
         // Set current dictionary
         data_info[i]->set_dict(i_fdict);
 
-        mlog << Debug(2) << data_info[i]->magic_str() << "\n";
-
         // Dump contents of current VarInfo
         if(mlog.verbosity_level() >=5) {
             mlog << Debug(5) << "Parsed data field "
-            << i + 1 << ":\n";
+                 << i + 1 << ":\n";
             data_info[i]->dump(cout);
         }
     }

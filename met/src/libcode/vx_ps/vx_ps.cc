@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1954,7 +1954,7 @@ int ff_to_roman(const FontFamily f)
 
 {
 
-int n;
+int n = 0;
 
 
 switch ( f )  {
@@ -1988,7 +1988,7 @@ int ff_to_italic(const FontFamily f)
 
 {
 
-int n;
+int n = 0;
 
 
 switch ( f )  {
@@ -2022,7 +2022,7 @@ int ff_to_bold(const FontFamily f)
 
 {
 
-int n;
+int n = 0;
 
 
 switch ( f )  {
@@ -2056,7 +2056,7 @@ int ff_to_bolditalic(const FontFamily f)
 
 {
 
-int n;
+int n = 0;
 
 
 switch ( f )  {

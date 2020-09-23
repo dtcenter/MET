@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_SCRIPTS    "${MET_BUILD_BASE}/scripts">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+]>
+
+<met_test>
+
+  <!-- Dependency: unit_tc_pairs.xml -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="plot_tc_TCMPR">
+    <exec>Rscript &MET_SCRIPTS;/Rscripts/plot_tcmpr.R</exec>
+    <env>
+      <pair><name>MET_INSTALL_DIR</name> <value>${MET_BASE}/../..</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
+      -filter '-amodel AHWI,BCLP' \
+      -outdir &OUTPUT_DIR;/plot_tc \
+      -dep 'TK_ERR,ABS(AMAX_WIND-BMAX_WIND)'
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.png</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.log</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.png</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.log</exist> 
+    </output>
+  </test>
+
+</met_test>

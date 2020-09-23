@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -95,15 +95,15 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const double gaussian_radius, const double gaussian_dx) {
-   double v;
+                  double t, const GaussianInfo &gaussian) {
+   double v = 0.0;
    int x, y;
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
-   // Check that grid template is at least 1 point
-   if(width == 1 || mthd == InterpMthd_Nearest) return;
+   // For nearest neighbor, no work to do.
+   if(width == 1 && mthd == InterpMthd_Nearest) return;
 
    // build the grid template
    GridTemplateFactory gtf;
@@ -137,13 +137,17 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // Unweighted Mean
+            case(InterpMthd_Gaussian): // For Gaussian, pass the data through
+               v = dp.get(x, y);
+               break;
+
+            case(InterpMthd_MaxGauss): // For Max Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
             // Distance-weighted mean, area-weighted mean, least-squares
-            // fit, bilinear, and gaussian interpolation are omitted
-            // here since they are not options for gridded data.
+            // fit, and bilinear are omitted here since they are not
+            // options for gridded data.
 
             default:
                mlog << Error << "\nsmooth_field() -> "
@@ -159,11 +163,16 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       } // end for y
    } // end for x
-   
-   if (mthd == InterpMthd_Gaussian) {
-     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx);
+
+   // Apply the Gaussian smoother 
+   if(mthd == InterpMthd_Gaussian ||
+      mthd == InterpMthd_MaxGauss) {
+      interp_gaussian_dp(smooth_dp, gaussian, t);
    }
+
+   // Cleanup
    delete gt;
+
    return;
 }
 
@@ -177,10 +186,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double t, const double gaussian_radius, const double gaussian_dx) {
+                       double t, const GaussianInfo &gaussian) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian_radius, gaussian_dx);
+   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian);
 
    return(smooth_dp);
 }
@@ -196,7 +205,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
         SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
-   int x, y, n_vld, n_thr;
+   int x, y;
+   int n_vld = 0;
+   int n_thr = 0;
    double v;
 
    // Check that width is set to 1 or greater
@@ -289,20 +300,21 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
-        int wdth, SingleThresh t, double vld_t) {
+        int width, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
-   int count_vld, count_thr;
+   int count_vld = 0;
+   int count_thr = 0;
    NumArray box_na;
 
    mlog << Debug(3)
         << "Computing fractional coverage field using the "
         << t.get_str() << " threshold and the "
         << interpmthd_to_string(InterpMthd_Nbrhd)
-        << "(" << wdth*wdth << ") interpolation method.\n";
+        << "(" << width*width << ") interpolation method.\n";
 
    // Check that width is set to 1 or greater
-   if(wdth < 1) {
+   if(width < 1) {
       mlog << Error << "\nfractional_coverage_square() -> "
            << "width must be set to a value of 1 or greater.\n\n";
       exit(1);
@@ -313,10 +325,10 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
    frac_dp.set_constant(bad_data_double);
 
    // Compute the box half-width
-   half_width = (wdth - 1)/2;
+   half_width = (width - 1)/2;
 
    // Initialize the box
-   for(i=0; i<wdth*wdth; i++) box_na.add(bad_data_int);
+   for(i=0; i<width*width; i++) box_na.add(bad_data_int);
 
    // Compute the fractional coverage meeting the threshold criteria
    for(x=0; x<dp.nx(); x++) {
@@ -336,15 +348,15 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
             // Initialize counts
             count_vld = count_thr = 0;
 
-            for(i=0; i<wdth; i++) {
+            for(i=0; i<width; i++) {
 
                xx = x_ll + i;
 
-               for(j=0; j<wdth; j++) {
+               for(j=0; j<width; j++) {
 
                   yy = y_ll + j;
 
-                  n = DefaultTO.two_to_one(wdth, wdth, i, j);
+                  n = DefaultTO.two_to_one(width, width, i, j);
 
                   // Check for being off the grid
                   if(xx < 0 || xx >= dp.nx() ||
@@ -374,12 +386,12 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
          else {
 
             // Compute the row of the neighborhood box to be updated
-            j = (y - 1) % wdth;
+            j = (y - 1) % width;
 
-            for(i=0; i<wdth; i++) {
+            for(i=0; i<width; i++) {
 
                // Index into the box
-               n = DefaultTO.two_to_one(wdth, wdth, i, j);
+               n = DefaultTO.two_to_one(width, width, i, j);
 
                // Get x and y values to be checked
                xx = x_ll + i;
@@ -416,7 +428,7 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
          } // end else
 
          // Check whether enough valid grid points were found
-         if((double) count_vld/(wdth*wdth) < vld_t ||
+         if((double) count_vld/(width*width) < vld_t ||
             count_vld == 0) {
             v = bad_data_double;
          }
@@ -786,13 +798,6 @@ DataPlane distance_map(const DataPlane &dp) {
             }
          }
          
-         //if (debug_scan) {
-         //   cout << " DEBUG: iy: " << iy << "  s:";
-         //   for (ix=0; ix<nx; ix++) cout << " " << s[ix];
-         //   cout << "  t:";
-         //   for (ix=0; ix<nx; ix++) cout << " " << t[ix];
-         //   cout << "\n";
-         //}
          // Meijster Scan 4
          for (ix=nx-1; ix>=0; ix--) {
             distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
@@ -806,21 +811,21 @@ DataPlane distance_map(const DataPlane &dp) {
    if(mlog.verbosity_level() >= debug_level) {
       if (debug_g_distance) {
          for (ix=0; ix<nx; ix++) {
-            ostringstream message;
+            ConcatString message;
             message << " g_distance: " ;
             for (iy = 0; iy<ny; iy++) {
                message << "  " << g_distance.get(ix, iy);
             }
-            mlog << Debug(debug_level) << message.str() << "\n";
+            mlog << Debug(debug_level) << message << "\n";
          }
       }
       for (ix=0; ix<nx; ix++) {
-         ostringstream message;
+         ConcatString message;
          message << " distance: " ;
          for (iy = 0; iy<ny; iy++) {
             message << "  " << dm.get(ix, iy);
          }
-         mlog << Debug(debug_level) << message.str() << "\n";
+         mlog << Debug(debug_level) << message << "\n";
       }
    }
 

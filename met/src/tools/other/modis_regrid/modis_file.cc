@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -93,10 +93,6 @@ ModisFile::ModisFile(const ModisFile &)
 
 {
 
-// init_from_scratch();
-// 
-// assign(f);
-
 mlog << Error
      << "\n\n  ModisFile::ModisFile(const ModisFile &) -> should never be called!\n\n";
 
@@ -111,11 +107,6 @@ exit ( 1 );
 ModisFile & ModisFile::operator=(const ModisFile &)
 
 {
-
-// if ( this == &f )  return ( * this );
-// 
-// assign(f);
-
 
 mlog << Error
      << "\n\n  ModisFile::operator=(const ModisFile &) -> should never be called!\n\n";
@@ -366,13 +357,6 @@ get_geo_field(Latitude,  "Latitude");
 get_geo_field(Longitude, "Longitude");
 
    //
-   //  get the data fields
-   //
-
-// get_data_field(SurfaceTemperature, "Surface_Temperature");
-// get_data_field(CloudFraction,      "Cloud_Fraction");
-
-   //
    //  get the scan start time
    //
 
@@ -613,8 +597,6 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
    mlog << Error
         << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
 
-   // exit ( 1 );
-
    return ( false );
 
 }
@@ -686,8 +668,6 @@ if ( status < 0 )  {
    mlog << Error
         << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   // exit ( 1 );
-
    return ( false );
 
 }
@@ -718,8 +698,6 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
    mlog << Error
         << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
-
-   // exit ( 1 );
 
    return ( false );
 
@@ -987,24 +965,6 @@ return ( ScanStartTime );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void ModisFile::get_scale_offset()
-
-{
-
-mlog << Warning
-     << "\n\n  ModisFile::get_scale_offset() -<> not yet implemented!\n\n";
-
-// exit ( 1 );
-
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 

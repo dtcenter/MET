@@ -2,9 +2,11 @@
 <!DOCTYPE met_test [
   <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+  <!ENTITY MET_PYTHON_EXE "/usr/local/python3/bin/python3">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PYTHON "&INPUT_DIR;/python">
@@ -30,6 +32,21 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/python/letter.ps</ps>
+    </output>
+  </test>
+
+  <test name="python_numpy_plot_data_plane_file_type">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_PYTHON;/letter.txt \
+      &OUTPUT_DIR;/python/letter_file_type.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG LETTER"; file_type=PYTHON_NUMPY;' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled plot_data_plane using file_type option" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_file_type.ps</ps>
     </output>
   </test>
 
@@ -173,6 +190,159 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/python/regrid_data_plane.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_series_analysis">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+    </env>
+    <param> \
+      -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -obs  &DATA_DIR_PYTHON;/obs.txt  &DATA_DIR_PYTHON;/obs.txt  \
+      -paired \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_python \
+      -out &OUTPUT_DIR;/python/series_analysis.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/series_analysis.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_mtd">
+    <exec>&MET_BIN;/mtd</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
+    </env>
+    <param> \
+      -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -obs  &DATA_DIR_PYTHON;/obs.txt  &DATA_DIR_PYTHON;/obs.txt  \
+      -config &CONFIG_DIR;/MTDConfig_python \
+      -outdir &OUTPUT_DIR;/python \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_single_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_pair_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_single_cluster.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_pair_cluster.txt</exist>
+      <grid_nc>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_obj.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_ensemble_stat">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
+    </env>
+    <param> \
+      2 &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -grid_obs &DATA_DIR_PYTHON;/obs.txt \
+      &CONFIG_DIR;/EnsembleStatConfig_python \
+      -outdir &OUTPUT_DIR;/python \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V_ens.nc</grid_nc>
+    </output>
+  </test>
+  
+  <!-- Invokes Python script to read point data  -->
+  <test name="python_ascii2nc">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      &OUTPUT_DIR;/python/ascii2nc_python.nc \
+      -format python
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_python.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Invokes Python script to read point data using variable name strings  -->
+  <test name="python_ascii2nc_varname">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs_varname.txt" \
+      &OUTPUT_DIR;/python/ascii2nc_python_varname.nc \
+      -format python
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_python_varname.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Invokes Python script to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_python_AGGR_MPR_to_SL1L2.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_python_AGGR_MPR_to_SL1L2.stat</stat>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to read point data  -->
+  <test name="python_ascii2nc_pickle">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <env>
+       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      &OUTPUT_DIR;/python/ascii2nc_pickle.nc \
+      -format python
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_pickle.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to read NUMPY text data -->
+  <test name="python_numpy_plot_data_plane_pickle">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_pickle.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled plot_data_plane" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_pickle.ps</ps>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis_pickle">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat</stat>
     </output>
   </test>
 

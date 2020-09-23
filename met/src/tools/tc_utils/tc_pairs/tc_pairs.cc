@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -54,6 +54,7 @@ using namespace std;
 
 #include "tc_pairs.h"
 
+#include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
@@ -138,7 +139,6 @@ static double compute_dland        (double, double);
 static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
                                     TimeArray &, NumArray &, NumArray &,
                                     NumArray &, NumArray &, NumArray &);
-static void   load_dland           ();
 static void   process_watch_warn   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
 static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
@@ -254,7 +254,9 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Load the distance to land data file
-   if(dland_dp.nx() == 0 || dland_dp.ny() == 0) load_dland();
+   if(dland_dp.is_empty()) {
+      load_dland(conf_info.DLandFile, dland_grid, dland_dp);
+   }
 
    return;
 }
@@ -534,7 +536,7 @@ void process_track_files(const StringArray &files,
                          bool check_anly) {
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
-   ConcatString cs;
+   ConcatString suffix;
    ATCFTrackLine line;
 
    // Initialize
@@ -542,6 +544,11 @@ void process_track_files(const StringArray &files,
 
    // Initialize counts
    tot_read = tot_add = 0;
+
+   // Set metadata pointers
+   line.set_basin_map(&conf_info.BasinMap);
+   line.set_best_technique(&conf_info.BestTechnique);
+   line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
    for(i=0; i<files.n_elements(); i++) {
@@ -557,28 +564,16 @@ void process_track_files(const StringArray &files,
       // Initialize counts
       cur_read = cur_add = 0;
 
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
       // Read each line in the file
       while(f >> line) {
 
          // Increment the line counts
          cur_read++;
          tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
-
-         // Check for BEST track technqiue
-         if(conf_info.BestTechnique.has(line.technique())) {
-            line.set_best_track(true);
-         }
-
-         // Check for operational track technqiue
-         if(conf_info.OperTechnique.has(line.technique())) {
-            line.set_oper_track(true);
-         }
 
          // Check the keep status if requested
          if(check_keep && !is_keeper(&line)) continue;
@@ -634,7 +629,7 @@ void process_prob_files(const StringArray &files,
                         ProbInfoArray &probs) {
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
-   ConcatString cs;
+   ConcatString suffix;
    ATCFProbLine line;
 
    // Initialize
@@ -642,6 +637,11 @@ void process_prob_files(const StringArray &files,
 
    // Initialize counts
    tot_read = tot_add = 0;
+
+   // Set metadata pointers
+   line.set_basin_map(&conf_info.BasinMap);
+   line.set_best_technique(&conf_info.BestTechnique);
+   line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
    for(i=0; i<files.n_elements(); i++) {
@@ -657,18 +657,16 @@ void process_prob_files(const StringArray &files,
       // Initialize counts
       cur_read = cur_add = 0;
 
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
       // Read each line in the file
       while(f >> line) {
 
          // Increment the line counts
          cur_read++;
          tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
 
          // Check the keep status
          if(!is_keeper(&line)) continue;
@@ -1726,10 +1724,6 @@ double compute_dland(double lat, double lon) {
    double x_dbl, y_dbl, dist;
    int x, y;
 
-   // Check for empty grid
-   if(dland_grid.nx() == 0 || dland_grid.ny() == 0)
-      return(bad_data_double);
-
    // Convert lat,lon to x,y
    dland_grid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
 
@@ -1861,65 +1855,6 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
          if(!is_bad_data(crtk[i]))
             crtk_err.set(i, tc_nautical_miles_per_km*crtk[i]);
       }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void load_dland() {
-   ConcatString file_name;
-   LongArray dim;
-   int i;
-
-   // Get the path for the distance to land file
-   file_name = replace_path(conf_info.DLandFile);
-
-   mlog << Debug(1)
-        << "Distance to land file: " << file_name << "\n";
-
-   // Check for no file provided
-   if(file_name.empty()) return;
-   // Open the NetCDF output of the tc_dland tool
-   MetNcFile MetNc;
-   if(!MetNc.open(file_name.c_str())) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "problem reading file \"" << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Find the first non-lat/lon variable
-   for(i=0; i<MetNc.Nvars; i++) {
-      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_var_name) != 0 &&
-         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_var_name) != 0)
-         break;
-   }
-
-   // Check range
-   if(i == MetNc.Nvars) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't find non-lat/lon variable in file \""
-           << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the grid
-   dland_grid = MetNc.grid;
-
-   // Set the dimension to (*,*)
-   dim.add(vx_data2d_star);
-   dim.add(vx_data2d_star);
-
-   // Read the data
-   if(!MetNc.data(MetNc.Var[i].var, dim, dland_dp)) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't read data from file \""
-           << file_name << "\"\n\n";
-      exit(1);
    }
 
    return;

@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -80,7 +80,7 @@ class Shp_Array {
 
       void dump(ostream &, int = 0) const;
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
          //
          //  set stuff
@@ -182,21 +182,25 @@ return;
 
 template <typename T>
 
-void Shp_Array<T>::extend(int N)
+void Shp_Array<T>::extend(int N, bool exact)
 
 {
 
 if ( N <= Nalloc )  return;
 
-N = AllocInc*( (N + AllocInc - 1)/AllocInc );
+if ( ! exact )  {
+
+   N = AllocInc*( (N + AllocInc - 1)/AllocInc );
+
+}
 
 int j;
 T * u = new T [N];
 
 if ( !u )  {
 
-   mlog << Error
-        << "Shp_Array::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "Shp_Array::extend(int, bool) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -266,8 +270,8 @@ void Shp_Array<T>::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   mlog << Error
-        << "Shp_Array::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "Shp_Array::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -292,8 +296,8 @@ void Shp_Array<T>::set_n_elements(int N)
 
 if ( N < 0 )  {
 
-   mlog << Error
-        << "Shp_Array::set_n_elements(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "Shp_Array::set_n_elements(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -315,7 +319,7 @@ void Shp_Array<T>::add(const T & a)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 E[Nelements++] = a;
 
@@ -359,8 +363,8 @@ const T Shp_Array<T>::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   mlog << Error
-        << "\n\n  Shp_Array::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\n\n  Shp_Array::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }

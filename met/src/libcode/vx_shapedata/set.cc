@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -485,8 +485,6 @@ void SetCollection::extend(int N)
 
 if ( N <= n_alloc )  return;
 
-// cout << "\n  SetCollection::extend() -> N = " << N << "\n";
-
 int j, k;
 FcstObsSet * u = 0;
 
@@ -555,7 +553,7 @@ int SetCollection::merge()
 {
 
    int j, k;
-   int jm, km;
+   int jm=0, km=0;
    int need_merge;
 
    if( n_sets <= 1 ) return(0);

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -59,7 +59,7 @@ class NumArray {
 
       void erase();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -68,12 +68,14 @@ class NumArray {
       const double * vals() const;
       double * buf() const;
 
-      int has(int)    const;
-      int has(double) const;
+      int has(int, bool forward=true)    const;
+      int has(double, bool forward=true) const;
 
       void add(int);
       void add(double);
       void add(const NumArray &);
+      void add_seq(int, int);
+      void add_const(double, int);
       void add_css(const char *);
       void add_css_sec(const char *);
 
@@ -90,6 +92,7 @@ class NumArray {
       double percentile_array(double);
       double compute_percentile(double, bool) const;
       double iqr();
+      void   compute_mean_variance(double &, double &) const;
       void   compute_mean_stdev(double &, double &) const;
       double sum() const;
       double mode() const;

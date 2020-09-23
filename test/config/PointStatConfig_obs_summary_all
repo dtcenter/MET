@@ -44,6 +44,7 @@ eclv_points    = 0.05;
 //
 fcst = {
    message_type = [ "ADPSFC" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [
@@ -201,6 +202,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   rps    = NONE;
    eclv   = STAT;
    mpr    = BOTH;
 }
@@ -210,6 +212,6 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

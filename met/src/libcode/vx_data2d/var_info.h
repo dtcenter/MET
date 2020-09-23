@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,6 +18,7 @@
 #include "threshold.h"
 #include "vx_cal.h"
 #include "vx_config.h"
+#include "vx_grid.h"
 
 #include "data_file_type.h"
 
@@ -53,7 +54,32 @@ class VarInfo
       ThreshArray   CensorThresh; // Censoring thesholds
       NumArray      CensorVal;    // and replacement values
 
+      int           nBins;     // Number of pdf bins
+      NumArray      Range;     // Range of pdf bins
+
       RegridInfo    Regrid;    // Regridding logic
+
+      // Options to override metadata
+      ConcatString  SetAttrName;
+      ConcatString  SetAttrUnits;
+      ConcatString  SetAttrLevel;
+      ConcatString  SetAttrLongName;
+
+      Grid          SetAttrGrid;
+
+      unixtime      SetAttrInit;
+      unixtime      SetAttrValid;
+      int           SetAttrLead;
+      int           SetAttrAccum;
+
+      int           SetAttrIsPrecipitation;
+      int           SetAttrIsSpecificHumidity;
+      int           SetAttrIsUWind;
+      int           SetAttrIsVWind;
+      int           SetAttrIsGridRelative;
+      int           SetAttrIsWindSpeed;
+      int           SetAttrIsWindDirection;
+      int           SetAttrIsProb;
 
       void init_from_scratch();
       void assign(const VarInfo &);
@@ -104,7 +130,22 @@ class VarInfo
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
 
+      int          n_bins()         const;
+      NumArray     range()          const;
+
       RegridInfo   regrid()         const;
+
+      ConcatString name_attr()      const;
+      ConcatString units_attr()     const;
+      ConcatString level_attr()     const;
+      ConcatString long_name_attr() const;
+      ConcatString ensemble_attr()  const;
+
+      Grid         grid_attr()      const;
+      unixtime     init_attr()      const;
+      unixtime     valid_attr()     const;
+      int          lead_attr()      const;
+      int          accum_attr()     const;
 
          //
          // set stuff
@@ -139,6 +180,9 @@ class VarInfo
 
       void set_censor_thresh(const ThreshArray &);
       void set_censor_val(const NumArray &);
+
+      void set_n_bins(const int &);
+      void set_range(const NumArray &);
 
       void set_regrid(const RegridInfo &);
 
@@ -189,7 +233,22 @@ inline int          VarInfo::lead()           const { return(Lead);             
 inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
 inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
 
+inline int          VarInfo::n_bins()         const { return(nBins);            }
+inline NumArray     VarInfo::range()          const { return(Range);            }
+
 inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
+
+inline ConcatString VarInfo::name_attr()      const { return(SetAttrName.empty()     ? name()       : SetAttrName);     }
+inline ConcatString VarInfo::units_attr()     const { return(SetAttrUnits.empty()    ? units()      : SetAttrUnits);    }
+inline ConcatString VarInfo::level_attr()     const { return(SetAttrLevel.empty()    ? level_name() : SetAttrLevel);    }
+inline ConcatString VarInfo::long_name_attr() const { return(SetAttrLongName.empty() ? long_name()  : SetAttrLongName); }
+
+inline Grid         VarInfo::grid_attr()      const { return(SetAttrGrid);     }
+
+inline unixtime     VarInfo::init_attr()      const { return(SetAttrInit);     }
+inline unixtime     VarInfo::valid_attr()     const { return(SetAttrValid);    }
+inline int          VarInfo::lead_attr()      const { return(SetAttrLead);     }
+inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
 
 ///////////////////////////////////////////////////////////////////////////////
 

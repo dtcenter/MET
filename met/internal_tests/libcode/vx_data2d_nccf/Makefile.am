@@ -20,9 +20,10 @@ test_read_nccf_LDADD = -lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_util \
 	-lvx_math \
+	-lvx_color \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++4 -lnetcdf
-
+	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -251,13 +251,13 @@ double IcodeCell::as_double() const
 
 {
 
-double x;
+double x = 0.0;
 
 
 switch ( type )  {
 
    case integer:         x = (double) i;  break;
-   case floating_point:  x = d;             break;
+   case floating_point:  x = d;           break;
 
    default:
       cerr << "\n\n  IcodeCell::as_double() const -> bad type ... \"" << celltype_to_string(type) << "\"\n\n";
@@ -279,7 +279,7 @@ int IcodeCell::as_int() const
 
 {
 
-int k;
+int k = 0;
 
 switch ( type )  {
 

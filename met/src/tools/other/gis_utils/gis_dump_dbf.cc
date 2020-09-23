@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -62,7 +62,6 @@ if ( argc != 2 )  usage();
 
 int fd = -1;
 int j;
-// int pos;
 size_t n_read, bytes;
 ConcatString input_filename = (string)argv[1];
 DbfHeader h;
@@ -99,15 +98,7 @@ if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
 h.set_header(buf);
 
-// cout << "DbfHeader ...\n";
-// 
-// h.dump(cout, 1);
-
 cout << "\n";
-
-// pos = lseek(fd, 0, SEEK_CUR);
-
-// cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
    //
    //  subrecords
@@ -118,10 +109,6 @@ h.set_subrecords(fd);
 h.dump(cout);
 
 cout << "\n";
-
-// pos = lseek(fd, 0, SEEK_CUR);
-
-// cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
    //
    //  records
@@ -135,12 +122,6 @@ if ( lseek(fd, h.pos_first_record, SEEK_SET) < 0 )  {
    exit ( 1 );
 
 }
-
-// pos = lseek(fd, 0, SEEK_CUR);
-
-// cout << "\n  File position = " << comma_string(pos) << "\n\n";
-
-// cout << "Records ...\n";
 
 for (j=0; j<(h.n_records); ++j)  {
 
@@ -163,8 +144,6 @@ for (j=0; j<(h.n_records); ++j)  {
    
    cout << "Record " << j << " ...\n";
 
-   // cout << "   \"" << ((char *) buf) << "\"\n";
-
    dump_record(cout, 1, buf, h);
 
 }   //  for j
@@ -174,7 +153,7 @@ for (j=0; j<(h.n_records); ++j)  {
    //  done
    //
 
-close(fd);  fd = -1;
+close(fd);
 
 return ( 0 );
 

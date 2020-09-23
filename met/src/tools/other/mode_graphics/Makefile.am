@@ -23,6 +23,7 @@ plot_mode_field_SOURCES = cgraphbase_plottype_to_string.cc cgraphbase_plottype_t
 plot_mode_field_CPPFLAGS = ${MET_CPPFLAGS}
 plot_mode_field_LDFLAGS = -L. ${MET_LDFLAGS}
 plot_mode_field_LDADD = -lvx_config \
+	-lvx_gsl_prob \
 	-lvx_plot_util \
 	-lvx_data2d_nc_met \
 	$(PYTHON_LIBS) \
@@ -34,15 +35,11 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_render \
 	-lvx_color \
 	-lvx_util \
+	-lvx_config \
 	-lvx_cal \
 	-lvx_log \
 	-lvx_math \
-	-lnetcdf_c++4 \
-	-lnetcdf \
-	-lcairo \
-	-lfreetype \
-	-lm \
-	-lz
+	-lcairo -lfreetype -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

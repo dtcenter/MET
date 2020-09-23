@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@ using namespace std;
 #include "shp_file.h"
 #include "shx_file.h"
 #include "dbf_file.h"
+#include "shp_poly_record.h"
 #include "int_array.h"
 
 
@@ -57,7 +58,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int buf_size = 600000;
+static const int buf_size = 1200000;
 
 static unsigned char buf[buf_size];
 
@@ -91,8 +92,8 @@ static void set_separate_files (const StringArray &);
 
 static void get_record_infos(const char * shx_filename, const char * dbf_filename);
 
-static void write_record (ostream &, const ShpPolygonRecord &, int & recnum, const ConcatString & anno);
-static void write_part   (ostream &, const ShpPolygonRecord &, int & recnum, const ConcatString & anno, const int part);
+static void write_record (ostream &, const ShpPolyRecord &, int & recnum, const ConcatString & anno);
+static void write_part   (ostream &, const ShpPolyRecord &, int & recnum, const ConcatString & anno, const int part);
 
 static ConcatString create_anno_string(const RecordInfo &);
 
@@ -136,11 +137,11 @@ admin_name_tag                  = cline[4];
    //  get record info
    //
 
-get_record_infos(shx_filename, dbf_filename);
+get_record_infos(shx_filename.c_str(), dbf_filename.c_str());
 
-cout << "\n\n  There are " << n_records << " records\n\n";
+cout << "There are " << n_records << " records.\n\n";
 
-/*
+
 for (int j=0; j<n_records; ++j)  {
 
    cout << "Record " << j << " of " << n_records << "...\n";
@@ -150,8 +151,16 @@ for (int j=0; j<n_records; ++j)  {
    cout << "   offset  = " << records[j].offset             << '\n';
    cout << "   length  = " << records[j].length             << '\n';
 
+   if ( records[j].length > buf_size)  {
+
+      cerr << "\n  " << program_name << ": buffer size (" << buf_size
+           << ") is too small. Increase to at least " << records[j].length
+           << ".\n\n";
+
+      exit ( 1 );
+   }
 }
-*/
+
 
    //
    //  output
@@ -159,11 +168,11 @@ for (int j=0; j<n_records; ++j)  {
 
 if ( do_separate_files )   {
 
-    make_separate_files(shp_filename);
+    make_separate_files(shp_filename.c_str());
 
 } else {
 
-   make_one_file(shp_filename);
+   make_one_file(shp_filename.c_str());
 
 }
 
@@ -184,8 +193,9 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << ' '
-     << "[ -outdir path ] [ -separate_files ] shp_file shx_file dbf_file country_field admin_field\n\n";
+cerr << "\nusage: " << program_name << ' '
+     << "[-outdir path] [-separate_files] "
+     << "shp_file shx_file dbf_file country_field admin_field\n\n";
 
 exit ( 1 );
 
@@ -225,7 +235,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_record(ostream & out, const ShpPolygonRecord & gr, int & recnum, const ConcatString & anno)
+void write_record(ostream & out, const ShpPolyRecord & gr, int & recnum, const ConcatString & anno)
 
 {
 
@@ -246,7 +256,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_part(ostream & out, const ShpPolygonRecord & gr, int & recnum, const ConcatString & anno, const int part)
+void write_part(ostream & out, const ShpPolyRecord & gr, int & recnum, const ConcatString & anno, const int part)
 
 {
 
@@ -278,7 +288,7 @@ out << '\n';
 
 for (j=start_index; j<=stop_index; ++j)  {
 
-   sprintf(junk, " %.5f %.5f", gr.lat(j), gr.lon(j));
+   snprintf(junk, sizeof(junk), " %.5f %.5f", gr.lat(j), gr.lon(j));
 
    out << junk << '\n';
 
@@ -317,9 +327,9 @@ DbfSubRecord * r                = 0;
    //  get the country names (and admin names, if they're there) from the dbf file
    //
 
-if ( (fd = open(dbf_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(dbf_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": get_record_infos() -> unable to open dbf file \""
+   cerr << "\n  " << program_name << ": get_record_infos() -> unable to open dbf file \""
         << dbf_filename << "\"\n\n";
 
    exit ( 1 );
@@ -334,7 +344,7 @@ bytes = 32;
 
 if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-   cerr << "\n\n  " << program_name << ": get_record_infos() -> trouble reading header from dbf file \""
+   cerr << "\n  " << program_name << ": get_record_infos() -> trouble reading header from dbf file \""
         << dbf_filename << "\"\n\n";
 
    exit ( 1 );
@@ -353,15 +363,14 @@ hd.set_subrecords(fd);
    //  country name should be in there, but the admin name might not be
    //
 
-country_name_rec = hd.lookup_subrec(country_name_tag);
-  admin_name_rec = hd.lookup_subrec(admin_name_tag);
+country_name_rec = hd.lookup_subrec(country_name_tag.c_str());
+  admin_name_rec = hd.lookup_subrec(admin_name_tag.c_str());
 
 if ( ! country_name_rec )  {
 
-   cerr << "\n\n  " << program_name << ": get_record_infos() -> unable to get country name subrecord from dbf file \""
-        << dbf_filename << "\"\n\n";
-
-   exit ( 1 );
+   cout << "\n  WARNING: " << program_name << ": get_record_infos() -> "
+        << "unable to get country name subrecord from dbf file \""
+        << dbf_filename << "\". Processing all available records.\n\n";
 
 }
 
@@ -379,7 +388,7 @@ records = new RecordInfo [n_records];
 
 if ( lseek(fd, hd.pos_first_record, SEEK_SET) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": lseek error\n\n";
+   cerr << "\n  " << program_name << ": lseek error\n\n";
 
    exit ( 1 );
 
@@ -387,13 +396,23 @@ if ( lseek(fd, hd.pos_first_record, SEEK_SET) < 0 )  {
 
 for (j=0; j<(hd.n_records); ++j)  {
 
+   if ( (hd.record_length + 1) > buf_size) {
+
+      cerr << "\n  " << program_name << ": buffer size (" << buf_size
+           << ") is too small. Increase to at least " << bytes
+           << ".\n\n";
+
+      exit ( 1 );
+
+   }
+
    bytes = hd.record_length;
 
    n_read = read(fd, buf, bytes);
 
    if ( n_read != bytes )  {
 
-      cerr << "\n\n  " << program_name << ": read error ... n_read = " << n_read << "\n\n";
+      cerr << "\n  " << program_name << ": read error ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -401,13 +420,19 @@ for (j=0; j<(hd.n_records); ++j)  {
 
    buf[hd.record_length] = 0;
 
-   r = country_name_rec;
+   if( country_name_rec )  {
 
-   substring((const char *) buf, junk, r->start_pos, r->start_pos + r->field_length - 1);
+      r = country_name_rec;
 
-   s = junk;
+      substring((const char *) buf, junk, r->start_pos, r->start_pos + r->field_length - 1);
 
-   s.ws_strip();
+      s = junk;
+
+      s.ws_strip();
+   }
+   else  {
+      s << cs_erase << "REC" << j+1;
+   }
 
    records[j].country = s;
 
@@ -431,7 +456,7 @@ for (j=0; j<(hd.n_records); ++j)  {
    //  done with the dbf file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    ///////////////////////////////////////////
 
@@ -442,9 +467,9 @@ ShxRecord rx;
    //  get the offsets and record lengths from the shx file
    //
 
-if ( (fd = open(shx_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shx_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": get_record_infos() -> unable to open shx file \""
+   cerr << "\n  " << program_name << ": get_record_infos() -> unable to open shx file \""
         << shx_filename << "\"\n\n";
 
    exit ( 1 );
@@ -459,7 +484,7 @@ bytes = 100;
 
 if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-   cerr << "\n\n  " << program_name << ": get_record_infos() -> trouble reading main file header from shx file \""
+   cerr << "\n  " << program_name << ": get_record_infos() -> trouble reading main file header from shx file \""
         << shx_filename << "\"\n\n";
 
    exit ( 1 );
@@ -490,7 +515,7 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
    //  done with shx file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    //
    //  done
@@ -540,7 +565,7 @@ ConcatString output_filename;
 ConcatString s;
 ConcatString anno;
 // ShpRecordHeader rh;
-ShpPolygonRecord gr;
+ShpPolyRecord gr;
 ofstream f;
 
    //
@@ -559,11 +584,11 @@ output_filename << s << "_data";
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
-   cerr << "\n\n  " << program_name << ": make_one_file() -> unable to open output file \""
+   cerr << "\n  " << program_name << ": make_one_file() -> unable to open output file \""
         << output_filename << "\"\n\n";
 
    exit ( 1 );
@@ -574,9 +599,9 @@ if ( ! f )  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": make_one_file() -> unable to open shp file \""
+   cerr << "\n  " << program_name << ": make_one_file() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
 
    exit ( 1 );
@@ -595,7 +620,7 @@ for (j=0; j<n_records; ++j)  {
 
    if ( lseek(fd, pos, SEEK_SET) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": make_one_file() -> lseek error\n\n";
+      cerr << "\n  " << program_name << ": make_one_file() -> lseek error\n\n";
 
       exit ( 1 );
 
@@ -605,7 +630,7 @@ for (j=0; j<n_records; ++j)  {
 
    if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-      cerr << "\n\n  " << program_name << ": trouble reading record data ... n_read = " << n_read << "\n\n";
+      cerr << "\n  " << program_name << ": trouble reading record data ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -630,7 +655,7 @@ for (j=0; j<n_records; ++j)  {
 
 f.close();
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -670,9 +695,9 @@ for (j=0; j<n_records; ++j)  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": make_separate_files() -> unable to open shp file \""
+   cerr << "\n  " << program_name << ": make_separate_files() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
 
    exit ( 1 );
@@ -691,7 +716,7 @@ for (k=0; k<(names.n()); ++k)  {
 
    for (j=0; j<n_records; ++j)  {
 
-      if ( names[k] == records[j].country )  i.add(j);
+      if ( names[k].c_str() == records[j].country )  i.add(j);
 
    }
 
@@ -699,7 +724,7 @@ for (k=0; k<(names.n()); ++k)  {
 
    if ( output_directory.nonempty() )  output_filename << output_directory << '/';
 
-   s = get_short_name(names[k]);
+   s = get_short_name(names[k].c_str());
 
    patch(s);
 
@@ -718,7 +743,7 @@ for (k=0; k<(names.n()); ++k)  {
    //  done
    //
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -735,7 +760,7 @@ void process_array(int fd, const ConcatString & output_filename, const IntArray 
 int j, k;
 int pos, rec_num;
 int n_read, bytes;
-ShpPolygonRecord gr;
+ShpPolyRecord gr;
 ConcatString anno;
 ofstream f;
 
@@ -743,11 +768,11 @@ ofstream f;
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
-   cerr << "\n\n  process_array() -> unable to open output file \"" << output_filename << "\"\n\n";
+   cerr << "\n  process_array() -> unable to open output file \"" << output_filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -767,7 +792,7 @@ for (k=0; k<(i.n_elements()); ++k)  {
 
    if ( lseek(fd, pos, SEEK_SET) < 0 )  {
 
-      cerr << "\n\n  process_array() -> lseek error on file \"" << output_filename << "\"\n\n";
+      cerr << "\n  process_array() -> lseek error on file \"" << output_filename << "\"\n\n";
 
       exit ( 1 );
 
@@ -777,7 +802,7 @@ for (k=0; k<(i.n_elements()); ++k)  {
 
    if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-      cerr << "\n\n  " << program_name << ": trouble reading record data ... n_read = " << n_read << "\n\n";
+      cerr << "\n  " << program_name << ": trouble reading record data ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -850,5 +875,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,6 +16,7 @@
 
 #include "vx_grid.h"
 #include "data_plane.h"
+#include "var_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +33,8 @@ extern void rotate_wdir_grid_to_earth(const DataPlane &wdir2d,
 extern bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
                                     const Grid &,
                                     DataPlane &u2d_rot, DataPlane &v2d_rot);
+
+extern void set_attrs(const VarInfo *info, DataPlane &dp);
 
 ////////////////////////////////////////////////////////////////////////
 

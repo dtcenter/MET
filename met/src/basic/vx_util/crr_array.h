@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -92,7 +92,7 @@ class CRR_Array {
 
       T & operator[](int) const;
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void extend(int, const T);
 
@@ -171,20 +171,24 @@ return;
 
 template <typename T>
 
-void CRR_Array<T>::extend(int N)
+void CRR_Array<T>::extend(int N, bool exact)
 
 {
 
 if ( N <= Nalloc )  return;
 
-N = AllocInc*( (N + AllocInc - 1)/AllocInc );
+if ( ! exact )  {
+
+   N = AllocInc*( (N + AllocInc - 1)/AllocInc );
+
+}
 
 int j;
 T * u = new T [N];
 
 if ( !u )  {
 
-   mlog << Error << "\nCRR_Array::extend(int) -> "
+   mlog << Error << "\nCRR_Array::extend(int, bool) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
@@ -342,7 +346,7 @@ void CRR_Array<T>::add(const T & a)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = a;
 

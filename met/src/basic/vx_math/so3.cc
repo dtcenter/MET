@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -758,7 +758,7 @@ if ( (row < 0) || (row >= 3) || (col < 0) || (col >= 3) )  {
 }
 
 int k;
-double x;
+double x = 0.0;
 
 
 k = 3*row + col;

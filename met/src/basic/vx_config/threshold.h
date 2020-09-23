@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "concat_string.h"
 #include "vx_cal.h"
@@ -127,6 +128,7 @@ struct PC_info {
 
 
 class SingleThresh;
+class Simple_Node;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -143,6 +145,7 @@ class ThreshNode {
       virtual ~ThreshNode();
 
       virtual bool check(double) const = 0;
+      virtual bool check(double, double, double) const = 0;
 
       virtual ThreshNode * copy() const = 0;
 
@@ -163,6 +166,8 @@ class ThreshNode {
 
       virtual void multiply_by(const double) = 0;
 
+      virtual void get_simple_nodes(vector<Simple_Node> &) const = 0;
+
       ConcatString s;
       ConcatString abbr_s;
 
@@ -180,6 +185,7 @@ class Or_Node : public ThreshNode {
      ~Or_Node();
 
       bool check(double) const;
+      bool check(double, double, double) const;
 
       ThreshNode * copy() const;
 
@@ -199,6 +205,8 @@ class Or_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -226,6 +234,7 @@ class And_Node : public ThreshNode {
      ~And_Node();
 
       bool check(double) const;
+      bool check(double, double, double) const;
 
       ThreshType type() const;
 
@@ -243,6 +252,8 @@ class And_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -272,6 +283,7 @@ class Not_Node : public ThreshNode {
      ~Not_Node();
 
       bool check(double) const;
+      bool check(double, double, double) const;
 
       ThreshType type() const;
 
@@ -289,6 +301,8 @@ class Not_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -351,6 +365,8 @@ class Simple_Node : public ThreshNode {
 
       bool need_perc() const;
 
+      void get_simple_nodes(vector<Simple_Node> &) const;
+
          //
          //  do stuff
          //
@@ -358,6 +374,7 @@ class Simple_Node : public ThreshNode {
       ThreshNode * copy() const;
 
       bool check(double) const;
+      bool check(double, double, double) const;
 
       void multiply_by(const double);
 
@@ -418,12 +435,15 @@ class SingleThresh {
       double         get_value() const;
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
+      void           get_simple_nodes(vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
 
       ConcatString   get_str(int precision = thresh_default_precision) const;
       ConcatString   get_abbr_str(int precision = thresh_default_precision) const;
+
       bool           check(double) const;
+      bool           check(double, double, double) const;
 
 };
 
@@ -431,20 +451,14 @@ class SingleThresh {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     SingleThresh::get_type()          const { return ( node ? node->type()       : thresh_na           ); }
-inline double         SingleThresh::get_value()         const { return ( node ? node->value()      : bad_data_double     ); }
-inline PercThreshType SingleThresh::get_ptype()         const { return ( node ? node->ptype()      : no_perc_thresh_type ); }
-inline double         SingleThresh::get_pvalue()        const { return ( node ? node->pvalue()     : bad_data_double     ); }
-inline bool           SingleThresh::check(double __x__) const { return ( node ? node->check(__x__) : true                ); }
+inline ThreshType     SingleThresh::get_type()   const { return ( node ? node->type()   : thresh_na           ); }
+inline double         SingleThresh::get_value()  const { return ( node ? node->value()  : bad_data_double     ); }
+inline PercThreshType SingleThresh::get_ptype()  const { return ( node ? node->ptype()  : no_perc_thresh_type ); }
+inline double         SingleThresh::get_pvalue() const { return ( node ? node->pvalue() : bad_data_double     ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-extern bool check_threshold(double, double, int);
-
-
-////////////////////////////////////////////////////////////////////////
 
 #endif   //  __THRESHOLD_H__
 

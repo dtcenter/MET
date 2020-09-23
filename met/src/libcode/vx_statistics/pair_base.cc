@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -61,6 +61,8 @@ void PairBase::init_from_scratch() {
 
 void PairBase::clear() {
 
+   IsPointVx = false;
+
    mask_name.clear();
    mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
    mask_sid_ptr   = (StringArray *) 0;  // Not allocated
@@ -72,20 +74,21 @@ void PairBase::clear() {
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
-   sid_sa.clear();
-   lat_na.clear();
-   lon_na.clear();
+   o_na.clear();
    x_na.clear();
    y_na.clear();
-   wgt_na.clear();
-   vld_ta.clear();
-   lvl_na.clear();
-   elv_na.clear();
-   o_na.clear();
-   o_qc_sa.clear();
+   wgt_na.clear();      
    cmn_na.clear();
    csd_na.clear();
    cdf_na.clear();
+
+   sid_sa.clear();
+   lat_na.clear();
+   lon_na.clear();
+   vld_ta.clear();
+   lvl_na.clear();
+   elv_na.clear();
+   o_qc_sa.clear();
 
    n_obs = 0;
 
@@ -103,20 +106,71 @@ void PairBase::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::extend(int n) {
+void PairBase::erase() {
 
-   lat_na.extend(n);
-   lon_na.extend(n);
-   x_na.extend(n);
-   y_na.extend(n);
-   wgt_na.extend(n);
-   vld_ta.extend(n);
-   lvl_na.extend(n);
-   elv_na.extend(n);
-   o_na.extend(n);
-   cmn_na.extend(n);
-   csd_na.extend(n);
-   cdf_na.extend(n);
+   IsPointVx = false;
+
+   mask_name.erase();
+   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
+   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+
+   msg_typ.clear();
+   msg_typ_vals.clear();
+
+   interp_mthd = InterpMthd_None;
+   interp_shape = GridTemplateFactory::GridTemplate_None;
+
+   o_na.erase();
+   x_na.erase();
+   y_na.erase();
+   wgt_na.erase();      
+   cmn_na.erase();
+   csd_na.erase();
+   cdf_na.erase();
+
+   sid_sa.clear();  // no erase option
+   lat_na.erase();
+   lon_na.erase();
+   vld_ta.erase();
+   lvl_na.erase();
+   elv_na.erase();
+   o_qc_sa.clear(); // no erase option
+
+   n_obs = 0;
+
+   fcst_ut = 0;
+
+   obs_summary = ObsSummary_None;
+   obs_perc_value = bad_data_int;
+   check_unique = false;
+
+   map_key.clear();
+   map_val.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::extend(int n, bool exact) {
+
+   o_na.extend  (n, exact);
+   x_na.extend  (n, exact);
+   y_na.extend  (n, exact);
+   wgt_na.extend(n, exact);
+
+   cmn_na.extend(n, exact);
+   csd_na.extend(n, exact);
+   cdf_na.extend(n, exact);
+
+   if(IsPointVx) {
+      lat_na.extend(n, exact);
+      lon_na.extend(n, exact);
+      vld_ta.extend(n, exact);
+      lvl_na.extend(n, exact);
+      elv_na.extend(n, exact);
+   }
 
    return;
 }
@@ -255,6 +309,11 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
    int i, status = 0;
 
    //
+   // Only valid for point data
+   //
+   if(!IsPointVx) return(false);
+
+   //
    // Check for an existing record of this observation
    //
    for(i=0, i_obs=-1; i<n_obs; i++) {
@@ -299,11 +358,49 @@ void PairBase::set_climo(int i_obs, double obs, double cmn, double csd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairBase::add_obs(const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_climo_cdf() {
+   int i;
+
+   // The o_na, cmn_na, and csd_na have already been populated
+   if(o_na.n() != cmn_na.n() || o_na.n() != csd_na.n()) {
+      mlog << Error << "\nPairBase::add_climo_cdf() -> "
+           << "the observation, climo mean, and climo stdev arrays "
+           << "must all have the same length (" << o_na.n() << ").\n\n";
+      exit(1);
+   }
+
+   cdf_na.extend(o_na.n());
+
+   for(i=0; i<o_na.n(); i++) {
+      cdf_na.add(is_bad_data(o_na[i])   ||
+                 is_bad_data(cmn_na[i]) ||
+                 is_bad_data(csd_na[i]) ?
+                 bad_data_double :
+                 normal_cdf(o_na[i], cmn_na[i], csd_na[i]));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairBase::add_point_obs(const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
+
+   //
+   // Set or check the IsPointVx flag
+   //
+   if(n_obs == 0) {
+      IsPointVx = true;
+   }
+   else if(!IsPointVx) {
+      mlog << Error << "\nPairBase::add_point_obs() -> "
+           << "should not be called for gridded verification!\n\n";
+      exit(1);
+   }
 
    bool ret = false;
 
@@ -383,6 +480,38 @@ bool PairBase::add_obs(const char *sid,
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::set_point_obs(int i_obs, const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
+
+   if(i_obs < 0 || i_obs >= n_obs) {
+      mlog << Error << "\nPairBase::set_point_obs() -> "
+           << "range check error: " << i_obs << " not in (0, "
+           << n_obs << ").\n\n"
+          ;
+      exit(1);
+   }
+
+   sid_sa.set(i_obs, sid);
+   lat_na.set(i_obs, lat);
+   lon_na.set(i_obs, lon);
+   x_na.set(i_obs, x);
+   y_na.set(i_obs, y);
+   wgt_na.set(i_obs, wgt);
+   vld_ta.set(i_obs, ut);
+   lvl_na.set(i_obs, lvl);
+   elv_na.set(i_obs, elv);
+   o_na.set(i_obs, o);
+   o_qc_sa.set(i_obs, qc);
+   set_climo(i_obs, o, cmn, csd);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ob_val_t PairBase::compute_nearest(string obs_key) {
    station_values_t svt = map_val[obs_key];
    vector<ob_val_t>::iterator it = svt.obs.begin();
@@ -453,14 +582,13 @@ ob_val_t PairBase::compute_uw_mean(string obs_key) {
 ////////////////////////////////////////////////////////////////////////
 
 ob_val_t PairBase::compute_dw_mean(string obs_key) {
-   double total = 0.0;
-   double weight = 0.0;
-   double total_weight = 0.0;
+   double total, weight, total_weight;
    ob_val_t out;
    station_values_t svt = map_val[obs_key];
+
    vector<ob_val_t>::iterator it = svt.obs.begin();
    out.qc = (*it).qc;
-   for(; it != svt.obs.end(); it++) {
+   for(total=total_weight=0.0; it != svt.obs.end(); it++) {
      if( svt.ut == (*it).ut) return *it;
      weight = 1.0 / pow( labs( svt.ut - (*it).ut ), 2.0);
 
@@ -493,12 +621,14 @@ ob_val_t PairBase::compute_percentile(string obs_key, int perc) {
 
 void PairBase::print_obs_summary(){
 
+   if(!IsPointVx) return;
+
    if(obs_summary == ObsSummary_None ||
-      4 > mlog.verbosity_level() ||
-      ! map_val.size() ) return;
+      mlog.verbosity_level() < 4 ||
+      !map_val.size()) return;
 
    //  iterate over ordered list map keys in the station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -527,8 +657,10 @@ void PairBase::print_obs_summary(){
 
 void PairBase::calc_obs_summary(){
 
+   if(!IsPointVx) return;
+
    //  iterate over the keys in the unique station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -590,7 +722,7 @@ void PairBase::calc_obs_summary(){
       elv_na.add (svt.elv);
       o_na.add   (ob.val);
       o_qc_sa.add(ob.qc.c_str());
-      add_climo(ob.val, svt.cmn, svt.csd);
+      add_climo  (ob.val, svt.cmn, svt.csd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -602,20 +734,23 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_obs(double x, double y, double o,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_grid_obs(double o, double cmn, double csd,
+                            double wgt) {
 
-   sid_sa.add(na_str);
-   lat_na.add(bad_data_double);
-   lon_na.add(bad_data_double);
-   x_na.add(x);
-   y_na.add(y);
-   wgt_na.add(wgt);
-   vld_ta.add(bad_data_int);
-   lvl_na.add(bad_data_double);
-   elv_na.add(bad_data_double);
+   //
+   // Set or check the IsPointVx flag
+   //
+   if(n_obs == 0) {
+      IsPointVx = false;
+   }
+   else if(IsPointVx) {
+      mlog << Error << "\nPairBase::add_grid_obs() -> "
+           << "should not be called for point verification!\n\n";
+      exit(1);
+   }
+
    o_na.add(o);
-   o_qc_sa.add(na_str);
+   wgt_na.add(wgt);
    add_climo(o, cmn, csd);
 
    // Increment the number of observations
@@ -626,60 +761,14 @@ void PairBase::add_obs(double x, double y, double o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_obs(int i_obs, const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_grid_obs(double x, double y,
+                            double o, double cmn, double csd,
+                            double wgt) {
 
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
-      exit(1);
-   }
+   add_grid_obs(o, cmn, csd, wgt);
 
-   sid_sa.set(i_obs, sid);
-   lat_na.set(i_obs, lat);
-   lon_na.set(i_obs, lon);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, ut);
-   lvl_na.set(i_obs, lvl);
-   elv_na.set(i_obs, elv);
-   o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, qc);
-   set_climo(i_obs, o, cmn, csd);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_obs(int i_obs, double x, double y,
-                       double o, double cmn, double csd, double wgt) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n";
-      exit(1);
-   }
-
-   sid_sa.set(i_obs, na_str);
-   lat_na.set(i_obs, bad_data_double);
-   lon_na.set(i_obs, bad_data_double);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, bad_data_int);
-   lvl_na.set(i_obs, bad_data_double);
-   elv_na.set(i_obs, bad_data_double);
-   o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, na_str);
-   set_climo(i_obs, o, cmn, csd);
+   x_na.add(x);
+   y_na.add(y);
 
    return;
 }
@@ -698,7 +787,7 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
    }
 
    // Apply censor logic.
-   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+   for(int i=0; i<vinfo->censor_thresh().n(); i++) {
 
       // Break out after the first match.
       if(vinfo->censor_thresh()[i].check(new_v)) {
@@ -712,7 +801,7 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Begin miscellanous utility functions
+// Begin miscellaneous utility functions
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -777,7 +866,8 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 ////////////////////////////////////////////////////////////////////////
 
 double compute_interp(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y, const double obs_v,
+                      const double obs_x, const double obs_y,
+                      const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
                       const double thresh,
@@ -789,14 +879,14 @@ double compute_interp(const DataPlaneArray &dpa,
    // Check for no data
    if(dpa.n_planes() == 0) return(bad_data_double);
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
                                method, width, shape, thresh, cat_thresh);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
                                   method, width, shape, thresh, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
@@ -909,6 +999,86 @@ void get_interp_points(const DataPlaneArray &dpa,
    if ( gt )  { delete gt;  gt = (const GridTemplate *) 0; }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
+
+   // The climo values must have non-zero, consistent length and
+   // cannot all be bad data
+   if(c_na.n() != f_na.n() || c_na.n() < 1 || is_bad_data(c_na.max())) {
+      return(false);
+   }
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
+                           const SingleThresh &othresh) {
+   int i, n_mn, n_sd;
+   double prob;
+   NumArray climo_prob;
+
+   // Number of valid climo mean and standard deviation
+   n_mn = mn_na.n_valid();
+   n_sd = sd_na.n_valid();
+
+   // For CDP threshold types, the climo_prob is constant.
+   if(othresh.get_ptype() == perc_thresh_climo_dist) {
+      climo_prob.add_const(othresh.get_pvalue()/100.0, n_mn);
+   }
+   // If both mean and standard deviation were provided, use them to
+   // derive normal climatological probabilities for the current event
+   // threshold
+   else if(n_mn > 0 && n_sd > 0) {
+
+      mlog << Debug(2)
+           << "Deriving normal approximation of climatological "
+           << "probabilities for threshold " << othresh.get_str()
+           << ".\n";
+
+      // Compute probability value for each point
+      for(i=0; i<mn_na.n(); i++) {
+
+         prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
+
+         // Handle greater-than probabilities
+         if(!is_bad_data(prob) &&
+            (othresh.get_type() == thresh_gt ||
+             othresh.get_type() == thresh_ge)) {
+            prob = 1.0 - prob;
+         }
+         climo_prob.add(prob);
+      }
+   }
+   // If only climatological mean was provided, it should already
+   // contain probabilities.  Range check the data to be sure.
+   else {
+
+      // Range check climatological probability mean values
+      if(n_mn > 0 && n_sd == 0) {
+         if(mn_na.min() < 0.0 || mn_na.max() > 1.0) {
+            mlog << Error << "\nderive_climo_prob() -> "
+                 << "The range of climatological probability values ["
+                 << mn_na.min() << ", " << mn_na.max() << "] falls "
+                 << "outside the expected range of [0, 1].\n"
+                 << "When verifying a probabilistic forecast using "
+                 << "climatology data, either supply a probabilistic "
+                 << "climo_mean field or non-probabilistic\n"
+                 << "climo_mean and climo_stdev fields from which a "
+                 << "normal approximation of the climatological "
+                 << "probabilities should be derived.\n\n";
+            exit(1);
+         }
+      }
+
+      climo_prob = mn_na;
+   }
+
+   return(climo_prob);
 }
 
 ////////////////////////////////////////////////////////////////////////

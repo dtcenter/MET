@@ -1,7 +1,5 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +18,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <time.h>
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -47,6 +46,90 @@ static const string units_att_name       = "units";
 
 static const int  max_met_args           = 30;
 
+////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+
+void copy_nc_data_as_double(double *to_array, const T *from_array,
+                            const int x_slot, const int y_slot,
+                            const int nx, const int ny,
+                            double missing_value, double fill_value,
+                            float add_offset, float scale_factor) {
+   double value;
+   int x, y, offset, start_offset;
+
+   offset = 0;
+   if (add_offset != 0.0 || scale_factor != 1.0) {
+      if (x_slot > y_slot) {
+         for (y=0; y<ny; ++y) {
+            start_offset = y * nx;
+            for (x=0; x<nx; ++x) {
+               value = (double)from_array[x + start_offset];
+               if(is_eq(value, missing_value) || is_eq(value, fill_value))
+                  value = bad_data_double;
+               else value = value * scale_factor + add_offset;
+               to_array[offset++] = value;
+            }
+         }
+      }
+      else {
+         for (x=0; x<nx; ++x) {
+            start_offset = x * ny;
+            for (y=0; y<ny; ++y) {
+               value = (double)from_array[y + start_offset];
+               if(is_eq(value, missing_value) || is_eq(value, fill_value))
+                  value = bad_data_double;
+               else value = value * scale_factor + add_offset;
+               to_array[offset++] = value;
+            }
+         }
+      }
+   }
+   else {
+      if (x_slot > y_slot) {
+         for (y=0; y<ny; ++y) {
+            start_offset = y * nx;
+            for (x=0; x<nx; ++x) {
+               value = (double)from_array[x + start_offset];
+               if(is_eq(value, missing_value) || is_eq(value, fill_value))
+                  value = bad_data_double;
+               to_array[offset++] = value;
+            }
+         }
+      }
+      else {
+         for (x=0; x<nx; ++x) {
+            start_offset = x * ny;
+            for (y=0; y<ny; ++y) {
+               value = (double)from_array[y + start_offset];
+               if(is_eq(value, missing_value) || is_eq(value, fill_value))
+                  value = bad_data_double;
+               to_array[offset++] = value;
+            }
+         }
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void check_nc_data_2d(const double *from_array, const int nx, const int ny,
+                      const double missing_value) {
+   int count_zero, count_missing, count_valid;
+   count_zero = count_missing = count_valid = 0;
+   for (int y=0; y<ny; ++y) {
+      int start_offset = y * nx;
+      for (int x=0; x<nx; ++x) {
+         double value = from_array[x + start_offset];
+         if (is_eq(missing_value, value)) count_missing++;
+         else if (is_eq(missing_value, 0)) count_zero++;
+         else count_valid++;
+      }
+   }
+   mlog << Debug(7) << "check_nc_data_2d() count: valid=" << count_valid << ", zero="
+        << count_zero << ", missing=" << count_missing << ", " << (nx*ny)
+        << " == " << (count_zero+count_missing+count_valid) << "\n";
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -355,10 +438,11 @@ double MetNcFile::data(NcVar * var, const LongArray & a) const
 
 {
 
+const char *method_name = "MetNcFile::data(NcVar *, const LongArray &) const -> ";
+
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-        << "bad arguments:\n";
+   mlog << Error << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -369,7 +453,7 @@ if ( !args_ok(a) )  {
 int dimCount = GET_NC_DIM_COUNT_P(var);
 if ( dimCount != a.n_elements() )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << "needed " << (dimCount) << " arguments for variable "
         << (var->getName()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -379,7 +463,7 @@ if ( dimCount != a.n_elements() )  {
 
 if ( dimCount >= max_met_args )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
    exit ( 1 );
@@ -389,7 +473,7 @@ if ( dimCount >= max_met_args )  {
 int i;
 short s;
 float f;
-double d;
+double d = bad_data_double;
 bool status;
 float add_offset   = 0.f;
 float scale_factor = 1.f;
@@ -431,8 +515,8 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       break;
 
    default:
-      mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type (" << GET_NC_TYPE_ID_P(var) << ") for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
+      mlog << Error << "\n" << method_name << " bad type (" << GET_NC_TYPE_ID_P(var)
+           << ") for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -444,8 +528,7 @@ if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !i
 
 if ( !status )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-        << " bad status for var->get()\n\n";
+   mlog << Error << "\n" << method_name << " bad status for var->get()\n\n";
 
    exit ( 1 );
 }
@@ -467,10 +550,12 @@ bool MetNcFile::data(NcVar * v, const LongArray & a, DataPlane & plane) const
 
 {
 
+const char *method_name_short = "MetNcFile::data() const -> ";
+const char *method_name = "MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> ";
+
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-        << "bad arguments:\n";
+   mlog << Error << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -482,7 +567,7 @@ int dimCount = GET_NC_DIM_COUNT_P(v);
 
 if ( dimCount != a.n_elements() )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+   mlog << Error << "\n" << method_name
         << "needed " << (dimCount) << " arguments for variable "
         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -492,7 +577,7 @@ if ( dimCount != a.n_elements() )  {
 
 if ( dimCount >= max_met_args )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+   mlog << Error << "\n" << method_name
         << " too may arguments for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
 
    exit ( 1 );
@@ -501,13 +586,12 @@ if ( dimCount >= max_met_args )  {
 
 
 int j, count;
-int x, y;
-double value;
 bool found = false;
 NcVarInfo * var = (NcVarInfo *) 0;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
+const int cell_count = Nx * Ny;
 
 
    //
@@ -524,7 +608,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\n" << method_name
         << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
 
    exit ( 1 );
@@ -545,8 +629,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (var == NULL) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
 
-         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-              << " star found in bad slot\n\n";
+         mlog << Error << "\n" << method_name << " star found in bad slot\n\n";
 
          exit ( 1 );
 
@@ -558,7 +641,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\n" << method_name
         << " bad star count ... " << count << "\n\n";
 
    exit ( 1 );
@@ -573,8 +656,7 @@ if ( count != 2 )  {
  int y_slot_tmp = 0;
  if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0)  )  {
 
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-        << " bad x|y|z slot\n\n";
+   mlog << Error << "\n" << method_name << " bad x|y|z slot\n\n";
 
    exit ( 1 );
 
@@ -604,6 +686,8 @@ plane.set_size(Nx, Ny);
    //
    //  get the data
    //
+   clock_t clock_time;
+   double nc_time;
    float add_offset   = 0.f;
    float scale_factor = 1.f;
    NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
@@ -616,119 +700,81 @@ plane.set_size(Nx, Ny);
    if (att_scale_factor) delete att_scale_factor;
 
    int type_id = GET_NC_TYPE_ID_P(v);
-
    long dim[dimCount], cur[dimCount];
    for (int index=0; index<dimCount; index++) {
       dim[index] = 1;
       cur[index] = (b[index] == vx_data2d_star) ? 0 : b[index];
    }
-   if (Nx > Ny) {
-      double data_array[Nx];
-      int    int_array[Nx];
-      short  short_array[Nx];
-      float  float_array[Nx];
-      dim[x_slot] = Nx;
-      for (y=0; y<Ny; ++y)  {
-         cur[y_slot] = y;
-         switch ( type_id )  {
-            case NcType::nc_INT:
-               get_nc_data(v, int_array, dim, cur);
-               for (x=0; x<Nx; ++x) {
-                  data_array[x] = (double)int_array[x];
-               }
-               break;
+   dim[x_slot] = Nx;
+   dim[y_slot] = Ny;
 
-            case NcType::nc_SHORT:
-               get_nc_data(v, short_array, dim, cur);
-               for (x=0; x<Nx; ++x) {
-                  data_array[x] = (double)short_array[x];
-               }
-               break;
+   int *int_array = (int *)0;
+   short *short_array = (short *)0;
+   float *float_array = (float *)0;
+   double *double_array = (double *)0;
 
-            case NcType::nc_FLOAT:
-               get_nc_data(v, float_array, dim, cur);
-               for (x=0; x<Nx; ++x) {
-                  data_array[x] = (double)float_array[x];
-               }
-               break;
+   double *data_array = new double[cell_count];
+   clock_time = clock();
+   
+   switch ( type_id ) {
+      case NcType::nc_INT:
+         int_array = new int[cell_count];
+         get_nc_data(v, int_array, dim, cur);
+         copy_nc_data_as_double(data_array, int_array, x_slot, y_slot, Nx, Ny,
+                                missing_value, fill_value, add_offset, scale_factor);
+         if (int_array) delete[] int_array;
+         break;
 
-            case NcType::nc_DOUBLE:
-               get_nc_data(v, data_array, dim, cur);
-               break;
+      case NcType::nc_SHORT:
+         short_array = new short[cell_count];
+         get_nc_data(v, short_array, dim, cur);
+         copy_nc_data_as_double(data_array, short_array, x_slot, y_slot, Nx, Ny,
+                                missing_value, fill_value, add_offset, scale_factor);
+         if (short_array) delete[] short_array;
+         break;
 
-            default:
-               mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-                    << " bad type (" << GET_NC_TYPE_NAME_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-               exit ( 1 );
-               break;
+      case NcType::nc_FLOAT:
+         float_array = new float[cell_count];
+         get_nc_data(v, float_array, dim, cur);
+         copy_nc_data_as_double(data_array, float_array, x_slot, y_slot, Nx, Ny,
+                                missing_value, fill_value, add_offset, scale_factor);
+         if (float_array) delete[] float_array;
+         break;
 
-         }   //  switch
-         for (x=0; x<Nx; ++x)  {
-            value = data_array[x];
-            if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-               value = bad_data_double;
-            }
-            else if (add_offset != 0.0 || scale_factor != 1.0) {
-               value = value * scale_factor + add_offset;
-            }
-            plane.set(value, x, y);
-         }   //  for y
-      }   //  for x
+      case NcType::nc_DOUBLE:
+         double_array = new double[cell_count];
+         get_nc_data(v, double_array, dim, cur);
+         copy_nc_data_as_double(data_array, double_array, x_slot, y_slot, Nx, Ny,
+                                missing_value, fill_value, add_offset, scale_factor);
+         if (double_array) delete[] double_array;
+         break;
+
+      default:
+         mlog << Error << "\n" << method_name << " bad type (" << GET_NC_TYPE_NAME_P(v)
+              << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+         exit ( 1 );
+         break;
+
+   }   //  switch
+
+   nc_time = clock();
+   if (mlog.verbosity_level() >= 7) {
+      double duration_sec = (double)(nc_time - clock_time)/CLOCKS_PER_SEC;
+      check_nc_data_2d(data_array, Nx, Ny, missing_value);
+      mlog << Debug(7) << method_name_short << "took " << duration_sec
+           << " seconds to read NetCDF data\n";
    }
-   else {
-      double data_array[Ny];
-      int    int_array[Ny];
-      short  short_array[Ny];
-      float  float_array[Ny];
-      dim[y_slot] = Ny;
-      for (x=0; x<Nx; ++x)  {
-         cur[x_slot] = x;
-         switch ( type_id )  {
-            case NcType::nc_INT:
-               get_nc_data(v, int_array, dim, cur);
-               for (y=0; y<Ny; ++y) {
-                  data_array[y] = (double)int_array[y];
-               }
-               break;
-
-            case NcType::nc_SHORT:
-               get_nc_data(v, short_array, dim, cur);
-               for (y=0; y<Ny; ++y) {
-                  data_array[y] = (double)short_array[y];
-               }
-               break;
-
-            case NcType::nc_FLOAT:
-               get_nc_data(v, float_array, dim, cur);
-               for (y=0; y<Ny; ++y) {
-                  data_array[y] = (double)float_array[y];
-               }
-               break;
-
-            case NcType::nc_DOUBLE:
-               get_nc_data(v, data_array, dim, cur);
-               break;
-
-            default:
-               mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-                    << " bad type (" << GET_NC_TYPE_ID_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-               exit ( 1 );
-               break;
-
-         }   //  switch
-         for (y=0; y<Ny; ++y)  {
-            value = data_array[y];
-            if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-               value = bad_data_double;
-            }
-            else if (add_offset != 0.0 || scale_factor != 1.0) {
-               value = value * scale_factor + add_offset;
-            }
-            plane.set(value, x, y);
-         }   //  for y
-      }   //  for x
+   
+   plane.set_block(data_array, Nx, Ny);
+   
+   if (mlog.verbosity_level() >= 7) {
+      double duration_sec = (double)(clock() - nc_time)/CLOCKS_PER_SEC;
+      mlog << Debug(7) << method_name_short << "took " << duration_sec
+           << " seconds to fill data plane\n";
    }
-
+   
+   if (data_array) delete[] data_array;
+   
    //
    //  done
    //

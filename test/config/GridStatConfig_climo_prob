@@ -40,14 +40,17 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh  = [];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+censor_thresh       = [];
+censor_val          = [];
+cat_thresh          = [];
+cnt_thresh          = [ NA ];
+cnt_logic           = UNION;
+wind_thresh         = [ NA ];
+wind_logic          = UNION;
+eclv_points         = 0.05;
+nc_pairs_var_name   = "";
+nc_pairs_var_suffix = "";
+rank_corr_flag      = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -106,7 +109,7 @@ obs = {
 climo_mean = obs;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
       method     = BILIN;
@@ -115,9 +118,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = ${MATCH_DAY};
-   time_step          = 21600;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = 6;
 }
 
 //
@@ -125,10 +127,17 @@ climo_mean = {
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-  file_name = [ "${CLIMO_STDEV_FILE}" ];
+  file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
-climo_cdf_bins = [ 0.0, 0.4, 0.6, 1.0 ];
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = [ 0.0, 0.4, 0.6, 1.0 ];
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -256,6 +265,7 @@ nc_pairs_flag = {
    raw          = TRUE;
    diff         = FALSE;
    climo        = TRUE;
+   climo_cdp    = FALSE;
    weight       = FALSE;
    nbrhd        = FALSE;
    fourier      = FALSE;
@@ -267,9 +277,8 @@ nc_pairs_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = COS_LAT;
-rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V9.0";
+version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

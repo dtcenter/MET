@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -131,6 +131,9 @@ class MtdFileBase {
       int ny() const;
       int nt() const;
 
+      int nxy() const;
+      int nxyt() const;
+
       Grid grid() const;
 
       const Grid * grid_p() const;
@@ -158,6 +161,9 @@ class MtdFileBase {
 inline int MtdFileBase::nx() const { return ( Nx ); }
 inline int MtdFileBase::ny() const { return ( Ny ); }
 inline int MtdFileBase::nt() const { return ( Nt ); }
+
+inline int MtdFileBase::nxy  () const { return ( Nx*Ny    ); }
+inline int MtdFileBase::nxyt () const { return ( Nx*Ny*Nt ); }
 
 inline unixtime MtdFileBase::start_valid_time() const { return ( StartValidTime ); }
 

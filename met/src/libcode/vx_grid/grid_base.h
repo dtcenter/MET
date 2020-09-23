@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -234,6 +234,7 @@ class Grid : public GridInterface {
 
       int nx() const;
       int ny() const;
+      int nxy() const;
 
       double scale_km() const;   //  returns -1.0 if scale is unknown or inapplicable
 
@@ -272,6 +273,7 @@ extern bool is_eq(const StereographicData *, const StereographicData *);
 extern bool is_eq(const LatLonData *,        const LatLonData *);
 extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
+extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 
 

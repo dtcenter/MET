@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -241,6 +241,13 @@ void VarInfoNcMet::set_dict(Dictionary &dict){
 bool VarInfoNcMet::is_precipitation() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsPrecipitation)) {
+      return(SetAttrIsPrecipitation != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any precipitation variables.
    //
@@ -254,6 +261,13 @@ bool VarInfoNcMet::is_precipitation() const {
 bool VarInfoNcMet::is_specific_humidity() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+      return(SetAttrIsSpecificHumidity != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any specific humidity variables.
    //
@@ -265,24 +279,56 @@ bool VarInfoNcMet::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsUWind)) {
+      return(SetAttrIsUWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, ugrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_v_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsVWind)) {
+      return(SetAttrIsVWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, vgrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_wind_speed() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindSpeed)) {
+      return(SetAttrIsWindSpeed != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wind_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindDirection)) {
+      return(SetAttrIsWindDirection != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wdir_grib_code));
 }
 

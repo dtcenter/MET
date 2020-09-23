@@ -31,35 +31,52 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+cat_thresh   = [];
+cnt_thresh   = [ NA ];
+cnt_logic    = UNION;
+wind_thresh  = [ NA ];
+wind_logic   = UNION;
+eclv_points  = 0.05;
+message_type = [ "ADPUPA" ];
+sid_inc      = [];
+sid_exc      = [];
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_exc    = [];
-   cat_thresh = [];
-   message_type = [ "ADPUPA" ];
-   level = ["P500", "P850"];
 
    field = [
-      { name = "TMP";  },
-      { name = "UGRD"; },
-      { name = "VGRD"; },
-      { name = "WIND"; }
+      { name = "TMP";  level = [ "P500" ]; },
+      { name = "UGRD"; level = [ "P500" ]; },
+      { name = "VGRD"; level = [ "P500" ]; },
+      { name = "WIND"; level = [ "P500" ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
    ];
 }
-obs = fcst;
+obs = {
+
+   cnt_thresh = [ NA, <CDP50, >=CDP50, ==CDP25 ];
+
+   field = [
+      { name = "TMP";  level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "UGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "VGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "WIND"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
+   ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = fcst;
 climo_mean = {
@@ -80,9 +97,26 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = TRUE;
-   time_step          = 43200;
+   day_interval       = 1;
+   hour_interval      = 12;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+
+   file_name = [ "${CLIMO_DIR}/t850hPa_stdev.grib",
+                 "${CLIMO_DIR}/u850hPa_stdev.grib",
+                 "${CLIMO_DIR}/v850hPa_stdev.grib",
+                 "${CLIMO_DIR}/ws850hPa_stdev.grib" ];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 3;
+   center_bins = TRUE;
+   write_bins  = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,10 +178,12 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
+   flag            = TRUE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,7 +193,7 @@ hira = {
 //
 output_flag = {
    fho    = NONE;
-   ctc    = NONE;
+   ctc    = BOTH;
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
@@ -167,11 +203,12 @@ output_flag = {
    vl1l2  = BOTH;
    val1l2 = BOTH;
    vcnt   = BOTH;
-   pct    = NONE;
-   pstd   = NONE;
+   pct    = BOTH;
+   pstd   = BOTH;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE;
+   ecnt   = BOTH;
+   rps    = BOTH;
    eclv   = NONE;
    mpr    = BOTH;
 }
@@ -183,6 +220,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

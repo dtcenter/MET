@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -247,7 +247,6 @@ return;
 
 ConcatString MetConfig::get_tmp_dir()
 {
-   char *ptr;
    ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.
@@ -506,9 +505,8 @@ met_open(in, infile);
 
 if ( ! in )  {
 
-   mlog << Error
-        << "\nrecursive_envs() -> unable to open input file \""
-        << infile << "\"\n\n";
+   mlog << Error << "\nrecursive_envs() -> "
+        << "unable to open input file \"" << infile << "\"\n\n";
 
    exit ( 1 );
 
@@ -519,9 +517,8 @@ met_open(out, outfile);
 
 if ( ! out )  {
 
-   mlog << Error
-        << "\nrecursive_envs() -> unable to open output file \""
-        << outfile << "\"\n\n";
+   mlog << Error << "\nrecursive_envs() -> "
+        << "unable to open output file \"" << outfile << "\"\n\n";
 
    in.close();
    exit ( 1 );
@@ -602,9 +599,8 @@ if ( pos1 == string::npos )  return ( false );
 
 if ( (pos2 = line.find('}', pos1)) == string::npos )  {
 
-   mlog << Error
-        << "\nreplace_env(string &) -> can't closing brackent in string \""
-        << line << "\"\n\n";
+   mlog << Error << "\nreplace_env(string &) -> "
+        << "can't find closing bracket in string \"" << line << "\"\n\n";
 
    exit ( 1 );
 
@@ -619,8 +615,8 @@ env_value = getenv(env.c_str());
 
 if ( ! env_value )  {
 
-   mlog << Error
-        << "\nreplace_env() -> unable to get value for environment variable \""
+   mlog << Error << "\nreplace_env() -> "
+        << "unable to get value for environment variable \""
         << (env.c_str()) << "\"\n\n";
 
    exit ( 1 );

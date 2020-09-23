@@ -1,0 +1,147 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Series-Analysis configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "GFS";
+
+//
+// Output description to be written
+//
+desc = "NA";
+
+//
+// Output observation type to be written
+//
+obtype = "GFSANL";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+censor_thresh = []; 
+censor_val    = [];
+cat_thresh    = [ >CDP25, >CDP50, >CDP75 ];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   field = [ 
+      { name = "TMP"; level = "P850"; }
+   ];
+}
+obs = {
+   cnt_thresh = [ NA, >CDP25&&<CDP75 ];
+   field = [ 
+      { name = "TMP"; level = "P850"; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = fcst;
+climo_mean = {
+
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
+
+   regrid = {
+      method     = BILIN;
+      width      = 2;
+      vld_thresh = 0.5;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 1;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = "";
+   poly = "";
+}
+
+//
+// Number of grid points to be processed concurrently.  Set smaller to use
+// less memory but increase the number of passes through the data.
+//
+block_size = 150000;
+
+//
+// Ratio of valid matched pairs to compute statistics for a grid point
+//
+vld_thresh = 0.5;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_stats = {
+   fho    = [ "TOTAL", "F_RATE", "H_RATE", "O_RATE" ];
+   ctc    = [ ];
+   cts    = [ ];
+   mctc   = [ ];
+   mcts   = [ "ACC" ];
+   cnt    = [ "TOTAL", "RMSE", "ANOM_CORR" ];
+   sl1l2  = [ ];
+   sal1l2 = [ ];
+   pct    = [ ];
+   pstd   = [ ];
+   pjc    = [ ];
+   prc    = [ ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+version        = "V9.1";
+
+////////////////////////////////////////////////////////////////////////////////

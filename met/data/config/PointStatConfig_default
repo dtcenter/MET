@@ -92,6 +92,7 @@ obs = fcst;
 // May be set separately in each "obs.field" entry
 //
 message_type   = [ "ADPUPA" ];
+sid_inc        = [];
 sid_exc        = [];
 obs_quality    = [];
 duplicate_flag = NONE;
@@ -128,9 +129,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 climo_stdev = climo_mean;
@@ -138,7 +138,14 @@ climo_stdev = {
    file_name = [];
 }
 
-climo_cdf_bins = 1;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -239,11 +246,12 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
-   shape      = SQUARE;
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +277,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE; // Only for HiRA.
+   rps    = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
 }
@@ -277,6 +286,6 @@ output_flag = {
 
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

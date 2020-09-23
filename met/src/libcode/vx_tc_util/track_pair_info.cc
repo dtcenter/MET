@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -225,24 +225,26 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPairInfo::extend(int n) {
+void TrackPairInfo::extend(int n, bool exact) {
    int j, k;
    TCStatLine *new_line = (TCStatLine *) 0;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
 
-   // Check how many allocations are required
-   k = n/TrackPairLineAllocInc;
-   if(n%TrackPairLineAllocInc) k++;
-   n = k*TrackPairLineAllocInc;
+   // Compute the allocation size
+   if(!exact) {
+      k = n/TrackPairLineAllocInc;
+      if(n%TrackPairLineAllocInc) k++;
+      n = k*TrackPairLineAllocInc;
+   }
 
    // Allocate a new TCStatLine array of the required length
    new_line = new TCStatLine [n];
 
    if(!new_line) {
       mlog << Error
-           << "\nvoid TrackPairInfo::extend(int) -> "
+           << "\nvoid TrackPairInfo::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -441,7 +443,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
    Keep.add(1);
 
    // Store the input line
-   extend(NLines + 1);
+   extend(NLines + 1, false);
    Line[NLines++] = l;
 
    return;
@@ -918,24 +920,26 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPairInfoArray::extend(int n) {
+void TrackPairInfoArray::extend(int n, bool exact) {
    int j, k;
    TrackPairInfo *new_info = (TrackPairInfo *) 0;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
 
-   // Check how many allocations are required
-   k = n/TrackPairInfoAllocInc;
-   if(n%TrackPairInfoAllocInc) k++;
-   n = k*TrackPairInfoAllocInc;
+   // Compute the allocation size
+   if(!exact) {
+      k = n/TrackPairInfoAllocInc;
+      if(n%TrackPairInfoAllocInc) k++;
+      n = k*TrackPairInfoAllocInc;
+   }
 
    // Allocate a new TrackPairInfo array of the required length
    new_info = new TrackPairInfo [n];
 
    if(!new_info) {
       mlog << Error
-           << "\nvoid TrackPairInfoArray::extend(int) -> "
+           << "\nvoid TrackPairInfoArray::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -985,7 +989,7 @@ int TrackPairInfoArray::n_points() const {
 
 void TrackPairInfoArray::add(const TrackPairInfo &p) {
 
-   extend(NPairs + 1);
+   extend(NPairs + 1, false);
    Pair[NPairs++] = p;
 
    return;

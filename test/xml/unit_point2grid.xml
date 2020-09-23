@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="point2grid_ascii2nc_surfrad_DW_PSP">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/ascii2nc/surfrad.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/surfrad_to_G212.nc \
+      -field 'name="204"; level="*";' \
+      -name DW_PSP \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/surfrad_to_G212.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_pb2nc_TMP">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -name TEMP \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_pb2nc_TMP_prob">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_prob.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -name TEMP -prob_cat_thresh ">=280.0" \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_prob.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_pb2nc_TMP_prob_gaussian">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_prob_gaussian.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -name TEMP -prob_cat_thresh ">=280.0" -method GAUSSIAN \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_prob_gaussian.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_pb2nc_methods">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000";' \
+      -field 'name="RH"; level="*"; valid_time="20120409_120000";' \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_pb2nc_big_input">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/prepbufr.gdas.2017060300.nc \
+      G212 \
+      &OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc \
+      -field 'name="TMP"; level="Z2";' \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_GOES_16_AOD_TO_G212">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_compute.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -qc 1,2,3 -method MAX \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_compute.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -method MAX -prob_cat_thresh ">=1.0" -method GAUSSIAN \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -method MAX -prob_cat_thresh ">=1.0" -method GAUSSIAN \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="point2grid_GOES_16_ADP">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20192662141196_e20192662143569_c20192662145547.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP.nc \
+      -field 'name="AOD_Smoke";  level="(*,*)";' \
+      -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20192662141196_e20192662143569_c20192662144526.nc \
+      -qc 1,2 -method MAX \
+      -v 5:warning
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="point2grid_GOES_16_AOD_TO_G212_GRID_MAP">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_grid_map.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -qc 1,2,3 -method MAX \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_grid_map.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_GOES_16_AOD_TO_G212_COORD">
+    <exec>rm -f &OUTPUT_DIR;/CONUS_2500_1500_*;
+          &MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_GEOSTATIONARY_DATA</name><value>&DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -qc 1,2,3 -method MAX \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212.nc</grid_nc>
+    </output>
+  </test>
+</met_test>

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,7 +26,7 @@ using namespace std;
 
 
 #ifdef WITH_PYTHON
-#include "../vx_data2d_python/data2d_python.h"
+#include "data2d_python.h"
 #endif
 
 #ifdef WITH_GRIB2
@@ -199,6 +199,16 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       // Create a new data file object
       //
       mtddf = new_met_2d_data_file(type);
+
+#ifdef WITH_PYTHON
+      //
+      // Set MET_PYTHON_INPUT_ARG environment variable for python types
+      //
+      if(type == FileType_Python_Numpy ||
+         type == FileType_Python_Xarray) {
+         setenv(met_python_input_arg, filename, 1);
+      }
+#endif
 
       //
       // Call open for non-python types

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -736,7 +736,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
 //////////////////////////////////////////////////////////////////////////////
 
 bool is_grid_relative(const GribRecord &r) {
-   unsigned char res_flag;
+   unsigned char res_flag = 0;
 
    // LatLon
    if(r.gds->type == 0) {

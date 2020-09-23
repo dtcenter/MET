@@ -40,14 +40,17 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-cnt_thresh    = [ NA ];
-cnt_logic     = UNION;
-wind_thresh   = [ NA ];
-wind_logic    = UNION;
-eclv_points   = 0.05;
+censor_thresh       = [];
+censor_val          = [];
+cat_thresh          = [];
+cnt_thresh          = [ NA ];
+cnt_logic           = UNION;
+wind_thresh         = [ NA ];
+wind_logic          = UNION;
+eclv_points         = 0.05;
+nc_pairs_var_name   = "";
+nc_pairs_var_suffix = "";
+rank_corr_flag      = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -78,7 +81,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
-        nc_pairs_var_str = "TROPO";
+        nc_pairs_var_suffix = "TROPO";
       },
       {
         //max wind
@@ -86,7 +89,7 @@ fcst = {
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
         desc = maxw;
-        nc_pairs_var_str = "MAXWIND";
+        nc_pairs_var_suffix = "MAXWIND";
       },
       {
         // theta 310
@@ -115,7 +118,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
-        nc_pairs_var_str = "TROPO";
+        nc_pairs_var_suffix = "TROPO";
       },
       {
         // max wind
@@ -123,7 +126,7 @@ fcst = {
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
         desc = maxw;
-        nc_pairs_var_str = "MAXWIND";
+        nc_pairs_var_suffix = "MAXWIND";
       },
       {
         // tropopause
@@ -131,7 +134,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
-        nc_pairs_var_str = "TROPO";
+        nc_pairs_var_suffix = "TROPO";
       },
       {
         // max wind
@@ -139,7 +142,7 @@ fcst = {
         GRIB_lvl_typ = 76;
         GRIB_lvl_val1 = 0;
         desc = maxw;
-        nc_pairs_var_str = "MAXWIND";
+        nc_pairs_var_suffix = "MAXWIND";
       },
       {
         // freezing level
@@ -147,7 +150,7 @@ fcst = {
         GRIB_lvl_typ = 4;
         GRIB_lvl_val1 = 0;
         desc = fzl;
-        nc_pairs_var_str = "FREEZING";
+        nc_pairs_var_suffix = "FREEZING";
       }
    ];
 
@@ -280,6 +283,7 @@ nc_pairs_flag = {
    raw          = TRUE;
    diff         = FALSE;
    climo        = FALSE;
+   climo_cdp    = FALSE;
    weight       = FALSE;
    nbrhd        = FALSE;
    fourier      = FALSE;
@@ -291,9 +295,8 @@ nc_pairs_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "GRIB_lvl_typ_val";
-version          = "V9.0";
+version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////

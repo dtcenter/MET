@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,6 +71,7 @@ static int format_version;
 const float AERONET_MISSING_VALUE = -999.;
 
 double angstrom_power_interplation(double value_1, double value_2, double level_1, double level_2, double target_level);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -205,7 +206,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   NumArray header_heights;
   IntArray header_var_index;
   StringArray header_var_names;
-  bool has_aod_column_at_550 = false;
   
   sid_idx = elv_idx = lat_idx = lon_idx = -1;
 
@@ -263,8 +263,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       header_var_index.add(var_idx);
       header_var_names.add(var_name.c_str());
       header_heights.add(height_from_header);
-      if (0 == strcmp(var_name.c_str(), AOD_NAME.c_str())
-          && is_eq(height_from_header, 550)) has_aod_column_at_550 = true;
       mlog << Debug(5) << method_name << "header_idx: " << j
            << ", var_idx: " << var_idx << ", var: " << var_name << " from " << hdr_field
            << ", flag: " << flag << ", height: " << height_from_header << "\n";
@@ -462,9 +460,9 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   
   if (format_version == 3) {
     double aod_at_675, aod_at_440;
-    double aod_at_550_expected, angstrom_675_440_expected;
-    double angstrom_675_440, aod_at_550;
-    
+    double aod_at_550_expected, aod_at_550;
+    //double angstrom_675_440_expected, angstrom_675_440;
+
     aod_at_675 = 0.645283;
     aod_at_440 = 0.794593;
     aod_at_550_expected = 0.71286864;

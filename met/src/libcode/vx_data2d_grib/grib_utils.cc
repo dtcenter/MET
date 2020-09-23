@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -47,8 +47,6 @@ static void gds_to_stereographic  (const Section2_Header & gds, StereographicDat
 static void gds_to_gaussian       (const Section2_Header & gds, GaussianData &);
 
 static void scan_flag_to_order(const unsigned char scan_flag, int & xdir, int & ydir, int & order);
-
-static double decode_lat_lon(const unsigned char *, int);
 
 static bool all_bits_set(const unsigned char *, int);
 
@@ -211,8 +209,8 @@ data.name = latlon_proj_type;
    //
 
    // Latitude of the bottom left corner
-if ( ydir == 1 )  data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3);
-else              data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3);
+data.lat_ll = min(decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3),
+                  decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3));
 
    // Longitude of the bottom left corner
 if ( xdir == 0 )  data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3));
@@ -223,6 +221,16 @@ data.Nlat = char2_to_int(gds.ny);
 
    // Number of points in the Longitudinal (x) direction
 data.Nlon = char2_to_int(gds.nx);
+
+   // Check for thinned lat/lon grids
+if ( data.Nlon == 65535 )  {
+
+   mlog << Error << "\ngds_to_latlon() -> "
+        << "Thinned Lat/Lon grids are not supported for GRIB version 1.\n\n";
+
+   exit ( 1 );
+
+}
 
    // Latitudinal increment.  If not given, compute from lat1 and lat2
 if ( all_bits_set(gds.grid_type.latlon_grid.dj, 2) )  {
@@ -270,8 +278,8 @@ void gds_to_rotated_latlon(const Section2_Header & gds, RotatedLatLonData & data
 
 {
 
-mlog << Error
-     << "gds_to_rotated_latlon() -> Rotated Lat/Lon grids are not supported in Grib Version 1.\n\n";
+mlog << Error << "\ngds_to_rotated_latlon() -> "
+     << "Rotated Lat/Lon grids are not supported in GRIB version 1.\n\n";
 
 exit ( 1 );
 

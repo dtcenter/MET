@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,7 +90,7 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
 
     if (!ascii_file.open((*ascii_filename).c_str()))
     {
-      mlog << Error << "\nFileHandler::processFiles() -> "
+      mlog << Error << "\nFileHandler::readAsciiFiles() -> "
            << "can't open input ASCII file \"" << *ascii_filename
            << "\" for reading\n\n";
 

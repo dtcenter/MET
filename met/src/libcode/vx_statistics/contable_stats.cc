@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1053,6 +1053,12 @@ for (j=0; j<Nrows; ++j)  {
    }
 
 }
+
+   //
+   //  replace nan with bad data
+   //
+
+if (isnan(sum))  sum = bad_data_double;
 
    //
    //  done

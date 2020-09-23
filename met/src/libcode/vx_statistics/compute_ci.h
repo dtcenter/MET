@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,6 +16,7 @@
 #include "vx_gsl_prob.h"
 #include "vx_util.h"
 #include "met_stats.h"
+#include "pair_data_point.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,48 +46,44 @@ extern void compute_hk_ci(double hk, double alpha, double vif,
    double &hk_cl, double &hk_cu);
 
 extern void compute_cts_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, CTSInfo *&, int, int, int, const char *);
+   const PairDataPoint &, int, CTSInfo *&, int, bool, bool,
+   const char *);
 
 extern void compute_mcts_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, MCTSInfo &, int, int, const char *);
+   const PairDataPoint &, int, MCTSInfo &, bool, bool,
+   const char *);
 
 extern void compute_cnt_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &,
-   int, int, int, CNTInfo &, const char *);
+   const PairDataPoint &, bool, bool, int, CNTInfo &,
+   const char *);
 
 extern void compute_cts_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, double, CTSInfo *&, int, int, int, const char *);
+   const PairDataPoint &, int, double, CTSInfo *&, int, bool, bool,
+   const char *);
 
 extern void compute_mcts_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, double, MCTSInfo &, int, int, const char *);
+   const PairDataPoint &, int, double, MCTSInfo &, bool, bool,
+   const char *);
 
 extern void compute_cnt_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &,
-   int, int, int, double, CNTInfo &, const char *);
+   const PairDataPoint &, bool, bool, int, double, CNTInfo &,
+   const char *);
 
 extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, NBRCTSInfo *&, int, int, const char *);
+   const PairDataPoint &, int, NBRCTSInfo *&, int, bool,
+   const char *);
 
 extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &, const NumArray &,
-   int, NBRCNTInfo &, int, const char *);
+   const PairDataPoint &,  const PairDataPoint &,
+   int, NBRCNTInfo &, bool, const char *);
 
 extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   int, double, NBRCTSInfo *&, int, int, const char *);
+   const PairDataPoint &, int, double, NBRCTSInfo *&, int, bool,
+   const char *);
 
 extern void compute_nbrcnt_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &, const NumArray &,
-   int, double, NBRCNTInfo &, int, const char *);
+   const PairDataPoint &,  const PairDataPoint &,
+   int, double, NBRCNTInfo &, bool, const char *);
 
 extern void compute_mean_stdev_ci_bca(const gsl_rng *, const NumArray &,
    int, double, CIInfo &, CIInfo &);

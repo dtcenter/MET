@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,7 @@
 #include "thresh_array.h"
 #include "num_array.h"
 #include "two_d_array.h"
+#include "config_funcs.h"
 
 #include "vx_cal.h"
 
@@ -70,6 +71,7 @@ class DataPlane {
       void set_size(int Nx, int Ny);
 
       void set(double, int, int);   //  x, y
+      void set_block(double *, int, int);   //  nx, ny
 
       void set_constant(double);
 
@@ -100,7 +102,10 @@ class DataPlane {
          //
 
       void threshold(const SingleThresh &);
+      void convert  (const UserFunc_1Arg &);
       void censor   (const ThreshArray &, const NumArray &);
+
+      void replace_bad_data(const double value);
 
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
@@ -152,7 +157,7 @@ class DataPlaneArray {
 
       void assign(const DataPlaneArray &);
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void check_xy_size(const DataPlane &) const;   //  check to make sure all planes added are same size
 
@@ -212,6 +217,9 @@ class DataPlaneArray {
          //
 
       void add(const DataPlane &, double _low, double _up);   //  for two-level plane
+
+      void replace_bad_data(const double value);
+
 };
 
 ////////////////////////////////////////////////////////////////////////

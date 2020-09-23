@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,8 +23,10 @@
 
 #include "data2d_factory.h"
 #include "data2d_factory_utils.h"
+#include "is_bufr_file.h"
 #include "is_grib_file.h"
 #include "is_netcdf_file.h"
+#include "parse_file_list.h"
 #include "var_info_factory.h"
 
 

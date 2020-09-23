@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -266,7 +266,7 @@ if ( (n < 0) || (n >= total_predef_fonts) )  {
 
 char junk[256];
 
-sprintf(junk, "%02d.afm", n);
+snprintf(junk, sizeof(junk), "%02d.afm", n);
 
 short_afm_name = junk;
 

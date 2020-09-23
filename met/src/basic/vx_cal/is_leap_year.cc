@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,10 +16,12 @@ using namespace std;
 
 #include <iostream>
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "vx_cal.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,38 +70,64 @@ int get_days_from_mmdd(int month, int day, bool no_leap) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void decrease_one_month(int &year, int &month) {
+  month--;
+  if (month < 1) {
+    month = 12;
+    year--;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void increase_one_month(int &year, int &month) {
+  month++;
+  if (month > 12) {
+    month = 1;
+    year++;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
+  
   if (!no_leap || sec_per_unit != 86400) {
     ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
   }
   else {
     int day_offset;
     int month, day, year, hour, minute, second;
+    double time_fraction = time_value - (int)time_value;
     
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
-    day_offset  = get_days_from_mmdd(month, day, no_leap) + (int)time_value;
-    year       += (int)(day_offset / 365);
-    day_offset += day_offset % 365;
-    for (int idx = 0; idx<12; idx++) {
-      if (day_offset < monthly_days[idx]) {
-        month = (idx + 1);
-        day = day_offset;
-        break;
-      }
-      else {
-        day_offset -= monthly_days[idx];
+    day_offset = day + (int)time_value;
+    if (day_offset < 0) {
+      while (day_offset < 0) {
+        decrease_one_month(year, month);
+        day_offset += monthly_days[month-1];
       }
     }
+    else {
+      while (day_offset > monthly_days[month-1]) {
+        day_offset -= monthly_days[month-1];
+        increase_one_month(year, month);
+      }
+    }
+    day = day_offset;
+    if (day == 0) day = 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    ut += (time_fraction * sec_per_unit);
+    mlog << Debug(5) << "add_to_unixtime() -> "
+         << unix_to_yyyymmdd_hhmmss(base_unixtime)
+         << " plus " << time_value << " days = "
+         << unix_to_yyyymmdd_hhmmss(ut) << "\n";
   }
   
   return ut;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 

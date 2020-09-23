@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,30 +31,27 @@
 static const int i_fho       =  0;
 static const int i_ctc       =  1;
 static const int i_cts       =  2;
-
 static const int i_mctc      =  3;
 static const int i_mcts      =  4;
-static const int i_cnt       =  5;
 
+static const int i_cnt       =  5;
 static const int i_sl1l2     =  6;
 static const int i_sal1l2    =  7;
 static const int i_vl1l2     =  8;
-
 static const int i_val1l2    =  9;
+
 static const int i_pct       = 10;
 static const int i_pstd      = 11;
-
 static const int i_pjc       = 12;
 static const int i_prc       = 13;
 static const int i_ecnt      = 14;
 
-static const int i_eclv      = 15;
+static const int i_rps       = 15;
+static const int i_eclv      = 16;
+static const int i_mpr       = 17;
+static const int i_vcnt      = 18;
 
-static const int i_mpr       = 16;
-
-static const int i_vcnt      = 17;
-
-static const int n_txt       = 18;
+static const int n_txt       = 19;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -62,27 +59,24 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_fho,    //  0
    stat_ctc,    //  1
    stat_cts,    //  2
-
    stat_mctc,   //  3
    stat_mcts,   //  4
-   stat_cnt,    //  5
 
+   stat_cnt,    //  5
    stat_sl1l2,  //  6
    stat_sal1l2, //  7
    stat_vl1l2,  //  8
-
    stat_val1l2, //  9
-   stat_pct,    //  10
-   stat_pstd,   //  11
 
+   stat_pct,    //  10   
+   stat_pstd,   //  11
    stat_pjc,    //  12
    stat_prc,    //  13
    stat_ecnt,   //  14
 
+   stat_rps,    //  14
    stat_eclv,   //  15
-
    stat_mpr,    //  16
-
    stat_vcnt,   //  17
 
 };
@@ -135,7 +129,8 @@ class PointStatVxOpt {
       StringArray     mask_name;          // Masking names
 
       NumArray        eclv_points;        // ECLV points
-      ThreshArray     climo_cdf_ta;       // Climo CDF thresh array
+
+      ClimoCDFInfo    cdf_info;           // Climo CDF info
 
       NumArray        ci_alpha;           // Alpha value for confidence intervals
 
@@ -190,7 +185,7 @@ inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n_elemen
 inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);         }
 
 inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());     }
-inline int PointStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
+inline int PointStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);               }
 inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,64 +12,37 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// void write_tc_tracks(const ConcatString& track_nc_file,
-//     const TrackInfoArray& tracks) {
-
 void write_tc_tracks(NcFile* nc_out,
     const NcDim& track_point_dim,
     const TrackInfoArray& tracks) {
 
-    // mlog << Debug(2) << "Writing " << track_nc_file << "\n";
-
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
-    mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
-         << track_lines.n_elements() << "\n";
-
-    mlog << Debug(4) << track.serialize() << "\n";
-
-    for(int i = 0; i < track_lines.n_elements(); i++) {
-        mlog << Debug(4) << track_lines[i] << "\n";
-    }
-
-    // NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
-
-    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
-    // NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-
-    // if (IS_INVALID_NC_P(nc_out)) {
-    //     mlog << Error << "\nwrite_nc_tracks() -> "
-    //          << "unable to open NetCDF file " 
-    //          << track_nc_file << "\n\n";
-    //     exit(1);
-    // }
+    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
     NcVar track_lines_var = nc_out->addVar(
         "TrackLines", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
-        "Lat", ncFloat, track_point_dim);
+        "Lat", ncDouble, track_point_dim);
     add_att(&track_lat_var, "long_name", "Track Point Latitude");
     add_att(&track_lat_var, "units", "degrees_east");
     add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
-        "Lon", ncFloat, track_point_dim);
+        "Lon", ncDouble, track_point_dim);
     add_att(&track_lon_var, "long_name", "Track Point Longitude");
     add_att(&track_lon_var, "units", "degrees_north");
     add_att(&track_lon_var, "standard_name", "longitude_track");
     NcVar track_mrd_var = nc_out->addVar(
-        "RMW", ncFloat, track_point_dim);
+        "RMW", ncDouble, track_point_dim);
     add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
     add_att(&track_mrd_var, "units", "nautical_miles");
     add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
-    mlog << Debug(2) << "write_tc_tracks:n_points:"
-         << track.n_points() << "\n";
-
-    float* track_lat_data = new float[track.n_points()];
-    float* track_lon_data = new float[track.n_points()];
-    float* track_mrd_data = new float[track.n_points()];
+    double* track_lat_data = new double[track.n_points()];
+    double* track_lon_data = new double[track.n_points()];
+    double* track_mrd_data = new double[track.n_points()];
 
     for(int i = 0; i < track.n_points(); i++) {
         mlog << Debug(4) << track[i].serialize() << "\n";
@@ -81,13 +54,15 @@ void write_tc_tracks(NcFile* nc_out,
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    for(int i = 0; i < track_lines.n_elements(); i++) {
+    mlog << Debug(2) << "Writing " << track_lines.n() << " track lines.\n";
+
+    for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
         offsets.push_back(i);
         counts.clear();
         counts.push_back(1);
         string line = track_lines[i];
-        mlog << Debug(2) << line << "\n";
+        mlog << Debug(3) << line << "\n";
         const char* str = line.c_str();
         track_lines_var.putVar(offsets, counts, &str);
     }
@@ -105,8 +80,6 @@ void write_tc_tracks(NcFile* nc_out,
     delete[] track_lat_data;
     delete[] track_lon_data;
     delete[] track_mrd_data;
-
-    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,7 +91,6 @@ set<string> get_pressure_level_strings(
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
@@ -133,18 +105,17 @@ set<string> get_pressure_level_strings(
 
 ////////////////////////////////////////////////////////////////////////
 
-set<float> get_pressure_levels(
+set<double> get_pressure_levels(
     map<string, vector<string> > variable_levels) {
 
-    set<float> pressure_levels;
+    set<double> pressure_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
-            float level = atof(levels[j].substr(1).c_str());
+            double level = atof(levels[j].substr(1).c_str());
             if (label == "P") {
                 pressure_levels.insert(level);
             }
@@ -156,16 +127,16 @@ set<float> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-set<float> get_pressure_levels(
+set<double> get_pressure_levels(
     set<string> pressure_level_strings) {
 
-    set<float> pressure_levels;
+    set<double> pressure_levels;
 
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
         string level_str = *i;
-        float level = atof(level_str.substr(1).c_str());
+        double level = atof(level_str.substr(1).c_str());
         pressure_levels.insert(level);
     }
 
@@ -174,17 +145,17 @@ set<float> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-map<float, int> get_pressure_level_indices(
-    set<float> pressure_levels) {
+map<double, int> get_pressure_level_indices(
+    set<double> pressure_levels) {
 
-    map<float, int> pressure_level_indices;
+    map<double, int> pressure_level_indices;
 
     int k = pressure_levels.size() - 1;
 
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
 
-        float level = *i;
+        double level = *i;
         pressure_level_indices[level] = k; 
         k--;
     }
@@ -195,18 +166,18 @@ map<float, int> get_pressure_level_indices(
 ////////////////////////////////////////////////////////////////////////
 
 map<string, int> get_pressure_level_indices(
-    set<string> pressure_level_strings, set<float> pressure_levels) {
+    set<string> pressure_level_strings, set<double> pressure_levels) {
 
     map<string, int> pressure_level_indices;
 
-    map<float, int> indices_from_levels
+    map<double, int> indices_from_levels
         = get_pressure_level_indices(pressure_levels);
 
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
         string level_str = *i;
-        float level = atof(level_str.substr(1).c_str());
+        double level = atof(level_str.substr(1).c_str());
         pressure_level_indices[level_str] = indices_from_levels[level];
     }
 
@@ -216,29 +187,33 @@ map<string, int> get_pressure_level_indices(
 ////////////////////////////////////////////////////////////////////////
 
 void def_tc_pressure(NcFile* nc_out,
-    const NcDim& pressure_dim, set<float> pressure_levels) {
+    const NcDim& pressure_dim, set<double> pressure_levels) {
 
     NcVar pressure_var;
 
-    float* pressure_data = new float[pressure_levels.size()];
+    double* pressure_data = new double[pressure_levels.size()];
 
     // Define variable
-    pressure_var = nc_out->addVar("pressure", ncFloat, pressure_dim);
+    pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
 
     // Set attributes
     add_att(&pressure_var, "long_name", "pressure");
     add_att(&pressure_var, "units", "millibars");
     add_att(&pressure_var, "standard_name", "pressure");
+    add_att(&pressure_var, "_FillValue", bad_data_double);
 
     // Extract pressure coordinates
     int k = pressure_levels.size() - 1;
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
         pressure_data[k] = *i;
         k--;
     }
 
     put_nc_data(&pressure_var, &pressure_data[0]);
+
+    // Cleanup
+    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
 
     return;
 }
@@ -247,29 +222,32 @@ void def_tc_pressure(NcFile* nc_out,
 
 void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
-    const TcrmwGrid& grid) {
+    const TcrmwGrid& grid, double rmw_scale) {
 
     NcVar range_var;
     NcVar azimuth_var;
 
-    float* range_data = new float[grid.range_n()];
-    float* azimuth_data = new float[grid.azimuth_n()];
+    double* range_data = new double[grid.range_n()];
+    double* azimuth_data = new double[grid.azimuth_n()];
 
     // Define variables
-    range_var = nc_out->addVar("range", ncFloat, range_dim);
-    azimuth_var = nc_out->addVar("azimuth", ncFloat, azimuth_dim);
+    range_var = nc_out->addVar("range", ncDouble, range_dim);
+    azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
 
     // Set attributes
     add_att(&range_var, "long_name", "range");
-    add_att(&range_var, "units", "kilometers");
+    add_att(&range_var, "units", "fraction of RMW");
     add_att(&range_var, "standard_name", "range");
+    add_att(&range_var, "_FillValue", bad_data_double);
+
     add_att(&azimuth_var, "long_name", "azimuth");
     add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
     add_att(&azimuth_var, "standard_name", "azimuth");
+    add_att(&azimuth_var, "_FillValue", bad_data_double);
 
     // Compute grid coordinates
     for (int i = 0; i < grid.range_n(); i++) {
-        range_data[i] = i * grid.range_delta_km();
+        range_data[i] = i * rmw_scale;
     }
     for (int j = 0; j < grid.azimuth_n(); j++) {
         azimuth_data[j] = j * grid.azimuth_delta_deg();
@@ -278,6 +256,10 @@ void def_tc_range_azimuth(NcFile* nc_out,
     // Write coordinates
     put_nc_data(&range_var, &range_data[0]);
     put_nc_data(&azimuth_var, &azimuth_data[0]);
+
+    // Cleanup
+    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
 
     return;
 }
@@ -303,9 +285,11 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&lat_var, "long_name", "latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude");
+
     add_att(&lon_var, "long_name", "longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude");
+
     add_att(&valid_time_var, "long_name", "valid_time");
     add_att(&valid_time_var, "units", "yyyymmddhh");
     add_att(&valid_time_var, "standard_name", "valid_time");
@@ -364,11 +348,13 @@ void def_tc_variables(NcFile* nc_out,
                 var_name, ncDouble, dims_3d);
             add_att(&data_var, "long_name", long_name);
             add_att(&data_var, "units", units);
+            add_att(&data_var, "_FillValue", bad_data_double);
         } else {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims);
             add_att(&data_var, "long_name", long_name);
             add_att(&data_var, "units", units);
+            add_att(&data_var, "_FillValue", bad_data_double);
         }
         data_vars[var_name] = data_var;
     }
@@ -386,16 +372,17 @@ void def_tc_data(NcFile* nc_out,
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
 
-    ConcatString var_name = data_info->name();
+    ConcatString var_name = data_info->name_attr();
     var_name.add("_");
-    var_name.add(data_info->level().name());
+    var_name.add(data_info->level_attr());
 
     data_var = nc_out->addVar(
         var_name, ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -412,11 +399,12 @@ void def_tc_data_3d(NcFile* nc_out,
     dims.push_back(track_point_dim);
 
     data_var = nc_out->addVar(
-        data_info->name(), ncDouble, dims);
+        data_info->name_attr(), ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -430,16 +418,17 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     dims.push_back(range_dim);
     dims.push_back(track_point_dim);
 
-    ConcatString var_name = data_info->name();
+    ConcatString var_name = data_info->name_attr();
     var_name.add("_");
-    var_name.add(data_info->level().name());
+    var_name.add(data_info->level_attr());
     var_name.add("_azi_mean");
 
     data_var = nc_out->addVar(var_name, ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////

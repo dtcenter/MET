@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -59,6 +59,9 @@ class MtdIntFile : public MtdFileBase {
 
       int Radius;
 
+      int TimeBeg;
+      int TimeEnd;
+
       double Threshold;
 
    public:
@@ -80,8 +83,9 @@ class MtdIntFile : public MtdFileBase {
 
       void set_data_minmax(double _data_min, double _data_max);
 
-      void set_radius    (int);
-      void set_threshold (double);
+      void set_radius      (int);
+      void set_time_window (int, int);
+      void set_threshold   (double);
 
       void set_volumes(int n, const int *);
 
@@ -97,6 +101,10 @@ class MtdIntFile : public MtdFileBase {
       int operator()(int _x, int _y, int _t) const;
 
       int radius() const;
+
+      int time_beg() const;
+
+      int time_end() const;
 
       double threshold() const;
 
@@ -157,6 +165,9 @@ class MtdIntFile : public MtdFileBase {
 
 
 inline int MtdIntFile::radius() const { return ( Radius ); }
+
+inline int MtdIntFile::time_beg() const { return ( TimeBeg ); }
+inline int MtdIntFile::time_end() const { return ( TimeEnd ); }
 
 inline double MtdIntFile::threshold() const { return ( Threshold ); }
 

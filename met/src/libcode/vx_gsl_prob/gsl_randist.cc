@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -198,6 +198,7 @@ void ran_sample(const gsl_rng *r, NumArray &src_na,
    ran_sample(r, src, n, dest, k);
 
    dest_na.clear();
+   dest_na.extend(k);
    for(i=0; i<k; i++) dest_na.add(dest[i]);
 
    if(src)  { delete[] src;  src  = (double *) 0; }

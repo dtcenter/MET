@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,13 +8,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//    Filename:    tc_rmw.h
+//   Filename:   tc_rmw.h
 //
-//    Description:
+//   Description:
 //
-//    Mod#  Date      Name      Description
-//    ----  ----      ----      -----------
-//    000   04/18/19  Fillmore  New
+//   Mod#  Date      Name      Description
+//   ----  ----      ----      -----------
+//   000   04/18/19  Fillmore  New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -70,9 +70,6 @@ static const char* default_out_dir = ".";
 // Default output prefix
 static const char* default_out_prefix = "";
 
-// Nautical mile to kilometer conversion
-static const float nm_to_km = 1.852;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -80,12 +77,11 @@ static const float nm_to_km = 1.852;
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray    data_files, found_data_files;
-static StringArray    adeck_source, adeck_model_suffix;
-static StringArray    bdeck_source, bdeck_model_suffix;
-static ConcatString   config_file;
-static TCRMWConfInfo  conf_info;
-static GrdFileType    ftype;
+static StringArray   data_files;
+static StringArray   deck_source, deck_model_suffix;
+static ConcatString  config_file;
+static TCRMWConfInfo conf_info;
+static GrdFileType   ftype;
 
 // Optional arguments
 static ConcatString out_dir;
@@ -98,7 +94,7 @@ static ConcatString out_prefix;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static ConcatString out_nc_file;
+static ConcatString out_file;
 static NcFile*      nc_out = (NcFile*) 0;
 static NcDim        range_dim;
 static NcDim        azimuth_dim;
@@ -124,7 +120,7 @@ static map<string, string> variable_long_names;
 static map<string, string> variable_units;
 
 static set<string> pressure_level_strings;
-static set<float> pressure_levels;
+static set<double> pressure_levels;
 static map<string, int> pressure_level_indices;
 
 ////////////////////////////////////////////////////////////////////////
@@ -133,15 +129,11 @@ static map<string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static DataPlane    dp;
-static Grid         latlon_arr;
-static TcrmwData    grid_data;
-static TcrmwGrid    tcrmw_grid;
-static Grid         grid;
-
-// Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
+static DataPlane dp;
+static Grid      latlon_arr;
+static TcrmwData grid_data;
+static TcrmwGrid tcrmw_grid;
+static Grid      grid;
 
 // Grid coordinate arrays
 static double* lat_arr;

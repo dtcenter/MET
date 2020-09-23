@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -231,13 +231,15 @@ void process_directory(const char * dir_name)
          //
          // the TMPDIR environment variable is not set so check if /tmp exists
          //
-      if ((dir = met_opendir(tmp_directory.c_str())) == NULL)
+      dir = met_opendir(tmp_directory.c_str());
+      if (!dir)
       {
          mlog << Error << "\nprocess_directory() -> the directory \"/tmp\" does not exist.\n\n";
          exit (1);
       }
-
-      closedir(dir);
+      else {
+         met_closedir(dir);
+      }
 
    }
 
@@ -246,7 +248,8 @@ void process_directory(const char * dir_name)
       //
       // open this directory
       //
-   if ((dir = met_opendir(dir_name)) == NULL)
+   dir = met_opendir(dir_name);
+   if (!dir)
    {
       mlog << Error << "\nprocess_directory() -> can't open directory \"" << dir_name << "\"\n\n";
       exit (1);
@@ -403,8 +406,8 @@ void process_directory(const char * dir_name)
       //
       // close the directory
       //
-   closedir(dir);
-   dir = (DIR *) 0;
+   
+   if(dir) met_closedir(dir);
 
 }
 

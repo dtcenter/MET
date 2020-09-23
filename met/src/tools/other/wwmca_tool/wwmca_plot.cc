@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -540,10 +540,6 @@ bool region_ok(const MapRegion & r, const char hemisphere)
 
 {
 
-// if ( (hemisphere == 'N') && (r.lat_max() < -21.0) )  return ( false );
-//
-// if ( (hemisphere == 'S') && (r.lat_min() >  21.0) )  return ( false );
-
 return ( true );
 
 }
@@ -766,8 +762,8 @@ k = nint(lon);
 
 if ( k == -180 )  k = -k;
 
-if ( k >= 0 )  sprintf(junk, "%d W",  k);
-else           sprintf(junk, "%d E", -k);
+if ( k >= 0 )  snprintf(junk, sizeof(junk), "%d W",  k);
+else           snprintf(junk, sizeof(junk), "%d E", -k);
 
 
 grid->latlon_to_xy(ms, lon, x_grid, y_grid);

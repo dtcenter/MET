@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -53,7 +53,6 @@ void ShpFileHeader::set(unsigned char * buf)
 int    * i = (int *) buf;
 double * d = (double *) (buf + 36);
 
-
 handle_big_4    (buf);
 handle_big_4    (buf + 24);
 handle_little_4 (buf + 28);
@@ -69,9 +68,7 @@ file_length_bytes = 2*file_length_16;
 
 if ( is_big_endian() )  {
 
-   int j;
-
-   for (j=0; j<8; ++j)  shuffle_8(d + j);
+   for (int j=0; j<8; ++j)  shuffle_8(d + j);
 
 }
 

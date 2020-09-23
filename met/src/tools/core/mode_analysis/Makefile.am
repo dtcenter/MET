@@ -8,6 +8,10 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+if ENABLE_PYTHON
+LDFLAGS += -lvx_python3_utils
+endif
+
 # The program
 
 bin_PROGRAMS    = mode_analysis
@@ -31,11 +35,17 @@ mode_analysis_LDADD = -lvx_stat_out \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+
+if ENABLE_PYTHON
+mode_analysis_LDADD += $(MET_PYTHON_LD) -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils -lvx_util
+endif
+
 
 EXTRA_DIST = config_to_att.h

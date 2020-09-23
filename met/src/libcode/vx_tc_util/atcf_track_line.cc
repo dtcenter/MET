@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -143,7 +143,8 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
    if(!status) return(0);
 
    // Check the line type
-   if(Type != ATCFLineType_Track) {
+   if(Type != ATCFLineType_Track &&
+      Type != ATCFLineType_GenTrack) {
       mlog << Warning
            << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
            << "unexpected ATCF line type ("
@@ -152,12 +153,15 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
    }
 
    // Check for the minumum number of track line elements
-   if(n_items() < MinATCFTrackElements) {
+   if((Type == ATCFLineType_Track &&
+       n_items() < MinATCFTrackElements) ||
+      (Type == ATCFLineType_GenTrack &&
+       n_items() < MinATCFGenTrackElements)) {
       mlog << Warning
            << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
            << "found fewer than the expected number of elements ("
-           << n_items() << "<" << MinATCFTrackElements
-           << ") in ATCF track line:\n" << DataLine::get_line() << "\n\n";
+           << n_items() << ") in ATCF track line:\n" << DataLine::get_line()
+           << "\n\n";
       return(0);
    }
 
@@ -262,8 +266,60 @@ int ATCFTrackLine::max_wind_radius() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ATCFTrackLine::storm_direction() const {
+   if(Type == ATCFLineType_Track &&
+      StormDirectionOffset < N_items) {
+      return(parse_int(get_item(StormDirectionOffset).c_str()));
+   }
+   else if(Type == ATCFLineType_GenTrack &&
+           StormDirectionOffset < N_items) {
+      return(parse_int(get_item(GenStormDirectionOffset).c_str()));
+   }
+   return(bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::storm_speed() const {
+   if(Type == ATCFLineType_Track &&
+      StormSpeedOffset < N_items) {
+      return(parse_int(get_item(StormSpeedOffset).c_str()));
+   }
+   else if(Type == ATCFLineType_GenTrack &&
+           StormSpeedOffset < N_items) {
+      return(parse_int(get_item(GenStormSpeedOffset).c_str()));
+   }
+   return(bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// For ATCFLineType_Track, only valid when UserDefined = THERMO PARAMS
+// For ATCFLineType_GenTrack, get the warm core column
+//
+////////////////////////////////////////////////////////////////////////
+
+bool ATCFTrackLine::warm_core() const {
+   if(Type == ATCFLineType_Track &&
+      WarmCoreOffset < N_items) {
+      return(get_item(UserDefinedOffset).comparecase(ThermoParams_Str) == 0 &&
+             get_item(WarmCoreOffset).comparecase("Y") == 0);
+   }
+   else if(Type == ATCFLineType_GenTrack &&
+           GenWarmCoreOffset < N_items) {
+      return(get_item(GenWarmCoreOffset).comparecase("Y") == 0);
+   }
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Specific to ATCFLineType_Track
+//
+////////////////////////////////////////////////////////////////////////
+
 int ATCFTrackLine::gusts() const {
-   return(GustsOffset < N_items ?
+   return(Type == ATCFLineType_Track && GustsOffset < N_items ?
           parse_int_check_zero(get_item(GustsOffset).c_str()) :
           bad_data_int);
 }
@@ -271,7 +327,7 @@ int ATCFTrackLine::gusts() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::eye_diameter() const {
-   return(EyeDiameterOffset < N_items ?
+   return(Type == ATCFLineType_Track && EyeDiameterOffset < N_items ?
           parse_int_check_zero(get_item(EyeDiameterOffset).c_str()) :
           bad_data_int);
 }
@@ -279,7 +335,7 @@ int ATCFTrackLine::eye_diameter() const {
 ////////////////////////////////////////////////////////////////////////
 
 SubregionCode ATCFTrackLine::subregion() const {
-   return(SubRegionOffset < N_items ?
+   return(Type == ATCFLineType_Track && SubRegionOffset < N_items ?
           string_to_subregioncode(get_item(SubRegionOffset).c_str()) :
           NoSubregionCode);
 }
@@ -287,7 +343,7 @@ SubregionCode ATCFTrackLine::subregion() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::max_seas() const {
-   return(MaxSeasOffset < N_items ?
+   return(Type == ATCFLineType_Track && MaxSeasOffset < N_items ?
           parse_int_check_zero(get_item(MaxSeasOffset).c_str()) :
           bad_data_int);
 }
@@ -295,39 +351,23 @@ int ATCFTrackLine::max_seas() const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFTrackLine::initials() const {
-   return(InitialsOffset < N_items ?
-          (string)get_item(InitialsOffset) :
-          (string)"");
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFTrackLine::storm_direction() const {
-   return(StormDirectionOffset < N_items ?
-          parse_int(get_item(StormDirectionOffset).c_str()) :
-          bad_data_int);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFTrackLine::storm_speed() const {
-   return(StormSpeedOffset < N_items ?
-          parse_int(get_item(StormSpeedOffset).c_str()) :
-          bad_data_int);
+   return(Type == ATCFLineType_Track && InitialsOffset < N_items ?
+          (string) get_item(InitialsOffset) :
+          (string) "");
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFTrackLine::storm_name() const {
-   return(StormNameOffset < N_items ?
-          (string)get_item(StormNameOffset) :
-          (string)"");
+   return(Type == ATCFLineType_Track && StormNameOffset < N_items ?
+          (string) get_item(StormNameOffset) :
+          (string) "");
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SystemsDepth ATCFTrackLine::depth() const {
-   return(DepthOffset < N_items ?
+   return(Type == ATCFLineType_Track && DepthOffset < N_items ?
           string_to_systemsdepth(get_item(DepthOffset).c_str()) :
           NoSystemsDepth);
 }
@@ -335,7 +375,7 @@ SystemsDepth ATCFTrackLine::depth() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::wave_height() const {
-   return(WaveHeightOffset < N_items ?
+   return(Type == ATCFLineType_Track && WaveHeightOffset < N_items ?
           parse_int_check_zero(get_item(WaveHeightOffset).c_str()) :
           bad_data_int);
 }
@@ -343,7 +383,7 @@ int ATCFTrackLine::wave_height() const {
 ////////////////////////////////////////////////////////////////////////
 
 QuadrantType ATCFTrackLine::seas_code() const {
-   return(SeasCodeOffset < N_items ?
+   return(Type == ATCFLineType_Track && SeasCodeOffset < N_items ?
           string_to_quadranttype(get_item(SeasCodeOffset).c_str()) :
           NoQuadrantType);
 }
@@ -351,7 +391,7 @@ QuadrantType ATCFTrackLine::seas_code() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::seas_radius1() const {
-   return(SeasRadius1Offset < N_items ?
+   return(Type == ATCFLineType_Track && SeasRadius1Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius1Offset).c_str()) :
           bad_data_int);
 }
@@ -359,7 +399,7 @@ int ATCFTrackLine::seas_radius1() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::seas_radius2() const {
-   return(SeasRadius2Offset < N_items ?
+   return(Type == ATCFLineType_Track && SeasRadius2Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius2Offset).c_str()) :
           bad_data_int);
 }
@@ -367,7 +407,7 @@ int ATCFTrackLine::seas_radius2() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::seas_radius3() const {
-   return(SeasRadius3Offset < N_items ?
+   return(Type == ATCFLineType_Track && SeasRadius3Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius3Offset).c_str()) :
           bad_data_int);
 }
@@ -375,8 +415,71 @@ int ATCFTrackLine::seas_radius3() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::seas_radius4() const {
-   return(SeasRadius4Offset < N_items ?
+   return(Type == ATCFLineType_Track && SeasRadius4Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius4Offset).c_str()) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Specific to ATCFLineType_Track
+//
+////////////////////////////////////////////////////////////////////////
+
+double ATCFTrackLine::parameter_b() const {
+   int v = (Type == ATCFLineType_GenTrack && GenParameterBOffset < N_items ?
+            parse_int(get_item(GenParameterBOffset).c_str(), -999) :
+            bad_data_int);
+   return(!is_bad_data(v) ? v/10.0 : bad_data_double);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ATCFTrackLine::therm_wind_lower() const {
+   int v = (Type == ATCFLineType_GenTrack && GenThermWindLowerOffset < N_items ?
+            parse_int(get_item(GenThermWindLowerOffset).c_str(), -9999) :
+            bad_data_int);
+   return(!is_bad_data(v) ? v/10.0 : bad_data_double);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ATCFTrackLine::therm_wind_upper() const {
+   int v = (Type == ATCFLineType_GenTrack && GenThermWindUpperOffset < N_items ?
+            parse_int(get_item(GenThermWindUpperOffset).c_str(), -9999) :
+            bad_data_int);
+   return(!is_bad_data(v) ? v/10.0 : bad_data_double);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::mean_850_vort() const {
+   return(Type == ATCFLineType_GenTrack && GenMean850VortOffset < N_items ?
+          parse_int(get_item(GenThermWindUpperOffset).c_str(), -9999) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::max_850_vort() const {
+   return(Type == ATCFLineType_GenTrack && GenMax850VortOffset < N_items ?
+          parse_int(get_item(GenThermWindUpperOffset).c_str(), -9999) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::mean_700_vort() const {
+   return(Type == ATCFLineType_GenTrack && GenMean700VortOffset < N_items ?
+          parse_int(get_item(GenThermWindUpperOffset).c_str(), -9999) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::max_700_vort() const {
+   return(Type == ATCFLineType_GenTrack && GenMax700VortOffset < N_items ?
+          parse_int(get_item(GenThermWindUpperOffset).c_str(), -9999) :
           bad_data_int);
 }
 

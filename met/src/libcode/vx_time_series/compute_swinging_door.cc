@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -122,14 +122,14 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
 
   // Loop through the rest of the observations
 
-  time_t end_time;
-  double end_value;
+  time_t end_time  = start_time;
+  double end_value = start_value;
 
   for (++curr_obs; curr_obs != observations.end(); ++curr_obs)
   {
     // Calculate the needed values for this point
 
-    end_time = curr_obs->getValidTime();
+    end_time  = curr_obs->getValidTime();
     end_value = curr_obs->getValue();
 
     double time_diff = (double)(end_time - start_time);
@@ -137,10 +137,8 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
     double curr_top_slope = (end_value - start_top_value) / time_diff;
     double curr_bottom_slope = (end_value - start_bottom_value) / time_diff;
 
-    if (top_slope < curr_top_slope)
-      top_slope = curr_top_slope;
-    if (bottom_slope > curr_bottom_slope)
-      bottom_slope = curr_bottom_slope;
+    if (top_slope < curr_top_slope)       top_slope    = curr_top_slope;
+    if (bottom_slope > curr_bottom_slope) bottom_slope = curr_bottom_slope;
 
     // See if we are at the end of the current corridor
 

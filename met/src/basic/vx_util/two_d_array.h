@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,6 +81,7 @@ class TwoD_Array {
       int  nx()       const { return ( Nx ); }
       int  ny()       const { return ( Ny ); }
       bool is_empty() const { return ( Nx*Ny == 0 ); }
+      int  count()    const;
 
       const T * data() const { return ( E ); }
 
@@ -220,6 +221,30 @@ for (j=0; j<nxy; ++j)  {
 
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+int TwoD_Array<T>::count() const
+
+{
+
+int j, n;
+const int nxy = Nx*Ny;
+
+for (j=0,n=0; j<nxy; ++j)  {
+
+   if (E[j])  n++;
+
+}
+
+
+return(n);
 
 }
 
@@ -380,5 +405,3 @@ typedef TwoD_Array<bool> BoolPlane;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

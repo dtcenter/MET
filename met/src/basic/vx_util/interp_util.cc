@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,13 +18,14 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
+//#include "interp_mthd.h"
 #include "interp_util.h"
-#include "interp_mthd.h"
 #include "GridTemplate.h"
 #include "RectangularTemplate.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -229,7 +230,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
    double *data = (double *) 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double median_v = bad_data_double;
+   double median_v;
 
    // Allocate space to store the data points for sorting
    data = new double [gt.size()];
@@ -315,7 +316,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
    double sum = 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double uw_mean_v = bad_data_double;
+   double uw_mean_v;
 
    // Sum the valid data in the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
@@ -537,56 +538,32 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
 
-const double trunc_factor = 3.5;
-double max_raw_all;
-double max_gaussian;
-
-void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
+void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    int idx_x, idx_y;
-   int weight_cnt;
    double value;
-   double weight_sum;
-   double weight, distance_sq;
-   const double g_sigma = radius / dx;
-   const double g_sigma_sq = g_sigma * g_sigma;
-   const double f_sigma_exp_divider = (2 * g_sigma_sq);
-   const double f_sigma_divider = (2 * M_PI * g_sigma_sq);
-   const double max_distance_sq = pow((g_sigma * trunc_factor), 2);
-   
-   int max_r = nint(g_sigma * trunc_factor);
+   int max_r = gaussian.max_r;
    int g_nx = max_r * 2 + 1;
-   mlog << Debug(7) << "interp_gaussian_dp() "
-        << " max_r: " << max_r << " g_sigma: " << g_sigma
-        << " from gaussian_radius: " << radius << " gaussian_dx: " << dx
-        << "\n";
-   
-   //g_sigma = info.sigma / 81.271;
    int nx = dp.nx();
    int ny = dp.ny();
    DataPlane d_dp;
    DataPlane g_dp;
    
-   weight_cnt = 0;
-   weight_sum = 0.0;
-   max_raw_all = 0.0;
-   max_gaussian = 0.0;
+   if (max_r <= 0 || gaussian.weights == (double *)0) {
+      mlog << Error << "\ninterp_gaussian_dp() -> "
+           << "the gaussian weights were not computed (max_r: " << max_r << ").\n\n";
+      exit(1);
+   }
+   
    g_dp.set_size(g_nx, g_nx);
-   for(idx_x=-max_r; idx_x<=max_r; idx_x++) {
-      for(idx_y=-max_r; idx_y<=max_r; idx_y++) {
-         weight = 0.0;
-         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
-         if (distance_sq <= max_distance_sq) {
-            weight_cnt++;
-            weight = exp(-(distance_sq) / f_sigma_exp_divider) / f_sigma_divider;
-            weight_sum += weight;
-         }
-         g_dp.set(weight, idx_x+max_r, idx_y+max_r);
+   d_dp.set_size(nx, ny);
+   
+   int index = 0;
+   for(idx_x=0; idx_x<g_nx; idx_x++) {
+      for(idx_y=0; idx_y<g_nx; idx_y++) {
+         g_dp.set(gaussian.weights[index++], idx_x, idx_y);
       } // end for y
    } // end for x
-
-   d_dp.set_size(nx, ny);
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
          d_dp.set(dp.get(idx_x, idx_y), idx_x, idx_y);
@@ -594,81 +571,61 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
    } // end for x
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
-         value = interp_gaussian(d_dp, g_dp, (double)idx_x, (double)idx_y, max_r);
+         value = interp_gaussian(d_dp, g_dp, (double)idx_x,
+                                 (double)idx_y, max_r, t);
          dp.set(value, idx_x, idx_y);
       } // end for y
    } // end for x
 
    mlog << Debug(5) << "interp_gaussian_dp() "
-        << "weight_sum: " << weight_sum << " weight_cnt: " << weight_cnt
-        << " max_raw: " << max_raw_all << ", max_gaussian: " << max_gaussian
+        << "weight_sum: " << gaussian.weight_sum
+        << " weight_cnt: " << gaussian.weight_cnt
+        << " nx: " << nx << ", ny: " << ny << " max_r: " << max_r
         << "\n";
 }
 
-
-////////////////////////////////////////////////////////////////////////
-//
-// Compute the Gaussian filter
-// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
-//
 ////////////////////////////////////////////////////////////////////////
 
 double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
-                       double obs_x, double obs_y, int max_r) {
-
-   int count;
-   int ix, iy;
-   int nx, ny, g_nx;
-   double dx, dy;
-   double value, gaussian_value, gaussian_weight, max_raw;
-   double interp_value = bad_data_double;
+                       double obs_x, double obs_y, int max_r, double t) {
+   int count, count_vld;
+   double value, gaussian_value, gaussian_weight, weight_sum;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
-   int x_first = x - max_r;
-   int y_first = y - max_r;
-   int x_last = x + max_r;
-   int y_last = y + max_r;
-   
-   nx = dp.nx();
-   ny = dp.ny();
-   g_nx = g_dp.nx();
-   
-   count = 0;
-   max_raw = 0.0;
-   gaussian_value = 0.0;
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int g_nx = g_dp.nx();
+
+   count = count_vld = 0;
+   gaussian_value = weight_sum = 0.0;
    for(int x_idx=0; x_idx<g_nx; x_idx++) {
-      ix = x - max_r + x_idx;
+      int ix = x - max_r + x_idx;
       if (0 > ix || ix >= nx) continue;
       for(int y_idx=0; y_idx<g_nx; y_idx++) {
-         iy = y - max_r + y_idx;
+         int iy = y - max_r + y_idx;
          if (0 > iy || iy >= ny) continue;
-         
+
          gaussian_weight = g_dp.get(x_idx, y_idx);
          if(gaussian_weight <= 0.) continue;
          value = dp.get(ix, iy);
-         if(is_bad_data(value) || value <= 0.) continue;
-         gaussian_value += value * gaussian_weight;
          count++;
-         if (max_raw < value) {
-            max_raw = value;
-            if (max_raw_all < value) max_raw_all = value;
-         }
+         if(is_bad_data(value)) continue;
+         gaussian_value += value * gaussian_weight;
+         weight_sum += gaussian_weight;
+         count_vld++;
       }
    }
 
-   interp_value = gaussian_value;
-
-   if (max_gaussian < gaussian_value) {
-      max_gaussian = gaussian_value;
-      mlog << Debug(7) << "interp_gaussian() "
-           << "count: " << count << ", x: " << x << ", y: " << y
-           << "  raw data: " << dp.get(x, y) << " to interpolated " << interp_value
-           << ", max_raw: " << max_raw << ", max_raw_all: " << max_raw_all
-           << ", max_gaussian: " << max_gaussian
-           << "\n";
+   // Check whether enough valid grid points were found
+   if(0 == count || (double)count_vld/count < t || count_vld == 0) {
+      gaussian_value = bad_data_double;
    }
-   return(interp_value);
+   else {
+      gaussian_value /= weight_sum;
+   }
+
+   return(gaussian_value);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -746,7 +703,8 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
-                    double t, const SingleThresh *st, const MaskPlane *mp) {
+                    double t, const SingleThresh *st, double cmn, double csd,
+                    const MaskPlane *mp) {
    int count, count_thr;
 
    // Compute the ratio of events within the neighborhood
@@ -764,7 +722,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
       if(is_bad_data(data)) continue;
 
       count++;
-      if(st->check(data)) count_thr++;
+      if(st->check(data, cmn, csd)) count_thr++;
    }
 
    // Check whether enough valid grid points were found
@@ -976,7 +934,7 @@ double compute_sfc_interp(const DataPlane &dp,
                           const GridTemplateFactory::GridTemplates shape,
                           double interp_thresh, const SurfaceInfo &sfc_info,
                           bool is_land_obs) {
-   double v;
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1070,7 +1028,8 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
                            const SurfaceInfo &sfc_info,
                            bool is_land_obs, double obs_elv) {
    MaskPlane mp;
-   int nx, ny;
+   int nx = 0;
+   int ny = 0;
    bool land_ok, topo_ok;
 
    // Initialize the mask
@@ -1132,7 +1091,19 @@ double compute_horz_interp(const DataPlane &dp,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
                            double interp_thresh, const SingleThresh *cat_thresh) {
-   double v;
+   return(compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
+             bad_data_double, mthd, width, shape, interp_thresh, cat_thresh));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_horz_interp(const DataPlane &dp,
+                           double obs_x, double obs_y,
+                           double obs_v, double cmn, double csd,
+                           const InterpMthd mthd, const int width,
+                           const GridTemplateFactory::GridTemplates shape,
+                           double interp_thresh, const SingleThresh *cat_thresh) {
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1174,9 +1145,9 @@ double compute_horz_interp(const DataPlane &dp,
                            interp_thresh);
          break;
 
-      case(InterpMthd_Nbrhd):      // Neighborhood fractional coverage
+      case(InterpMthd_Nbrhd):       // Neighborhood fractional coverage
          v = interp_nbrhd(dp, *gt, x, y,
-                          interp_thresh, cat_thresh);
+                          interp_thresh, cat_thresh, cmn, csd);
          break;
 
       case(InterpMthd_Bilin):       // Bilinear interpolation
@@ -1205,10 +1176,6 @@ double compute_horz_interp(const DataPlane &dp,
 
       case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
          v = interp_xy(dp, floor(obs_x), floor(obs_y));
-         break;
-
-      case(InterpMthd_Gaussian):    // Gaussian filter of the grid box
-         v = interp_max(dp, *gt, x, y, 0);
          break;
 
       case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
@@ -1302,7 +1269,9 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    DataPlane dp, dp1, dp2;
    int x, y;
    bool use_min;
-   double v, v1, v2, w1, w2;
+   double v, v1, v2;
+   double w1 = bad_data_double;
+   double w2 = bad_data_double;
 
    // Store min and max valid times.
    dp1 = (in1.valid() <= in2.valid() ? in1 : in2);

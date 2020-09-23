@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -85,10 +85,11 @@ static const double default_mask_val = 1.0;
 ////////////////////////////////////////////////////////////////////////
 
 // Input data file, mask file, and output NetCDF file
-static ConcatString input_filename, mask_filename, out_filename;
+static ConcatString input_gridname, mask_filename, out_filename;
 
 // Optional arguments
 static MaskType mask_type = default_mask_type;
+static bool type_is_set = false;
 static ConcatString input_field_str, mask_field_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;
@@ -116,12 +117,13 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 static void      process_command_line(int, char **);
-static void      process_input_file(DataPlane &dp);
+static void      process_input_grid(DataPlane &dp);
 static void      process_mask_file(DataPlane &dp);
 static void      get_data_plane(Met2dDataFile *mtddf_ptr,
                                 const char *config_str, DataPlane &dp);
 static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
                                       DataPlane &dp);
+static void      get_shapefile_outline(ShpPolyRecord &shape);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
 static void      apply_box_mask(DataPlane &dp);
@@ -131,7 +133,8 @@ static void      apply_grid_mask(DataPlane &dp);
 static void      apply_data_mask(DataPlane &dp);
 static void      apply_solar_mask(DataPlane &dp);
 static void      apply_lat_lon_mask(DataPlane &dp);
-static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, SetLogic);
+static DataPlane combine(const DataPlane &dp_data,
+                         const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
 static void      set_type(const StringArray &);

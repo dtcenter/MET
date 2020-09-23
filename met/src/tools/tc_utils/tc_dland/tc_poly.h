@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,7 +81,7 @@ class TCPolyArray {
 
       void assign(const TCPolyArray &);
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       TCPoly * Poly;
       int      NPolys;

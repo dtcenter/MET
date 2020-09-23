@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -32,6 +32,8 @@ static bool parse_stereographic_grid(const StringArray &, Grid &);
 
 static bool parse_mercator_grid(const StringArray &, Grid &);
 
+static bool parse_gaussian_grid(const StringArray &, Grid &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +55,7 @@ if ( i.lc )  { g.set( *(i.lc) );  status = true; }
 if ( i.st )  { g.set( *(i.st) );  status = true; }
 if ( i.ll )  { g.set( *(i.ll) );  status = true; }
 if ( i.m  )  { g.set( *(i.m)  );  status = true; }
+if ( i.g  )  { g.set( *(i.g)  );  status = true; }
 
 return ( status );
 
@@ -150,7 +153,6 @@ for (j=0; j<n_ncep_lambert_grids; ++j)  {
 
 }
 
-
    //
    //  try ncep mercator grids
    //
@@ -160,6 +162,22 @@ for (j=0; j<n_ncep_mercator_grids; ++j)  {
    if ( strcmp(name, ncep_mercator_grids[j].name) == 0 )  {
 
       i.set( ncep_mercator_grids[j] );
+
+      return ( true );
+
+   }
+
+}
+
+   //
+   //  try ncep gaussian grids
+   //
+
+for (j=0; j<n_ncep_gaussian_grids; ++j)  {
+
+   if ( strcmp(name, ncep_gaussian_grids[j].name) == 0 )  {
+
+      i.set( ncep_gaussian_grids[j] );
 
       return ( true );
 
@@ -193,7 +211,8 @@ bool status = false;
 else if ( strcasecmp(grid_strings[0].c_str(), "latlon")   == 0 )  status = parse_latlon_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "stereo")   == 0 )  status = parse_stereographic_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "mercator") == 0 )  status = parse_mercator_grid(grid_strings, g);
-else                                                      status = false;
+else if ( strcasecmp(grid_strings[0].c_str(), "gaussian") == 0 )  status = parse_gaussian_grid(grid_strings, g);
+else                                                              status = false;
 
    //
    //  done
@@ -590,6 +609,75 @@ if ( !west_longitude_positive )  {
 }
 
 ToGrid = new Grid ( mdata );
+
+g = *ToGrid;
+
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+
+   //
+   //  done
+   //
+
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
+
+{
+
+Grid * ToGrid = (Grid *) 0;
+
+GaussianData gdata;
+
+const int N = grid_strings.n_elements();
+
+if ( N != 4 )  {
+
+   mlog << Error << "\nparse_gaussian_grid() -> "
+        << "gaussian grid spec should have 4 entries\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+int Nx, Ny;
+double lon_zero;
+
+
+j = 1;
+
+   //
+   //  get info from the strings
+   //
+
+lon_zero = atof(grid_strings[j++].c_str());
+Nx       = atoi(grid_strings[j++].c_str());
+Ny       = atoi(grid_strings[j++].c_str());
+
+   //
+   //  load up the struct
+   //
+
+gdata.name = "To (gaussian)";
+
+gdata.lon_zero = lon_zero;
+gdata.nx       = Nx;
+gdata.ny       = Ny;
+
+if ( !west_longitude_positive )  {
+
+   gdata.lon_zero *= -1.0;
+
+}
+
+ToGrid = new Grid ( gdata );
 
 g = *ToGrid;
 

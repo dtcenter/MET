@@ -1,11 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,9 +25,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-//static NcDim * nx_dim = 0;
-//static NcDim * ny_dim = 0;
-//static NcDim * nt_dim = 0;
 static NcDim  nx_dim ;
 static NcDim  ny_dim ;
 static NcDim  nt_dim ;
@@ -68,20 +64,9 @@ if ( IS_INVALID_NC(out) )  {
 const bool have_pairs =    (fcst_obj.n_objects() != 0)
                         && ( obs_obj.n_objects() != 0);
 
-// nc_info.dump(cout);
-
-//nx_dim = 0;
-//ny_dim = 0;
-//nt_dim = 0;
-
    //
    //  dimensions
    //
-
-
-//nx_dim = out.get_dim(nx_dim_name);
-//ny_dim = out.get_dim(ny_dim_name);
-//nt_dim = out.get_dim(nt_dim_name);
 
 nx_dim = add_dim(&out,  nx_dim_name, fcst_raw.nx());
 ny_dim = add_dim(&out,  ny_dim_name, fcst_raw.ny());
@@ -106,7 +91,6 @@ if ( nc_info.do_latlon )  {
 
 }
 
-
 if ( nc_info.do_raw )  {
 
    do_raw(out, fcst_raw, true);
@@ -121,7 +105,6 @@ if ( nc_info.do_object_id )  {
 
 }
 
-
 if ( have_pairs && (nc_info.do_cluster_id) )  {
 
    do_cluster_id (out, fcst_obj, true,  engine);
@@ -129,13 +112,9 @@ if ( have_pairs && (nc_info.do_cluster_id) )  {
 
 }
 
-
-
    //
    //  done
    //
-
-//out.close();
 
 return;
 
@@ -167,24 +146,13 @@ if ( IS_INVALID_NC(out) )  {
 
 }
 
-// nc_info.dump(cout);
-
-//nx_dim = 0;
-//ny_dim = 0;
-//nt_dim = 0;
-
    //
    //  dimensions
    //
 
-
 nx_dim = add_dim(&out,  nx_dim_name, raw.nx());
 ny_dim = add_dim(&out,  ny_dim_name, raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
-
-//nx_dim = out.get_dim(nx_dim_name);
-//ny_dim = out.get_dim(ny_dim_name);
-//nt_dim = out.get_dim(nt_dim_name);
 
    //
    //  global attributes
@@ -205,7 +173,6 @@ if ( nc_info.do_latlon )  {
 
 }
 
-
 if ( nc_info.do_raw )  {
 
    do_raw(out, raw, true);
@@ -218,13 +185,9 @@ if ( nc_info.do_object_id )  {
 
 }
 
-
-
    //
    //  done
    //
-
-//out.close();
 
 return;
 
@@ -245,12 +208,8 @@ float * Lon = 0;
 const int nx = grid.nx();
 const int ny = grid.ny();
 
-
 NcVar lat_var = add_var(&out, lat_name, ncFloat, ny_dim, nx_dim);
 NcVar lon_var = add_var(&out, lon_name, ncFloat, ny_dim, nx_dim);
-
-//NcVar * lat_var = get_nc_var(out, lat_name);
-//NcVar * lon_var = get_nc_var(out, lon_name);
 
 add_att(&lat_var, "long_name", "Latitude");
 add_att(&lon_var, "long_name", "Longitude");
@@ -276,15 +235,6 @@ for (y=0; y<ny; ++y)  {
    }
 
 }
-
-//lat_var->set_cur(0, 0);
-//
-//lat_var->put(lat_data, ny, nx);
-//
-//
-//lon_var->set_cur(0, 0);
-//
-//lon_var->put(lon_data, ny, nx);
 
 long offsets[2] = {0,0};
 long lengths[2] = {ny, nx};
@@ -319,18 +269,12 @@ const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
 
 NcVar var = add_var(&out, name, ncFloat, nt_dim, ny_dim, nx_dim);
 
-//NcVar * var = get_nc_var(&outname);
-
 if ( is_fcst )  s = "Forecast Raw Data";
 else            s = "Observed Raw Data";
 
 add_att(&var, "long_name", s.text());
 
 add_att(&var, "_FillValue", bad_data_float);
-
-//var->set_cur(0, 0, 0);
-//
-//var->put(raw.data(), nt, ny, nx);
 
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
@@ -357,12 +301,9 @@ const int ny = id.ny();
 const int nt = id.nt();
 ConcatString s;
 
-
 const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
-
-//NcVar * var = get_nc_var(&outname);
 
 if ( is_fcst )  s = "Forecast Object ID";
 else            s = "Observed Object ID";
@@ -370,10 +311,6 @@ else            s = "Observed Object ID";
 add_att(&var, "long_name", s.text());
 
 add_att(&var, "_FillValue", bad_data_int);
-
-//var->set_cur(0, 0, 0);
-//
-//var->put(id.data(), nt, ny, nx);
 
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
@@ -408,14 +345,11 @@ ConcatString s;
 
 const int n3 = nx*ny*nt;
 
-
 out_data = new int [n3];
 
 const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
-
-//NcVar * var = get_nc_var(&outname);
 
 if ( is_fcst )  s = "Forecast Cluster ID";
 else            s = "Observed Cluster ID";
@@ -428,10 +362,7 @@ add_att(&var, "_FillValue", bad_data_int);
    //  create mapping array
    //
 
-// const int n_clusters = e.n_composites();
 const int n_objects = ( is_fcst ? (e.n_fcst_simples()) : (e.n_obs_simples()) );
-
-// mlog << Debug(5) << "\n\n  " << n_clusters << " clusters\n\n";
 
 remap = new int [n_objects + 1];
 
@@ -456,10 +387,6 @@ for (j=0; j<n3; ++j)  {
 
 }
 
-
-//var->set_cur(0, 0, 0);
-//var->put(out_data, nt, ny, nx);
-
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
 put_nc_data(&var, out_data, lengths, offsets);
@@ -478,5 +405,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

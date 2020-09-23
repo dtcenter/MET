@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@
 #include "data_plane.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
+#include "config_gaussian.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -76,13 +77,13 @@ extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int 
 // GridTemplate version takes center x/y
 extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
 extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
-extern double   interp_gaussian  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, const double sigma, double t, const MaskPlane *mp = 0);
-extern void     interp_gaussian_dp(DataPlane &, const double gaussian_radius, const double gaussian_dx);
-extern double   interp_gaussian  (const DataPlane &, const DataPlane &g_dp, double obs_x, double obs_y, int max_r);
+extern void     interp_gaussian_dp(DataPlane &, const GaussianInfo &, double t);
+extern double   interp_gaussian  (const DataPlane &, const DataPlane &, double obs_x, double obs_y, int max_r, double t);
 
 extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 
-extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *, const MaskPlane *mp = 0);
+extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
+                                double cmn, double csd, const MaskPlane *mp = 0);
 extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y, const MaskPlane *mp = 0);
 extern double   interp_xy      (const DataPlane &, int x, int y, const MaskPlane *mp = 0);
 
@@ -110,6 +111,13 @@ extern MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
+                                  const InterpMthd mthd, const int width,
+                                  const GridTemplateFactory::GridTemplates shape,
+                                  double interp_thresh, const SingleThresh *cat_thresh = 0);
+
+extern double compute_horz_interp(const DataPlane &dp,
+                                  double obs_x, double obs_y,
+                                  double obs_v, double cmn, double csd,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
                                   double interp_thresh, const SingleThresh *cat_thresh = 0);

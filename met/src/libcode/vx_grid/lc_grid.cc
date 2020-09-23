@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -183,7 +183,7 @@ double r_pin, theta_pin;
 
 r_pin = lc_func(data.lat_pin, Cone, IsNorthHemisphere);
 
-theta_pin = H*Cone*(Lon_orient - data.lon_pin);
+theta_pin = H*Cone*(rescale_deg(Lon_orient - data.lon_pin, -180.0, 180.0));
 
 Bx = data.x_pin - Alpha*r_pin*H*sind(theta_pin);
 By = data.y_pin + Alpha*r_pin*H*cosd(theta_pin);
@@ -675,6 +675,8 @@ GridRep * LambertGrid::copy() const
 
 LambertGrid * p = new LambertGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }
@@ -789,7 +791,8 @@ double lambert_segment_area(double u0, double v0, double u1, double v1, double c
 
 int i, j, k, n;
 double rom, denom, h, delta_u, delta_v;
-double trap, t[15], left, right, test, sum;
+double trap, t[15], left, right, sum;
+double test = 0.0;
 const double a = 0.0, b = 1.0;
 const double tol = 1.0e-6;
 
@@ -982,8 +985,6 @@ data.name = "lc_zoom";
 
 data.hemisphere = ( is_north_projection ? 'N' : 'S' );
 
-// const double H = ( is_north_projection ? 1.0 : -1.0 );
-
 data.scale_lat_1 = lat_cen;
 data.scale_lat_2 = lat_cen;
 
@@ -1018,16 +1019,9 @@ g_old.latlon_to_xy(lat_prev, lon_prev, x_prev, y_prev);
 
 angle = atan2d(x_prev - x_cen, y_prev - y_cen);
 
-
-// cout << "create_oriented_lc() -> anagle = " << angle << "\n";
-
 s = angle - bearing;
 
-// cout << "create_oriented_lc() -> s = " << s << "\n";
-
 s -= 360.0*floor((s + 180.0)/360.0);
-
-// cout << "create_oriented_lc() -> s = " << s << "\n";
 
 data.so2_angle = s;
 

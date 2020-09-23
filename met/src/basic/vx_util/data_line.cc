@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,6 +29,10 @@ using namespace std;
 
 #include "data_line.h"
 #include "vx_log.h"
+
+#ifdef WITH_PYTHON
+#include "python_line.h"
+#endif  /*  WITH_PYTHON  */
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,6 +116,8 @@ Delimiter.assign(dataline_default_delim);
 
 File = (LineDataFile *) 0;
 
+IsHeader = false;
+
 return;
 
 }
@@ -149,12 +155,8 @@ void DataLine::assign(const DataLine & a)
 
 clear();
 
-//extend_char(a.N_chars);
-
 Line = a.Line;
 Items = a.Items;
-
-//extend_int(a.N_items);
 
 Offset = a.Offset;
 
@@ -178,7 +180,7 @@ void DataLine::dump(ostream & out, int depth) const
 {
 
 int j;
-//char junk[256];
+char junk[256];
 Indent prefix(depth);
 
 
@@ -191,33 +193,42 @@ out << prefix << "\n";
 
 if ( N_items == 0 )  { out.flush();  return; }
 
-std::ostringstream sstream;
-sstream.width(2);
+// std::ostringstream sstream;
+// sstream.width(2);
 
 for (j=0; j<N_items; ++j)  {
 
-   //snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
+   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
-   sstream << "Item[" << j << "]       = \"";
-   out << prefix << sstream.str() << Line.substr(j) << "\"\n";
+   out << prefix << junk << Items[j] << "\"\n";
 
-   if ( (j%5) == 4 )  out << prefix << "\n";
+   // sstream << "Item[" << j << "]       = \"";
+   // out << prefix << sstream.str() << Line.substr(j) << "\"\n";
+
+   if ( (j%5) == 4 )  out << prefix << '\n';
+
+   out.flush();
 
 }
 
 out << prefix << "\n";
 
 
-sstream.str("");
-sstream.clear();
+// sstream.str("");
+// sstream.clear();
 
 for (j=0; j<N_items; ++j)  {
 
-   //snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
-   sstream << "Offset[" << j << "]     = ";
-   out << prefix << sstream.str() << Offset[j] << "\n";
+   snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
 
-   if ( (j%5) == 4 )  out << prefix << "\n";
+   out << prefix << junk << Offset[j] << '\n';
+
+   // sstream << "Offset[" << j << "]     = ";
+   // out << prefix << sstream.str() << Offset[j] << "\n";
+
+   if ( (j%5) == 4 )  out << prefix << '\n';
+
+   out.flush();
 
 }
 
@@ -281,67 +292,6 @@ return ( c );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void DataLine::extend_char(int n)
-
-{
-
-++n;   //  add room for trailing nul, if needed
-
-if ( N_chars >= n )  return;
-
-int k;
-
-k = n/dataline_charextend_alloc_inc;
-
-if ( n%dataline_charextend_alloc_inc ) ++k;
-
-n = k*dataline_charextend_alloc_inc;
-
-Line.reserve(n);
-N_chars = n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void DataLine::extend_int(int n)
-
-{
-
-if ( N_ints >= n )  return;
-
-int k;
-
-k = n/dataline_intextend_alloc_inc;
-
-if ( n%dataline_intextend_alloc_inc ) ++k;
-
-n = k*dataline_intextend_alloc_inc;
-
-Offset.reserve(n);
-
-N_ints = n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 int DataLine::max_item_width() const
 
@@ -376,36 +326,20 @@ int DataLine::read_line(LineDataFile * ldf)
 
 clear();
 
-ifstream & f = *(ldf->in);
-
-if ( !f )  return ( 0 );
-
-File = ldf;
-
-char c;
 size_t pos, count;
+
+
+pos = 0;
+count = 0;
 
 
    //
    //  get a line from the file
    //
 
-pos = 0;
-count = 0;
 
-while ( f.get(c) )  {
+if ( ! read_single_text_line(ldf) )  { clear();  return ( 0 ); }
 
-   if ( !f )  { clear();  return ( 0 ); }
-
-   //extend_char(pos + 5);   //  better safe than sorry
-
-   if ( c == '\n' )  { break; }
-
-   Line += c;
-
-}
-
-if ( !f )  { clear();  return ( 0 ); }
 
    //
    //  parse the line with strtok
@@ -415,7 +349,6 @@ size_t len, tpos = std::string::npos;
 
 if (!Line.find_first_not_of(Delimiter)) { // no leading delimiter
     ++count;
-    //extend_int(count);
     Offset.push_back(pos);
     Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
@@ -426,7 +359,6 @@ while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos) 
     pos += tpos + len;
     
     ++count;
-    //extend_int(count);
     Offset.push_back(pos);
     Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
@@ -447,6 +379,7 @@ return ( 1 );
 int DataLine::read_fwf_line(LineDataFile * ldf, const int *wdth, int n_wdth)
 
 {
+const char *method_name = "DataLine::read_fwf_line() -> ";
 
 clear();
 
@@ -468,18 +401,26 @@ int null_char_count;
 
 null_char_count = pos = count = 0;
 
+int line_len;
 for( i=0; i<n_wdth; i++ )  {
+   line_len = wdth[i];
+   if (wdth[i] >= max_str_len) {
+      line_len = (max_str_len-1);
+      mlog << Warning
+           << "\n" << method_name << "the line length " << wdth[i] << " for "
+           << i << "-th line is bigger than allocatcated buffer ("
+           << max_str_len << ").\n\n";
+   }
 
    if ( !f )  { clear();  return ( 0 ); }
 
-   //extend_char(pos + wdth[i] + 1);   //  better safe than sorry
-   //extend_int(++count);
    ++count;
 
+   
    //
    //  get the next entry
    //
-   f.read(buf, wdth[i]);
+   f.read(buf, line_len);
 
    //
    //  store the offset to this entry
@@ -490,7 +431,7 @@ for( i=0; i<n_wdth; i++ )  {
    //
    //  store this entry
    //
-   for( j=0; j<wdth[i]; j++ )  {
+   for( j=0; j<line_len; j++ )  {
 
      Line += buf[j]; pos++;
 
@@ -503,7 +444,7 @@ for( i=0; i<n_wdth; i++ )  {
      }
      else if(buf[j] == '\n') {
         mlog << Warning
-             << "\nDataLine::read_fwf_line() -> "
+             << "\n" << method_name
              << "Encountered newline while parsing line "
              << ldf->last_line_number() + 1 << ".\n\n";
      }
@@ -520,7 +461,7 @@ for( i=0; i<n_wdth; i++ )  {
 
 if (null_char_count > 0)
    mlog << Warning
-        << "\nDataLine::read_fwf_line() -> "
+        << "\n" << method_name
         << "Encountered " << null_char_count << " null character"
         << (null_char_count==1?"":"s") << " while parsing line "
         << ldf->last_line_number() + 1 << ".\n\n";
@@ -552,13 +493,13 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int DataLine::is_ok() const
+bool DataLine::is_ok() const
 
 {
 
-if ( N_items == 0 )  return ( 0 );
+if ( N_items == 0 )  return ( false );
 
-return ( 1 );
+return ( true );
 
 }
 
@@ -566,11 +507,12 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int DataLine::is_header() const
+bool DataLine::is_header() const
 
 {
 
-return ( 0 );
+// return ( false );
+return ( IsHeader );
 
 }
 
@@ -584,6 +526,80 @@ void DataLine::set_delimiter(const char *delimiter)
   Delimiter.assign(delimiter);
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool DataLine::read_single_text_line(LineDataFile * ldf)
+
+{
+
+////////////////////////////////////////////////////
+#ifdef  WITH_PYTHON
+
+   PyLineDataFile * pldf = dynamic_cast<PyLineDataFile *>(ldf);
+
+   if ( pldf )  {
+
+      const bool status = read_py_single_text_line(pldf);
+
+      return ( status );
+
+   }
+
+#endif   /*  WITH_PYTHON  */
+////////////////////////////////////////////////////
+
+ifstream & f = *(ldf->in);
+
+if ( !f )  return ( false );
+
+File = ldf;
+
+char c;
+
+
+while ( f.get(c) )  {
+
+   if ( !f )  return ( false );
+
+   if ( c == '\n' )  { break; }
+
+   Line += c;
+
+}
+
+if ( !f )  return ( false );
+
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifdef  WITH_PYTHON
+
+bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
+
+{
+
+bool status = false;
+ConcatString s;
+
+status = pldf->next_line(s);
+
+if ( ! status )  return ( false );
+
+Line = s.text();
+
+return ( true );
+
+}
+
+#endif   /*  WITH_PYTHON  */
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -700,9 +716,6 @@ if ( !(*in) )  {
    //  get filename
    //
 
-int j, n;
-
-n = strlen(path);
 
 Filename.assign(path);
 ShortFilename.assign(get_short_name(path));
@@ -900,9 +913,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return ( lgr );
 
-int j, k, N;
-char c;
-
+int j;
 
 // k = L.N_items - 1;   //  last item
 // 

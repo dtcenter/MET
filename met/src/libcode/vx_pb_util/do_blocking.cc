@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,7 +157,7 @@ int find_magic_cookie(int fd)
 {
 
 int j, n_read;
-int pos;
+int pos = 0;
 const int temp_buf_size = 128;
 char tempbuf[temp_buf_size];
 

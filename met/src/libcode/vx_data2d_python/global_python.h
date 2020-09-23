@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,13 @@ extern "C" {
 #include "Python.h"
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "python3_util.h"
+#include "concat_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,6 +63,21 @@ if ( ! is_initialized )  {
    Py_Initialize();
 
    is_initialized = true;
+
+   //
+   //  add wrappers directory to the path
+   //
+
+   run_python_string("import sys");
+
+   ConcatString command;
+
+   command << cs_erase
+           << "sys.path.append(\""
+           << replace_path(wrappers_dir)
+           << "\")";
+
+   run_python_string(command.text());
 
 }
 
@@ -97,5 +119,4 @@ extern GlobalPython GP;
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

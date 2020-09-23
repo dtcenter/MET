@@ -1,0 +1,145 @@
+////////////////////////////////////////////////////////////////////////////////
+
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+censor_thresh = [];
+censor_val    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
+sid_inc       = [];
+sid_exc       = [];
+
+fcst = {
+
+   field = [
+      {
+         name          = "UGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
+         censor_thresh = [ ${CENSOR_THRESH} ];
+         censor_val    = [ ${CENSOR_VAL}    ];
+      },
+      {
+         name          = "VGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
+         sid_inc       = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ];
+         desc          = "SID_INC";
+      },
+      {
+         name          = "VGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
+         sid_exc       = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ];
+         desc          = "SID_EXC";
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [ "DTC165" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE;
+   rps    = NONE;
+   eclv   = NONE;
+   mpr    = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = NONE;
+obs_summary    = NEAREST;
+rank_corr_flag = TRUE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V9.1";
+
+////////////////////////////////////////////////////////////////////////////////

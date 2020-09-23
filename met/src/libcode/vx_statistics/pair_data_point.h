@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,34 +41,29 @@ class PairDataPoint : public PairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      // Forecast and climatological values
+      // Forecast values
       NumArray f_na; // Forecast [n_obs]
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
+      void erase();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
-      bool add_pair(const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+      bool add_point_pair(const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(double, double, double, double,
-                    double wgt = default_grid_weight);
+      void set_point_pair(int, const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(const NumArray &f_in, const NumArray &o_in,
-                    const NumArray &c_in, const NumArray &w_in);
+      bool add_grid_pair(double, double, double, double, double);
 
-      bool add_pair(const NumArray &f_in,   const NumArray &o_in,
-                    const NumArray &cmn_in, const NumArray &csd_in,
-                    const NumArray &w_in);
-
-      void set_pair(int, const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+      bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
+                         const NumArray &cmn_in, const NumArray &csd_in,
+                         const NumArray &w_in);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,6 +122,7 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray sid_inc_filt;  // Station ID inclusion list
       StringArray sid_exc_filt;  // Station ID exclusion list
       StringArray obs_qty_filt;  // Observation quality markers
 
@@ -154,7 +150,7 @@ class VxPairDataPoint {
 
       //  Counts for observation rejection reason codes
       int n_try;                 // Number of observations processed
-      int rej_sid_exc;           // Reject based on SID exclusion list
+      int rej_sid;               // Reject based on SID inclusion and exclusion lists
       int rej_gc;                // Reject based on GRIB code
       int rej_vld;               // Reject based on valid time
       int rej_obs;               // Reject observation bad data
@@ -167,6 +163,8 @@ class VxPairDataPoint {
       int ***rej_typ;            // Reject based on message type
       int ***rej_mask;           // Reject based on masking region
       int ***rej_fcst;           // Reject forecast bad data
+      int ***rej_cmn;            // Reject climo mean bad data
+      int ***rej_csd;            // Reject climo stdev bad data
       int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
@@ -189,6 +187,7 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_sid_inc_filt(const StringArray);
       void set_sid_exc_filt(const StringArray);
       void set_obs_qty_filt(const StringArray);
 
@@ -212,9 +211,9 @@ class VxPairDataPoint {
 
       void set_sfc_info(const SurfaceInfo &);
 
-      void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &, const char * = 0,
-                   const DataPlane * = 0);
+      void add_point_obs(float *, const char *, const char *, unixtime,
+                         const char *, float *, Grid &, const char * = 0,
+                         const DataPlane * = 0);
 
       int  get_n_pair() const;
 
@@ -241,18 +240,19 @@ class VxPairDataPoint {
 ////////////////////////////////////////////////////////////////////////
 
 // Apply conditional thresholds to subset the pairs
-PairDataPoint subset_pairs(const PairDataPoint &,
-                           const SingleThresh &, const SingleThresh &,
-                           const SetLogic);
+extern PairDataPoint subset_pairs(const PairDataPoint &,
+                        const SingleThresh &, const SingleThresh &,
+                        const SetLogic);
+
+// Apply conditional thresholds to subset the wind pairs
+extern void subset_wind_pairs(const PairDataPoint &,
+                        const PairDataPoint &, const SingleThresh &,
+                        const SingleThresh &, const SetLogic,
+                        PairDataPoint &, PairDataPoint &);
 
 // Subset pairs for a specific climatology CDF bin
-PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
-                                   const ThreshArray &, int i_bin);
-
-extern bool   set_climo_flag(const NumArray &, const NumArray &);
-
-NumArray      derive_climo_prob(const NumArray &, const NumArray &,
-                                const SingleThresh &);
+extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
+                        const ThreshArray &, int i_bin);
 
 ////////////////////////////////////////////////////////////////////////
 

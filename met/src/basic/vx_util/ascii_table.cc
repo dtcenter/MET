@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -13,11 +13,12 @@
 using namespace std;
 
 #include <cstdio>
+#include <cmath>
 #include <iostream>
-#include <unistd.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cmath>
+#include <unistd.h>
 
 #include "vx_log.h"
 #include "vx_cal.h"
@@ -131,10 +132,6 @@ char tmp_str[512];
 
 if ( !e.empty() )  {
 
-   int j, n;
-
-   n = Nrows*Ncols;
-
    e.clear();
 
 }
@@ -190,8 +187,6 @@ return;
 void AsciiTable::erase()
 
 {
-
-int j;
 
 const int NRC = Nrows*Ncols;
 
@@ -252,7 +247,7 @@ if ( a.e.empty() )  return;
 set_size(a.nrows(), a.ncols());
 
 
-int j, r, c;
+int r, c;
 
 
 ColWidth = a.ColWidth;
@@ -324,7 +319,6 @@ if ( (NR <= 0) || (NC <= 0) )  {
 
 clear();
 
-int j;
 const int NRC = NR*NC;
 
 e.resize(NRC);
@@ -902,6 +896,8 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
 void AsciiTable::set_entry(const int r, const int c, const char* text)
 
 {
@@ -954,8 +950,8 @@ else  {
 fix_float(str);
 
 if ( DoCommaString )  {
-  char * junk;
-  strncpy(junk, str.c_str(), str.length());
+   char junk[256];
+   strncpy(junk, str.c_str(), str.length());
    char * p = (char *) 0;
    long X;
    ConcatString s;
@@ -1273,17 +1269,23 @@ void AsciiTable::line_up_decimal_points()
 
 {
 
-int r, c, n, k;
-int max_left, max_right;
-int w_old, w_new;
+if ( Nrows < 0 || Nrows >= INT_MAX )  {
+
+   mlog << Error << "\nAsciiTable::line_up_decimal_points() -> "
+        << "invalid number of rows ... " << Nrows << "\n\n";
+
+   exit ( 1 );
+}
+
 int left[Nrows];
 int right[Nrows];
+
+int r, c, n, k;
+int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
 for (c=0; c<Ncols; ++c)  {
-
-   w_old = ColWidth[c];
 
       //  get the pad size for that column
 
@@ -1305,23 +1307,13 @@ for (c=0; c<Ncols; ++c)  {
 
    }
 
-   w_new = max_left + max_right;
-
-   if ( w_new < w_old )  w_new = w_old;
-
       //
       //  pad each entry in that column
       //
 
    for (r=r_start; r<Nrows; ++r)  {
 
-      n = rc_to_n(r, c);
-
-      // len = (e[n] == (char *) 0 ? 0 : strlen(e[n]));
-
       k = max_right - right[r];
-
-      // k = w_new - len - 1;
 
       if ( k > 0 )  pad_entry_right(r, c, k, fill_char);
 
@@ -1474,7 +1466,8 @@ if ( !out )  {
    //  get to work
    //
 
-int j, len, offset;
+int j, len;
+int offset = 0;
 
    //
    //  fill the output field with the pad character

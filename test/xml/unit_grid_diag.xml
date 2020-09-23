@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="grid_diag">
+    <exec>&MET_BIN;/grid_diag</exec>
+    <param> \
+      -config &CONFIG_DIR;/GridDiagConfig \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_out.nc \
+      -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_out.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_diag_TMP">
+    <exec>echo "&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_03.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_06.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_09.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_15.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_18.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_21.tm00_G212 \
+                &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212" \
+                > &OUTPUT_DIR;/grid_diag/input_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <param> \
+      -config &CONFIG_DIR;/GridDiagConfig_TMP \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_temperature.nc \
+      -data &OUTPUT_DIR;/grid_diag/input_file_list \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_temperature.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_diag_APCP_06_FCST_OBS">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F006.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F012.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F018.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F024.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib" \
+                > &OUTPUT_DIR;/grid_diag/fcst_file_list; \
+          echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                > &OUTPUT_DIR;/grid_diag/obs_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/obs_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_APCP_06_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

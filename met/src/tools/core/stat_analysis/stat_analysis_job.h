@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,7 @@
 //   005    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   006    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   007    03/01/18  Halley Gotway   Update summary job type.
+//   008    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -105,6 +106,9 @@ extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
 
 extern void write_job_aggr_ecnt(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrENSInfo> &, AsciiTable &);
+
+extern void write_job_aggr_rps(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrRPSInfo> &, AsciiTable &);
 
 extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrENSInfo> &, AsciiTable &);

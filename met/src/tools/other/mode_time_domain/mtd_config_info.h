@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -92,20 +92,17 @@ class MtdConfigInfo {
       int              fcst_conv_radius;       // Convolution radius in grid squares
       int              obs_conv_radius;
 
+      int              fcst_conv_time_beg;     // Convolution time window begin offset
+      int              obs_conv_time_beg;
+
+      int              fcst_conv_time_end;     // Convolution time window end offset
+      int              obs_conv_time_end;
+
       SingleThresh     fcst_conv_thresh;       // Convolution threshold to define objects
       SingleThresh     obs_conv_thresh;
 
       double           fcst_vld_thresh;        // Minimum ratio of valid data points in the convolution area
       double           obs_vld_thresh;
-
-      SingleThresh     fcst_area_thresh;       // Discard objects whose area doesn't meet threshold
-      SingleThresh     obs_area_thresh;
-
-      int              fcst_inten_perc_value;  // Intensity percentile of interest
-      int              obs_inten_perc_value;
-
-      SingleThresh     fcst_inten_perc_thresh; // Discard objects whose percentile intensity doesn't meet threshold
-      SingleThresh     obs_inten_perc_thresh;
 
       SingleThresh     fcst_merge_thresh;      // Lower convolution threshold used for double merging method
       SingleThresh     obs_merge_thresh;
@@ -165,7 +162,9 @@ class MtdConfigInfo {
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
-      int              min_volume;             //  throw away 3D objects with volumes smaller than this
+      int              inten_perc_value;       // Intensity percentile of interest
+
+      int              min_volume;             // Throw away 3D objects with volumes smaller than this
 
          //
          //  delta_t_seconds:  this is not from the config file

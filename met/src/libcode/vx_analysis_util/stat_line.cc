@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -299,7 +299,7 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int STATLine::is_ok() const
+bool STATLine::is_ok() const
 
 {
 
@@ -311,7 +311,7 @@ return ( DataLine::is_ok() );
 ////////////////////////////////////////////////////////////////////////
 
 
-int STATLine::is_header() const
+bool STATLine::is_header() const
 
 {
 

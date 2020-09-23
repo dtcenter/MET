@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -224,24 +224,26 @@ void TrackInfo::assign(const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfo::extend(int n) {
+void TrackInfo::extend(int n, bool exact) {
    int j, k;
    TrackPoint *new_line = (TrackPoint *) 0;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
 
-   // Check how many allocations are required
-   k = n/TrackInfoAllocInc;
-   if(n%TrackInfoAllocInc) k++;
-   n = k*TrackInfoAllocInc;
+   // Compute the allocation size 
+   if(!exact) {
+      k = n/TrackInfoAllocInc;
+      if(n%TrackInfoAllocInc) k++;
+      n = k*TrackInfoAllocInc;
+   }
 
    // Allocate a new TrackPoint array of the required length
    new_line = new TrackPoint [n];
 
    if(!new_line) {
       mlog << Error
-           << "\nvoid TrackInfo::extend(int) -> "
+           << "\nvoid TrackInfo::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -368,6 +370,13 @@ void TrackInfo::set_storm_id() {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackInfo::duration() const {
+   return(MaxValidTime == 0 || MinValidTime == 0 ? bad_data_int :
+          MaxValidTime - MinValidTime);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -384,7 +393,7 @@ int TrackInfo::valid_inc() const {
 
 void TrackInfo::add(const TrackPoint &p) {
 
-   extend(NPoints + 1);
+   extend(NPoints + 1, false);
    Point[NPoints++] = p;
 
    // Check the valid time range
@@ -444,7 +453,7 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
 
    // Otherwise, create a new point
    if(!found) {
-      extend(NPoints + 1);
+      extend(NPoints + 1, false);
       status = Point[NPoints++].set(l);
    }
 
@@ -675,7 +684,7 @@ ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
    s << prefix << serialize() << ", Tracks:\n";
 
    for(i=0; i<NTracks; i++)
-      s << Track[i].serialize_r(i+1, indent_depth+1);
+      s << Track[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return(s);
 
@@ -701,24 +710,26 @@ void TrackInfoArray::assign(const TrackInfoArray &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfoArray::extend(int n) {
+void TrackInfoArray::extend(int n, bool exact) {
    int j, k;
    TrackInfo *new_info = (TrackInfo *) 0;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
 
-   // Check how many allocations are required
-   k = n/TrackInfoArrayAllocInc;
-   if(n%TrackInfoArrayAllocInc) k++;
-   n = k*TrackInfoArrayAllocInc;
+   // Compute the allocation size 
+   if(!exact) {
+      k = n/TrackInfoArrayAllocInc;
+      if(n%TrackInfoArrayAllocInc) k++;
+      n = k*TrackInfoArrayAllocInc;
+   }
 
    // Allocate a new TrackInfo array of the required length
    new_info = new TrackInfo [n];
 
    if(!new_info) {
       mlog << Error
-           << "\nvoid TrackInfoArray::extend(int) -> "
+           << "\nvoid TrackInfoArray::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -758,7 +769,7 @@ const TrackInfo & TrackInfoArray::operator[](int n) const {
 
 void TrackInfoArray::add(const TrackInfo &t) {
 
-   extend(NTracks + 1);
+   extend(NTracks + 1, false);
    Track[NTracks++] = t;
 
    return;
@@ -810,7 +821,7 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
 
    // Otherwise, create a new track
    if(!found) {
-      extend(NTracks + 1);
+      extend(NTracks + 1, false);
       status = Track[NTracks++].add(l, check_dup, check_anly);
    }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -78,6 +78,8 @@ class SingleAtt3D {
       double Ptile_75;
       double Ptile_90;
 
+      int    Ptile_Value;
+      double Ptile_User;
 
    public:
 
@@ -179,6 +181,9 @@ class SingleAtt3D {
       double ptile_75() const;
       double ptile_90() const;
 
+      int    ptile_value() const;
+      double ptile_user()  const;
+
          //
          //  do stuff
          //
@@ -240,6 +245,9 @@ inline double SingleAtt3D::ptile_25() const { return ( Ptile_25 ); }
 inline double SingleAtt3D::ptile_50() const { return ( Ptile_50 ); }
 inline double SingleAtt3D::ptile_75() const { return ( Ptile_75 ); }
 inline double SingleAtt3D::ptile_90() const { return ( Ptile_90 ); }
+
+inline int  SingleAtt3D::ptile_value()  const { return ( Ptile_Value ); }
+inline double SingleAtt3D::ptile_user() const { return ( Ptile_User  ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -415,7 +423,7 @@ inline void PairAtt3D::set_cluster () { IsSimple = false;  return; }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt3D calc_3d_single_atts(const Object & mask, const Raw & raw, const char * model);
+extern SingleAtt3D calc_3d_single_atts(const Object & mask, const Raw & raw, const char * model, const int ptile_value);
 
 extern PairAtt3D   calc_3d_pair_atts(const Object      & _fcst_obj, 
                                      const Object      & _obs_obj, 

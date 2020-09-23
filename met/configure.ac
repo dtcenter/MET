@@ -118,6 +118,7 @@ fi
 AC_ARG_VAR([MET_GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
 AC_ARG_VAR([MET_GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CLIB must also be defined and MET_GRIB2C will be ignored.])
 AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CINC must also be defined and MET_GRIB2C will be ignored.])
+AC_ARG_VAR([GRIB2CLIB_NAME], [Name of grib2c library to link with. For example, -lgrib2c_v1.6.0 or -lgrib2c, etc.  If it is -lgrib2c, you don't have to specify it.])
 
 # Ensure that both or neither are specified.
 
@@ -156,7 +157,7 @@ AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<
 AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python-config --ldflags'.])
 
 if test -n "$MET_PYTHON_CC"; then
-   CPPFLAGS="${CPPFLAGS} ${MET_PYTHON_CC}"
+   CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"
 fi
 
 if test -n "$MET_PYTHON_LD"; then
@@ -222,6 +223,15 @@ fi
 if test -n "$MET_BUFRLIB"; then
    LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbufr_v11.3.0_4_64 or -lbufr, etc.  If it is -lbufr, you don't have to specify it.])
+
+AC_SUBST([BUFRLIB_NAME])
+AM_CONDITIONAL([BUFRLIB_NAME_SET], [test ! -z "$BUFRLIB_NAME"])
+AC_MSG_NOTICE([BUFRLIB_NAME will be set])
+
 
 #
 # Look for the HDF library
@@ -677,6 +687,26 @@ else
     AC_MSG_NOTICE([regrid_data_plane will not be compiled])
 fi
 
+# point2grid
+
+AC_ARG_ENABLE(point2grid,
+          [AS_HELP_STRING([--disable-point2grid], [Disable compilation of point2grid])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_POINT2GRID="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-point2grid) ;;
+   esac],
+  [ENABLE_POINT2GRID="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_POINT2GRID], [test "x$ENABLE_POINT2GRID" = "xyes"])
+
+if test "x$ENABLE_POINT2GRID" = "xyes"; then
+    AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
+    AC_MSG_NOTICE([point2grid will be compiled])
+else
+    AC_MSG_NOTICE([point2grid will not be compiled])
+fi
+
 # shift_data_plane
 
 AC_ARG_ENABLE(shift_data_plane,
@@ -950,12 +980,19 @@ AC_ARG_ENABLE(grib2,
 )
 
 AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
+AM_CONDITIONAL([GRIB2CLIB_NAME_SET], [test ! -z "$GRIB2CLIB_NAME"])
 
 if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
     AC_MSG_NOTICE([GRIB2 utilites will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
-    GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+    AC_SUBST([GRIB2CLIB_NAME])
+    AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
+    if test -z "$GRIB2CLIB_NAME"; then
+       GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+    else
+       GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
+    fi
 else
     AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
     GRIB2_LIBS=
@@ -979,12 +1016,17 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils ${MET_PYTHON_LD}"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
 fi
 AC_SUBST([PYTHON_LIBS])
+
+########################################################################
+
+
+
 
 ########################################################################
 
@@ -1120,6 +1162,7 @@ AC_CONFIG_FILES([Makefile
                  data/poly/Makefile
                  data/poly/HMT_masks/Makefile
                  data/poly/NCEP_masks/Makefile
+                 data/wrappers/Makefile
                  data/ps/Makefile
                  data/table_files/Makefile
                  data/tc_data/Makefile
@@ -1165,7 +1208,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_regrid/Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
-                 src/libcode/vx_python_utils/Makefile
+                 src/libcode/vx_python3_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/libcode/vx_bool_calc/Makefile
                  src/tools/Makefile
@@ -1193,14 +1236,18 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/wwmca_tool/Makefile
                  src/tools/other/gsi_tools/Makefile
                  src/tools/other/regrid_data_plane/Makefile
+                 src/tools/other/point2grid/Makefile
                  src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
                  src/tools/other/mode_multivar/Makefile
+                 src/tools/other/grid_diag/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
-                 src/tools/tc_utils/tc_rmw/Makefile
-                 src/tools/tc_utils/tc_stat/Makefile])
+                 src/tools/tc_utils/tc_stat/Makefile
+                 src/tools/tc_utils/tc_gen/Makefile
+                 src/tools/tc_utils/rmw_analysis/Makefile
+                 src/tools/tc_utils/tc_rmw/Makefile])
 
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile

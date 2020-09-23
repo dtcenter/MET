@@ -1,10 +1,23 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   tc_rmw.cc
+//
+//   Description:
+//
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000   04/18/19  Fillmore        New
+//   001   05/15/20  Halley Gotway   Fix data file list option logic.
+//
+////////////////////////////////////////////////////////////////////////
 
 #include <cstdio>
 #include <cstdlib>
@@ -39,21 +52,23 @@
 
 static void usage();
 static void process_command_line(int, char**);
-static void process_decks();
-static void process_adecks(TrackInfoArray&);
-static void process_bdecks(TrackInfoArray&);
+
+static GrdFileType get_file_type(const StringArray &, const GrdFileType);
+static bool file_is_ok(const ConcatString &, const GrdFileType);
+
+static void process_rmw();
+static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
-    const StringArray&, TrackInfoArray&, bool, bool);
-static void set_adeck(const StringArray&);
-static void set_bdeck(const StringArray&);
+    const StringArray&, TrackInfoArray&);
+static bool is_keeper(const ATCFLineBase *);
+static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
-static void set_out_dir(const StringArray&);
-static void set_out_prefix(const StringArray&);
+static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
@@ -83,8 +98,8 @@ int main(int argc, char *argv[]) {
     // Setup NetCDF output
     setup_nc_file();
 
-    // Process deck files
-    process_decks();
+    // Process gridded and track data
+    process_rmw();
 
     return(0);
 }
@@ -97,13 +112,30 @@ void usage() {
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
          << "\t-data file_1 ... file_n | data_file_list\n"
-         << "\t-adeck file\n"
+         << "\t-deck file\n"
          << "\t-config file\n"
-         << "\t[-bdeck file]\n"
-         << "\t[-ddeck file]\n"
+         << "\t-out file\n"
          << "\t[-log file]\n"
-         << "\t[-out file]\n"
-         << "\t[-v level]\n\n" << flush;
+         << "\t[-v level]\n\n"
+
+         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+         << "specifies the gridded data files or an ASCII file "
+         << "containing a list of files to be used (required).\n"
+
+         << "\t\t\"-deck source\" is the ATCF format data source "
+         << "(required).\n"
+
+         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "(required).\n"
+
+         << "\t\t\"-out file\" is the NetCDF output file to be written "
+         << "(required).\n"
+
+         << "\t\t\"-log file\" outputs log messages to the specified "
+         << "file (optional).\n"
+
+         << "\t\t\"-v level\" overrides the default level of logging ("
+         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
     exit(1);
 }
@@ -111,7 +143,6 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-
     CommandLine cline;
     ConcatString default_config_file;
 
@@ -121,6 +152,9 @@ void process_command_line(int argc, char **argv) {
     // Default output prefix
     out_prefix = replace_path(default_out_prefix);
 
+    // Print usage statement for no arguments
+    if(argc <= 1) usage();
+
     // Parse command line into tokens
     cline.set(argc, argv);
 
@@ -128,22 +162,17 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     // Add function calls for arguments
-    cline.add(set_data_files, "-data",  -1);
-    cline.add(set_adeck,      "-adeck", -1);
-    cline.add(set_bdeck,      "-bdeck", -1);
-    cline.add(set_config,     "-config", 1);
-    cline.add(set_out_dir,    "-out",    1);
-    cline.add(set_out_prefix, "-prefix", -1);
-    cline.add(set_logfile,    "-log",    1);
-    cline.add(set_verbosity,  "-v",      1);
+    cline.add(set_data_files, "-data",   -1);
+    cline.add(set_deck,       "-deck",   -1);
+    // Queitly support -adeck option for backward compatibility with met-9.0
+    cline.add(set_deck,       "-adeck",  -1);
+    cline.add(set_config,     "-config",  1);
+    cline.add(set_out,        "-out",     1);
+    cline.add(set_logfile,    "-log",     1);
+    cline.add(set_verbosity,  "-v",       1);
 
     // Parse command line
     cline.parse();
-
-    // Check number of arguments
-    // if(cline.n() != 1) usage();
-
-    // data_file = cline[0];
 
     // Create default config file name
     default_config_file = replace_path(default_config_filename);
@@ -153,77 +182,102 @@ void process_command_line(int argc, char **argv) {
          << "Config File Default: " << default_config_file << "\n"
          << "Config File User: " << config_file << "\n";
 
+    // Parse the data file list
+    data_files = parse_file_list(data_files);
+
     // Read config files
     conf_info.read_config(default_config_file.c_str(),
                           config_file.c_str());
 
-
     // Get data file type from config
     ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
-        conf_key_data));
+                                 conf_key_data));
+
+    // Get data file type from input files
+    ftype = get_file_type(data_files, ftype);
 
     // Process the configuration
     conf_info.process_config(ftype);
-
-    // Search for files
-    data_files
-        = parse_file_list(data_files, ftype);
 
     return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_decks() {
-    // Process ADECK files
-    TrackInfoArray adeck_tracks;
-    process_adecks(adeck_tracks);
+GrdFileType get_file_type(const StringArray &file_list,
+                          const GrdFileType in_ftype) {
+    int i;
+    Met2dDataFileFactory mtddf_factory;
+    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+    GrdFileType out_ftype;
 
-    process_fields(adeck_tracks);
+    // Find the first file that actually exists
+    for(i=0; i<file_list.n(); i++) {
+        if(file_is_ok(file_list[i], in_ftype)) break;
+    }
 
-    // nc_out->close();
+    // Check for no valid files
+    if(i == file_list.n()) {
+        mlog << Error << "\nTrouble reading input data files.\n\n";
+        exit(1);
+    }
+
+    // Read first valid file
+    if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), in_ftype))) {
+        mlog << Error << "\nTrouble reading data file \""
+             << file_list[i] << "\"\n\n";
+        exit(1);
+    }
+
+    // Store the file type
+    out_ftype = mtddf->file_type();
+
+    // Clean up
+    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
+    return(out_ftype);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_adecks(TrackInfoArray& adeck_tracks) {
-    StringArray files, files_model_suffix;
-
-    // Initialize
-    adeck_tracks.clear();
-
-    // Get list of track files
-    get_atcf_files(adeck_source, adeck_model_suffix,
-                   files, files_model_suffix);
-
-    mlog << Debug(2)
-         << "Processing " << files.n_elements() << " ADECK file(s).\n";
-
-    process_track_files(files, files_model_suffix, adeck_tracks,
-                        false, false);
-
-    ConcatString adeck_track_file("adeck.nc");
-    // write_tc_tracks(adeck_track_file, adeck_tracks);
-    write_tc_tracks(nc_out, track_point_dim, adeck_tracks);
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+    return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_bdecks(TrackInfoArray& bdeck_tracks) {
+void process_rmw() {
+
+    // Process the track data
+    TrackInfoArray tracks;
+    process_tracks(tracks);
+
+    // Process the gridded data
+    process_fields(tracks);
+
+    // List the output file
+    mlog << Debug(1)
+         << "Writing output file: " << out_file << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_tracks(TrackInfoArray& tracks) {
     StringArray files, files_model_suffix;
 
     // Initialize
-    bdeck_tracks.clear();
+    tracks.clear();
 
     // Get list of track files
-    get_atcf_files(bdeck_source, bdeck_model_suffix,
+    get_atcf_files(deck_source, deck_model_suffix,
                    files, files_model_suffix);
 
     mlog << Debug(2)
-         << "Processing " << files.n_elements() << " BDECK file(s).\n";
+         << "Processing " << files.n() << " track data file(s).\n";
 
-    process_track_files(files, files_model_suffix, bdeck_tracks,
-                        false, false);
+    process_track_files(files, files_model_suffix, tracks);
+
+    write_tc_tracks(nc_out, track_point_dim, tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -237,9 +291,8 @@ void get_atcf_files(const StringArray& source,
 
     StringArray cur_source, cur_files;
 
-    if(source.n_elements() != model_suffix.n_elements()) {
-        mlog << Error
-             << "\nget_atcf_files() -> "
+    if(source.n() != model_suffix.n()) {
+        mlog << Error << "\nget_atcf_files() -> "
              << "the source and suffix arrays must be equal length!\n\n";
         exit(1);
     }
@@ -249,12 +302,12 @@ void get_atcf_files(const StringArray& source,
     files_model_suffix.clear();
 
     // Build list of files from all sources
-    for(int i = 0; i < source.n_elements(); i++) {
+    for(int i = 0; i < source.n(); i++) {
         cur_source.clear();
         cur_source.add(source[i]);
         cur_files = get_filenames(cur_source, NULL, atcf_suffix);
 
-        for(int j = 0; j < cur_files.n_elements(); j++) {
+        for(int j = 0; j < cur_files.n(); j++) {
             files.add(cur_files[j]);
             files_model_suffix.add(model_suffix[i]);
         }
@@ -267,11 +320,8 @@ void get_atcf_files(const StringArray& source,
 
 void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
-                         TrackInfoArray& tracks,
-                         bool check_keep,
-                         bool check_anly) {
+                         TrackInfoArray& tracks) {
     int cur_read, cur_add, tot_read, tot_add;
-
     LineDataFile f;
     ConcatString cs;
     ATCFTrackLine line;
@@ -283,12 +333,13 @@ void process_track_files(const StringArray& files,
     tot_read = tot_add = 0;
 
     // Process input ATCF files
-    for(int i = 0; i < files.n_elements(); i++) {
+    for(int i = 0; i < files.n(); i++) {
+
+        mlog << Debug(1) << "Reading track file: " << files[i] << "\n";
 
         // Open current file
         if(!f.open(files[i].c_str())) {
-            mlog << Error
-                 << "\nprocess_track_files() -> "
+            mlog << Error << "\nprocess_track_files() -> "
                  << "unable to open file \"" << files[i] << "\"\n\n";
             exit(1);
         }
@@ -298,9 +349,6 @@ void process_track_files(const StringArray& files,
 
         // Read each line
         while(f >> line) {
-
-            // line.dump(cout);
-            // cout << line.get_line() << "\n";
 
             // Increment line counts
             cur_read++;
@@ -312,8 +360,11 @@ void process_track_files(const StringArray& files,
                 line.set_technique(cs);
             }
 
+            // Check the keep status
+            if(!is_keeper(&line)) continue;
+
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, true, check_anly)) {
+            if(tracks.add(line, true, false)) {
                 cur_add++;
                 tot_add++;
             }
@@ -321,8 +372,8 @@ void process_track_files(const StringArray& files,
 
         // Dump out current number of lines
         mlog << Debug(4)
-             << "[File " << i + 1 << " of " << files.n_elements()
-             << "] " << cur_read
+             << "[File " << i + 1 << " of " << files.n()
+             << "] Used " << cur_add << " of " << cur_read
              << " lines read from file \n\"" << files[i] << "\"\n";
 
         // Close current file
@@ -330,22 +381,110 @@ void process_track_files(const StringArray& files,
 
     } // End loop over files
 
-    // Issue warning if more than one track found
-    if (tracks.n_tracks() > 1) {
-        mlog << Warning << "Found " << tracks.n_tracks() << " tracks.\n";
+    // Check the number of tracks: exit for 0 and warning for > 1
+    if(tracks.n_tracks() == 0) {
+        mlog << Error << "\nprocess_track_files() -> "
+             << "no tracks retained! Adjust the configuration file "
+             << "filtering options to select a single track.\n\n";
+        exit(1);
     }
+    // Issue warning if more than one track found
+    else if(tracks.n_tracks() > 1) {
+        mlog << Warning << "\nprocess_track_files() -> "
+             << "multiple tracks found (" << tracks.n_tracks()
+             << ")! Using the first one. Adjust the configuration file "
+             << "filtering options to select a single track.\n\n";
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check if the ATCFLineBase should be kept.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_keeper(const ATCFLineBase * line) {
+   bool keep = true;
+   ConcatString cs;
+
+   // Check model
+   if(conf_info.Model.nonempty() &&
+      conf_info.Model != line->technique()) {
+      cs << "model " << line->technique() << " != " << conf_info.Model;
+      keep = false;
+   }
+
+   // Check storm id
+   else if(conf_info.StormId.nonempty() &&
+           conf_info.StormId != line->storm_id()) {
+      cs << "storm_id " << line->storm_id() << " != " << conf_info.StormId;
+      keep = false;
+   }
+
+   // Check basin
+   else if(conf_info.Basin.nonempty() &&
+           conf_info.Basin != line->basin()) {
+      cs << "basin " << line->basin() << " != " << conf_info.Basin;
+      keep = false;
+   }
+
+   // Check cyclone
+   else if(conf_info.Cyclone.nonempty() &&
+           conf_info.Cyclone != line->cyclone_number()) {
+      cs << "cyclone " << line->cyclone_number() << " != " << conf_info.Cyclone;
+      keep = false;
+   }
+
+   // Check initialization time
+   else if(conf_info.InitInc != (unixtime) 0 &&
+           conf_info.InitInc != line->warning_time()) {
+      cs << "init_inc " << unix_to_yyyymmddhh(line->warning_time())
+         << " != " << unix_to_yyyymmdd_hhmmss(conf_info.InitInc);
+      keep = false;
+   }
+
+   // Check valid time
+   else if((conf_info.ValidBeg > 0 &&
+            conf_info.ValidBeg > line->valid())    ||
+           (conf_info.ValidEnd > 0 &&
+            conf_info.ValidEnd < line->valid())    ||
+           (conf_info.ValidInc.n() > 0 &&
+           !conf_info.ValidInc.has(line->valid())) ||
+           (conf_info.ValidExc.n() > 0 &&
+            conf_info.ValidExc.has(line->valid()))) {
+       cs << "valid_time " << unix_to_yyyymmddhh(line->valid());
+       keep = false;
+    }
+
+    // Check valid hour
+    else if(conf_info.ValidHour.n() > 0 &&
+           !conf_info.ValidHour.has(line->valid_hour())) {
+       cs << "valid_hour " << line->valid_hour();
+       keep = false;
+    }
+
+   // Check lead time
+   else if(conf_info.LeadTime.n() > 0 &&
+          !conf_info.LeadTime.has(line->lead())){
+      cs << "lead_time " << sec_to_hhmmss(line->lead());
+      keep = false;
+   }
+
+   if(!keep) {
+      mlog << Debug(4) << "Skipping track line for " << cs << ":\n"
+           << line->get_line() << "\n";
+   }
+
+   // Return the keep status
+   return(keep);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adeck(const StringArray& a) {
-    set_atcf_source(a, adeck_source, adeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_bdeck(const StringArray& b) {
-    set_atcf_source(b, bdeck_source, bdeck_model_suffix);
+void set_deck(const StringArray& a) {
+    set_atcf_source(a, deck_source, deck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -357,13 +496,12 @@ void set_atcf_source(const StringArray& a,
     ConcatString cs, suffix;
 
     // Check for optional suffix sub-argument
-    for(int i = 0; i < a.n_elements(); i++) {
+    for(int i = 0; i < a.n(); i++) {
         if(a[i] == "suffix") {
             cs = a[i];
             sa = cs.split("=");
-            if(sa.n_elements() != 2) {
-                mlog << Error
-                     << "\nset_atcf_source() -> "
+            if(sa.n() != 2) {
+                mlog << Error << "\nset_atcf_source() -> "
                      << "the model suffix must be specified as "
                      << "\"suffix=string\".\n\n";
             }
@@ -374,7 +512,7 @@ void set_atcf_source(const StringArray& a,
     }
 
     // Parse remaining sources
-    for(int i = 0; i < a.n_elements(); i++) {
+    for(int i = 0; i < a.n(); i++) {
         if( a[i] == "suffix" ) continue;
         source.add(a[i]);
         model_suffix.add(suffix);
@@ -395,14 +533,8 @@ void set_config(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_dir(const StringArray& a) {
-    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_out_prefix(const StringArray& a) {
-    out_prefix = a[0];
+void set_out(const StringArray& a) {
+    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -436,24 +568,19 @@ void setup_grid() {
 void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
 
-    // Create output NetCDF file name
-    // out_nc_file.add("tc_rmw_out.nc");
-    build_outfile_name(out_prefix, "out.nc", out_nc_file);
-
-    mlog << Debug(1) << out_nc_file << "\n";
-
     // Create NetCDF file
-    nc_out = open_ncfile(out_nc_file.c_str(), true);
+    nc_out = open_ncfile(out_file.c_str(), true);
 
     if(IS_INVALID_NC_P(nc_out)) {
         mlog << Error << "\nsetup_nc_file() -> "
              << "trouble opening output NetCDF file "
-             << out_nc_file << "\n\n";
+             << out_file << "\n\n";
         exit(1);
     }
 
-    mlog << Debug(4) << tcrmw_grid.range_n() << "\n";
-    mlog << Debug(4) << tcrmw_grid.azimuth_n() << "\n";
+    mlog << Debug(4)
+         << "Range = " << tcrmw_grid.range_n()
+         << ", Azimuth = " << tcrmw_grid.azimuth_n() << "\n";
 
     // Define dimensions
     range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
@@ -461,7 +588,8 @@ void setup_nc_file() {
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
+        conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
@@ -471,16 +599,13 @@ void setup_nc_file() {
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
-        mlog << Debug(4) << "data_info->name():"
-             << data_info->name().c_str() << "\n";
-        mlog << Debug(4) << "data_info->level_name():"
-             << data_info->level_name().c_str() << "\n";
-        variable_levels[data_info->name()].push_back(
-            data_info->level_name());
-        variable_long_names[data_info->name()]
-            = data_info->long_name();
-        variable_units[data_info->name()]
-            = data_info->units();
+        mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
+        variable_levels[data_info->name_attr()].push_back(
+            data_info->level_attr());
+        variable_long_names[data_info->name_attr()]
+            = data_info->long_name_attr();
+        variable_units[data_info->name_attr()]
+            = data_info->units_attr();
     }
 
     // Define pressure levels
@@ -491,39 +616,10 @@ void setup_nc_file() {
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
-    // Define variables
-    // for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-        // Get VarInfo
-        // data_info = conf_info.data_info[i_var];
-        // def_tc_data(nc_out, range_dim, azimuth_dim,
-        //     track_point_dim, data_var, data_info);
-        // data_vars.push_back(data_var);
-        // def_tc_azi_mean_data(nc_out, range_dim,
-        //     track_point_dim, data_var, data_info);
-        // azi_mean_data_vars.push_back(data_var);
-    // }
-
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
         range_dim, azimuth_dim, pressure_dim, track_point_dim,
         data_3d_vars);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void build_outfile_name(
-    const ConcatString& prefix, const char* suffix, ConcatString& str) {
-
-    // Append output directory and program name
-    str << cs_erase << out_dir << "/" << program_name;
-
-    // Append prefix
-    str << prefix << "_";
-
-    // Append suffix
-    str << suffix;
-
-    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -589,21 +685,29 @@ void process_fields(const TrackInfoArray& tracks) {
     // Take only first track
     TrackInfo track = tracks[0];
 
+    mlog << Debug(2) << "Processing 1 track consisting of "
+         << track.n_points() << " points.\n";
+
     // Loop over track points
     for(int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
         long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
-        mlog << Debug(4)
-             << "(" << point.lat() << ", " << point.lon() << ")\n";
+
+        mlog << Debug(3) << "[" << i_point+1 << " of "
+             << track.n_points()  << "] Processing track point valid at "
+             << unix_to_yyyymmdd_hhmmss(valid_time)
+             << " with center (lat, lon) = (" << point.lat() << ", "
+             << point.lon() << ").\n";
 
         // Set grid center
         grid_data.lat_center = point.lat();
-        grid_data.lon_center = - point.lon(); // internal sign change
+        grid_data.lon_center = -1.0*point.lon(); // internal sign change
+
         // RMW is same as mrd()
         grid_data.range_max_km = conf_info.rmw_scale *
-            point.mrd() * nm_to_km * conf_info.n_range;
+            point.mrd() * tc_km_per_nautical_miles * conf_info.n_range;
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();
@@ -621,35 +725,37 @@ void process_fields(const TrackInfoArray& tracks) {
             valid_time_var, valid_yyyymmddhh);
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-            // Get variable info
+
+            // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
-            get_series_entry(i_point, data_info,
-                data_files, ftype, found_data_files,
-                data_dp, latlon_arr);
+            data_info->set_valid(valid_time);
+
+            // Find data for this track point
+            get_series_entry(i_point, data_info, data_files, ftype, data_dp,
+                             latlon_arr);
+
             // Check data range
             double data_min, data_max;
             data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
+
             // Regrid data
             data_dp = met_regrid(data_dp,
                 latlon_arr, grid, data_info->regrid());
             data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
+
             // Write data
-            if (variable_levels[data_info->name()].size() > 1) {
+            if (variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                    pressure_level_indices, data_info->level().name(),
-                    i_point, data_3d_vars[data_info->name()], data_dp.data());
+                    pressure_level_indices, data_info->level_attr(),
+                    i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             } else {
                 write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-                    data_3d_vars[data_info->name()], data_dp.data());
+                    data_3d_vars[data_info->name_attr()], data_dp.data());
             }
-            // write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-            //     data_vars[i_var], data_dp.data());
-            // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-            //     azi_mean_data_vars[i_var], data_dp.data());
         }
     } // Close loop over track points
 

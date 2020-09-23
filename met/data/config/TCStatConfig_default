@@ -1,6 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Default TCStat configuration file
+// TC-Stat configuration file.
+//
+// For additional information, see the MET_BASE/config/README_TC file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -191,4 +193,4 @@ jobs = [];
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V9.0";
+version = "V9.1";
