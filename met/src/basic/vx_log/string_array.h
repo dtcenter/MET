@@ -54,7 +54,7 @@ class StringArray {
 
       void clear();
 
-      void extend(int);
+      // void extend(int);
 
       void dump(std::ostream &, int depth = 0) const;
 

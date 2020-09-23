@@ -879,23 +879,23 @@ fi
 
 # mode_multivar
 
-AC_ARG_ENABLE(mode_multivar,
-          [AS_HELP_STRING([--disable-mode_multivar], [Disable compilation of mode_multivar])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_MODE_MULTIVAR="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-mode_multivar) ;;
-   esac],
-  [ENABLE_MODE_MULTIVAR="yes"]
-)
-
-AM_CONDITIONAL([ENABLE_MODE_MULTIVAR], [test "x$ENABLE_MODE_MULTIVAR" = "xyes"])
-
-if test "x$ENABLE_MODE_MULTIVAR" = "xyes"; then
-    AC_DEFINE([ENABLE_MODE_MULTIVAR], [], ["build mode_multivar"])
-    AC_MSG_NOTICE([mode_multivar will be compiled])
-else
-    AC_MSG_NOTICE([mode_multivar will not be compiled])
-fi
+#AC_ARG_ENABLE(mode_multivar,
+#          [AS_HELP_STRING([--disable-mode_multivar], [Disable compilation of mode_multivar])],
+#  [case "${enableval}" in
+#     yes | no ) ENABLE_MODE_MULTIVAR="${enableval}" ;;
+#     *) AC_MSG_ERROR(bad value ${enableval} for --disable-mode_multivar) ;;
+#   esac],
+#  [ENABLE_MODE_MULTIVAR="yes"]
+#)
+#
+#AM_CONDITIONAL([ENABLE_MODE_MULTIVAR], [test "x$ENABLE_MODE_MULTIVAR" = "xyes"])
+#
+#if test "x$ENABLE_MODE_MULTIVAR" = "xyes"; then
+#    AC_DEFINE([ENABLE_MODE_MULTIVAR], [], ["build mode_multivar"])
+#    AC_MSG_NOTICE([mode_multivar will be compiled])
+#else
+#    AC_MSG_NOTICE([mode_multivar will not be compiled])
+#fi
 
 
 # tc_utils

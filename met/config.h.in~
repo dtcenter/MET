@@ -36,9 +36,6 @@
 /* "build mode_graphics" */
 #undef ENABLE_MODE_GRAPHICS
 
-/* "build mode_multivar" */
-#undef ENABLE_MODE_MULTIVAR
-
 /* "build mode_time_domain" */
 #undef ENABLE_MODE_TIME_DOMAIN
 

@@ -92,6 +92,9 @@ void ModeConfInfo::clear()
 
    Field_Index = 0;
 
+   fcst_multivar_logic.clear();
+    obs_multivar_logic.clear();
+
    // fcst_conv_radius_array.clear();
    //  obs_conv_radius_array.clear();
 
@@ -206,6 +209,8 @@ void ModeConfInfo::read_config(const char * default_file_name, const char * user
    // Read the user-specified config file
    conf.read(user_file_name);
 
+   get_multivar_programs();
+
    nc_info.set_compress_level(conf.nc_compression());
 
    return;
@@ -262,6 +267,7 @@ PlotInfo plot_info;
 
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
+
 
 //  X
    read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
@@ -978,6 +984,75 @@ const int nr = n_conv_radii();
 const int nt = n_conv_threshs();
 
 return ( nr*nt );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool ModeConfInfo::is_multivar()
+
+{
+
+const DictionaryEntry * e = conf.lookup("fcst");
+
+if ( e->type() != DictionaryType )  {
+
+   mlog << Error
+        << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
+
+   exit ( 1 );
+
+}
+
+
+const DictionaryEntry * e2 = e->dict()->lookup("field");
+bool status = false;
+
+switch ( e2->type() )  {
+
+   case ArrayType:        status = true;   break;
+   case DictionaryType:   status = false;  break;
+
+   default:
+      mlog << Error
+           << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
+      exit ( 1 );
+      break;
+
+}
+
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::get_multivar_programs()
+
+{
+
+Dictionary * dict = (Dictionary *) 0;
+
+fcst_multivar_logic.clear();
+ obs_multivar_logic.clear();
+
+
+dict = conf.lookup_dictionary(conf_key_fcst);
+
+if ( dict->lookup(conf_key_multivar_logic) )  fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+
+dict = conf.lookup_dictionary(conf_key_obs);
+
+if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+
+
+
+return;
 
 }
 

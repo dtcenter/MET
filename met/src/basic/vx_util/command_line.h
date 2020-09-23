@@ -165,7 +165,7 @@ class CommandLine {
          //  set stuff
          //
 
-      void set(int argc, char ** argv);   //  includes argv[0]
+      void set(int argc, char ** argv);                  //  includes argv[0]
 
       void set(const StringArray &);                     //  includes argv[0]
       void set(const StringArray &, UsageFunction);      //  includes argv[0]

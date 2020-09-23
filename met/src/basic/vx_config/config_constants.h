@@ -592,6 +592,12 @@ static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_eclv_points[]       = "eclv_points";
 
 //
+//  for use with mode multivar
+//
+
+static const char conf_key_multivar_logic   [] = "multivar_logic";
+
+//
 // Climatology parameter key names
 //
 

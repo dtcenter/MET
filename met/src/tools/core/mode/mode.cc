@@ -56,6 +56,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+
 using namespace std;
 
 #include <cstdio>
@@ -90,39 +91,27 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 
 
+extern int     mode_frontend(const StringArray &);
+extern int multivar_frontend(const StringArray &);
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void usage();   //  needs external linkage
+
+
+///////////////////////////////////////////////////////////////////////
+
+
 static const char program_name [] = "mode";
 
 static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
 
+static const char default_config_filename [] = "MET_BASE/config/MODEConfig_default";
 
-///////////////////////////////////////////////////////////////////////
-
-
-// static const char * default_out_dir = "MET_BASE/out/mode";
-static const char * default_out_dir = ".";
-
-static int compress_level = -1;
-
-static int field_index = -1;
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-static void do_quilt    ();
-static void do_straight ();
-
-static void process_command_line(int, char **);
-
-static void usage();
-
-static void set_config_merge_file (const StringArray &);
-static void set_outdir            (const StringArray &);
-static void set_logfile           (const StringArray &);
-static void set_verbosity         (const StringArray &);
-static void set_compress          (const StringArray &);
-
-static void set_field_index       (const StringArray &);   //  undocumented
+static void singlevar_usage();
+static void multivar_usage();
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -132,52 +121,57 @@ int main(int argc, char * argv [])
 
 {
 
-   //
-   // Set handler to be called for memory allocation error
-   //
+if ( argc == 1 )  usage();
 
-set_new_handler(oom);
-
-   //
-   // Process the command line arguments
-   //
-
-process_command_line(argc, argv);
-
-   //
-   // Process the forecast and observation files
-   //
-
-ModeConfInfo & conf = mode_exec.engine.conf_info;
-
-if ( field_index >= 0 )  conf.set_field_index(field_index);
-
-mode_exec.setup_fcst_obs_data();
-
-if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
+int j;
+int status;
+ModeConfInfo config;
+StringArray Argv;
+string s;
+bool has_field_index = false;
+const char * const user_config_filename = argv[3];
 
 
-if ( conf.quilt )  {
 
-   do_quilt();
+file_id = 0;   //  I hate having to do this
+
+
+for (j=0; j<argc; ++j)  {
+
+   if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
+
+   s = argv[j];
+
+   Argv.add(s);
+
+}
+
+
+
+config.read_config  (default_config_filename, user_config_filename);
+
+
+// cout << "\n\n   mode: is_multivar = " << config.is_multivar() << "\n\n" << flush;
+// 
+// config.conf.dump(cout);
+
+
+if ( config.is_multivar() && !has_field_index )  {
+
+   status = multivar_frontend(Argv);
 
 } else {
 
-   do_straight();
+   status = mode_frontend(Argv);
 
 }
 
-mode_exec.clear();
 
    //
    //  done
    //
 
-#ifdef  WITH_PYTHON
-   GP.finalize();
-#endif
-
-return ( 0 );
+return ( status );
 
 }
 
@@ -185,42 +179,29 @@ return ( 0 );
 ///////////////////////////////////////////////////////////////////////
 
 
-void do_straight()
+void usage()
 
 {
 
-const ModeConfInfo & conf = mode_exec.engine.conf_info;
 
-const int NCT = conf.n_conv_threshs();
-const int NCR = conf.n_conv_radii();
-
-if ( NCT != NCR )  {
-
-   mlog << Error
-        << "\n\n  "
-        << program_name
-        << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
-
-   exit ( 1 );
-
-}
-
-int index;
-
-for (index=0; index<NCT; ++index)  {
-
-   mode_exec.do_conv_thresh(index, index);
-
-   mode_exec.do_match_merge();
-
-   mode_exec.process_output();
-
-}
+cout << "\n*** Model Evaluation Tools (MET" << met_version << ") ***\n\n";
 
 
-   //
-   //  done
-   //
+cout << "if singlevar mode:\n"
+        "==================\n";
+
+
+singlevar_usage();
+
+
+cout << "if multivar mode:\n"
+     << "=================\n";
+
+
+multivar_usage();
+
+
+exit ( 1 );
 
 return;
 
@@ -230,30 +211,51 @@ return;
 ///////////////////////////////////////////////////////////////////////
 
 
-void do_quilt()
+void singlevar_usage()
 
 {
 
-int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
+cout << "\n\n"
+     << "Usage: " << program_name << "\n"
+     << "\tfcst_file\n"
+     << "\tobs_file\n"
+     << "\tconfig_file\n"
+     << "\t[-config_merge merge_config_file]\n"
+     << "\t[-outdir path]\n"
+     << "\t[-log file]\n"
+     << "\t[-v level]\n"
+     << "\t[-compress level]\n\n"
 
-for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
+     << "\twhere\n"
 
-   for (t_index=0; t_index<(mode_exec.n_conv_threshs()); ++t_index)  {
+     << "\t\t\"fcst_file\" is a gridded forecast file "
+     << "containing the field to be verified (required).\n"
 
-      mode_exec.do_conv_thresh(r_index, t_index);
+     << "\t\t\"obs_file\" is a gridded observation file "
+     << "containing the verifying field (required).\n"
 
-      mode_exec.do_match_merge();
+     << "\t\t\"config_file\" is a MODEConfig file "
+     << "containing the desired configuration settings (required).\n"
 
-      mode_exec.process_output();
+     << "\t\t\"-config_merge merge_config_file\" overrides the default "
+     << "fuzzy engine settings for merging within the fcst/obs fields "
+     << "(optional).\n"
 
-   }
+     << "\t\t\"-outdir path\" overrides the default output directory ("
+     << mode_exec.out_dir << ") (optional).\n"
 
-}
+     << "\t\t\"-log file\" outputs log messages to the specified "
+     << "file (optional).\n"
 
-   //
-   //  done
-   //
+     << "\t\t\"-v level\" overrides the default level of logging ("
+     << mlog.verbosity_level() << ") (optional).\n"
+
+     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+     << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n" 
+
+     << flush;
+
 
 return;
 
@@ -263,158 +265,25 @@ return;
 ///////////////////////////////////////////////////////////////////////
 
 
-void process_command_line(int argc, char **argv)
+void multivar_usage()
 
 {
 
-   CommandLine cline;
-   ConcatString s;
+cout << "\n\n"
+     << "\tUsage:  "
+     << program_name
+     << " fcst obs config "
+     << "[ mode_options ]\n\n"
 
+     << "\twhere\n"
 
-   // Set the default output directory
-   mode_exec.out_dir = replace_path(default_out_dir);
+     << "\t\t\"fcst\" is the name of a file containing the forecaset files to be used (required)\n"
+     << "\t\t\"obs\"  is the name of a file containing the observation files to be used (required)\n"
+     << "\t\t\"config\" is a MODEConfig file "
+     << "containing the desired configuration settings (required).\n"
 
-   // Check for zero arguments
-   if(argc == 1) usage();
+     << flush;
 
-   // Parse the command line into tokens
-   cline.set(argc, argv);
-
-   // Set the usage function
-   cline.set_usage(usage);
-
-   // Add the options function calls
-   cline.add(set_config_merge_file, "-config_merge", 1);
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
-
-      //
-      //  add for mode mulltivar ... undocumented
-      //
-
-   cline.add(set_field_index, "-field_index", 1);
-
-   // Parse the command line
-   cline.parse();
-
-   // Check for error. There should be three arguments left:
-   // forecast, observation, and config filenames
-   if(cline.n() != 3) usage();
-
-   // Store the input forecast and observation file names
-   mode_exec.fcst_file         = cline[0];
-   mode_exec.obs_file          = cline[1];
-   mode_exec.match_config_file = cline[2];
-
-   mode_exec.init();
-
-   return;
-
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void usage() {
-
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
-
-        << "Usage: " << program_name << "\n"
-        << "\tfcst_file\n"
-        << "\tobs_file\n"
-        << "\tconfig_file\n"
-        << "\t[-config_merge merge_config_file]\n"
-        << "\t[-outdir path]\n"
-        << "\t[-log file]\n"
-        << "\t[-v level]\n"
-        << "\t[-compress level]\n\n"
-
-        << "\twhere\t\"fcst_file\" is a gridded forecast file "
-        << "containing the field to be verified (required).\n"
-
-        << "\t\t\"obs_file\" is a gridded observation file "
-        << "containing the verifying field (required).\n"
-
-        << "\t\t\"config_file\" is a MODEConfig file "
-        << "containing the desired configuration settings (required).\n"
-
-        << "\t\t\"-config_merge merge_config_file\" overrides the default "
-        << "fuzzy engine settings for merging within the fcst/obs fields "
-        << "(optional).\n"
-
-        << "\t\t\"-outdir path\" overrides the default output directory ("
-        << mode_exec.out_dir << ") (optional).\n"
-
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
-
-        << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n"
-
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n" << flush;
-
-   exit (1);
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void set_config_merge_file(const StringArray & a)
-{
-   mode_exec.merge_config_file = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_outdir(const StringArray & a)
-{
-   mode_exec.out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-  mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_compress(const StringArray & a) {
-  compress_level = atoi(a[0].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_field_index(const StringArray & a)
-
-{
-
-field_index = atoi(a[0].c_str());
-
-if ( field_index < 0 )  {
-
-   mlog << Error
-        << program_name << ": bad index value ... "
-        << field_index << "\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 
@@ -422,7 +291,8 @@ return;
 
 
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
 
 
 

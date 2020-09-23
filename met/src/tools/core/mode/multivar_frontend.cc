@@ -3,8 +3,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const char program [] = "(#1 || #2) && (!#3)";
-static const char program [] = "#1 && #2 && #3";
+// static const char f_multivar_program [] = "#1 && #2 && #3";
+// static const char o_multivar_program [] = "#1 && #2 && #3";
 
 static const char fcst_super_nc_filename [] = "f_super.nc";
 static const char  obs_super_nc_filename [] = "o_super.nc";
@@ -60,7 +60,9 @@ using namespace netCDF;
 
 static ConcatString program_name;
 
-static const char mode_path [] = "/d3/personal/randy/github/feature_1184_dryline/MET/met/src/tools/core/mode/mode";   //  hardwired for now
+// static const char mode_path [] = "/d3/personal/randy/github/feature_1184_dryline/MET/met/src/tools/core/mode/mode";   //  hardwired for now
+
+// static const char mode_path [] = "/d3/personal/randy/github/new/MET/met/src/tools/core/mode/mode";   //  hardwired for now
 
 static const char sep [] = "====================================================\n";
 
@@ -68,17 +70,19 @@ static const char tab [] = "   ";
 
 static const bool do_clusters = false;
 
-static const char * config_file = 0;
+static ModeConfInfo config;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+extern void usage();
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static void read_config(const string & filename);
 
 static void get_filename_list(const char * fof_name, StringArray &);
 
@@ -90,26 +94,60 @@ static void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filena
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int multivar_frontend(const StringArray & Argv)
 
 {
 
-cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
+// cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
 
-program_name = get_short_name(argv[0]);
+const int Argc = Argv.n();
 
-if ( argc < 4 )  usage();
+program_name = get_short_name(Argv[0].c_str());
+
+if ( Argc < 4 )  usage();
 
 int j, k;
 StringArray fcst_filenames;
 StringArray  obs_filenames;
-const char * const    fcst_fof = argv[1];
-const char * const     obs_fof = argv[2];
-config_file = argv[3];
+string config_file;
+const string    mode_path = Argv[0];
+const string    fcst_fof  = Argv[1];
+const string     obs_fof  = Argv[2];
 
 
-get_filename_list(fcst_fof, fcst_filenames);
-get_filename_list( obs_fof,  obs_filenames);
+config_file = Argv[3];
+
+read_config(config_file);
+
+if ( config.fcst_multivar_logic.empty() )  {
+
+   mlog << Error
+        << program_name << ": fcst multivar logic not specified!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+if ( config.obs_multivar_logic.empty() )  {
+
+   mlog << Error
+        << program_name << ": obs multivar logic not specified!\n\n";
+
+   exit ( 1 );
+
+}
+
+  //
+  //  make sure the multivar logic programs are in the config file
+  //
+
+// cout << "fcst_multivar_logic = \"" << config.fcst_multivar_logic << "\"\n";
+// cout << " obs_multivar_logic = \"" << config.obs_multivar_logic  << "\"\n";
+
+
+get_filename_list(fcst_fof.c_str(), fcst_filenames);
+get_filename_list( obs_fof.c_str(),  obs_filenames);
 
 
 if ( fcst_filenames.n() != obs_filenames.n() )  {
@@ -136,15 +174,17 @@ mlog << Debug(1) << '\n' << sep << '\n';
 
 for (j=0; j<n_files; ++j)  {
 
+   mlog << Debug(1) << "\n starting mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
+
    command << cs_erase
            << mode_path << ' '
            << fcst_filenames[j] << ' '
            <<  obs_filenames[j] << ' '
            << config_file;
 
-   for (k=4; k<argc; ++k)  {
+   for (k=4; k<Argc; ++k)  {
 
-      command << ' ' << argv[k];
+      command << ' ' << Argv[k];
 
    }
 
@@ -154,11 +194,11 @@ for (j=0; j<n_files; ++j)  {
 
    command << " -field_index " << j;
 
-   // cout << command.text() << '\n' << flush;
+   // cout << "\n\n  command = \"" << command.text() << "\"\n\n" << flush;
 
    run_command(command);
 
-   mlog << Debug(1) << "\n mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
+   mlog << Debug(1) << "\n finished mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
 
    a = get_filenames_from_dir(dir, "mode_", ".nc");
 
@@ -204,19 +244,23 @@ for (j=0; j<n_files; ++j)  {
    //  combine the objects into super-objects
    //
 
-BoolCalc calc;
+// cout << "f = \"" << conf.
+
+BoolCalc f_calc, o_calc ;
 const int nx = f_plane[0].nx();
 const int ny = f_plane[0].ny();
 
-calc.set(program);
+f_calc.set(config.fcst_multivar_logic.text());
+o_calc.set(config.obs_multivar_logic.text());
 
-calc.dump_program(cout);
+// f_calc.dump_program(cout);
+// o_calc.dump_program(cout);
 
 f_result.set_size(nx, ny);
 o_result.set_size(nx, ny);
 
-combine_boolplanes(f_plane, n_files, calc, f_result);
-combine_boolplanes(o_plane, n_files, calc, o_result);
+combine_boolplanes(f_plane, n_files, f_calc, f_result);
+combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
 boolplane_to_pgm(f_result, image);
 
@@ -260,27 +304,6 @@ replace_data(o_result,  obs_super_nc_filename);
    //
 
 return ( 0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void usage()
-
-{
-
-mlog << Error
-     << "\n\n   usage:  " 
-     << program_name
-     << " fcst obs config "
-     << "[ mode_options ]\n\n";
-
-
-exit ( 1 );
-
-return;
 
 }
 
@@ -356,21 +379,7 @@ void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filename)
 
 {
 
-// ModeConfInfo conf(config_file);
-MetConfig conf;
-ConcatString path;
-
-   //
-   //  probably could move the conf stuff up into main()
-   //
-
-// path << cs_erase << getenv("MET_BASE") << '/' << mode_default_config;
-
-path << cs_erase << getenv("MET_BASE") << '/' << config_constants;
-
-conf.read(path.c_str());
-
-conf.read(config_file);
+// ConcatString path;
 
 NcFile nc((string) fcst_super_nc_filename, NcFile::write, NcFile::classic);
 
@@ -380,7 +389,7 @@ NcFile nc((string) fcst_super_nc_filename, NcFile::write, NcFile::classic);
 
 const DictionaryEntry * e = 0;
 
-e = conf.lookup("fcst", DictionaryType);
+e = config.conf.lookup("fcst", DictionaryType);
 
 Dictionary * fcst_dict = e->dict();
 
@@ -439,6 +448,26 @@ data_var.putVar(buf);
    //
 
 nc.close();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void read_config(const string & filename)
+
+{
+
+ConcatString path;
+
+
+path << cs_erase << getenv("MET_BASE") << '/' << mode_default_config;
+
+config.read_config(path.c_str(), filename.c_str());
+
 
 return;
 

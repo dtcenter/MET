@@ -85,6 +85,15 @@ class ModeConfInfo {
 
       int field_index() const;
 
+      bool is_multivar();
+
+
+      ConcatString  fcst_multivar_logic;
+      ConcatString   obs_multivar_logic;
+
+      void get_multivar_programs();
+
+
    /////////////////////////////////////////////////////////////////////
 
 
