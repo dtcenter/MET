@@ -94,7 +94,7 @@ _____________________
 
 **Least-Squares Fit**
 
-To perform least squares interpolation of a gridded field at a location P, MET uses an **WxW** subgrid centered (as closely as possible) at P. Figure 7.1 shows the case where N = 5.
+To perform least squares interpolation of a gridded field at a location P, MET uses an **WxW** subgrid centered (as closely as possible) at P. :numref:`point_stat_fig1` shows the case where N = 5.
 
 If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in :numref:`point_stat_fig1`, P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form :math:`z=\alpha (x) + \beta (y) + \gamma` over the subgrid. The values of :math:`\alpha, \beta, \gamma` are calculated from the data values at the vertices. Finally, the coordinates (**x,y**) of P are substituted into this expression to give z, our least squares interpolated data value at P.
 
@@ -270,7 +270,7 @@ The usage statement for the Point-Stat tool is shown below:
          [-log file]
          [-v level]
 
-point_stat has three required arguments and can take many optional ones.
+**point_stat** has three required arguments and can take many optional ones.
 
 Required arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -296,7 +296,7 @@ Optional arguments for point_stat
 
 9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the point_stat calling sequence is shown below:
+An example of the **point_stat** calling sequence is shown below:
 
 .. code-block:: none
 

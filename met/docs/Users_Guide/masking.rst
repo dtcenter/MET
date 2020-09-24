@@ -36,7 +36,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
          [-v level]
          [-compress level]
 
-gen_vx_mask has three required arguments and can take optional ones.
+**gen_vx_mask** has three required arguments and can take optional ones.
 
 Required arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
