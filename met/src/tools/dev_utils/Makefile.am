@@ -3,6 +3,7 @@
 ## @end 1
 
 MAINTAINERCLEANFILES	= Makefile.in
+AUTOMAKE_OPTIONS	= subdir-objects
 
 # Include the project definitions
 
