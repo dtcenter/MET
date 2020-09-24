@@ -66,10 +66,6 @@ if ENABLE_MODE_TIME_DOMAIN
   SUBDIRS += mode_time_domain
 endif
 
-#if ENABLE_MODE_MULTIVAR
-#  SUBDIRS += mode_multivar
-#endif
-
 if ENABLE_GSI_TOOLS
   SUBDIRS += gsi_tools
 endif
