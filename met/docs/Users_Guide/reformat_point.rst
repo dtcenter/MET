@@ -949,7 +949,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 2. Longitude
 
 
-3. The variable specified in the -field string regridded to the grid defined in the to_grid argument.
+3. The variable specified in the -field string regridded to the grid defined in the **to_grid** argument.
 
 
 4. The count field which represents the number of point observations that were included calculating the value of the variable at that grid cell.
@@ -958,7 +958,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 5. The mask field which is a binary field representing the presence or lack thereof of point observations at that grid cell. A value of “1” indicates that there was at least one point observation within the bounds of that grid cell and a value of “0” indicates the lack of point observations at that grid cell.
 
 
-6. The probability field which is the probability of the event defined by the -prob_cat_thresh command line option. The output variable name includes the threshold used to define the probability. Ranges from 0 to 1.
+6. The probability field which is the probability of the event defined by the **-prob_cat_thresh** command line option. The output variable name includes the threshold used to define the probability. Ranges from 0 to 1.
 
 
 7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either “0” or “1” with “0” meaning the probability value does not exist and a value of “1” meaning that the probability value does exist. 
