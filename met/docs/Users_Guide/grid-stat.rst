@@ -189,14 +189,14 @@ A second example of the grid_stat calling sequence is listed below:
   sample_obs.nc
   GridStatConfig
 
-In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of **pcp_combine**, using the observations in the sample_obs.nc NetCDF output of **pcp_combine**, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
+In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
 
 .. _grid_stat-configuration-file:
 
 grid_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed **share/met/config** directory. Other versions of the configuration file are included in **scripts/config**. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
+The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
 Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -851,4 +851,4 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
     - List the gradient of the forecast and observation fields computed in the grid-x and grid-y directions where DX and DY indicate the gradient direction and size.
 
 
-The STAT output files described for **grid_stat** may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by **grid_stat**, please see :numref:`stat-analysis`. 
+The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`. 

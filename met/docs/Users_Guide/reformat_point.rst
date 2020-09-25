@@ -519,7 +519,7 @@ Optional arguments for ascii2nc
 
 10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-An example of the **ascii2nc** calling sequence is shown below:
+An example of the ascii2nc calling sequence is shown below:
 
 .. code-block:: none
 		
@@ -876,13 +876,13 @@ Required arguments for point2grid
 
 1. The **input_filename** argument indicates the name of the input NetCDF file to be processed. Currently, only NetCDF files produced from the ascii2nc, madis2nc, pb2nc, and lidar2nc are supported. And AOD dataset from GOES16/17 are supported, too. Support for additional file types will be added in future releases.
 
-2. The to_grid argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
+2. The **to_grid** argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
 
 
-3. The output_filename argument is the name of the output NetCDF file to be written.
+3. The **output_filename** argument is the name of the output NetCDF file to be written.
 
 
-4. The -field string argument is a string that defines the data to be regridded. It may be used multiple times. If -adp option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, “AOD_Smoke” or “AOD_Dust”: getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
+4. The **-field string** argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, “AOD_Smoke” or “AOD_Dust”: getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
 
 
 Optional arguments for point2grid
