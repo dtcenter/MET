@@ -38,10 +38,6 @@ extern StringArray get_filenames_from_dir(const char * directory_path,
 extern bool        check_prefix_suffix(const char * path,
                       const char * prefix, const char * suffix);
 
-extern StringArray parse_file_list(const StringArray&);
-
-extern StringArray parse_ascii_file_list(const char * path);
-
 
 ////////////////////////////////////////////////////////////////////////
 
