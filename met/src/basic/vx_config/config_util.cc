@@ -1509,25 +1509,28 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    // Interpret a single value as the number of bins
    else {
 
+      // Store the number of bins
+      int n_bins = nint(bins[0]);
+
       // Must be greater than 0
-      if(bins[0] <= 0) {
+      if(n_bins <= 0) {
          mlog << Error << "\nparse_conf_climo_cdf() -> "
-              << "The \"" << conf_key_cdf_bins << "\" entry (" << bins[0]
+              << "The \"" << conf_key_cdf_bins << "\" entry (" << n_bins 
               << ") must be greater than zero.\n\n";
          exit(1);
       }
 
       // Even number of bins cannot be centered
-      if(nint(bins[0])%2 == 0 && center) {
+      if(n_bins%2 == 0 && center) {
          mlog << Warning << "\nparse_conf_climo_cdf() -> "
               << "Resetting \"" << conf_key_center_bins
               << "\" to false since the \"" << conf_key_cdf_bins
-              << "\" entry (" << bins[0] << ") is even.\n\n";
+              << "\" entry (" << n_bins << ") is even.\n\n";
          center = false;
       }
 
       // For a single bin, set center to false
-      if(is_eq(bins[0], 1.0)) center = false;
+      if(n_bins == 1) center = false;
 
       // Add the first threshold for 0.0
       info.cdf_ta.add(0.0, thresh_ge);
@@ -1544,11 +1547,18 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
       // Add the last threshold for 1.0
       info.cdf_ta.add(1.0, thresh_ge);
 
-      mlog << Debug(4) << "parse_conf_climo_cdf() -> "
-           << "For \"" << conf_key_cdf_bins << "\" (" << bins[0] << ") and \""
-           << conf_key_center_bins << "\" (" << bool_to_string(center)
-           << "), defined climatology CDF thresholds: "
-           << write_css(info.cdf_ta) << "\n";
+      if(n_bins == 1) {
+         mlog << Debug(4) << "parse_conf_climo_cdf() -> "
+              << "Since \"" << conf_key_cdf_bins << "\" = 1, "
+              << "no climatology CDF bins will be applied.\n";
+      }
+      else {
+         mlog << Debug(4) << "parse_conf_climo_cdf() -> "
+              << "For \"" << conf_key_cdf_bins << "\" (" << n_bins << ") and \""
+              << conf_key_center_bins << "\" (" << bool_to_string(center)
+              << "), defined climatology CDF thresholds: "
+              << write_css(info.cdf_ta) << "\n";
+      }
    }
 
    // Sanity check the end points

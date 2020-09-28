@@ -317,7 +317,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
-   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))) return;
+   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))) return;
 
    //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
