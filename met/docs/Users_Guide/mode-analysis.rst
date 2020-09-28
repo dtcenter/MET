@@ -50,7 +50,7 @@ Required arguments for mode_analysis:
 
 1. The **-lookin path** specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
 
-2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified. 
+2. The MODE-Analysis tool can perform two basic types of jobs **-summary** or **-bycase**. Exactly one of these job types must be specified. 
 
 Specifying **-summary** will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the **-column** option. Column names are not case sensitive. The column names are the same as described in :numref:`MODE-output`. More information about this option is provided in subsequent sections.
 
