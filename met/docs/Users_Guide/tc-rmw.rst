@@ -14,7 +14,7 @@ _____________________
 tc_rmw usage
 ~~~~~~~~~~~~
 
-The following sections describe the usage statement, required arguments, and optional arguments for **tc_rmw**.
+The following sections describe the usage statement, required arguments, and optional arguments for tc_rmw.
 
 .. code-block:: none
 
@@ -26,7 +26,7 @@ The following sections describe the usage statement, required arguments, and opt
          [-log file]
          [-v level]
 
-**tc_rmw** has required arguments and can accept several optional arguments.
+tc_rmw has required arguments and can accept several optional arguments.
 
 Required arguments for tc_rmw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

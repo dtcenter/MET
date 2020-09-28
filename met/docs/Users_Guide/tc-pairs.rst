@@ -13,12 +13,12 @@ The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF f
 Practical information
 _____________________
 
-This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run **tc_pairs** on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
+This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run tc_pairs on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
 
 tc_pairs usage
 ~~~~~~~~~~~~~~
 
-The usage statement for **tc_pairs** is shown below:
+The usage statement for tc_pairs is shown below:
 
 .. code-block:: none
 
@@ -30,7 +30,7 @@ The usage statement for **tc_pairs** is shown below:
          [-log file]
          [-v level]
 
-**tc_pairs** has required arguments and can accept several optional arguments.
+tc_pairs has required arguments and can accept several optional arguments.
 
 Required arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +54,7 @@ Optional arguments for tc_pairs
 
 This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases. At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names.
 
-An example of the **tc_pairs** calling sequence is shown below:
+An example of the tc_pairs calling sequence is shown below:
 
 .. code-block:: none
 
@@ -211,7 +211,7 @@ ____________________
 
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 
-The **dland_file** string specifies the path of the NetCDF format file (default file: dland_global_tenth_degree.nc) to be used for the distance to land check in the **tc_pairs code**. This file is generated using tc_dland (default file provided in installed **share/met/tc_data** directory).
+The **dland_file** string specifies the path of the NetCDF format file (default file: dland_global_tenth_degree.nc) to be used for the distance to land check in the tc_pairs code. This file is generated using tc_dland (default file provided in installed *share/met/tc_data* directory).
 
 ____________________
 

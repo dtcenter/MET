@@ -70,12 +70,12 @@ Users may specify several job command options to configure the behavior of this 
 Practical information
 _____________________
 
-The following sections describe the usage statement, required arguments, and optional arguments for **tc_stat**.
+The following sections describe the usage statement, required arguments, and optional arguments for tc_stat.
 
 tc_stat usage
 ~~~~~~~~~~~~~
 
-The usage statement for **tc_stat** is shown below:
+The usage statement for tc_stat is shown below:
 
 .. code-block:: none
 
@@ -93,7 +93,7 @@ The usage statement for the TC-Stat tool includes the "job" term, which refers t
 Required arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin source** argument indicates the location of the input TCST files generated from **tc_pairs**. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
+1. The **-lookin source** argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in :numref:`tc_stat-configuration-file`.
 
@@ -108,13 +108,13 @@ Optional arguments for tc_stat
 
 6. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-An example of the **tc_stat** calling sequence is shown below:
+An example of the tc_stat calling sequence is shown below:
 
 .. code-block:: none
 
   tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for the job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for the job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
 
 .. _tc_stat-configuration-file:
 
@@ -361,7 +361,7 @@ _________________________
 tc_stat output
 ~~~~~~~~~~~~~~
 
-The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each **tc_stat** job command is listed below.
+The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each tc_stat job command is listed below.
 
 **Job: Filter**
 
