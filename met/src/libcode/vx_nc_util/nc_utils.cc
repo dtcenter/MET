@@ -445,8 +445,8 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVar *var, const ConcatString &att_name,
-                ConcatString &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
+                      ConcatString &att_val, bool exit_on_error) {
    bool status = false;
    NcVarAtt *att = (NcVarAtt *) 0;
 
@@ -469,10 +469,10 @@ bool get_nc_att(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVar *var, const ConcatString &att_name,
-                int &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
+                      int &att_val, bool exit_on_error) {
    bool status = false;
-   static const char *method_name = "get_nc_att(NcVar,int) -> ";
+   static const char *method_name = "get_nc_att_value(NcVar,int) -> ";
 
    // Initialize
    att_val = bad_data_int;
@@ -498,10 +498,10 @@ bool get_nc_att(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVar *var, const ConcatString &att_name,
-                float &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
+                      float &att_val, bool exit_on_error) {
    bool status = true;
-   static const char *method_name = "get_nc_att(NcVar,float) -> ";
+   static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
 
    // Initialize
    att_val = bad_data_float;
@@ -527,7 +527,7 @@ bool get_nc_att(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVarAtt *att, ConcatString &att_val) {
+bool get_nc_att_value(const NcVarAtt *att, ConcatString &att_val) {
    bool status = false;
 
    // Initialize
@@ -546,10 +546,10 @@ bool get_nc_att(const NcVarAtt *att, ConcatString &att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVarAtt *att, int &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVarAtt *att, int &att_val, bool exit_on_error) {
    bool status = true;
    string attr_value;
-   static const char *method_name = "get_nc_att(NcVarAtt,int) -> ";
+   static const char *method_name = "get_nc_att_value(NcVarAtt,int) -> ";
 
    // Initialize
    att_val = bad_data_int;
@@ -570,7 +570,7 @@ bool get_nc_att(const NcVarAtt *att, int &att_val, bool exit_on_error) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVarAtt *att, float &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVarAtt *att, float &att_val, bool exit_on_error) {
    bool status = true;
 
    // Initialize
@@ -581,7 +581,7 @@ bool get_nc_att(const NcVarAtt *att, float &att_val, bool exit_on_error) {
    //
    status = get_att_value((NcAtt *)att, att_val);
    if (!status) {
-      mlog << Error << "\nget_nc_att(float) -> "
+      mlog << Error << "\nget_nc_att_value(float) -> "
            << get_nc_att_log(att);
       if (exit_on_error) exit(1);
    }
@@ -591,7 +591,7 @@ bool get_nc_att(const NcVarAtt *att, float &att_val, bool exit_on_error) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_att(const NcVarAtt *att, double &att_val, bool exit_on_error) {
+bool get_nc_att_value(const NcVarAtt *att, double &att_val, bool exit_on_error) {
    bool status = true;
 
    // Initialize
@@ -602,7 +602,7 @@ bool get_nc_att(const NcVarAtt *att, double &att_val, bool exit_on_error) {
    //
    status = get_att_value((NcAtt *)att, att_val);
    if (!status) {
-      mlog << Error << "\nget_nc_att(double) -> "
+      mlog << Error << "\nget_nc_att_value(double) -> "
            << get_nc_att_log(att);
       if (exit_on_error) exit(1);
    }
@@ -1005,14 +1005,14 @@ bool get_var_att_float(const NcVar *var, const ConcatString &att_name,
 
 bool get_var_units(const NcVar *var, ConcatString &att_val) {
 
-   return(get_nc_att(var, units_att_name, att_val));
+   return(get_nc_att_value(var, units_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_var_level(const NcVar *var, ConcatString &att_val) {
 
-   return(get_nc_att(var, level_att_name, att_val));
+   return(get_nc_att_value(var, level_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2690,7 +2690,7 @@ NcVar get_var(NcFile *nc, const char *var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar get_nc_var(NcFile *nc, const char *var_name, bool as_error, bool show_warning) {
+NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
    patch_nc_name(&new_var_name);
 
@@ -2702,12 +2702,10 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool as_error, bool show_warn
       ConcatString log_message;
       log_message << "\nget_nc_var(NcFile) --> The variable \""
                   << new_var_name << "\" does not exist!\n\n";
-      if (as_error) {
+      if (log_as_error)
          mlog << Error << log_message;
-      }
-      else if (show_warning) {
+      else
          mlog << Warning << log_message;
-      }
    }
 
    return(var);
@@ -3532,6 +3530,177 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool is_nc_name_lat(const ConcatString name) {
+   bool is_latitude = (name == "lat" || name == "LAT"
+           || name == "Lat" || name == "Latitude"
+           || name == "latitude" || name == "LATITUDE");
+   return is_latitude;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_name_lon(const ConcatString name) {
+   bool is_longitude = (name == "lon" || name == "LON"
+           || name == "Lon" || name == "Longitude"
+           || name == "longitude" || name == "LONGITUDE");
+   return is_longitude;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_name_time(const ConcatString name) {
+   bool is_time = (name == "t" || name == "time" || name == "Time" || name == "TIME"
+           || name == "datetime" || name == "Datetime" || name == "DATETIME");
+   return is_time;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_attr_lat(const ConcatString name) {
+   bool is_latitude = (is_nc_name_lat(name) || name == "x" || name == "X");
+   return is_latitude;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_attr_lon(const ConcatString name) {
+   bool is_longitude = (is_nc_name_lon(name) || name == "y" || name == "Y");
+   return is_longitude;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_attr_time(const ConcatString name) {
+   bool is_time = (is_nc_name_time(name) || name == "T");
+   return is_time;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcVar get_nc_var_lat(const NcFile *nc) {
+   NcVar var;
+   bool found = false;
+   multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
+   static const char *method_name = "get_nc_var_lat() ";
+
+   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+        itVar != mapVar.end(); ++itVar) {
+      ConcatString name = (*itVar).first;
+      //if (is_nc_name_lat(name)) found = true;
+      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+         if (is_nc_name_lat(name)) found = true;
+      }
+      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+         if (is_nc_unit_latitude(name.c_str())) {
+            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+               if (is_nc_attr_lat(name)) found = true;
+            }
+            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+               if (is_nc_attr_lat(name)) found = true;
+            }
+         }
+      }
+      if (found) {
+         var = (*itVar).second;
+         break;
+      }
+   }
+
+   if (found) {
+      mlog << Debug(6) << method_name << "found the latitude variable \""
+           << GET_NC_NAME(var) << "\"\n";
+   }
+   else {
+      mlog << Debug(6) << method_name << "fail to find the latitude variable\n";
+   }
+   return var;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcVar get_nc_var_lon(const NcFile *nc) {
+   NcVar var;
+   bool found = false;
+   multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
+   static const char *method_name = "get_nc_var_lon() ";
+
+   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+        itVar != mapVar.end(); ++itVar) {
+      ConcatString name = (*itVar).first;
+      //if (is_nc_name_lon(name)) found = true;
+      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+         if (is_nc_name_lon(name)) found = true;
+      }
+      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+         if (is_nc_unit_longitude(name.c_str())) {
+            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+               if (is_nc_attr_lon(name)) found = true;
+            }
+            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+               if (is_nc_attr_lon(name)) found = true;
+            }
+         }
+      }
+      if (found) {
+         var = (*itVar).second;
+         break;
+      }
+   }
+
+   if (found) {
+      mlog << Debug(6) << method_name << "found the longitude variable \""
+           << GET_NC_NAME(var) << "\"\n";
+   }
+   else {
+      mlog << Debug(6) << method_name << "fail to find the longitude variable\n";
+   }
+   return var;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcVar get_nc_var_time(const NcFile *nc) {
+   NcVar var;
+   bool found = false;
+   multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
+   static const char *method_name = "get_nc_var_time()) ";
+
+   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+        itVar != mapVar.end(); ++itVar) {
+      ConcatString name = (*itVar).first;
+      //if (is_nc_name_time(name)) found = true;
+      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+         if (is_nc_name_time(name)) found = true;
+      }
+      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+         if (is_nc_unit_time(name.c_str())) {
+            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+               if (is_nc_attr_time(name)) found = true;
+            }
+            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+               if (is_nc_attr_time(name)) found = true;
+            }
+         }
+      }
+      if (found) {
+         var = (*itVar).second;
+         break;
+      }
+   }
+
+   if (found) {
+      mlog << Debug(6) << method_name << "found the time variable \""
+           << GET_NC_NAME(var) << "\"\n";
+   }
+   else {
+      mlog << Debug(6) << method_name << "fail to find the time variable\n";
+   }
+   return var;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 NcFile *open_ncfile(const char * nc_name, bool write) {
    NcFile *nc = (NcFile *)0;
 
@@ -3567,37 +3736,21 @@ int get_data_size(NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime get_reference_unixtime(ConcatString time_str) {
-   unixtime ut;
-   int offset, array_count;
-   int year, month, day, hour, minute, second;
+unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
+                                bool &no_leap_year) {
+   unixtime ref_ut = 0;
+   ConcatString time_unit_str;
+   static const char *method_name = "get_reference_unixtime()) -> ";
 
-   StringArray time_units = time_str.split(" -:ZT");
-   offset = 0;
-   array_count = time_units.n_elements();
-   for (int idx=0; idx<array_count; idx++) {
-     if (0 != atoi(time_units[idx].c_str())) break;
-      //if (0 == strcmp(time_units[idx],"seconds")) {
-      offset++;
+   if (get_nc_att_value(time_var, (string)"units", time_unit_str)) {
+      parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
+      no_leap_year = (86400 == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
    }
-   if ((array_count - offset) < 3) {
-      mlog << Error << "\nget_unixtime() -> "
-           << "trouble to parse time string \""
-           << time_str << "\"\n\n";
-      exit(1);
+   else {
+      sec_per_unit = 1;
    }
 
-   year  = atoi(time_units[offset++].c_str());
-   month = atoi(time_units[offset++].c_str());
-   day   = atoi(time_units[offset++].c_str());
-   hour   = 0;
-   minute = 0;
-   second = 0;
-   if (offset < array_count) hour   = atoi(time_units[offset++].c_str());
-   if (offset < array_count) minute = atoi(time_units[offset++].c_str());
-   if (offset < array_count) second = nint(atof(time_units[offset++].c_str()));
-   ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-   return ut;
+   return ref_ut;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3627,11 +3780,73 @@ bool is_nc_unit_longitude(const char *units) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_unit_time(const char *units) {
-   //bool time_unit = (strcmp(units, "T") == 0 ||
-   //     strcmp(units, "time") == 0 ||
-   //     strcmp(units, "Time") == 0) ||
-   //     check_reg_exp(nc_time_unit_exp, units);
    return check_reg_exp(nc_time_unit_exp, units);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void parse_cf_time_string(const char *str, unixtime &ref_ut,
+                          int &sec_per_unit) {
+
+   // Initialize
+   ref_ut = sec_per_unit = 0;
+
+   // Check for expected time string format:
+   //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
+   if(!check_reg_exp(nc_time_unit_exp, str)) {
+      mlog << Warning << "\nparse_cf_time_string() -> "
+           << "unexpected NetCDF CF convention time unit \""
+           << str << "\"\n\n";
+      return;
+   }
+   else {
+      // Tokenize the input string
+      // Parse using spaces or 'T' for timestrings such as:
+      //   minutes since 2016-01-28T12:00:00Z
+      //   seconds since 1977-08-07 12:00:00Z
+      StringArray tok;
+      tok.parse_delim(str, " T");
+      tok.set_ignore_case(true);
+
+      // Determine the time step
+           if(tok.has("second")  ||
+              tok.has("seconds") ||
+              tok.has("s"))      sec_per_unit = 1;
+      else if(tok.has("minute")  ||
+              tok.has("minutes") ||
+              tok.has("min"))    sec_per_unit = 60;
+      else if(tok.has("hour")    ||
+              tok.has("hours")   ||
+              tok.has("hr")      ||
+              tok.has("h"))      sec_per_unit = 3600;
+      else if(tok.has("day")     ||
+              tok.has("days")    ||
+              tok.has("d"))      sec_per_unit = 86400;
+      else {
+         mlog << Warning << "\nparse_cf_time_string() -> "
+              << "Unsupported time step in the CF convention time unit \""
+              << str << "\"\n\n";
+         return;
+      }
+
+      // Parse the reference time
+      StringArray ymd, hms;
+      ymd.parse_delim(tok[2], "-");
+      if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
+      else                     hms.parse_delim("00:00:00", ":");
+      ref_ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
+                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
+                              hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
+                              hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
+   }
+
+   mlog << Debug(4) << "parse_cf_time_string() -> "
+        << "parsed NetCDF CF convention time unit string \"" << str
+        << "\"\n\t\t as a reference time of " << unix_to_yyyymmdd_hhmmss(ref_ut)
+        << " and " << sec_per_unit << " second(s) per time step.\n";
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

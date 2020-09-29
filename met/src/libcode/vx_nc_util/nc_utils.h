@@ -164,13 +164,13 @@ extern bool      get_att_no_leap_year(const NcVar *);
 extern NcVarAtt    *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = false);
 extern NcGroupAtt  *get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = false);
 
-extern bool get_nc_att(const NcVarAtt *, string &);
-extern bool get_nc_att(const NcVarAtt *, int          &, bool exit_on_error = true);
-extern bool get_nc_att(const NcVarAtt *, float        &, bool exit_on_error = true);
-extern bool get_nc_att(const NcVarAtt *, double       &, bool exit_on_error = true);
-extern bool get_nc_att(const NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
-extern bool get_nc_att(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
-extern bool get_nc_att(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
+extern bool get_nc_att_value(const NcVarAtt *, string &);
+extern bool get_nc_att_value(const NcVarAtt *, int          &, bool exit_on_error = true);
+extern bool get_nc_att_value(const NcVarAtt *, float        &, bool exit_on_error = true);
+extern bool get_nc_att_value(const NcVarAtt *, double       &, bool exit_on_error = true);
+extern bool get_nc_att_value(const NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
+extern bool get_nc_att_value(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
+extern bool get_nc_att_value(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 
 extern bool has_att(NcFile *, const ConcatString name, bool exit_on_error = false);
 
@@ -306,7 +306,7 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
 extern NcVar    get_var(NcFile *, const char * var_name);   // exit if not exists
-extern NcVar get_nc_var(NcFile *, const char * var_name, bool as_error=false, bool show_warning=true);   // continue even though not exists
+extern NcVar get_nc_var(NcFile *, const char * var_name, bool log_as_error=false);   // continue even though not exists
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(NcFile *, NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( NcVar *,  NcVar *, const ConcatString attr_name);
@@ -337,14 +337,22 @@ extern NcDim  get_nc_dim(const NcVar *, int dim_offset);
 extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 
+extern NcVar  get_nc_var_lat(const NcFile *nc);
+extern NcVar  get_nc_var_lon(const NcFile *nc);
+extern NcVar  get_nc_var_time(const NcFile *nc);
+
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
-extern unixtime get_reference_unixtime(ConcatString);
+extern unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
+                                       bool &no_leap_year);
 
 extern bool is_nc_unit_time(const char *units);
 extern bool is_nc_unit_longitude(const char *units);
 extern bool is_nc_unit_latitude(const char *units);
+
+extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
+                                 int &sec_per_unit);
 
 ////////////////////////////////////////////////////////////////////////
 
