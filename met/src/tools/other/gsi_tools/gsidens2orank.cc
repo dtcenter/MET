@@ -31,6 +31,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include "vx_data2d_factory.h"
 #include "vx_util.h"
 #include "vx_math.h"
 #include "config_constants.h"
