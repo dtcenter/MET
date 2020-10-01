@@ -145,24 +145,6 @@
     </output>
   </test>
   
-  <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
-    <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
-      G212 \
-      &OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc \
-      -field 'name="AOD";  level="(*,*)";' \
-      -method MAX -prob_cat_thresh ">=1.0" -method GAUSSIAN \
-      -v 1
-    </param>
-    <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc</grid_nc>
-    </output>
-  </test>
-  
   <test name="point2grid_GOES_16_ADP">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
