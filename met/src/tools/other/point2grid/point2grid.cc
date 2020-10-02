@@ -410,7 +410,7 @@ void process_data_file() {
       process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
    else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
-      setenv(nc_att_met_point_nccf, NULL, 1);
+      unsetenv(nc_att_met_point_nccf);
    }
    else {
       mlog << Error << "\n" << method_name
