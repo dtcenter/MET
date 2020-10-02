@@ -62,8 +62,6 @@ static const char * default_config_filename = "MET_BASE/config/Point2GridConfig_
 
 static const string lat_dim_name_list = "x";    // "lat,latitude";
 static const string lon_dim_name_list = "y";    // "lon,longitude";
-//static const string lat_var_name_list = "lat,latitude";
-//static const string lon_var_name_list = "lon,longitude";
 
 static const char * GOES_global_attr_names[] = {
       "naming_authority",
@@ -346,6 +344,15 @@ void process_data_file() {
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
 
+   // Open the input file
+   mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
+   nc_in = open_ncfile(InputFilename.c_str());
+   
+   int obs_type = get_obs_type(nc_in);
+   bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+
+   if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
+   
    // Read the input data file
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
@@ -380,7 +387,6 @@ void process_data_file() {
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
 
-   //GridTemplateFactory gtf;
    mlog << Debug(2) << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
@@ -388,12 +394,6 @@ void process_data_file() {
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
    
-   // Open the input file
-   mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
-   nc_in = open_ncfile(InputFilename.c_str());
-   
-   int obs_type = get_obs_type(nc_in);
-   bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
    if (goes_data) {
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid, to_grid);
@@ -408,8 +408,10 @@ void process_data_file() {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
    else if (TYPE_OBS == obs_type)
       process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
-   else if (TYPE_NCCF == obs_type)
+   else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
+      setenv(nc_att_met_point_nccf, NULL, 1);
+   }
    else {
       mlog << Error << "\n" << method_name
            << "Please check the input file. Only supports GOES, MET point obs. and CF complaint NetCDF with time/lat/lon variables.\n\n";
@@ -509,14 +511,17 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 int get_obs_type(NcFile *nc) {
-   int obs_type;
+   int obs_type = TYPE_UNKNOWN;
    ConcatString att_val;
+   ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
    
    if (get_global_att(nc, (string)"scene_id", att_val)) {
       obs_type = TYPE_GOES;
+      input_type = "GOES";
       if (0 < AdpFilename.length()) {
          obs_type = TYPE_GOES_ADP;
+         input_type = "GOES_ADP";
          if (!file_exists(AdpFilename.c_str())) {
             mlog << Error << method_name << "ADP input \"" << AdpFilename << "\" does not exist!\n";
             exit(1);
@@ -525,10 +530,14 @@ int get_obs_type(NcFile *nc) {
    }
    else if (has_lat_lon_vars(nc)) {
       obs_type = TYPE_NCCF;
+      input_type = "OBS_NCCF";
    }
-   else if (has_dim(nc, nc_dim_nhdr) && has_dim(nc, nc_dim_nobs))
+   else if (has_dim(nc, nc_dim_nhdr) && has_dim(nc, nc_dim_nobs)) {
       obs_type = TYPE_OBS;
+      input_type = "OBS_MET";
+   }
 
+   mlog << Debug(5) << method_name << "input type: " << input_type << "\".\n";
    return obs_type;
 }
 
@@ -2645,82 +2654,14 @@ bool get_lat_lon_dims(NcFile *nc_in, int *lat_size, int *lon_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//int get_lat_dim_offset(NcVar *var) {
-//   int offset = -1;
-//
-//   StringArray dim_names, lat_dim_names;
-//   if (get_dim_names(var, &dim_names)) {
-//      lat_dim_names.add_css(lat_dim_name_list);   
-//      lat_dim_names.set_ignore_case(true);   
-//      for (int idx=0; idx<dim_names.n(); idx++) {
-//         if (lat_dim_names.has(dim_names[idx])) {
-//            NcDim dim = get_nc_dim(var, dim_names[idx]);
-//            if (IS_VALID_NC(dim)) {
-//               offset = idx;
-//               break;
-//            }
-//         }
-//      }
-//   }
-//
-//   return offset;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//int get_lon_dim_offset(NcVar *var) {
-//   int offset = -1;
-//
-//   StringArray dim_names, lon_dim_names;
-//   if (get_dim_names(var, &dim_names)) {
-//      lon_dim_names.add_css(lon_dim_name_list);   
-//      lon_dim_names.set_ignore_case(true);   
-//      for (int idx=0; idx<dim_names.n(); idx++) {
-//         if (lon_dim_names.has(dim_names[idx])) {
-//            NcDim dim = get_nc_dim(var, dim_names[idx]);
-//            if (IS_VALID_NC(dim)) {
-//               offset = idx;
-//               break;
-//            }
-//         }
-//      }
-//   }
-//
-//   return offset;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
 bool has_lat_lon_vars(NcFile *nc) {
 
-   bool has_lat_var = false;
-   bool has_lon_var = false;
-   bool has_time_var = false;
-   
-   //if (env_va)
-   has_lat_var = IS_VALID_NC(get_nc_var_lat(nc));
-   has_lon_var = IS_VALID_NC(get_nc_var_lon(nc));
-   has_time_var = IS_VALID_NC(get_nc_var_time(nc));
-   //if (!(has_lat_var && has_lon_var && has_time_var)) {
-   //   StringArray var_names, lat_names, lon_names;
-   //   get_var_names(nc, &var_names);
-   //   lat_names.add_css(lat_var_name_list);   
-   //   lon_names.add_css(lon_var_name_list);   
-   //   lat_names.set_ignore_case(true);   
-   //   lon_names.set_ignore_case(true);   
-   //   for (int idx=0; idx<var_names.n(); idx++) {
-   //      if (lat_names.has(var_names[idx])) {
-   //         has_lat_var = true;
-   //         //lat_name = var_names[idx];
-   //      }
-   //      if (lon_names.has(var_names[idx])) {
-   //         has_lon_var = true;
-   //         //lon_name = var_names[idx];
-   //      }
-   //      if (has_lat_var && has_lon_var) break;
-   //   }
-   //}
+   bool has_lat_var = IS_VALID_NC(get_nc_var_lat(nc));
+   bool has_lon_var = IS_VALID_NC(get_nc_var_lon(nc));
+   bool has_time_var = IS_VALID_NC(get_nc_var_time(nc));
 
+   //TODO: chech if this is a gridded data or a point data here!!!
+   
    return (has_lat_var && has_lon_var && has_time_var);
 }
 
@@ -2728,7 +2669,6 @@ bool has_lat_lon_vars(NcFile *nc) {
 
 void usage() {
 
-   //GridTemplateFactory gtf;
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
