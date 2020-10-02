@@ -1902,25 +1902,33 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   // As a sanity check, make sure that the deltas are constant through the
   // entire grid.  CF compliancy doesn't require this, but MET does.
 
-  for (int i = 1; i < lat_counts; ++i)
-  {
-    double curr_delta = lat_values[i] - lat_values[i-1];
-    if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
-    {
-      mlog << Error << "\n" << method_name << " -> "
-           << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
-      exit(1);
-    }
+  ConcatString point_nccf;
+  bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
+  if (!skip_sanity_check) {
+    get_env(nc_att_met_point_nccf, point_nccf);
+    skip_sanity_check = point_nccf == "yes";
   }
-
-  for (int i = 1; i < lon_counts; ++i)
-  {
-    double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
-    if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+  if (!skip_sanity_check) {
+    for (int i = 1; i < lat_counts; ++i)
     {
-      mlog << Error << "\n" << method_name << " -> "
-           << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
-      exit(1);
+      double curr_delta = lat_values[i] - lat_values[i-1];
+      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
+        exit(1);
+      }
+    }
+    
+    for (int i = 1; i < lon_counts; ++i)
+    {
+      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
+      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+        exit(1);
+      }
     }
   }
 
@@ -2587,7 +2595,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   NcVarAtt *coordinates_att = get_nc_att(data_var, (string)"coordinates");
 
   if (IS_VALID_NC_P(coordinates_att)) {
-    ConcatString coordinates_value, units_value;
+    ConcatString coordinates_value, units_value, axis_value;
     NcVarAtt *missing_value_att = (NcVarAtt*) 0;
     get_att_value_chars(coordinates_att, coordinates_value);
     StringArray sa = coordinates_value.split(" ");
@@ -2608,15 +2616,22 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
             if (is_nc_unit_latitude(units_value.c_str())) {
               y_dim_var_name = sa[cIdx];
               is_y_dim_var = true;
+              mlog << Debug(4) << method_name << " -> "
+                   << "found the latitude variable \"" << Var[var_num].name << "\"\n";
             }
             else if (is_nc_unit_longitude(units_value.c_str())) {
               x_dim_var_name = sa[cIdx];
               is_x_dim_var = true;
+              mlog << Debug(4) << method_name << " -> "
+                   << "found the longitude variable \"" << Var[var_num].name << "\"\n";
             }
             else if (!is_nc_unit_time(units_value.c_str())) {
-              mlog << Warning << "\n" << method_name << " -> "
-                   << "unknown units [" << units_value << "] from ["
-                   << Var[var_num].name << "]\n\n";
+              if (!get_nc_att_value(Var[var_num].var, (string)"axis", axis_value)
+                  || (axis_value != "Z" && axis_value != "z")) {
+                mlog << Debug(4) << "\n" << method_name << " -> "
+                     << "unknown units [" << units_value << "] for the coordinate variable ["
+                     << Var[var_num].name << "]\n\n";
+              }
             }
           }
           break;
@@ -2733,31 +2748,40 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // As a sanity check, make sure that the deltas are constant through the
     // entire grid.  CF compliancy doesn't require this, but MET does.
 
-    for (int i = 1; i < (int)lat_counts; ++i)
-    {
-      if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
-      double curr_delta = lat_values[i] - lat_values[i-1];
-      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
-      {
-        mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
-        if (coordinates_att) delete coordinates_att;
-        exit(1);
-      }
+    ConcatString point_nccf;
+    bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
+    if (!skip_sanity_check) {
+      get_env(nc_att_met_point_nccf, point_nccf);
+      skip_sanity_check = point_nccf == "yes";
     }
-
-    for (int i = 1; i < (int)lon_counts; ++i)
-    {
-      if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
-      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
-      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+    if (!skip_sanity_check) {
+      for (int i = 1; i < (int)lat_counts; ++i)
       {
-        mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
-        if (coordinates_att) delete coordinates_att;
-        exit(1);
+        if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
+            (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
+        double curr_delta = lat_values[i] - lat_values[i-1];
+        if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+        {
+          mlog << Error << "\n" << method_name << " -> "
+               << "MET can only process Latitude/Longitude files where the lat delta is constant (dlat="
+               << dlat <<", dlon=" << dlon << ")\n\n";
+          if (coordinates_att) delete coordinates_att;
+          exit(1);
+        }
+      }
+      
+      for (int i = 1; i < (int)lon_counts; ++i)
+      {
+        if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
+            (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
+        double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
+        if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+        {
+          mlog << Error << "\n" << method_name << " -> "
+               << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+          if (coordinates_att) delete coordinates_att;
+          exit(1);
+        }
       }
     }
 
