@@ -64,7 +64,7 @@ LOGFILE=${RUN_DIR}/run_fortify_sca_`date +%Y%m%d`.log
 # Run scan and check for bad return status
 ${SCRIPT_DIR}/run_fortify_sca.sh ${1} > ${LOGFILE}
 if [[ $? -ne 0 ]]; then
-  echo "$0: The nightly Fortify scan FAILED on ${TODAY}." >> ${LOGFILE}
-  cat ${LOGFILE} | mail -s "MET Fortify Scan Failed for ${1} (autogen msg)" ${EMAIL_LIST}
+  echo "$0: The nightly Fortify scan FAILED in `basename ${RUN_DIR}`." >> ${LOGFILE}
+  cat ${LOGFILE} | mail -s "MET Fortify Scan Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi

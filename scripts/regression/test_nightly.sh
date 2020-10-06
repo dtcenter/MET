@@ -80,7 +80,7 @@ ${SCRIPT_DIR}/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
 if [[ $? -ne 0 ]]; then
   echo "$0: ERROR -> the regression test failed." >> ${LOGFILE}
   echo -e "Nightly Build Log: `hostname`:${LOGFILE}\n\n`tail -10 ${LOGFILE}`" | \
-  mail -s "MET Nightly Build Failed for ${1} (autogen msg)" ${EMAIL_LIST}
+  mail -s "MET Nightly Build Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
 
@@ -93,7 +93,7 @@ echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 if [[ $N_ERR -gt 0 ]]; then
   echo "$0: ERROR -> grep found ERRORS in regtest" >> ${LOGFILE}
   echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
-  mail -s "MET Nightly Build Failed for ${1} (autogen msg)" ${EMAIL_LIST}
+  mail -s "MET Nightly Build Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
 
