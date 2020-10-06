@@ -66,7 +66,7 @@ mkdir -p ${RUN_DIR}
 cd ${RUN_DIR}
 
 # Create a logfile
-LOGFILE=${RUN_DIR}.out
+LOGFILE=${RUN_DIR}/test_regression_`date +%Y%m%d`.log
 >${LOGFILE}
 
 # Check that we have a script to run
