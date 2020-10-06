@@ -20,24 +20,43 @@
 #
 #=======================================================================
 
+# Constants
+#EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
+EMAIL_LIST="johnhg@ucar.edu"
+KEEP_STUFF_DURATION=5    #This is in days
+
+# Store the script directory
+SCRIPT_DIR=`dirname $0`
+
+# Usage statement
 function usage {
   echo
   echo "USAGE: test_nightly.sh name"
   echo "   where \"name\" specifies a branch or tag for which a corresponding"
   echo "         \"name-ref\" branch or tag exists"
   echo
+  exit 1
 }
 
 # Check for arguments
-if [ $# -lt 1 ]; then usage; exit 1; fi
+if [ $# -lt 1 ]; then usage; fi
 
-# Configure run for dakota
-RUNDIR="/d3/projects/MET/MET_regression/${1}"
-EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
-KEEP_STUFF_DURATION=5    #This is in days
+# Set base directory based on the machine name
+if [ `uname -a | egrep -i dakota | wc -l` -gt 0 ]; then
+  echo "Running on dakota..."
+  MET_DIR=/d3/projects/MET
+elif [ `uname -a | egrep -i kiowa | wc -l` -gt 0 ]; then
+  echo "Running on kiowa..."
+  MET_DIR=/d1/projects/MET
+else
+  echo "ERROR: Unsupported machine name!"
+  uname -a
+  exit 1
+fi
 
-# Store the scripts location
-SCRIPTS=`dirname $0`
+# Create and switch to the run directory
+mkdir -p ${MET_DIR}/MET_regression/${1}
+cd ${MET_DIR}/MET_regression/${1}
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
@@ -71,7 +90,7 @@ export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_NET
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_PYTHON}/lib"
 
 # Variables required to run MET
-export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
+export MET_FONT_DIR=${MET_DIR}/MET_test_data/unit_test/fonts
 
 # This is a cron script -- create the shell environment for this job
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
@@ -85,10 +104,6 @@ E_FOUND_WARNING=63
 # Keep it open
 umask 0002
 
-# Get to the run directory
-mkdir -p ${RUNDIR}
-cd ${RUNDIR}
-
 # Clean the place up
 find . -mtime +${KEEP_STUFF_DURATION} -name "NB*" | xargs rm -rf
 
@@ -97,20 +112,20 @@ today=`date +%Y%m%d`
 LOGFILE=${PWD}/NB${today}.out
 >${LOGFILE}
 
-# make a little home - always start from scratch
+# Create a daily directory
 if [[ -e NB${today} ]];  then rm -rf NB${today}; fi
 mkdir NB${today}
 cd NB${today}
 
 # Check that we have a script to run
-if [[ ! -r ${SCRIPTS}/test_regression.sh ]]
+if [[ ! -r ${SCRIPT_DIR}/test_regression.sh ]]
 then
-  echo "$0: FAILURE ${SCRIPTS}/test_regression.sh not found" > ${LOGFILE}
+  echo "$0: FAILURE ${SCRIPT_DIR}/test_regression.sh not found" > ${LOGFILE}
   exit $E_NOEXECSCRIPT
 fi
 
 # Run the regression test fail if non-zero status
-${SCRIPTS}/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
+${SCRIPT_DIR}/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
 if [[ $? -ne 0 ]]
 then
   echo "$0: FAILURE the regression test failed." >> ${LOGFILE}
