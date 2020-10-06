@@ -23,7 +23,7 @@
 # Constants
 #EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
 EMAIL_LIST="johnhg@ucar.edu"
-KEEP_STUFF_DURATION=5 # In days
+KEEP_DAYS=5
 
 # Usage statement
 function usage {
@@ -38,7 +38,7 @@ function usage {
 # Check for arguments
 if [ $# -lt 1 ]; then usage; fi
 
-# Store full path to the script directory
+# Store the full path to the scripts directory
 SCRIPT_DIR=`dirname $0`
 if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi 
 
@@ -56,7 +56,7 @@ umask 0002
 
 # Delete old directories
 find ${MET_PROJ_DIR}/MET_regression/${1} \
-     -mtime +${KEEP_STUFF_DURATION} -name "NB*" | \
+     -mtime +${KEEP_DAYS} -name "NB*" | \
      xargs rm -rf
 
 # Create and switch to a run directory
