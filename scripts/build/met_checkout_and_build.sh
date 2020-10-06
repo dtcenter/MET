@@ -9,7 +9,7 @@
 # an existing tag or branch name.  First, go to the directory where
 # you'd like the release built.  Then run:
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/met_checkout_and_build.sh [new|tag|branch] [name]
+#    MET/scripts/build/met_checkout_and_build.sh [new|tag|branch] [name]
 #
 # For a new release, this script will:
 # (1) Checkout the latest version of the MET source code and
@@ -143,17 +143,17 @@ else
 fi
 
 # Check that the met_build.sh script exists
-if [[ ! -e "scripts/met_build.sh" ]]; then
+if [[ ! -e "scripts/build/met_build.sh" ]]; then
 
   echo
-  echo "ERROR: scripts/met_build.sh does not exist!"
+  echo "ERROR: scripts/build/met_build.sh does not exist!"
   echo
   exit 1
 
 fi
 
 # Call the build script to build the release
-run_command "scripts/met_build.sh ${BUILD_ARGS}"
+run_command "scripts/build/met_build.sh ${BUILD_ARGS}"
 run_command "mv *.tar.gz ../../."
 run_command "cd ../.."
 run_command "rm -rf build"
