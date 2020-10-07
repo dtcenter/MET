@@ -92,7 +92,7 @@ echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 # Check for non-zero errors
 if [[ $N_ERR -gt 0 ]]; then
   echo "$0: ERROR -> grep found ERRORS in regtest" >> ${LOGFILE}
-  echo "Nightly Build Log: `hostname`:${LOGFILE}\n\n`tail -3 ${LOGFILE}`" | \
+  echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
   mail -s "MET Nightly Build Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
