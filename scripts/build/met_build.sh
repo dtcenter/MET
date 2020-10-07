@@ -40,15 +40,21 @@ fi
 if [ ${NARGS} -eq 0 ]; then
   VERSION="met-${CUR_REV}"
 elif [ ${NARGS} -eq 1 ]; then
-  VERSION="met-${1}"
+  # Prepend met, if needed
+  if [[ ${1:0:3} != "met" ]]; then
+    VERSION="met-${1}"
+  else
+    VERSION="${1}"
+  fi
 else
   echo
-  echo "USAGE: MET_build <version_number>"
+  echo "USAGE: MET_build <version>"
   echo
   exit 1
 fi
 
 # Copy the current met directory
+echo "Building version '${VERSION}'..."
 cp -r met ${VERSION}
 cd ${VERSION}
 
@@ -56,8 +62,7 @@ cd ${VERSION}
 rm -f `find ./ -name ".gitignore"`
 
 # Set the MET build version for bootstrap by stripping off leading "met-"
-export MET_BUILD_VERSION=`echo $VERSION | sed 's/met-//g'`
-echo "Building MET version '${MET_BUILD_VERSION}'"
+export MET_BUILD_VERSION=`echo ${VERSION} | sed 's/met-//g'`
 
 # Run the bootstrap program to prepare for running configure
 echo "Running 'bootstrap' to prepare for running configure"

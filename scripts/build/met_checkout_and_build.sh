@@ -61,6 +61,10 @@ if [[ ${NARGS} -ne 1 && ${NARGS} -ne 2 ]]; then
    exit 1
 fi
 
+# Store the full path to the scripts directory
+SCRIPT_DIR=`dirname $0`
+if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi
+
 # Sub-routine for running a command and checking return status
 run_command() {
 
@@ -143,17 +147,22 @@ else
 fi
 
 # Check that the met_build.sh script exists
-if [[ ! -e "scripts/build/met_build.sh" ]]; then
-
-  echo
-  echo "ERROR: scripts/build/met_build.sh does not exist!"
-  echo
+if [[ ! -e "${SCRIPT_DIR}/met_build.sh" ]]; then
+  echo "ERROR: ${SCRIPT_DIR}/met_build.sh does not exist!"
   exit 1
+fi
 
+# Define the development environment
+ENV_FILE=${SCRIPT_DIR}/../environment/development.`hostname`
+if [[ -e ${ENV_FILE} ]]; then
+  echo "Sourcing development environment file: ${ENV_FILE}"
+  source ${ENV_FILE}
+else
+  echo "Development environment file not found: ${ENV_FILE}"
 fi
 
 # Call the build script to build the release
-run_command "scripts/build/met_build.sh ${BUILD_ARGS}"
+run_command "${SCRIPT_DIR}/met_build.sh ${BUILD_ARGS}"
 run_command "mv *.tar.gz ../../."
 run_command "cd ../.."
 run_command "rm -rf build"
