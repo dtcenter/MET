@@ -425,7 +425,9 @@ static bool get_filtered_nc_data(NcVar var, float *data,
    if (IS_VALID_NC(var)) {
       if(!(status = get_nc_data(&var, data, dim, cur))) return status;
       
-      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
+      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+           << in_fillValue_str <<  "=" << in_fill_value << "\n";
       for (int idx=0; idx<dim; idx++) {
          if(is_eq(data[idx], in_fill_value)) {
             data[idx] = bad_data_float;
@@ -455,9 +457,9 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
    if (IS_VALID_NC(var)) {
       if(!(status = get_nc_data(&var, data, dim, cur))) return status;
       
-      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
-      mlog << Debug(5)  << "    " << method_name << ": in_fill_value="
-           << in_fill_value << "\n";
+      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+           << in_fillValue_str <<  "=" << in_fill_value << "\n";
       
       int offset, offsetStart = 0;
       for (int idx=0; idx<dim[0]; idx++) {
@@ -496,9 +498,9 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
       if(!(status = get_nc_data(&var, data, dim, cur))) return status;
       
-      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
-      mlog << Debug(5)  << method_name << "in_fill_value="
-           << in_fill_value << "\n";
+      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+           << in_fillValue_str <<  "=" << in_fill_value << "\n";
       
       int offset, offsetStart = 0;
       for (int idx=0; idx<dim[0]; idx++) {
