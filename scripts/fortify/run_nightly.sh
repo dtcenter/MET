@@ -53,6 +53,7 @@ find ${MET_PROJ_DIR}/MET_regression/fortify \
 
 # Create and switch to a run directory
 TODAY=`date +%Y%m%d`
+YESTERDAY=`date -d "1 day ago" +%Y%m%d`
 RUN_DIR=${MET_PROJ_DIR}/MET_regression/fortify/NB${TODAY}
 if [[ -e ${RUN_DIR} ]]; then rm -rf ${RUN_DIR}; fi
 mkdir -p ${RUN_DIR}
@@ -68,3 +69,48 @@ if [[ $? -ne 0 ]]; then
   cat ${LOGFILE} | mail -s "MET Fortify Scan Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
+
+# Convert Fortify report from pdf to html
+PDF_TODAY=${RUN_DIR}/MET-${1}/met/MET-${1}_${TODAY}.pdf
+HTML_TODAY=${RUN_DIR}/MET-${1}/met/MET-${1}_${TODAY}s.html
+pdftohtml -f 2 -l 2 ${PDF_TODAY}
+
+HTML_YESTERDAY=`echo ${HTML_TODAY} | sed "s/${TODAY}/${YESTERDAY}/g"`
+if [ ! -e ${HTML_YESTERDAY} ]; then
+  pdftohtml -f 2 -l 2 `echo ${HTML_YESTERDAY} | sed 's/s.html/.pdf/g'`
+fi  
+
+# Extract the counts and compare
+TODAY_COUNTS=''
+YESTERDAY_COUNTS=''
+for LEVEL in Critical High Medium Low; do
+
+  # Today's counts
+  LINES=`grep -A 1 ${LEVEL} ${HTML_TODAY} | wc -l`
+  if [[ ${LINES} -eq 0 ]]; then
+    COUNT=0
+  else
+    COUNT=`egrep -A 1 ${LEVEL} ${HTML_TODAY} | egrep -v ${LEVEL} | cut -d '<' -f1`
+  fi
+  TODAY_COUNTS="${TODAY_COUNTS}${LEVEL}=${COUNT} "
+
+  # Yesterday's counts
+  LINES=`grep -A 1 ${LEVEL} ${HTML_YESTERDAY} | wc -l`
+  if [[ ${LINES} -eq 0 ]]; then
+    COUNT=0
+  else
+    COUNT=`egrep -A 1 ${LEVEL} ${HTML_YESTERDAY} | egrep -v ${LEVEL} | cut -d '<' -f1`
+  fi
+  YESTERDAY_COUNTS="${YESTERDAY_COUNTS}${LEVEL}=${COUNT} "
+done
+
+echo "Foritfy Counts for ${1} on ${YESTERDAY}: ${YESTERDAY_COUNTS}" >> ${LOGFILE}
+echo "Fortify Counts for ${1} on ${TODAY}: ${TODAY_COUNTS}" >> ${LOGFILE}
+
+# Send an email if the counts change
+if [ "${TODAY_COUNTS}" != "${YESTERDAY_COUNTS}" ]; then
+  echo "$0: The Fortify counts have CHANGED in `basename ${RUN_DIR}`." >> ${LOGFILE}
+  tail -3 ${LOGFILE} | mail -s "MET Fortify Counts Changed for ${1} on ${TODAY} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
+  exit 1
+fi
+
