@@ -43,8 +43,7 @@ SCRIPT_DIR=`dirname $0`
 if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi 
 
 # Define the development environment
-MACHINE=`uname -n`
-ENV_FILE=${SCRIPT_DIR}/../environment/development.${MACHINE}
+ENV_FILE=${SCRIPT_DIR}/../environment/development.`hostname`
 if [[ ! -e ${ENV_FILE} ]]; then
   echo "$0: ERROR -> Development environment file missing: ${ENV_FILE}"
   exit 1
@@ -92,7 +91,7 @@ echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 # Check for non-zero errors
 if [[ $N_ERR -gt 0 ]]; then
   echo "$0: ERROR -> grep found ERRORS in regtest" >> ${LOGFILE}
-  echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
+  echo "Nightly Build Log: `hostname`:${LOGFILE}\n\n`tail -3 ${LOGFILE}`" | \
   mail -s "MET Nightly Build Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
