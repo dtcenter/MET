@@ -20,8 +20,7 @@
 #=======================================================================
 
 # Constants
-#EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu mccabe@ucar.edu"
-EMAIL_LIST="johnhg@ucar.edu"
+EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu fillmore@ucar.edu"
 KEEP_DAYS=5
 
 function usage {
@@ -114,3 +113,4 @@ if [ "${TODAY_COUNTS}" != "${YESTERDAY_COUNTS}" ]; then
   exit 1
 fi
 
+exit 0
