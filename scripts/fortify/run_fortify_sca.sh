@@ -34,7 +34,7 @@ if [[ $# -lt 1 ]]; then usage; exit; fi
 
 # Check that FORTIFY_BIN is defined
 if [ -z ${FORTIFY_BIN+x} ]; then
-  echo "ERROR: ${FORTIFY_BIN} must be defined!"
+  echo "ERROR: ${FORTIFY_BIN} must be set"
   exit 1
 fi
 
@@ -102,4 +102,4 @@ run_command "${FORTIFY_BIN}/sourceanalyzer -b ${BUILD_ID} -export-build-session 
 
 # Run Fortify report generator to make a PDF file
 TODAY=`date +%Y%m%d`
-run_command "${FORTIFY_BIN}/ReportGenerator -format pdf -f ${BUILD_ID}_${TODAY}_rev${REV}.pdf -source ${BUILD_ID}.fpr"
+run_command "${FORTIFY_BIN}/ReportGenerator -format pdf -f ${BUILD_ID}_${TODAY}.pdf -source ${BUILD_ID}.fpr"
