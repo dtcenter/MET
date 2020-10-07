@@ -52,13 +52,14 @@ find ${MET_PROJ_DIR}/MET_regression/fortify \
      xargs rm -rf
 
 # Create and switch to a run directory
-RUN_DIR=${MET_PROJ_DIR}/MET_regression/fortify/NB`date +%Y%m%d`
+TODAY=`date +%Y%m%d`
+RUN_DIR=${MET_PROJ_DIR}/MET_regression/fortify/NB${TODAY}
 if [[ -e ${RUN_DIR} ]]; then rm -rf ${RUN_DIR}; fi
 mkdir -p ${RUN_DIR}
 cd ${RUN_DIR}
 
 # Create a logfile
-LOGFILE=${RUN_DIR}/run_fortify_sca_`date +%Y%m%d`.log
+LOGFILE=${RUN_DIR}/run_fortify_sca_${TODAY}.log
 
 # Run scan and check for bad return status
 ${SCRIPT_DIR}/run_fortify_sca.sh ${1} > ${LOGFILE}

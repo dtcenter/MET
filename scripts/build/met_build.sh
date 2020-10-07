@@ -23,7 +23,7 @@ MET_DEVELOPMENT=true
 NARGS=$#
 
 # Get the current date
-DATE=`date +%Y%m%d`
+TODAY=`date +%Y%m%d`
 
 # Get the current revision hash
 CUR_REV=`git rev-parse --short HEAD`
@@ -100,7 +100,7 @@ make dist > /dev/null
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
-TAR_FILE="${VERSION}.${DATE}.tar.gz"
+TAR_FILE="${VERSION}.${TODAY}.tar.gz"
 
 echo "Copying tar file to new name: '${TAR_FILE}'"
 mv met-* ../${TAR_FILE}

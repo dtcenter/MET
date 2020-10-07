@@ -59,13 +59,14 @@ find ${MET_PROJ_DIR}/MET_regression/${1} \
      xargs rm -rf
 
 # Create and switch to a run directory
-RUN_DIR=${MET_PROJ_DIR}/MET_regression/${1}/NB`date +%Y%m%d`
+TODAY=`date +%Y%m%d`
+RUN_DIR=${MET_PROJ_DIR}/MET_regression/${1}/NB${TODAY}
 if [[ -e ${RUN_DIR} ]]; then rm -rf ${RUN_DIR}; fi
 mkdir -p ${RUN_DIR}
 cd ${RUN_DIR}
 
 # Create a logfile
-LOGFILE=${RUN_DIR}/test_regression_`date +%Y%m%d`.log
+LOGFILE=${RUN_DIR}/test_regression_${TODAY}.log
 >${LOGFILE}
 
 # Check that we have a script to run
