@@ -1,13 +1,13 @@
 ## Pull Request Testing ##
 
-- [ ] Describe testing already performed for these changes:
+- [ ] Describe testing already performed for these changes:</br>
 
-- [ ] Recommend testing for the reviewer to perform, including the location of input datasets:
+- [ ] Recommend testing for the reviewer to perform, including the location of input datasets:</br>
 
 - [ ] Will this PR result in changes to the regression test output? **[Yes or No]**</br>
 If **yes**, describe the new output and/or changes to the existing output:
 
-- [ ] After merging, should the reviewer **DELETE** the feature branch from GitHub? **[Yes or No]**
+- [ ] After merging, should the reviewer **DELETE** the feature branch from GitHub? **[Yes or No]**</br>
 
 ## Pull Request Checklist ##
 See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
