@@ -11,9 +11,9 @@ If **yes**, describe new test output and/or changes to existing output:
 
 ## Pull Request Checklist ##
 See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
-- [ ] Complete the pull request definition above.
-- [ ] Ensure the pull request title matches the feature or bugfix branch name.
-- [ ] Define the pull request metadata, as permissions allow.
+- [ ] Complete the PR definition above.
+- [ ] Ensure the PR title matches the feature or bugfix branch name.
+- [ ] Define the PR metadata, as permissions allow.
 Select: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
