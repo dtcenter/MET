@@ -317,7 +317,7 @@ void VxPairDataPoint::clear() {
 
    n_try       = 0;
    rej_sid     = 0;
-   rej_gc      = 0;
+   rej_var     = 0;
    rej_vld     = 0;
    rej_obs     = 0;
    rej_grd     = 0;
@@ -793,12 +793,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // the specified code
    if((var_name != 0) && (0 < strlen(var_name))) {
       if ( var_name != obs_info->name() ) {
-         rej_gc++;
+         rej_var++;
          return;
       }
    }
    else if(obs_info->code() != nint(obs_arr[1])) {
-      rej_gc++;
+      rej_var++;
       return;
    }
 

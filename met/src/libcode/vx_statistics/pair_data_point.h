@@ -151,7 +151,7 @@ class VxPairDataPoint {
       //  Counts for observation rejection reason codes
       int n_try;                 // Number of observations processed
       int rej_sid;               // Reject based on SID inclusion and exclusion lists
-      int rej_gc;                // Reject based on GRIB code
+      int rej_var;               // Reject based on observation variable name
       int rej_vld;               // Reject based on valid time
       int rej_obs;               // Reject observation bad data
       int rej_grd;               // Reject based on location
