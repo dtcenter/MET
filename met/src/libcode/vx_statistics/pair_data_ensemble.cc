@@ -1304,8 +1304,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
       (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) return;
 
-   // Check whether the GRIB code for the observation matches
-   // the specified code (rej_gc)
+   // Check whether the observation variable name matches (rej_var)
    if ((var_name != 0) && (0 < strlen(var_name))) {
       if ( var_name != obs_info->name() ) {
          return;
