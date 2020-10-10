@@ -98,7 +98,6 @@ static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
 ///////////////////////////////////////////////////////////////////////
 
 
-// static const char * default_out_dir = "MET_BASE/out/mode";
 static const char * default_out_dir = ".";
 
 static int compress_level = -1;

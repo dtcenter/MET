@@ -9,8 +9,7 @@
 static const char fcst_super_nc_filename [] = "f_super.nc";
 static const char  obs_super_nc_filename [] = "o_super.nc";
 
-static const char config_constants    [] = "config/ConfigConstants";   //  relative to MET_BASE
-static const char mode_default_config [] = "config/MODEConfig_default";   //  relative to MET_BASE
+static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,8 +96,6 @@ static void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filena
 int multivar_frontend(const StringArray & Argv)
 
 {
-
-// cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
 
 const int Argc = Argv.n();
 
@@ -464,7 +461,7 @@ void read_config(const string & filename)
 ConcatString path;
 
 
-path << cs_erase << getenv("MET_BASE") << '/' << mode_default_config;
+path = replace_path(mode_default_config);
 
 config.read_config(path.c_str(), filename.c_str());
 
