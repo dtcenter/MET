@@ -10,7 +10,7 @@
 # two sets of tests.  To run this script, use the following commands:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/test_regression.sh version1 version2
+#    MET/scripts/regression/test_regression.sh version1 version2
 #
 # Usage: test_regression.sh version1 version2
 #    where version1 and version2 are named branches, tags, or hashes.
@@ -54,8 +54,9 @@ function run_command() {
   return ${STATUS}
 }
 
-# Store the scripts location
-SCRIPTS=`dirname $0`
+# Store the full path to the scripts directory
+SCRIPT_DIR=`dirname $0`
+if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi
 
 # Run the unit test script for each version
 PID_LIST=""
@@ -65,7 +66,7 @@ for VERSION in `echo "${1} ${2}"`; do
   LOG="$(pwd)/test_unit_${VERSION}.log"
 
   # Run the unit tests in the background
-  UNIT_CMD="${SCRIPTS}/test_unit.sh ${VERSION}"
+  UNIT_CMD="${SCRIPT_DIR}/test_unit.sh ${VERSION}"
   echo "CALLING: ${UNIT_CMD}"
   echo "LOGGING: ${LOG}"
   $UNIT_CMD > $LOG 2>&1 &

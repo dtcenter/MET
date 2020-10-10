@@ -9,7 +9,7 @@
 # then run:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/run_fortify_sca.sh name
+#    MET/scripts/fortify/run_fortify_sca.sh name
 #
 # Usage: run_fortify_sca.sh name
 #    Test the specified branched version of MET:
@@ -21,7 +21,6 @@
 
 # Constants
 GIT_REPO="https://github.com/dtcenter/MET"
-FORTIFY_BIN=/d3/projects/Fortify/19.2.0/Fortify_SCA_and_Apps_19.2.0/bin
 
 function usage {
         echo
@@ -32,6 +31,12 @@ function usage {
 
 # Check for arguments
 if [[ $# -lt 1 ]]; then usage; exit; fi
+
+# Check that FORTIFY_BIN is defined
+if [ -z ${FORTIFY_BIN+x} ]; then
+  echo "ERROR: ${FORTIFY_BIN} must be set"
+  exit 1
+fi
 
 # Sub-routine for running a command and checking return status
 function run_command() {
@@ -97,4 +102,4 @@ run_command "${FORTIFY_BIN}/sourceanalyzer -b ${BUILD_ID} -export-build-session 
 
 # Run Fortify report generator to make a PDF file
 TODAY=`date +%Y%m%d`
-run_command "${FORTIFY_BIN}/ReportGenerator -format pdf -f ${BUILD_ID}_${TODAY}_rev${REV}.pdf -source ${BUILD_ID}.fpr"
+run_command "${FORTIFY_BIN}/ReportGenerator -format pdf -f ${BUILD_ID}_${TODAY}.pdf -source ${BUILD_ID}.fpr"

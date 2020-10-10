@@ -245,7 +245,7 @@ In this example, the Stat-Analysis tool will read MPR lines from the input file 
 GSIDENS2ORANK tool
 __________________
 
-This section describes how to run the tool gsidens2orank tool. The gsidens2orank tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The ORANK line type contains ensemble matched pair information and is analogous to the MPR line type for a deterministic model. The output ORANK data may be passed to the Stat-Analysis tool to compute ensemble statistics.
+This section describes how to run the gsidens2orank tool. The gsidens2orank tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The ORANK line type contains ensemble matched pair information and is analogous to the MPR line type for a deterministic model. The output ORANK data may be passed to the Stat-Analysis tool to compute ensemble statistics.
 
 gsidens2orank usage
 ~~~~~~~~~~~~~~~~~~~

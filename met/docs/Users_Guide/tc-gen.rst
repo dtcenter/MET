@@ -20,12 +20,12 @@ Care should be taken when interpreting the statistics for filtered data. In some
 Practical information
 _____________________
 
-This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for **tc_gen**.
+This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for tc_gen.
 
 tc_gen usage
 ~~~~~~~~~~~~
 
-The usage statement for **tc_gen** is shown below:
+The usage statement for tc_gen is shown below:
 
 .. code-block:: none
 

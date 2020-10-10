@@ -9,7 +9,7 @@
 # an existing tag or branch name.  First, go to the directory where
 # you'd like the release built.  Then run:
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/met_checkout_and_build.sh [new|tag|branch] [name]
+#    MET/scripts/build/met_checkout_and_build.sh [new|tag|branch] [name]
 #
 # For a new release, this script will:
 # (1) Checkout the latest version of the MET source code and
@@ -60,6 +60,10 @@ if [[ ${NARGS} -ne 1 && ${NARGS} -ne 2 ]]; then
    usage
    exit 1
 fi
+
+# Store the full path to the scripts directory
+SCRIPT_DIR=`dirname $0`
+if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi
 
 # Sub-routine for running a command and checking return status
 run_command() {
@@ -143,17 +147,22 @@ else
 fi
 
 # Check that the met_build.sh script exists
-if [[ ! -e "scripts/met_build.sh" ]]; then
-
-  echo
-  echo "ERROR: scripts/met_build.sh does not exist!"
-  echo
+if [[ ! -e "${SCRIPT_DIR}/met_build.sh" ]]; then
+  echo "ERROR: ${SCRIPT_DIR}/met_build.sh does not exist!"
   exit 1
+fi
 
+# Define the development environment
+ENV_FILE=${SCRIPT_DIR}/../environment/development.`hostname`
+if [[ -e ${ENV_FILE} ]]; then
+  echo "Sourcing development environment file: ${ENV_FILE}"
+  source ${ENV_FILE}
+else
+  echo "Development environment file not found: ${ENV_FILE}"
 fi
 
 # Call the build script to build the release
-run_command "scripts/met_build.sh ${BUILD_ARGS}"
+run_command "${SCRIPT_DIR}/met_build.sh ${BUILD_ARGS}"
 run_command "mv *.tar.gz ../../."
 run_command "cd ../.."
 run_command "rm -rf build"
