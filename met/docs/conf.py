@@ -20,6 +20,7 @@ print(sys.path)
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, and CSU/CIRA'
 author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T.'
+verinfo = '9.1'
 version = '9.1'
 release = f'{version}'
 release_year = '2020'
@@ -49,9 +50,22 @@ suppress_warnings = ['ref.citation']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-html_css_files = ['theme_override.css']
+#html_theme = 'sphinx_rtd_theme'
+try:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+except ImportError:
+    pass
+                    
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+html_theme_options = {'canonical_url': 'https://dtcenter.github.io/MET/latest/'}
+if 'sphinx_rtd_theme' in vars() and sphinx_rtd_theme.__version__ == '0.2.5b1.post1':
+    html_theme_options['versions'] = {'latest': '../latest', 'develop': '../develop'}
 
+html_css_files = ['theme_override.css']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -61,6 +75,8 @@ html_static_path = ['_static']
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 html_logo = os.path.join('_static','met_logo_2019_09.png')
+
+html_js_files = ['pop_ver.js']
 
 # -- Intersphinx control -----------------------------------------------------
 intersphinx_mapping = {'numpy':("https://docs.scipy.org/doc/numpy/", None)}
