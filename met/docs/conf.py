@@ -61,7 +61,7 @@ except ImportError:
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'canonical_url': 'https://jprestop.github.io/VersionTest/latest/'}
+html_theme_options = {'canonical_url': 'https://dtcenter.github.io/MET/latest/'}
 if 'sphinx_rtd_theme' in vars() and sphinx_rtd_theme.__version__ == '0.2.5b1.post1':
     html_theme_options['versions'] = {'latest': '../latest', 'develop': '../develop'}
 
