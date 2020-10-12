@@ -1,6 +1,6 @@
 $(document).ready(function() {
-    // Add 8 to get to end of URL METplus/
-    var proj_end = document.baseURI.indexOf("VersionTest") + 12;
+    // Add 4 to get to end of URL MET/
+    var proj_end = document.baseURI.indexOf("MET") + 4;
     var end = document.baseURI.indexOf("/", proj_end);
     var cur_ver = document.baseURI.substring(proj_end, end);
     var name = cur_ver.startsWith('v') ? cur_ver.substring(1) : cur_ver;
