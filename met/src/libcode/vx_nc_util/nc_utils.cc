@@ -1406,18 +1406,12 @@ bool get_nc_data(NcVar *var, float *data) {
          float add_offset = 0.;
          float scale_factor = 1.;
          int unpacked_count = 0;
-         bool unsigned_value = false;
+         bool unsigned_value = has_unsigned_attribute(var);
          NcVarAtt *att_add_offset   = get_nc_att(var, string("add_offset"));
          NcVarAtt *att_scale_factor = get_nc_att(var, string("scale_factor"));
-         NcVarAtt *att_unsigned     = get_nc_att(var, string("_Unsigned"));
          NcVarAtt *att_fill_value   = get_nc_att(var, string("_FillValue"));
          if (IS_VALID_NC_P(att_add_offset)) add_offset = get_att_value_float(att_add_offset);
          if (IS_VALID_NC_P(att_scale_factor)) scale_factor = get_att_value_float(att_scale_factor);
-         if (IS_VALID_NC_P(att_unsigned)) {
-            ConcatString att_value;
-            get_att_value_chars(att_unsigned, att_value);
-            unsigned_value = ( att_value == "true" );
-         }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
               << ", is_unsigned_value: " << unsigned_value << "\n";
@@ -1592,7 +1586,6 @@ bool get_nc_data(NcVar *var, float *data) {
          }
          if(att_add_offset) delete att_add_offset;
          if(att_scale_factor) delete att_scale_factor;
-         if(att_unsigned) delete att_unsigned;
          if(att_fill_value) delete att_fill_value;
       }
       return_status = true;
@@ -1696,21 +1689,15 @@ bool get_nc_data(NcVar *var, double *data) {
 
          double add_offset = 0.;
          double scale_factor = 1.;
-         bool unsigned_value = false;
+         bool unsigned_value = has_unsigned_attribute(var);
          NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
          NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-         NcVarAtt *att_unsigned     = get_nc_att(var, (string)"_Unsigned");
          NcVarAtt *att_fill_value   = get_nc_att(var, (string)"_FillValue");
          if (IS_VALID_NC_P(att_add_offset)) {
             add_offset = get_att_value_double(att_add_offset);
          }
          if (IS_VALID_NC_P(att_scale_factor)) {
             scale_factor = get_att_value_double(att_scale_factor);
-         }
-         if (IS_VALID_NC_P(att_unsigned)) {
-            ConcatString att_value;
-            get_att_value_chars(att_unsigned, att_value);
-            unsigned_value = ("true" == att_value);
          }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
@@ -1885,7 +1872,6 @@ bool get_nc_data(NcVar *var, double *data) {
          }
          if(att_add_offset) delete att_add_offset;
          if(att_scale_factor) delete att_scale_factor;
-         if(att_unsigned) delete att_unsigned;
          if(att_fill_value) delete att_fill_value;
       }
       return_status = true;
