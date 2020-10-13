@@ -218,4 +218,22 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_NCCF_TO_G231.nc</grid_nc>
     </output>
   </test>
+
+  <test name="point2grid_GOES_16_AOD_TO_G212_unsigned">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20202581441152_e20202581443525_c20202581445493.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_unsigned.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -qc 1,2,3 -method MAX \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_unsigned.nc</grid_nc>
+    </output>
+  </test>
 </met_test>
