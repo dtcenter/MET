@@ -89,6 +89,20 @@ bool _get_att_num_value(const NcAtt *att, T &att_val, int matching_type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_att_value(const NcAtt *att, ncbyte &att_val) {
+   bool status = _get_att_num_value(att, att_val, NC_BYTE);
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_att_value(const NcAtt *att, short &att_val) {
+   bool status = _get_att_num_value(att, att_val, NC_SHORT);
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_att_value(const NcAtt *att, int &att_val) {
    bool status = _get_att_num_value(att, att_val, NC_INT);
    return(status);
@@ -713,28 +727,29 @@ bool get_global_att(const NcFile *nc, const ConcatString &att_name,
 
 template <typename T>
 bool _get_global_att_value(const NcFile *nc, const ConcatString& att_name,
-                     T &att_val, T bad_data, bool error_out, const char *caller_name) {
+                           T &att_val, T bad_data, bool error_out, const char *caller_name) {
    bool status = false;
-
    // Initialize
    att_val = bad_data;
 
    NcGroupAtt *nc_att = get_nc_att(nc, att_name);
-   status = get_att_value((NcAtt *)nc_att, att_val);
-   string data_type = (IS_INVALID_NC_P(nc_att) ? C_unknown_str : GET_NC_TYPE_NAME_P(nc_att));
-   if (nc_att) delete nc_att;
-   // Check error_out status
-   if(error_out && !status) {
-      if (IS_INVALID_NC_P(nc_att)) {
-         mlog << Error << caller_name
-              << "can't find global NetCDF attribute \"" << att_name
-              << "\".\n\n";
-      }
-      else {
+   if (IS_VALID_NC_P(nc_att)) {
+      status = get_att_value((NcAtt *)nc_att, att_val);
+      string data_type = GET_NC_TYPE_NAME_P(nc_att);
+      if (nc_att) delete nc_att;
+      // Check error_out status
+      if (error_out && !status) {
          mlog << Error << caller_name
               << "The data type \"" << data_type
-              << "\" for \"" << att_name << "\" is not supported...\n\n";
+              << "\" for \"" << att_name << "\" does not match...\n\n";
+         exit(1);
       }
+   }
+   else if (error_out) {
+      if (nc_att) delete nc_att;
+      mlog << Error << caller_name
+           << "can't find global NetCDF attribute \"" << att_name
+           << "\".\n\n";
       exit(1);
    }
 
@@ -748,7 +763,19 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     int &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(int) -> ";
    bool status = _get_global_att_value(nc, att_name, att_val, bad_data_int,
-                                       error_out, method_name);
+                                       false, method_name);
+   if (!status) {
+      short tmp_att_val;
+      status = _get_global_att_value(nc, att_name, tmp_att_val, (short)bad_data_int,
+                                     false, method_name);
+      if (status) att_val = tmp_att_val;
+      else {
+         ncbyte tmp_att_val;
+         status = _get_global_att_value(nc, att_name, tmp_att_val, (ncbyte)bad_data_int,
+                                        error_out, method_name);
+         if (status) att_val = tmp_att_val;
+      }
+   }
 
    return(status);
 }
@@ -757,20 +784,20 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
 
 bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     bool &att_val, bool error_out) {
-   bool status = false;
+   bool status;
    ConcatString att_value;
+   static const char *method_name = "\nget_global_att(bool) -> ";
 
    // Initialize
    att_val = false;
-   if(get_global_att(nc, att_name, att_value, error_out)) {
+   status = get_global_att(nc, att_name, att_value, error_out);
+   if(status) {
       att_val = (0 == strcmp("true", att_value.text()))
              || (0 == strcmp("yes", att_value.text()));
-      status = true;
    }
-
-   // Check error_out status
-   if(error_out && !status) {
-      mlog << Error << "\nget_global_att(int) -> "
+   else if(error_out) {
+      // Check error_out status
+      mlog << Error << method_name
            << "can't find global NetCDF attribute \"" << att_name << "\".\n\n";
       exit(1);
    }
@@ -794,8 +821,15 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
 bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     double &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(double) -> ";
-   bool status = _get_global_att_value(nc, att_name, att_val, bad_data_double,
-                                       error_out, method_name);
+   bool status;
+   status = _get_global_att_value(nc, att_name, att_val, bad_data_double,
+                                      false, method_name);
+   if (!status) {
+      float tmp_att_val;
+      status = _get_global_att_value(nc, att_name, tmp_att_val, bad_data_float,
+                                     error_out, method_name);
+      if (status) att_val = tmp_att_val;
+   }
 
    return (status);
 }
