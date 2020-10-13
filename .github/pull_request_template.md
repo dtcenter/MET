@@ -4,7 +4,7 @@
 
 - [ ] Recommend testing for the reviewer to perform, including the location of input datasets:</br>
 
-- [ ] Will this PR result in changes to the regression test output? **[Yes or No]**</br>
+- [ ] Will this PR result in changes to the test suite? **[Yes or No]**</br>
 If **yes**, describe the new output and/or changes to the existing output:</br>
 
 - [ ] After merging, should the reviewer **DELETE** the feature branch from GitHub? **[Yes or No]**</br>
