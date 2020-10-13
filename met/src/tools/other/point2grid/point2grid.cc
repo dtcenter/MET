@@ -2271,15 +2271,15 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    ConcatString goes_var_name;
    ConcatString goes_var_sub_name;
    ConcatString qc_var_name;
-   ncbyte qc_value;
-   ncbyte *qc_data = new ncbyte[from_data_size];
+   uchar qc_value;
+   uchar *qc_data = new uchar[from_data_size];
    uchar *adp_data = new uchar[from_data_size];
    float *from_data = new float[from_data_size];
    unsigned short *adp_qc_data = new unsigned short[from_data_size];
    static const char *method_name = "regrid_goes_variable() ";
 
    // -99 is arbitrary number as invalid QC value
-   memset(qc_data, -99, from_data_size*sizeof(ncbyte));
+   memset(qc_data, -99, from_data_size*sizeof(uchar));
 
    NcVar var_qc;
    NcVar var_adp;
