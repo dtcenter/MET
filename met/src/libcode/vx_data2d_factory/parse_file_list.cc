@@ -138,7 +138,7 @@ if ( !f_in )  {
    //  Read and store the file names
    //
 
-int n_exist = 0;
+int n_missing = 0;
 
 const int max_missing = 10;
 
@@ -157,33 +157,34 @@ while(f_in >> file_name)  {
       continue;
    }
 
+   //
+   //  Add current string to the list of files
+   //
+
    a.add(file_name.c_str());
 
    //
-   //  Count how many files actually exist and
-   //  abort after too many missing files
+   //  Keep track of the number of missing files.
+   //  After too many missing files, assume this is not a file list
+   //  and return an empty list.
    //
 
-   if ( check_files_exist && n_exist == 0 )  {
+   if ( check_files_exist ) {
 
-      if ( a.n() >= max_missing )  break;
+      if ( !is_regular_file(file_name.c_str()) )  n_missing++;
 
-      if ( is_regular_file(file_name.c_str()) )  n_exist++;
+      if ( n_missing >= max_missing )  {
 
+         mlog << Debug(5) << "parse_ascii_file_list() -> "
+              << "File \"" << path << "\" is not an ASCII file list "
+              << "since there are too many missing files.\n";
+
+         a.clear();
+
+         break;
+      }
    }
-
 }
-
-   //
-   //  When checking file existence and none exist,
-   //  return an empty list
-   //
-
-if ( check_files_exist && n_exist == 0 )  a.clear();
-
-   //
-   //  done
-   //
 
 f_in.close();
 
