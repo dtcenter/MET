@@ -165,29 +165,37 @@ while(f_in >> file_name)  {
 
    //
    //  Keep track of the number of missing files.
-   //  After too many missing files, assume this is not a file list
-   //  and return an empty list.
    //
 
    if ( check_files_exist ) {
 
       if ( !is_regular_file(file_name.c_str()) )  n_missing++;
 
-      if ( n_missing >= max_missing )  {
+      if ( n_missing >= max_missing )  break;
 
-         mlog << Debug(5) << "parse_ascii_file_list() -> "
-              << "File \"" << path << "\" is not an ASCII file list "
-              << "since there are too many missing files.\n";
+   }
+}
 
-         a.clear();
+//
+//  Check for too many missing files:
+//  - A small number of files that are all missing
+//  - A large number of files with a least 10 missing
+//
 
-         break;
-      }
+if ( check_files_exist )  {
+
+   if ( ( a.n() <  max_missing && n_missing == a.n()       ) ||
+        ( a.n() >= max_missing && n_missing >= max_missing ) )  { 
+
+      mlog << Debug(5) << "parse_ascii_file_list() -> "
+           << "File \"" << path << "\" is not an ASCII file list "
+           << "since there are too many missing files.\n";
+
+      a.clear();
    }
 }
 
 f_in.close();
-
 
 return(a);
 
