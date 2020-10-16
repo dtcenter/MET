@@ -783,14 +783,11 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   for (int k=0; k<dim_count; k++) {
     int dim_size = var->getDim(k).getSize();
     if (dim_size < a[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < a[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << a[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(var) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << a[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(var) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
@@ -1004,14 +1001,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     lengths[k] = 1;
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < offsets[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << offsets[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(v) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << offsets[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(v) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
