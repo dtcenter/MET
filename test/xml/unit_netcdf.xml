@@ -94,5 +94,18 @@
       <grid_nc>&OUTPUT_DIR;/netcdf/grid_stat/grid_stat_no_leap_000000L_19860101_000000V_pairs.nc</grid_nc>
     </output>
   </test>
-  
+
+  <test name="netcdf_1byte_time">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/cyg.ddmi.s20200803-003000-e20200803-233000.l3.grid-wind.a10.d21.nc \
+      &OUTPUT_DIR;/netcdf/test_1byte_time.ps \
+      'name="wind_speed"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/netcdf/test_1byte_time.ps</ps>
+    </output>
+  </test>
+
 </met_test>
