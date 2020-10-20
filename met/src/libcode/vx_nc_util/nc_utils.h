@@ -254,11 +254,11 @@ extern bool get_nc_data(NcVar *, float  *data, const long *dims, const long *cur
 extern bool get_nc_data(NcVar *, double *data, const long *dims, const long *curs);
 extern bool get_nc_data(NcVar *, ncbyte *data, const long *dims, const long *curs);
 
-extern bool get_nc_data(NcFile *, const char *var_name, int    *data, const long *curs, const long *dims);
-extern bool get_nc_data(NcFile *, const char *var_name, char   *data, const long *curs, const long *dims);
-extern bool get_nc_data(NcFile *, const char *var_name, float  *data, const long *curs, const long *dims);
-extern bool get_nc_data(NcFile *, const char *var_name, double *data, const long *curs, const long *dims);
-extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long *curs, const long *dims);
+extern bool get_nc_data(NcFile *, const char *var_name, int    *data, const long *dims, const long *curs);
+extern bool get_nc_data(NcFile *, const char *var_name, char   *data, const long *dims, const long *curs);
+extern bool get_nc_data(NcFile *, const char *var_name, float  *data, const long *dims, const long *curs);
+extern bool get_nc_data(NcFile *, const char *var_name, double *data, const long *dims, const long *curs);
+extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long *dims, const long *curs);
 
 extern bool get_nc_data_to_array(NcVar  *, StringArray *);
 extern bool get_nc_data_to_array(NcFile *, const char *, StringArray *);

@@ -153,7 +153,6 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(NcFile *nc_in);
-static bool get_lat_lon_dims(NcFile *nc_in, int *lat_size, int *lon_size);
 //static int  get_lat_dim_offset(NcVar *);
 //static int  get_lon_dim_offset(NcVar *);
 
@@ -605,7 +604,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    bool use_var_id = true;
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
-   unixtime requested_valid_time, valid_time = 0;
+   unixtime requested_valid_time, valid_time;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_point_file() -> ";
 
@@ -747,7 +746,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
                else {
                   bool not_found_grib_code = true;
-                  for (int idx=0; idx<nobs; idx++) {
+                  for (idx=0; idx<nobs; idx++) {
                      if (var_idx_or_gc == obs_ids[idx]) {
                         not_found_grib_code = false;
                         break;
@@ -764,7 +763,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          if (exit_by_field_name_error) {
             ConcatString log_msg;
             if (use_var_id) {
-               for (int idx=0; idx<var_names.n(); idx++) {
+               for (idx=0; idx<var_names.n(); idx++) {
                   if (0 < idx) log_msg << ", ";
                   log_msg << var_names[idx];
                }
@@ -772,7 +771,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             else {
                log_msg << "GRIB codes: ";
                IntArray grib_codes;
-               for (int idx=0; idx<nobs; idx++) {
+               for (idx=0; idx<nobs; idx++) {
                   if (!grib_codes.has(obs_ids[idx])) {
                      grib_codes.add(obs_ids[idx]);
                      if (0 < idx) log_msg << ", ";
@@ -1099,19 +1098,13 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                              VarInfo *vinfo, Met2dDataFile *fr_mtddf,
                              const Grid to_grid) {
-   int nobs;
-   int nx, ny, var_count, to_count, var_count2;
-   int idx;
-   int filtered_by_time;
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
-   DataPlane prob_dp, prob_mask_dp;
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
 
    unixtime requested_valid_time, valid_time = 0;
-   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
    static const char *method_name = "process_point_file_with_latlon() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
@@ -1256,14 +1249,13 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    int from_lat_cnt = fr_grid.ny();
    int from_lon_cnt = fr_grid.nx();
    int from_data_size = from_lat_cnt * from_lon_cnt;
-   float *from_data = new float[from_data_size];
    if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
       mlog << Error << "\n" << method_name << "Trouble reading data \"" 
            << vinfo->name() << "\" from file \"" << InputFilename << "\"\n\n";
       exit(1);
    }
    else {
-
+      float *from_data = new float[from_data_size];
       for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
             int offset = fr_dp.two_to_one(xIdx,yIdx);
@@ -1349,7 +1341,6 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
            << " out of " << (to_lat_cnt*to_lon_cnt)
            << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
            << "]\n";
-       
    }
 
    if (to_cell_cnt == 0) {
@@ -1814,23 +1805,16 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    else if (IS_INVALID_NC(var_lon))
       mlog << Error << method_name << " Fail to get longitudes\n";
    else if (data_size > 0) {
-      double x, y;
-      float  lat, lon;
-      int    idx_x, idx_y;
-      int    coord_offset, to_offset;
-      int    count_in_grid;
-      int    buff_size = data_size*sizeof(float);
-
       float *latitudes  = new float[data_size];
       float *longitudes = new float[data_size];
-      get_nc_data(&var_lat, latitudes);
-      get_nc_data(&var_lon, longitudes);
-
-      get_grid_mapping(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                       longitudes, from_lat_count, from_lon_count);
-      if (latitudes)  { delete [] latitudes;   latitudes  = NULL; }
-      if (longitudes) { delete [] longitudes;  longitudes = NULL; }
+      status = get_nc_data(&var_lat, latitudes);
+      if (status) status = get_nc_data(&var_lon, longitudes);
+      if (status) get_grid_mapping(from_dp, to_dp, to_grid, cellMapping, latitudes,
+                                   longitudes, from_lat_count, from_lon_count);
+      if (latitudes)  delete [] latitudes;
+      if (longitudes) delete [] longitudes;
    }   //  if data_size > 0
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1947,11 +1931,6 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      double x, y;
-      float  lat, lon;
-      int    idx_x, idx_y;
-      int    coord_offset, to_offset;
-      int    count_in_grid;
       float  *latitudes  = (float *)NULL;
       float  *longitudes = (float *)NULL;
       float  *latitudes_buf  = (float *)NULL;
@@ -2048,17 +2027,14 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                           longitudes, from_lat_count, from_lon_count);
       }
 
-      if (latitudes_buf)  { delete [] latitudes_buf;   latitudes_buf  = NULL; }
-      if (longitudes_buf) { delete [] longitudes_buf;  longitudes_buf = NULL; }
+      if (latitudes_buf)  delete [] latitudes_buf;
+      if (longitudes_buf) delete [] longitudes_buf;
 
       grid_data.release();
 
    }   //  if data_size > 0
 
-
-   if(coord_nc_in) {
-      delete coord_nc_in;  coord_nc_in = 0;
-   }
+   if(coord_nc_in) delete coord_nc_in;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2296,7 +2272,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    bool is_adp_variable = (0 != actual_var_name.compare(vinfo->name().c_str()));
 
    memset(adp_data, 1, from_data_size*sizeof(uchar));   // Default: 1 = data present
-   memset(adp_qc_data, 65535, from_data_size*sizeof(unsigned short));
+   memset(adp_qc_data, 255, from_data_size*sizeof(unsigned short));
    if (is_adp_variable && IS_VALID_NC_P(nc_adp)) {
       is_dust_only  = (0 == vinfo->name().comparecase((actual_var_len + 1),
             vname_dust.length(), vname_dust.c_str()));
@@ -2617,39 +2593,6 @@ bool keep_message_type(const int mt_index) {
           message_type_list.has(mt_index);
 
    return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
-bool get_lat_lon_dims(NcFile *nc_in, int *lat_size, int *lon_size) {
-   bool has_lat_dim = false;
-   bool has_lon_dim = false;
-
-   StringArray dim_names, lat_names, lon_names;
-   if (get_dim_names(nc_in, &dim_names)) {
-      lat_names.add_css(lat_dim_name_list);   
-      lat_names.set_ignore_case(true);   
-      lon_names.add_css(lon_dim_name_list);   
-      lon_names.set_ignore_case(true);   
-      for (int idx=0; idx<dim_names.n(); idx++) {
-         if (lat_names.has(dim_names[idx])) {
-            NcDim dim = get_nc_dim(nc_in, dim_names[idx]);
-            if (IS_VALID_NC(dim)) {
-               has_lat_dim = true;
-               *lat_size = get_dim_size(&dim);
-            }
-         }
-         else if (lon_names.has(dim_names[idx])) {
-            NcDim dim = get_nc_dim(nc_in, dim_names[idx]);
-            if (IS_VALID_NC(dim)) {
-               has_lon_dim = true;
-               *lon_size = get_dim_size(&dim);
-            }
-         }
-         if (has_lat_dim && has_lon_dim) break;
-      }
-   }
-
-   return (has_lat_dim && has_lon_dim);
 }
 
 ////////////////////////////////////////////////////////////////////////

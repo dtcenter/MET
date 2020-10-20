@@ -719,7 +719,6 @@ void process_obs_file(int i_nc) {
 
    int obs_count = get_dim_size(&obs_vars.obs_dim);
    int hdr_count = get_dim_size(&obs_vars.hdr_dim);
-   int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
 
    mlog << Debug(2)
         << "Searching " << obs_count
