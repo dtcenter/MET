@@ -1086,13 +1086,6 @@ int get_int_var(NcVar * var, const int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//double get_nc_time(NcFile * nc, const char * var_name, const int index) {
-//   NcVar var = get_var(nc, var_name);
-//   return(get_nc_time(&var, index));
-//}
-
-////////////////////////////////////////////////////////////////////////
-
 double get_nc_time(NcVar * var, const int index) {
    double k;
    std::vector<size_t> start;
