@@ -216,7 +216,6 @@ extern char   get_char_val(NcVar *var, const int index);
 extern int    get_int_var(NcFile *, const char * var_name, const int index);
 extern int    get_int_var(NcVar *, const int index);
 
-//extern double get_nc_time(NcFile *, const char * var_name, const int index = 0);
 extern double get_nc_time(NcVar *, int index = 0);
 
 extern float  get_float_var(NcFile *, const char * var_name, const int index = 0);
