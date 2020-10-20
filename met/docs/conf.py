@@ -18,7 +18,7 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'MET'
-author = 'UCAR/NCAR, NOAA, and CSU/CIRA'
+author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T.'
 version = 'develop'
 verinfo = version
