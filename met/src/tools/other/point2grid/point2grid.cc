@@ -269,6 +269,13 @@ void process_command_line(int argc, char **argv) {
    RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
+   // Check if the input file
+   if ( !file_exists(InputFilename.c_str()) ) {
+      mlog << Error << "\n" << method_name
+           << "file does not exist \"" << InputFilename << "\"\n\n";
+      exit(1);
+   }
+
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
       mlog << Error << "\nprocess_command_line() -> "
@@ -1104,7 +1111,6 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
 
-   unixtime requested_valid_time, valid_time = 0;
    static const char *method_name = "process_point_file_with_latlon() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
@@ -1127,7 +1133,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       usage();
    }
 
-   valid_time = find_valid_time(nc_in);
+   unixtime valid_time = find_valid_time(nc_in);
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon);
