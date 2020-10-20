@@ -438,19 +438,20 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
       mlog << Error << "\n" << method_name
            << "can't read attribute \"" << att_name
            << "\" from because NC is invalid.\n\n";
+      if (exit_on_error) exit(1);
    }
    else {
       multimap<string,NcGroupAtt>::iterator itAtt;
       multimap<string,NcGroupAtt> mapAttrs = nc->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
-      if ( att_name == (*itAtt).first ) {
+         if ( att_name == (*itAtt).first ) {
             att = new NcGroupAtt();
             *att = (*itAtt).second;
             break;
          }
       }
 
-      if(IS_INVALID_NC_P(att) && exit_on_error) {
+      if(IS_INVALID_NC_P(att)) {
          mlog << Error << "\n" << method_name
               << "can't read attribute \"" << att_name
               << "\" from \"" << nc->getName() << "\".\n\n";
@@ -1085,17 +1086,18 @@ int get_int_var(NcVar * var, const int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double get_double_var(NcFile * nc, const char * var_name, const int index) {
-   NcVar var = get_var(nc, var_name);
-   return(get_double_var(&var, index));
-}
+//double get_nc_time(NcFile * nc, const char * var_name, const int index) {
+//   NcVar var = get_var(nc, var_name);
+//   return(get_nc_time(&var, index));
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
-double get_double_var(NcVar * var, const int index) {
+double get_nc_time(NcVar * var, const int index) {
    double k;
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_nc_time() -> ";
 
    k = bad_data_double;
    if (IS_VALID_NC_P(var)) {
@@ -1105,6 +1107,7 @@ double get_double_var(NcVar * var, const int index) {
       int vi;
       short vs;
       float vf;
+      ncbyte vb;
       long long vl;
       int dataType = GET_NC_TYPE_ID_P(var);
       switch (dataType) {
@@ -1119,6 +1122,10 @@ double get_double_var(NcVar * var, const int index) {
             var->getVar(start, count, &vs);
             k = (double)vs;
             break;
+         case NC_BYTE:
+            var->getVar(start, count, &vb);
+            k = (double)vs;
+            break;
          case NC_INT:
             var->getVar(start, count, &vi);
             k = (double)vi;
@@ -1129,16 +1136,16 @@ double get_double_var(NcVar * var, const int index) {
             k = (double)vl;
             converted_vl = (long long)k;
             if (converted_vl != vl) {
-               mlog << Warning << "\nget_double_var() -> "
+               mlog << Warning << "\n" << method_name
                     << " the value was changed during type conversion: "
                     << converted_vl << " (was  " << vl << ")\n";
             }
             break;
          default:
-            mlog << Error << "\nget_double_var() -> "
+            mlog << Error << "\n" << method_name
                  << "data type mismatch (double vs. \"" << GET_NC_TYPE_NAME_P(var)
-                 << "\").\nIt won't be converted because of dimension issue.\n"
-                 << "Please correct the data type to double for variable \"" << GET_NC_NAME_P(var) << "\".\n\n";
+                 << "\").\nPlease correct the data type to double for variable \""
+                 << GET_NC_NAME_P(var) << "\".\n\n";
             exit(1);
       }
    }
