@@ -419,7 +419,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
          mlog << Error << "\n" << method_name
               << "can't read attribute \"" << att_name
               << "\" from \"" << var->getName() << "\" variable.\n\n";
-         if (exit_on_error) exit(1);
+         exit(1);
       }
    }
    return(att);
@@ -451,11 +451,11 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
          }
       }
 
-      if(IS_INVALID_NC_P(att)) {
+      if(IS_INVALID_NC_P(att) && exit_on_error) {
          mlog << Error << "\n" << method_name
               << "can't read attribute \"" << att_name
               << "\" from \"" << nc->getName() << "\".\n\n";
-         if (exit_on_error) exit(1);
+         exit(1);
       }
    }
    return(att);
