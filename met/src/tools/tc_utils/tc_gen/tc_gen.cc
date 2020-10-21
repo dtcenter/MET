@@ -405,7 +405,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                      << " genesis at (" << bga[i].lat() << ", "
                      << bga[i].lon() << ") for "
                      << unix_to_yyyymmdd_hhmmss(ut)
-                     << " initialization "
+                     << " initialization, "
                      << (bga[i].genesis_time() - ut)/sec_per_hour
                      << " lead matches " << fga[j].technique() << " "
                      << unix_to_yyyymmdd_hhmmss(fga[j].genesis_time())
