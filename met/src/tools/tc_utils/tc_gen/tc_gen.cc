@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    05/17/19  Halley Gotway   New
+//   001    10/21/21  Halley Gotway   Fix for MET #1465
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -421,7 +422,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                  << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
                  << " genesis at (" << bga[i].lat() << ", "
                  << bga[i].lon() << ") for "
-                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization "
+                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization, "
                  << (bga[i].genesis_time() - ut)/sec_per_hour
                  << " lead is a MISS.\n";
             info.cts_info.cts.inc_fn_oy();
@@ -554,21 +555,6 @@ void process_track_files(const StringArray &files,
             continue;
          }
 
-         // Check the model genesis event criteria
-         if(!is_anly) {
-
-            // Check the lead time window
-            if(tracks[j][0].lead() < conf_info.LeadSecBeg ||
-               tracks[j][0].lead() > conf_info.LeadSecEnd) {
-               continue;
-            }
-
-            // Check the minimum duration
-            if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
-               continue;
-            }
-         }
-
          // Select the genesis event filtering criteria
          if(tracks[j].is_best_track())      event_info = &conf_info.BestEventInfo;
          else if(tracks[j].is_oper_track()) event_info = &conf_info.OperEventInfo;
@@ -584,6 +570,25 @@ void process_track_files(const StringArray &files,
          } // end for k
 
          if(!keep) continue;
+
+         // Check the model genesis event criteria
+         if(!is_anly) {
+
+            // Check the lead time window
+            if(tracks[j][k].lead() < conf_info.LeadSecBeg ||
+               tracks[j][k].lead() > conf_info.LeadSecEnd) {
+               mlog << Debug(6) << "Skipping genesis event for lead time "
+                    << tracks[j][k].lead()/sec_per_hour << ".\n";
+               continue;
+            }
+
+            // Check the minimum duration
+            if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
+               mlog << Debug(6) << "Skipping genesis event for track duration of "
+                    << tracks[j].duration()/sec_per_hour << ".\n";
+               continue;
+            }
+         }
 
          // Store the genesis event
          genesis.add(tracks[j], k);
