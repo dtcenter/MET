@@ -1881,8 +1881,11 @@ void process_pbfile(int i_pb) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                  hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
-      
-      for(float *tmp_pqtzuv : pqtzuv_list) delete tmp_pqtzuv;
+
+      for(vector<float *>::iterator it = pqtzuv_list.begin();
+          it != pqtzuv_list.end(); ++it) {
+         delete *it;
+      }
       pqtzuv_list.clear();
       pqtzuv_map_tq.clear();
       pqtzuv_map_uv.clear();
