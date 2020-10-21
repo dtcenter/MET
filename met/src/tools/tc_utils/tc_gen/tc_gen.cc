@@ -405,7 +405,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                      << " genesis at (" << bga[i].lat() << ", "
                      << bga[i].lon() << ") for "
                      << unix_to_yyyymmdd_hhmmss(ut)
-                     << " initialization "
+                     << " initialization, "
                      << (bga[i].genesis_time() - ut)/sec_per_hour
                      << " lead matches " << fga[j].technique() << " "
                      << unix_to_yyyymmdd_hhmmss(fga[j].genesis_time())
@@ -422,9 +422,9 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                  << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
                  << " genesis at (" << bga[i].lat() << ", "
                  << bga[i].lon() << ") for "
-                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization "
+                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization, "
                  << (bga[i].genesis_time() - ut)/sec_per_hour
-                 << ", lead is a MISS.\n";
+                 << " lead is a MISS.\n";
             info.cts_info.cts.inc_fn_oy();
          }
       } // end for ut
