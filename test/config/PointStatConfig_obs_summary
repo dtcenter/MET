@@ -143,6 +143,6 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.1";
+version        = "V10.0";
 
 ////////////////////////////////////////////////////////////////////////////////

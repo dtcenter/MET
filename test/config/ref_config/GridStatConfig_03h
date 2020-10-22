@@ -196,6 +196,6 @@ nc_pairs_flag = FALSE;
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "${MODEL}_F${FCST_TIME}_03h";
-version          = "V9.1";
+version          = "V10.0";
 
 ////////////////////////////////////////////////////////////////////////////////

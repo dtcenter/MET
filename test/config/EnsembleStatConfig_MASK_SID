@@ -233,6 +233,6 @@ rng = {
 
 grid_weight_flag = NONE;
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V9.1";
+version          = "V10.0";
 
 ////////////////////////////////////////////////////////////////////////////////
