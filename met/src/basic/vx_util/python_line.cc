@@ -324,11 +324,7 @@ script = new Python3_Script (path.text());
    //     the user's script
    //
 
-if ( UserScriptArgs.n() > 0 )  {
-
-   script->reset_argv(UserScriptPath.text(), UserScriptArgs);
-
-}
+script->reset_argv(UserScriptPath.text(), UserScriptArgs);
 
    //
    //  import the user's script as a module
