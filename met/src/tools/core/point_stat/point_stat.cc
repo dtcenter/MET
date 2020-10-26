@@ -155,8 +155,6 @@ static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -217,8 +215,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
    cline.add(set_outdir,             "-outdir",        1);
-   cline.add(set_logfile,            "-log",           1);
-   cline.add(set_verbosity,          "-v",             1);
 
    // Parse the command line
    cline.parse();
@@ -2186,24 +2182,6 @@ void set_obs_valid_end_time(const StringArray & a)
 void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

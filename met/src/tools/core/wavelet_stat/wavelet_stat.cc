@@ -129,8 +129,6 @@ static void render_tile(PSfile *, const double *, int, int, Box &);
 
 static void usage();
 static void set_outdir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -174,9 +172,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress, "-compress", 1);
 
    // Parse the command line
    cline.parse();
@@ -2956,25 +2952,8 @@ void set_outdir(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
+void set_compress(const StringArray & a)
 {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 

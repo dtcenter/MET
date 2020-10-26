@@ -109,8 +109,6 @@ static void set_obs_var(const StringArray &);
 static void set_msg_type(const StringArray &);
 static void set_data_filename(const StringArray &);
 static void set_dotsize(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -157,8 +155,6 @@ int main(int argc, char *argv[]) {
    cline.add(set_msg_type, "-msg_typ", 1);
    cline.add(set_data_filename, "-data_file", 1);
    cline.add(set_dotsize, "-dotsize", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
 
    //
    // parse the command line
@@ -706,22 +702,3 @@ void set_dotsize(const StringArray & a)
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-////////////////////////////////////////////////////////////////////////
-

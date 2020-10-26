@@ -62,8 +62,6 @@ static void set_channel(const StringArray &);
 static void set_hdr(const StringArray &);
 static void set_suffix(const StringArray &);
 static void set_outdir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,8 +82,6 @@ int main(int argc, char * argv []) {
    cline.add(set_hdr,          "-set_hdr",      2);
    cline.add(set_suffix,       "-suffix",       1);
    cline.add(set_outdir,       "-outdir",       1);
-   cline.add(set_logfile,      "-log",          1);
-   cline.add(set_verbosity,    "-v",            1);
 
    // Parse the command line
    cline.parse();
@@ -589,22 +585,6 @@ void set_suffix(const StringArray & a) {
 
 void set_outdir(const StringArray & a) {
    output_directory = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

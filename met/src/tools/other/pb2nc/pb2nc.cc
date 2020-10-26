@@ -401,8 +401,6 @@ static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_collect_metadata(const StringArray &);
 static void   set_target_variables(const StringArray & a);
-static void   set_logfile(const StringArray &);
-static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
 
 static void   display_bufr_variables(const StringArray &, const StringArray &,
@@ -553,11 +551,9 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_nmsg, "-nmsg", 1);
    cline.add(set_dump_path, "-dump", 1);
-   cline.add(set_collect_metadata,  "-index",  0);
+   cline.add(set_collect_metadata, "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress, "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -3554,24 +3550,6 @@ void set_target_variables(const StringArray & a)
      ConcatString arg = a[0];
      bufr_target_variables = arg.split(",+ ");
    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

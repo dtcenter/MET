@@ -134,12 +134,10 @@ static FileHandler *determine_ascii_format(const ConcatString &);
 
 static void usage();
 static void set_format(const StringArray &);
-static void set_logfile(const StringArray &);
 static void set_config(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_mask_sid(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 static void setup_wrapper_path();
@@ -173,8 +171,6 @@ int main(int argc, char *argv[]) {
    // Add the options function calls
    //
    cline.add(set_format,    "-format",    1);
-   cline.add(set_logfile,   "-log",       1);
-   cline.add(set_verbosity, "-v",         1);
    cline.add(set_config,    "-config",    1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
@@ -536,16 +532,6 @@ void set_format(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_config(const StringArray & a) {
    config_filename = a[0];
 }
@@ -610,12 +596,6 @@ void set_mask_sid(const StringArray & a) {
    mlog << Debug(2)
         << "Parsed Station ID Mask: " << mask_name
         << " containing " << mask_sid.n_elements() << " points\n";
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
