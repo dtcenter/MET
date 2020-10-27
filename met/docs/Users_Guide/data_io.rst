@@ -264,8 +264,7 @@ MET Configuration File Options
 
 The information listed below may also be found in the **data/config/README** file.
 
-.. highlight:: none
-.. literalinclude:: ../../data/config/README
+:ref:`README`
 
 .. _Data IO MET-TC Configuration File Options:
 
