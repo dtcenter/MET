@@ -119,11 +119,9 @@ static void set_qc_dd(const StringArray &);
 static void set_lvl_dim(const StringArray &);
 static void set_rec_beg(const StringArray &);
 static void set_rec_end(const StringArray &);
-static void set_logfile(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_mask_sid(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 static void set_config(const StringArray &);
 
@@ -240,8 +238,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_lvl_dim,   "-lvl_dim",   1);
    cline.add(set_rec_beg,   "-rec_beg",   1);
    cline.add(set_rec_end,   "-rec_end",   1);
-   cline.add(set_logfile,   "-log",       1);
-   cline.add(set_verbosity, "-v",         1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
    cline.add(set_mask_sid,  "-mask_sid",  1);
@@ -3692,17 +3688,6 @@ void set_rec_end(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_mask_grid(const StringArray & a) {
 
    // List the grid masking file
@@ -3761,13 +3746,6 @@ void set_mask_sid(const StringArray & a) {
    mlog << Debug(2)
         << "Parsed Station ID Mask: " << mask_name
         << " containing " << mask_sid.n_elements() << " points\n";
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

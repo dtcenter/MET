@@ -719,9 +719,18 @@ for (j=0; j<N; ++j)  {
 
    if ( is_switch(args[j]) )  {
 
-      if ( (args[j].compare("-help") == 0) || (args[j].compare("--help") == 0) )  do_help();   //  doesn't return
+      if ( (args[j].compare("-help")  == 0) ||
+           (args[j].compare("--help") == 0) )  do_help();
 
-      if ( (args[j].compare("-version") == 0) || (args[j].compare("--version") == 0) )  show_version();   //  doesn't return
+      if ( (args[j].compare("-version")  == 0) ||
+           (args[j].compare("--version") == 0) )  show_version();
+
+         //
+         //  ignore -v and -log options
+         //
+
+      if ( (args[j].compare(verbosity_option) == 0) ||
+           (args[j].compare(log_option)       == 0) )  continue;      
 
       option_index = options.lookup(args[j]);
 
@@ -848,6 +857,60 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void CommandLine::do_verbosity()
+
+{
+
+int i_arg;
+
+   //
+   //  use the last -v option
+   //
+
+args.has(verbosity_option, i_arg, false);
+
+if ( i_arg >= 0 )  {
+
+   mlog.set_verbosity_level(atoi(args[i_arg+1].c_str()));
+   args.shift_down(i_arg, 2);
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::do_log()
+
+{
+
+int i_arg;
+
+   //
+   //  use the last -log option
+   //
+
+args.has(log_option, i_arg, false);
+
+if ( i_arg >= 0 )  {
+
+   mlog.open_log_file(args[i_arg+1]);
+   args.shift_down(i_arg, 2);
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int CommandLine::length(int k) const
 
 {
@@ -868,6 +931,13 @@ int j, index;
 int N, M;
 StringArray a;
 
+   //
+   //  parse -v and -log options first
+   //
+
+do_verbosity();
+
+do_log();
 
 while ( (j = next_option(index)) >= 0 )  {
 

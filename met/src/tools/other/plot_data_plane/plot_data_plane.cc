@@ -82,8 +82,6 @@ static void usage();
 static void set_colortable_name(const StringArray &);
 static void set_plot_range(const StringArray &);
 static void set_title_string(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -250,8 +248,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_colortable_name, "-color_table", 1);
    cline.add(set_plot_range, "-plot_range", 2);
    cline.add(set_title_string, "-title", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
 
    //
    // parse the command line
@@ -339,22 +335,6 @@ void set_title_string(const StringArray & a) {
 void set_plot_range(const StringArray & a) {
    PlotRangeMin = atof(a[0].c_str());
    PlotRangeMax = atof(a[1].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

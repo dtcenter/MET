@@ -131,9 +131,7 @@ static void set_method(const StringArray &);
 static void set_prob_cat_thresh(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
-static void set_logfile(const StringArray &);
 static void set_config(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 static void set_adp(const StringArray &);
 static void set_gaussian_dx(const StringArray &);
@@ -239,16 +237,14 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_field,      "-field",      1);
-   cline.add(set_method,     "-method",     1);
-   cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_name,       "-name",       1);
-   cline.add(set_logfile,    "-log",        1);
-   cline.add(set_verbosity,  "-v",          1);
-   cline.add(set_compress,   "-compress",   1);
-   cline.add(set_qc_flags,   "-qc",         1);
-   cline.add(set_adp,        "-adp",        1);
-   cline.add(set_config,     "-config",     1);
+   cline.add(set_field,           "-field",           1);
+   cline.add(set_method,          "-method",          1);
+   cline.add(set_vld_thresh,      "-vld_thresh",      1);
+   cline.add(set_name,            "-name",            1);
+   cline.add(set_compress,        "-compress",        1);
+   cline.add(set_qc_flags,        "-qc",              1);
+   cline.add(set_adp,             "-adp",             1);
+   cline.add(set_config,          "-config",          1);
    cline.add(set_prob_cat_thresh, "-prob_cat_thresh", 1);
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
    cline.add(set_gaussian_dx,     "-gaussian_dx",     1);
@@ -2734,24 +2730,8 @@ void set_name(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray &a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_config(const StringArray & a) {
    config_filename = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray &a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

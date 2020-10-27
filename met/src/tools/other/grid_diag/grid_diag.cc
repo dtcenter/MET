@@ -64,8 +64,6 @@ static void usage();
 static void set_data_files(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
-static void set_log_file(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -122,8 +120,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_data_files,  "-data",    -1);
    cline.add(set_config_file, "-config",   1);
    cline.add(set_out_file,    "-out",      1);
-   cline.add(set_log_file,    "-log",      1);
-   cline.add(set_verbosity,   "-v",        1);
    cline.add(set_compress,    "-compress", 1);
 
    // Parse the command line
@@ -796,22 +792,6 @@ void set_out_file(const StringArray & a) {
 
 void set_config_file(const StringArray & a) {
    config_file = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_log_file(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

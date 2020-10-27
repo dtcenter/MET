@@ -72,7 +72,6 @@ static void set_scale     (const StringArray &);
 static void set_offset    (const StringArray &);
 static void set_fillvalue (const StringArray &);
 static void set_compress  (const StringArray &);
-static void set_verbosity(const StringArray & a);
 
 static void usage();
 
@@ -106,7 +105,6 @@ cline.add(set_units,     "-units",     1);
 cline.add(set_scale,     "-scale",     1);
 cline.add(set_offset,    "-offset",    1);
 cline.add(set_fillvalue, "-fill",      1);
-cline.add(set_verbosity, "-v", 1);
 cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
@@ -338,13 +336,6 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
 
 int get_compress() {
    return ((compress_level < 0) ? 0 : compress_level);

@@ -98,10 +98,6 @@ static void set_outdir(const StringArray &);
 
 static void set_max_minutes(const StringArray &);
 
-static void set_logfile(const StringArray &);
-
-static void set_verbosity(const StringArray &);
-
 static void process(const char * filename);
 
 static void set_pixel_time_filename(const char *, char *);
@@ -142,10 +138,6 @@ cline.set_usage(usage);
 cline.add(set_outdir, "-outdir", 1);
 
 cline.add(set_max_minutes, "-max", 1);
-
-cline.add(set_logfile, "-log", 1);
-
-cline.add(set_verbosity, "-v", 1);
 
 cline.parse();
 
@@ -230,38 +222,6 @@ void set_max_minutes(const StringArray & a)
 {
 
 max_minutes = atoi(a[0].c_str());
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_logfile(const StringArray & a)
-
-{
-
-ConcatString filename;
-
-filename = a[0];
-
-mlog.open_log_file(filename);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_verbosity(const StringArray & a)
-
-{
-
-mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 

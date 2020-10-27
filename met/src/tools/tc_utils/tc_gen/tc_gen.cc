@@ -75,8 +75,6 @@ static void   set_genesis          (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
-static void   set_logfile          (const StringArray &);
-static void   set_verbosity        (const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,12 +109,10 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add function calls for the arguments
-   cline.add(set_genesis,   "-genesis", -1);
-   cline.add(set_track,     "-track",   -1);
-   cline.add(set_config,    "-config",   1);
-   cline.add(set_out,       "-out",      1);
-   cline.add(set_logfile,   "-log",      1);
-   cline.add(set_verbosity, "-v",        1);
+   cline.add(set_genesis, "-genesis", -1);
+   cline.add(set_track,   "-track",   -1);
+   cline.add(set_config,  "-config",   1);
+   cline.add(set_out,     "-out",      1);
 
    // Parse the command line
    cline.parse();
@@ -940,22 +936,6 @@ void set_config(const StringArray & a) {
 
 void set_out(const StringArray & a) {
    out_base = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

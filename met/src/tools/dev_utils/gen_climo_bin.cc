@@ -80,7 +80,6 @@ static void set_mean_file(const StringArray & a);
 static void set_stdev_file(const StringArray & a);
 static void set_field_str(const StringArray & a);
 static void set_var_name(const StringArray & a);
-static void set_verbosity(const StringArray & a);
 static void my_memcpy(void * to, unsigned char * & from, int n_bytes);
 
 static void usage();
@@ -102,7 +101,6 @@ int main(int argc, char *argv[]) {
    cline.add(set_stdev_file, "-stdev", 1);
    cline.add(set_field_str,  "-field", 1);
    cline.add(set_var_name,   "-name",  1);
-   cline.add(set_verbosity,  "-v",     1);
 
    cline.parse();
 
@@ -434,8 +432,6 @@ void set_mean_file (const StringArray & a) { mean_file  = a[0];       return; }
 void set_stdev_file(const StringArray & a) { stdev_file = a[0];       return; }
 void set_field_str (const StringArray & a) { field_str  = a[0];       return; }
 void set_var_name  (const StringArray & a) { var_name   = a[0];       return; }
-void set_verbosity (const StringArray & a) {
-                          mlog.set_verbosity_level(atoi(a[0].c_str()));       return; }
 
 ////////////////////////////////////////////////////////////////////////
 

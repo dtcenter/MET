@@ -173,9 +173,6 @@ static void set_raw       (const StringArray &);
 static void set_simple    (const StringArray &);
 static void set_cluster   (const StringArray &);
 
-static void set_logfile   (const StringArray &);
-static void set_verbosity (const StringArray &);
-
 static void sanity_check();
 
 static void read_config();
@@ -230,9 +227,6 @@ cline.add(set_fcst,      "-fcst",    0);
 cline.add(set_raw,       "-raw",     0);
 cline.add(set_simple,    "-simple",  0);
 cline.add(set_cluster,   "-cluster", 0);
-
-cline.add(set_logfile,   "-log",     1);
-cline.add(set_verbosity, "-v",       1);
 
 cline.parse();
 
@@ -721,38 +715,6 @@ void set_cluster(const StringArray &)
 {
 
 plot_field = cluster_obj_field;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_logfile(const StringArray & a)
-
-{
-
-ConcatString filename;
-
-filename = a[0];
-
-mlog.open_log_file(filename);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_verbosity(const StringArray & a)
-
-{
-
-mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 
