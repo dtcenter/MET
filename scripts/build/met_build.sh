@@ -9,8 +9,9 @@
 # This script is called by the
 # MET_checkout_and_build.sh script.
 #
-# The desired version of the code must have alredy
-# been checked out prior to calling this script.
+# The desired version of the code must have
+# already been checked out prior to calling this
+# script.
 #
 # Usage: MET_build <version_number>
 #
@@ -38,31 +39,26 @@ fi
 
 # Check for 0 or 1 arguments
 if [ ${NARGS} -eq 0 ]; then
-  VERSION="met-${CUR_REV}"
+  VERSION="${CUR_REV}"
 elif [ ${NARGS} -eq 1 ]; then
-  # Prepend met, if needed
-  if [[ ${1:0:3} != "met" ]]; then
-    VERSION="met-${1}"
-  else
-    VERSION="${1}"
-  fi
+  VERSION="${1}"
 else
   echo
-  echo "USAGE: MET_build <version>"
+  echo "USAGE: MET_build <version_number>"
   echo
   exit 1
 fi
 
+# Set the MET build version by stripping off leading "v" from "vX.Y"
+export MET_BUILD_VERSION=`echo $VERSION | sed 's/v//g'`
+echo "Building MET version '${MET_BUILD_VERSION}'"
+
 # Copy the current met directory
-echo "Building version '${VERSION}'..."
-cp -r met ${VERSION}
-cd ${VERSION}
+cp -r met met-${MET_BUILD_VERSION}
+cd met-${MET_BUILD_VERSION}
 
 # Cleanup
 rm -f `find ./ -name ".gitignore"`
-
-# Set the MET build version for bootstrap by stripping off leading "met-"
-export MET_BUILD_VERSION=`echo ${VERSION} | sed 's/met-//g'`
 
 # Run the bootstrap program to prepare for running configure
 echo "Running 'bootstrap' to prepare for running configure"
@@ -105,8 +101,8 @@ make dist > /dev/null
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
-TAR_FILE="${VERSION}.${TODAY}.tar.gz"
+TAR_FILE="met-${MET_BUILD_VERSION}.${TODAY}.tar.gz"
 
-echo "Copying tar file to new name: '${TAR_FILE}'"
+echo "Moving tar file to new name: '${TAR_FILE}'"
 mv met-* ../${TAR_FILE}
 
