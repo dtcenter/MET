@@ -18,94 +18,138 @@ configuration file itself is one large dictionary consisting of entries, some of
 which are dictionaries themselves.
 
 The configuration file language supports the following data types:
-   - Dictionary:
-      - Grouping of one or more entries enclosed by curly braces {}.
-   - Array:
-      - List of one or more entries enclosed by square braces [].
-      - Array elements are separated by commas.
-   - String:
-      - A character string enclosed by double quotation marks "".
-   - Integer:
-      - A numeric integer value.
-   - Float:
-      - A numeric float value.
-   - Boolean:
-      - A boolean value (TRUE or FALSE).
-   - Threshold:
-      - A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
-      - The threshold type may also be specified using two letter abbreviations
-        (lt, le, eq, ne, ge, gt).
-      - Multiple thresholds may be combined by specifying the logic type of AND
-        (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
-        and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
-   - Percentile Thresholds:
-      - Thresholds may be defined as percentiles of the data being processed in
-        several places:
-         - In Point-Stat and Grid-Stat when setting "cat_thresh", "wind_thresh"
-	   and "cnt_thresh".
-         - In Wavelet-Stat when setting "cat_thresh".
-         - In MODE when setting "conv_thresh" and "merge_thresh".
-         - In Ensemble-Stat when setting "obs_thresh".
-         - When using the "censor_thresh" config option.
-         - In the Stat-Analysis "-out_fcst_thresh" and "-out_obs_thresh" job
-           command options.
-         - In the Gen-Vx-Mask "-thresh" command line option.
-      - The following percentile threshold types are supported:
-         - "SFP" for a percentile of the sample forecast values.
-           e.g. ">SFP50" means greater than the 50-th forecast percentile.
-         - "SOP" for a percentile of the sample observation values.
-           e.g. ">SOP75" means greater than the 75-th observation percentile.
-         - "SCP" for a percentile of the sample climatology values.
-           e.g. ">SCP90" means greater than the 90-th climatology percentile.
-         - "USP" for a user-specified percentile threshold.
-           e.g. "<USP90(2.5)" means less than the 90-th percentile values which
-           the user has already determined to be 2.5 outside of MET.
-         - "==FBIAS1" to automatically de-bias the data. This option must be
-           used in conjunction with a simple threshold in the other field.
-           For example, when "obs.cat_thresh = >5.0" and
-           "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
-           observations and then chooses a forecast threshold which results in a
-           frequency bias of 1.
-         - "CDP" for climatological distribution percentile thresholds.
-           These thresholds require that the climatological mean and standard
-           deviation be defined using the climo_mean and climo_stdev config file
-           options, respectively. The categorical (cat_thresh), conditional
-           (cnt_thresh), or wind speed (wind_thresh) thresholds are defined
-           relative to the climatological distribution at each point. Therefore,
-           the actual numeric threshold applied can change for each point.
-           e.g. ">CDP50" means greater than the 50-th percentile of the
-           climatological distribution for each point.
-      - When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
-        for continuous filtering thresholds (cnt_thresh), wind speed thresholds
-        (wind_thresh), or observation filtering thresholds (obs_thresh in
-        ensemble_stat), the following special logic is applied. Percentile
-        thresholds of type equality are automatically converted to percentile
-        bins which span the values from 0 to 100.
-        For example, "==CDP25" is automatically expanded to 4 percentile bins:
-	>=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
-      - When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
-        requested, MET recomputes the actual percentile that the threshold
-        represents. If the requested percentile and actual percentile differ by
-        more than 5%, a warning message is printed. This may occur when the
-        sample size is small or the data values are not truly continuous.
-      - When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
-        actual threshold value is appended to the FCST_THRESH and OBS_THRESH
-        output columns. For example, if the 90-th percentile of the current set
-        of forecast values is 3.5, then the requested threshold "<=SFP90" is
-        written to the output as "<=SFP90(3.5)".
-      - When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
-        ignores the actual percentile values listed in parentheses.
-   - Piecewise-Linear Function (currently used only by MODE):
-      - A list of (x, y) points enclosed in parenthesis ().
-      - The (x, y) points are *NOT* separated by commas.
-   - User-defined function of a single variable:
-      - Left side is a function name followed by variable name in parenthesis.
-      - Right side is an equation which includes basic math functions (+,-,*,/),
-        built-in functions (listed below), or other user-defined functions.
-      - Built-in functions include:
-        sin, cos, tan, sind, cosd, tand, asin, acos, atan, asind, acosd, atand,
-        atan2, atan2d, arg, argd, log, exp, log10, exp10, sqrt, abs, min, max,
-        mod, floor, ceil, step, nint, sign
+
+* Dictionary:
+  
+  * Grouping of one or more entries enclosed by curly braces {}.
+
+* Array:
+  
+  * List of one or more entries enclosed by square braces [].
+    
+  * Array elements are separated by commas.
+
+* String:
+  
+  * A character string enclosed by double quotation marks "".
+    
+* Integer:
+  
+  * A numeric integer value.
+    
+* Float:
+  
+  * A numeric float value.
+    
+* Boolean:
+  
+  * A boolean value (TRUE or FALSE).
+    
+* Threshold:
+  
+  * A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
+    
+  * The threshold type may also be specified using two letter abbreviations
+    (lt, le, eq, ne, ge, gt).
+      
+  * Multiple thresholds may be combined by specifying the logic type of AND
+    (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
+    and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
+     
+* Percentile Thresholds:
+  
+  * Thresholds may be defined as percentiles of the data being processed in
+    several places:
+    
+    * In Point-Stat and Grid-Stat when setting "cat_thresh", "wind_thresh"
+      and "cnt_thresh".
+      
+    * In Wavelet-Stat when setting "cat_thresh".
+      
+    * In MODE when setting "conv_thresh" and "merge_thresh".
+      
+    * In Ensemble-Stat when setting "obs_thresh".
+	
+    * When using the "censor_thresh" config option.
+	
+    * In the Stat-Analysis "-out_fcst_thresh" and "-out_obs_thresh" job
+      command options.
+	
+    * In the Gen-Vx-Mask "-thresh" command line option.
+	
+  * The following percentile threshold types are supported:
+    
+    * "SFP" for a percentile of the sample forecast values.
+      e.g. ">SFP50" means greater than the 50-th forecast percentile.
+      
+    * "SOP" for a percentile of the sample observation values.
+      e.g. ">SOP75" means greater than the 75-th observation percentile.
+      
+    * "SCP" for a percentile of the sample climatology values.
+      e.g. ">SCP90" means greater than the 90-th climatology percentile.
+      
+    * "USP" for a user-specified percentile threshold.
+      e.g. "<USP90(2.5)" means less than the 90-th percentile values which
+      the user has already determined to be 2.5 outside of MET.
+      
+    * "==FBIAS1" to automatically de-bias the data. This option must be
+      used in conjunction with a simple threshold in the other field.
+      For example, when "obs.cat_thresh = >5.0" and
+      "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
+      observations and then chooses a forecast threshold which results in a
+      frequency bias of 1.
+      
+    * "CDP" for climatological distribution percentile thresholds.
+      These thresholds require that the climatological mean and standard
+      deviation be defined using the climo_mean and climo_stdev config file
+      options, respectively. The categorical (cat_thresh), conditional
+      (cnt_thresh), or wind speed (wind_thresh) thresholds are defined
+      relative to the climatological distribution at each point. Therefore,
+      the actual numeric threshold applied can change for each point.
+      e.g. ">CDP50" means greater than the 50-th percentile of the
+      climatological distribution for each point.
+      
+   * When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
+     for continuous filtering thresholds (cnt_thresh), wind speed thresholds
+     (wind_thresh), or observation filtering thresholds (obs_thresh in
+     ensemble_stat), the following special logic is applied. Percentile
+     thresholds of type equality are automatically converted to percentile
+     bins which span the values from 0 to 100.
+     For example, "==CDP25" is automatically expanded to 4 percentile bins:
+     >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
+     
+   * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
+     requested, MET recomputes the actual percentile that the threshold
+     represents. If the requested percentile and actual percentile differ by
+     more than 5%, a warning message is printed. This may occur when the
+     sample size is small or the data values are not truly continuous.
+     
+   * When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
+     actual threshold value is appended to the FCST_THRESH and OBS_THRESH
+     output columns. For example, if the 90-th percentile of the current set
+     of forecast values is 3.5, then the requested threshold "<=SFP90" is
+     written to the output as "<=SFP90(3.5)".
+     
+   * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
+     ignores the actual percentile values listed in parentheses.
+     
+* Piecewise-Linear Function (currently used only by MODE):
+  
+  * A list of (x, y) points enclosed in parenthesis ().
+    
+  * The (x, y) points are *NOT* separated by commas.
+    
+* User-defined function of a single variable:
+  
+  * Left side is a function name followed by variable name in parenthesis.
+    
+  * Right side is an equation which includes basic math functions (+,-,*,/),
+    built-in functions (listed below), or other user-defined functions.
+    
+  * Built-in functions include:
+    sin, cos, tan, sind, cosd, tand, asin, acos, atan, asind, acosd, atand,
+    atan2, atan2d, arg, argd, log, exp, log10, exp10, sqrt, abs, min, max,
+    mod, floor, ceil, step, nint, sign
 
 The context of a configuration entry matters. If an entry cannot be found in
 the expected dictionary, the MET tools recursively search for that entry in the
@@ -127,11 +171,14 @@ When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
    1.
    Reads share/met/config/ConfigConstants to define constants.
+   
    2.
    If the tool produces PostScript output, it reads
    share/met/config/ConfigMapData to define the map data to be plotted.
+   
    3.
    Reads the default configuration file for the tool from share/met/config.
+   
    4.
    Reads the user-specified configuration file from the command line.
 
@@ -220,8 +267,8 @@ Column 6: variable description
 Column 7: units
 
 References:
-   http://www.nco.ncep.noaa.gov/pmb/docs/on388
-   http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html
+`<http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
+`<http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB2".
@@ -274,10 +321,13 @@ environment variable MET_NC_COMPRESS overrides the compression level
 from configuration file. The command line argument "-compress n" for some
 tools overrides it.
 The range is 0 to 9.
-  - 0 is to disable the compression.
-  - 1 to 9: Lower number is faster, higher number for smaller files.
+
+* 0 is to disable the compression.
+
+* 1 to 9: Lower number is faster, higher number for smaller files.
+
 WARNING: Selecting a high compression level may slow down the reading and
-         writing of NetCDF files within MET significantly.
+writing of NetCDF files within MET significantly.
 
 .. code-block:: none
 		
@@ -380,75 +430,102 @@ The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
 
-  - The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
-    to a gridded data file defining the grid, or an explicit grid specification
-    string.
-     - to_grid = NONE;   To disable regridding.
-     - to_grid = FCST;   To regrid observations to the forecast grid.
-     - to_grid = OBS;    To regrid forecasts to the observation grid.
-     - to_grid = "G218"; To regrid both to a named grid.
-     - to_grid = "path"; To regrid both to a grid defined by a file.
-     - to_grid = "spec"; To define a grid specified as follows:
-        - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-          [standard_parallel_2] N|S
-        - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-        - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
-        - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-        - gaussian lon_zero Nx Ny
+* The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
+  to a gridded data file defining the grid, or an explicit grid specification
+  string.
+  
+  * to_grid = NONE;   To disable regridding.
+    
+  * to_grid = FCST;   To regrid observations to the forecast grid.
+    
+  * to_grid = OBS;    To regrid forecasts to the observation grid.
+    
+  * to_grid = "G218"; To regrid both to a named grid.
+    
+  * to_grid = "path"; To regrid both to a grid defined by a file.
+    
+  * to_grid = "spec"; To define a grid specified as follows:
+    
+    * lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
+      [standard_parallel_2] N|S
+      
+    * stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+      
+    * latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
+      
+    * mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+      
+    * gaussian lon_zero Nx Ny
 
-   - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
-     the required ratio of valid data points. When regridding, compute
-     a ratio of the number of valid data points to the total number of
-     points in the neighborhood. If that ratio is less than this threshold,
-     write bad data for the current point.
+* The "vld_thresh" entry specifies a proportion between 0 and 1 to define
+  the required ratio of valid data points. When regridding, compute
+  a ratio of the number of valid data points to the total number of
+  points in the neighborhood. If that ratio is less than this threshold,
+  write bad data for the current point.
 
-  - The "method" entry defines the regridding method to be used.
-     - Valid regridding methods:
-        - MIN         for the minimum value
-        - MAX         for the maximum value
-        - MEDIAN      for the median value
-        - UW_MEAN     for the unweighted average value
-        - DW_MEAN     for the distance-weighted average value (weight =
-                      distance^-2)
-        - AW_MEAN     for an area-weighted mean when regridding from
-                      high to low resolution grids (width = 1)
-        - LS_FIT      for a least-squares fit
-        - BILIN       for bilinear interpolation (width = 2)
-        - NEAREST     for the nearest grid point (width = 1)
-        - BUDGET      for the mass-conserving budget interpolation
-        - FORCE       to compare gridded data directly with no interpolation
-                      as long as the grid x and y dimensions match.
-        - UPPER_LEFT  for the upper left grid point (width = 1)
-        - UPPER_RIGHT for the upper right grid point (width = 1)
-        - LOWER_RIGHT for the lower right grid point (width = 1)
-        - LOWER_LEFT  for the lower left grid point (width = 1)
-        - MAXGAUSS    to compute the maximum value in the neighborhood
-                      and apply a Gaussian smoother to the result
+* The "method" entry defines the regridding method to be used.
+  
+  * Valid regridding methods:
+    
+    * MIN         for the minimum value
+      
+    * MAX         for the maximum value
+      
+    * MEDIAN      for the median value
+      
+    * UW_MEAN     for the unweighted average value
+      
+    * DW_MEAN     for the distance-weighted average value (weight =
+      distance^-2)
+      
+    * AW_MEAN     for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1)
+      
+    * LS_FIT      for a least-squares fit
+      
+    * BILIN       for bilinear interpolation (width = 2)
+      
+    * NEAREST     for the nearest grid point (width = 1)
+      
+    * BUDGET      for the mass-conserving budget interpolation
+      
+    * FORCE       to compare gridded data directly with no interpolation
+      as long as the grid x and y dimensions match.
+      
+    * UPPER_LEFT  for the upper left grid point (width = 1)
+      
+    * UPPER_RIGHT for the upper right grid point (width = 1)
+      
+    * LOWER_RIGHT for the lower right grid point (width = 1)
+      
+    * LOWER_LEFT  for the lower left grid point (width = 1)
+      
+    * MAXGAUSS    to compute the maximum value in the neighborhood
+      and apply a Gaussian smoother to the result
 
-        The BEST and GEOG_MATCH interpolation options are not valid for
-        regridding.
+The BEST and GEOG_MATCH interpolation options are not valid for regridding.
 
-  - The "width" entry specifies a regridding width, when applicable.
-     - width = 4;     To regrid using a 4x4 box or circle with diameter 4.
+* The "width" entry specifies a regridding width, when applicable.
+  - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
 
-  - The "shape" entry defines the shape of the neighborhood.
-    Valid values are "SQUARE" or "CIRCLE"
+* The "shape" entry defines the shape of the neighborhood.
+  Valid values are "SQUARE" or "CIRCLE"
 
-  - The "gaussian_dx" entry specifies a delta distance for Gaussian
-    smoothing. The default is 81.271. Ignored if not Gaussian method.
+* The "gaussian_dx" entry specifies a delta distance for Gaussian
+  smoothing. The default is 81.271. Ignored if not Gaussian method.
 
-  - The "gaussian_radius" entry defines the radius of influence for Gaussian
-    smoothing. The default is 120. Ignored if not Gaussian method.
+* The "gaussian_radius" entry defines the radius of influence for Gaussian
+  smoothing. The default is 120. Ignored if not Gaussian method.
 
-  - The "gaussian_dx" and "gaussian_radius" settings must be in the same
-    units, such as kilometers or degress.  Their ratio
-    (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
-    function.
+* The "gaussian_dx" and "gaussian_radius" settings must be in the same
+  units, such as kilometers or degress.  Their ratio
+  (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
+  function.
 
-  - The "convert", "censor_thresh", and "censor_val" entries are described
-    below.  When specified, these operations are applied to the output of the
-    regridding step.  The conversion operation is applied first, followed by
-    the censoring operation.
+* The "convert", "censor_thresh", and "censor_val" entries are described
+  below.  When specified, these operations are applied to the output of the
+  regridding step.  The conversion operation is applied first, followed by
+  the censoring operation.
 
 .. code-block:: none
 		
@@ -468,18 +545,18 @@ using the following entries:
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
 
-  - The "field" entry is an array of dictionaries, each specifying a
-    verification task. Each of these dictionaries may include:
+* The "field" entry is an array of dictionaries, each specifying a
+  verification task. Each of these dictionaries may include:
 
-     - The "name" entry specifies a name for the field.
+  * The "name" entry specifies a name for the field.
 
-     - The "level" entry specifies level information for the field.
+  * The "level" entry specifies level information for the field.
 
-     - Setting "name" and "level" is file-format specific. See below.
+  * Setting "name" and "level" is file-format specific. See below.
 
-     - The "prob" entry in the forecast dictionary defines probability
-       information. It may either be set as a boolean (i.e. TRUE or FALSE)
-       or as a dictionary defining probabilistic field information.
+  * The "prob" entry in the forecast dictionary defines probability
+    information. It may either be set as a boolean (i.e. TRUE or FALSE)
+    or as a dictionary defining probabilistic field information.
 
        When set as a boolean to TRUE, it indicates that the "fcst.field" data
        should be treated as probabilities. For example, when verifying the
