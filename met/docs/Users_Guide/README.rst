@@ -226,7 +226,7 @@ and applied to the ensemble member values. See the obs_error description below
 for details on the supported error distributions. The last two columns, MIN and
 MAX, define the bounds for the valid range of the bias-corrected observation
 values and randomly perturbed ensemble member values. Values less than MIN are
-reset to the mimumum value and values greater than MAX are reset to the maximum
+reset to the mimimum value and values greater than MAX are reset to the maximum
 value. A value of NA indicates that the variable is unbounded.
 
 The MET_GRIB_TABLES environment variable can be set to specify the location of
@@ -1247,7 +1247,8 @@ in the following ways:
      three digit grid number. Supplying a value of "FULL" indicates that the
      verification should be performed over the entire grid on which the data
      resides.
-     http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+     See: `ON388 - TABLE B, GRID IDENTIFICATION <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_
+     (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92)
      The "grid" entry can be the gridded data file defining grid.
 
    - The "poly" entry contains a comma-separated list of files that define
@@ -1386,11 +1387,10 @@ should be used for computing bootstrap confidence intervals:
      computation of bootstrap confidence intervals. Subsamples are chosen at
      random from the full set of matched pairs. The randomness is determined
      by the random number generator specified. Users should refer to detailed
-     documentation of the GNU Scientific Library for a listing of the random
-     number generators available for use.
-     http://www.gnu.org/software/gsl/manual/html_node/
-     Random-Number-Generator-Performance.html
-
+     documentation of the
+     `GNU Scientific Library <https://www.gnu.org/software/gsl/doc/html/>`_
+     for a listing of the random number generators available for use.
+     
    - The "seed" entry may be set to a specific value to make the computation
      of bootstrap confidence intervals fully repeatable. When left empty
      the random number generator seed is chosen automatically which will lead
@@ -2208,10 +2208,10 @@ file settings.
 The dist_parm entry is an array of length 1 or 2 specifying the parameters
 for the distribution selected in dist_type. The NORMAL, EXPONENTIAL, and
 CHISQUARED distributions are defined by a single parameter. The GAMMA,
-UNIFORM, and BETA distributions are defined by two parameters. See the GNU
-Scientific Library Reference Manual for more information on these
-distributions:
-   https://www.gnu.org/software/gsl/manual
+UNIFORM, and BETA distributions are defined by two parameters. See the
+`GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
+for more information on these distributions.
+   
 
 The inst_bias_scale and inst_bias_offset entries specify bias scale and
 offset values that should be applied to observation values prior to
@@ -2275,10 +2275,8 @@ which ensemble products should be generated:
      weight    = FALSE;
   }
 
-Random number generator used for random assignment of ranks when they
-are tied.
-http://www.gnu.org/software/gsl/manual/html_node/
-Random-Number-Generator-Performance.html
+See: `Random Number Generator Performance <https://www.gnu.org/software/gsl/doc/html/rng.html#performance>`_
+used for random assignment of ranks when they are tied.
 
 .. code-block:: none
 		
@@ -2883,7 +2881,7 @@ List of valid message types:
 
    e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+`Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 		
@@ -2929,7 +2927,7 @@ retained. The numeric "pb_report_type" entry allows for further
 stratification within message types. An empty list indicates that all should
 be retained.
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
 
 e.g.
   Report Type 120 is for message type ADPUPA but is only RAWINSONDE
@@ -2945,7 +2943,7 @@ retained. The numeric "in_report_type" entry provides additional
 stratification of observations. An empty list indicates that all should
 be retained.
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
+See: `Code table for input report types <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
 e.g.
 Input Report Type 11 Fixed land RAOB and PIBAL by block and station number
@@ -2989,7 +2987,7 @@ categories should be retained:
        (upper-air profile reports)
 An empty list indicates that all should be retained.
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 		
@@ -3049,7 +3047,7 @@ to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
 this threshold will be retained, while observations with a quality mark
 GREATER THAN this threshold will be discarded.
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm
+See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
 
 .. code-block:: none
 		
@@ -3508,7 +3506,7 @@ wavelet decomposition should be performed:
    - The "type" entry specifies which wavelet should be used.
 
    - The "member" entry specifies the wavelet shape.
-     http://www.gnu.org/software/gsl/manual/html_node/DWT-Initialization.html
+     See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
 
    - Valid combinations of the two are listed below:
       - "HAAR" for Haar wavelet (member = 2)
