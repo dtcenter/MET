@@ -109,29 +109,29 @@ The configuration file language supports the following data types:
       e.g. ">CDP50" means greater than the 50-th percentile of the
       climatological distribution for each point.
       
-   * When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
-     for continuous filtering thresholds (cnt_thresh), wind speed thresholds
-     (wind_thresh), or observation filtering thresholds (obs_thresh in
-     ensemble_stat), the following special logic is applied. Percentile
-     thresholds of type equality are automatically converted to percentile
-     bins which span the values from 0 to 100.
-     For example, "==CDP25" is automatically expanded to 4 percentile bins:
-     >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
+  * When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
+    for continuous filtering thresholds (cnt_thresh), wind speed thresholds
+    (wind_thresh), or observation filtering thresholds (obs_thresh in
+    ensemble_stat), the following special logic is applied. Percentile
+    thresholds of type equality are automatically converted to percentile
+    bins which span the values from 0 to 100.
+    For example, "==CDP25" is automatically expanded to 4 percentile bins:
+    >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
      
-   * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
-     requested, MET recomputes the actual percentile that the threshold
-     represents. If the requested percentile and actual percentile differ by
-     more than 5%, a warning message is printed. This may occur when the
-     sample size is small or the data values are not truly continuous.
+  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
+    requested, MET recomputes the actual percentile that the threshold
+    represents. If the requested percentile and actual percentile differ by
+    more than 5%, a warning message is printed. This may occur when the
+    sample size is small or the data values are not truly continuous.
      
-   * When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
-     actual threshold value is appended to the FCST_THRESH and OBS_THRESH
-     output columns. For example, if the 90-th percentile of the current set
-     of forecast values is 3.5, then the requested threshold "<=SFP90" is
-     written to the output as "<=SFP90(3.5)".
+  * When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
+    actual threshold value is appended to the FCST_THRESH and OBS_THRESH
+    output columns. For example, if the 90-th percentile of the current set
+    of forecast values is 3.5, then the requested threshold "<=SFP90" is
+    written to the output as "<=SFP90(3.5)".
      
-   * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
-     ignores the actual percentile values listed in parentheses.
+  * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
+    ignores the actual percentile values listed in parentheses.
      
 * Piecewise-Linear Function (currently used only by MODE):
   
@@ -169,18 +169,10 @@ and scripts/config.
 
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
-   1.
-   Reads share/met/config/ConfigConstants to define constants.
-   
-   2.
-   If the tool produces PostScript output, it reads
-   share/met/config/ConfigMapData to define the map data to be plotted.
-   
-   3.
-   Reads the default configuration file for the tool from share/met/config.
-   
-   4.
-   Reads the user-specified configuration file from the command line.
+   1. Reads share/met/config/ConfigConstants to define constants.
+   2. If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
+   3. Reads the default configuration file for the tool from share/met/config.
+   4. Reads the user-specified configuration file from the command line.
 
 Many of the entries from step (3) are overwritten by the user-specified entries
 from step (4). Therefore, the configuration file you pass in on the command
@@ -252,51 +244,43 @@ GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB1".
 The following lines consist of 4 integers followed by 3 strings:
 
-Column 1: GRIB code (e.g. 11 for temperature)
+| Column 1: GRIB code (e.g. 11 for temperature)
+| Column 2: parameter table version number
+| Column 3: center id (e.g. 07 for US Weather Service- National Met. Center)
+| Column 4: subcenter id
+| Column 5: variable name
+| Column 6: variable description
+| Column 7: units
+|
 
-Column 2: parameter table version number
-
-Column 3: center id (e.g. 07 for US Weather Service- National Met. Center)
-
-Column 4: subcenter id
-
-Column 5: variable name
-
-Column 6: variable description
-
-Column 7: units
 
 References:
-`<http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
-`<http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
+
+| `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
+| `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
+| 
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB2".
 The following lines consist of 8 integers followed by 3 strings.
 
-column 1:  Section 0 Discipline
+| Column 1:  Section 0 Discipline
+| Column 2:  Section 1 Master Tables Version Number
+| Column 3:  Section 1 Master Tables Version Number, low range of tables
+| Column 4:  Section 1 Master Table Version Number, high range of tables
+| Column 5:  Section 1 originating center
+| Column 6:  Local Tables Version Number
+| Column 7:  Section 4 Template 4.0 Parameter category
+| Column 8:  Section 4 Template 4.0 Parameter number
+| Column 9:  variable name
+| Column 10: variable description
+| Column 11: units
+| 
 
-column 2:  Section 1 Master Tables Version Number
+References:
 
-column 3:  Section 1 Master Tables Version Number, low range of tables
-
-column 4:  Section 1 Master Table Version Number, high range of tables
-
-column 5:  Section 1 originating center
-
-column 6:  Local Tables Version Number
-
-column 7:  Section 4 Template 4.0 Parameter category
-
-column 8:  Section 4 Template 4.0 Parameter number
-
-column 9:  variable name
-
-column 10: variable description
-
-column 11: units
-
-`NOAA grib2 references <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+| `NCEP WMO GRIB2 Documentation <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+|
 
 
 Configuration settings used by the MET tools
@@ -305,6 +289,7 @@ Configuration settings used by the MET tools
 Settings common to multiple tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+**exit_on_warning**
 
 The "exit_on_warning" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
@@ -314,6 +299,8 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
+**nc_compression**
+  
 The "nc_compression" entry in ConfigConstants defines the compression level
 for the NetCDF variables. Setting this option in the config file of one of
 the tools overrides the default value set in ConfigConstants. The
@@ -333,6 +320,8 @@ writing of NetCDF files within MET significantly.
 		
   nc_compression = 0;
 
+**output_precision**  
+  
 The "output_precision" entry in ConfigConstants defines the precision
 (number of significant decimal places) to be written to the ASCII output
 files. Setting this option in the config file of one of the tools will
@@ -342,6 +331,8 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
+**tmp_dir**
+  
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
 variable MET_TMP_DIR overrides the default value at the configuration file.
@@ -352,6 +343,7 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
+**message_type_group_map**
 
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
@@ -370,6 +362,8 @@ which surface verification logic should be applied.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
+**message_type_map**
+  
 The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
 to output message types. This mapping is applied in ASCII2NC when
@@ -391,6 +385,8 @@ types.
      { key = "FM-97 ACARS";  val = "AIRCFT"; }
   ];
 
+**model**
+  
 The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
 verifying multiple models, you should choose descriptive model names (no
@@ -401,6 +397,8 @@ e.g. model = "GFS";
 		
   model = "WRF";
 
+**desc**
+  
 The "desc" entry specifies a user-specified description for each verification
 task. This string is written to the DESC column of the ASCII output
 generated. It may be set separately in each "obs.field" verification task
@@ -414,6 +412,8 @@ e.g. desc = "QC_9";
 		
   desc = "NA";
 
+**obtype**  
+  
 The "obtype" entry specifies a name to describe the type of verifying gridded
 observation used. This name is written to the OBTYPE column in the ASCII
 output generated. If you're using multiple types of verifying observations,
@@ -426,6 +426,8 @@ the configuration file obtype value is written.
 		
   obtype = "ANALYS";
 
+**regrid**
+  
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
@@ -503,7 +505,7 @@ using the following entries:
     * MAXGAUSS    to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
-The BEST and GEOG_MATCH interpolation options are not valid for regridding.
+    The BEST and GEOG_MATCH interpolation options are not valid for regridding.
 
 * The "width" entry specifies a regridding width, when applicable.
   - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
@@ -542,6 +544,8 @@ The BEST and GEOG_MATCH interpolation options are not valid for regridding.
      censor_val      = [];
   }
 
+**fcst**
+  
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
 
@@ -558,137 +562,152 @@ to be verified. This dictionary may include the following entries:
     information. It may either be set as a boolean (i.e. TRUE or FALSE)
     or as a dictionary defining probabilistic field information.
 
-       When set as a boolean to TRUE, it indicates that the "fcst.field" data
-       should be treated as probabilities. For example, when verifying the
-       probabilistic NetCDF output of Ensemble-Stat, one could configure the
-       Grid-Stat or Point-Stat tools as follows:
+    When set as a boolean to TRUE, it indicates that the "fcst.field" data
+    should be treated as probabilities. For example, when verifying the
+    probabilistic NetCDF output of Ensemble-Stat, one could configure the
+    Grid-Stat or Point-Stat tools as follows:
 
-          fcst = {
-             field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
-                         level = "(*,*)";
-                         prob  = TRUE; } ];
-          }
+    .. code-block:: none
+    
+      fcst = {
+         field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
+                     level = "(*,*)";
+                     prob  = TRUE; } ];
+         }
 
-       Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
-       data should be processed as probabilities.
+    Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
+    data should be processed as probabilities.
 
-       When set as a dictionary, it defines the probabilistic field to be
-       used. For example, when verifying GRIB files containing probabilistic
-       data,  one could configure the Grid-Stat or Point-Stat tools as
-       follows:
+    When set as a dictionary, it defines the probabilistic field to be
+    used. For example, when verifying GRIB files containing probabilistic
+    data,  one could configure the Grid-Stat or Point-Stat tools as
+    follows:
 
-          fcst = {
-             field = [ { name = "PROB"; level = "A24";
-                         prob = { name = "APCP"; thresh_lo = 2.54; } },
-                       { name = "PROB"; level = "P850";
-                         prob = { name = "TMP"; thresh_hi = 273; } } ];
-          }
+    .. code-block:: none
 
-       The example above selects two probabilistic fields. In both, "name"
-       is set to "PROB", the GRIB abbreviation for probabilities. The "level"
-       entry defines the level information (i.e. "A24" for a 24-hour
-       accumulation and "P850" for 850mb). The "prob" dictionary defines the
-       event for which the probability is defined. The "thresh_lo"
-       (i.e. APCP > 2.54) and/or "thresh_hi" (i.e. TMP < 273) entries are
-       used to define the event threshold(s).
+      fcst = {
+         field = [ { name = "PROB"; level = "A24";
+                     prob = { name = "APCP"; thresh_lo = 2.54; } },
+                   { name = "PROB"; level = "P850";
+                     prob = { name = "TMP"; thresh_hi = 273; } } ];
+      }
 
-       Probability fields should contain values in the range
-       [0, 1] or [0, 100]. However, when MET encounters a probability field
-       with a range [0, 100], it will automatically rescale it to be [0, 1]
-       before applying the probabilistic verification methods.
+    The example above selects two probabilistic fields. In both, "name"
+    is set to "PROB", the GRIB abbreviation for probabilities. The "level"
+    entry defines the level information (i.e. "A24" for a 24-hour
+    accumulation and "P850" for 850mb). The "prob" dictionary defines the
+    event for which the probability is defined. The "thresh_lo"
+    (i.e. APCP > 2.54) and/or "thresh_hi" (i.e. TMP < 273) entries are
+    used to define the event threshold(s).
 
-     - Set "prob_as_scalar = TRUE" to override the processing of probability
-       data. When the "prob" entry is set as a dictionary to define the
-       field of interest, setting "prob_as_scalar = TRUE" indicates that this
-       data should be processed as regular scalars rather than probabilities.
-       For example, this option can be used to compute traditional 2x2
-       contingency tables and neighborhood verification statistics for
-       probability data. It can also be used to compare two probability
-       fields directly. When this flag is set, probability values are
-       automatically rescaled from the range [0, 100] to [0, 1].
+    Probability fields should contain values in the range
+    [0, 1] or [0, 100]. However, when MET encounters a probability field
+    with a range [0, 100], it will automatically rescale it to be [0, 1]
+    before applying the probabilistic verification methods.
 
-     - The "convert" entry is a user-defined function of a single variable
-       for processing input data values. Any input values that are not bad
-       data are replaced by the value of this function. The convert function
-       is applied prior to regridding or thresholding. This function may
-       include any of the built-in math functions (e.g. sqrt, log10)
-       described above.
-       Several standard unit conversion functions are already defined in
-       data/config/ConfigConstants.
-       Examples of user-defined conversion functions include:
-         convert(x) = 2*x;
-         convert(x) = x^2;
-         convert(a) = log10(a);
-         convert(a) = a^10;
-         convert(t) = max(1, sqrt(abs(t)));
-         convert(x) = K_to_C(x); where K_to_C(x) is defined in
-                                 ConfigConstants
+  * Set "prob_as_scalar = TRUE" to override the processing of probability
+    data. When the "prob" entry is set as a dictionary to define the
+    field of interest, setting "prob_as_scalar = TRUE" indicates that this
+    data should be processed as regular scalars rather than probabilities.
+    For example, this option can be used to compute traditional 2x2
+    contingency tables and neighborhood verification statistics for
+    probability data. It can also be used to compare two probability
+    fields directly. When this flag is set, probability values are
+    automatically rescaled from the range [0, 100] to [0, 1].
 
-     - The "censor_thresh" entry is an array of thresholds to be applied
-       to the input data. The "censor_val" entry is an array of numbers
-       and must be the same length as "censor_thresh". These arguments must
-       appear together in the correct format (threshold and number). For each
-       censor threshold, any input values meeting the threshold criteria will
-       be reset to the corresponding censor value. An empty list indicates
-       that no censoring should be performed. The censoring logic is applied
-       prior to any regridding but after the convert function. All statistics
-       are computed on the censored data. These entries may be used to apply
-       quality control logic by resetting data outside of an expected range
-       to the bad data value of -9999. These entries are not indicated in the
-       metadata of any output files, but the user can set the "desc" entry
-       accordingly.
+  * The "convert" entry is a user-defined function of a single variable
+    for processing input data values. Any input values that are not bad
+    data are replaced by the value of this function. The convert function
+    is applied prior to regridding or thresholding. This function may
+    include any of the built-in math functions (e.g. sqrt, log10)
+    described above.
+    Several standard unit conversion functions are already defined in
+    data/config/ConfigConstants.
+    Examples of user-defined conversion functions include:
 
-     Examples of user-defined conversion functions include:
-         censor_thresh = [ >12000 ];
-         censor_val    = [ 12000 ];
+    .. code-block:: none
 
-     - Several configuration options are provided to override and correct the
-       metadata read from the input file. The supported options are listed
-       below:
+      convert(x) = 2*x;
+      convert(x) = x^2;
+      convert(a) = log10(a);
+      convert(a) = a^10;
+      convert(t) = max(1, sqrt(abs(t)));
+      convert(x) = K_to_C(x); where K_to_C(x) is defined in
+                              ConfigConstants
 
-       Data attributes
-       set_attr_name      = "string";
-       set_attr_level     = "string";
-       set_attr_units     = "string";
-       set_attr_long_name = "string";
+  * The "censor_thresh" entry is an array of thresholds to be applied
+    to the input data. The "censor_val" entry is an array of numbers
+    and must be the same length as "censor_thresh". These arguments must
+    appear together in the correct format (threshold and number). For each
+    censor threshold, any input values meeting the threshold criteria will
+    be reset to the corresponding censor value. An empty list indicates
+    that no censoring should be performed. The censoring logic is applied
+    prior to any regridding but after the convert function. All statistics
+    are computed on the censored data. These entries may be used to apply
+    quality control logic by resetting data outside of an expected range
+    to the bad data value of -9999. These entries are not indicated in the
+    metadata of any output files, but the user can set the "desc" entry
+    accordingly.
 
-       Time attributes
-       set_attr_init  = "YYYYMMDD[_HH[MMSS]]";
-       set_attr_valid = "YYYYMMDD[_HH[MMSS]]";
-       set_attr_lead  = "HH[MMSS]";
-       set_attr_accum = "HH[MMSS]";
+    Examples of user-defined conversion functions include:
 
-       Grid definition (must match the actual data dimensions)
-       set_attr_grid  = "named grid or grid specification string";
+    .. code-block:: none
+		    
+      censor_thresh = [ >12000 ];
+      censor_val    = [ 12000 ];
 
-       Flags
-       is_precipitation     = boolean;
-       is_specific_humidity = boolean;
-       is_u_wind            = boolean;
-       is_v_wind            = boolean;
-       is_grid_relative     = boolean;
-       is_wind_speed        = boolean;
-       is_wind_direction    = boolean;
-       is_prob              = boolean;
+  * Several configuration options are provided to override and correct the
+    metadata read from the input file. The supported options are listed
+    below:
 
-     - The "cat_thresh" entry is an array of thresholds to be used when
-       computing categorical statistics.
+    .. code-block:: none
 
-     - The "cnt_thresh" entry is an array of thresholds for filtering
-       data prior to computing continuous statistics and partial sums.
+      // Data attributes
+      set_attr_name      = "string";
+      set_attr_level     = "string";
+      set_attr_units     = "string";
+      set_attr_long_name = "string";
 
-     - The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
-       and controls the logic for how the forecast and observed cnt_thresh
-       settings are combined when filtering matched pairs of forecast and
-       observed values.
+      // Time attributes
+      set_attr_init  = "YYYYMMDD[_HH[MMSS]]";
+      set_attr_valid = "YYYYMMDD[_HH[MMSS]]";
+      set_attr_lead  = "HH[MMSS]";
+      set_attr_accum = "HH[MMSS]";
 
-  - The "file_type" entry specifies the input gridded data file type rather
-    than letting the code determine it. MET determines the file type by
-    checking for known suffixes and examining the file contents. Use this
-    option to override the code's choice. The valid file_type values are
-    listed the "data/config/ConfigConstants" file and are described below.
-    This entry should be defined within the "fcst" and/or "obs" dictionaries.
-    e.g.
+      // Grid definition (must match the actual data dimensions)
+      set_attr_grid  = "named grid or grid specification string";
+
+      // Flags
+      is_precipitation     = boolean;
+      is_specific_humidity = boolean;
+      is_u_wind            = boolean;
+      is_v_wind            = boolean;
+      is_grid_relative     = boolean;
+      is_wind_speed        = boolean;
+      is_wind_direction    = boolean;
+      is_prob              = boolean;
+
+  * The "cat_thresh" entry is an array of thresholds to be used when
+    computing categorical statistics.
+
+  * The "cnt_thresh" entry is an array of thresholds for filtering
+    data prior to computing continuous statistics and partial sums.
+
+  * The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+    and controls the logic for how the forecast and observed cnt_thresh
+    settings are combined when filtering matched pairs of forecast and
+    observed values.
+
+* The "file_type" entry specifies the input gridded data file type rather
+  than letting the code determine it. MET determines the file type by
+  checking for known suffixes and examining the file contents. Use this
+  option to override the code's choice. The valid file_type values are
+  listed the "data/config/ConfigConstants" file and are described below.
+  This entry should be defined within the "fcst" and/or "obs" dictionaries.
+  For example:
+
+  .. code-block:: none
+		    
     fcst = {
        file_type = GRIB1;         GRIB version 1
        file_type = GRIB2;         GRIB version 2
@@ -706,40 +725,40 @@ to be verified. This dictionary may include the following entries:
                                   an xarray object.
     }
 
-  - The "wind_thresh" entry is an array of thresholds used to filter wind
-    speed values when computing VL1L2 vector partial sums. Only those U/V
-    pairs that meet this wind speed criteria will be included in the sums.
-    Setting this threshold to NA will result in all U/V pairs being used.
+* The "wind_thresh" entry is an array of thresholds used to filter wind
+  speed values when computing VL1L2 vector partial sums. Only those U/V
+  pairs that meet this wind speed criteria will be included in the sums.
+  Setting this threshold to NA will result in all U/V pairs being used.
 
-  - The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
-    and controls the logic for how the forecast and observed wind_thresh
-    settings are combined when filtering matched pairs of forecast and
-    observed wind speeds.
+* The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+  and controls the logic for how the forecast and observed wind_thresh
+  settings are combined when filtering matched pairs of forecast and
+  observed wind speeds.
 
-  - The "eclv_points" entry specifies the economic cost/loss ratio points
-    to be evaluated. For each cost/loss ratio specified, the relative value
-    will be computed and written to the ECLV output line. This entry may
-    either be specified as an array of numbers between 0 and 1 or as a single
-    number. For an array, each array entry will be evaluated. For a single
-    number, all evenly spaced points between 0 and 1 will be evaluated, where
-    eclv_points defines the spacing. Cost/loss values are omitted for
-    ratios of 0.0 and 1.0 since they are undefined.
+* The "eclv_points" entry specifies the economic cost/loss ratio points
+  to be evaluated. For each cost/loss ratio specified, the relative value
+  will be computed and written to the ECLV output line. This entry may
+  either be specified as an array of numbers between 0 and 1 or as a single
+  number. For an array, each array entry will be evaluated. For a single
+  number, all evenly spaced points between 0 and 1 will be evaluated, where
+  eclv_points defines the spacing. Cost/loss values are omitted for
+  ratios of 0.0 and 1.0 since they are undefined.
 
-  - The "init_time" entry specifies the initialization time in
-    YYYYMMDD[_HH[MMSS]]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    initialization times for different fields.
+* The "init_time" entry specifies the initialization time in
+  YYYYMMDD[_HH[MMSS]]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  initialization times for different fields.
 
-  - The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    valid times for different fields.
+* The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  valid times for different fields.
 
-  - The "lead_time" entry specifies the lead time in HH[MMSS]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    lead times for different fields.
+* The "lead_time" entry specifies the lead time in HH[MMSS]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  lead times for different fields.
 
 It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
 settings when verifying a file containing data for multiple output times.
@@ -748,113 +767,166 @@ could use "lead_time" to specify the record to be verified.
 
 File-format specific settings for the "field" entry:
 
-   - GRIB1 and GRIB2:
-      - For custom GRIB tables, see note about MET_GRIB_TABLES.
-      - The "name" entry specifies a GRIB code number or abbreviation.
-        - GRIB1 Product Definition Section:
-          http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-        - GRIB2 Product Definition Section:
-          http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc
-      - The "level" entry specifies a level type and value:
-         - ANNN for accumulation interval NNN
-         - ZNNN for vertical level NNN
-         - ZNNN-NNN for a range of vertical levels
-         - PNNN for pressure level NNN in hPa
-         - PNNN-NNN for a range of pressure levels in hPa
-         - LNNN for a generic level type
-         - RNNN for a specific GRIB record number
-      - The "GRIB_lvl_typ" entry is an integer specifying the level type.
-      - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
-        the first and second level values.
-      - The "GRIB_ens" entry is a string specifying NCEP's usage of the
-        extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
-        "+n", or "-n", for the n-th ensemble member.
-      - The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
-        table version number.
-      - The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
-        kpds5 value).
-      - The "GRIB1_center" is an integer specifying the originating center.
-      - The "GRIB1_subcenter" is an integer specifying the originating
-        subcenter.
-      - The "GRIB1_tri" is an integer specifying the time range indicator.
-      - The "GRIB2_mtab" is an integer specifying the master table number.
-      - The "GRIB2_ltab" is an integer specifying the local table number.
-      - The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
-      - The "GRIB2_parm_cat" is an integer specifying the parameter category
-        code.
-      - The "GRIB2_parm" is an integer specifying the parameter code.
-      - The "GRIB2_pdt" is an integer specifying the product definition
-        template (Table 4.0).
-      - The "GRIB2_process" is an integer specifying the generating process
-        (Table 4.3).
-      - The "GRIB2_cntr" is an integer specifying the originating center.
-      - The "GRIB2_ens_type" is an integer specifying the ensemble type
-        (Table 4.6).
-      - The "GRIB2_der_type" is an integer specifying the derived product
-        type (Table 4.7).
-      - The "GRIB2_stat_type" is an integer specifying the statistical
-        processing type (Table 4.10).
-      - The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
-        of integers which specify the product description template values to
-        be used. The indices are 0-based. For example, use the following to
-        request a GRIB2 record whose 9-th and 27-th product description
-        template values are 1 and 2, respectively:
-           GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
+  * GRIB1 and GRIB2:
 
-   - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
-      - The "name" entry specifies the NetCDF variable name.
-      - The "level" entry specifies the dimensions to be used:
-         - (i,...,j,*,*) for a single field, where i,...,j specifies fixed
-           dimension values and *,* specifies the two dimensions for the
-           gridded field.
-      e.g.
-          field = [
-            {
-              name       = "QVAPOR";
-              level      = "(0,5,*,*)";
-            },
-            {
-              name       = "TMP_P850_ENS_MEAN";
-              level      = [ "(*,*)" ];
-            }
+    * For custom GRIB tables, see note about MET_GRIB_TABLES.
 
+    * The "name" entry specifies a GRIB code number or abbreviation.
+
+      * `GRIB1 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
+
+      * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+	 
+    * The "level" entry specifies a level type and value:
+       
+      * ANNN for accumulation interval NNN
+	 
+      * ZNNN for vertical level NNN
+	 
+      * ZNNN-NNN for a range of vertical levels
+	 
+      * PNNN for pressure level NNN in hPa
+	 
+      * PNNN-NNN for a range of pressure levels in hPa
+	 
+      * LNNN for a generic level type
+	 
+      * RNNN for a specific GRIB record number
+	 
+    * The "GRIB_lvl_typ" entry is an integer specifying the level type.
+       
+    * The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
+      the first and second level values.
+       
+    * The "GRIB_ens" entry is a string specifying NCEP's usage of the
+      extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
+      "+n", or "-n", for the n-th ensemble member.
+       
+    * The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
+      table version number.
+       
+    * The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
+      kpds5 value).
+       
+    * The "GRIB1_center" is an integer specifying the originating center.
+       
+    * The "GRIB1_subcenter" is an integer specifying the originating
+      subcenter.
+       
+    * The "GRIB1_tri" is an integer specifying the time range indicator.
+       
+    * The "GRIB2_mtab" is an integer specifying the master table number.
+       
+    * The "GRIB2_ltab" is an integer specifying the local table number.
+       
+    * The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
+       
+    * The "GRIB2_parm_cat" is an integer specifying the parameter category
+      code.
+       
+    * The "GRIB2_parm" is an integer specifying the parameter code.
+       
+    * The "GRIB2_pdt" is an integer specifying the product definition
+      template (Table 4.0).
+       
+    * The "GRIB2_process" is an integer specifying the generating process
+      (Table 4.3).
+       
+    * The "GRIB2_cntr" is an integer specifying the originating center.
+       
+    * The "GRIB2_ens_type" is an integer specifying the ensemble type
+      (Table 4.6).
+       
+    * The "GRIB2_der_type" is an integer specifying the derived product
+      type (Table 4.7).
+       
+    * The "GRIB2_stat_type" is an integer specifying the statistical
+      processing type (Table 4.10).
+       
+    * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
+      of integers which specify the product description template values to
+      be used. The indices are 0-based. For example, use the following to
+      request a GRIB2 record whose 9-th and 27-th product description
+      template values are 1 and 2, respectively:
+         GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
+	  
+  * NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
+     
+    * The "name" entry specifies the NetCDF variable name.
+       
+    * The "level" entry specifies the dimensions to be used:
+       
+      * (i,...,j,*,*) for a single field, where i,...,j specifies fixed
+        dimension values and *,* specifies the two dimensions for the
+        gridded field. For example:
+
+      .. code-block:: none
+
+        field = [
+             {
+               name       = "QVAPOR";
+               level      = "(0,5,*,*)";
+             },
+             {
+               name       = "TMP_P850_ENS_MEAN";
+               level      = [ "(*,*)" ];
+             }
+           ];
+
+  * Python (using PYTHON_NUMPY or PYTHON_XARRAY):
+     
+    * The Python interface for MET is described in Appendix F of the MET
+      User's Guide.
+       
+    * Two methods for specifying the Python command and input file name
+      are supported. For tools which read a single gridded forecast and/or
+      observation file, both options work. However, only the second option
+      is supported for tools which read multiple gridded data files, such
+      as Ensemble-Stat, Series-Analysis, and MTD.
+
+    Option 1:
+     
+      * On the command line, replace the path to the input gridded data
+        file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
+	 
+      * Specify the configuration "name" entry as the Python command to be
+        executed to read the data.
+	 
+      * The "level" entry is not required for Python.
+
+      For example:
+
+         .. code-block:: none
+        
+           field = [
+             { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
+           ];
+
+    Option 2:
+
+      * On the command line, leave the path to the input gridded data
+        as is.
+	 
+      * Set the configuration "file_type" entry to the constant
+        PYTHON_NUMPY or PYTHON_XARRAY.
+	 
+      * Specify the configuration "name" entry as the Python command to be
+        executed to read the data, but replace the input gridded data file
+        with the constant MET_PYTHON_INPUT_ARG.
+	 
+      * The "level" entry is not required for Python.
+
+      For example:
+
+        .. code-block:: none
+			 
+	  file_type = PYTHON_NUMPY;
+          field     = [
+            { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
           ];
 
-   - Python (using PYTHON_NUMPY or PYTHON_XARRAY):
-      - The Python interface for MET is described in Appendix F of the MET
-        User's Guide.
-      - Two methods for specifying the Python command and input file name
-        are supported. For tools which read a single gridded forecast and/or
-        observation file, both options work. However, only the second option
-        is supported for tools which read multiple gridded data files, such
-        as Ensemble-Stat, Series-Analysis, and MTD.
-
-      Option 1:
-         - On the command line, replace the path to the input gridded data
-           file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
-         - Specify the configuration "name" entry as the Python command to be
-           executed to read the data.
-         - The "level" entry is not required for Python.
-         e.g.
-            field = [
-              { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
-            ];
-
-      Option 2:
-         - On the command line, leave the path to the input gridded data
-           as is.
-         - Set the configuration "file_type" entry to the constant
-           PYTHON_NUMPY or PYTHON_XARRAY.
-         - Specify the configuration "name" entry as the Python command to be
-           executed to read the data, but replace the input gridded data file
-           with the constant MET_PYTHON_INPUT_ARG.
-         - The "level" entry is not required for Python.
-         e.g.
-            file_type = PYTHON_NUMPY;
-            field     = [
-              { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
-            ];
-
+	  
+	  
 .. code-block:: none
 		
   fcst = {
@@ -879,6 +951,8 @@ File-format specific settings for the "field" entry:
      ];
   }
 
+**obs**  
+  
 The "obs" entry specifies the same type of information as "fcst", but for
 the observation data. It will often be set to the same things as "fcst",
 as shown in the example below. However, when comparing forecast and
