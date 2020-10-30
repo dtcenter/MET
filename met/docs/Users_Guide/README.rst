@@ -698,15 +698,16 @@ to be verified. This dictionary may include the following entries:
     settings are combined when filtering matched pairs of forecast and
     observed values.
 
-**file_type**
+* The "file_type" entry specifies the input gridded data file type rather
+  than letting the code determine it. MET determines the file type by
+  checking for known suffixes and examining the file contents. Use this
+  option to override the code's choice. The valid file_type values are
+  listed the "data/config/ConfigConstants" file and are described below.
+  This entry should be defined within the "fcst" and/or "obs" dictionaries.
+  For example:
 
-  - The "file_type" entry specifies the input gridded data file type rather
-    than letting the code determine it. MET determines the file type by
-    checking for known suffixes and examining the file contents. Use this
-    option to override the code's choice. The valid file_type values are
-    listed the "data/config/ConfigConstants" file and are described below.
-    This entry should be defined within the "fcst" and/or "obs" dictionaries.
-    e.g.
+  .. code-block:: none
+		    
     fcst = {
        file_type = GRIB1;         GRIB version 1
        file_type = GRIB2;         GRIB version 2
@@ -724,40 +725,40 @@ to be verified. This dictionary may include the following entries:
                                   an xarray object.
     }
 
-  - The "wind_thresh" entry is an array of thresholds used to filter wind
-    speed values when computing VL1L2 vector partial sums. Only those U/V
-    pairs that meet this wind speed criteria will be included in the sums.
-    Setting this threshold to NA will result in all U/V pairs being used.
+* The "wind_thresh" entry is an array of thresholds used to filter wind
+  speed values when computing VL1L2 vector partial sums. Only those U/V
+  pairs that meet this wind speed criteria will be included in the sums.
+  Setting this threshold to NA will result in all U/V pairs being used.
 
-  - The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
-    and controls the logic for how the forecast and observed wind_thresh
-    settings are combined when filtering matched pairs of forecast and
-    observed wind speeds.
+* The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+  and controls the logic for how the forecast and observed wind_thresh
+  settings are combined when filtering matched pairs of forecast and
+  observed wind speeds.
 
-  - The "eclv_points" entry specifies the economic cost/loss ratio points
-    to be evaluated. For each cost/loss ratio specified, the relative value
-    will be computed and written to the ECLV output line. This entry may
-    either be specified as an array of numbers between 0 and 1 or as a single
-    number. For an array, each array entry will be evaluated. For a single
-    number, all evenly spaced points between 0 and 1 will be evaluated, where
-    eclv_points defines the spacing. Cost/loss values are omitted for
-    ratios of 0.0 and 1.0 since they are undefined.
+* The "eclv_points" entry specifies the economic cost/loss ratio points
+  to be evaluated. For each cost/loss ratio specified, the relative value
+  will be computed and written to the ECLV output line. This entry may
+  either be specified as an array of numbers between 0 and 1 or as a single
+  number. For an array, each array entry will be evaluated. For a single
+  number, all evenly spaced points between 0 and 1 will be evaluated, where
+  eclv_points defines the spacing. Cost/loss values are omitted for
+  ratios of 0.0 and 1.0 since they are undefined.
 
-  - The "init_time" entry specifies the initialization time in
-    YYYYMMDD[_HH[MMSS]]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    initialization times for different fields.
+* The "init_time" entry specifies the initialization time in
+  YYYYMMDD[_HH[MMSS]]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  initialization times for different fields.
 
-  - The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    valid times for different fields.
+* The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  valid times for different fields.
 
-  - The "lead_time" entry specifies the lead time in HH[MMSS]
-    format. This entry can be included in the "fcst" entry as shown below or
-    included in the "field" entry if the user would like to use different
-    lead times for different fields.
+* The "lead_time" entry specifies the lead time in HH[MMSS]
+  format. This entry can be included in the "fcst" entry as shown below or
+  included in the "field" entry if the user would like to use different
+  lead times for different fields.
 
 It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
 settings when verifying a file containing data for multiple output times.
@@ -766,113 +767,166 @@ could use "lead_time" to specify the record to be verified.
 
 File-format specific settings for the "field" entry:
 
-   - GRIB1 and GRIB2:
-      - For custom GRIB tables, see note about MET_GRIB_TABLES.
-      - The "name" entry specifies a GRIB code number or abbreviation.
-        - GRIB1 Product Definition Section:
-          http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-        - GRIB2 Product Definition Section:
-          http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc
-      - The "level" entry specifies a level type and value:
-         - ANNN for accumulation interval NNN
-         - ZNNN for vertical level NNN
-         - ZNNN-NNN for a range of vertical levels
-         - PNNN for pressure level NNN in hPa
-         - PNNN-NNN for a range of pressure levels in hPa
-         - LNNN for a generic level type
-         - RNNN for a specific GRIB record number
-      - The "GRIB_lvl_typ" entry is an integer specifying the level type.
-      - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
-        the first and second level values.
-      - The "GRIB_ens" entry is a string specifying NCEP's usage of the
-        extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
-        "+n", or "-n", for the n-th ensemble member.
-      - The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
-        table version number.
-      - The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
-        kpds5 value).
-      - The "GRIB1_center" is an integer specifying the originating center.
-      - The "GRIB1_subcenter" is an integer specifying the originating
-        subcenter.
-      - The "GRIB1_tri" is an integer specifying the time range indicator.
-      - The "GRIB2_mtab" is an integer specifying the master table number.
-      - The "GRIB2_ltab" is an integer specifying the local table number.
-      - The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
-      - The "GRIB2_parm_cat" is an integer specifying the parameter category
-        code.
-      - The "GRIB2_parm" is an integer specifying the parameter code.
-      - The "GRIB2_pdt" is an integer specifying the product definition
-        template (Table 4.0).
-      - The "GRIB2_process" is an integer specifying the generating process
-        (Table 4.3).
-      - The "GRIB2_cntr" is an integer specifying the originating center.
-      - The "GRIB2_ens_type" is an integer specifying the ensemble type
-        (Table 4.6).
-      - The "GRIB2_der_type" is an integer specifying the derived product
-        type (Table 4.7).
-      - The "GRIB2_stat_type" is an integer specifying the statistical
-        processing type (Table 4.10).
-      - The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
-        of integers which specify the product description template values to
-        be used. The indices are 0-based. For example, use the following to
-        request a GRIB2 record whose 9-th and 27-th product description
-        template values are 1 and 2, respectively:
-           GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
+  * GRIB1 and GRIB2:
 
-   - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
-      - The "name" entry specifies the NetCDF variable name.
-      - The "level" entry specifies the dimensions to be used:
-         - (i,...,j,*,*) for a single field, where i,...,j specifies fixed
-           dimension values and *,* specifies the two dimensions for the
-           gridded field.
-      e.g.
-          field = [
-            {
-              name       = "QVAPOR";
-              level      = "(0,5,*,*)";
-            },
-            {
-              name       = "TMP_P850_ENS_MEAN";
-              level      = [ "(*,*)" ];
-            }
+    * For custom GRIB tables, see note about MET_GRIB_TABLES.
 
+    * The "name" entry specifies a GRIB code number or abbreviation.
+
+      * `GRIB1 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
+
+      * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+	 
+    * The "level" entry specifies a level type and value:
+       
+      * ANNN for accumulation interval NNN
+	 
+      * ZNNN for vertical level NNN
+	 
+      * ZNNN-NNN for a range of vertical levels
+	 
+      * PNNN for pressure level NNN in hPa
+	 
+      * PNNN-NNN for a range of pressure levels in hPa
+	 
+      * LNNN for a generic level type
+	 
+      * RNNN for a specific GRIB record number
+	 
+    * The "GRIB_lvl_typ" entry is an integer specifying the level type.
+       
+    * The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
+      the first and second level values.
+       
+    * The "GRIB_ens" entry is a string specifying NCEP's usage of the
+      extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
+      "+n", or "-n", for the n-th ensemble member.
+       
+    * The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
+      table version number.
+       
+    * The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
+      kpds5 value).
+       
+    * The "GRIB1_center" is an integer specifying the originating center.
+       
+    * The "GRIB1_subcenter" is an integer specifying the originating
+      subcenter.
+       
+    * The "GRIB1_tri" is an integer specifying the time range indicator.
+       
+    * The "GRIB2_mtab" is an integer specifying the master table number.
+       
+    * The "GRIB2_ltab" is an integer specifying the local table number.
+       
+    * The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
+       
+    * The "GRIB2_parm_cat" is an integer specifying the parameter category
+      code.
+       
+    * The "GRIB2_parm" is an integer specifying the parameter code.
+       
+    * The "GRIB2_pdt" is an integer specifying the product definition
+      template (Table 4.0).
+       
+    * The "GRIB2_process" is an integer specifying the generating process
+      (Table 4.3).
+       
+    * The "GRIB2_cntr" is an integer specifying the originating center.
+       
+    * The "GRIB2_ens_type" is an integer specifying the ensemble type
+      (Table 4.6).
+       
+    * The "GRIB2_der_type" is an integer specifying the derived product
+      type (Table 4.7).
+       
+    * The "GRIB2_stat_type" is an integer specifying the statistical
+      processing type (Table 4.10).
+       
+    * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
+      of integers which specify the product description template values to
+      be used. The indices are 0-based. For example, use the following to
+      request a GRIB2 record whose 9-th and 27-th product description
+      template values are 1 and 2, respectively:
+         GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
+	  
+  * NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
+     
+    * The "name" entry specifies the NetCDF variable name.
+       
+    * The "level" entry specifies the dimensions to be used:
+       
+      * (i,...,j,*,*) for a single field, where i,...,j specifies fixed
+        dimension values and *,* specifies the two dimensions for the
+        gridded field. For example:
+
+      .. code-block:: none
+
+        field = [
+             {
+               name       = "QVAPOR";
+               level      = "(0,5,*,*)";
+             },
+             {
+               name       = "TMP_P850_ENS_MEAN";
+               level      = [ "(*,*)" ];
+             }
+           ];
+
+  * Python (using PYTHON_NUMPY or PYTHON_XARRAY):
+     
+    * The Python interface for MET is described in Appendix F of the MET
+      User's Guide.
+       
+    * Two methods for specifying the Python command and input file name
+      are supported. For tools which read a single gridded forecast and/or
+      observation file, both options work. However, only the second option
+      is supported for tools which read multiple gridded data files, such
+      as Ensemble-Stat, Series-Analysis, and MTD.
+
+    Option 1:
+     
+      * On the command line, replace the path to the input gridded data
+        file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
+	 
+      * Specify the configuration "name" entry as the Python command to be
+        executed to read the data.
+	 
+      * The "level" entry is not required for Python.
+
+      For example:
+
+         .. code-block:: none
+        
+           field = [
+             { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
+           ];
+
+    Option 2:
+
+      * On the command line, leave the path to the input gridded data
+        as is.
+	 
+      * Set the configuration "file_type" entry to the constant
+        PYTHON_NUMPY or PYTHON_XARRAY.
+	 
+      * Specify the configuration "name" entry as the Python command to be
+        executed to read the data, but replace the input gridded data file
+        with the constant MET_PYTHON_INPUT_ARG.
+	 
+      * The "level" entry is not required for Python.
+
+      For example:
+
+        .. code-block:: none
+			 
+	  file_type = PYTHON_NUMPY;
+          field     = [
+            { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
           ];
 
-   - Python (using PYTHON_NUMPY or PYTHON_XARRAY):
-      - The Python interface for MET is described in Appendix F of the MET
-        User's Guide.
-      - Two methods for specifying the Python command and input file name
-        are supported. For tools which read a single gridded forecast and/or
-        observation file, both options work. However, only the second option
-        is supported for tools which read multiple gridded data files, such
-        as Ensemble-Stat, Series-Analysis, and MTD.
-
-      Option 1:
-         - On the command line, replace the path to the input gridded data
-           file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
-         - Specify the configuration "name" entry as the Python command to be
-           executed to read the data.
-         - The "level" entry is not required for Python.
-         e.g.
-            field = [
-              { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
-            ];
-
-      Option 2:
-         - On the command line, leave the path to the input gridded data
-           as is.
-         - Set the configuration "file_type" entry to the constant
-           PYTHON_NUMPY or PYTHON_XARRAY.
-         - Specify the configuration "name" entry as the Python command to be
-           executed to read the data, but replace the input gridded data file
-           with the constant MET_PYTHON_INPUT_ARG.
-         - The "level" entry is not required for Python.
-         e.g.
-            file_type = PYTHON_NUMPY;
-            field     = [
-              { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
-            ];
-
+	  
+	  
 .. code-block:: none
 		
   fcst = {
@@ -897,6 +951,8 @@ File-format specific settings for the "field" entry:
      ];
   }
 
+**obs**  
+  
 The "obs" entry specifies the same type of information as "fcst", but for
 the observation data. It will often be set to the same things as "fcst",
 as shown in the example below. However, when comparing forecast and
