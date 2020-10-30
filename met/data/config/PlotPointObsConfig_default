@@ -1,0 +1,71 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Plot-Point-Obs configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+plot_data_plane = {
+   flag             = FALSE;
+   field            = { name = ""; level = ""; };
+   data_color_table = {
+      flag             = TRUE; 
+      color_table      = "MET_BASE/colortables/met_default.ctable";
+      plot_min         = 0.0;
+      plot_max         = 0.0;
+      colorbar_flag    = TRUE; 
+      colorbar_spacing = 1;
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Define named colors in RGB format
+black = {   0, 0, 0 }
+red   = { 255, 0, 0 }
+
+// Filtering options
+// May be set separately in each "plot_point_obs" entry
+
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+valid_beg       = "";
+valid_end       = "";
+lat_thresh      = NA;
+lon_thresh      = NA;
+elv_thresh      = NA;
+obs_var         = [];
+height_thresh   = NA;
+pressure_thresh = NA;
+obs_quality     = [];
+obs_thresh      = NA;
+
+// Plotting options
+// May be set separately in each "plot_point_obs" entry
+
+dotsize(x)       = 10; // Function of the obs value
+outline_color    = NA;
+fill_color       = red;
+fill_color_table = { // Takes precedence over fill_color
+   flag             = FALSE;
+   color_table      = "MET_BASE/colortables/met_default.ctable";
+   plot_min         = 0.0;
+   plot_max         = 0.0;
+   colorbar_flag    = TRUE; 
+   colorbar_spacing = 1;
+}
+
+// Array of dictionaries to define plotting options 
+plot_point_obs = [
+   {
+      fill_color    = red;
+      convert(x)    = x;
+      censor_thresh = [];
+      censor_val    = [];
+   }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
