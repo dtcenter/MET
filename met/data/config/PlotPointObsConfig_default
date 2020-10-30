@@ -46,9 +46,10 @@ obs_thresh      = NA;
 // May be set separately in each "plot_point_obs" entry
 
 dotsize(x)       = 10; // Function of the obs value
-outline_color    = NA;
+line_color       = red;
+line_width       = 1;
 fill_color       = red;
-fill_color_table = { // Takes precedence over fill_color
+fill_color_table = {   // Takes precedence over fill_color
    flag             = FALSE;
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
