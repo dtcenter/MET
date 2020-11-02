@@ -16,7 +16,7 @@
 #    where version1 and version2 are named branches, tags, or hashes.
 #
 # For example, test the met-8.1 release versus the develop branch:
-#    test_regression.sh met-8.1 develop
+#    test_regression.sh v8.1 develop
 #
 #=======================================================================
 
