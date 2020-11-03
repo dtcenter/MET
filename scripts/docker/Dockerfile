@@ -152,7 +152,7 @@ RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
 
 #
 # Download and install MET and GhostScript fonts.
-# Delete the MET source code for tagged releases matching "met-"*.
+# Delete the MET source code for tagged releases matching "v"*.
 #
 RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && git clone ${MET_GIT_URL} /met/MET-${MET_GIT_NAME} \
@@ -172,6 +172,6 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_test.log \
  && echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make test > ${LOG_FILE} 2>&1 \
- && if [[ $MET_GIT_NAME == "met-"* ]]; then cd /met; rm -rf MET-*; fi \
+ && if [[ $MET_GIT_NAME == "v"* ]]; then cd /met; rm -rf MET-*; fi \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL}" \
  && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
