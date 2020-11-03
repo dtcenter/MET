@@ -1,11 +1,11 @@
 .. _README:
 
-Configuration file overview
-___________________________
+README - Configuration File Overview
+____________________________________
  
 The configuration files that control many of the MET tools contain formatted
-ASCII text. This format has been updated for METv4.0 and continues to be used
-in subsequent releases.
+ASCII text. This format has been updated for MET version |version| and
+continues to be used in subsequent releases.
 
 Settings common to multiple tools are described in the top part of this README
 file and settings specific to individual tools are described beneath the common
@@ -1496,39 +1496,39 @@ This dictionary may include the following entries:
   * The "method" entry specifies the interpolation procedure to be
     applied to the points in the box:
     
-  * MIN         for the minimum value
+    * MIN         for the minimum value
     
-  * MAX         for the maximum value
+    * MAX         for the maximum value
     
-  * MEDIAN      for the median value
+    * MEDIAN      for the median value
     
-  * UW_MEAN     for the unweighted average value
+    * UW_MEAN     for the unweighted average value
     
-  * DW_MEAN     for the distance-weighted average value
-    where weight = distance^-2
+    * DW_MEAN     for the distance-weighted average value
+      where weight = distance^-2
 		
-  * LS_FIT      for a least-squares fit
+    * LS_FIT      for a least-squares fit
     
-  * BILIN       for bilinear interpolation (width = 2)
+    * BILIN       for bilinear interpolation (width = 2)
     
-  * NEAREST     for the nearest grid point (width = 1)
+    * NEAREST     for the nearest grid point (width = 1)
     
-  * BEST        for the value closest to the observation
+    * BEST        for the value closest to the observation
     
-  * UPPER_LEFT  for the upper left grid point (width = 1)
+    * UPPER_LEFT  for the upper left grid point (width = 1)
 
-  * UPPER_RIGHT for the upper right grid point (width = 1)
+    * UPPER_RIGHT for the upper right grid point (width = 1)
     
-  * LOWER_RIGHT for the lower right grid point (width = 1)
+    * LOWER_RIGHT for the lower right grid point (width = 1)
     
-  * LOWER_LEFT  for the lower left grid point (width = 1)
+    * LOWER_LEFT  for the lower left grid point (width = 1)
 
-  * GAUSSIAN    for the Gaussian kernel
+    * GAUSSIAN    for the Gaussian kernel
 
-  * MAXGAUSS    for the maximum value followed by a Gaussian smoother
+    * MAXGAUSS    for the maximum value followed by a Gaussian smoother
     
-  * GEOG_MATCH  for the nearest grid point where the land/sea mask
-    and geography criteria are satisfied.
+    * GEOG_MATCH  for the nearest grid point where the land/sea mask
+      and geography criteria are satisfied.
 
     The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
     interpolating to point locations. For grid-to-grid comparisons, the
@@ -1555,29 +1555,33 @@ entry. It specifies information for computing neighborhood statistics in
 Grid-Stat. This dictionary may include the following entries:
 
 * The "field" entry specifies to which field(s) the computation of
-     fractional coverage should be applied. Grid-Stat processes each
-     combination of categorical threshold and neighborhood width to
-     derive the fractional coverage fields from which neighborhood
-     statistics are calculated. Users who have computed fractional
-     coverage fields outside of MET can use this option to disable
-     these computations. Instead, the raw input values will be
-     used directly to compute neighborhood statistics:
-   * "BOTH" to compute fractional coverage for both the forecast
-               and the observation fields (default).
-   * "FCST" to only process the forecast field.
-   * "OBS"  to only process the observation field.
-   * "NONE" to process neither field.
+  fractional coverage should be applied. Grid-Stat processes each
+  combination of categorical threshold and neighborhood width to
+  derive the fractional coverage fields from which neighborhood
+  statistics are calculated. Users who have computed fractional
+  coverage fields outside of MET can use this option to disable
+  these computations. Instead, the raw input values will be
+  used directly to compute neighborhood statistics:
+
+  * "BOTH" to compute fractional coverage for both the forecast
+    and the observation fields (default).
+    
+  * "FCST" to only process the forecast field.
+     
+  * "OBS"  to only process the observation field.
+     
+  * "NONE" to process neither field.
 
 * The "vld_thresh" entry is described above.
 
 * The "shape" entry defines the shape of the neighborhood.
-     Valid values are "SQUARE" or "CIRCLE"
+  Valid values are "SQUARE" or "CIRCLE"
 
 * The "width" entry is as described above, and must be odd.
 
 * The "cov_thresh" entry is an array of thresholds to be used when
-     computing categorical statistics for the neighborhood fractional
-     coverage field.
+  computing categorical statistics for the neighborhood fractional
+  coverage field.
 
 .. code-block:: none
 		
@@ -1605,11 +1609,11 @@ The available wave numbers start at 0 (the mean across each row of data)
 and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension
 of the verification grid:
 
-   - The "wave_1d_beg" entry is an array of integers specifying the first
-     wave number to be included.
+* The "wave_1d_beg" entry is an array of integers specifying the first
+  wave number to be included.
 
-   - The "wave_1d_end" entry is an array of integers specifying the last
-     wave number to be included.
+* The "wave_1d_end" entry is an array of integers specifying the last
+  wave number to be included.
 
 .. code-block:: none
 		
@@ -1698,6 +1702,7 @@ topography data is assumed to exist in the input forecast file. Otherwise,
 the specified file(s) are searched for the data specified in the "field"
 entry. The "regrid" settings specify how this field should be regridded to
 the verification domain.
+
 topo_mask.flag may be set separately in each "obs.field" entry.
 
 .. code-block:: none
@@ -1729,26 +1734,26 @@ probabilistic HiRA output lines is determined by the number of categorical
 forecast thresholds and HiRA neighborhood widths chosen.
 This dictionary may include the following entries:
 
-   - The "flag" entry is a boolean which toggles "hira"
-     on (TRUE) and off (FALSE).
+* The "flag" entry is a boolean which toggles "hira"
+  on (TRUE) and off (FALSE).
 
-   - The "width" entry specifies the neighborhood size. Since HiRA applies
-     to point observations, the width may be even or odd.
+* The "width" entry specifies the neighborhood size. Since HiRA applies
+  to point observations, the width may be even or odd.
 
-   - The "vld_thresh" entry is as described above.
+* The "vld_thresh" entry is as described above.
 
-   - The "cov_thresh" entry is an array of probabilistic thresholds used to
-     populate the Nx2 probabilistic contingency table written to the PCT
-     output line and used for computing probabilistic statistics.
+* The "cov_thresh" entry is an array of probabilistic thresholds used to
+  populate the Nx2 probabilistic contingency table written to the PCT
+  output line and used for computing probabilistic statistics.
 
-   - The "shape" entry defines the shape of the neighborhood.
-     Valid values are "SQUARE" or "CIRCLE"
+* The "shape" entry defines the shape of the neighborhood.
+  Valid values are "SQUARE" or "CIRCLE"
 
-   - The "prob_cat_thresh" entry defines the thresholds which define ensemble
-     probabilities from which to compute the ranked probability score output.
-     If left empty but climatology data is provided, the climo_cdf thresholds
-     will be used instead. If left empty but no climatology data is provided,
-     the obs.cat_thresh thresholds will be used instead.
+* The "prob_cat_thresh" entry defines the thresholds which define ensemble
+  probabilities from which to compute the ranked probability score output.
+  If left empty but climatology data is provided, the climo_cdf thresholds
+  will be used instead. If left empty but no climatology data is provided,
+  the obs.cat_thresh thresholds will be used instead.
 
 .. code-block:: none
 		
@@ -1765,10 +1770,13 @@ This dictionary may include the following entries:
 The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
 output line type from the MET tools. Each line type may be set to one of:
-   - "NONE" to skip the corresponding verification method
-   - "STAT" to write the verification output only to the ".stat" output file
-   - "BOTH" to write to the ".stat" output file as well the optional
-     "_type.txt" file, a more readable ASCII file sorted by line type.
+
+* "NONE" to skip the corresponding verification method
+  
+* "STAT" to write the verification output only to the ".stat" output file
+  
+* "BOTH" to write to the ".stat" output file as well the optional
+  "_type.txt" file, a more readable ASCII file sorted by line type.
 
 .. code-block:: none
 		
@@ -1843,7 +1851,7 @@ file. The default value of an empty string indicates that the "name" and
 string changes for each run of Grid-Stat, using this option to define a
 constant string may make downstream processing more convenient.
 
-e.g. nc_pairs_var_name = "TMP";
+For example:  nc_pairs_var_name = "TMP";
 
 .. code-block:: none
 		
@@ -1856,11 +1864,16 @@ This enables the output variable names to be made unique. For example, when
 verifying height for multiple level types but all with the same level value,
 use this option to customize the output variable names.
 
-e.g. nc_pairs_var_suffix = "TROPO"; (for the tropopause height)
-     nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
+For example:
+
+.. code-block:: none
+		
+  nc_pairs_var_suffix = "TROPO"; (for the tropopause height)
+  nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
+
 
 NOTE: This option was previously named "nc_pairs_var_str", which is
-      now deprecated.
+now deprecated.
 
 .. code-block:: none
 		
@@ -1881,10 +1894,12 @@ Lat/Lon grids. It is only applied for grid-to-grid verification in Grid-Stat
 and Ensemble-Stat and is not applied for grid-to-point verification.
 Three grid weighting options are currently supported:
 
-   - "NONE" to disable grid weighting using a constant weight (default).
-   - "COS_LAT" to define the weight as the cosine of the grid point latitude.
-     This an approximation for grid box area used by NCEP and WMO.
-   - "AREA" to define the weight as the true area of the grid box (km^2).
+* "NONE" to disable grid weighting using a constant weight (default).
+  
+* "COS_LAT" to define the weight as the cosine of the grid point latitude.
+  This an approximation for grid box area used by NCEP and WMO.
+  
+* "AREA" to define the weight as the true area of the grid box (km^2).
 
 The weights are ultimately computed as the weight at each grid point divided
 by the sum of the weights for the current masking region.
@@ -1905,11 +1920,12 @@ intensive and slows down the runtime significantly.
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
 
-   - "NONE" to use all point observations (legacy behavior)
-   - "UNIQUE" only use a single observation if two or more observations
-     match. Matching observations are determined if they contain identical
-     latitude, longitude, level, elevation, and time information.
-     They may contain different observation values or station IDs
+* "NONE" to use all point observations (legacy behavior)
+  
+* "UNIQUE" only use a single observation if two or more observations
+  match. Matching observations are determined if they contain identical
+  latitude, longitude, level, elevation, and time information.
+  They may contain different observation values or station IDs
 
 The reporting mechanism for this feature can be activated by specifying
 a verbosity level of three or higher. The report will show information
@@ -1925,16 +1941,23 @@ observations that appear at a single location (lat,lon,level,elev)
 in Point-Stat and Ensemble-Stat. Eight techniques are
 currently supported:
 
-   - "NONE" to use all point observations (legacy behavior)
-   - "NEAREST" use only the observation that has the valid
-     time closest to the forecast valid time
-   - "MIN" use only the observation that has the lowest value
-   - "MAX" use only the observation that has the highest value
-   - "UW_MEAN" compute an unweighted mean of the observations
-   - "DW_MEAN" compute a weighted mean of the observations based
-     on the time of the observation
-   - "MEDIAN" use the median observation
-   - "PERC" use the Nth percentile observation where N = obs_perc_value
+* "NONE" to use all point observations (legacy behavior)
+  
+* "NEAREST" use only the observation that has the valid
+  time closest to the forecast valid time
+  
+* "MIN" use only the observation that has the lowest value
+  
+* "MAX" use only the observation that has the highest value
+  
+* "UW_MEAN" compute an unweighted mean of the observations
+  
+* "DW_MEAN" compute a weighted mean of the observations based
+  on the time of the observation
+  
+* "MEDIAN" use the median observation
+  
+* "PERC" use the Nth percentile observation where N = obs_perc_value
 
 The reporting mechanism for this feature can be activated by specifying
 a verbosity level of three or higher. The report will show information
@@ -1975,14 +1998,14 @@ The "fcst_raw_plot" entry is a dictionary used by Wavelet-Stat and MODE
 containing colortable plotting information for the plotting of the raw
 forecast field:
 
-   - The "color_table" entry specifies the location and name of the
-     colortable file to be used.
+* The "color_table" entry specifies the location and name of the
+  colortable file to be used.
 
-   - The "plot_min" and "plot_max" entries specify the range of data values.
-     If they are both set to 0, the MET tools will automatically rescale
-     the colortable to the range of values present in the data. If they
-     are not both set to 0, the MET tools will rescale the colortable using
-     their values.
+* The "plot_min" and "plot_max" entries specify the range of data values.
+  If they are both set to 0, the MET tools will automatically rescale
+  the colortable to the range of values present in the data. If they
+  are not both set to 0, the MET tools will rescale the colortable using
+  their values.
 
 .. code-block:: none
 		
@@ -2032,11 +2055,15 @@ summary interval in seconds. It may either be set as an integer number of
 seconds for a centered time interval or a dictionary with beginning and
 ending time offsets in seconds.
 
-e.g. beg = "00";
-     end = "235959";
-     step = 300;
-     width = 600;
-     width = { beg = -300; end = 300; }
+For example:
+
+.. code-block:: none
+		
+   beg = "00";
+   end = "235959";
+   step = 300;
+   width = 600;
+   width = { beg = -300; end = 300; }
 
 This example does a 10-minute time summary every 5 minutes throughout the
 day. The first interval will be from 23:55:00 the previous day through
@@ -2095,24 +2122,24 @@ The "ens" entry is a dictionary that specifies the fields for which ensemble
 products should be generated. This is very similar to the "fcst" and "obs"
 entries. This dictionary may include the following entries:
 
-   - The "censor_thresh" and "censor_val" entries are described above.
+* The "censor_thresh" and "censor_val" entries are described above.
 
-   - The "ens_thresh" entry specifies a proportion between 0 and 1 to define
-     the required ratio of valid input ensemble member files. If the ratio
-     of valid input ensemble files to expected ones is too low, the tool
-     will error out.
+* The "ens_thresh" entry specifies a proportion between 0 and 1 to define
+  the required ratio of valid input ensemble member files. If the ratio
+  of valid input ensemble files to expected ones is too low, the tool
+  will error out.
 
-   - The "vld_thresh" entry specifies a proportion between 0 and 1 to
-     define the required ratio of valid data points. When computing
-     ensemble products, if the ratio of valid data values is too low, the
-     ensemble product will be set to bad data for that point.
+* The "vld_thresh" entry specifies a proportion between 0 and 1 to
+  define the required ratio of valid data points. When computing
+  ensemble products, if the ratio of valid data values is too low, the
+  ensemble product will be set to bad data for that point.
 
-   - The "field" entry is as described above. However, in this case, the
-     cat_thresh entry is used for calculating probabilities of exceeding
-     the given threshold. In the default shown below, the probability of
-     accumulated precipitation > 0.0 mm and > 5.0 mm will be calculated
-     from the member accumulated precipitation fields and stored as an
-     ensemble field.
+* The "field" entry is as described above. However, in this case, the
+  cat_thresh entry is used for calculating probabilities of exceeding
+  the given threshold. In the default shown below, the probability of
+  accumulated precipitation > 0.0 mm and > 5.0 mm will be calculated
+  from the member accumulated precipitation fields and stored as an
+  ensemble field.
 
 .. code-block:: none
 		
@@ -2300,21 +2327,34 @@ levels, and range of values.
 
 The "ensemble_flag" entry is a dictionary of boolean value indicating
 which ensemble products should be generated:
-   - "mean" for the simple ensemble mean
-   - "stdev" for the ensemble standard deviation
-   - "minus" for the mean minus one standard deviation
-   - "plus" for the mean plus one standard deviation
-   - "min" for the ensemble minimum
-   - "max" for the ensemble maximum
-   - "range" for the range of ensemble values
-   - "vld_count" for the number of valid ensemble members
-   - "frequency" for the ensemble relative frequency meeting a threshold
-   - "nep" for the neighborhood ensemble probability
-   - "nmep" for the neighborhood maximum ensemble probability
-   - "rank" to write the rank for the gridded observation field to separate
-     NetCDF output file.
-   - "weight" to write the grid weights specified in grid_weight_flag to the
-     rank NetCDF output file.
+
+* "mean" for the simple ensemble mean
+  
+* "stdev" for the ensemble standard deviation
+  
+* "minus" for the mean minus one standard deviation
+  
+* "plus" for the mean plus one standard deviation
+  
+* "min" for the ensemble minimum
+  
+* "max" for the ensemble maximum
+  
+* "range" for the range of ensemble values
+  
+* "vld_count" for the number of valid ensemble members
+  
+* "frequency" for the ensemble relative frequency meeting a threshold
+  
+* "nep" for the neighborhood ensemble probability
+  
+* "nmep" for the neighborhood maximum ensemble probability
+  
+* "rank" to write the rank for the gridded observation field to separate
+  NetCDF output file.
+  
+* "weight" to write the grid weights specified in grid_weight_flag to the
+  rank NetCDF output file.
 
 .. code-block:: none
 		
@@ -2351,9 +2391,11 @@ MODE line options are used to create filters that determine which MODE output
 lines are read in and processed. The MODE line options are numerous. They
 fall into seven categories: toggles, multiple set string options, multiple
 set integer options, integer max/min options, date/time max/min options,
-floating-point max/min options, and miscellaneous options. In order to be
+floating-point max/min options, and miscellaneous options. **In order to be
 applied, the options must be uncommented (i.e. remove  the "//" marks) before
-running. These options are described in subsequent sections.
+running.** These options are described in subsequent sections. Please note
+that this configuration file is processed differently than the other config
+files.
 
 
 
@@ -2407,28 +2449,36 @@ quotation marks.
 
 This options specifies which model to use
 
-model    = [];
+.. code-block:: none
+
+  // model    = [];
 
 
 These two options specify thresholds for forecast and observations objects to
 be used in the analysis, respectively.
 
-fcst_thr = [];
-obs_thr  = [];
+.. code-block:: none
+
+  // fcst_thr = [];
+  // obs_thr  = [];
 
 
 These options indicate the names of variables to be used in the analysis for
 forecast and observed fields.
 
-fcst_var = [];
-obs_var = [];
+.. code-block:: none
+
+  // fcst_var = [];
+  // obs_var = [];
 
 
 These options indicate vertical levels for forecast and observed fields to be
 used in the analysis.
 
-fcst_lev = [];
-obs_lev = [];
+.. code-block:: none
+
+  // fcst_lev = [];
+  // obs_lev = [];
 
 
 Multiple-set integer options: The following options set various integer
@@ -2439,35 +2489,45 @@ integer.
 
 These options are integers of the form HH[MMSS] specifying the lead_time.
 
-fcst_lead       = [];
-obs_lead       = [];
+.. code-block:: none
+
+  // fcst_lead       = [];
+  //obs_lead       = [];
 
 
 These options are integers of the form HH[MMSS] specifying the valid hour.
 
-fcst_valid_hour = [];
-obs_valid_hour = [];
+.. code-block:: none
+
+  // fcst_valid_hour = [];
+  // obs_valid_hour = [];
 
 
 These options are integers of the form HH[MMSS] specifying the model
 initialization hour.
 
-fcst_init_hour  = [];
-obs_init_hour  = [];
+.. code-block:: none
+
+  // fcst_init_hour  = [];
+  // obs_init_hour  = [];
 
 
 These options are integers of the form HHMMSS specifying the accumulation
 time.
 
-fcst_accum      = [];
-obs_accum      = [];
+.. code-block:: none
+
+  // fcst_accum      = [];
+  // obs_accum      = [];
 
 
 These options indicate the convolution radius used for forecast of observed
 objects, respectively.
 
-fcst_rad        = [];
-obs_rad        = [];
+.. code-block:: none
+
+  // fcst_rad        = [];
+  // obs_rad        = [];
 
 
 Integer max/min options: These options set limits on various integer
@@ -2479,37 +2539,47 @@ the value of the attribute. The option works similarly for minimum values.
 These options are used to indicate minimum/maximum values for the area
 attribute to be used in the analysis.
 
-area_min              = 0;
-area_max              = 0;
+.. code-block:: none
+
+  // area_min              = 0;
+  // area_max              = 0;
 
 
 These options are used to indicate minimum/maximum values accepted for the
 area thresh. The area thresh is the area of the raw field inside the object
 that meets the threshold criteria.
 
-area_thresh_min       = 0;
-area_thresh_max       = 0;
+.. code-block:: none
+
+  // area_thresh_min       = 0;
+  // area_thresh_max       = 0;
 
 
 These options refer to the minimum/maximum values accepted for the
 intersection area attribute.
 
-intersection_area_min = 0;
-intersection_area_max = 0;
+.. code-block:: none
+
+  // intersection_area_min = 0;
+  // intersection_area_max = 0;
 
 
 These options refer to the minimum/maximum union area values accepted for
 analysis.
 
-union_area_min        = 0;
-union_area_max        = 0;
+.. code-block:: none
+
+  // union_area_min        = 0;
+  // union_area_max        = 0;
 
 
 These options refer to the minimum/maximum values for symmetric difference
 for objects to be used in the analysis.
 
-symmetric_diff_min    = 0;
-symmetric_diff_max    = 0;
+.. code-block:: none
+
+  // symmetric_diff_min    = 0;
+  // symmetric_diff_max    = 0;
 
 
 Date/time max/min options: These options set limits on various date/time
@@ -2525,28 +2595,36 @@ be zero.
 
 These options indicate minimum/maximum values for the forecast valid time.
 
-fcst_valid_min = "";
-fcst_valid_max = "";
+.. code-block:: none
+
+  // fcst_valid_min = "";
+  // fcst_valid_max = "";
 
 
 These options indicate minimum/maximum values for the observation valid time.
 
-obs_valid_min  = "";
-obs_valid_max  = "";
+.. code-block:: none
+
+  // obs_valid_min  = "";
+  // obs_valid_max  = "";
 
 
 These options indicate minimum/maximum values for the forecast initialization
 time.
 
-fcst_init_min  = "";
-fcst_init_max  = "";
+.. code-block:: none
+
+  // fcst_init_min  = "";
+  // fcst_init_max  = "";
 
 
 These options indicate minimum/maximum values for the observation
 initialization time.
 
-obs_init_min   = "";
-obs_init_max   = "";
+.. code-block:: none
+
+  // obs_init_min   = "";
+  // obs_init_max   = "";
 
 
 Floating-point max/min options: Setting limits on various floating-point
@@ -2556,90 +2634,93 @@ maximum values for each MODE attribute that can be described as a floating-
 point number. Please refer to "The MODE Tool" section on attributes in the
 MET User's Guide for a description of these attributes.
 
+.. code-block:: none
 
-centroid_x_min                 = 0.0;
-centroid_x_max                 = 0.0;
+  // centroid_x_min                 = 0.0;
+  // centroid_x_max                 = 0.0;
+ 
+  // centroid_y_min                 = 0.0;
+  // centroid_y_max                 = 0.0;
+ 
+  // centroid_lat_min               = 0.0;
+  // centroid_lat_max               = 0.0;
+ 
+  // centroid_lon_min               = 0.0;
+  // centroid_lon_max               = 0.0;
+ 
+  // axis_ang_min                   = 0.0;
+  // axis_ang_max                   = 0.0;
+ 
+  // length_min                     = 0.0;
+  // length_max                     = 0.0;
+ 
+  // width_min                      = 0.0;
+  // width_max                      = 0.0;
+ 
+  // aspect_ratio_min               = 0.0;
+  // aspect_ratio_max               = 0.0;
+ 
+  // curvature_min                  = 0.0;
+  // curvature_max                  = 0.0;
+ 
+  // curvature_x_min                = 0.0;
+  // curvature_x_max                = 0.0;
+ 
+  // curvature_y_min                = 0.0;
+  // curvature_y_max                = 0.0;
+ 
+  // complexity_min                 = 0.0;
+  // complexity_max                 = 0.0;
+ 
+  // intensity_10_min               = 0.0;
+  // intensity_10_max               = 0.0;
+ 
+  // intensity_25_min               = 0.0;
+  // intensity_25_max               = 0.0;
 
-centroid_y_min                 = 0.0;
-centroid_y_max                 = 0.0;
+  // intensity_50_min               = 0.0;
+  // intensity_50_max               = 0.0;
+ 
+  // intensity_75_min               = 0.0;
+  // intensity_75_max               = 0.0;
+ 
+  // intensity_90_min               = 0.0;
+  // intensity_90_max               = 0.0;
+ 
+  // intensity_user_min             = 0.0;
+  // intensity_user_max             = 0.0;
+ 
+  // intensity_sum_min              = 0.0;
+  // intensity_sum_max              = 0.0;
+ 
+  // centroid_dist_min              = 0.0;
+  // centroid_dist_max              = 0.0;
+ 
+  // boundary_dist_min              = 0.0;
+  // boundary_dist_max              = 0.0;
+ 
+  // convex_hull_dist_min           = 0.0;
+  // convex_hull_dist_max           = 0.0;
+ 
+  // angle_diff_min                 = 0.0;
+  // angle_diff_max                 = 0.0;
+ 
+  // area_ratio_min                 = 0.0;
+  // area_ratio_max                 = 0.0;
+ 
+  // intersection_over_area_min     = 0.0;
+  // intersection_over_area_max     = 0.0;
+ 
+  // complexity_ratio_min           = 0.0;
+  // complexity_ratio_max           = 0.0;
+ 
+  // percentile_intensity_ratio_min = 0.0;
+  // percentile_intensity_ratio_max = 0.0;
+ 
+  // interest_min                   = 0.0;
+  // interest_max                   = 0.0;
 
-centroid_lat_min               = 0.0;
-centroid_lat_max               = 0.0;
 
-centroid_lon_min               = 0.0;
-centroid_lon_max               = 0.0;
-
-axis_ang_min                   = 0.0;
-axis_ang_max                   = 0.0;
-
-length_min                     = 0.0;
-length_max                     = 0.0;
-
-width_min                      = 0.0;
-width_max                      = 0.0;
-
-aspect_ratio_min               = 0.0;
-aspect_ratio_max               = 0.0;
-
-curvature_min                  = 0.0;
-curvature_max                  = 0.0;
-
-curvature_x_min                = 0.0;
-curvature_x_max                = 0.0;
-
-curvature_y_min                = 0.0;
-curvature_y_max                = 0.0;
-
-complexity_min                 = 0.0;
-complexity_max                 = 0.0;
-
-intensity_10_min               = 0.0;
-intensity_10_max               = 0.0;
-
-intensity_25_min               = 0.0;
-intensity_25_max               = 0.0;
-
-intensity_50_min               = 0.0;
-intensity_50_max               = 0.0;
-
-intensity_75_min               = 0.0;
-intensity_75_max               = 0.0;
-
-intensity_90_min               = 0.0;
-intensity_90_max               = 0.0;
-
-intensity_user_min             = 0.0;
-intensity_user_max             = 0.0;
-
-intensity_sum_min              = 0.0;
-intensity_sum_max              = 0.0;
-
-centroid_dist_min              = 0.0;
-centroid_dist_max              = 0.0;
-
-boundary_dist_min              = 0.0;
-boundary_dist_max              = 0.0;
-
-convex_hull_dist_min           = 0.0;
-convex_hull_dist_max           = 0.0;
-
-angle_diff_min                 = 0.0;
-angle_diff_max                 = 0.0;
-
-area_ratio_min                 = 0.0;
-area_ratio_max                 = 0.0;
-
-intersection_over_area_min     = 0.0;
-intersection_over_area_max     = 0.0;
-
-complexity_ratio_min           = 0.0;
-complexity_ratio_max           = 0.0;
-
-percentile_intensity_ratio_min = 0.0;
-percentile_intensity_ratio_max = 0.0;
-
-interest_min                   = 0.0;
-interest_max                   = 0.0;
 
 MODEConfig_default
 ------------------
@@ -2660,52 +2741,52 @@ MODE will be run.
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
 
-   - The "censor_thresh" and "censor_val" entries are described above.
-     The entries replace the previously supported "raw_thresh" entry.
+* The "censor_thresh" and "censor_val" entries are described above.
+  The entries replace the previously supported "raw_thresh" entry.
 
-   - The "conv_radius" entry specifies the convolution radius in grid
-     squares. The larger the convolution radius, the smoother the objects.
-     Multiple convolution radii may be specified as an array:
+* The "conv_radius" entry specifies the convolution radius in grid
+  squares. The larger the convolution radius, the smoother the objects.
+  Multiple convolution radii may be specified as an array:
        conv_radius = [ 5, 10, 15 ];
 
-   - The "conv_thresh" entry specifies the convolution threshold used to
-     define MODE objects. The lower the threshold, the larger the objects.
-     Multiple convolution thresholds may be specified as an array:
-        conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
+* The "conv_thresh" entry specifies the convolution threshold used to
+  define MODE objects. The lower the threshold, the larger the objects.
+  Multiple convolution thresholds may be specified as an array:
+       conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
 
-   - The "vld_thresh" entry is described above.
+* The "vld_thresh" entry is described above.
 
-   - The "filter_attr_name" and "filter_attr_thresh" entries are arrays of
-     the same length which specify object filtering criteria. By default, no
-     object filtering criteria is defined.
+* The "filter_attr_name" and "filter_attr_thresh" entries are arrays of
+  the same length which specify object filtering criteria. By default, no
+  object filtering criteria is defined.
 
-     The "filter_attr_name" entry is an array of strings specifying the MODE
-     output header column names for the object attributes of interest, such
-     as "AREA", "LENGTH", "WIDTH", and "INTENSITY_50". In addition,
-     "ASPECT_RATIO" specifies the aspect ratio (width/length),
-     "INTENSITY_101" specifies the  mean intensity value, and "INTENSITY_102"
-     specifies the sum of the intensity values.
+  The "filter_attr_name" entry is an array of strings specifying the MODE
+  output header column names for the object attributes of interest, such
+  as "AREA", "LENGTH", "WIDTH", and "INTENSITY_50". In addition,
+  "ASPECT_RATIO" specifies the aspect ratio (width/length),
+  "INTENSITY_101" specifies the  mean intensity value, and "INTENSITY_102"
+  specifies the sum of the intensity values.
 
-     The "filter_attr_thresh" entry is an array of thresholds for the
-     object attributes. Any simple objects not meeting all of these
-     filtering criteria are discarded.
+  The "filter_attr_thresh" entry is an array of thresholds for the
+  object attributes. Any simple objects not meeting all of these
+  filtering criteria are discarded.
 
-     Note that the "area_thresh" and "inten_perc_thresh" entries form
-     earlier versions of MODE are replaced by these options and are now
-     deprecated.
+  Note that the "area_thresh" and "inten_perc_thresh" entries form
+  earlier versions of MODE are replaced by these options and are now
+  deprecated.
 
-   - The "merge_thresh" entry specifies a lower convolution threshold used
-     when the double-threshold merging method is applied. The number of
-     merge thresholds must match the number of convolution thresholds.
-     Multiple merge thresholds may be specified as an array:
-        merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
+* The "merge_thresh" entry specifies a lower convolution threshold used
+  when the double-threshold merging method is applied. The number of
+  merge thresholds must match the number of convolution thresholds.
+  Multiple merge thresholds may be specified as an array:
+     merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
-   - The "merge_flag" entry specifies the merging methods to be applied:
-      - "NONE" for no merging
-      - "THRESH" for the double-threshold merging method. Merge objects
-        that would be part of the same object at the lower threshold.
-      - "ENGINE" for the fuzzy logic approach comparing the field to itself
-      - "BOTH" for both the double-threshold and engine merging methods
+* The "merge_flag" entry specifies the merging methods to be applied:
+   * "NONE" for no merging
+   * "THRESH" for the double-threshold merging method. Merge objects
+     that would be part of the same object at the lower threshold.
+   * "ENGINE" for the fuzzy logic approach comparing the field to itself
+   * "BOTH" for both the double-threshold and engine merging methods
 
 .. code-block:: none
 		
@@ -2737,12 +2818,12 @@ are used for these variables.
   grid_res = 4;
 
 The "match_flag" entry specifies the matching method to be applied:
-   - "NONE" for no matching between forecast and observation objects
-   - "MERGE_BOTH" for matching allowing additional merging in both fields.
+* "NONE" for no matching between forecast and observation objects
+* "MERGE_BOTH" for matching allowing additional merging in both fields.
      If two objects in one field match the same object in the other field,
      those two objects are merged.
-   - "MERGE_FCST" for matching allowing only additional forecast merging
-   - "NO_MERGE" for matching with no additional merging in either field
+* "MERGE_FCST" for matching allowing only additional forecast merging
+* "NO_MERGE" for matching with no additional merging in either field
 
 .. code-block:: none
 		
@@ -3190,16 +3271,16 @@ job to be performed. The format for an analysis job is as follows:
          computation of WMO mean values. Both unweighted and weighted mean
          values are reported, and they are computed using three types of
          logic:
-            - simple arithmetic mean (default)
-            - square root of the mean of the statistic squared
+         * simple arithmetic mean (default)
+         * square root of the mean of the statistic squared
               (applied to columns listed in "wmo_sqrt_stats")
-            - apply fisher transform
+         * apply fisher transform
              (applied to columns listed in "wmo_fisher_stats")
          The columns of data to be summarized are specified in one of two
          ways:
-            - Specify the -line_type option once and specify one or more
-              -column names.
-            - Format the -column option as LINE_TYPE:COLUMN.
+         * Specify the -line_type option once and specify one or more
+           *column names.
+         * Format the -column option as LINE_TYPE:COLUMN.
 
          Use the -derive job command option to automatically derive
          statistics on the fly from input contingency tables and partial
@@ -3221,16 +3302,16 @@ job to be performed. The format for an analysis job is as follows:
 
          Required Args: -line_type, -column
          Optional Args: -by column_name to specify case information
-                        -out_alpha to override default alpha value of 0.05
-                        -derive to derive statistics on the fly
-                        -column_union to summarize multiple columns
+                     *out_alpha to override default alpha value of 0.05
+                     *derive to derive statistics on the fly
+                     *column_union to summarize multiple columns
 
       "aggregate"
          To aggregate the STAT data for the STAT line type specified using
          the "-line_type" argument. The output of the job will be in the
          same format as the input line type specified. The following line
          types may be aggregated:
-         -line_type FHO, CTC, MCTC,
+      *line_type FHO, CTC, MCTC,
                     SL1L2, SAL1L2, VL1L2, VAL1L2,
                     PCT, NBRCNT, NBRCTC, GRAD,
                     ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
