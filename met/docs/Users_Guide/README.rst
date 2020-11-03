@@ -169,10 +169,18 @@ and scripts/config.
 
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
-   1. Reads share/met/config/ConfigConstants to define constants.
-   2. If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
-   3. Reads the default configuration file for the tool from share/met/config.
-   4. Reads the user-specified configuration file from the command line.
+
+   1.
+   Reads share/met/config/ConfigConstants to define constants.
+
+   2.
+   If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
+
+   3.
+   Reads the default configuration file for the tool from share/met/config.
+
+   4.
+   Reads the user-specified configuration file from the command line.
 
 Many of the entries from step (3) are overwritten by the user-specified entries
 from step (4). Therefore, the configuration file you pass in on the command
@@ -848,7 +856,8 @@ File-format specific settings for the "field" entry:
       be used. The indices are 0-based. For example, use the following to
       request a GRIB2 record whose 9-th and 27-th product description
       template values are 1 and 2, respectively:
-         GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
+
+      GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
 	  
   * NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
      
@@ -894,7 +903,7 @@ File-format specific settings for the "field" entry:
 	 
       * The "level" entry is not required for Python.
 
-      For example:
+        For example:
 
          .. code-block:: none
         
@@ -916,7 +925,7 @@ File-format specific settings for the "field" entry:
 	 
       * The "level" entry is not required for Python.
 
-      For example:
+        For example:
 
         .. code-block:: none
 			 
@@ -958,107 +967,115 @@ the observation data. It will often be set to the same things as "fcst",
 as shown in the example below. However, when comparing forecast and
 observation files of different format types, this entry will need to be set
 in a non-trivial way. The length of the "obs.field" array must match the
-length of the "fcst.field" array.
-    e.g.
+length of the "fcst.field" array.  For example:
+
+.. code-block:: none
+		
         obs = fcst;
 
-    or
+Or
 
-        fcst = {
-          censor_thresh = [];
-          censor_val    = [];
-          cnt_thresh    = [ NA ];
-          cnt_logic     = UNION;
-          wind_thresh   = [ NA ];
-          wind_logic    = UNION;
+.. code-block:: none
+		
+   fcst = {
+     censor_thresh = [];
+     censor_val    = [];
+     cnt_thresh    = [ NA ];
+     cnt_logic     = UNION;
+     wind_thresh   = [ NA ];
+     wind_logic    = UNION;
 
-          field = [
-             {
-                name       = "PWAT";
-                level      = [ "L0" ];
-                cat_thresh = [ >2.5 ];
-             }
-           ];
+     field = [
+        {
+           name       = "PWAT";
+           level      = [ "L0" ];
+           cat_thresh = [ >2.5 ];
         }
-
-
-        obs = {
-          censor_thresh = [];
-          censor_val    = [];
-          cnt_thresh    = [ NA ];
-          cnt_logic     = UNION;
-          wind_thresh   = [ NA ];
-          wind_logic    = UNION;
-
-          field = [
-             {
-                name       = "IWV";
-                level      = [ "L0" ];
-                cat_thresh = [ >25.0 ];
-             }
-           ];
-        }
-
-
-  - The "message_type" entry is an array of point observation message types
-    to be used. This only applies to the tools that verify against point
-    observations. This may be specified once at the top-level "obs"
-    dictionary or separately for each "field" array element. In the example
-    shown above, this is specified in the "fcst" dictionary and copied to
-    "obs".
-
-  - Simplified vertical level matching logic is applied for surface message
-    types. Observations for the following message types are assumed to be at
-    the surface, as defined by the default message_type_group_map:
-       ADPSFC, SFCSHP, MSONET
-
-  - The "message_type" would be placed in the "field" array element if more
-    than one "message_type" entry is desired within the config file.
-    e.g.
-    fcst = {
-      censor_thresh = [];
-      censor_val    = [];
-      cnt_thresh    = [ NA ];
-      cnt_logic     = UNION;
-      wind_thresh   = [ NA ];
-      wind_logic    = UNION;
-
-      field = [
-         {
-           message_type = [ "ADPUPA" ];
-           sid_inc      = [];
-           sid_exc      = [];
-           name         = "TMP";
-           level        = [ "P250", "P500", "P700", "P850", "P1000" ];
-           cat_thresh   = [ <=273.0 ];
-         },
-         {
-           message_type = [ "ADPSFC" ];
-           sid_inc      = [];
-           sid_exc      = [ "KDEN", "KDET" ];
-           name         = "TMP";
-           level        = [ "Z2" ];
-           cat_thresh   = [ <=273.0 ];
-         }
       ];
-    }
+   }
 
-   - The "sid_inc" entry is an array of station ID groups indicating which
-     station ID's should be included in the verification task. If specified,
-     only those station ID's appearing in the list will be included.  Note
-     that filtering by station ID may also be accomplished using the "mask.sid"
-     option. However, when using the "sid_inc" option, statistics are reported
-     separately for each masking region.
-   - The "sid_exc" entry is an array of station ID groups indicating which
-     station ID's should be excluded from the verification task.
-   - Each element in the "sid_inc" and "sid_exc" arrays is either the name of
-     a single station ID or the full path to a station ID group file name.
-     A station ID group file consists of a name for the group followed by a
-     list of station ID's. All of the station ID's indicated will be concatenated
-     into one long list of station ID's to be included or excluded.
-   - As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
-     placed in the in the "field" array element to control which station ID's
-     are included or excluded for each verification task.
+
+   obs = {
+     censor_thresh = [];
+     censor_val    = [];
+     cnt_thresh    = [ NA ];
+     cnt_logic     = UNION;
+     wind_thresh   = [ NA ];
+     wind_logic    = UNION;
+
+     field = [
+        {
+           name       = "IWV";
+           level      = [ "L0" ];
+           cat_thresh = [ >25.0 ];
+        }
+      ];
+   }
+
+* The "message_type" entry is an array of point observation message types
+  to be used. This only applies to the tools that verify against point
+  observations. This may be specified once at the top-level "obs"
+  dictionary or separately for each "field" array element. In the example
+  shown above, this is specified in the "fcst" dictionary and copied to
+  "obs".
+
+* Simplified vertical level matching logic is applied for surface message
+  types. Observations for the following message types are assumed to be at
+  the surface, as defined by the default message_type_group_map:
+  ADPSFC, SFCSHP, MSONET
+
+* The "message_type" would be placed in the "field" array element if more
+  than one "message_type" entry is desired within the config file. For example:
+
+  .. code-block:: none
+     
+     fcst = {
+         censor_thresh = [];
+         censor_val    = [];
+         cnt_thresh    = [ NA ];
+         cnt_logic     = UNION;
+         wind_thresh   = [ NA ];
+         wind_logic    = UNION;
+
+         field = [
+            {
+              message_type = [ "ADPUPA" ];
+              sid_inc      = [];
+              sid_exc      = [];
+              name         = "TMP";
+              level        = [ "P250", "P500", "P700", "P850", "P1000" ];
+              cat_thresh   = [ <=273.0 ];
+            },
+            {
+              message_type = [ "ADPSFC" ];
+              sid_inc      = [];
+              sid_exc      = [ "KDEN", "KDET" ];
+              name         = "TMP";
+              level        = [ "Z2" ];
+              cat_thresh   = [ <=273.0 ];
+            }
+         ];
+       }
+
+ * The "sid_inc" entry is an array of station ID groups indicating which
+   station ID's should be included in the verification task. If specified,
+   only those station ID's appearing in the list will be included.  Note
+   that filtering by station ID may also be accomplished using the "mask.sid"
+   option. However, when using the "sid_inc" option, statistics are reported
+   separately for each masking region.
+   
+ * The "sid_exc" entry is an array of station ID groups indicating which
+   station ID's should be excluded from the verification task.
+   
+ * Each element in the "sid_inc" and "sid_exc" arrays is either the name of
+   a single station ID or the full path to a station ID group file name.
+   A station ID group file consists of a name for the group followed by a
+   list of station ID's. All of the station ID's indicated will be concatenated
+   into one long list of station ID's to be included or excluded.
+   
+ * As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
+   placed in the in the "field" array element to control which station ID's
+   are included or excluded for each verification task.
 
 .. code-block:: none
 		
@@ -1069,36 +1086,37 @@ The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
 of several entires defining the climatology file names and fields to be used.
 
-  - The "file_names" entry specifies one or more file names containing
-    the gridded climatology data to be used.
+* The "file_names" entry specifies one or more file names containing
+  the gridded climatology data to be used.
 
-  - The "field" entry is an array of dictionaries, specified the same
-    way as those in the "fcst" and "obs" dictionaries. If the array has
-    length zero, not climatology data will be read and all climatology
-    statistics will be written as missing data. Otherwise, the array
-    length must match the length of "field" in the "fcst" and "obs"
-    dictionaries.
+* The "field" entry is an array of dictionaries, specified the same
+  way as those in the "fcst" and "obs" dictionaries. If the array has
+  length zero, not climatology data will be read and all climatology
+  statistics will be written as missing data. Otherwise, the array
+  length must match the length of "field" in the "fcst" and "obs"
+  dictionaries.
 
-  - The "regrid" dictionary defines how the climatology data should be
-    regridded to the verification domain.
+* The "regrid" dictionary defines how the climatology data should be
+  regridded to the verification domain.
 
-  - The "time_interp_method" entry specifies how the climatology data should
-    be interpolated in time to the forecast valid time:
-     - NEAREST for data closest in time
-     - UW_MEAN for average of data before and after
-     - DW_MEAN for linear interpolation in time of data before and after
+* The "time_interp_method" entry specifies how the climatology data should
+  be interpolated in time to the forecast valid time:
+  
+ * NEAREST for data closest in time
+ * UW_MEAN for average of data before and after
+ * DW_MEAN for linear interpolation in time of data before and after
 
-  - The "day_interval" entry is an integer specifying the spacing in days of
-    the climatology data. Use 31 for monthly data or 1 for daily data.
-    Use "NA" if the timing of the climatology data should not be checked.
+* The "day_interval" entry is an integer specifying the spacing in days of
+  the climatology data. Use 31 for monthly data or 1 for daily data.
+  Use "NA" if the timing of the climatology data should not be checked.
 
-  - The "hour_interval" entry is an integer specifying the spacing in hours of
-    the climatology data for each day. This should be set between 0 and 24,
-    with 6 and 12 being common choices. Use "NA" if the timing of the
-    climatology data should not be checked.
+* The "hour_interval" entry is an integer specifying the spacing in hours of
+  the climatology data for each day. This should be set between 0 and 24,
+  with 6 and 12 being common choices. Use "NA" if the timing of the
+  climatology data should not be checked.
 
-  - The "day_interval" and "hour_interval" entries replace the deprecated
-    entries "match_month", "match_day", and "time_step".
+* The "day_interval" and "hour_interval" entries replace the deprecated
+  entries "match_month", "match_day", and "time_step".
 
 .. code-block:: none
 		
@@ -1123,10 +1141,14 @@ be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
 tools. The "climo_mean" and "climo_stdev" data define the climatological
 distribution for each grid point, assuming normality. These climatological
 distributions are used in two ways:
-(1) To define climatological distribution percentile (CDP) thresholds which
+
+(1)
+    To define climatological distribution percentile (CDP) thresholds which
     can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
     speed (wind_thresh) thresholds.
-(2) To subset matched pairs into climatological bins based on where the
+
+(2)
+    To subset matched pairs into climatological bins based on where the
     observation value falls within the climatological distribution. See the
     "climo_cdf" dictionary.
 
@@ -1148,10 +1170,16 @@ The "climo_cdf" dictionary specifies how the the climatological mean
 evaluate model performance relative to where the observation value falls
 within the climatological distribution. This dictionary consists of 3
 entries:
-(1) The "cdf_bins" entry defines the climatological bins either as an integer
+
+(1)
+    The "cdf_bins" entry defines the climatological bins either as an integer
     or an array of floats between 0 and 1.
-(2) The "center_bins" entry may be set to TRUE or FALSE.
-(3) The "write_bins" entry may be set to TRUE or FALSE.
+
+(2)
+    The "center_bins" entry may be set to TRUE or FALSE.
+
+(3)
+    The "write_bins" entry may be set to TRUE or FALSE.
 
 MET uses the climatological mean and standard deviation to construct a normal
 PDF at each observation location. The total area under the PDF is 1, and the
@@ -1162,12 +1190,18 @@ bins must span that same range.
 When "cdf_bins" is set to an array of floats, they explicitly define the
 climatological bins. The array must begin with 0.0 and end with 1.0.
 For example:
+
+.. code-block:: none
+		
   cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
 
 When "cdf_bins" is set to an integer, it defines the number of bins to be
 used. The "center_bins" flag indicates whether or not the bins should be
 centered on 0.5. An odd number of bins can be centered or uncentered while
 an even number of bins can only be  uncentered. For example:
+
+.. code-block:: none
+		
   4 uncentered bins (cdf_bins = 4; center_bins = FALSE;) yields:
     0.0, 0.25, 0.50, 0.75, 1.0
   5 uncentered bins (cdf_bins = 5; center_bins = FALSE;) yields:
@@ -1210,10 +1244,14 @@ probabilities. Those derived probability values are used to compute BSS.
 
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
-   - "NONE" to perform no masking of missing data
-   - "FCST" to mask the forecast field with missing observation data
-   - "OBS" to mask the observation field with missing forecast data
-   - "BOTH" to mask both fields with missing data from the other
+
+ * "NONE" to perform no masking of missing data
+   
+ * "FCST" to mask the forecast field with missing observation data
+   
+ * "OBS" to mask the observation field with missing forecast data
+   
+ * "BOTH" to mask both fields with missing data from the other
 
 .. code-block:: none
 		
@@ -1240,74 +1278,74 @@ geographic extent, and any matched pairs falling inside that area will be
 used in the computation of statistics. Masking regions may be specified
 in the following ways:
 
-   - The "grid" entry is an array of named grids. It contains a
-     comma-separated list of pre-defined NCEP grids over which to perform
-     verification. An empty list indicates that no masking grids should be
-     used. The standard NCEP grids are named "GNNN" where NNN indicates the
-     three digit grid number. Supplying a value of "FULL" indicates that the
-     verification should be performed over the entire grid on which the data
-     resides.
-     See: `ON388 - TABLE B, GRID IDENTIFICATION <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_
-     (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92)
-     The "grid" entry can be the gridded data file defining grid.
+* The "grid" entry is an array of named grids. It contains a
+  comma-separated list of pre-defined NCEP grids over which to perform
+  verification. An empty list indicates that no masking grids should be
+  used. The standard NCEP grids are named "GNNN" where NNN indicates the
+  three digit grid number. Supplying a value of "FULL" indicates that the
+  verification should be performed over the entire grid on which the data
+  resides.
+  See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_  
+  The "grid" entry can be the gridded data file defining grid.
 
-   - The "poly" entry contains a comma-separated list of files that define
-     verification masking regions. These masking regions may be specified in
-     two ways: as a lat/lon polygon or using a gridded data file such as the
-     NetCDF output of the Gen-Vx-Mask tool.
+* The "poly" entry contains a comma-separated list of files that define
+  verification masking regions. These masking regions may be specified in
+  two ways: as a lat/lon polygon or using a gridded data file such as the
+  NetCDF output of the Gen-Vx-Mask tool.
 
-      - An ASCII file containing a lat/lon polygon.
-        Latitude in degrees north and longitude in degrees east.
-        The first and last polygon points are connected.
-        e.g. "MET_BASE/poly/EAST.poly" which consists of n points:
-             "poly_name lat1 lon1 lat2 lon2... latn lonn"
+  * An ASCII file containing a lat/lon polygon.
+    Latitude in degrees north and longitude in degrees east.
+    The first and last polygon points are connected.
+    For example, "MET_BASE/poly/EAST.poly" which consists of n points:
+    "poly_name lat1 lon1 lat2 lon2... latn lonn"
 
-        Several masking polygons used by NCEP are predefined in the
-        installed share/met/poly directory. Creating a new polygon is as
-        simple as creating a text file with a name for the polygon followed
-        by the lat/lon points which define its boundary. Adding a new masking
-        polygon requires no code changes and no recompiling. Internally, the
-        lat/lon polygon points are converted into x/y values in the grid. The
-        lat/lon values for the observation points are also converted into x/y
-        grid coordinates. The computations performed to check whether the
-        observation point falls within the polygon defined is done in x/y
-        grid space.
+    Several masking polygons used by NCEP are predefined in the
+    installed share/met/poly directory. Creating a new polygon is as
+    simple as creating a text file with a name for the polygon followed
+    by the lat/lon points which define its boundary. Adding a new masking
+    polygon requires no code changes and no recompiling. Internally, the
+    lat/lon polygon points are converted into x/y values in the grid. The
+    lat/lon values for the observation points are also converted into x/y
+    grid coordinates. The computations performed to check whether the
+    observation point falls within the polygon defined is done in x/y
+    grid space.
 
-      - The NetCDF output of the gen_vx_mask tool.
+  * The NetCDF output of the gen_vx_mask tool.
 
-      - Any gridded data file that MET can read may be used to define a
-        verification masking region. Users must specify a description of the
-        field to be used from the input file and, optionally, may specify a
-        threshold to be applied to that field. Once this threshold is
-        applied, any grid point where the resulting field is 0, the mask is
-        turned off. Any grid point where it is non-zero, the mask is turned
-        on.
-        e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+  * Any gridded data file that MET can read may be used to define a
+    verification masking region. Users must specify a description of the
+    field to be used from the input file and, optionally, may specify a
+    threshold to be applied to that field. Once this threshold is
+    applied, any grid point where the resulting field is 0, the mask is
+    turned off. Any grid point where it is non-zero, the mask is turned
+    on.
+    For example,  "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
-   - The "sid" entry is an array of strings which define groups of
-     observation station ID's over which to compute statistics. Each entry
-     in the array is either a filename of a comma-separated list.
-      - For a filename, the strings are whitespace-separated. The first
-        string is the mask "name" and the remaining strings are the station
-        ID's to be used.
-      - For a comma-separated list, optionally use a colon to specify a name.
-        For "MY_LIST:SID1,SID2", name = MY_LIST and values = SID1 and SID2.
-      - For a comma-separated list of length one with no name specified, the
-        mask "name" and value are both set to the single station ID string.
-        For "SID1", name = SID1 and value = SID1.
-      - For a comma-separated list of length greater than one with no name
-        specified, the name is set to MASK_SID and the values are the station
-        ID's to be used.
-        For "SID1,SID2", name = MASK_SID and values = SID1 and SID2.
-      - The "name" of the station ID mask is written to the VX_MASK column
-        of the MET output files.
-   - The "llpnt" entry is either a single dictionary or an array of
-     dictionaries. Each dictionary contains three entries, the "name" for
-     the masking region, "lat_thresh", and "lon_thresh". The latitude and
-     longitude thresholds are applied directly to the point observation
-     latitude and longitude values. Only observations whose latitude and
-     longitude values meet this threshold criteria are used. A threshold set
-     to "NA" always evaluates to true.
+* The "sid" entry is an array of strings which define groups of
+  observation station ID's over which to compute statistics. Each entry
+  in the array is either a filename of a comma-separated list.
+  
+  * For a filename, the strings are whitespace-separated. The first
+    string is the mask "name" and the remaining strings are the station
+    ID's to be used.
+  * For a comma-separated list, optionally use a colon to specify a name.
+    For "MY_LIST:SID1,SID2", name = MY_LIST and values = SID1 and SID2.
+  * For a comma-separated list of length one with no name specified, the
+    mask "name" and value are both set to the single station ID string.
+    For "SID1", name = SID1 and value = SID1.
+  * For a comma-separated list of length greater than one with no name
+    specified, the name is set to MASK_SID and the values are the station
+    ID's to be used.
+    For "SID1,SID2", name = MASK_SID and values = SID1 and SID2.
+  * The "name" of the station ID mask is written to the VX_MASK column
+    of the MET output files.
+* The "llpnt" entry is either a single dictionary or an array of
+  dictionaries. Each dictionary contains three entries, the "name" for
+  the masking region, "lat_thresh", and "lon_thresh". The latitude and
+  longitude thresholds are applied directly to the point observation
+  latitude and longitude values. Only observations whose latitude and
+  longitude values meet this threshold criteria are used. A threshold set
+  to "NA" always evaluates to true.
 
 The masking logic for processing point observations in Point-Stat and
 Ensemble-Stat fall into two cateogries. The "sid" and "llpnt" options apply
@@ -1355,49 +1393,51 @@ The "boot" entry defines the parameters to be used in calculation of
 bootstrap confidence intervals. The interval variable indicates what method
 should be used for computing bootstrap confidence intervals:
 
-   - The "interval" entry specifies the confidence interval method:
-      - "BCA" for the BCa (bias-corrected percentile) interval method is
-        highly accurate but computationally intensive.
-      - "PCTILE" uses the percentile method which is somewhat less accurate
-        but more efficient.
+* The "interval" entry specifies the confidence interval method:
+  
+  * "BCA" for the BCa (bias-corrected percentile) interval method is
+    highly accurate but computationally intensive.
+    
+  * "PCTILE" uses the percentile method which is somewhat less accurate
+    but more efficient.
 
-   - The "rep_prop" entry specifies a proportion between 0 and 1 to define
-     the replicate sample size to be used when computing percentile
-     intervals. The replicate sample size is set to boot_rep_prop * n,
-     where n is the number of raw data points.
+* The "rep_prop" entry specifies a proportion between 0 and 1 to define
+  the replicate sample size to be used when computing percentile
+  intervals. The replicate sample size is set to boot_rep_prop * n,
+  where n is the number of raw data points.
 
-     When computing bootstrap confidence intervals over n sets of matched
-     pairs, the size of the subsample, m, may be chosen less than or equal to
-     the size of the sample, n. This variable defines the size of m as a
-     proportion relative to the size of n. A value of 1 indicates that the
-     size of the subsample, m, should be equal to the size of the sample, n.
+  When computing bootstrap confidence intervals over n sets of matched
+  pairs, the size of the subsample, m, may be chosen less than or equal to
+  the size of the sample, n. This variable defines the size of m as a
+  proportion relative to the size of n. A value of 1 indicates that the
+  size of the subsample, m, should be equal to the size of the sample, n.
 
-   - The "n_rep" entry defines the number of subsamples that should be taken
-     when computing bootstrap confidence intervals. This variable should be
-     set large enough so that when confidence intervals are computed multiple
-     times for the same set of data, the intervals do not change much.
-     Setting this variable to zero disables the computation of bootstrap
-     confidence intervals, which may be necessary to run MET in realtime or
-     near-realtime over large domains since bootstrapping is computationally
-     expensive. Setting this variable to 1000 indicates that bootstrap
-     confidence interval should be computed over 1000 subsamples of the
-     matched pairs.
+* The "n_rep" entry defines the number of subsamples that should be taken
+  when computing bootstrap confidence intervals. This variable should be
+  set large enough so that when confidence intervals are computed multiple
+  times for the same set of data, the intervals do not change much.
+  Setting this variable to zero disables the computation of bootstrap
+  confidence intervals, which may be necessary to run MET in realtime or
+  near-realtime over large domains since bootstrapping is computationally
+  expensive. Setting this variable to 1000 indicates that bootstrap
+  confidence interval should be computed over 1000 subsamples of the
+  matched pairs.
 
-   - The "rng" entry defines the random number generator to be used in the
-     computation of bootstrap confidence intervals. Subsamples are chosen at
-     random from the full set of matched pairs. The randomness is determined
-     by the random number generator specified. Users should refer to detailed
-     documentation of the
-     `GNU Scientific Library <https://www.gnu.org/software/gsl/doc/html/>`_
-     for a listing of the random number generators available for use.
-     
-   - The "seed" entry may be set to a specific value to make the computation
-     of bootstrap confidence intervals fully repeatable. When left empty
-     the random number generator seed is chosen automatically which will lead
-     to slightly different bootstrap confidence intervals being computed each
-     time the data is run. Specifying a value here ensures that the bootstrap
-     confidence intervals will be reproducable over multiple runs on the same
-     computing platform.
+* The "rng" entry defines the random number generator to be used in the
+  computation of bootstrap confidence intervals. Subsamples are chosen at
+  random from the full set of matched pairs. The randomness is determined
+  by the random number generator specified. Users should refer to detailed
+  documentation of the
+  `GNU Scientific Library <https://www.gnu.org/software/gsl/doc/html/rng.html>`_
+  for a listing of the random number generators available for use.
+  
+* The "seed" entry may be set to a specific value to make the computation
+  of bootstrap confidence intervals fully repeatable. When left empty
+  the random number generator seed is chosen automatically which will lead
+  to slightly different bootstrap confidence intervals being computed each
+  time the data is run. Specifying a value here ensures that the bootstrap
+  confidence intervals will be reproducable over multiple runs on the same
+  computing platform.
 
 .. code-block:: none
 		
@@ -1413,68 +1453,87 @@ The "interp" entry is a dictionary that specifies what interpolation or
 smoothing (for the Grid-Stat tool) methods should be applied.
 This dictionary may include the following entries:
 
-   - The "field" entry specifies to which field(s) the interpolation method
-     should be applied. This does not apply when doing point verification
-     with the Point-Stat or Ensemble-Stat tools:
-      - "FCST" to interpolate/smooth the forecast field.
-      - "OBS" to interpolate/smooth the observation field.
-      - "BOTH" to interpolate/smooth both the forecast and the observation.
+* The "field" entry specifies to which field(s) the interpolation method
+  should be applied. This does not apply when doing point verification
+  with the Point-Stat or Ensemble-Stat tools:
+  
+  * "FCST" to interpolate/smooth the forecast field.
+    
+  * "OBS" to interpolate/smooth the observation field.
+    
+  * "BOTH" to interpolate/smooth both the forecast and the observation.
 
-   - The "vld_thresh" entry specifies a number between 0 and 1. When
-     performing interpolation over some neighborhood of points the ratio of
-     the number of valid data points to the total number of points in the
-     neighborhood is computed. If that ratio is less than this threshold,
-     the matched pair is discarded. Setting this threshold to 1, which is the
-     default, requires that the entire neighborhood must contain valid data.
-     This variable will typically come into play only along the boundaries of
-     the verification region chosen.
+* The "vld_thresh" entry specifies a number between 0 and 1. When
+  performing interpolation over some neighborhood of points the ratio of
+  the number of valid data points to the total number of points in the
+  neighborhood is computed. If that ratio is less than this threshold,
+  the matched pair is discarded. Setting this threshold to 1, which is the
+  default, requires that the entire neighborhood must contain valid data.
+  This variable will typically come into play only along the boundaries of
+  the verification region chosen.
 
-   - The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
-     of the smoothing area.
+* The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
+  of the smoothing area.
 
-   - The "type" entry is an array of dictionaries, each specifying an
-     interpolation method. Interpolation is performed over a N by N box
-     centered on each point, where N is the width specified. Each of these
-     dictionaries must include:
+* The "type" entry is an array of dictionaries, each specifying an
+  interpolation method. Interpolation is performed over a N by N box
+  centered on each point, where N is the width specified. Each of these
+  dictionaries must include:
 
-     - The "width" entry is an integer which specifies the size of the
-       interpolation area. The area is either a square or circle containing
-       the observation point. The width value specifies the width of the
-       square or diameter of the circle. A width value of 1 is interpreted
-       as the nearest neighbor model grid point to the observation point.
-       For squares, a width of 2 defines a 2 x 2 box of grid points around
-       the observation point (the 4 closest model grid points), while a width
-       of 3 defines a 3 x 3 box of grid points around the observation point,
-       and so on. For odd widths in grid-to-point comparisons
-       (i.e. Point-Stat), the interpolation area is centered on the model
-       grid point closest to the observation point. For grid-to-grid
-       comparisons (i.e. Grid-Stat), the width must be odd.
+  * The "width" entry is an integer which specifies the size of the
+    interpolation area. The area is either a square or circle containing
+    the observation point. The width value specifies the width of the
+    square or diameter of the circle. A width value of 1 is interpreted
+    as the nearest neighbor model grid point to the observation point.
+    For squares, a width of 2 defines a 2 x 2 box of grid points around
+    the observation point (the 4 closest model grid points), while a width
+    of 3 defines a 3 x 3 box of grid points around the observation point,
+    and so on. For odd widths in grid-to-point comparisons
+    (i.e. Point-Stat), the interpolation area is centered on the model
+    grid point closest to the observation point. For grid-to-grid
+    comparisons (i.e. Grid-Stat), the width must be odd.
 
-     - The "method" entry specifies the interpolation procedure to be
-       applied to the points in the box:
-        - MIN         for the minimum value
-        - MAX         for the maximum value
-        - MEDIAN      for the median value
-        - UW_MEAN     for the unweighted average value
-        - DW_MEAN     for the distance-weighted average value
-                        where weight = distance^-2
-        - LS_FIT      for a least-squares fit
-        - BILIN       for bilinear interpolation (width = 2)
-        - NEAREST     for the nearest grid point (width = 1)
-        - BEST        for the value closest to the observation
-        - UPPER_LEFT  for the upper left grid point (width = 1)
-        - UPPER_RIGHT for the upper right grid point (width = 1)
-        - LOWER_RIGHT for the lower right grid point (width = 1)
-        - LOWER_LEFT  for the lower left grid point (width = 1)
-        - GAUSSIAN    for the Gaussian kernel
-        - MAXGAUSS    for the maximum value followed by a Gaussian smoother
-        - GEOG_MATCH  for the nearest grid point where the land/sea mask
-                         and geography criteria are satisfied.
+  * The "method" entry specifies the interpolation procedure to be
+    applied to the points in the box:
+    
+  * MIN         for the minimum value
+    
+  * MAX         for the maximum value
+    
+  * MEDIAN      for the median value
+    
+  * UW_MEAN     for the unweighted average value
+    
+  * DW_MEAN     for the distance-weighted average value
+    where weight = distance^-2
+		
+  * LS_FIT      for a least-squares fit
+    
+  * BILIN       for bilinear interpolation (width = 2)
+    
+  * NEAREST     for the nearest grid point (width = 1)
+    
+  * BEST        for the value closest to the observation
+    
+  * UPPER_LEFT  for the upper left grid point (width = 1)
 
-        The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
-        interpolating to point locations. For grid-to-grid comparisons, the
-        only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
-        GAUSSIAN, and MAXGAUSS.
+  * UPPER_RIGHT for the upper right grid point (width = 1)
+    
+  * LOWER_RIGHT for the lower right grid point (width = 1)
+    
+  * LOWER_LEFT  for the lower left grid point (width = 1)
+
+  * GAUSSIAN    for the Gaussian kernel
+
+  * MAXGAUSS    for the maximum value followed by a Gaussian smoother
+    
+  * GEOG_MATCH  for the nearest grid point where the land/sea mask
+    and geography criteria are satisfied.
+
+    The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
+    interpolating to point locations. For grid-to-grid comparisons, the
+    only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
+    GAUSSIAN, and MAXGAUSS.
 
 .. code-block:: none
 		
@@ -1495,7 +1554,7 @@ The "nbrhd" entry is a dictionary that is very similar to the "interp"
 entry. It specifies information for computing neighborhood statistics in
 Grid-Stat. This dictionary may include the following entries:
 
-   - The "field" entry specifies to which field(s) the computation of
+* The "field" entry specifies to which field(s) the computation of
      fractional coverage should be applied. Grid-Stat processes each
      combination of categorical threshold and neighborhood width to
      derive the fractional coverage fields from which neighborhood
@@ -1503,20 +1562,20 @@ Grid-Stat. This dictionary may include the following entries:
      coverage fields outside of MET can use this option to disable
      these computations. Instead, the raw input values will be
      used directly to compute neighborhood statistics:
-      - "BOTH" to compute fractional coverage for both the forecast
+   * "BOTH" to compute fractional coverage for both the forecast
                and the observation fields (default).
-      - "FCST" to only process the forecast field.
-      - "OBS"  to only process the observation field.
-      - "NONE" to process neither field.
+   * "FCST" to only process the forecast field.
+   * "OBS"  to only process the observation field.
+   * "NONE" to process neither field.
 
-   - The "vld_thresh" entry is described above.
+* The "vld_thresh" entry is described above.
 
-   - The "shape" entry defines the shape of the neighborhood.
+* The "shape" entry defines the shape of the neighborhood.
      Valid values are "SQUARE" or "CIRCLE"
 
-   - The "width" entry is as described above, and must be odd.
+* The "width" entry is as described above, and must be odd.
 
-   - The "cov_thresh" entry is an array of thresholds to be used when
+* The "cov_thresh" entry is an array of thresholds to be used when
      computing categorical statistics for the neighborhood fractional
      coverage field.
 
