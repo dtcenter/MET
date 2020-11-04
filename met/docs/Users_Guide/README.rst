@@ -1851,7 +1851,11 @@ file. The default value of an empty string indicates that the "name" and
 string changes for each run of Grid-Stat, using this option to define a
 constant string may make downstream processing more convenient.
 
-For example:  nc_pairs_var_name = "TMP";
+For example:
+
+.. code-block:: none
+		
+  nc_pairs_var_name = "TMP";
 
 .. code-block:: none
 		
@@ -2782,10 +2786,14 @@ The object definition settings for MODE are contained within the "fcst" and
      merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
 * The "merge_flag" entry specifies the merging methods to be applied:
+  
    * "NONE" for no merging
+     
    * "THRESH" for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
+     
    * "ENGINE" for the fuzzy logic approach comparing the field to itself
+     
    * "BOTH" for both the double-threshold and engine merging methods
 
 .. code-block:: none
@@ -2973,53 +2981,77 @@ PB2NCConfig_default
 
 The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 following criteria:
- (1) by message type: supply a list of PREPBUFR message types to retain
- (2) by station id: supply a list of observation stations to retain
- (3) by valid time: supply the beginning and ending time offset values
-     in the obs_window entry described above.
- (4) by location: use the "mask" entry described below to supply either
-     an NCEP masking grid, a masking lat/lon polygon or a file to a
-     mask lat/lon polygon
- (5) by elevation: supply min/max elevation values
- (6) by report type: supply a list of report types to retain using
-     pb_report_type and in_report_type entries described below
- (7) by instrument type: supply a list of instrument type to
-     retain
- (8) by vertical level: supply beg/end vertical levels using the
-     level_range entry described below
- (9) by variable type: supply a list of observation variable types to
-     retain using the obs_bufr_var entry described below
-(11) by quality mark: supply a quality mark threshold
-(12) Flag to retain values for all quality marks, or just the first
+
+(1) by message type: supply a list of PREPBUFR message types to retain
+ 
+(2) by station id: supply a list of observation stations to retain
+ 
+(3) by valid time: supply the beginning and ending time offset values
+    in the obs_window entry described above.
+
+(4) by location: use the "mask" entry described below to supply either
+    an NCEP masking grid, a masking lat/lon polygon or a file to a
+    mask lat/lon polygon
+ 
+(5) by elevation: supply min/max elevation values
+
+(6) by report type: supply a list of report types to retain using
+    pb_report_type and in_report_type entries described below
+
+(7) by instrument type: supply a list of instrument type to
+    retain
+ 
+(8) by vertical level: supply beg/end vertical levels using the
+    level_range entry described below
+ 
+(9) by variable type: supply a list of observation variable types to
+    retain using the obs_bufr_var entry described below
+ 
+(10) by quality mark: supply a quality mark threshold
+ 
+(11) Flag to retain values for all quality marks, or just the first
      quality mark (highest): use the event_stack_flag described below
-(13) by data level category: supply a list of category types to
+
+(12) by data level category: supply a list of category types to
      retain.
 
      0 - Surface level (mass reports only)
+     
      1 - Mandatory level (upper-air profile reports)
+     
      2 - Significant temperature level (upper-air profile reports)
+     
      2 - Significant temperature and winds-by-pressure level
-         (future combined mass and wind upper-air reports)
+     (future combined mass and wind upper-air reports)
+	 
      3 - Winds-by-pressure level (upper-air profile reports)
+     
      4 - Winds-by-height level (upper-air profile reports)
+     
      5 - Tropopause level (upper-air profile reports)
+     
      6 - Reports on a single level
-         (e.g., aircraft, satellite-wind, surface wind,
-          precipitable water retrievals, etc.)
+     (e.g., aircraft, satellite-wind, surface wind,
+     precipitable water retrievals, etc.)
+	  
      7 - Auxiliary levels generated via interpolation from spanning levels
-         (upper-air profile reports)
+     (upper-air profile reports)
 
 
 
 In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
 
-List of valid message types:
-   ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
-   MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
-   SFCSHP SPSSMI SYNDAT VADWND
+| List of valid message types:
+| ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
+| MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
+| SFCSHP SPSSMI SYNDAT VADWND
 
-   e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
+For example:
+
+.. code-block:: none
+		
+   message_type[] = [ "ADPUPA", "AIRCAR" ];
 
 `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
@@ -3045,7 +3077,7 @@ the filename which contains station ids. An array of station ids
 contains a comma-separated list. An empty list indicates that all
 stations should be retained.
 
-e.g. station_id = [ "KDEN" ];
+For example:  station_id = [ "KDEN" ];
 
 .. code-block:: none
 		
@@ -3069,11 +3101,12 @@ be retained.
 
 See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
 
-e.g.
-  Report Type 120 is for message type ADPUPA but is only RAWINSONDE
-  Report Type 132 is for message type ADPUPA but is only FLIGHT-LEVEL RECON
-    and PROFILE DROPSONDE
+For example:
 
+| Report Type 120 is for message type ADPUPA but is only RAWINSONDE
+| Report Type 132 is for message type ADPUPA but is only FLIGHT-LEVEL RECON
+| and PROFILE DROPSONDE
+|
 .. code-block:: none
 		
   pb_report_type  = [];
@@ -3085,10 +3118,11 @@ be retained.
 
 See: `Code table for input report types <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
-e.g.
-Input Report Type 11 Fixed land RAOB and PIBAL by block and station number
-Input Report Type 12 Fixed land RAOB and PIBAL by call letters
+For example:
 
+| Input Report Type 11 Fixed land RAOB and PIBAL by block and station number
+| Input Report Type 12 Fixed land RAOB and PIBAL by call letters
+|
 .. code-block:: none
 		
   in_report_type = [];
@@ -3112,19 +3146,29 @@ entries specifying the range of vertical levels (1 to 255) to be retained.
 
 The "level_category" entry is an array of integers specifying which level
 categories should be retained:
+
    0 = Surface level (mass reports only)
+   
    1 = Mandatory level (upper-air profile reports)
+   
    2 = Significant temperature level (upper-air profile reports)
+   
    2 = Significant temperature and winds-by-pressure level
-       (future combined mass and wind upper-air reports)
+   (future combined mass and wind upper-air reports)
+   
    3 = Winds-by-pressure level (upper-air profile reports)
+   
    4 = Winds-by-height level (upper-air profile reports)
+   
    5 = Tropopause level (upper-air profile reports)
+   
    6 = Reports on a single level
-       (e.g., aircraft, satellite-wind, surface wind,
-        precipitable water retrievals, etc.)
+   (For example: aircraft, satellite-wind, surface wind,
+   precipitable water retrievals, etc.)
+   
    7 = Auxiliary levels generated via interpolation from spanning levels
-       (upper-air profile reports)
+   (upper-air profile reports)
+   
 An empty list indicates that all should be retained.
 
 See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
@@ -3138,13 +3182,14 @@ names to be retained or derived. This replaces the "obs_grib_code" setting
 from earlier versions of MET. Run PB2NC on your data with the "-index"
 command line option to see the list of available observation variables.
 
-Observation variables that can be derived begin with "D_":
-   D_DPT   for Dew point Temperature in K
-   D_WDIR  for Wind Direction
-   D_WIND  for Wind Speed in m/s
-   D_RH    for Relative Humidity in %
-   D_MIXR  for Humidity Mixing Ratio in kg/kg
-   D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
+| Observation variables that can be derived begin with "D\_":
+|    D_DPT   for Dew point Temperature in K
+|    D_WDIR  for Wind Direction
+|    D_WIND  for Wind Speed in m/s
+|    D_RH    for Relative Humidity in %
+|    D_MIXR  for Humidity Mixing Ratio in kg/kg
+|    D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
+|
 
 .. code-block:: none
 		
@@ -3251,35 +3296,43 @@ The "jobs" entry is an array of STAT-Analysis jobs to be performed.
 Each element in the array contains the specifications for a single analysis
 job to be performed. The format for an analysis job is as follows:
 
+.. code-block:: none
+		
    -job job_name
    OPTIONAL ARGS
 
-   Where "job_name" is set to one of the following:
+Where "job_name" is set to one of the following:
 
-      "filter"
-         To filter out the STAT or TCMPR lines matching the job filtering
-         criteria specified below and using the optional arguments below.
-         The output STAT lines are written to the file specified using the
-         "-dump_row" argument.
-         Required Args: -dump_row
+|     "filter"
+|        To filter out the STAT or TCMPR lines matching the job filtering
+|        criteria specified below and using the optional arguments below.
+|        The output STAT lines are written to the file specified using the
+|        "-dump_row" argument.
+|        Required Args: -dump_row
+|
+|      "summary"
+|         To compute summary information for a set of statistics.
+|         The summary output includes the mean, standard deviation,
+|         percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
+|         and inter-quartile range. Also included are columns summarizing the
+|         computation of WMO mean values. Both unweighted and weighted mean
+|         values are reported, and they are computed using three types of
+|         logic:
 
-      "summary"
-         To compute summary information for a set of statistics.
-         The summary output includes the mean, standard deviation,
-         percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
-         and inter-quartile range. Also included are columns summarizing the
-         computation of WMO mean values. Both unweighted and weighted mean
-         values are reported, and they are computed using three types of
-         logic:
          * simple arithmetic mean (default)
+	   
          * square root of the mean of the statistic squared
-              (applied to columns listed in "wmo_sqrt_stats")
+           (applied to columns listed in "wmo_sqrt_stats")
+	   
          * apply fisher transform
-             (applied to columns listed in "wmo_fisher_stats")
+           (applied to columns listed in "wmo_fisher_stats")
+	   
          The columns of data to be summarized are specified in one of two
          ways:
+	 
          * Specify the -line_type option once and specify one or more
            *column names.
+	   
          * Format the -column option as LINE_TYPE:COLUMN.
 
          Use the -derive job command option to automatically derive
@@ -3290,149 +3343,152 @@ job to be performed. The format for an analysis job is as follows:
          summary statistics across the union of input columns rather than
          processing them separately.
 
-         For TCStat, the "-column" argument may be set to:
-            "TRACK" for track, along-track, and cross-track errors.
-            "WIND" for all wind radius errors.
-            "TI" for track and maximum wind intensity errors.
-            "AC" for along-track and cross-track errors.
-            "XY" for x-track and y-track errors.
-            "col" for a specific column name.
-            "col1-col2" for a difference of two columns.
-            "ABS(col or col1-col2)" for the absolute value.
+|         For TCStat, the "-column" argument may be set to:
+|            "TRACK" for track, along-track, and cross-track errors.
+|            "WIND" for all wind radius errors.
+|            "TI" for track and maximum wind intensity errors.
+|            "AC" for along-track and cross-track errors.
+|            "XY" for x-track and y-track errors.
+|            "col" for a specific column name.
+|            "col1-col2" for a difference of two columns.
+|            "ABS(col or col1-col2)" for the absolute value.
+|
+|         Required Args: -line_type, -column
+|         Optional Args: -by column_name to specify case information
 
-         Required Args: -line_type, -column
-         Optional Args: -by column_name to specify case information
-                     *out_alpha to override default alpha value of 0.05
-                     *derive to derive statistics on the fly
-                     *column_union to summarize multiple columns
+                     * out_alpha to override default alpha value of 0.05
+		     
+                     * derive to derive statistics on the fly
+		     
+                     * column_union to summarize multiple columns
 
-      "aggregate"
-         To aggregate the STAT data for the STAT line type specified using
-         the "-line_type" argument. The output of the job will be in the
-         same format as the input line type specified. The following line
-         types may be aggregated:
-      *line_type FHO, CTC, MCTC,
-                    SL1L2, SAL1L2, VL1L2, VAL1L2,
-                    PCT, NBRCNT, NBRCTC, GRAD,
-                    ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
-         Required Args: -line_type
-
-      "aggregate_stat"
-         To aggregate the STAT data for the STAT line type specified using
-         the "-line_type" argument. The output of the job will be the line
-         type specified using the "-out_line_type" argument. The valid
-         combinations of "-line_type" and "-out_line_type" are listed below.
-         -line_type FHO,   CTC,    -out_line_type CTS, ECLV
-         -line_type MCTC           -out_line_type MCTS
-         -line_type SL1L2, SAL1L2, -out_line_type CNT
-         -line_type VL1L2          -out_line_type VCNT
-         -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-         -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
-         -line_type NBRCTC,        -out_line_type NBRCTS
-         -line_type ORANK,         -out_line_type ECNT, RPS, RHIST, PHIST,
-                                                  RELP, SSVAR
-         -line_type MPR,           -out_line_type FHO, CTC, CTS,
-                                                  MCTC, MCTS, CNT,
-                                                  SL1L2, SAL1L2,
-                                                  VL1L2, VCNT,
-                                                  PCT, PSTD, PJC, PRC, ECLV,
-                                                  WDIR (wind direction)
-         Required Args:
-            -line_type, -out_line_type
-         Additional Required Args for -line_type MPR:
-            -out_thresh or -out_fcst_thresh and -out_obs_thresh
-            When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-                                PCT, PSTD, PJC, PRC
-         Additional Optional Args for -line_type MPR:
-            -mask_grid, -mask_poly, -mask_sid
-            -out_thresh or -out_fcst_thresh and -out_obs_thresh
-            -out_cnt_logic
-            -out_wind_thresh or -out_fcst_wind_thresh and
-            -out_obs_wind_thresh
-            -out_wind_logic
-            When -out_line_type WDIR
-         Additional Optional Arg for:
-            -line_type ORANK -out_line_type PHIST, SSVAR ...
-            -out_bin_size
-         Additional Optional Args for:
-            -out_line_type ECLV ...
-            -out_eclv_points
-
-      "ss_index"
-         The skill score index job can be configured to compute a weighted
-         average of skill scores derived from a configurable set of
-         variables, levels, lead times, and statistics. The skill score
-         index is computed using two models, a forecast model and a
-         reference model. For each statistic in the index, a skill score
-         is computed as:
-            SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
-         Where S is the statistic.
-         Next, a weighted average is computed over all the skill scores.
-         Lastly, an index value is computed as:
-            Index = sqrt(1/(1-SS[avg]))
-         Where SS[avg] is the weighted average of skill scores.
-         Required Args:
-            Exactly 2 entries for -model, the forecast model and reference
-            For each term of the index:
-            -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
-            Where -line_type is CNT or CTS and -column is the statistic.
-            Optionally, specify other filters for each term, -fcst_thresh.
-
-      "go_index"
-         The GO Index is a special case of the skill score index consisting
-         of a predefined set of variables, levels, lead times, statistics,
-         and weights.
-         For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
-         - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
-         - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
-         - Temperature at the surface(b), 400(a) mB
-         - Height at 400(a) mB
-         - Sea Level Pressure(b)
-         Where (a) means weights of 4, 3, 2, 1 for the lead times, and
-         (b) means weights of 8, 6, 4, 2 for the lead times.
-
-         Required Args: None
-
-      "ramp"
-         The ramp job operates on a time-series of forecast and observed
-         values and is analogous to the RIRW (Rapid Intensification and
-         Weakening) job supported by the tc_stat tool. The amount of change
-         from one time to the next is computed for forecast and observed
-         values. Those changes are thresholded to define events which are
-         used to populate a 2x2 contingency table.
-
-         Required Args:
-            -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
-               For DYDT, threshold for the amount of change required to
-               define an event.
-               For SWING, threshold the slope.
-            -swing_width val
-               Required for the swinging door algorithm width.
-
-         Optional Args:
-            -ramp_type str
-               Overrides the default ramp definition algorithm to be used.
-               May be set to DYDT (default) or SWING for the swinging door
-               algorithm.
-            -line_type str
-               Overrides the default input line type, MPR.
-            -out_line_type str
-               Overrides the default output line types of CTC and CTS.
-               Set to CTC,CTS,MPR for all possible output types.
-            -column fcst_column,obs_column
-               Overrides the default forecast and observation columns
-               to be used, FCST and OBS.
-            -ramp_time HH[MMSS] (-ramp_time_fcst or -ramp_time_obs)
-               Overrides the default ramp time interval, 1 hour.
-            -ramp_exact true/false (-ramp_exact_fcst or -ramp_exact_obs)
-               Defines ramps using an exact change (true, default) or maximum
-               change in the time window (false).
-            -ramp_window width in HH[MMSS] format
-            -ramp_window beg end in HH[MMSS] format
-               Defines a search time window when attempting to convert misses
-               to hits and false alarms to correct negatives. Use 1 argument
-               to define a symmetric time window or 2 for an asymmetric
-               window. Default window is 0 0, requiring an exact match.
+|      "aggregate"
+|         To aggregate the STAT data for the STAT line type specified using
+|         the "-line_type" argument. The output of the job will be in the
+|         same format as the input line type specified. The following line
+|         types may be aggregated:
+|         -line_type FHO, CTC, MCTC,
+|                    SL1L2, SAL1L2, VL1L2, VAL1L2,
+|                    PCT, NBRCNT, NBRCTC, GRAD,
+|                    ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
+|         Required Args: -line_type
+|
+|      "aggregate_stat"
+|         To aggregate the STAT data for the STAT line type specified using
+|         the "-line_type" argument. The output of the job will be the line
+|         type specified using the "-out_line_type" argument. The valid
+|         combinations of "-line_type" and "-out_line_type" are listed below.
+|         -line_type FHO,   CTC,    -out_line_type CTS, ECLV
+|         -line_type MCTC           -out_line_type MCTS
+|         -line_type SL1L2, SAL1L2, -out_line_type CNT
+|         -line_type VL1L2          -out_line_type VCNT
+|         -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
+|         -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
+|         -line_type NBRCTC,        -out_line_type NBRCTS
+|         -line_type ORANK,         -out_line_type ECNT, RPS, RHIST, PHIST,
+|                                                  RELP, SSVAR
+|         -line_type MPR,           -out_line_type FHO, CTC, CTS,
+|                                                  MCTC, MCTS, CNT,
+|                                                  SL1L2, SAL1L2,
+|                                                  VL1L2, VCNT,
+|                                                  PCT, PSTD, PJC, PRC, ECLV,
+|                                                  WDIR (wind direction)
+|         Required Args:
+|            -line_type, -out_line_type
+|         Additional Required Args for -line_type MPR:
+|            -out_thresh or -out_fcst_thresh and -out_obs_thresh
+|            When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+|                                PCT, PSTD, PJC, PRC
+|         Additional Optional Args for -line_type MPR:
+|            -mask_grid, -mask_poly, -mask_sid
+|            -out_thresh or -out_fcst_thresh and -out_obs_thresh
+|            -out_cnt_logic
+|            -out_wind_thresh or -out_fcst_wind_thresh and
+|            -out_obs_wind_thresh
+|            -out_wind_logic
+|            When -out_line_type WDIR
+|         Additional Optional Arg for:
+|            -line_type ORANK -out_line_type PHIST, SSVAR ...
+|            -out_bin_size
+|         Additional Optional Args for:
+|            -out_line_type ECLV ...
+|            -out_eclv_points
+|
+|      "ss_index"
+|         The skill score index job can be configured to compute a weighted
+|         average of skill scores derived from a configurable set of
+|         variables, levels, lead times, and statistics. The skill score
+|         index is computed using two models, a forecast model and a
+|         reference model. For each statistic in the index, a skill score
+|         is computed as:
+|            SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+|         Where S is the statistic.
+|         Next, a weighted average is computed over all the skill scores.
+|         Lastly, an index value is computed as:
+|            Index = sqrt(1/(1-SS[avg]))
+|         Where SS[avg] is the weighted average of skill scores.
+|         Required Args:
+|            Exactly 2 entries for -model, the forecast model and reference
+|            For each term of the index:
+|            -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
+|            Where -line_type is CNT or CTS and -column is the statistic.
+|            Optionally, specify other filters for each term, -fcst_thresh.
+|
+|      "go_index"
+|         The GO Index is a special case of the skill score index consisting
+|         of a predefined set of variables, levels, lead times, statistics,
+|         and weights.
+|         For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
+|        - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
+|         - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
+|         - Temperature at the surface(b), 400(a) mB
+|         - Height at 400(a) mB
+|         - Sea Level Pressure(b)
+|         Where (a) means weights of 4, 3, 2, 1 for the lead times, and
+|         (b) means weights of 8, 6, 4, 2 for the lead times.
+|
+|         Required Args: None
+|
+|      "ramp"
+|         The ramp job operates on a time-series of forecast and observed
+|         values and is analogous to the RIRW (Rapid Intensification and
+|         Weakening) job supported by the tc_stat tool. The amount of change
+|         from one time to the next is computed for forecast and observed
+|         values. Those changes are thresholded to define events which are
+|         used to populate a 2x2 contingency table.
+|
+|         Required Args:
+|            -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
+|               For DYDT, threshold for the amount of change required to
+|               define an event.
+|               For SWING, threshold the slope.
+|            -swing_width val
+|               Required for the swinging door algorithm width.
+|
+|         Optional Args:
+|            -ramp_type str
+|               Overrides the default ramp definition algorithm to be used.
+|               May be set to DYDT (default) or SWING for the swinging door
+|               algorithm.
+|            -line_type str
+|               Overrides the default input line type, MPR.
+|            -out_line_type str
+|               Overrides the default output line types of CTC and CTS.
+|               Set to CTC,CTS,MPR for all possible output types.
+|            -column fcst_column,obs_column
+|               Overrides the default forecast and observation columns
+|               to be used, FCST and OBS.
+|            -ramp_time HH[MMSS] (-ramp_time_fcst or -ramp_time_obs)
+|               Overrides the default ramp time interval, 1 hour.
+|            -ramp_exact true/false (-ramp_exact_fcst or -ramp_exact_obs)
+|               Defines ramps using an exact change (true, default) or maximum
+|               change in the time window (false).
+|            -ramp_window width in HH[MMSS] format
+|            -ramp_window beg end in HH[MMSS] format
+|               Defines a search time window when attempting to convert misses
+|               to hits and false alarms to correct negatives. Use 1 argument
+|               to define a symmetric time window or 2 for an asymmetric
+|               window. Default window is 0 0, requiring an exact match.
 
    Job command FILTERING options to further refine the STAT data:
       Each optional argument may be used in the job specification multiple
