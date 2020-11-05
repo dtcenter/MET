@@ -3489,104 +3489,108 @@ Where "job_name" is set to one of the following:
 |               to hits and false alarms to correct negatives. Use 1 argument
 |               to define a symmetric time window or 2 for an asymmetric
 |               window. Default window is 0 0, requiring an exact match.
-
-   Job command FILTERING options to further refine the STAT data:
-      Each optional argument may be used in the job specification multiple
-      times unless otherwise indicated. When multiple optional arguments of
-      the same type are indicated, the analysis will be performed over their
-      union:
-
-      "-model            name"
-      "-fcst_lead        HHMMSS"
-      "-obs_lead         HHMMSS"
-      "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
-      "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
-      "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-      "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
-      "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-      "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
-      "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
-      "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
-      "-fcst_init_hour   HH[MMSS]"
-      "-obs_init_hour    HH[MMSS]"
-      "-fcst_valid_hour" HH[MMSS]
-      "-obs_valid_hour"  HH[MMSS]
-      "-fcst_var         name"
-      "-obs_var          name"
-      "-fcst_lev         name"
-      "-obs_lev          name"
-      "-obtype           name"
-      "-vx_mask          name"
-      "-interp_mthd      name"
-      "-interp_pnts      n"
-      "-fcst_thresh      t"
-      "-obs_thresh       t"
-      "-cov_thresh       t"
-      "-thresh_logic     UNION, or, ||
-                         INTERSECTION, and, &&
-                         SYMDIFF, symdiff, *
-      "-alpha            a"
-      "-line_type        type"
-      "-column           name"
-      "-weight           value"
-
+|
+|   Job command FILTERING options to further refine the STAT data:
+|      Each optional argument may be used in the job specification multiple
+|      times unless otherwise indicated. When multiple optional arguments of
+|      the same type are indicated, the analysis will be performed over their
+|      union:
+|
+|      "-model            name"
+|      "-fcst_lead        HHMMSS"
+|      "-obs_lead         HHMMSS"
+|      "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
+|      "-fcst_init_hour   HH[MMSS]"
+|      "-obs_init_hour    HH[MMSS]"
+|      "-fcst_valid_hour" HH[MMSS]
+|      "-obs_valid_hour"  HH[MMSS]
+|      "-fcst_var         name"
+|      "-obs_var          name"
+|      "-fcst_lev         name"
+|      "-obs_lev          name"
+|      "-obtype           name"
+|      "-vx_mask          name"
+|      "-interp_mthd      name"
+|      "-interp_pnts      n"
+|      "-fcst_thresh      t"
+|      "-obs_thresh       t"
+|      "-cov_thresh       t"
+|      "-thresh_logic     UNION, or, ||
+|                         INTERSECTION, and, &&
+|                         SYMDIFF, symdiff, *
+|      "-alpha            a"
+|      "-line_type        type"
+|      "-column           name"
+|      "-weight           value"
+|
+|
   Job command FILTERING options that may be used only when -line_type
   has been listed once. These options take two arguments: the name of the
   data column to be used and the min, max, or exact value for that column.
   If multiple column eq/min/max/str options are listed, the job will be
   performed on their intersection:
-
-      "-column_min    col_name value"     e.g. -column_min BASER 0.02
-      "-column_max    col_name value"
-      "-column_eq     col_name value"
-      "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
-      "-column_str    col_name string" separate multiple filtering strings
-                                       with commas
-
+|
+|      "-column_min    col_name value"     e.g. -column_min BASER 0.02
+|      "-column_max    col_name value"
+|      "-column_eq     col_name value"
+|      "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
+|      "-column_str    col_name string" separate multiple filtering strings
+                                      with commas
+|
+|
   Job command options to DEFINE the analysis job. Unless otherwise noted,
   these options may only be used ONCE per analysis job:
-
-      "-dump_row        path"
-
-      "-mask_grid       name"
-      "-mask_poly       file"
-      "-mask_sid        file|list" see description of "sid" entry above
-
-      "-out_line_type   name"
-      "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
-      "-out_fcst_thresh value" multiple for multi-category contingency tables
+|
+|      "-dump_row        path"
+|
+|      "-mask_grid       name"
+|      "-mask_poly       file"
+|      "-mask_sid        file|list" see description of "sid" entry above
+|
+|      "-out_line_type   name"
+|      "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
+|      "-out_fcst_thresh value" multiple for multi-category contingency tables
                                and probabilistic forecasts
-      "-out_obs_thresh  value" multiple for multi-category contingency tables
-      "-out_cnt_logic   value"
-
-      "-out_wind_thresh      value"
-      "-out_fcst_wind_thresh value"
-      "-out_obs_wind_thresh  value"
-      "-out_wind_logic       value"
-
-      "-out_bin_size    value"
-
-      "-out_eclv_points value" see description of "eclv_points" config file
+|      "-out_obs_thresh  value" multiple for multi-category contingency tables
+|      "-out_cnt_logic   value"
+|
+|      "-out_wind_thresh      value"
+|      "-out_fcst_wind_thresh value"
+|      "-out_obs_wind_thresh  value"
+|      "-out_wind_logic       value"
+|
+|      "-out_bin_size    value"
+|
+|      "-out_eclv_points value" see description of "eclv_points" config file
                                entry
-
-      "-out_alpha       value"
-
-      "-boot_interval   value"
-      "-boot_rep_prop   value"
-      "-n_boot_rep      value"
-      "-boot_rng        value"
-      "-boot_seed       value"
-
-      "-rank_corr_flag  value"
-      "-vif_flag        value"
-
+|
+|      "-out_alpha       value"
+|
+|      "-boot_interval   value"
+|      "-boot_rep_prop   value"
+|      "-n_boot_rep      value"
+|      "-boot_rng        value"
+|      "-boot_seed       value"
+|
+|      "-rank_corr_flag  value"
+|      "-vif_flag        value"
+|
+|
   For aggregate and aggregate_stat job types:
-
-      "-out_stat        path"   to write a .stat output file for the job
+|
+|
+|      "-out_stat        path"   to write a .stat output file for the job
                                 including the .stat header columns. Multiple
                                 values for each header column are written as
                                 a comma-separated list.
-      "-set_hdr col_name value" may be used multiple times to explicity
+|      "-set_hdr col_name value" may be used multiple times to explicity
                                 specify what should be written to the header
                                 columns of the output .stat file.
 
@@ -3594,10 +3598,10 @@ Where "job_name" is set to one of the following:
   in the "-set_hdr" job command options. For example, when computing statistics
   separately for each station, write the station ID string to the VX_MASK column
   of the output .stat output file:
-    -job aggregate_stat -line_type MPR -out_line_type CNT \
-    -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
-  When using mulitple "-by" options, use "CASE" to reference the full string:
-    -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
+|    -job aggregate_stat -line_type MPR -out_line_type CNT \
+|    -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
+|  When using mulitple "-by" options, use "CASE" to reference the full string:
+|    -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
 
 .. code-block:: none
 		
@@ -3664,11 +3668,12 @@ WaveletStatConfig_default
 
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
-   - "AUTO" to tile the input data using tiles of dimension n by n where n
-     is the largest integer power of 2 less than the smallest dimension of
-     the input data. Center as many tiles as possible with no overlap.
-   - "TILE" to use the tile definition specified below.
-   - "PAD" to pad the input data out to the nearest integer power of 2.
+
+* "AUTO" to tile the input data using tiles of dimension n by n where n
+  is the largest integer power of 2 less than the smallest dimension of
+  the input data. Center as many tiles as possible with no overlap.
+* "TILE" to use the tile definition specified below.
+* "PAD" to pad the input data out to the nearest integer power of 2.
 
 .. code-block:: none
 		
@@ -3677,12 +3682,12 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 The "tile" entry is a dictionary that specifies how tiles should be defined
 in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
 
-   - The "width" entry specifies the dimension for all tiles and must be
-     an integer power of 2.
+* The "width" entry specifies the dimension for all tiles and must be
+  an integer power of 2.
 
-   - The "location" entry is an array of dictionaries where each element
-     consists of an "x_ll" and "y_ll" entry specifying the lower-left (x,y)
-     coordinates of the tile.
+* The "location" entry is an array of dictionaries where each element
+  consists of an "x_ll" and "y_ll" entry specifying the lower-left (x,y)
+  coordinates of the tile.
 
 .. code-block:: none
 		
@@ -3699,22 +3704,28 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
 
-   - The "type" entry specifies which wavelet should be used.
+* The "type" entry specifies which wavelet should be used.
 
-   - The "member" entry specifies the wavelet shape.
-     See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
+* The "member" entry specifies the wavelet shape.
+  See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
 
-   - Valid combinations of the two are listed below:
-      - "HAAR" for Haar wavelet (member = 2)
-      - "HAAR_CNTR" for Centered-Haar wavelet (member = 2)
-      - "DAUB" for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
-        18, 20)
-      - "DAUB_CNTR" for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
-         12, 14, 16, 18, 20)
-      - "BSPLINE" for Bspline wavelet (member = 103, 105, 202, 204, 206,
-        208, 301, 303, 305, 307, 309)
-      - "BSPLINE_CNTR" for Centered-Bspline wavelet (member = 103, 105, 202,
-         204, 206, 208, 301, 303, 305, 307, 309)
+* Valid combinations of the two are listed below:
+    
+  * "HAAR" for Haar wavelet (member = 2)
+      
+  * "HAAR_CNTR" for Centered-Haar wavelet (member = 2)
+
+  * "DAUB" for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
+    18, 20)
+	
+  * "DAUB_CNTR" for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
+    12, 14, 16, 18, 20)
+	 
+  * "BSPLINE" for Bspline wavelet (member = 103, 105, 202, 204, 206,
+    208, 301, 303, 305, 307, 309)
+
+  * "BSPLINE_CNTR" for Centered-Bspline wavelet (member = 103, 105, 202,
+    204, 206, 208, 301, 303, 305, 307, 309)
 
 .. code-block:: none
 		
@@ -3733,29 +3744,31 @@ WWMCARegridConfig_default
 Specify the grid to which the data should be interpolated in one of the
 following ways:
 
-   - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
+* Name ("GNNN" where NNN indicates the three digit NCEP grid number)
 
-   - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-     [standard_parallel_2] N|S
+* lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
+  [standard_parallel_2] N|S
 
-   - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+* stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 
-   - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
+* latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 
-   - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+* mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 
-   - gaussian lon_zero Nx Ny
+* gaussian lon_zero Nx Ny
 
 .. code-block:: none
 		
   to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
 
-Supply the NetCDF output information
+Supply the NetCDF output information.  For example:
 
-e.g. variable_name = "Cloud_Pct";
-     units         = "percent";
-     long_name     = "cloud cover percent";
-     level         = "SFC";
+.. code-block:: none
+
+   variable_name = "Cloud_Pct";
+   units         = "percent";
+   long_name     = "cloud cover percent";
+   level         = "SFC";
 
 .. code-block:: none
 		
@@ -3766,7 +3779,9 @@ e.g. variable_name = "Cloud_Pct";
 
 Maximum pixel age in minutes
 
-max_minutes = 120;
+.. code-block:: none
+
+  max_minutes = 120;
 
 
 The WWMCA pixel age data is stored in binary data files in 4-byte blocks.
