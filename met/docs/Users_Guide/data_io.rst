@@ -273,5 +273,4 @@ MET-TC Configuration File Options
 
 The information listed below may also be found in the *data/config/README_TC* file.
 
-.. highlight:: none
-.. literalinclude:: ../../data/config/README_TC
+:ref:`README_TC`
