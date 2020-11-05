@@ -9,7 +9,8 @@
 plot_data_plane = {
    flag             = FALSE;
    field            = { name = ""; level = ""; };
-   data_color_table = {
+   data_color_table = :q
+{
       flag             = TRUE; 
       color_table      = "MET_BASE/colortables/met_default.ctable";
       plot_min         = 0.0;
@@ -31,15 +32,15 @@ red   = { 255, 0, 0 }
 message_type    = [];
 sid_inc         = [];
 sid_exc         = [];
+obs_var         = [];
+obs_quality     = [];
 valid_beg       = "";
 valid_end       = "";
 lat_thresh      = NA;
 lon_thresh      = NA;
 elv_thresh      = NA;
-obs_var         = [];
 height_thresh   = NA;
 pressure_thresh = NA;
-obs_quality     = [];
 obs_thresh      = NA;
 
 // Plotting options

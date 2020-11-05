@@ -2000,6 +2000,15 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void PlotInfo::clear() {
+   color_table.clear();
+   plot_min = bad_data_double;
+   plot_max = bad_data_double;
+   colorbar_spacing = bad_data_int;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 PlotInfo parse_conf_plot_info(Dictionary *dict) {
    PlotInfo info;
 

@@ -17,7 +17,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    06-10-10  Halley Gotway   New
+//   000    06/10/10  Halley Gotway   New
 //   001    10/19/11  Holmes          Added use of command line class to
 //                                    parse the command line arguments.
 //   002    01/03/12  Holmes          Modified to get a grid definition
@@ -42,6 +42,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "plot_point_obs.h"
+
 #include "nc_utils.h"
 #include "vx_log.h"
 #include "data_plane.h"
@@ -63,44 +65,6 @@ using namespace std;
 #include "nc_obs_util.h"
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Constants
-//
-////////////////////////////////////////////////////////////////////////
-
-static const char  *program_name = "plot_point_obs";
-static const Color  c_map(25, 25, 25);
-static const double l_width = 0.5;
-static const double default_dotsize = 1.0;
-
-static const double margin_size = 36.0;
-
-static const bool use_flate = true;
-
-
-static int   obs_hid_block[DEF_NC_BUFFER_SIZE];
-static int   obs_vid_block[DEF_NC_BUFFER_SIZE];
-static float obs_lvl_block[DEF_NC_BUFFER_SIZE];
-static float obs_hgt_block[DEF_NC_BUFFER_SIZE];
-static float obs_val_block[DEF_NC_BUFFER_SIZE];
-static float obs_arr_block[DEF_NC_BUFFER_SIZE][OBS_ARRAY_LEN];
-
-////////////////////////////////////////////////////////////////////////
-//
-// Variables for Command Line Arguments
-//
-////////////////////////////////////////////////////////////////////////
-
-static Grid         grid("G004");
-static Box          grid_bb;
-static StringArray  ityp;
-static IntArray     ivar;
-static StringArray  svar;
-static StringArray  var_list;
-static ConcatString data_plane_filename;
-static double       dotsize = default_dotsize;
-
-///////////////////////////////////////////////////////////////////////////////
 
 static void draw_border(PSfile &, Box &);
 static void usage();
@@ -636,6 +600,7 @@ void usage() {
    cout << "\nUsage: " << program_name << "\n"
         << "\tnc_file\n"
         << "\tps_file\n"
+        << "\t[-config config_file]\n"
         << "\t[-gc code] or [-obs_var variable name]\n"
         << "\t[-msg_typ name]\n"
         << "\t[-data_file name]\n"
@@ -647,6 +612,9 @@ void usage() {
         << "file to be plotted.\n"
         << "\t\t\"ps_file\" is the output PostScript image file to be"
         << "generated.\n"
+        << "\t\t\"-config config_file\" specifies a PlotPointObs "
+        << "config file defining plotting options. Note that command "
+        << "line settings override config file options (optional).\n"
         << "\t\t\"-gc code\" is the GRIB code(s) to be plotted "
         << "(optional).\n"
         << "\t\t\"-obs_var variable name\" is the variable name(s) to be plotted "

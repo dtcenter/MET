@@ -350,6 +350,8 @@ struct PlotInfo {
    double       plot_min;         // Minimum plot value
    double       plot_max;         // Maximum plot value
    int          colorbar_spacing; // Spacing of colors in the colorbar
+
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,8 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS    = plot_point_obs
-plot_point_obs_SOURCES = plot_point_obs.cc
+plot_point_obs_SOURCES = plot_point_obs.cc \
+	plot_point_obs_conf_info.cc
 plot_point_obs_CPPFLAGS = ${MET_CPPFLAGS}
 plot_point_obs_LDFLAGS = ${MET_LDFLAGS}
 plot_point_obs_LDADD = -lvx_data2d_factory \
@@ -41,3 +42,7 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_math \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = plot_point_obs.h \
+	plot_point_obs_conf_info.h
+
