@@ -2826,11 +2826,15 @@ are used for these variables.
   grid_res = 4;
 
 The "match_flag" entry specifies the matching method to be applied:
+
 * "NONE" for no matching between forecast and observation objects
+  
 * "MERGE_BOTH" for matching allowing additional merging in both fields.
-     If two objects in one field match the same object in the other field,
-     those two objects are merged.
+  If two objects in one field match the same object in the other field,
+  those two objects are merged.
+  
 * "MERGE_FCST" for matching allowing only additional forecast merging
+  
 * "NO_MERGE" for matching with no additional merging in either field
 
 .. code-block:: none
@@ -3107,6 +3111,7 @@ For example:
 | Report Type 132 is for message type ADPUPA but is only FLIGHT-LEVEL RECON
 | and PROFILE DROPSONDE
 |
+
 .. code-block:: none
 		
   pb_report_type  = [];
@@ -3123,6 +3128,7 @@ For example:
 | Input Report Type 11 Fixed land RAOB and PIBAL by block and station number
 | Input Report Type 12 Fixed land RAOB and PIBAL by call letters
 |
+
 .. code-block:: none
 		
   in_report_type = [];
@@ -3331,7 +3337,8 @@ Where "job_name" is set to one of the following:
          ways:
 	 
          * Specify the -line_type option once and specify one or more
-           *column names.
+
+	 * column names.
 	   
          * Format the -column option as LINE_TYPE:COLUMN.
 
@@ -3598,10 +3605,12 @@ Where "job_name" is set to one of the following:
   in the "-set_hdr" job command options. For example, when computing statistics
   separately for each station, write the station ID string to the VX_MASK column
   of the output .stat output file:
+
 |    -job aggregate_stat -line_type MPR -out_line_type CNT \
 |    -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
 |  When using mulitple "-by" options, use "CASE" to reference the full string:
 |    -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
+|
 
 .. code-block:: none
 		
