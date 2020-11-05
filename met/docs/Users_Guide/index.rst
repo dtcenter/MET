@@ -69,6 +69,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    tc-rmw
    rmw-analysis
    plotting
+   README
    refs
    appendixA
    appendixB
