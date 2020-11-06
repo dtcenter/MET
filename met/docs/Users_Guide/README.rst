@@ -3933,7 +3933,7 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
      ];
   }
 
-**wavelet, obs_raw_plot, wvlt_plot, object_plot**
+**wavelet** 
   
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
@@ -3968,6 +3968,8 @@ wavelet decomposition should be performed:
      member = 2;
   }
 
+**obs_raw_plot, wvlt_plot, object_plot**  
+  
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
