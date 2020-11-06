@@ -1,8 +1,8 @@
 .. _README:
 
 README - Configuration File Overview
-____________________________________
- 
+====================================
+
 The configuration files that control many of the MET tools contain formatted
 ASCII text. This format has been updated for MET version |version| and
 continues to be used in subsequent releases.
@@ -288,10 +288,11 @@ References:
 
 
 Configuration settings used by the MET tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+____________________________________________
+
 
 Settings common to multiple tools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **exit_on_warning**
 
@@ -2179,10 +2180,10 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
   }
 
 Settings specific to individual tools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 EnsembleStatConfig_default
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **ens**
 
@@ -2473,7 +2474,7 @@ used for random assignment of ranks when they are tied.
   }
 
 MODEAnalysisConfig_default
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 MODE line options are used to create filters that determine which MODE output
 lines are read in and processed. The MODE line options are numerous. They
@@ -2811,7 +2812,7 @@ MET User's Guide for a description of these attributes.
 
 
 MODEConfig_default
-------------------
+^^^^^^^^^^^^^^^^^^
 
 **quilt**
 
@@ -3100,7 +3101,7 @@ much more flexible "regrid" option may be used instead.
   shift_right = 0;
 
 PB2NCConfig_default
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 following criteria:
@@ -3288,7 +3289,7 @@ The "level_category" entry is an array of integers specifying which level
 categories should be retained:
 
 | 0 = Surface level (mass reports only) 
-| 1 = Mandatory level (upper-air profile reports) 
+| 1 = Mandatory level (upper-air profile reports)
 | 2 = Significant temperature level (upper-air profile reports) 
 | 2 = Significant temperature and winds-by-pressure level (future combined mass
 |     and wind upper-air reports) 
@@ -3388,7 +3389,7 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
   event_stack_flag = TOP;
 
 SeriesAnalysisConfig_default
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **block_size**
 
@@ -3437,7 +3438,7 @@ grid is large.
   }
 
 STATAnalysisConfig_default
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **jobs**
 
@@ -3892,7 +3893,7 @@ confidence intervals computed for the aggregated statistics.
   vif_flag = FALSE;
 
 WaveletStatConfig_default
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **grid_decomp_flag**
 
@@ -3975,7 +3976,7 @@ similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
 
 WWMCARegridConfig_default
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **to_grid**
 
