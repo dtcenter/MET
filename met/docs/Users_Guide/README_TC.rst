@@ -1,12 +1,12 @@
 .. _README_TC:
 
 README_TC Configuration file overview
-_____________________________________
+=====================================
 
 See :numref:`README` for configuration file overview.
 
 Configuration settings common to multiple tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_______________________________________________
 
 **storm_id**
 
@@ -47,18 +47,29 @@ For example:
 // Specify a comma-separated list of cyclone numbers (01-99) to be used.
 // An empty list indicates that all should be used.
 //
-// e.g. cyclone = [ "01", "02", "03" ];
-//
-cyclone = [];
+For example:
+
+.. code-block:: none
+		
+  cyclone = [ "01", "02", "03" ];
+
+.. code-block:: none
+		
+  cyclone = [];
 
 
 //
 // Specify a comma-separated list of storm names to be used.
 // An empty list indicates that all should be used.
 //
-// e.g. storm_name = [ "KATRINA" ];
-//
-storm_name = [];
+// For example:
+
+.. code-block:: none
+   storm_name = [ "KATRINA" ];
+
+.. code-block:: none
+		
+  storm_name = [];
 
 **init_beg, init_end, init_inc, init_exc**
 
@@ -69,34 +80,51 @@ storm_name = [];
 // criteria will be used. An empty string indicates that all times
 // should be used.
 //
-// e.g. init_beg = "20100101";
-//      init_end = "20101231";
-//      init_inc = [ "20101231_06" ];
-//      init_exc = [ "20101231_00" ];
-//
-init_beg = "";
-init_end = "";
-init_inc = [];
-init_exc = [];
+For example:
+
+.. code-block:: none
+
+   init_beg = "20100101";
+   init_end = "20101231";
+   init_inc = [ "20101231_06" ];
+   init_exc = [ "20101231_00" ];
+
+.. code-block:: none
+
+  init_beg = "";
+  init_end = "";
+  init_inc = [];
+  init_exc = [];
 
 //
 // Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
 // Tracks for which all valid times fall within the time window will be used.
 // An empty string indicates that all times should be used.
 //
-// e.g. valid_beg = "20100101";
-//      valid_end = "20101231";
-//
-valid_beg = "";
-valid_end = "";
+For example:
+
+.. code-block:: none
+   valid_beg = "20100101";
+   valid_end = "20101231";
+
+.. code-block:: none
+		
+  valid_beg = "";
+  valid_end = "";
 
 //
 // Specify a comma-separated list of model initialization hours to be used
 // in HH[MMSS] format. An empty list indicates that all hours should be used.
 //
-// e.g. init_hour = [ "00", "06", "12", "18" ];
-//
-init_hour = [];
+// For example:
+
+.. code-block:: none
+
+  init_hour = [ "00", "06", "12", "18" ];
+
+.. code-block:: none
+		
+  init_hour = [];
 
 //
 // Specify the required lead time in HH[MMSS] format.
@@ -105,47 +133,71 @@ init_hour = [];
 // retained.  An empty list indicates that no lead times
 // are required to determine which tracks are to be used;
 // all lead times will be used.
-//
-lead_req  = [];
+
+.. code-block:: none
+		
+  lead_req  = [];
 
 //
 // Specify lat/lon polylines defining masking regions to be applied.
 // Tracks whose initial location falls within init_mask will be used.
 // Tracks for which all locations fall within valid_mask will be used.
 //
-// e.g. init_mask  = "MET_BASE/poly/EAST.poly";
-//
-init_mask  = "";
-valid_mask = "";
+// For example:
+
+.. code-block:: none
+
+  init_mask  = "MET_BASE/poly/EAST.poly";
+
+.. code-block:: none
+		
+  init_mask  = "";
+  valid_mask = "";
 
 //
 // Indicate the version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V6.0";
+
+.. code-block:: none
+		
+  version = "V6.0";
 
 
 Settings specific to individual tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_____________________________________
+
 
 TCPairsConfig_default
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 //
 // The "model" entry specifies an array of model names to be verified. If
 // verifying multiple models, choose descriptive model names (no whitespace)
 // to distinguish between their output.
-// e.g. model = [ "AHW4", "AHWI" ];
-//
-model  = [];
+For example:
+
+.. code-block:: none
+		
+  model = [ "AHW4", "AHWI" ];
+
+.. code-block:: none
+		  
+  model  = [];
 
 //
 // Specify whether the code should check for duplicate ATCF lines when
 // building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 //
-// e.g. check_dup = FALSE;
-//
-check_dup = FALSE;
+For example:
+
+.. code-block:: none
+
+  check_dup = FALSE;
+
+.. code-block:: none
+		
+  check_dup = FALSE;
 
 //
 // Specify whether special processing should be performed for interpolated model
@@ -156,8 +208,10 @@ check_dup = FALSE;
 //              'I' track does not already exist.
 //  - "REPLACE" to create a copy of the '2' track and rename it as 'I' in all
 //              cases, replacing any 'I' tracks that may already exist.
-//
-interp12 = REPLACE;
+
+.. code-block:: none
+		
+  interp12 = REPLACE;
 
 //
 // Specify how consensus forecasts should be defined:
@@ -167,7 +221,10 @@ interp12 = REPLACE;
 //             if empty, default is FALSE
 //   min_req = minimum number of members required for the consensus
 //
-// e.g.
+For example:
+
+.. code-block:: none
+
 //    consensus = [
 //       {
 //          name     = "CON1";
@@ -177,16 +234,25 @@ interp12 = REPLACE;
 //       }
 //    ];
 //
-consensus = [];
+
+.. code-block:: none
+
+  consensus = [];
 
 //
 // Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
 // format.  For each ADECK track identified, a lagged track will be derived
 // for each entry listed.
 //
-// e.g. lag_time = [ "06", "12" ];
-//
-lag_time = [];
+For example:
+
+.. code-block:: none
+
+  lag_time = [ "06", "12" ];
+
+.. code-block:: none
+		
+  lag_time = [];
 
 //
 // Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
@@ -196,15 +262,22 @@ lag_time = [];
 // Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
 // Derived from OPER tracks: OCLP, OCS5, OCD5, OCDT
 //
-// e.g. best_technique = [ "BEST" ];
+For example:
+
+.. code-block:: none
+		
+     best_technique = [ "BEST" ];
 //      base_baseline  = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
 //      oper_technique = [ "CARQ" ];
 //      oper_baseline  = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
 //
-best_technique = [ "BEST" ];
-best_baseline  = [];
-oper_technique = [ "CARQ" ];
-oper_baseline  = [];
+
+.. code-block:: none
+		
+  best_technique = [ "BEST" ];
+  best_baseline  = [];
+  oper_technique = [ "CARQ" ];
+  oper_baseline  = [];
 
 //
 // Analysis tracks consist of multiple track points with a lead time of zero
@@ -213,23 +286,37 @@ oper_baseline  = [];
 // be searched for analysis track data by setting this to NONE, ADECK, BDECK,
 // or BOTH. Use BOTH to create pairs using two different analysis tracks.
 //
-// e.g. anly_track = BDECK;
-//
-anly_track = BDECK;
+For example:
+
+.. code-block:: none
+
+  anly_track = BDECK;
+
+.. code-block:: none
+		
+  anly_track = BDECK;
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
 // tracks should be written out.
 //
-// e.g. match_points = FALSE;
-//
-match_points = FALSE;
+For example:
+
+.. code-block:: none
+
+  match_points = FALSE;
+
+.. code-block:: none
+		
+  match_points = FALSE;
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
-dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
+.. code-block:: none
+
+  dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
 
 //
 // Specify watch/warning information.  Specify an ASCII file containing
@@ -239,10 +326,13 @@ dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
 // time processed.  NHC applies watch/warning information to all track points
 // occurring 4 hours (-14400 second) prior to the watch/warning time.
 //
-watch_warn = {
-   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
-   time_offset = -14400;
-}
+
+.. code-block:: none
+
+  watch_warn = {
+     file_name   = "MET_BASE/tc_data/wwpts_us.txt";
+     time_offset = -14400;
+  }
 
 //
 // The basin_map entry defines a mapping of input names to output values.
@@ -269,27 +359,36 @@ watch_warn = {
 // use the same basin identifier conventions, using an empty list for this
 // parameter will result in missed matches.
 //
-basin_map = [
-   { key = "SI"; val = "SH"; },
-   { key = "SP"; val = "SH"; },
-   { key = "AU"; val = "SH"; },
-   { key = "AB"; val = "IO"; },
-   { key = "BB"; val = "IO"; }
-];
+
+.. code-block:: none
+
+  basin_map = [
+     { key = "SI"; val = "SH"; },
+     { key = "SP"; val = "SH"; },
+     { key = "AU"; val = "SH"; },
+     { key = "AB"; val = "IO"; },
+     { key = "BB"; val = "IO"; }
+  ];
 
 TCStatConfig_default
-~~~~~~~~~~~~~~~~~~~~
+____________________
 
 //
 // Stratify by the AMODEL or BMODEL columns.
 // Specify comma-separated lists of model names to be used for all analyses
 // performed.  May add to this list using the "-amodel" and "-bmodel"
 // job command options.
-// e.g. amodel = [ "AHW4" ];
-//      bmodel = [ "BEST" ];
-//
-amodel = [];
-bmodel = [];
+// For example:
+
+.. code-block:: none
+
+	amodel = [ "AHW4" ];
+        bmodel = [ "BEST" ];
+
+.. code-block:: none
+		
+  amodel = [];
+  bmodel = [];
 
 //
 // Stratify by the VALID times.
@@ -298,15 +397,22 @@ bmodel = [];
 // May modify using the "-valid_beg", "-valid_end", "-valid_inc",
 // and "-valid_exc" job command options.
 //
-// e.g. valid_beg = "20100101";
+// For example:
+
+.. code-block:: none
+
+     valid_beg = "20100101";
 //      valid_end = "20101231_12";
 //      valid_inc = [ "20101231_06" ];
 //      valid_exc = [ "20101231_00" ];
 //
-valid_beg = "";
-valid_end = "";
-valid_inc = [];
-valid_exc = [];
+
+.. code-block:: none
+		
+  valid_beg = "";
+  valid_end = "";
+  valid_inc = [];
+  valid_exc = [];
 
 //
 // Stratify by the initialization and valid hours and lead time.
@@ -315,23 +421,35 @@ valid_exc = [];
 // May add using the "-init_hour", "-valid_hour", "-lead",
 // and "-lead_req" job command options.
 //
-// e.g. init_hour  = [ "00" ];
+// For example:
+
+.. code-block:: none
+
+     init_hour  = [ "00" ];
 //      valid_hour = [ "12" ];
 //      lead       = [ "24", "36" ];
 //      lead_req   = [ "72", "84", "96", "108" ];
-//
-init_hour  = [];
-valid_hour = [];
-lead       = [];
-lead_req   = [];
+
+.. code-block:: none
+		
+  init_hour  = [];
+  valid_hour = [];
+  lead       = [];
+  lead_req   = [];
 
 //
 // Stratify by the LINE_TYPE column.  May add using the "-line_type"
 // job command option.
 //
-// e.g. line_type = [ "TCMPR" ];
-//
-line_type = [];
+// For example:
+
+.. code-block:: none
+
+  line_type = [ "TCMPR" ];
+
+.. code-block:: none
+		
+  line_type = [];
 
 //
 // Stratify by checking the watch/warning status for each track point
@@ -342,9 +460,15 @@ line_type = [];
 // May add using the "-track_watch_warn" job command option.
 // The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
 //
-// e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
-//
-track_watch_warn = [];
+// For example:
+
+.. code-block:: none
+
+  track_watch_warn = [ "HUWATCH", "HUWARN" ];
+
+.. code-block:: none
+		
+  track_watch_warn = [];
 
 //
 // Stratify by applying thresholds to numeric data columns.
@@ -352,11 +476,17 @@ track_watch_warn = [];
 // to be applied.  May add using the "-column_thresh name thresh" job command
 // options.
 //
-// e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
-//      column_thresh_val  = [ >200,     >200     ];
-//
-column_thresh_name = [];
-column_thresh_val  = [];
+// For example:
+
+.. code-block:: none
+
+  column_thresh_name = [ "ADLAND", "BDLAND" ];
+//   column_thresh_val  = [ >200,     >200     ];
+
+.. code-block:: none
+		
+  column_thresh_name = [];
+  column_thresh_val  = [];
 
 //
 // Stratify by performing string matching on non-numeric data columns.
@@ -364,11 +494,17 @@ column_thresh_val  = [];
 // to be checked.  May add using the "-column_str name string" job command
 // options.
 //
-// e.g. column_str_name = [ "LEVEL", "LEVEL" ];
-//      column_str_val  = [ "HU",    "TS"    ];
-//
-column_str_name = [];
-column_str_val  = [];
+// For example:
+
+.. code-block:: none
+
+  column_str_name = [ "LEVEL", "LEVEL" ];
+//   column_str_val  = [ "HU",    "TS"    ];
+
+.. code-block:: none
+		
+  column_str_name = [];
+  column_str_val  = [];
 
 //
 // Just like the column_thresh options above, but apply the threshold only
@@ -376,30 +512,48 @@ column_str_val  = [];
 // the entire track.  May add using the "-init_thresh name thresh" job command
 // options.
 //
-// e.g. init_thresh_name = [ "ADLAND" ];
-//      init_thresh_val  = [ >200     ];
-//
-init_thresh_name = [];
-init_thresh_val  = [];
+// For example:
+
+.. code-block:: none
+
+  init_thresh_name = [ "ADLAND" ];
+//   init_thresh_val  = [ >200     ];
+
+.. code-block:: none
+		
+  init_thresh_name = [];
+  init_thresh_val  = [];
 
 //
 // Just like the column_str options above, but apply the string matching only
 // when lead = 0.  If lead = 0 string does not match, discard the entire track.
 // May add using the "-init_str name thresh" job command options.
 //
-// e.g. init_str_name = [ "LEVEL" ];
-//      init_str_val  = [ "HU"    ];
-//
-init_str_name = [];
-init_str_val  = [];
+// For example:
+
+.. code-block:: none
+
+  init_str_name = [ "LEVEL" ];
+  init_str_val  = [ "HU"    ];
+
+.. code-block:: none
+
+  init_str_name = [];
+  init_str_val  = [];
 
 //
 // Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
 // BDECK track encounters land, discard the remainder of the track.
 //
-// e.g. water_only = FALSE;
-//
-water_only = FALSE;
+// For example:
+
+.. code-block:: none
+
+  water_only = FALSE;
+
+.. code-block:: none
+		
+  water_only = FALSE;
 
 //
 // Specify whether only those track points for which rapid intensification
@@ -416,18 +570,19 @@ water_only = FALSE;
 //    "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
 //
 
-rirw = {
-   track  = NONE;       // Specify which track types to search (NONE, ADECK,
-                        // BDECK, or BOTH)
-   adeck = {
-      time   = "24";    // Rapid intensification/weakening time period in HHMMSS
-                        // format.
-      exact  = TRUE;    // Use the exact or maximum intensity difference over the
-                        // time period.
-      thresh = >=30.0;  // Threshold for the intensity change.
-   }
-   bdeck = adeck;       // Copy settings to the BDECK or specify different logic.
-}
+.. code-block:: none
+  rirw = {
+     track  = NONE;       // Specify which track types to search (NONE, ADECK,
+                          // BDECK, or BOTH)
+     adeck = {
+        time   = "24";    // Rapid intensification/weakening time period in HHMMSS
+                          // format.
+        exact  = TRUE;    // Use the exact or maximum intensity difference over the
+                          // time period.
+        thresh = >=30.0;  // Threshold for the intensity change.
+     }
+     bdeck = adeck;       // Copy settings to the BDECK or specify different logic.
+  }
 
 //
 // Specify whether only those track points occurring near landfall should be
@@ -446,45 +601,71 @@ rirw = {
 // "-landfall_window 00 12" defines the time window from the landfall event to 12
 // hours after.
 //
-// e.g. landfall     = FALSE;
-//      landfall_beg = "-24"; (24 hours prior to landfall)
-//      landfall_end = "00";
-//
-landfall     = FALSE;
-landfall_beg = "-24";
-landfall_end = "00";
+// For example:
+
+.. code-block:: none
+
+  landfall     = FALSE;
+  landfall_beg = "-24"; (24 hours prior to landfall)
+  landfall_end = "00";
+
+.. code-block:: none
+
+  landfall     = FALSE;
+  landfall_beg = "-24";
+  landfall_end = "00";
 
 //
 // Specify whether only those cases common to all models in the dataset should
 // be retained.  May modify using the "-event_equal" job command option.
 //
-// e.g. event_equal = FALSE;
-//
-event_equal = FALSE;
+// For example:
+
+.. code-block:: none
+
+  event_equal = FALSE;
+
+.. code-block:: none
+		
+  event_equal = FALSE;
 
 //
 // Specify lead times that must be present for a track to be included in the
 // event equalization logic.
 //
-event_equal_lead = [ "12", "24", "36" ];
+.. code-block:: none
+
+  event_equal_lead = [ "12", "24", "36" ];
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
 // initialization time.  If it falls outside the mask, discard the entire track.
 // May modify using the "-out_init_mask" job command option.
 //
-// e.g. out_init_mask = "";
-//
-out_init_mask = "";
+// For example:
+
+.. code-block:: none
+
+  out_init_mask = "";
+
+.. code-block:: none
+
+  out_init_mask = "";
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
 // valid time.  If it falls outside the mask, discard only the current track
 // point.  May modify using the "-out_valid_mask" job command option.
 //
-// e.g. out_valid_mask = "";
-//
-out_valid_mask = "";
+// For example:
+
+.. code-block:: none
+
+  out_valid_mask = "";
+
+.. code-block:: none
+
+  out_valid_mask = "";
 
 //
 // The "jobs" entry is an array of TCStat jobs to be performed.
@@ -536,7 +717,7 @@ out_valid_mask = "";
 //          that column. If multiple column eq/min/max/str options are listed,
 //          the job will be performed on their intersection:
 //
-//          "-column_min col_name value"  e.g. -column_min TK_ERR 100.00
+//          "-column_min col_name value"  For example: -column_min TK_ERR 100.00
 //          "-column_max col_name value"
 //          "-column_eq  col_name value"
 //          "-column_str col_name string" separate multiple filtering strings
@@ -603,16 +784,16 @@ out_valid_mask = "";
 //
 //          Required Args:
 //             -probrirw_thresh to define the forecast probabilities to be
-//                evaluated (e.g. -probrirw_thresh 30)
+//                evaluated (For example: -probrirw_thresh 30)
 //
 //          Optional Args:
-//             -probrirw_exact TRUE/FALSE to verify against the exact (e.g.
-//                BDELTA column) or maximum (e.g. BDELTA_MAX column) intensity
+//             -probrirw_exact TRUE/FALSE to verify against the exact (For example:
+//                BDELTA column) or maximum (For example: BDELTA_MAX column) intensity
 //                change in the BEST track
 //             -probrirw_bdelta_thresh to define BEST track change event
-//                threshold (e.g. -probrirw_bdelta_thresh >=30)
+//                threshold (For example: -probrirw_bdelta_thresh >=30)
 //             -probrirw_prob_thresh to define output probability thresholds
-//                (e.g. -probrirw_prob_thresh ==0.1)
+//                (For example: -probrirw_prob_thresh ==0.1)
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
 //             -out_line_type to specify output line types (PCT, PSTD, PRC, and
@@ -623,7 +804,7 @@ out_valid_mask = "";
 //       probability values greater than 0:
 //         -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
 //
-//       e.g.
+//       For example:
 //       jobs = [
 //          "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
 //          "-job filter -column_min TK_ERR 100.000 \
@@ -635,25 +816,30 @@ out_valid_mask = "";
 jobs = [];
 
 TCGenConfig_default
-~~~~~~~~~~~~~~~~~~~
+___________________
 
 //
 // Model initialization frequency in hours, starting at 0.
 //
-init_freq = 6;
+.. code-block:: none
+
+  init_freq = 6;
 
 //
 // Lead times in hours to be searched for genesis events.
 //
-lead_window = {
-   beg = 24;
-   end = 120;
-}
+.. code-block:: none
+  lead_window = {
+     beg = 24;
+     end = 120;
+  }
 
 //
 // Minimum track duration for genesis event in hours.
 //
-min_duration = 12;
+.. code-block:: none
+
+  min_duration = 12;
 
 //
 // Forecast genesis event criteria.  Defined as tracks reaching the specified
@@ -661,10 +847,12 @@ min_duration = 12;
 // pressure threshold.  The forecast genesis time is the valid time of the first
 // track point where all of these criteria are met.
 //
-fcst_genesis = {
-   vmax_thresh = NA;
-   mslp_thresh = NA;
-}
+.. code-block:: none
+
+  fcst_genesis = {
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
 
 //
 // BEST track genesis event criteria.  Defined as tracks reaching the specified
@@ -672,12 +860,14 @@ fcst_genesis = {
 // pressure threshold.  The BEST track genesis time is the valid time of the
 // first track point where all of these criteria are met.
 //
-best_genesis = {
-   technique   = "BEST";
-   category    = [ "TD", "TS" ];
-   vmax_thresh = NA;
-   mslp_thresh = NA;
-}
+.. code-block:: none
+
+  best_genesis = {
+     technique   = "BEST";
+     category    = [ "TD", "TS" ];
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
 
 //
 // Operational track genesis event criteria.  Defined as tracks reaching the
@@ -685,63 +875,80 @@ best_genesis = {
 // sea-level pressure threshold.  The operational track genesis time is valid
 // time of the first track point where all of these criteria are met.
 //
-oper_genesis = {
-   technique   = "CARQ";
-   category    = [ "DB", "LO", "WV" ];
-   vmax_thresh = NA;
-   mslp_thresh = NA;
-}
+.. code-block:: none
 
-Track filtering options which may be specified separately in each filter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-array entry.
-^^^^^^^^^^^^
+  oper_genesis = {
+     technique   = "CARQ";
+     category    = [ "DB", "LO", "WV" ];
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
+
+Track filtering options which may be specified separately in each filter array entry.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 //
 // Filter is an array of dictionaries containing the track filtering options
 // listed below.  If empty, a single filter is defined using the top-level
 // settings.
 //
-filter = [];
+.. code-block:: none
+
+  filter = [];
 
 //
 // Description written to output DESC column
 //
-desc = "NA";
+.. code-block:: none
+		
+  desc = "NA";
 
 //
 // Forecast ATCF ID's
 // If empty, all ATCF ID's found will be processed.
 // Statistics will be generated separately for each ATCF ID.
 //
-model = [];
+.. code-block:: none
+		
+  model = [];
 
 //
 // BEST and operational track storm identifiers
 //
-storm_id = [];
+.. code-block:: none
+		
+  storm_id = [];
 
 //
 // BEST and operational track storm names
 //
-storm_name = [];
+.. code-block:: none
+
+  storm_name = [];
 
 //
 // Forecast and operational initialization time window
 //
-init_beg = "";
-init_end = "";
+.. code-block:: none
+
+  init_beg = "";
+  init_end = "";
 
 //
 // Forecast, BEST, and operational valid time window
 //
-valid_beg = "";
-valid_end = "";
+.. code-block:: none
+		
+  valid_beg = "";
+  valid_end = "";
 
 //
 // Forecast and operational initialization hours
 //
-init_hour = [];
+.. code-block:: none
+		
+  init_hour = [];
 
 //
 // Forecast and operational lead times in hours
@@ -751,39 +958,51 @@ lead = [];
 //
 // Spatial masking region (path to gridded data file or polyline file)
 //
-vx_mask = "";
+.. code-block:: none
+
+  vx_mask = "";
 
 //
 // Distance to land threshold
 //
-dland_thresh = NA;
+.. code-block:: none
+
+  dland_thresh = NA;
 
 //
 // Genesis matching time window, in hours relative to the forecast genesis time
 //
-genesis_window = {
-   beg = -24;
-   end =  24;
-}
+.. code-block:: none
+		
+  genesis_window = {
+     beg = -24;
+     end =  24;
+  }
 
 //
 // Genesis matching search radius in km.
 //
-genesis_radius = 300;
+.. code-block:: none
+		
+  genesis_radius = 300;
 
 Global settings
-~~~~~~~~~~~~~~~
+_______________
 
 //
 // Confidence interval alpha value
 //
-ci_alpha = 0.05;
+.. code-block:: none
+		
+  ci_alpha = 0.05;
 
 //
 // Statistical output types
 //
-output_flag = {
-   fho    = NONE;
-   ctc    = BOTH;
-   cts    = BOTH;
-}
+.. code-block:: none
+		
+  output_flag = {
+     fho    = NONE;
+     ctc    = BOTH;
+     cts    = BOTH;
+  }
