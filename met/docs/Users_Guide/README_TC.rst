@@ -3,11 +3,6 @@
 README_TC Configuration file overview
 =====================================
 
-See :numref:`README` for configuration file overview.
-
-Configuration settings common to multiple tools
-_______________________________________________
-
 **storm_id**
 
 // Specify a comma-separated list of storm id's to be used:
@@ -57,7 +52,6 @@ For example:
 		
   cyclone = [];
 
-
 //
 // Specify a comma-separated list of storm names to be used.
 // An empty list indicates that all should be used.
@@ -101,6 +95,7 @@ For example:
 // Tracks for which all valid times fall within the time window will be used.
 // An empty string indicates that all times should be used.
 //
+
 For example:
 
 .. code-block:: none
@@ -170,11 +165,11 @@ _____________________________________
 
 TCPairsConfig_default
 ~~~~~~~~~~~~~~~~~~~~~
-
 //
 // The "model" entry specifies an array of model names to be verified. If
 // verifying multiple models, choose descriptive model names (no whitespace)
 // to distinguish between their output.
+
 For example:
 
 .. code-block:: none
@@ -184,7 +179,6 @@ For example:
 .. code-block:: none
 		  
   model  = [];
-
 //
 // Specify whether the code should check for duplicate ATCF lines when
 // building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
@@ -198,7 +192,6 @@ For example:
 .. code-block:: none
 		
   check_dup = FALSE;
-
 //
 // Specify whether special processing should be performed for interpolated model
 // names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
@@ -221,6 +214,7 @@ For example:
 //             if empty, default is FALSE
 //   min_req = minimum number of members required for the consensus
 //
+<<<<<<< HEAD
 For example:
 
 .. code-block:: none
@@ -267,10 +261,6 @@ For example:
 .. code-block:: none
 		
      best_technique = [ "BEST" ];
-//      base_baseline  = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
-//      oper_technique = [ "CARQ" ];
-//      oper_baseline  = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
-//
 
 .. code-block:: none
 		
@@ -286,7 +276,6 @@ For example:
 // be searched for analysis track data by setting this to NONE, ADECK, BDECK,
 // or BOTH. Use BOTH to create pairs using two different analysis tracks.
 //
-For example:
 
 .. code-block:: none
 
@@ -300,6 +289,7 @@ For example:
 // Specify whether only those track points common to both the ADECK and BDECK
 // tracks should be written out.
 //
+
 For example:
 
 .. code-block:: none
@@ -314,6 +304,7 @@ For example:
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
+
 .. code-block:: none
 
   dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
@@ -397,6 +388,7 @@ ____________________
 // May modify using the "-valid_beg", "-valid_end", "-valid_inc",
 // and "-valid_exc" job command options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -406,6 +398,7 @@ ____________________
 //      valid_inc = [ "20101231_06" ];
 //      valid_exc = [ "20101231_00" ];
 //
+
 
 .. code-block:: none
 		
@@ -421,6 +414,7 @@ ____________________
 // May add using the "-init_hour", "-valid_hour", "-lead",
 // and "-lead_req" job command options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -441,6 +435,7 @@ ____________________
 // Stratify by the LINE_TYPE column.  May add using the "-line_type"
 // job command option.
 //
+
 // For example:
 
 .. code-block:: none
@@ -460,6 +455,7 @@ ____________________
 // May add using the "-track_watch_warn" job command option.
 // The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
 //
+
 // For example:
 
 .. code-block:: none
@@ -476,6 +472,7 @@ ____________________
 // to be applied.  May add using the "-column_thresh name thresh" job command
 // options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -487,13 +484,13 @@ ____________________
 		
   column_thresh_name = [];
   column_thresh_val  = [];
-
 //
 // Stratify by performing string matching on non-numeric data columns.
 // Specify a comma-separated list of columns names and values
 // to be checked.  May add using the "-column_str name string" job command
 // options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -512,6 +509,7 @@ ____________________
 // the entire track.  May add using the "-init_thresh name thresh" job command
 // options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -523,12 +521,12 @@ ____________________
 		
   init_thresh_name = [];
   init_thresh_val  = [];
-
 //
 // Just like the column_str options above, but apply the string matching only
 // when lead = 0.  If lead = 0 string does not match, discard the entire track.
 // May add using the "-init_str name thresh" job command options.
 //
+
 // For example:
 
 .. code-block:: none
@@ -570,6 +568,7 @@ ____________________
 //    "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
 //
 
+
 .. code-block:: none
   rirw = {
      track  = NONE;       // Specify which track types to search (NONE, ADECK,
@@ -583,7 +582,6 @@ ____________________
      }
      bdeck = adeck;       // Copy settings to the BDECK or specify different logic.
   }
-
 //
 // Specify whether only those track points occurring near landfall should be
 // retained, and define the landfall retention window as a timestring in HH[MMSS]
@@ -601,6 +599,7 @@ ____________________
 // "-landfall_window 00 12" defines the time window from the landfall event to 12
 // hours after.
 //
+
 // For example:
 
 .. code-block:: none
@@ -614,11 +613,11 @@ ____________________
   landfall     = FALSE;
   landfall_beg = "-24";
   landfall_end = "00";
-
 //
 // Specify whether only those cases common to all models in the dataset should
 // be retained.  May modify using the "-event_equal" job command option.
 //
+
 // For example:
 
 .. code-block:: none
@@ -633,6 +632,7 @@ ____________________
 // Specify lead times that must be present for a track to be included in the
 // event equalization logic.
 //
+
 .. code-block:: none
 
   event_equal_lead = [ "12", "24", "36" ];
@@ -642,6 +642,7 @@ ____________________
 // initialization time.  If it falls outside the mask, discard the entire track.
 // May modify using the "-out_init_mask" job command option.
 //
+
 // For example:
 
 .. code-block:: none
@@ -657,6 +658,7 @@ ____________________
 // valid time.  If it falls outside the mask, discard only the current track
 // point.  May modify using the "-out_valid_mask" job command option.
 //
+
 // For example:
 
 .. code-block:: none
@@ -717,7 +719,8 @@ ____________________
 //          that column. If multiple column eq/min/max/str options are listed,
 //          the job will be performed on their intersection:
 //
-//          "-column_min col_name value"  For example: -column_min TK_ERR 100.00
+//          "-column_min col_name value"
+For example: -column_min TK_ERR 100.00
 //          "-column_max col_name value"
 //          "-column_eq  col_name value"
 //          "-column_str col_name string" separate multiple filtering strings
@@ -824,10 +827,10 @@ ___________________
 .. code-block:: none
 
   init_freq = 6;
-
 //
 // Lead times in hours to be searched for genesis events.
 //
+
 .. code-block:: none
   lead_window = {
      beg = 24;
@@ -837,6 +840,7 @@ ___________________
 //
 // Minimum track duration for genesis event in hours.
 //
+
 .. code-block:: none
 
   min_duration = 12;
@@ -847,13 +851,13 @@ ___________________
 // pressure threshold.  The forecast genesis time is the valid time of the first
 // track point where all of these criteria are met.
 //
+
 .. code-block:: none
 
   fcst_genesis = {
      vmax_thresh = NA;
      mslp_thresh = NA;
   }
-
 //
 // BEST track genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
@@ -868,7 +872,6 @@ ___________________
      vmax_thresh = NA;
      mslp_thresh = NA;
   }
-
 //
 // Operational track genesis event criteria.  Defined as tracks reaching the
 // specified intensity category, maximum wind speed threshold, and minimum
@@ -887,19 +890,19 @@ ___________________
 Track filtering options which may be specified separately in each filter array entry.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 //
 // Filter is an array of dictionaries containing the track filtering options
 // listed below.  If empty, a single filter is defined using the top-level
 // settings.
 //
+
 .. code-block:: none
 
   filter = [];
-
 //
 // Description written to output DESC column
 //
+
 .. code-block:: none
 		
   desc = "NA";
@@ -909,6 +912,7 @@ Track filtering options which may be specified separately in each filter array e
 // If empty, all ATCF ID's found will be processed.
 // Statistics will be generated separately for each ATCF ID.
 //
+
 .. code-block:: none
 		
   model = [];
@@ -926,7 +930,6 @@ Track filtering options which may be specified separately in each filter array e
 .. code-block:: none
 
   storm_name = [];
-
 //
 // Forecast and operational initialization time window
 //
@@ -934,7 +937,6 @@ Track filtering options which may be specified separately in each filter array e
 
   init_beg = "";
   init_end = "";
-
 //
 // Forecast, BEST, and operational valid time window
 //
@@ -995,7 +997,6 @@ _______________
 .. code-block:: none
 		
   ci_alpha = 0.05;
-
 //
 // Statistical output types
 //
