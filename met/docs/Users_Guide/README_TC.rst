@@ -8,6 +8,8 @@ See :numref:`README` for configuration file overview.
 Configuration settings common to multiple tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**storm_id**
+
 // Specify a comma-separated list of storm id's to be used:
 //    2-letter basin, 2-digit cyclone number, 4-digit year
 // An empty list indicates that all should be used.
@@ -57,6 +59,8 @@ cyclone = [];
 // e.g. storm_name = [ "KATRINA" ];
 //
 storm_name = [];
+
+**init_beg, init_end, init_inc, init_exc**
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
