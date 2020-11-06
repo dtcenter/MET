@@ -170,17 +170,13 @@ and scripts/config.
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
 
-   1.
-   Reads share/met/config/ConfigConstants to define constants.
+   1. Reads share/met/config/ConfigConstants to define constants.
 
-   2.
-   If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
+   2. If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
 
-   3.
-   Reads the default configuration file for the tool from share/met/config.
+   3. Reads the default configuration file for the tool from share/met/config.
 
-   4.
-   Reads the user-specified configuration file from the command line.
+   4. Reads the user-specified configuration file from the command line.
 
 Many of the entries from step (3) are overwritten by the user-specified entries
 from step (4). Therefore, the configuration file you pass in on the command
@@ -973,7 +969,7 @@ length of the "fcst.field" array.  For example:
 		
         obs = fcst;
 
-Or
+or
 
 .. code-block:: none
 		
@@ -1081,7 +1077,8 @@ Or
 		
   obs = fcst;
 
-
+**climo_mean**
+  
 The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
 of several entires defining the climatology file names and fields to be used.
@@ -1136,6 +1133,8 @@ of several entires defining the climatology file names and fields to be used.
      hour_interal       = 6;
   }
 
+**climo_stdev**
+  
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
 tools. The "climo_mean" and "climo_stdev" data define the climatological
@@ -1164,7 +1163,8 @@ over the "climo_mean" setting and then updating the "file_name" entry.
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
   }
 
-
+**climo_cdf**
+  
 The "climo_cdf" dictionary specifies how the the climatological mean
 ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
@@ -1226,6 +1226,7 @@ all pairs into a single climatological bin.
      write_bins  = FALSE; or TRUE
   }
 
+**climatology data for probability forecasts**
 
 When specifying climatology data for probability forecasts, either supply a
 probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
@@ -1241,6 +1242,7 @@ the MET tools use the mean, standard deviation, and observation event
 threshold to derive a normal approximation of the climatological
 probabilities. Those derived probability values are used to compute BSS.
 
+**mask_missing_flag**
 
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
@@ -1257,6 +1259,9 @@ in the Wavelet-Stat and MODE tools:
 		
   mask_missing_flag = BOTH;
 
+
+**obs_window**
+
 The "obs_window" entry is a dictionary specifying a beginning ("beg"
 entry) and ending ("end" entry) time offset values in seconds. It defines
 the time window over which observations are retained for scoring. These time
@@ -1271,6 +1276,7 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
+**mask**
 
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
@@ -1285,7 +1291,7 @@ in the following ways:
   three digit grid number. Supplying a value of "FULL" indicates that the
   verification should be performed over the entire grid on which the data
   resides.
-  See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_  
+  See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.  
   The "grid" entry can be the gridded data file defining grid.
 
 * The "poly" entry contains a comma-separated list of files that define
@@ -1379,6 +1385,9 @@ is included in the mask.
                    lon_thresh = >=-110&&<=-90; } ];
   }
 
+
+**ci_alpha**
+
 The "ci_alpha" entry is an array of floats specifying the values for alpha
 to be used when computing confidence intervals. Values of alpha must be
 between 0 and 1. The confidence interval computed is 1 minus the alpha
@@ -1388,6 +1397,8 @@ interval.
 .. code-block:: none
 		
   ci_alpha = [ 0.05, 0.10 ];
+
+**boot**
 
 The "boot" entry defines the parameters to be used in calculation of
 bootstrap confidence intervals. The interval variable indicates what method
@@ -1448,6 +1459,8 @@ should be used for computing bootstrap confidence intervals:
      rng      = "mt19937";
      seed     = "";
   }
+
+**interp**
 
 The "interp" entry is a dictionary that specifies what interpolation or
 smoothing (for the Grid-Stat tool) methods should be applied.
@@ -1550,6 +1563,8 @@ This dictionary may include the following entries:
      ];
   }
 
+**nbrhd**
+  
 The "nbrhd" entry is a dictionary that is very similar to the "interp"
 entry. It specifies information for computing neighborhood statistics in
 Grid-Stat. This dictionary may include the following entries:
@@ -1593,6 +1608,8 @@ Grid-Stat. This dictionary may include the following entries:
      cov_thresh = [ >=0.5 ];
   }
 
+**fourier**
+
 The "fourier" entry is a dictionary which specifies the application of the
 Fourier decomposition method. It consists of two arrays of the same length
 which define the beginning and ending wave numbers to be included. If the
@@ -1622,6 +1639,8 @@ of the verification grid:
      wave_1d_end = [ 3, 9, 20 ];
   }
 
+**gradient**  
+  
 The "gradient" entry is a dictionary which specifies the number and size of
 gradients to be computed. The "dx" and "dy" entries specify the size of the
 gradients in grid units in the X and Y dimensions, respectively. dx and dy
@@ -1640,6 +1659,8 @@ This configuration option may be set separately in each "obs.field" entry.
      dy = [ 1 ];
   }
 
+**distance_map**
+  
 The "distance_map" entry is a dictionary containing options related to the
 distance map statistics in the DMAP output line type. The "baddeley_p" entry
 is an integer specifying the exponent used in the Lp-norm when computing the
@@ -1663,7 +1684,9 @@ This configuration option may be set separately in each "obs.field" entry.
      fom_alpha         = 0.1;
      zhu_weight        = 0.5;
   }
-
+  
+**land_mask**
+  
 The "land_mask" dictionary defines the land/sea mask field which is used
 when verifying at the surface. For point observations whose message type
 appears in the "LANDSF" entry of the "message_type_group_map" setting,
@@ -1689,6 +1712,8 @@ land_mask.flag may be set separately in each "obs.field" entry.
      thresh    = eq1;
   }
 
+**topo_mask**
+		
 The "topo_mask" dictionary defines the model topography field which is used
 when verifying at the surface. This logic is applied to point observations
 whose message type appears in the "SURFACE" entry of the
@@ -1715,6 +1740,8 @@ topo_mask.flag may be set separately in each "obs.field" entry.
      use_obs_thresh     = ge-100&&le100;
      interp_fcst_thresh = ge-50&&le50;
   }
+
+**hira**
 
 The "hira" entry is a dictionary that is very similar to the "interp" and
 "nbrhd" entries. It specifies information for applying the High Resolution
@@ -1766,6 +1793,7 @@ This dictionary may include the following entries:
      prob_cat_thresh = [];
   }
 
+**output_flag**
 
 The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
@@ -1815,6 +1843,8 @@ output line type from the MET tools. Each line type may be set to one of:
      grad   = NONE;  Gradient statistics (S1 score)
   }
 
+**nc_pairs_flag**
+
 The "nc_pairs_flag" can be set either to a boolean value or a dictionary
 in either Grid-Stat, Wavelet-Stat or MODE. The dictionary (with slightly
 different entries for the various tools ... see the default config files)
@@ -1843,6 +1873,8 @@ netcdf output will be generated.
      apply_mask   = TRUE;
   }
 
+**nc_pairs_var_name**
+  
 The "nc_pairs_var_name" entry specifies a string for each verification task
 in Grid-Stat. This string is parsed from each "obs.field" dictionary entry
 and is used to construct variable names for the NetCDF matched pairs output
@@ -1853,14 +1885,15 @@ constant string may make downstream processing more convenient.
 
 For example:
 
-.. code-block:: none
-		
-  nc_pairs_var_name = "TMP";
-
+| nc_pairs_var_name = "TMP";
+|
+ 
 .. code-block:: none
 		
   nc_pairs_var_name = "";
 
+**nc_pairs_var_suffix**  
+  
 The "nc_pairs_var_suffix" entry is similar to the "nc_pairs_var_name" entry
 described above.  It is also parsed from each "obs.field" dictionary entry.
 However, it defines a suffix to be appended to the output variable name.
@@ -1870,11 +1903,9 @@ use this option to customize the output variable names.
 
 For example:
 
-.. code-block:: none
-		
-  nc_pairs_var_suffix = "TROPO"; (for the tropopause height)
-  nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
-
+| nc_pairs_var_suffix = "TROPO"; (for the tropopause height)
+| nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
+|
 
 NOTE: This option was previously named "nc_pairs_var_str", which is
 now deprecated.
@@ -1883,6 +1914,8 @@ now deprecated.
 		
   nc_pairs_var_suffix = "";
 
+**ps_plot_flag**
+  
 The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 indicating whether a PostScript plot should be generated summarizing
 the verification.
@@ -1890,6 +1923,8 @@ the verification.
 .. code-block:: none
 		
   ps_plot_flag = TRUE;
+
+**grid_weight_flag**
 
 The "grid_weight_flag" specifies how grid weighting should be applied
 during the computation of continuous statistics and partial sums. It is
@@ -1912,6 +1947,8 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
+**rank_corr_flag**
+
 The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
 and Spearman's Rank Correlation Coefficients (in the CNT line type) should
 be computed. Computing them over large datasets is computationally
@@ -1920,6 +1957,8 @@ intensive and slows down the runtime significantly.
 .. code-block:: none
 		
   rank_corr_flag = FALSE;
+
+**duplicate_flag**
 
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
@@ -1939,6 +1978,8 @@ in those cases.
 .. code-block:: none
 		
   duplicate_flag = NONE;
+
+**obs_summary**
 
 The "obs_summary" entry specifies how to compute statistics on
 observations that appear at a single location (lat,lon,level,elev)
@@ -1972,12 +2013,18 @@ in those cases.
 		
   obs_summary = NONE;
 
+
+**obs_perc_value**
+
 Percentile value to use when obs_summary = PERC
 
 .. code-block:: none
 		
   obs_perc_value = 50;
 
+  
+**obs_quality**
+		
 The "obs_quality" entry specifies the quality flag values that are to be
 retained and used for verification. An empty list signifies that all
 point observations should be used, regardless of their quality flag value.
@@ -1989,6 +2036,9 @@ an array of strings, even if the values themselves are numeric.
 		
   obs_quality = [ "1", "2", "3", "9" ];
 
+  
+**met_data_dir**
+
 The "met_data_dir" entry specifies the location of the internal MET data
 sub-directory which contains data files used when generating plots. It
 should be set to the installed share/met directory so the MET tools can
@@ -1998,6 +2048,8 @@ locate the static data files they need at run time.
 		
   met_data_dir = "MET_BASE";
 
+**fcst_raw_plot, obs_raw_plot, wvlt_plot, object_plot**
+		
 The "fcst_raw_plot" entry is a dictionary used by Wavelet-Stat and MODE
 containing colortable plotting information for the plotting of the raw
 forecast field:
@@ -2023,7 +2075,7 @@ forecast field:
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described above.
 
-
+**tmp_dir**
 
 The "tmp_dir" entry is a string specifying the location where temporary
 files should be written.
@@ -2031,6 +2083,9 @@ files should be written.
 .. code-block:: none
 		
   tmp_dir = "/tmp";
+
+
+**output_prefix**
 
 The "output_prefix" entry specifies a string to be included in the output
 file name. The MET statistics tools construct output file names that
@@ -2042,6 +2097,8 @@ of the same tool.
 		
   output_prefix  = "";
 
+**version**
+		
 The "version" entry specifies the version number of the configuration file.
 The configuration file version number should match the version number of
 the MET code being run. This value should generally not be modified.
@@ -2050,6 +2107,8 @@ the MET code being run. This value should generally not be modified.
 		
   version = "V6.0";
 
+**time_summary**
+		
 This feature was implemented to allow additional processing of observations
 with high temporal resolution. The "flag" entry toggles the "time_summary"
 on (TRUE) and off (FALSE). Obs may be summarized across the user specified
@@ -2078,7 +2137,10 @@ The two "width" settings listed above are equivalent. Both define a centered
 10-minute time interval. Use the "beg" and "end" entries to define
 uncentered time intervals. The following example requests observations for
 one hour prior:
-     width = { beg = -3600; end = 0; }
+
+.. code-block:: none
+		
+  width = { beg = -3600; end = 0; }
 
 The summaries will only be calculated for the specified GRIB codes.
 The supported summaries are "min" (minimum), "max" (maximum), "range",
@@ -2122,6 +2184,8 @@ Settings specific to individual tools
 EnsembleStatConfig_default
 --------------------------
 
+**ens**
+
 The "ens" entry is a dictionary that specifies the fields for which ensemble
 products should be generated. This is very similar to the "fcst" and "obs"
 entries. This dictionary may include the following entries:
@@ -2162,6 +2226,8 @@ entries. This dictionary may include the following entries:
      ];
   }
 
+**nbrhd_prob**
+		
 The nbrhd_prob dictionary defines the neighborhoods used to compute NEP
 and NMEP output. The neighborhood shape is a SQUARE or CIRCLE centered on
 the current point, and the width array specifies the width of the square or
@@ -2180,6 +2246,8 @@ specified.
      shape      = CIRCLE;
      vld_thresh = 0.0;
   }
+
+**nmep_smooth**
 
 Similar to the interp dictionary, the nmep_smooth dictionary includes a type
 array of dictionaries to define one or more methods for smoothing the NMEP
@@ -2204,6 +2272,8 @@ combination of the categorical threshold (cat_thresh), neighborhood width
         }
      ];
   }
+
+**fcst, obs**
 
 The fcst and obs entries define the fields for which Ensemble-Stat should
 compute rank histograms, probability integral transform histograms,
@@ -2240,6 +2310,9 @@ data is provided, the climo_cdf thresholds will be used instead.
      ];
   }
 
+
+**nc_var_str**
+		
 The "nc_var_str" entry specifies a string for each ensemble field and
 verification task in Ensemble-Stat. This string is parsed from each
 "ens.field" and "obs.field" dictionary entry and is used to customize
@@ -2254,6 +2327,8 @@ e.g. nc_var_str = "MIN";
 		
   nc_var_str = "";
 
+**obs_thresh**
+
 The "obs_thresh" entry is an array of thresholds for filtering observation
 values prior to applying ensemble verification logic. The default setting
 of NA means that no observations should be filtered out. Verification output
@@ -2263,6 +2338,8 @@ set separately for each obs.field entry.
 .. code-block:: none
 		
   obs_thresh = [ NA ];
+
+**skip_const**
 
 Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all
 the ensemble members and the observation have a constant value. For example,
@@ -2275,7 +2352,10 @@ random.
 		
   skip_const = FALSE;
 
+**obs_error**
+
 Observation error options
+
 Set dist_type to NONE to use the observation error table instead.
 May be set separately in each "obs.field" entry.
 The obs_error dictionary controls how observation error information should be
@@ -2329,6 +2409,8 @@ levels, and range of values.
      max              = NA;
   }
 
+**ensemble_flag**
+  
 The "ensemble_flag" entry is a dictionary of boolean value indicating
 which ensemble products should be generated:
 
@@ -2377,6 +2459,8 @@ which ensemble products should be generated:
      rank      = TRUE;
      weight    = FALSE;
   }
+
+**rng**
 
 See: `Random Number Generator Performance <https://www.gnu.org/software/gsl/doc/html/rng.html#performance>`_
 used for random assignment of ranks when they are tied.
@@ -2729,6 +2813,8 @@ MET User's Guide for a description of these attributes.
 MODEConfig_default
 ------------------
 
+**quilt**
+
 The "quilt" entry is a boolean to indicate whether all permutations of
 convolution radii and thresholds should be run. If set to false, the number
 of forecast and observation convolution radii and thresholds must all match.
@@ -2742,6 +2828,8 @@ MODE will be run.
 		
   quilt = false;
 
+**fcst, obs**
+
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
 
@@ -2750,13 +2838,19 @@ The object definition settings for MODE are contained within the "fcst" and
 
 * The "conv_radius" entry specifies the convolution radius in grid
   squares. The larger the convolution radius, the smoother the objects.
-  Multiple convolution radii may be specified as an array:
-       conv_radius = [ 5, 10, 15 ];
+  Multiple convolution radii may be specified as an array. For example:
+
+  .. code-block:: none
+		  
+    conv_radius = [ 5, 10, 15 ];
 
 * The "conv_thresh" entry specifies the convolution threshold used to
   define MODE objects. The lower the threshold, the larger the objects.
-  Multiple convolution thresholds may be specified as an array:
-       conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
+  Multiple convolution thresholds may be specified as an array. For example:
+
+  .. code-block:: none
+		  
+    conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
 
 * The "vld_thresh" entry is described above.
 
@@ -2782,8 +2876,11 @@ The object definition settings for MODE are contained within the "fcst" and
 * The "merge_thresh" entry specifies a lower convolution threshold used
   when the double-threshold merging method is applied. The number of
   merge thresholds must match the number of convolution thresholds.
-  Multiple merge thresholds may be specified as an array:
-     merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
+  Multiple merge thresholds may be specified as an array. For example:
+
+  .. code-block:: none
+		  
+    merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
 * The "merge_flag" entry specifies the merging methods to be applied:
   
@@ -2815,6 +2912,8 @@ The object definition settings for MODE are contained within the "fcst" and
      merge_flag         = THRESH;
   }
 
+**grid_res**
+
 The "grid_res" entry is the nominal spacing for each grid square in
 kilometers. The variable is not used directly in the code, but subsequent
 variables in the configuration files are defined in terms of it. Therefore,
@@ -2824,6 +2923,8 @@ are used for these variables.
 .. code-block:: none
 		
   grid_res = 4;
+
+**match_flag**
 
 The "match_flag" entry specifies the matching method to be applied:
 
@@ -2841,6 +2942,8 @@ The "match_flag" entry specifies the matching method to be applied:
 		
   match_flag = MERGE_BOTH;
 
+**max_centroid_dist**
+		
 The "max_centroid_dist" entry specifies the maximum allowable distance in
 grid squares between the centroids of objects for them to be compared.
 Setting this to a reasonable value speeds up the runtime enabling MODE to
@@ -2850,6 +2953,8 @@ skip unreasonable object comparisons.
 		
   max_centroid_dist = 800.0/grid_res;
 
+**weight**
+  
 The weight variables control how much weight is assigned to each pairwise
 attribute when computing a total interest value for object pairs. The weights
 need not sum to any particular value but must be non-negative. When the
@@ -2870,6 +2975,8 @@ sum of the weights listed.
      inten_perc_value = 50;
   }
 
+**interest_function**
+		
 The set of interest function variables listed define which values are of
 interest for each pairwise attribute measured. The interest functions may be
 defined as a piecewise linear function or as an algebraic expression. A
@@ -2924,6 +3031,8 @@ mathematical functions.
      inten_perc_ratio = ratio_if;
   }
 
+**total_interest_thresh**
+  
 The total_interest_thresh variable should be set between 0 and 1. This
 threshold is applied to the total interest values computed for each pair of
 objects and is used in determining matches.
@@ -2932,6 +3041,8 @@ objects and is used in determining matches.
 		
   total_interest_thresh = 0.7;
 
+**print_interest_thresh**
+		
 The print_interest_thresh variable determines which pairs of object
 attributes will be written to the output object attribute ASCII file. The
 user may choose to set the print_interest_thresh to the same value as the
@@ -2944,6 +3055,8 @@ the max_centroid_dist variable.
 		
   print_interest_thresh = 0.0;
 
+**plot_valid_flag**
+
 When applied, the plot_valid_flag variable indicates that only the region
 containing valid data after masking is applied should be plotted. TRUE
 indicates the entire domain should be plotted; FALSE indicates only the
@@ -2953,6 +3066,8 @@ region containing valid data after masking should be plotted.
 		
   plot_valid_flag = FALSE;
 
+**plot_gcarc_flag**
+
 When applied, the plot_gcarc_flag variable indicates that the edges of
 polylines should be plotted using great circle arcs as opposed to straight
 lines in the grid.
@@ -2961,6 +3076,8 @@ lines in the grid.
 		
   plot_gcarc_flag = FALSE;
 
+**ct_stats_flag**
+  
 The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
 in the form of contingency table counts and statistics.
 
@@ -2968,6 +3085,8 @@ in the form of contingency table counts and statistics.
 		
   ct_stats_flag = TRUE;
 
+**shift_right**
+		
 When MODE is run on global grids, this parameter specifies how many grid
 squares to shift the grid to the right. MODE does not currently connect
 objects from one side of a global grid to the other, potentially causing
@@ -3041,7 +3160,7 @@ following criteria:
      7 - Auxiliary levels generated via interpolation from spanning levels
      (upper-air profile reports)
 
-
+**message_type**
 
 In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
@@ -3053,15 +3172,16 @@ to be retained. An empty list indicates that all should be retained.
 
 For example:
 
-.. code-block:: none
-		
-   message_type[] = [ "ADPUPA", "AIRCAR" ];
+| message_type[] = [ "ADPUPA", "AIRCAR" ];
+| 
 
 `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 		
   message_type = [];
+
+**message_type_group_map**
 
 Mapping of message type group name to comma-separated list of values.
 The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
@@ -3076,6 +3196,8 @@ Derive PRMSL only for SURFACE message types.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
+**station_id**
+		
 The "station_id" entry is an array of station ids to be retained or
 the filename which contains station ids. An array of station ids
 contains a comma-separated list. An empty list indicates that all
@@ -3085,7 +3207,9 @@ For example:  station_id = [ "KDEN" ];
 
 .. code-block:: none
 		
-  stat[=]ion_id = [];
+  station_id = [];
+
+**elevation_range**
 
 The "elevation_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of observing locations elevations to be
@@ -3098,6 +3222,8 @@ retained.
      end = 100000;
   }
 
+**pb_report_type**
+		
 The "pb_report_type" entry is an array of PREPBUFR report types to be
 retained. The numeric "pb_report_type" entry allows for further
 stratification within message types. An empty list indicates that all should
@@ -3116,6 +3242,8 @@ For example:
 		
   pb_report_type  = [];
 
+**in_report_type**
+		
 The "in_report_type" entry is an array of input report type values to be
 retained. The numeric "in_report_type" entry provides additional
 stratification of observations. An empty list indicates that all should
@@ -3133,6 +3261,8 @@ For example:
 		
   in_report_type = [];
 
+**instrument_type**
+
 The "instrument_type" entry is an array of instrument types to be retained.
 An empty list indicates that all should be retained.
 
@@ -3140,6 +3270,8 @@ An empty list indicates that all should be retained.
 		
   instrument_type = [];
 
+**level_range**
+  
 The "level_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of vertical levels (1 to 255) to be retained.
 
@@ -3150,31 +3282,24 @@ entries specifying the range of vertical levels (1 to 255) to be retained.
      end = 255;
   }
 
+**level_category**
+  
 The "level_category" entry is an array of integers specifying which level
 categories should be retained:
 
-   0 = Surface level (mass reports only)
-   
-   1 = Mandatory level (upper-air profile reports)
-   
-   2 = Significant temperature level (upper-air profile reports)
-   
-   2 = Significant temperature and winds-by-pressure level
-   (future combined mass and wind upper-air reports)
-   
-   3 = Winds-by-pressure level (upper-air profile reports)
-   
-   4 = Winds-by-height level (upper-air profile reports)
-   
-   5 = Tropopause level (upper-air profile reports)
-   
-   6 = Reports on a single level
-   (For example: aircraft, satellite-wind, surface wind,
-   precipitable water retrievals, etc.)
-   
-   7 = Auxiliary levels generated via interpolation from spanning levels
-   (upper-air profile reports)
-   
+| 0 = Surface level (mass reports only) 
+| 1 = Mandatory level (upper-air profile reports) 
+| 2 = Significant temperature level (upper-air profile reports) 
+| 2 = Significant temperature and winds-by-pressure level (future combined mass
+|     and wind upper-air reports) 
+| 3 = Winds-by-pressure level (upper-air profile reports) 
+| 4 = Winds-by-height level (upper-air profile reports)
+| 5 = Tropopause level (upper-air profile reports)
+| 6 = Reports on a single level  (For example: aircraft, satellite-wind,
+|      surface wind, precipitable water retrievals, etc.)
+| 7 = Auxiliary levels generated via interpolation from spanning levels
+|     (upper-air profile reports)
+|    
 An empty list indicates that all should be retained.
 
 See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
@@ -3182,6 +3307,8 @@ See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.no
 .. code-block:: none
 		
   level_category = [];
+
+**obs_bufr_var**
 
 The "obs_bufr_var" entry is an array of strings containing BUFR variable
 names to be retained or derived. This replaces the "obs_grib_code" setting
@@ -3201,6 +3328,8 @@ command line option to see the list of available observation variables.
 		
   obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
+**obs_bufr_map**
+
 Mapping of input BUFR variable names to output variables names.
 The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
 Users may choose to rename BUFR variables to match the naming convention
@@ -3210,6 +3339,8 @@ of the forecast the observation is used to verify.
 		
   obs_bufr_map = [];
 
+**obs_prefbufr_map**
+  
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
 abbreviations in the output. This default map is appended to obs_bufr_map.
 This should not typically be overridden. This default mapping provides
@@ -3233,6 +3364,8 @@ abbreviations to the output.
      { key = "D_PRMSL"; val = "PRMSL"; }
   ];
 
+**quality_mark_thresh**
+  
 The "quality_mark_thresh" entry specifies the maximum quality mark value
 to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
 this threshold will be retained, while observations with a quality mark
@@ -3244,6 +3377,8 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 		
   quality_mark_thresh = 2;
 
+**event_stack_flag**
+  
 The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
 specify whether observations should be drawn from the top of the event
 stack (most quality controlled) or the bottom of the event stack (most raw).
@@ -3255,6 +3390,8 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
 SeriesAnalysisConfig_default
 ----------------------------
 
+**block_size**
+
 Computation may be memory intensive, especially for large grids.
 The "block_size" entry sets the number of grid points to be processed
 concurrently (i.e. in one pass through a time series). Smaller values
@@ -3264,6 +3401,8 @@ require less memory but increase the number of passes through the data.
 		
   block_size = 1024;
 
+**vld_thresh**
+  
 Ratio of valid matched pairs to total length of series for a grid
 point. If valid threshold is exceeded at that grid point the statistics
 are computed and stored. If not, a bad data flag is stored. The default
@@ -3274,6 +3413,8 @@ setting requires all data in the series to be valid.
 		
   vld_thresh = 1.0;
 
+**output_stats**
+  
 Statistical output types need to be specified explicitly. Refer to User's
 Guide for available output types. To keep output file size reasonable,
 it is recommended to process a few output types at a time, especially if the
@@ -3298,319 +3439,397 @@ grid is large.
 STATAnalysisConfig_default
 --------------------------
 
+**jobs**
+
 The "jobs" entry is an array of STAT-Analysis jobs to be performed.
 Each element in the array contains the specifications for a single analysis
 job to be performed. The format for an analysis job is as follows:
 
-.. code-block:: none
-		
-   -job job_name
-   OPTIONAL ARGS
+| -job job_name
+| OPTIONAL ARGS
+| 
 
 Where "job_name" is set to one of the following:
 
-|     "filter"
-|        To filter out the STAT or TCMPR lines matching the job filtering
-|        criteria specified below and using the optional arguments below.
-|        The output STAT lines are written to the file specified using the
-|        "-dump_row" argument.
-|        Required Args: -dump_row
-|
-|      "summary"
-|         To compute summary information for a set of statistics.
-|         The summary output includes the mean, standard deviation,
-|         percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
-|         and inter-quartile range. Also included are columns summarizing the
-|         computation of WMO mean values. Both unweighted and weighted mean
-|         values are reported, and they are computed using three types of
-|         logic:
+* "filter"
+  
+  To filter out the STAT or TCMPR lines matching the job filtering
+  criteria specified below and using the optional arguments below.
+  The output STAT lines are written to the file specified using the
+  "-dump_row" argument.
+  Required Args: -dump_row
 
-         * simple arithmetic mean (default)
+* "summary"
+  
+  To compute summary information for a set of statistics.
+  The summary output includes the mean, standard deviation,
+  percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
+  and inter-quartile range. Also included are columns summarizing the
+  computation of WMO mean values. Both unweighted and weighted mean
+  values are reported, and they are computed using three types of
+  logic:
+
+  * simple arithmetic mean (default)
 	   
-         * square root of the mean of the statistic squared
-           (applied to columns listed in "wmo_sqrt_stats")
+  * square root of the mean of the statistic squared
+    (applied to columns listed in "wmo_sqrt_stats")
 	   
-         * apply fisher transform
-           (applied to columns listed in "wmo_fisher_stats")
+  *  apply fisher transform
+     (applied to columns listed in "wmo_fisher_stats")
 	   
-         The columns of data to be summarized are specified in one of two
-         ways:
+  The columns of data to be summarized are specified in one of two
+  ways:
 	 
-         * Specify the -line_type option once and specify one or more
+  * Specify the -line_type option once and specify one or more
 
-	 * column names.
+  * column names.
 	   
-         * Format the -column option as LINE_TYPE:COLUMN.
+  * Format the -column option as LINE_TYPE:COLUMN.
 
-         Use the -derive job command option to automatically derive
-         statistics on the fly from input contingency tables and partial
-         sums.
+  Use the -derive job command option to automatically derive
+  statistics on the fly from input contingency tables and partial
+  sums.
 
-         Use the -column_union TRUE/FALSE job command option to compute
-         summary statistics across the union of input columns rather than
-         processing them separately.
+  Use the -column_union TRUE/FALSE job command option to compute
+  summary statistics across the union of input columns rather than
+  processing them separately.
 
-|         For TCStat, the "-column" argument may be set to:
-|            "TRACK" for track, along-track, and cross-track errors.
-|            "WIND" for all wind radius errors.
-|            "TI" for track and maximum wind intensity errors.
-|            "AC" for along-track and cross-track errors.
-|            "XY" for x-track and y-track errors.
-|            "col" for a specific column name.
-|            "col1-col2" for a difference of two columns.
-|            "ABS(col or col1-col2)" for the absolute value.
-|
-|         Required Args: -line_type, -column
-|         Optional Args: -by column_name to specify case information
+  For TCStat, the "-column" argument may be set to:
+  
+    * "TRACK" for track, along-track, and cross-track errors.
+    * "WIND" for all wind radius errors.
+    * "TI" for track and maximum wind intensity errors.
+    * "AC" for along-track and cross-track errors.
+    * "XY" for x-track and y-track errors.
+    * "col" for a specific column name.
+    * "col1-col2" for a difference of two columns.
+    * "ABS(col or col1-col2)" for the absolute value.
 
-                     * out_alpha to override default alpha value of 0.05
-		     
-                     * derive to derive statistics on the fly
-		     
-                     * column_union to summarize multiple columns
+  Required Args: -line_type, -column
 
-|      "aggregate"
-|         To aggregate the STAT data for the STAT line type specified using
-|         the "-line_type" argument. The output of the job will be in the
-|         same format as the input line type specified. The following line
-|         types may be aggregated:
-|         -line_type FHO, CTC, MCTC,
-|                    SL1L2, SAL1L2, VL1L2, VAL1L2,
-|                    PCT, NBRCNT, NBRCTC, GRAD,
-|                    ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
-|         Required Args: -line_type
-|
-|      "aggregate_stat"
-|         To aggregate the STAT data for the STAT line type specified using
-|         the "-line_type" argument. The output of the job will be the line
-|         type specified using the "-out_line_type" argument. The valid
-|         combinations of "-line_type" and "-out_line_type" are listed below.
-|         -line_type FHO,   CTC,    -out_line_type CTS, ECLV
-|         -line_type MCTC           -out_line_type MCTS
-|         -line_type SL1L2, SAL1L2, -out_line_type CNT
-|         -line_type VL1L2          -out_line_type VCNT
-|         -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-|         -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
-|         -line_type NBRCTC,        -out_line_type NBRCTS
-|         -line_type ORANK,         -out_line_type ECNT, RPS, RHIST, PHIST,
-|                                                  RELP, SSVAR
-|         -line_type MPR,           -out_line_type FHO, CTC, CTS,
-|                                                  MCTC, MCTS, CNT,
-|                                                  SL1L2, SAL1L2,
-|                                                  VL1L2, VCNT,
-|                                                  PCT, PSTD, PJC, PRC, ECLV,
-|                                                  WDIR (wind direction)
-|         Required Args:
-|            -line_type, -out_line_type
-|         Additional Required Args for -line_type MPR:
-|            -out_thresh or -out_fcst_thresh and -out_obs_thresh
-|            When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-|                                PCT, PSTD, PJC, PRC
-|         Additional Optional Args for -line_type MPR:
-|            -mask_grid, -mask_poly, -mask_sid
-|            -out_thresh or -out_fcst_thresh and -out_obs_thresh
-|            -out_cnt_logic
-|            -out_wind_thresh or -out_fcst_wind_thresh and
-|            -out_obs_wind_thresh
-|            -out_wind_logic
-|            When -out_line_type WDIR
-|         Additional Optional Arg for:
-|            -line_type ORANK -out_line_type PHIST, SSVAR ...
-|            -out_bin_size
-|         Additional Optional Args for:
-|            -out_line_type ECLV ...
-|            -out_eclv_points
-|
-|      "ss_index"
-|         The skill score index job can be configured to compute a weighted
-|         average of skill scores derived from a configurable set of
-|         variables, levels, lead times, and statistics. The skill score
-|         index is computed using two models, a forecast model and a
-|         reference model. For each statistic in the index, a skill score
-|         is computed as:
-|            SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
-|         Where S is the statistic.
-|         Next, a weighted average is computed over all the skill scores.
-|         Lastly, an index value is computed as:
-|            Index = sqrt(1/(1-SS[avg]))
-|         Where SS[avg] is the weighted average of skill scores.
-|         Required Args:
-|            Exactly 2 entries for -model, the forecast model and reference
-|            For each term of the index:
-|            -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
-|            Where -line_type is CNT or CTS and -column is the statistic.
-|            Optionally, specify other filters for each term, -fcst_thresh.
-|
-|      "go_index"
-|         The GO Index is a special case of the skill score index consisting
-|         of a predefined set of variables, levels, lead times, statistics,
-|         and weights.
-|         For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
-|        - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
-|         - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
-|         - Temperature at the surface(b), 400(a) mB
-|         - Height at 400(a) mB
-|         - Sea Level Pressure(b)
-|         Where (a) means weights of 4, 3, 2, 1 for the lead times, and
-|         (b) means weights of 8, 6, 4, 2 for the lead times.
-|
-|         Required Args: None
-|
-|      "ramp"
-|         The ramp job operates on a time-series of forecast and observed
-|         values and is analogous to the RIRW (Rapid Intensification and
-|         Weakening) job supported by the tc_stat tool. The amount of change
-|         from one time to the next is computed for forecast and observed
-|         values. Those changes are thresholded to define events which are
-|         used to populate a 2x2 contingency table.
-|
-|         Required Args:
-|            -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
-|               For DYDT, threshold for the amount of change required to
-|               define an event.
-|               For SWING, threshold the slope.
-|            -swing_width val
-|               Required for the swinging door algorithm width.
-|
-|         Optional Args:
-|            -ramp_type str
-|               Overrides the default ramp definition algorithm to be used.
-|               May be set to DYDT (default) or SWING for the swinging door
-|               algorithm.
-|            -line_type str
-|               Overrides the default input line type, MPR.
-|            -out_line_type str
-|               Overrides the default output line types of CTC and CTS.
-|               Set to CTC,CTS,MPR for all possible output types.
-|            -column fcst_column,obs_column
-|               Overrides the default forecast and observation columns
-|               to be used, FCST and OBS.
-|            -ramp_time HH[MMSS] (-ramp_time_fcst or -ramp_time_obs)
-|               Overrides the default ramp time interval, 1 hour.
-|            -ramp_exact true/false (-ramp_exact_fcst or -ramp_exact_obs)
-|               Defines ramps using an exact change (true, default) or maximum
-|               change in the time window (false).
-|            -ramp_window width in HH[MMSS] format
-|            -ramp_window beg end in HH[MMSS] format
-|               Defines a search time window when attempting to convert misses
-|               to hits and false alarms to correct negatives. Use 1 argument
-|               to define a symmetric time window or 2 for an asymmetric
-|               window. Default window is 0 0, requiring an exact match.
-|
-|   Job command FILTERING options to further refine the STAT data:
-|      Each optional argument may be used in the job specification multiple
-|      times unless otherwise indicated. When multiple optional arguments of
-|      the same type are indicated, the analysis will be performed over their
-|      union:
-|
-|      "-model            name"
-|      "-fcst_lead        HHMMSS"
-|      "-obs_lead         HHMMSS"
-|      "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
-|      "-fcst_init_hour   HH[MMSS]"
-|      "-obs_init_hour    HH[MMSS]"
-|      "-fcst_valid_hour" HH[MMSS]
-|      "-obs_valid_hour"  HH[MMSS]
-|      "-fcst_var         name"
-|      "-obs_var          name"
-|      "-fcst_lev         name"
-|      "-obs_lev          name"
-|      "-obtype           name"
-|      "-vx_mask          name"
-|      "-interp_mthd      name"
-|      "-interp_pnts      n"
-|      "-fcst_thresh      t"
-|      "-obs_thresh       t"
-|      "-cov_thresh       t"
-|      "-thresh_logic     UNION, or, ||
-|                         INTERSECTION, and, &&
-|                         SYMDIFF, symdiff, *
-|      "-alpha            a"
-|      "-line_type        type"
-|      "-column           name"
-|      "-weight           value"
-|
-|
+  Optional Args:
+
+  .. code-block:: none
+		  
+    -by column_name to specify case information
+    -out_alpha to override default alpha value of 0.05
+    -derive to derive statistics on the fly
+    -column_union to summarize multiple columns
+
+* "aggregate"
+  
+  To aggregate the STAT data for the STAT line type specified using
+  the "-line_type" argument. The output of the job will be in the
+  same format as the input line type specified. The following line
+  types may be aggregated:
+
+  .. code-block:: none
+		  
+    -line_type FHO, CTC, MCTC,
+               SL1L2, SAL1L2, VL1L2, VAL1L2,
+               PCT, NBRCNT, NBRCTC, GRAD,
+               ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
+	       
+  Required Args: -line_type
+
+* "aggregate_stat"
+  
+  To aggregate the STAT data for the STAT line type specified using
+  the "-line_type" argument. The output of the job will be the line
+  type specified using the "-out_line_type" argument. The valid
+  combinations of "-line_type" and "-out_line_type" are listed below.
+
+  .. code-block:: none
+		  
+    -line_type FHO, CTC,      -out_line_type CTS, ECLV
+    -line_type MCTC           -out_line_type MCTS
+    -line_type SL1L2, SAL1L2, -out_line_type CNT
+    -line_type VL1L2          -out_line_type VCNT
+    -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
+    -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
+    -line_type NBRCTC,        -out_line_type NBRCTS
+    -line_type ORANK,         -out_line_type ECNT, RPS, RHIST, PHIST,
+                                             RELP, SSVAR
+    -line_type MPR,           -out_line_type FHO, CTC, CTS,
+                                             MCTC, MCTS, CNT,
+                                             SL1L2, SAL1L2,
+                                             VL1L2, VCNT,
+                                             PCT, PSTD, PJC, PRC, ECLV,
+                                             WDIR (wind direction)
+  Required Args: -line_type, -out_line_type
+
+  Additional Required Args for -line_type MPR:
+
+  .. code-block:: None
+		  
+    -out_thresh or -out_fcst_thresh and -out_obs_thresh
+     When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+                         PCT, PSTD, PJC, PRC
+
+  Additional Optional Args for -line_type MPR:
+
+  .. code-block:: none
+		  
+    -mask_grid, -mask_poly, -mask_sid
+    -out_thresh or -out_fcst_thresh and -out_obs_thresh
+    -out_cnt_logic
+    -out_wind_thresh or -out_fcst_wind_thresh and
+    -out_obs_wind_thresh
+    -out_wind_logic
+    When -out_line_type WDIR
+	    
+  Additional Optional Arg for:
+
+  .. code-block:: none
+		  
+    -line_type ORANK -out_line_type PHIST, SSVAR ...
+    -out_bin_size
+	    
+  Additional Optional Args for:
+
+  .. code-block:: none
+		  
+    -out_line_type ECLV ...
+    -out_eclv_points
+
+* "ss_index"
+  
+  The skill score index job can be configured to compute a weighted
+  average of skill scores derived from a configurable set of
+  variables, levels, lead times, and statistics. The skill score
+  index is computed using two models, a forecast model and a
+  reference model. For each statistic in the index, a skill score
+  is computed as:
+  
+  SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+
+  Where S is the statistic.
+
+  Next, a weighted average is computed over all the skill scores.
+
+  Lastly, an index value is computed as:
+
+  Index = sqrt(1/(1-SS[avg]))
+
+  Where SS[avg] is the weighted average of skill scores.
+
+  Required Args:
+
+  .. code-block:: none
+
+    Exactly 2 entries for -model, the forecast model and reference
+    For each term of the index:
+    -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
+    Where -line_type is CNT or CTS and -column is the statistic.
+    Optionally, specify other filters for each term, -fcst_thresh.
+
+* "go_index"
+  
+  The GO Index is a special case of the skill score index consisting
+  of a predefined set of variables, levels, lead times, statistics,
+  and weights.
+  
+  For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
+
+  .. code-block:: none
+		  
+    - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
+    - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
+    - Temperature at the surface(b), 400(a) mB
+    - Height at 400(a) mB
+    - Sea Level Pressure(b)
+    Where (a) means weights of 4, 3, 2, 1 for the lead times, and
+          (b) means weights of 8, 6, 4, 2 for the lead times.
+
+  Required Args: None
+
+* "ramp"
+  
+  The ramp job operates on a time-series of forecast and observed
+  values and is analogous to the RIRW (Rapid Intensification and
+  Weakening) job supported by the tc_stat tool. The amount of change
+  from one time to the next is computed for forecast and observed
+  values. Those changes are thresholded to define events which are
+  used to populate a 2x2 contingency table.
+
+  Required Args:
+
+  .. code-block:: none
+		  
+    -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
+       For DYDT, threshold for the amount of change required to
+       define an event.
+       For SWING, threshold the slope.
+    -swing_width val
+       Required for the swinging door algorithm width.
+
+  Optional Args:
+
+  .. code-block:: none
+		  
+    -ramp_type str
+       Overrides the default ramp definition algorithm to be used.
+       May be set to DYDT (default) or SWING for the swinging door
+       algorithm.
+    -line_type str
+       Overrides the default input line type, MPR.
+    -out_line_type str
+       Overrides the default output line types of CTC and CTS.
+       Set to CTC,CTS,MPR for all possible output types.
+    -column fcst_column,obs_column
+       Overrides the default forecast and observation columns
+       to be used, FCST and OBS.
+    -ramp_time HH[MMSS] (-ramp_time_fcst or -ramp_time_obs)
+       Overrides the default ramp time interval, 1 hour.
+    -ramp_exact true/false (-ramp_exact_fcst or -ramp_exact_obs)
+       Defines ramps using an exact change (true, default) or maximum
+       change in the time window (false).
+    -ramp_window width in HH[MMSS] format
+    -ramp_window beg end in HH[MMSS] format
+       Defines a search time window when attempting to convert misses
+       to hits and false alarms to correct negatives. Use 1 argument
+       to define a symmetric time window or 2 for an asymmetric
+       window. Default window is 0 0, requiring an exact match.
+
+  Job command FILTERING options to further refine the STAT data:
+
+  Each optional argument may be used in the job specification multiple
+  times unless otherwise indicated. When multiple optional arguments of
+  the same type are indicated, the analysis will be performed over their
+  union:
+
+  .. code-block:: none
+		  
+    "-model            name"
+    "-fcst_lead        HHMMSS"
+    "-obs_lead         HHMMSS"
+    "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
+    "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
+    "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+    "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
+    "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+    "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
+    "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
+    "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
+    "-fcst_init_hour   HH[MMSS]"
+    "-obs_init_hour    HH[MMSS]"
+    "-fcst_valid_hour" HH[MMSS]
+    "-obs_valid_hour"  HH[MMSS]
+    "-fcst_var         name"
+    "-obs_var          name"
+    "-fcst_lev         name"
+    "-obs_lev          name"
+    "-obtype           name"
+    "-vx_mask          name"
+    "-interp_mthd      name"
+    "-interp_pnts      n"
+    "-fcst_thresh      t"
+    "-obs_thresh       t"
+    "-cov_thresh       t"
+    "-thresh_logic     UNION, or, ||
+                       INTERSECTION, and, &&
+                       SYMDIFF, symdiff, *
+    "-alpha            a"
+    "-line_type        type"
+    "-column           name"
+    "-weight           value"
+
+
   Job command FILTERING options that may be used only when -line_type
   has been listed once. These options take two arguments: the name of the
   data column to be used and the min, max, or exact value for that column.
   If multiple column eq/min/max/str options are listed, the job will be
   performed on their intersection:
-|
-|      "-column_min    col_name value"     e.g. -column_min BASER 0.02
-|      "-column_max    col_name value"
-|      "-column_eq     col_name value"
-|      "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
-|      "-column_str    col_name string" separate multiple filtering strings
-                                      with commas
-|
-|
+
+  .. code-block:: none
+		  
+    "-column_min    col_name value"     e.g. -column_min BASER 0.02
+    "-column_max    col_name value"
+    "-column_eq     col_name value"
+    "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
+    "-column_str    col_name string" separate multiple filtering strings
+                                     with commas
+
+
   Job command options to DEFINE the analysis job. Unless otherwise noted,
   these options may only be used ONCE per analysis job:
-|
-|      "-dump_row        path"
-|
-|      "-mask_grid       name"
-|      "-mask_poly       file"
-|      "-mask_sid        file|list" see description of "sid" entry above
-|
-|      "-out_line_type   name"
-|      "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
-|      "-out_fcst_thresh value" multiple for multi-category contingency tables
-                               and probabilistic forecasts
-|      "-out_obs_thresh  value" multiple for multi-category contingency tables
-|      "-out_cnt_logic   value"
-|
-|      "-out_wind_thresh      value"
-|      "-out_fcst_wind_thresh value"
-|      "-out_obs_wind_thresh  value"
-|      "-out_wind_logic       value"
-|
-|      "-out_bin_size    value"
-|
-|      "-out_eclv_points value" see description of "eclv_points" config file
-                               entry
-|
-|      "-out_alpha       value"
-|
-|      "-boot_interval   value"
-|      "-boot_rep_prop   value"
-|      "-n_boot_rep      value"
-|      "-boot_rng        value"
-|      "-boot_seed       value"
-|
-|      "-rank_corr_flag  value"
-|      "-vif_flag        value"
-|
-|
+
+  .. code-block:: none
+
+    "-dump_row        path"
+
+  .. code-block:: none
+
+    "-mask_grid       name"
+    "-mask_poly       file"
+    "-mask_sid        file|list" see description of "sid" entry above
+
+  .. code-block:: none
+		  
+    "-out_line_type   name"
+    "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
+    "-out_fcst_thresh value" multiple for multi-category contingency tables
+                             and probabilistic forecasts
+    "-out_obs_thresh  value" multiple for multi-category contingency tables
+    "-out_cnt_logic   value"
+
+  .. code-block:: none
+
+    "-out_wind_thresh      value"
+    "-out_fcst_wind_thresh value"
+    "-out_obs_wind_thresh  value"
+    "-out_wind_logic       value"
+
+  .. code-block:: none
+
+    "-out_bin_size    value"
+
+  .. code-block:: none
+
+    "-out_eclv_points value" see description of "eclv_points" config file
+                             entry
+
+  .. code-block:: none
+		  
+    "-out_alpha       value"
+
+  .. code-block:: none
+
+    "-boot_interval   value"
+    "-boot_rep_prop   value"
+    "-n_boot_rep      value"
+    "-boot_rng        value"
+    "-boot_seed       value"
+
+  .. code-block:: none
+		  
+    "-rank_corr_flag  value"
+    "-vif_flag        value"
+
   For aggregate and aggregate_stat job types:
-|
-|
-|      "-out_stat        path"   to write a .stat output file for the job
-                                including the .stat header columns. Multiple
-                                values for each header column are written as
-                                a comma-separated list.
-|      "-set_hdr col_name value" may be used multiple times to explicity
-                                specify what should be written to the header
-                                columns of the output .stat file.
+
+  .. code-block:: none
+		    
+    "-out_stat        path"   to write a .stat output file for the job
+                              including the .stat header columns. Multiple
+                              values for each header column are written as
+                              a comma-separated list.
+    "-set_hdr col_name value" may be used multiple times to explicity
+                              specify what should be written to the header
+                              columns of the output .stat file.
 
   When using the "-by" job command option, you may reference those columns
   in the "-set_hdr" job command options. For example, when computing statistics
   separately for each station, write the station ID string to the VX_MASK column
   of the output .stat output file:
 
-|    -job aggregate_stat -line_type MPR -out_line_type CNT \
-|    -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
-|  When using mulitple "-by" options, use "CASE" to reference the full string:
-|    -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
-|
+  .. code-block:: none
+		  
+    -job aggregate_stat -line_type MPR -out_line_type CNT \
+    -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
+    When using mulitple "-by" options, use "CASE" to reference the full string:
+    -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
+
 
 .. code-block:: none
 		
@@ -3675,6 +3894,8 @@ confidence intervals computed for the aggregated statistics.
 WaveletStatConfig_default
 -------------------------
 
+**grid_decomp_flag**
+
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 
@@ -3688,6 +3909,8 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 		
   grid_decomp_flag = AUTO;
 
+**tile**
+		
 The "tile" entry is a dictionary that specifies how tiles should be defined
 in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
 
@@ -3710,6 +3933,8 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
      ];
   }
 
+**wavelet** 
+  
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
 
@@ -3743,12 +3968,16 @@ wavelet decomposition should be performed:
      member = 2;
   }
 
+**obs_raw_plot, wvlt_plot, object_plot**  
+  
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
 
 WWMCARegridConfig_default
 -------------------------
+
+**to_grid**
 
 Specify the grid to which the data should be interpolated in one of the
 following ways:
@@ -3770,6 +3999,8 @@ following ways:
 		
   to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
 
+**NetCDF output information**  
+  
 Supply the NetCDF output information.  For example:
 
 .. code-block:: none
@@ -3786,12 +4017,15 @@ Supply the NetCDF output information.  For example:
   long_name     = "";
   level         = "";
 
+**max_minutes (pixel age)**  
+  
 Maximum pixel age in minutes
 
 .. code-block:: none
 
   max_minutes = 120;
 
+**swap_endian**
 
 The WWMCA pixel age data is stored in binary data files in 4-byte blocks.
 The swap_endian option indicates whether the endian-ness of the data should
@@ -3801,6 +4035,8 @@ be swapped after reading.
 		
   swap_endian = TRUE;
 
+**write_pixel_age**  
+  
 By default, wwmca_regrid writes the cloud percent data specified on the
 command line to the output file. This option writes the pixel age data,
 in minutes, to the output file instead.
