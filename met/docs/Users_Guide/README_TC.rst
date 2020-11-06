@@ -12,11 +12,18 @@ Configuration settings common to multiple tools
 //    2-letter basin, 2-digit cyclone number, 4-digit year
 // An empty list indicates that all should be used.
 //
-// e.g. storm_id = [ "AL092011" ];
-//
+
+For example:
+
+.. code-block:: none
+
+  storm_id = [ "AL092011" ];
+
 // This may also be set using basin, cyclone, and timing information below.
-//
-storm_id = [];
+
+.. code-block:: none
+
+   storm_id = [];
 
 //
 // Specify a comma-separated list of basins to be used.
@@ -24,9 +31,15 @@ storm_id = [];
 // An empty list indicates that all should be used.
 //   Valid basins: WP, IO, SH, CP, EP, AL, SL
 //
-// e.g. basin = [ "AL", "EP" ];
-//
-basin = [];
+For example:
+
+.. code-block:: none
+
+   basin = [ "AL", "EP" ];
+
+.. code-block:: none
+		
+   basin = [];
 
 //
 // Specify a comma-separated list of cyclone numbers (01-99) to be used.
