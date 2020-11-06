@@ -3288,19 +3288,29 @@ entries specifying the range of vertical levels (1 to 255) to be retained.
 The "level_category" entry is an array of integers specifying which level
 categories should be retained:
 
-| 0 = Surface level (mass reports only) 
+| 0 = Surface level (mass reports only)
+
 | 1 = Mandatory level (upper-air profile reports)
+
 | 2 = Significant temperature level (upper-air profile reports) 
+
 | 2 = Significant temperature and winds-by-pressure level (future combined mass
 |     and wind upper-air reports) 
+
 | 3 = Winds-by-pressure level (upper-air profile reports) 
+
 | 4 = Winds-by-height level (upper-air profile reports)
+
 | 5 = Tropopause level (upper-air profile reports)
+
 | 6 = Reports on a single level  (For example: aircraft, satellite-wind,
-|      surface wind, precipitable water retrievals, etc.)
+|     surface wind, precipitable water retrievals, etc.)
+
 | 7 = Auxiliary levels generated via interpolation from spanning levels
 |     (upper-air profile reports)
+
 |    
+
 An empty list indicates that all should be retained.
 
 See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
@@ -3557,11 +3567,12 @@ Where "job_name" is set to one of the following:
                                              VL1L2, VCNT,
                                              PCT, PSTD, PJC, PRC, ECLV,
                                              WDIR (wind direction)
+
   Required Args: -line_type, -out_line_type
 
   Additional Required Args for -line_type MPR:
 
-  .. code-block:: None
+  .. code-block:: none
 		  
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
      When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
