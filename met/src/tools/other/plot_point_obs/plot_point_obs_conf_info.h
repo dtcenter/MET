@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <set>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -23,6 +24,8 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 
+#include "observation.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 // Default configuration file name
@@ -31,11 +34,13 @@ static const char * default_config_filename =
 
 ////////////////////////////////////////////////////////////////////////
 
-struct ObsInfo {
+struct LocationInfo {
   double lat;
   double lon;
   double val;
 };
+
+extern bool operator<(const LocationInfo&, const LocationInfo&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +97,9 @@ class PlotPointObsOpt {
 
       //////////////////////////////////////////////////////////////////
 
-      vector<ObsInfo> point_locations;
+      // Unique collection of locations
+      int n_obs;
+      set<LocationInfo> locations;
 
       //////////////////////////////////////////////////////////////////
 
@@ -100,8 +107,7 @@ class PlotPointObsOpt {
 
       void process_config(Dictionary &);
 
-      // JHG add obs record here
-      bool add();
+      bool add(const Observation &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,11 +144,11 @@ class PlotPointObsConfInfo {
 
       void clear();
 
-      void read_config   (const char *);
+      void read_config(const char *);
+
       void process_config();
 
-      // JHG add obs record here
-      bool add();
+      bool add(const Observation &);
 };
 
 ////////////////////////////////////////////////////////////////////////
