@@ -57,7 +57,7 @@ The MODE (Method for Object-based Diagnostic Evaluation) tool also uses gridded 
 
 The MODE-TD tool extends object-based analysis from two-dimensional forecasts and observations to include the time dimension. In addition to the two dimensional information provided by MODE, MODE-TD can be used to examine even more features including displacement in time, and duration and speed of moving areas of interest.
 
-The Grid-Diag tools produce multivariate probability density functions (PDFs) that may be use either for exploring the relationship between two fields, or for the computation of percentiles generated from the sample for use with percentile thresholding. The output from this tool requires post-processing by METplus or user-provided utilities.
+The Grid-Diag tools produce multivariate probability density functions (PDFs) that may be used either for exploring the relationship between two fields, or for the computation of percentiles generated from the sample for use with percentile thresholding. The output from this tool requires post-processing by METplus or user-provided utilities.
 
 The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to the Intensity-Scale verification technique described by :ref:`Casati et al. (2004) <Casati-2004>`. There are many types of spatial verification approaches and the Intensity-Scale technique belongs to the scale-decomposition (or scale-separation) verification approaches. The spatial scale components are obtained by applying a wavelet transformation to the forecast and observation fields. The resulting scale-decomposition measures error, bias and skill of the forecast on each spatial scale. Information is provided on the scale dependency of the error and skill, on the no-skill to skill transition scale, and on the ability of the forecast to reproduce the observed scale structure. The Wavelet-Stat tool is primarily used for precipitation fields. However, the tool can be applied to other variables, such as cloud fraction.
 
@@ -67,7 +67,7 @@ The Stat-Analysis and MODE-Analysis tools aggregate the output statistics from t
 
 Tropical cyclone forecasts and observations are quite different than numerical model forecasts, and thus they have their own set of tools. The MET-TC package includes several modules: TC-Dland, TC-Pairs, TC-Stat, TC-Gen, TC-RMW, and RMW-Analysis. The TC-Dland module calculates the distance to land from all locations on a specified grid. This information can be used in later modules to eliminate tropical cyclones that are over land from being included in the statistics. TC-Pairs matches up tropical cyclone forecasts and observations and writes all output to a file. In TC-Stat, these forecast / observation pairs are analyzed according to user preference to produce statistics. TC-Gen evaluates the performance of Tropical Cyclone genesis forecast using contingency table counts and statistics. TC-RMW performs a coordinate transformation for gridded model or analysis fields centered on the current storm location. RMW-Analysis filters and aggregates the output of TC-RMW across multiple cases.
 
-The following sections of this MET User's Guide contain usage statements for each tool, which may be viewed if you type the name of the tool. Alternatively, the user can also type the name of the tool followed by -help to obtain the usage statement. Each tool also has a -version command line option associated with it so that the user can determine what version of the tool they are using.
+The following sections of this MET User's Guide contain usage statements for each tool, which may be viewed if you type the name of the tool. Alternatively, the user can also type the name of the tool followed by **-help** to obtain the usage statement. Each tool also has a **-version** command line option associated with it so that the user can determine what version of the tool they are using.
 
 .. _release-notes:
 
@@ -85,7 +85,7 @@ MET support is provided through a MET-help email address: met_help@ucar.edu. We 
 
 We welcome comments and suggestions for improvements to MET, especially information regarding errors. Comments may be submitted using the MET Feedback form available on the MET website. In addition, comments on this document would be greatly appreciated. While we cannot promise to incorporate all suggested changes, we will certainly take all suggestions into consideration.
 
--help and -version command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
+**-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
 
 The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please contact met_help@ucar.edu.
 
