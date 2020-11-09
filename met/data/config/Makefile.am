@@ -44,7 +44,6 @@ config_DATA = \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
 	PlotPointObsConfig_default \
-	README \
 	README_TC
 
 EXTRA_DIST = ${config_DATA}
