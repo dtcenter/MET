@@ -5,14 +5,17 @@ README_TC Configuration file overview
 
 **storm_id**
 
-| Specify a comma-separated list of storm id's to be used:
+Specify a comma-separated list of storm id's to be used:
+
 | 2-letter basin, 2-digit cyclone number, 4-digit year
-| An empty list indicates that all should be used.
-| For example:
+|
 
-.. code-block:: none
+An empty list indicates that all should be used.
 
-  storm_id = [ "AL092011" ];
+For example:
+
+| storm_id = [ "AL092011" ];
+| 
 
 This may also be set using basin, cyclone, and timing information below.
 
@@ -22,15 +25,15 @@ This may also be set using basin, cyclone, and timing information below.
 
 **basin**
 
-| Specify a comma-separated list of basins to be used.
-| Expected format is 2-letter basin identifier.
-| An empty list indicates that all should be used.
-| Valid basins: WP, IO, SH, CP, EP, AL, SL
-| For example:
+Specify a comma-separated list of basins to be used. Expected format is
+a 2-letter basin identifier. An empty list indicates that all should be used.
 
-.. code-block:: none
+Valid basins: WP, IO, SH, CP, EP, AL, SL
 
-   basin = [ "AL", "EP" ];
+For example:
+
+| basin = [ "AL", "EP" ];
+|
 
 .. code-block:: none
 		
@@ -39,13 +42,13 @@ This may also be set using basin, cyclone, and timing information below.
 
 **cyclone**
    
-| Specify a comma-separated list of cyclone numbers (01-99) to be used.
-| An empty list indicates that all should be used.
-| For example:
+Specify a comma-separated list of cyclone numbers (01-99) to be used.
+An empty list indicates that all should be used.
 
-.. code-block:: none
-		
-  cyclone = [ "01", "02", "03" ];
+For example:
+
+| cyclone = [ "01", "02", "03" ];
+| 
 
 .. code-block:: none
 		
