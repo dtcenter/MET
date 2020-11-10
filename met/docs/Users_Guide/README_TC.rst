@@ -60,10 +60,9 @@ For example:
 | An empty list indicates that all should be used.
 | For example:
 
-.. code-block:: none
 
-  storm_name = [ "KATRINA" ];
-
+|  storm_name = [ "KATRINA" ];
+|
 .. code-block:: none
 		
   storm_name = [];
@@ -78,12 +77,11 @@ should be used.
 
 For example:
 
-.. code-block:: none
-
-   init_beg = "20100101";
-   init_end = "20101231";
-   init_inc = [ "20101231_06" ];
-   init_exc = [ "20101231_00" ];
+|   init_beg = "20100101";
+|   init_end = "20101231";
+|   init_inc = [ "20101231_06" ];
+|   init_exc = [ "20101231_00" ];
+|
 
 .. code-block:: none
 
@@ -101,11 +99,10 @@ An empty string indicates that all times should be used.
 
 
 For example:
-
-.. code-block:: none
 		
-   valid_beg = "20100101";
-   valid_end = "20101231";
+|   valid_beg = "20100101";
+|   valid_end = "20101231";
+|
 
 .. code-block:: none
 		
@@ -119,9 +116,8 @@ in HH[MMSS] format. An empty list indicates that all hours should be used.
 
 For example:
 
-.. code-block:: none
-
-  init_hour = [ "00", "06", "12", "18" ];
+|  init_hour = [ "00", "06", "12", "18" ];
+|
 
 .. code-block:: none
 		
@@ -148,9 +144,8 @@ Tracks for which all locations fall within valid_mask will be used.
 
 For example:
 
-.. code-block:: none
-
-  init_mask  = "MET_BASE/poly/EAST.poly";
+|  init_mask  = "MET_BASE/poly/EAST.poly";
+|
 
 .. code-block:: none
 		
@@ -182,10 +177,9 @@ verifying multiple models, choose descriptive model names (no whitespace)
 to distinguish between their output.
 
 For example:
-
-.. code-block:: none
 		
-  model = [ "AHW4", "AHWI" ];
+|  model = [ "AHW4", "AHWI" ];
+|
 
 .. code-block:: none
 		  
@@ -199,9 +193,8 @@ building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 
 For example:
 
-.. code-block:: none
-
-  check_dup = FALSE;
+|  check_dup = FALSE;
+|
 
 .. code-block:: none
 		
@@ -231,17 +224,15 @@ Specify how consensus forecasts should be defined:
 
 For example:
 
-.. code-block:: none
-
-   consensus = [
-      {
-         name     = "CON1";
-         members  = [ "MOD1", "MOD2", "MOD3" ];
-         required = [ TRUE, FALSE, FALSE ];
-         min_req  = 2;
-      }
-   ];
-
+|   consensus = [
+|      {
+|         name     = "CON1";
+|         members  = [ "MOD1", "MOD2", "MOD3" ];
+|         required = [ TRUE, FALSE, FALSE ];
+|         min_req  = 2;
+|      }
+|   ];
+|
 
 .. code-block:: none
 
@@ -256,9 +247,8 @@ for each entry listed.
 
 For example:
 
-.. code-block:: none
-
-  lag_time = [ "06", "12" ];
+|  lag_time = [ "06", "12" ];
+|
 
 .. code-block:: none
 		
@@ -275,10 +265,9 @@ Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
 Derived from OPER tracks: OCLP, OCS5, OCD5, OCDT
 
 For example:
-
-.. code-block:: none
 		
-     best_technique = [ "BEST" ];
+|     best_technique = [ "BEST" ];
+|
 
 .. code-block:: none
 		
@@ -296,10 +285,10 @@ analysis fields through a tracking algorithm. Specify which datasets should
 be searched for analysis track data by setting this to NONE, ADECK, BDECK,
 or BOTH. Use BOTH to create pairs using two different analysis tracks.
 
+For example:
 
-.. code-block:: none
-
-  anly_track = BDECK;
+|  anly_track = BDECK;
+|
 
 .. code-block:: none
 		
@@ -314,9 +303,8 @@ tracks should be written out.
 
 For example:
 
-.. code-block:: none
-
-  match_points = FALSE;
+|  match_points = FALSE;
+|
 
 .. code-block:: none
 		
@@ -399,12 +387,12 @@ Stratify by the AMODEL or BMODEL columns.
 Specify comma-separated lists of model names to be used for all analyses
 performed.  May add to this list using the "-amodel" and "-bmodel"
 job command options.
+
 For example:
 
-.. code-block:: none
-
-	amodel = [ "AHW4" ];
-        bmodel = [ "BEST" ];
+|        amodel = [ "AHW4" ];
+|        bmodel = [ "BEST" ];
+|
 
 .. code-block:: none
 		
