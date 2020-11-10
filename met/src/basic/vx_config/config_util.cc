@@ -2001,9 +2001,11 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void PlotInfo::clear() {
+   flag = true; // enabled by default
    color_table.clear();
    plot_min = bad_data_double;
    plot_max = bad_data_double;
+   colorbar_flag = true; // plot colorbar by default
    colorbar_spacing = bad_data_int;
 }
 
@@ -2018,6 +2020,10 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
       exit(1);
    }
 
+   // Get the flag, true if not present
+   info.flag = dict->lookup_bool(conf_key_flag, false);
+   if(!dict->last_lookup_status()) info.flag = true;
+
    // Get the color table
    info.color_table = dict->lookup_string(conf_key_color_table);
 
@@ -2028,6 +2034,10 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
    // Get the maximum plot value, 0 if not present
    info.plot_max = dict->lookup_double(conf_key_plot_max, false);
    if(is_bad_data(info.plot_max)) info.plot_max = 0.0;
+
+   // Get the colorbar flag, true if not present
+   info.colorbar_flag = dict->lookup_bool(conf_key_colorbar_flag, false);
+   if(!dict->last_lookup_status()) info.colorbar_flag = true;
 
    // Get the colorbar spacing, 1 if not present
    info.colorbar_spacing = dict->lookup_int(conf_key_colorbar_spacing, false);
