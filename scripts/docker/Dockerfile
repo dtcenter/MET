@@ -131,7 +131,7 @@ RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
  && cd /met/external_libs/HDF4.2r3 \
  && LOG_FILE=/met/logs/HDF4.2r3_configure.log \
  && echo "Configuring HDF4.2r3 and writing log file ${LOG_FILE}" \
- && ./configure --prefix=/usr/local --disable-netcdf > ${LOG_FILE} \
+ && ./configure --prefix=/usr/local/hdf --disable-netcdf > ${LOG_FILE} \
  && cat mfhdf/hdiff/Makefile | sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' > Makefile_NEW \
  && mv -f Makefile_NEW mfhdf/hdiff/Makefile \
  && LOG_FILE=/met/logs/HDF4.2r3_make_install.log \
@@ -142,11 +142,12 @@ RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
  && cd /met/external_libs/hdfeos \
  && LOG_FILE=/met/logs/hdfeos_configure.log \
  && echo "Configuring hdfeos and writing log file ${LOG_FILE}" \
- && ./configure --prefix=/usr/local --with-hdf4=/usr/local CC=/usr/local/bin/h4cc > ${LOG_FILE} \
+ && ./configure --prefix=/usr/local/hdfeos --with-hdf4=/usr/local/hdf CC=/usr/local/hdf/bin/h4cc > ${LOG_FILE} \
  && LOG_FILE=/met/logs/hdfeos_make_install.log \
  && echo "Compiling hdfeos and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
- && cp include/*.h /usr/local/include/. \
+ && mkdir /usr/local/hdfeos/include \
+ && cp include/*.h /usr/local/hdfeos/include/. \
  && cd /met/external_libs \
  && rm -rf HDF4.2r3 hdfeos
 
@@ -163,6 +164,7 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && ./bootstrap \
  && echo "Configuring MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && ./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python \
+    MET_HDF=/usr/local/hdf MET_HDFEOS=/usr/local/hdfeos \
     MET_FREETYPEINC=/usr/include/freetype2 MET_FREETYPELIB=/usr/lib \
     MET_CAIROINC=/usr/include/cairo MET_CAIROLIB=/usr/lib \
     MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE} \
