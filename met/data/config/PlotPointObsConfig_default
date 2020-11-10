@@ -6,12 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-plot_data_plane = {
-   flag             = FALSE;
-   field            = { name = ""; level = ""; };
-   data_color_table = :q
-{
-      flag             = TRUE; 
+// Gridded data plotting options
+
+grid_data = {
+
+   field = [];
+
+   grid_plot_info = {
       color_table      = "MET_BASE/colortables/met_default.ctable";
       plot_min         = 0.0;
       plot_max         = 0.0;
@@ -22,35 +23,38 @@ plot_data_plane = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Define named colors in RGB format
-black = {   0, 0, 0 }
-red   = { 255, 0, 0 }
+// Point data filtering options
+// May be set separately in each "point_data" entry
 
-// Filtering options
-// May be set separately in each "plot_point_obs" entry
+message_type = [];
+sid_inc      = [];
+sid_exc      = [];
+obs_var      = [];
+obs_quality  = [];
+valid_beg    = "";
+valid_end    = "";
+lat_thresh   = NA;
+lon_thresh   = NA;
+elv_thresh   = NA;
+hgt_thresh   = NA;
+prs_thresh   = NA;
+obs_thresh   = NA;
 
-message_type    = [];
-sid_inc         = [];
-sid_exc         = [];
-obs_var         = [];
-obs_quality     = [];
-valid_beg       = "";
-valid_end       = "";
-lat_thresh      = NA;
-lon_thresh      = NA;
-elv_thresh      = NA;
-height_thresh   = NA;
-pressure_thresh = NA;
-obs_thresh      = NA;
+// Point data pre-processing options
+// May be set separately in each "point_data" entry
 
-// Plotting options
-// May be set separately in each "plot_point_obs" entry
+convert(x)    = x;
+censor_thresh = [];
+censor_val    = [];
 
-dotsize(x)       = 10; // Function of the obs value
-line_color       = red;
-line_width       = 1;
-fill_color       = red;
-fill_color_table = {   // Takes precedence over fill_color
+// Point data plotting options
+// May be set separately in each "point_data" entry
+
+dotsize(x)     = 10; // Function of the obs value
+line_color     = [ 255, 0, 0 ];
+line_width     = 1;
+fill_color     = [ 255, 0, 0 ];
+fill_plot_info = { // Overrides fill_color
    flag             = FALSE;
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
@@ -59,14 +63,9 @@ fill_color_table = {   // Takes precedence over fill_color
    colorbar_spacing = 1;
 }
 
-// Array of dictionaries to define plotting options 
-plot_point_obs = [
-   {
-      fill_color    = red;
-      convert(x)    = x;
-      censor_thresh = [];
-      censor_val    = [];
-   }
+// Array of point data filtering, pre-processing, and plotting options
+point_data = [
+   { fill_color = [ 255, 0, 0 ]; }
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

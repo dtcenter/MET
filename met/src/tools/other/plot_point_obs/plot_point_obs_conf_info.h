@@ -91,14 +91,13 @@ class PlotPointObsOpt {
       NumArray      line_color;
       double        line_width;
       NumArray      fill_color;
-      PlotInfo      fill_ctable;
-      bool          fill_ctable_flag;
-      bool          fill_colorbar_flag;
+      PlotInfo      fill_plot_info;
 
       //////////////////////////////////////////////////////////////////
 
       // Unique collection of locations
       int n_obs;
+      bool obs_value_flag;
       set<LocationInfo> locations;
 
       //////////////////////////////////////////////////////////////////
@@ -122,23 +121,21 @@ class PlotPointObsConfInfo {
 
       PlotPointObsConfInfo();
      ~PlotPointObsConfInfo();
-
-      //////////////////////////////////////////////////////////////////
-
-      // Options to plot a field of gridded data
-      bool     data_plane_flag;
-      VarInfo *data_plane_info;
-      PlotInfo data_ctable;
-      bool     data_ctable_flag;
-      bool     data_colorbar_flag;
-
+    
       //////////////////////////////////////////////////////////////////
 
       // PlotPointObs configuration object
       MetConfig conf;
+    
+      //////////////////////////////////////////////////////////////////
 
-      // Array of plotting options
-      vector<PlotPointObsOpt> plot_opts;
+      // Options to plot a field of gridded data
+      bool     grid_data_flag;
+      VarInfo *grid_data_info;
+      PlotInfo grid_plot_info;
+
+      // Options for plotting point data
+      vector<PlotPointObsOpt> point_opts;
 
       //////////////////////////////////////////////////////////////////
 
@@ -146,7 +143,7 @@ class PlotPointObsConfInfo {
 
       void read_config(const char *);
 
-      void process_config();
+      void process_config(GrdFileType);
 
       bool add(const Observation &);
 };
