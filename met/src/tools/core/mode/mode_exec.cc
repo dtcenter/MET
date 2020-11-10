@@ -549,6 +549,7 @@ void ModeExecutive::compute_ct_stats()
 
    for(i=0; i<n_cts; i++) {
 
+      cts[i].zero_out();
       cts[i].set_name(cts_str[i]);
 
       // Raw fields

@@ -320,7 +320,7 @@ bool NcCfFile::open(const char * filepath)
     bool no_leap_year = get_att_no_leap_year(valid_time_var);
     for(int i=0; i<n_times; i++)
     {
-      double time_value = get_double_var(valid_time_var, i);
+      double time_value = get_nc_time(valid_time_var, i);
       ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_value, no_leap_year));
     }
   }
@@ -369,7 +369,7 @@ bool NcCfFile::open(const char * filepath)
 
     if (units_att) delete units_att;
 
-    double time_value = get_double_var(&init_time_var,(int)0);
+    double time_value = get_nc_time(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
 
     //bool no_leap_year = get_att_no_leap_year(&init_time_var);
@@ -783,14 +783,11 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   for (int k=0; k<dim_count; k++) {
     int dim_size = var->getDim(k).getSize();
     if (dim_size < a[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < a[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << a[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(var) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << a[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(var) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
@@ -851,7 +848,6 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
            << "bad type [" << GET_NC_TYPE_NAME_P(var)
            << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit(1);
-      break;
     }
   }   //  switch
   if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
@@ -1004,14 +1000,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     lengths[k] = 1;
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < offsets[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << offsets[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(v) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << offsets[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(v) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
@@ -2830,7 +2823,6 @@ bool NcCfFile::get_grid_from_dimensions()
   NcVar coord_var;
   const NcVarAtt units_att;
   ConcatString dim_units;
-  string dim_units_str;
   ConcatString dim_name;
   for (int dim_num = 0; dim_num < _numDims; ++dim_num)
   {

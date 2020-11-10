@@ -24,6 +24,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char verbosity_option [] = "-v";
+
+static const char log_option       [] = "-log";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 typedef void (*CLSetFunction)(const StringArray &);   //  command-line set function
 
 typedef void (*UsageFunction)();   //  usage function
@@ -126,10 +134,13 @@ class CommandLine {
 
       void assign(const CommandLine &);
 
-
       void do_help() const;
 
       void show_version() const;
+
+      void do_verbosity();
+
+      void do_log();
 
       void get_n_args(StringArray &, const int Nargs,
                       const string & switch_name, const int pos);

@@ -18,12 +18,13 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'MET'
-author = 'UCAR/NCAR, NOAA, and CSU/CIRA'
+author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T.'
-version = '9.1'
+version = 'develop'
+verinfo = version
 release = f'{version}'
 release_year = '2020'
-release_date = f'{release_year}0810'
+release_date = f'{release_year}1022'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -50,8 +51,11 @@ suppress_warnings = ['ref.citation']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+html_theme_path = ["_themes", ]
+html_js_files = ['pop_ver.js']
+html_theme_options = {'canonical_url': 'https://dtcenter.github.io/MET/latest/'}
+html_theme_options['versions'] = {'latest': '../latest', 'develop': '../develop'}
 html_css_files = ['theme_override.css']
-
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

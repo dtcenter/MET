@@ -86,9 +86,6 @@ static void set_fcst      (const StringArray &);
 static void set_obs       (const StringArray &);
 static void set_single    (const StringArray &);
 static void set_config    (const StringArray &);
-
-static void set_verbosity (const StringArray &);
-static void set_logfile   (const StringArray &);
 static void set_outdir    (const StringArray &);
 
 static ConcatString make_output_prefix(const MtdConfigInfo &, unixtime start_time);
@@ -109,13 +106,11 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_fcst,      "-fcst",   -1);
-cline.add(set_obs,       "-obs",    -1);
-cline.add(set_single,    "-single", -1);
-cline.add(set_config,    "-config",  1);
-cline.add(set_verbosity, "-v",       1);
-cline.add(set_logfile,   "-log",     1);
-cline.add(set_outdir,    "-outdir",  1);
+cline.add(set_fcst,   "-fcst",   -1);
+cline.add(set_obs,    "-obs",    -1);
+cline.add(set_single, "-single", -1);
+cline.add(set_config, "-config",  1);
+cline.add(set_outdir, "-outdir",  1);
 
 cline.parse();
 
@@ -994,40 +989,6 @@ void set_config  (const StringArray & a)
 {
 
 local_config_filename = a[0];
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_verbosity  (const StringArray & a)
-
-{
-
-int k = atoi(a[0].c_str());
-
-mlog.set_verbosity_level(k);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_logfile  (const StringArray & a)
-
-{
-
-ConcatString filename;
-
-filename = a[0];
-
-mlog.open_log_file(filename);
 
 return;
 

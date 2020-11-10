@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,9 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -147,7 +142,7 @@ data.name = ps_default_gridname;
    //  scale latitude
    //
 
-get_global_att_double(&nc, (string)"TRUELAT1", data.scale_lat, true);
+get_global_att(&nc, (string)"TRUELAT1", data.scale_lat, true);
 
    //
    //  hemisphere ... assume north?
@@ -167,8 +162,8 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  pin point
    //
 
-get_global_att_double(&nc, (string)"CEN_LAT", data.lat_pin, true);
-get_global_att_double(&nc, (string)"CEN_LON", data.lon_pin, true);
+get_global_att(&nc, (string)"CEN_LAT", data.lat_pin, true);
+get_global_att(&nc, (string)"CEN_LON", data.lon_pin, true);
 data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
@@ -178,14 +173,14 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-get_global_att_double(&nc, (string)"STAND_LON", data.lon_orient, true);
+get_global_att(&nc, (string)"STAND_LON", data.lon_orient, true);
 data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-get_global_att_double(&nc, (string)"DX", data.d_km, true);
+get_global_att(&nc, (string)"DX", data.d_km, true);
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
@@ -223,8 +218,8 @@ data.name = lambert_default_gridname;
    //  scale latitude(s)
    //
 
-get_global_att_double(&nc, (string)"TRUELAT1", data.scale_lat_1, true);
-get_global_att_double(&nc, (string)"TRUELAT2", data.scale_lat_2, true);
+get_global_att(&nc, (string)"TRUELAT1", data.scale_lat_1, true);
+get_global_att(&nc, (string)"TRUELAT2", data.scale_lat_2, true);
 
    //
    //  hemisphere ... assume north?
@@ -244,8 +239,8 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  pin point
    //
 
-get_global_att_double(&nc, (string)"CEN_LAT", data.lat_pin, true);
-get_global_att_double(&nc, (string)"CEN_LON", data.lon_pin, true);
+get_global_att(&nc, (string)"CEN_LAT", data.lat_pin, true);
+get_global_att(&nc, (string)"CEN_LON", data.lon_pin, true);
 data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
@@ -255,14 +250,14 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-get_global_att_double(&nc, (string)"STAND_LON", data.lon_orient, true);
+get_global_att(&nc, (string)"STAND_LON", data.lon_orient, true);
 data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-get_global_att_double(&nc, (string)"DX", data.d_km, true);
+get_global_att(&nc, (string)"DX", data.d_km, true);
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
@@ -317,22 +312,22 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  center lat, lon
    //
 
-get_global_att_double(&nc, (string)"CEN_LAT", lat_center, true);
-get_global_att_double(&nc, (string)"CEN_LON", lon_center, true);
+get_global_att(&nc, (string)"CEN_LAT", lat_center, true);
+get_global_att(&nc, (string)"CEN_LON", lon_center, true);
 lon_center *= -1.0;
 
    //
    //  D_km
    //
 
-get_global_att_double(&nc, (string)"DX", D_km, true);
+get_global_att(&nc, (string)"DX", D_km, true);
 D_km *= 0.001;
 
    //
    //  scale latitude
    //
 
-get_global_att_double(&nc, (string)"TRUELAT1", scale_lat, true);
+get_global_att(&nc, (string)"TRUELAT1", scale_lat, true);
 
    //
    //  do some calculations

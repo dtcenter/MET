@@ -346,7 +346,7 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
    return ( false );
@@ -392,7 +392,7 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
 
@@ -402,7 +402,7 @@ if ( PyErr_Occurred() )  {
 
 if ( ! module_obj )  {
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "error running python script\n\n";
 
    return ( false );
@@ -433,6 +433,9 @@ if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 }
 
 if ( use_xarray )  {
+
+   mlog << Error << "\npickle_dataplane() -> "
+        << "pickling logic is not yet supported for Xarray\n\n";
 
    exit ( 1 );
 

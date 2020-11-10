@@ -96,8 +96,6 @@ static void set_vld_thresh(const StringArray &);
 static void set_convert(const StringArray &);
 static void set_censor(const StringArray &);
 static void set_name(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -145,19 +143,17 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_field,      "-field",      1);
-   cline.add(set_method,     "-method",     1);
-   cline.add(set_shape,      "-shape",      1);
-   cline.add(set_width,      "-width",      1);
+   cline.add(set_field,           "-field",           1);
+   cline.add(set_method,          "-method",          1);
+   cline.add(set_shape,           "-shape",           1);
+   cline.add(set_width,           "-width",           1);
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
-   cline.add(set_gaussian_dx,     "-gaussian_dx",      1);
-   cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_convert,    "-convert",    1);
-   cline.add(set_censor,     "-censor",     2);
-   cline.add(set_name,       "-name",       1);
-   cline.add(set_logfile,    "-log",        1);
-   cline.add(set_verbosity,  "-v",          1);
-   cline.add(set_compress,   "-compress",   1);
+   cline.add(set_gaussian_dx,     "-gaussian_dx",     1);
+   cline.add(set_vld_thresh,      "-vld_thresh",      1);
+   cline.add(set_convert,         "-convert",         1);
+   cline.add(set_censor,          "-censor",          2);
+   cline.add(set_name,            "-name",            1);
+   cline.add(set_compress,        "-compress",        1);
 
    cline.allow_numbers();
 
@@ -615,22 +611,6 @@ void set_censor(const StringArray &a) {
 
 void set_name(const StringArray & a) {
    VarNameSA.add_css(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray &a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray &a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

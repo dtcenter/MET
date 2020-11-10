@@ -44,7 +44,6 @@ config_DATA = \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
-	README \
 	README_TC
 
 EXTRA_DIST = ${config_DATA}

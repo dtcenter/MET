@@ -131,10 +131,7 @@ string s;
 bool has_field_index = false;
 const char * const user_config_filename = argv[3];
 
-
-
 file_id = 0;   //  I hate having to do this
-
 
 for (j=0; j<argc; ++j)  {
 
@@ -146,15 +143,7 @@ for (j=0; j<argc; ++j)  {
 
 }
 
-
-
 config.read_config  (default_config_filename, user_config_filename);
-
-
-// cout << "\n\n   mode: is_multivar = " << config.is_multivar() << "\n\n" << flush;
-// 
-// config.conf.dump(cout);
-
 
 if ( config.is_multivar() && !has_field_index )  {
 
@@ -165,7 +154,6 @@ if ( config.is_multivar() && !has_field_index )  {
    status = mode_frontend(Argv);
 
 }
-
 
    //
    //  done
@@ -280,7 +268,7 @@ cout << "\n\n"
      << "\t\t\"fcst\" is the name of a file containing the forecaset files to be used (required)\n"
      << "\t\t\"obs\"  is the name of a file containing the observation files to be used (required)\n"
      << "\t\t\"config\" is a MODEConfig file "
-     << "containing the desired configuration settings (required).\n"
+     << "containing the desired configuration settings (required).\n\n"
 
      << flush;
 
@@ -289,10 +277,4 @@ return;
 
 }
 
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-
-
+////////////////////////////////////////////////////////////////////////
