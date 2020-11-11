@@ -207,6 +207,8 @@ For example:
 		
   check_dup = FALSE;
 
+**interp**??
+  
 Specify whether special processing should be performed for interpolated model
 names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
 name ends in '2' (e.g. AHW2) and apply the following logic:
@@ -225,10 +227,11 @@ name ends in '2' (e.g. AHW2) and apply the following logic:
 
 
 Specify how consensus forecasts should be defined:
+
 |   name    = consensus model name
 |   members = array of consensus member model names
 |   required = array of TRUE/FALSE for each member
-|            if empty, default is FALSE
+|              if empty, default is FALSE
 |   min_req = minimum number of members required for the consensus
 |
 
@@ -271,8 +274,9 @@ Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
 derived from the BEST and operational tracks, as defined by the
 best_technique and oper_technique settings.
 
-Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
-Derived from OPER tracks: OCLP, OCS5, OCD5, OCDT
+| Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
+| Derived from OPER tracks: OCLP, OCS5, OCD5, OCDT
+|
 
 For example:
 		
@@ -567,6 +571,7 @@ For example:
 
 |  init_str_name = [ "LEVEL" ];
 |  init_str_val  = [ "HU"    ];
+|
 
 .. code-block:: none
 
@@ -587,7 +592,8 @@ For example:
 		
   water_only = FALSE;
 
-?? what should the title be??
+**rirw**??
+
 Specify whether only those track points for which rapid intensification
 or weakening of the maximum wind speed occurred in the previous time
 step should be retained.
@@ -596,11 +602,12 @@ The NHC considers a 24-hour change >=30 kts to constitute rapid
 intensification or weakening.
 
 May modify using the following job command options:
-   "-rirw_track"
-   "-rirw_time" for both or "-rirw_time_adeck" and "-rirw_time_bdeck"
-   "-rirw_exact" for both or "-rirw_exact_adeck" and "-rirw_exact_bdeck"
-   "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
 
+|  "-rirw_track"
+|  "-rirw_time" for both or "-rirw_time_adeck" and "-rirw_time_bdeck"
+|  "-rirw_exact" for both or "-rirw_exact_adeck" and "-rirw_exact_bdeck"
+|  "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
+|
 
 
 .. code-block:: none
@@ -730,6 +737,7 @@ job to be performed.  The format for an analysis job is as follows:
   specified above and using the optional arguments below.  The
   output TCST lines are written to the file specified using the
   "-dump_row" argument.
+  
   Required Args: -dump_row
 
   To further refine the TCST data: Each optional argument may be used
@@ -862,8 +870,8 @@ job to be performed.  The format for an analysis job is as follows:
       For example, the following options select 30 kt probabilities and match
       probability values greater than 0:
 
-|        -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
-
+|            -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
+|
 |      For example:
 |
 |      jobs = [
@@ -880,6 +888,7 @@ jobs = [];
 TCGenConfig_default
 ___________________
 
+**int_freq**
 
 Model initialization frequency in hours, starting at 0.
 
@@ -887,6 +896,8 @@ Model initialization frequency in hours, starting at 0.
 
   init_freq = 6;
 
+**lead_window**
+ 
 Lead times in hours to be searched for genesis events.
 
 
@@ -897,14 +908,15 @@ Lead times in hours to be searched for genesis events.
      end = 120;
   }
 
+**min_duration**
 
 Minimum track duration for genesis event in hours.
-
 
 .. code-block:: none
 
   min_duration = 12;
 
+**fcst_genesis**
 
 Forecast genesis event criteria.  Defined as tracks reaching the specified
 intensity category, maximum wind speed threshold, and minimum sea-level
@@ -919,6 +931,8 @@ track point where all of these criteria are met.
      mslp_thresh = NA;
   }
 
+**best_genesis**
+  
 BEST track genesis event criteria.  Defined as tracks reaching the specified
 intensity category, maximum wind speed threshold, and minimum sea-level
 pressure threshold.  The BEST track genesis time is the valid time of the
@@ -933,6 +947,8 @@ first track point where all of these criteria are met.
      mslp_thresh = NA;
   }
 
+**oper_genesis**
+  
 Operational track genesis event criteria.  Defined as tracks reaching the
 specified intensity category, maximum wind speed threshold, and minimum
 sea-level pressure threshold.  The operational track genesis time is valid
@@ -950,6 +966,7 @@ time of the first track point where all of these criteria are met.
 Track filtering options which may be specified separately in each filter array entry.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**filter**
 
 Filter is an array of dictionaries containing the track filtering options
 listed below.  If empty, a single filter is defined using the top-level
@@ -960,6 +977,8 @@ settings.
 
   filter = [];
 
+**desc**
+  
 Description written to output DESC column
 
 
@@ -967,6 +986,7 @@ Description written to output DESC column
 		
   desc = "NA";
 
+**model** ??commands below are all listed in above sections??
 
 Forecast ATCF ID's
 If empty, all ATCF ID's found will be processed.
@@ -977,6 +997,7 @@ Statistics will be generated separately for each ATCF ID.
 		
   model = [];
 
+**storm_id**
 
 BEST and operational track storm identifiers
 
@@ -984,6 +1005,7 @@ BEST and operational track storm identifiers
 		
   storm_id = [];
 
+**storm_name**  
 
 BEST and operational track storm names
 
@@ -991,6 +1013,8 @@ BEST and operational track storm names
 
   storm_name = [];
 
+**init_beg, init_end**
+  
 Forecast and operational initialization time window
 
 .. code-block:: none
@@ -998,6 +1022,8 @@ Forecast and operational initialization time window
   init_beg = "";
   init_end = "";
 
+**valid_beg, valid_end**
+  
 Forecast, BEST, and operational valid time window
 
 .. code-block:: none
@@ -1005,6 +1031,7 @@ Forecast, BEST, and operational valid time window
   valid_beg = "";
   valid_end = "";
 
+**init_hour**
 
 Forecast and operational initialization hours
 
@@ -1012,11 +1039,15 @@ Forecast and operational initialization hours
 		
   init_hour = [];
 
+**lead**
 
 Forecast and operational lead times in hours
 
-lead = [];
+.. code-block:: none
 
+  lead = [];
+
+**vx_mask**
 
 Spatial masking region (path to gridded data file or polyline file)
 
@@ -1024,6 +1055,7 @@ Spatial masking region (path to gridded data file or polyline file)
 
   vx_mask = "";
 
+**dland_thresh**
 
 Distance to land threshold
 
@@ -1031,6 +1063,7 @@ Distance to land threshold
 
   dland_thresh = NA;
 
+**genesis_window**
 
 Genesis matching time window, in hours relative to the forecast genesis time
 
@@ -1041,6 +1074,7 @@ Genesis matching time window, in hours relative to the forecast genesis time
      end =  24;
   }
 
+**genesis_radius**
 
 Genesis matching search radius in km.
 
@@ -1051,12 +1085,15 @@ Genesis matching search radius in km.
 Global settings
 _______________
 
+**ci_alpha**
 
 Confidence interval alpha value
 
 .. code-block:: none
 		
   ci_alpha = 0.05;
+
+**output_flag**
 
 Statistical output types
 
