@@ -467,8 +467,7 @@ For example:
 **line_type**
 
 Stratify by the LINE_TYPE column.  May add using the "-line_type"
-job command option. ?? why is there a dash above but not in the below example??
-
+job command option.
 
 For example:
 
@@ -660,7 +659,7 @@ For example:
 **event_equal**
   
 Specify whether only those cases common to all models in the dataset should
-be retained.  May modify using the "-event_equal" job command option.  ?? Again, what's up with the dash??
+be retained.  May modify using the "-event_equal" job command option.
 
 
 For example:
@@ -688,7 +687,7 @@ event equalization logic.
   
 Apply polyline masking logic to the location of the ADECK track at the
 initialization time.  If it falls outside the mask, discard the entire track.
-May modify using the "-out_init_mask" job command option. ??dash??
+May modify using the "-out_init_mask" job command option.
 
 
 For example:
@@ -705,7 +704,7 @@ For example:
   
 Apply polyline masking logic to the location of the ADECK track at the
 valid time.  If it falls outside the mask, discard only the current track
-point.  May modify using the "-out_valid_mask" job command option. ??dash??
+point.  May modify using the "-out_valid_mask" job command option.
 
 
 For example:
