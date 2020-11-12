@@ -1,6 +1,6 @@
 .. _README_TC:
 
-README_TC Configuration file overview
+README_TC Configuration File Overview
 =====================================
 
 See :ref:`README`
