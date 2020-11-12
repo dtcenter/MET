@@ -616,7 +616,7 @@ May modify using the following job command options:
 **landfall, landfall_beg, landfall_end**
 
 Specify whether only those track points occurring near landfall should be
-retained, and define the landfall retention window as a timestring in HH[MMSS]
+retained, and define the landfall retention window as a time string in HH[MMSS]
 format (or as an integer number of seconds) offset from the landfall time.
 Landfall is defined as the last BDECK track point before the distance to land
 switches from positive to 0 or negative.
