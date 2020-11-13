@@ -373,19 +373,19 @@ void process_point_obs(const char *point_obs_filename) {
          typ_idx = (use_obs_arr ? h : header_data.typ_idx_array[h]);
          sid_idx = (use_obs_arr ? h : header_data.sid_idx_array[h]);
          vld_idx = (use_obs_arr ? h : header_data.vld_idx_array[h]);
-
-         // JHG fix this time_t hdr_vld = header_data.vld_array[vld_idx];
-         time_t hdr_vld = 0;
           
          // Store data in an observation object
          Observation cur_obs(
             header_data.typ_array[typ_idx],          // message type
             header_data.sid_array[sid_idx],          // station id
-            hdr_vld,                                 // valid time
+                                                     // valid time
+            timestring_to_time_t(header_data.vld_array[vld_idx].c_str()),
             header_data.lat_array[h],                // latitude
             header_data.lon_array[h],                // longitude
             header_data.elv_array[h],                // elevation
-            na_string,                               // quality flag JHG fix this
+                                                     // TODO: need to parse quality
+                                                     // string instead of using na_str!
+            na_string,                               // quality flag
             (use_var_id ? bad_data_int : v),         // grib code
             (double) obs_arr[2],                     // pressure
             (double) obs_arr[3],                     // height
