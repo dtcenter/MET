@@ -351,7 +351,6 @@ struct PlotInfo {
    double       plot_min;         // Minimum plot value
    double       plot_max;         // Maximum plot value
    bool         colorbar_flag;    // Turn on/off plotting the colorbar
-   int          colorbar_spacing; // Spacing of colors in the colorbar
 
    void clear();
 };
@@ -595,7 +594,6 @@ static const char conf_key_color_table[]       = "color_table";
 static const char conf_key_plot_min[]          = "plot_min";
 static const char conf_key_plot_max[]          = "plot_max";
 static const char conf_key_colorbar_flag[]     = "colorbar_flag";
-static const char conf_key_colorbar_spacing[]  = "colorbar_spacing";
 static const char conf_key_map_data_source[]   = "map_data.source";
 static const char conf_key_file_name[]         = "file_name";
 static const char conf_key_line_color[]        = "line_color";

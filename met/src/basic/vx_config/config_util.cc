@@ -2006,7 +2006,6 @@ void PlotInfo::clear() {
    plot_min = bad_data_double;
    plot_max = bad_data_double;
    colorbar_flag = true; // plot colorbar by default
-   colorbar_spacing = bad_data_int;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2038,18 +2037,6 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
    // Get the colorbar flag, true if not present
    info.colorbar_flag = dict->lookup_bool(conf_key_colorbar_flag, false);
    if(!dict->last_lookup_status()) info.colorbar_flag = true;
-
-   // Get the colorbar spacing, 1 if not present
-   info.colorbar_spacing = dict->lookup_int(conf_key_colorbar_spacing, false);
-   if(is_bad_data(info.colorbar_spacing)) info.colorbar_spacing = 1;
-
-   // Check that the colorbar spacing is set >= 1
-   if(info.colorbar_spacing < 1) {
-      mlog << Error << "\nparse_conf_plot_info() -> "
-           << "the colorbar_spacing (" << info.colorbar_spacing
-           << ") must be set >= 1.\n\n";
-      exit(1);
-   }
 
    return(info);
 }
