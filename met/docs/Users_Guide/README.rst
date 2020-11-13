@@ -2064,12 +2064,16 @@ forecast field:
   are not both set to 0, the MET tools will rescale the colortable using
   their values.
 
+* When applicable, the "colorbar_flag" enables the creation of a colorbar
+  for this plot.
+
 .. code-block:: none
 		
   fcst_raw_plot = {
-     color_table = "MET_BASE/colortables/met_default.ctable";
-     plot_min = 0.0;
-     plot_max = 0.0;
+     color_table   = "MET_BASE/colortables/met_default.ctable";
+     plot_min      = 0.0;
+     plot_max      = 0.0;
+     colorbar_flag = TRUE;
   }
 
 
