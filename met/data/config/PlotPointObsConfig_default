@@ -50,10 +50,11 @@ censor_val    = [];
 // Point data plotting options
 // May be set separately in each "point_data" entry
 
-dotsize(x)     = 10; // Function of the obs value
-line_color     = [ 255, 0, 0 ];
-line_width     = 1;
-fill_color     = [ 255, 0, 0 ];
+dotsize(x) = 10; // Function of the obs value
+line_color = [];
+line_width = 1;
+fill_color = [];
+
 fill_plot_info = { // Overrides fill_color
    flag          = FALSE;
    color_table   = "MET_BASE/colortables/met_default.ctable";
