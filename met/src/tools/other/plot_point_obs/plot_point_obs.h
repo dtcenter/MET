@@ -56,22 +56,22 @@ using namespace netCDF;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char  *program_name = "plot_point_obs";
+static const char *program_name = "plot_point_obs";
 
-static const Color  c_map(25, 25, 25);
-static const double l_width = 0.5;
-static const double default_dotsize = 1.0;
+static const char *DEFAULT_CONFIG_FILENAME =
+   "MET_BASE/config/PlotPointObsConfig_default";
 
-static const double margin_size = 36.0;
+static const double line_width = 2.0;
+
+static const int num_cbar_vals = 300;
+
+static const double one_inch = 72;
+
+static const double margin_size = one_inch;
+
+static const int num_ticks = 9;
 
 static const bool use_flate = true;
-
-static int   obs_hid_block[DEF_NC_BUFFER_SIZE];
-static int   obs_vid_block[DEF_NC_BUFFER_SIZE];
-static float obs_lvl_block[DEF_NC_BUFFER_SIZE];
-static float obs_hgt_block[DEF_NC_BUFFER_SIZE];
-static float obs_val_block[DEF_NC_BUFFER_SIZE];
-static float obs_arr_block[DEF_NC_BUFFER_SIZE][OBS_ARRAY_LEN];
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -79,14 +79,21 @@ static float obs_arr_block[DEF_NC_BUFFER_SIZE][OBS_ARRAY_LEN];
 //
 ////////////////////////////////////////////////////////////////////////
 
-static Grid         grid("G004");
-static Box          grid_bb;
+static StringArray  nc_file;
+static ConcatString ps_file;
 static StringArray  ityp;
 static IntArray     ivar;
 static StringArray  svar;
 static StringArray  var_list;
-static ConcatString data_plane_filename;
-static double       dotsize = default_dotsize;
+
+static ConcatString         config_filename;
+static PlotPointObsConfInfo conf_info;
+static ConcatString         plot_grid_string;
+static ConcatString         title_string;
+
+static double dotsize = bad_data_double;
+
+static bool added_colorbar = false;
 
 ////////////////////////////////////////////////////////////////////////
 

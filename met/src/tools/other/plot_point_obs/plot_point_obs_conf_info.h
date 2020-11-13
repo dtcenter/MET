@@ -16,6 +16,7 @@
 #include <iostream>
 #include <set>
 
+#include "vx_color.h"
 #include "vx_config.h"
 #include "vx_data2d.h"
 #include "vx_analysis_util.h"
@@ -35,12 +36,12 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 struct LocationInfo {
-  double lat;
-  double lon;
-  double val;
-};
+   double lat;
+   double lon;
+   double val;
 
-extern bool operator<(const LocationInfo&, const LocationInfo&);
+   bool operator==(const LocationInfo &);
+};
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,10 @@ class PlotPointObsOpt {
       StringArray obs_var;
       StringArray obs_qty;
 
+      // Integer filtering options
+
+      IntArray obs_gc;
+
       // Time filtering options
 
       unixtime valid_beg;
@@ -88,23 +93,30 @@ class PlotPointObsOpt {
       // Plotting options
 
       UserFunc_1Arg dotsize_fx;
-      NumArray      line_color;
+      Color         line_color;
       double        line_width;
-      NumArray      fill_color;
+      Color         fill_color;
       PlotInfo      fill_plot_info;
+      ColorTable    fill_ctable;
 
       //////////////////////////////////////////////////////////////////
 
       // Unique collection of locations
       int n_obs;
-      bool obs_value_flag;
-      set<LocationInfo> locations;
+      vector<LocationInfo> locations;
+
+      // Flags
+      bool store_obs_val;
+      bool fill_point;
+      bool outline_point;
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void process_config(Dictionary &);
+
+      bool has(const LocationInfo &);
 
       bool add(const Observation &);
 };
@@ -130,9 +142,12 @@ class PlotPointObsConfInfo {
       //////////////////////////////////////////////////////////////////
 
       // Options to plot a field of gridded data
-      bool     grid_data_flag;
-      VarInfo *grid_data_info;
-      PlotInfo grid_plot_info;
+      Grid      grid;
+      VarInfo  *grid_data_info;
+      DataPlane grid_data;
+      PlotInfo  grid_plot_info;
+
+      UserFunc_1Arg const_dotsize_fx;
 
       // Options for plotting point data
       vector<PlotPointObsOpt> point_opts;
@@ -142,9 +157,13 @@ class PlotPointObsConfInfo {
       void clear();
 
       void read_config(const char *);
+      void process_config(const char *);
 
-      void process_config(GrdFileType);
-
+      void set_msg_typ(const StringArray &);
+      void set_obs_var(const StringArray &);
+      void set_obs_gc (const IntArray &);
+      void set_dotsize(double);
+    
       bool add(const Observation &);
 };
 

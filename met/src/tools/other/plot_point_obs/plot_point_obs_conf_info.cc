@@ -20,10 +20,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool operator<(const LocationInfo&lhs, const LocationInfo& rhs) {
-   return(!is_eq(lhs.lat, rhs.lat) ||
-          !is_eq(lhs.lon, rhs.lon) ||
-          !is_eq(lhs.val, rhs.val));
+bool LocationInfo::operator==(const LocationInfo &x) {
+   return(is_eq(lat, x.lat) && is_eq(lon, x.lon) && is_eq(val, x.val));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,24 +84,29 @@ void PlotPointObsOpt::clear() {
    line_width = 0.0;
    fill_color.clear();
    fill_plot_info.clear();
+   fill_ctable.clear();
 
    // Initialize point location data
    n_obs = 0;
-   obs_value_flag = false;
    locations.clear();
 
+   store_obs_val = false;
+   fill_point = false;
+   outline_point = false;
+    
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PlotPointObsOpt::process_config(Dictionary &dict) {
+   NumArray tmp_na;
 
    // Initialize
    clear();
 
-   // Conf: message_type
-   msg_typ = parse_conf_message_type(&dict);
+   // Conf: msg_typ
+   msg_typ = dict.lookup_string_array(conf_key_msg_typ);
     
    // Conf: sid_inc and sid_exc
    sid_inc = parse_conf_sid_list(&dict, conf_key_sid_inc);
@@ -111,6 +114,9 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
 
    // Conf: obs_var
    obs_var = dict.lookup_string_array(conf_key_obs_var);
+
+   // Conf: obs_gc
+   obs_gc = dict.lookup_int_array(conf_key_obs_gc);
 
    // Conf: obs_quality
    obs_qty = dict.lookup_string_array(conf_key_obs_qty);
@@ -152,29 +158,60 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
    dotsize_fx.set(dict.lookup(conf_key_dotsize));
 
    // Conf: line_color
-   line_color = dict.lookup_num_array(conf_key_line_color);
+   tmp_na = dict.lookup_num_array(conf_key_line_color);
+
+   // Check for correctly formatted colors
+   if(tmp_na.n() != 0 && tmp_na.n() != 3) {
+      mlog << Error << "\nPlotPointObsOpt::process_config() -> "
+           << "The \"" << conf_key_line_color << "\" entry is specified "
+           << "as three RGB values (0 to 255) or an empty list.\n\n";
+      exit(1);
+   }
+
+   // Store the color
+   if(tmp_na.n() == 3) {
+      outline_point = true;
+      line_color.set_rgb(tmp_na[0], tmp_na[1], tmp_na[2]);
+   }
 
    // Conf: line_width
    line_width = dict.lookup_double(conf_key_line_width);
 
    // Conf: fill_color
-   fill_color = dict.lookup_num_array(conf_key_fill_color);
+   tmp_na = dict.lookup_num_array(conf_key_fill_color);
 
    // Check for correctly formatted colors
-   if(line_color.n() != 3 || fill_color.n() != 3) {
+   if(tmp_na.n() != 0 && tmp_na.n() != 3) {
       mlog << Error << "\nPlotPointObsOpt::process_config() -> "
-           << "The \"" << conf_key_line_color << "\" and \"" << conf_key_fill_color
-           << "\" entries must be specified as three RGB values.\n\n";
+           << "The \"" << conf_key_fill_color << "\" entry is specified "
+           << "as three RGB values (0 to 255) or an empty list.\n\n";
       exit(1);
    }
 
+   // Store the color
+   if(tmp_na.n() == 3) {
+      fill_point = true;
+      fill_color.set_rgb(tmp_na[0], tmp_na[1], tmp_na[2]);
+   }
+    
    // Conf: fill_plot_info
    fill_plot_info = parse_conf_plot_info(
                        dict.lookup_dictionary(conf_key_fill_plot_info));
 
-   // Set obs_value_flag if a fill color table is enabled
+   // Load the color table
+   if(fill_plot_info.flag) {
+      fill_ctable.read(replace_path(fill_plot_info.color_table).c_str());
+      if(fill_plot_info.plot_min != 0.0 ||
+         fill_plot_info.plot_max != 0.0) {
+         fill_ctable.rescale(fill_plot_info.plot_min,
+                             fill_plot_info.plot_max,
+                             bad_data_double);
+      }
+   }
+
+   // Set store_obs_val if a fill color table is enabled
    // or the dotsize function is not constant
-   obs_value_flag = (fill_plot_info.flag || dotsize_fx(1) != dotsize_fx(2));
+   store_obs_val = (fill_plot_info.flag || dotsize_fx(1) != dotsize_fx(2));
 
    return;
 }
@@ -192,6 +229,9 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // observation variable
    if(obs_var.n() > 0 && !obs_var.has(obs.getVarName())) return(false);
+
+   // observation GRIB code
+   if(obs_gc.n() > 0 && !obs_gc.has(obs.getGribCode())) return(false);
 
    // quality control string
    if(obs_qty.n() > 0 && !obs_qty.has(obs.getQualityFlag())) return(false);
@@ -214,18 +254,34 @@ bool PlotPointObsOpt::add(const Observation &obs) {
    if(!obs_thresh.check(obs.getValue())) return(false);
 
    // Store this matching point location
-   LocationInfo loc;
-   loc.lat = obs.getLatitude();
-   loc.lon = obs.getLongitude();
+   LocationInfo cur_loc;
+   cur_loc.lat = obs.getLatitude();
+   cur_loc.lon = obs.getLongitude();
 
    // Only store the value if the flag is set
-   loc.val = (obs_value_flag ? obs.getValue() : bad_data_double);
+   cur_loc.val = (store_obs_val ? obs.getValue() : bad_data_double);
 
    // Update the set of locations
    n_obs++;
-   locations.insert(loc);
+   if(!has(cur_loc)) locations.push_back(cur_loc);
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PlotPointObsOpt::has(const LocationInfo &loc) {
+   bool match = false;
+
+   for(vector<LocationInfo>::iterator it = locations.begin();
+       it != locations.end(); it++) {
+      if(*it == loc) {
+         match = true;
+         break;
+      }
+   }
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,9 +319,13 @@ void PlotPointObsConfInfo::init_from_scratch() {
 void PlotPointObsConfInfo::clear() {
 
    // Initialize values
-   grid_data_flag = false;
+   find_grid_by_name("G004", grid);
+   grid_data.clear();
    grid_plot_info.clear();
    point_opts.clear();
+
+   // Delete allocated memory
+   if(grid_data_info) { delete grid_data_info; grid_data_info = 0; }
 
    return;
 }
@@ -273,6 +333,11 @@ void PlotPointObsConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void PlotPointObsConfInfo::read_config(const char *user_file_name) {
+   ConcatString default_file_name = replace_path(default_config_filename);
+    
+   // List the default config file
+   mlog << Debug(1) << "Default Config File: "
+        << default_file_name << "\n";
 
    // Read the config file constants and map data
    conf.read(replace_path(config_const_filename).c_str());
@@ -280,19 +345,26 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
    conf.read(replace_path(default_config_filename).c_str());
 
    // Read the user file name, if provided
-   if(user_file_name) conf.read(user_file_name);
+   if(strlen(user_file_name) > 0) {
+      mlog << Debug(1) << "User Config File: "
+           << user_file_name << "\n";
+      conf.read(user_file_name);
+   }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PlotPointObsConfInfo::process_config(GrdFileType ftype) {
-   VarInfoFactory info_factory;
+void PlotPointObsConfInfo::process_config(const char *plot_grid_string) {
    Dictionary  *dict = (Dictionary *) 0;
    Dictionary *fdict = (Dictionary *) 0;
+   Dictionary i_fdict;
+   StringArray sa;
+   Met2dDataFileFactory m_factory;
+   Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
    PlotPointObsOpt opt;
-   int i, n;
+   int i, n_vx;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -303,36 +375,84 @@ void PlotPointObsConfInfo::process_config(GrdFileType ftype) {
    // Conf: grid_data
    dict = conf.lookup_dictionary(conf_key_grid_data);
 
+   // Conf: grid_data.file_type, if present
+   GrdFileType ftype = parse_conf_file_type(dict);
+
    // Conf: field
    fdict = dict->lookup_array(conf_key_field);
 
    // Check length
-   if((n = parse_conf_n_vx(fdict)) > 1) {
+   if((n_vx = parse_conf_n_vx(fdict)) > 1) {
       mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
            << "the \"" << conf_key_grid_data << "." << conf_key_field
            << "\" array can only have length 0 or 1.\n\n";
       exit(1);
    }
 
-   // Process gridded data
-   if(n > 0) {
+   // Parse plot_grid_string, if set
+   if(strlen(plot_grid_string) > 0) {
 
-      grid_data_flag = true;
+      // Parse as a white-space separated string
+      sa.parse_wsss(plot_grid_string);
 
-      // Allocate new VarInfo object
-      grid_data_info = info_factory.new_var_info(ftype);
-      grid_data_info->set_dict(*(fdict));
+      // Search for a named grid
+      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+         mlog << Debug(3) << "Use the grid named \""
+              << plot_grid_string << "\".\n";
+      }
+      // Parse grid definition
+      else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+         mlog << Debug(3) << "Use the grid defined by string \""
+              << plot_grid_string << "\".\n";
+      }
+      // Extract the grid from a gridded data file
+      else {
+         mlog << Debug(3) << "Use the grid defined by file \""
+              << plot_grid_string << "\".\n";
 
-      // Conf: grid_plot_info
-      grid_plot_info = parse_conf_plot_info(
-                          dict->lookup_dictionary(conf_key_grid_plot_info));
-   }
+         // Open the data file
+         if(!(met_ptr = m_factory.new_met_2d_data_file(plot_grid_string, ftype))) {
+            mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
+                 << "can't open file \"" << plot_grid_string << "\"\n\n";
+            exit(1);
+         }
+
+         // Store the grid
+         grid = met_ptr->grid();
+      }
+
+      // Process gridded data
+      if(n_vx > 0 && met_ptr) {
+
+         // Allocate and set the VarInfo object
+         VarInfoFactory v_factory;
+         grid_data_info = v_factory.new_var_info(met_ptr->file_type());
+         i_fdict = parse_conf_i_vx_dict(fdict, 0);
+         grid_data_info->set_dict(i_fdict);
+
+         // Get the requested data
+         if(!met_ptr->data_plane(*grid_data_info, grid_data)) {
+            mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
+                 << "trouble getting field \"" << grid_data_info->magic_str()
+                 << "\" from file \"" << plot_grid_string << "\"\n\n";
+            exit(1);
+         }
+
+         // Conf: grid_plot_info
+         grid_plot_info = parse_conf_plot_info(
+                             dict->lookup_dictionary(conf_key_grid_plot_info));
+      }
+
+      // Cleanup
+      if(met_ptr) { delete met_ptr; met_ptr = 0; }
+
+   } // end if plot_grid_string
 
    // Conf: point_data
    dict = conf.lookup_array(conf_key_point_data);
 
    // Check length
-   if((n = dict->n_entries()) == 0) {
+   if(dict->n_entries() == 0) {
       mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
            << "the \"" << conf_key_point_data
            << "\" array is empty!\n\n";
@@ -340,13 +460,66 @@ void PlotPointObsConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Parse each array entry
-   for(i=0; i<n; i++) {
+   for(i=0; i<dict->n_entries(); i++) {
       opt.process_config(*((*dict)[i]->dict_value()));
       point_opts.push_back(opt);
    }
    
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void PlotPointObsConfInfo::set_msg_typ(const StringArray &sa) {
+   for(vector<PlotPointObsOpt>::iterator it = point_opts.begin();
+       it != point_opts.end(); it++) {
+      it->msg_typ = sa;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PlotPointObsConfInfo::set_obs_var(const StringArray &sa) {
+   for(vector<PlotPointObsOpt>::iterator it = point_opts.begin();
+       it != point_opts.end(); it++) {
+      it->obs_var = sa;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PlotPointObsConfInfo::set_obs_gc(const IntArray &ia) {
+   for(vector<PlotPointObsOpt>::iterator it = point_opts.begin();
+       it != point_opts.end(); it++) {
+      it->obs_gc = ia;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PlotPointObsConfInfo::set_dotsize(double s) {
+   ConcatString cs;
+   MetConfig config;
+
+   cs << conf_key_dotsize << "(x) = " << s << ";";
+   config.read_string(cs.c_str());
+
+   const_dotsize_fx.set(config.lookup(conf_key_dotsize));
+
+   for(vector<PlotPointObsOpt>::iterator it = point_opts.begin();
+       it != point_opts.end(); it++) {
+      it->dotsize_fx = const_dotsize_fx;
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 bool PlotPointObsConfInfo::add(const Observation &obs) {
