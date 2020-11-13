@@ -975,6 +975,8 @@ static const char conf_key_block_size[]   = "block_size";
 
 static const char conf_key_grid_data[]      = "grid_data";
 static const char conf_key_point_data[]     = "point_data";
+static const char conf_key_msg_typ[]        = "msg_typ";
+static const char conf_key_obs_gc[]         = "obs_gc";
 static const char conf_key_elv_thresh[]     = "elv_thresh";
 static const char conf_key_hgt_thresh[]     = "hgt_thresh";
 static const char conf_key_prs_thresh[]     = "prs_thresh";
