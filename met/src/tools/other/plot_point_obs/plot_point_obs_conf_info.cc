@@ -250,8 +250,24 @@ bool PlotPointObsOpt::add(const Observation &obs) {
       !hgt_thresh.check(obs.getHeight()) ||
       !prs_thresh.check(obs.getPressureLevel())) return(false);
 
+   // store the current observation value
+   double cur_val = obs.getValue();
+
+   // apply conversion logic
+   if(convert_fx.is_set()) cur_val = convert_fx(cur_val);
+
+   // apply censor logic
+   for(int i=0; i<censor_thresh.n(); i++) {
+
+      // break out after the first match
+      if(censor_thresh[i].check(cur_val)) {
+         cur_val = censor_val[i];
+         break;
+      }
+   }
+
    // observation value
-   if(!obs_thresh.check(obs.getValue())) return(false);
+   if(!obs_thresh.check(cur_val)) return(false);
 
    // Store this matching point location
    LocationInfo cur_loc;
@@ -259,7 +275,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
    cur_loc.lon = obs.getLongitude();
 
    // Only store the value if the flag is set
-   cur_loc.val = (store_obs_val ? obs.getValue() : bad_data_double);
+   cur_loc.val = (store_obs_val ? cur_val : bad_data_double);
 
    // Update the set of locations
    n_obs++;
