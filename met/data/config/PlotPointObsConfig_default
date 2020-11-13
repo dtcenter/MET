@@ -30,6 +30,7 @@ message_type = [];
 sid_inc      = [];
 sid_exc      = [];
 obs_var      = [];
+obs_gc       = []; // integer list of GRIB codes
 obs_quality  = [];
 valid_beg    = "";
 valid_end    = "";
