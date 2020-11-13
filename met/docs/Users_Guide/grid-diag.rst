@@ -53,7 +53,7 @@ Optional arguments for grid_diag
 grid_diag configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Diag tool named 'GridDiagConfig_default' can be found in the installed **share/met/config/ directory**. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Grid-Diag tool named **GridDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 _____________________
 
