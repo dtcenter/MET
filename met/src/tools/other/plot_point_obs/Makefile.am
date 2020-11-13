@@ -20,7 +20,6 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -40,6 +39,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
+	$(PYTHON_LIBS) \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
