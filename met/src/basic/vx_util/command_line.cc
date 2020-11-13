@@ -864,12 +864,11 @@ void CommandLine::do_verbosity()
 int i_arg;
 
    //
-   //  use the last -v option
+   //  parse and remove all the -v options
+   //  in case it is used more than once
    //
 
-args.has(verbosity_option, i_arg, false);
-
-if ( i_arg >= 0 )  {
+while ( args.has(verbosity_option, i_arg) )  {
 
    mlog.set_verbosity_level(atoi(args[i_arg+1].c_str()));
    args.shift_down(i_arg, 2);
@@ -891,12 +890,11 @@ void CommandLine::do_log()
 int i_arg;
 
    //
-   //  use the last -log option
+   //  parse and remove all the -log options
+   //  in case it is used more than once
    //
 
-args.has(log_option, i_arg, false);
-
-if ( i_arg >= 0 )  {
+while ( args.has(log_option, i_arg) )  {
 
    mlog.open_log_file(args[i_arg+1]);
    args.shift_down(i_arg, 2);
