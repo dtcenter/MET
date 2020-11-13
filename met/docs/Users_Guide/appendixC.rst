@@ -655,7 +655,7 @@ Gradient values
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :numref:`table_GS_format_info_GRAD`
 
-These statistics are only computed by the Grid_Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
+These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
 .. math:: \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
 
