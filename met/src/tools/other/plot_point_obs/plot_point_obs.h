@@ -63,11 +63,9 @@ static const char *DEFAULT_CONFIG_FILENAME =
 
 static const double line_width = 2.0;
 
-static const int num_cbar_vals = 300;
+static const int num_colorbar_vals = 300;
 
 static const double one_inch = 72;
-
-static const double margin_size = one_inch;
 
 static const int num_ticks = 9;
 

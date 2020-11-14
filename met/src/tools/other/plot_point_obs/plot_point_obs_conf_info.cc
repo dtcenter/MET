@@ -141,7 +141,8 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
    convert_fx.set(dict.lookup(conf_key_convert));
 
    // Conf: censor_thresh and censor_val
-   censor_thresh = dict.lookup_thresh_array(conf_key_censor_thresh, false);
+   censor_thresh = dict.lookup_thresh_array(conf_key_censor_thresh,
+                                            false);
    censor_val    = dict.lookup_num_array(conf_key_censor_val, false);
 
    // Check for equal number of censor thresholds and values
@@ -150,7 +151,8 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
            << "The number of censor thresholds in \""
            << conf_key_censor_thresh << "\" (" << censor_thresh.n()
            << ") must match the number of replacement values in \""
-           << conf_key_censor_val << "\" (" << censor_val.n() << ").\n\n";
+           << conf_key_censor_val << "\" (" << censor_val.n()
+           << ").\n\n";
       exit(1);
    }
 
@@ -163,8 +165,9 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
    // Check for correctly formatted colors
    if(tmp_na.n() != 0 && tmp_na.n() != 3) {
       mlog << Error << "\nPlotPointObsOpt::process_config() -> "
-           << "The \"" << conf_key_line_color << "\" entry is specified "
-           << "as three RGB values (0 to 255) or an empty list.\n\n";
+           << "The \"" << conf_key_line_color << "\" entry is "
+           << "specified as three RGB values (0 to 255) or an empty "
+           << "list.\n\n";
       exit(1);
    }
 
@@ -183,8 +186,9 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
    // Check for correctly formatted colors
    if(tmp_na.n() != 0 && tmp_na.n() != 3) {
       mlog << Error << "\nPlotPointObsOpt::process_config() -> "
-           << "The \"" << conf_key_fill_color << "\" entry is specified "
-           << "as three RGB values (0 to 255) or an empty list.\n\n";
+           << "The \"" << conf_key_fill_color << "\" entry is "
+           << "specified as three RGB values (0 to 255) or an empty "
+           << "list.\n\n";
       exit(1);
    }
 
@@ -200,7 +204,8 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
 
    // Load the color table
    if(fill_plot_info.flag) {
-      fill_ctable.read(replace_path(fill_plot_info.color_table).c_str());
+      fill_ctable.read(
+         replace_path(fill_plot_info.color_table).c_str());
       if(fill_plot_info.plot_min != 0.0 ||
          fill_plot_info.plot_max != 0.0) {
          fill_ctable.rescale(fill_plot_info.plot_min,
@@ -211,7 +216,8 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
 
    // Set store_obs_val if a fill color table is enabled
    // or the dotsize function is not constant
-   store_obs_val = (fill_plot_info.flag || dotsize_fx(1) != dotsize_fx(2));
+   store_obs_val = (fill_plot_info.flag ||
+                    dotsize_fx(1) != dotsize_fx(2));
 
    return;
 }
@@ -221,34 +227,50 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
 bool PlotPointObsOpt::add(const Observation &obs) {
 
    // message type
-   if(msg_typ.n() > 0 && !msg_typ.has(obs.getHeaderType())) return(false);
+   if(msg_typ.n() > 0 && !msg_typ.has(obs.getHeaderType())) {
+      return(false);
+   }
 
    // station id
    if((sid_inc.n() > 0 && !sid_inc.has(obs.getStationId())) ||
-      (sid_exc.n() > 0 &&  sid_exc.has(obs.getStationId()))) return(false);
+      (sid_exc.n() > 0 &&  sid_exc.has(obs.getStationId()))) {
+      return(false);
+   }
 
    // observation variable
-   if(obs_var.n() > 0 && !obs_var.has(obs.getVarName())) return(false);
+   if(obs_var.n() > 0 && !obs_var.has(obs.getVarName())) {
+      return(false);
+   }
 
    // observation GRIB code
-   if(obs_gc.n() > 0 && !obs_gc.has(obs.getGribCode())) return(false);
+   if(obs_gc.n() > 0 && !obs_gc.has(obs.getGribCode())) {
+      return(false);
+   }
 
    // quality control string
-   if(obs_qty.n() > 0 && !obs_qty.has(obs.getQualityFlag())) return(false);
+   if(obs_qty.n() > 0 && !obs_qty.has(obs.getQualityFlag())) {
+      return(false);
+   }
     
    // valid time
    unixtime ut = obs.getValidTime();
    if((valid_beg > 0 && ut < valid_beg) ||
-      (valid_end > 0 && ut > valid_end)) return(false);
+      (valid_end > 0 && ut > valid_end)) {
+      return(false);
+   }
 
    // lat, lon
    if(!lat_thresh.check(obs.getLatitude()) ||
-      !lon_thresh.check(obs.getLongitude())) return(false);
+      !lon_thresh.check(obs.getLongitude())) {
+      return(false);
+   }
 
    // elevation, height, pressure
    if(!elv_thresh.check(obs.getElevation()) ||
       !hgt_thresh.check(obs.getHeight()) ||
-      !prs_thresh.check(obs.getPressureLevel())) return(false);
+      !prs_thresh.check(obs.getPressureLevel())) {
+      return(false);
+   }
 
    // store the current observation value
    double cur_val = obs.getValue();
@@ -267,7 +289,9 @@ bool PlotPointObsOpt::add(const Observation &obs) {
    }
 
    // observation value
-   if(!obs_thresh.check(cur_val)) return(false);
+   if(!obs_thresh.check(cur_val)) {
+      return(false);
+   }
 
    // Store this matching point location
    LocationInfo cur_loc;
@@ -288,9 +312,9 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
 bool PlotPointObsOpt::has(const LocationInfo &loc) {
    bool match = false;
+   vector<LocationInfo>::iterator it;
 
-   for(vector<LocationInfo>::iterator it = locations.begin();
-       it != locations.end(); it++) {
+   for(it = locations.begin(); it != locations.end(); it++) {
       if(*it == loc) {
          match = true;
          break;
@@ -349,7 +373,8 @@ void PlotPointObsConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void PlotPointObsConfInfo::read_config(const char *user_file_name) {
-   ConcatString default_file_name = replace_path(default_config_filename);
+   ConcatString default_file_name =
+                   replace_path(default_config_filename);
     
    // List the default config file
    mlog << Debug(1) << "Default Config File: "
@@ -372,7 +397,8 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PlotPointObsConfInfo::process_config(const char *plot_grid_string) {
+void PlotPointObsConfInfo::process_config(
+                              const char *plot_grid_string) {
    Dictionary  *dict = (Dictionary *) 0;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary i_fdict;
@@ -427,9 +453,12 @@ void PlotPointObsConfInfo::process_config(const char *plot_grid_string) {
               << plot_grid_string << "\".\n";
 
          // Open the data file
-         if(!(met_ptr = m_factory.new_met_2d_data_file(plot_grid_string, ftype))) {
-            mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
-                 << "can't open file \"" << plot_grid_string << "\"\n\n";
+         if(!(met_ptr = m_factory.new_met_2d_data_file(
+                           plot_grid_string, ftype))) {
+            mlog << Error
+                 << "\nPlotPointObsConfInfo::process_config() -> "
+                 << "can't open file \"" << plot_grid_string
+                 << "\"\n\n";
             exit(1);
          }
 
@@ -448,15 +477,18 @@ void PlotPointObsConfInfo::process_config(const char *plot_grid_string) {
 
          // Get the requested data
          if(!met_ptr->data_plane(*grid_data_info, grid_data)) {
-            mlog << Error << "\nPlotPointObsConfInfo::process_config() -> "
-                 << "trouble getting field \"" << grid_data_info->magic_str()
-                 << "\" from file \"" << plot_grid_string << "\"\n\n";
+            mlog << Error
+                 << "\nPlotPointObsConfInfo::process_config() -> "
+                 << "trouble getting field \""
+                 << grid_data_info->magic_str() << "\" from file \""
+                 << plot_grid_string << "\"\n\n";
             exit(1);
          }
 
          // Conf: grid_plot_info
          grid_plot_info = parse_conf_plot_info(
-                             dict->lookup_dictionary(conf_key_grid_plot_info));
+                             dict->lookup_dictionary(
+                                conf_key_grid_plot_info));
       }
 
       // Cleanup

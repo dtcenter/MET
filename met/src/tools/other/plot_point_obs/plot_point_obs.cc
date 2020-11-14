@@ -6,7 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-///////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   plot_point_obs.cc
 //
@@ -23,8 +23,8 @@
 //   002    01/03/12  Holmes          Modified to get a grid definition
 //                                    from a data file to use for the
 //                                    plot.
-//   003    01/24/13  Halley Gotway   Add -dotsize command line argument.
-//   004    11/10/20  Halley Gotway   Add -config option.
+//   003    01/24/13  Halley Gotway   Add -dotsize.
+//   004    11/10/20  Halley Gotway   Add -config and -plot_grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,24 +86,16 @@ static void set_dotsize(const StringArray &);
 int main(int argc, char *argv[]) {
    CommandLine cline;
 
-   //
    // Check for zero arguments
-   //
    if(argc == 1) usage();
 
-   //
    // Parse the command line into tokens
-   //
    cline.set(argc, argv);
 
-   //
    // Set the usage function
-   //
    cline.set_usage(usage);
 
-   //
    // Add the options function calls
-   //
    cline.add(set_config,    "-config",    1);
    cline.add(set_point_obs, "-point_obs", 1);
    cline.add(set_plot_grid, "-plot_grid", 1);
@@ -116,49 +108,37 @@ int main(int argc, char *argv[]) {
    // Quietly support old -data_file option
    cline.add(set_plot_grid, "-data_file", 1);
 
-   //
    // Parse the command line
-   //
    cline.parse();
 
-   //
    // Check for error. There should be two arguments left:
    // Input point observation file and output plot filename
-   //
    if(cline.n() != 2) usage();
 
-   //
    // Store the input arguments
-   //
    nc_file.insert(0, cline[0].c_str());
    ps_file = cline[1];
 
-   //
    // Read and process the config file
-   //
    conf_info.read_config(config_filename.c_str());
    conf_info.process_config(plot_grid_string.c_str());
 
    mlog << Debug(3) << "Plotting grid definition: "
         << conf_info.grid.serialize() << "\n";
 
-   //
    // Overwrite configuration using command line options:
    //    -msg_typ, -gc, -obs_var, -dotsize
-   //
    if(ityp.n() > 0)          conf_info.set_msg_typ(ityp);
    if(ivar.n() > 0)          conf_info.set_obs_gc (ivar);
    if(svar.n() > 0)          conf_info.set_obs_var(svar);
    if(!is_bad_data(dotsize)) conf_info.set_dotsize(dotsize);
 
-   //
    // Loop over and process each point observation file
-   //
-   for(int i=0; i<nc_file.n(); i++) process_point_obs(nc_file[i].c_str());
+   for(int i=0; i<nc_file.n(); i++) {
+      process_point_obs(nc_file[i].c_str());
+   }
 
-   //
    // Plot the result
-   //
    create_plot();
 
    return(0);
@@ -176,9 +156,7 @@ void process_point_obs(const char *point_obs_filename) {
    float obs_val_block[DEF_NC_BUFFER_SIZE];
    float obs_arr_block[DEF_NC_BUFFER_SIZE][OBS_ARRAY_LEN];
 
-   //
    // Open the netCDF point observation file
-   //
    mlog << Debug(1) << "Reading point observation file: "
         << point_obs_filename << "\n";
 
@@ -194,17 +172,13 @@ void process_point_obs(const char *point_obs_filename) {
       exit(1);
    }
 
-   //
    // Read the dimensions and variables
-   //
    NetcdfObsVars obsVars;
    read_nc_dims_vars(obsVars, f_in);
    bool use_var_id = obsVars.use_var_id;
    bool use_qty_idx = IS_VALID_NC(obsVars.obs_qty_tbl_var);
 
-   //
    // Print warning about ineffective command line arguments
-   //
    if(use_var_id && ivar.n() != 0) {
       mlog << Warning << "\n-gc option is ignored!\n\n";
    }
@@ -249,12 +223,12 @@ void process_point_obs(const char *point_obs_filename) {
 
    long nhdr_count = get_dim_size(&obsVars.hdr_dim);
    long nobs_count = get_dim_size(&obsVars.obs_dim);
-   mlog << Debug(2) << "Processing " << (nobs_count) << " observations at "
-        << nhdr_count << " locations.\n";
 
-   //
-   // Get the corresponding header (message type, staton_id, valid_time, and lat/lon/elv)
-   //
+   mlog << Debug(2) << "Processing " << nobs_count
+        << " observations at " << nhdr_count << " locations.\n";
+
+   // Get the corresponding header:
+   //   message type, staton_id, valid_time, and lat/lon/elv
    NcHeaderData header_data = get_nc_hdr_data(obsVars);
    int strl_len = header_data.strl_len;
    int typ_len  = header_data.typ_len;
@@ -264,13 +238,13 @@ void process_point_obs(const char *point_obs_filename) {
    bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
    bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);
 
-   int hdr_arr_len  = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) : HDR_ARRAY_LEN;
-   int obs_arr_len  = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) : OBS_ARRAY_LEN;
+   int hdr_arr_len  = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) :
+                                    HDR_ARRAY_LEN;
+   int obs_arr_len  = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) :
+                                    OBS_ARRAY_LEN;
    int buf_size;
 
-   //
    // Allocate space to store the data
-   //
    float hdr_arr[hdr_arr_len];
    float obs_arr[obs_arr_len];
 
@@ -287,7 +261,9 @@ void process_point_obs(const char *point_obs_filename) {
 
       lengths[0] = var_count;
       lengths[1] = var_len;
-      if(!get_nc_data(&obs_var_var, (char *)&obs_var_str[0], lengths, offsets)) {
+      if(!get_nc_data(&obs_var_var,
+                      (char *) &obs_var_str[0],
+                      lengths, offsets)) {
          mlog << Error << "\nprocess_point_obs() -> "
               << "trouble getting " << nc_var_obs_var << "\n\n";
          exit(1);
@@ -305,7 +281,9 @@ void process_point_obs(const char *point_obs_filename) {
 
       lengths[0] = qty_count;
       lengths[1] = qty_len;
-      if(!get_nc_data(&obsVars.obs_qty_tbl_var, (char *)obs_var_str, lengths, offsets)) {
+      if(!get_nc_data(&obsVars.obs_qty_tbl_var,
+                      (char *) obs_var_str,
+                      lengths, offsets)) {
          mlog << Error << "\nprocess_point_obs() -> "
               << "trouble getting " << nc_var_obs_qty_tbl << "\n\n";
          exit(1);
@@ -331,7 +309,8 @@ void process_point_obs(const char *point_obs_filename) {
          lengths[1] = obs_arr_len;
 
          // Read the current observation message
-         if(!get_nc_data(&obsVars.obs_arr_var, (float *) &obs_arr_block[0],
+         if(!get_nc_data(&obsVars.obs_arr_var,
+                         (float *) &obs_arr_block[0],
                          lengths, offsets)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_arr\n\n";
@@ -339,7 +318,9 @@ void process_point_obs(const char *point_obs_filename) {
          }
 
          lengths[1] = qty_len;
-         if(!get_nc_data(&obsVars.obs_qty_var, (char *)qty_str_block, lengths, offsets)) {
+         if(!get_nc_data(&obsVars.obs_qty_var,
+                         (char *) qty_str_block,
+                         lengths, offsets)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_qty\n\n";
             exit(1);
@@ -352,7 +333,9 @@ void process_point_obs(const char *point_obs_filename) {
       }
       else {
          // Read the current observation message
-         if(!get_nc_data(&obsVars.obs_hid_var, (int *) &obs_hid_block[0], lengths_1D, offsets_1D)) {
+         if(!get_nc_data(&obsVars.obs_hid_var,
+                         (int *) &obs_hid_block[0],
+                         lengths_1D, offsets_1D)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_hid\n\n";
             exit(1);
@@ -364,23 +347,31 @@ void process_point_obs(const char *point_obs_filename) {
                  << "trouble getting obs_hid\n\n";
             exit(1);
          }
-         if(!get_nc_data(&obsVars.obs_lvl_var, (float *) &obs_lvl_block[0], lengths_1D, offsets_1D)) {
+         if(!get_nc_data(&obsVars.obs_lvl_var,
+                         (float *) &obs_lvl_block[0],
+                         lengths_1D, offsets_1D)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_lvl\n\n";
             exit(1);
          }
-         if(!get_nc_data(&obsVars.obs_hgt_var, (float *) &obs_hgt_block[0], lengths_1D, offsets_1D)) {
+         if(!get_nc_data(&obsVars.obs_hgt_var,
+                         (float *) &obs_hgt_block[0],
+                         lengths_1D, offsets_1D)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_hgt\n\n";
             exit(1);
          }
-         if(!get_nc_data(&obsVars.obs_val_var, (float *) &obs_val_block[0], lengths_1D, offsets_1D)) {
+         if(!get_nc_data(&obsVars.obs_val_var,
+                         (float *) &obs_val_block[0],
+                         lengths_1D, offsets_1D)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_val\n\n";
             exit(1);
          }
          if (use_qty_idx) {
-            if(!get_nc_data(&obsVars.obs_qty_var, (int *)obs_qty_block, lengths_1D, offsets_1D)) {
+            if(!get_nc_data(&obsVars.obs_qty_var,
+                            (int *) obs_qty_block,
+                            lengths_1D, offsets_1D)) {
                mlog << Error << "\nprocess_point_obs() -> "
                     << "trouble getting obs_qty\n\n";
                exit(1);
@@ -407,9 +398,7 @@ void process_point_obs(const char *point_obs_filename) {
 
          if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
 
-         //
          // Get the header index and variable type for this observation.
-         //
          h = nint(obs_arr[0]);
          v = nint(obs_arr[1]);
 
@@ -421,14 +410,14 @@ void process_point_obs(const char *point_obs_filename) {
          Observation cur_obs(
             header_data.typ_array[typ_idx],          // message type
             header_data.sid_array[sid_idx],          // station id
-                                                     // valid time
-            timestring_to_time_t(header_data.vld_array[vld_idx].c_str()),
+            timestring_to_time_t(                    // valid time
+               header_data.vld_array[vld_idx].c_str()),
             header_data.lat_array[h],                // latitude
             header_data.lon_array[h],                // longitude
             header_data.elv_array[h],                // elevation
-                                                     // TODO: need to parse quality
-                                                     // string instead of using na_str!
-            (use_qty_idx ? qty_list[obs_qty_block[i_offset]] : qty_list[i_offset]),  // quality flag
+            (use_qty_idx ?                           // quality string
+               qty_list[obs_qty_block[i_offset]] :
+               qty_list[i_offset]),
             (use_var_id ? bad_data_int : v),         // grib code
             (double) obs_arr[2],                     // pressure
             (double) obs_arr[3],                     // height
@@ -441,9 +430,7 @@ void process_point_obs(const char *point_obs_filename) {
       } // end for i_offset
    } // end for i_start
 
-   //
    // Clean up
-   //
    if(f_in) { delete f_in; f_in = (NcFile *) 0; }
 
    return;
@@ -461,46 +448,38 @@ void create_plot() {
    vector<PlotPointObsOpt>::iterator it_ppo;
    vector<LocationInfo>::iterator it_loc;
 
-   //
    // Setup the min/max lat/lon Bounding Box for the grid
-   //
    grid_bb.set_llwh(0, 0, conf_info.grid.nx(), conf_info.grid.ny());
 
-   //
    // Create a PostScript file
-   //
    mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
    plot.open(ps_file.c_str(), OrientationLandscape);
    plot.pagenumber(1);
    plot.setlinewidth(line_width);
 
-   //
    // Set plotting dimensions
-   //
    page.set_llwh(0.0, 0.0, plot.page_width(), plot.page_height());
 
-   view.set_llwh(margin_size, margin_size,
-                 page.width()  - 2.0 * margin_size,
-                 page.height() - 3.0 * margin_size);
+   view.set_llwh(one_inch, one_inch,
+                 page.width()  - 2.0 * one_inch,
+                 page.height() - 3.0 * one_inch);
 
-   //
-   // Calculate how much to magnify the map to get it to fill the view box
-   // without distorting the map. e.g. it will either bump the top and bottom
-   // of the view box or bump the left and right sides of the view box or both.
-   //
+   // Calculate how much to magnify the map to get it to fill the view
+   // box without distorting the map. e.g. it will either bump the top
+   // and bottome of the view box or bump the left and right sides of
+   // the view box or both.
    mag = calc_mag(grid_bb, view);
 
-   map_box.set_llwh(view.left() + 0.5 * view.width() - 0.5 * mag * grid_bb.width(),
-                    view.bottom() + 0.5 * view.height() - 0.5 * mag * grid_bb.height(),
-                    mag * grid_bb.width(), mag * grid_bb.height());
+   map_box.set_llwh(
+      view.left() + 0.5*view.width() - 0.5*mag*grid_bb.width(),
+      view.bottom() + 0.5*view.height() - 0.5*mag*grid_bb.height(),
+      mag*grid_bb.width(), mag*grid_bb.height());
 
    cbar_box.set_llwh(map_box.right() + 0.125 * one_inch,
                      map_box.bottom(), 0.5 * one_inch,
                      map_box.height());
 
-   //
    // Add a title string
-   //
    ConcatString cs;
    if(title_string.nonempty()) {
       cs = title_string;
@@ -513,15 +492,15 @@ void create_plot() {
    }
    plot.choose_font(31, 24.0);
    plot.write_centered_text(1, 1, 0.5 * page.width(),
-                            map_box.top() + margin_size, 0.5, 0.5, cs.c_str());
+                            map_box.top() + one_inch, 0.5, 0.5,
+                            cs.c_str());
    
-   //
    // Plot gridded data, if provided
-   //
    if(!conf_info.grid_data.is_empty()) {
 
       // Read the color table
-      ct.read(replace_path(conf_info.grid_plot_info.color_table).c_str());
+      ct.read(replace_path(
+                 conf_info.grid_plot_info.color_table).c_str());
 
       // Rescale to the user-specified range
       if(!is_eq(conf_info.grid_plot_info.plot_min, 0.0) ||
@@ -561,9 +540,7 @@ void create_plot() {
       }
    }
 
-   //
    // Loop through the options and add a colorbar
-   //
    for(it_ppo = conf_info.point_opts.begin();
        it_ppo != conf_info.point_opts.end(); it_ppo++) {
 
@@ -574,9 +551,7 @@ void create_plot() {
       }
    }
     
-   //
    // Draw the map first and then put a border around it
-   //
    plot.setrgbcolor(0.0, 0.0, 0.0);
 
    if(use_flate) plot.begin_flate();
@@ -585,10 +560,8 @@ void create_plot() {
 
    draw_border(plot, map_box, line_width);
 
-   //
    // Set up clipping path so that the circles will not be made
    // outside the map box
-   //
    plot.gsave();
    plot.newpath();
    plot.moveto(map_box.x_ll(), map_box.y_ll());
@@ -597,51 +570,39 @@ void create_plot() {
    plot.lineto(map_box.x_ll(), map_box.y_ur());
    plot.clip();
 
-   //
    // Plot the locations for each set of plotting options
-   //
    plot_count = skip_count = 0;
    for(i = 0, it_ppo = conf_info.point_opts.begin();
        it_ppo != conf_info.point_opts.end(); it_ppo++) {
 
       mlog << Debug(3) << "For point data group " << ++i
-           << ", plotting " << it_ppo->locations.size() << " locations for "
-           << it_ppo->n_obs << " observations.\n";
+           << ", plotting " << it_ppo->locations.size()
+           << " locations for " << it_ppo->n_obs << " observations.\n";
 
       // Loop over the locations
       for(it_loc = it_ppo->locations.begin();
           it_loc != it_ppo->locations.end(); it_loc++) {
 
-         //
          // Convert lat/lon to grid x/y
-         //
          lat = (double) it_loc->lat;
          lon = (double) (-1.0*it_loc->lon);
          conf_info.grid.latlon_to_xy(lat, lon, grid_x, grid_y);
 
-         //
-         // If the current point is off the grid, increment the skip count
-         //
+         // Track the number of points off the grid
          if(grid_x < 0 || grid_x >= conf_info.grid.nx() ||
             grid_y < 0 || grid_y >= conf_info.grid.ny()) {
             skip_count++;
             continue;
          }
 
-         //
          // Convert grid x/y to page x/y
-         //
          gridxy_to_pagexy(conf_info.grid, grid_bb, grid_x, grid_y,
                           page_x, page_y, map_box);
 
-         //
          // Get the size of the circle
-         //
          size = it_ppo->dotsize_fx(it_loc->val);
 
-         //
          // Draw a circle and fill it
-         //
          if(it_ppo->fill_point) {
             plot.set_color(it_ppo->fill_plot_info.flag ?
                            it_ppo->fill_ctable.nearest(it_loc->val) :
@@ -650,21 +611,18 @@ void create_plot() {
             plot.fill();
          }
         
-         //
          // Outline the circle
-         //
          if(it_ppo->outline_point) {
             plot.setlinewidth(it_ppo->line_width);
             plot.set_color(it_ppo->line_color);
             plot.circle(page_x, page_y, size, true);
          }
 
-         //
          // Dump out the location being plotted
-         //
          mlog << Debug(4) << "[" << ++plot_count
               << "] Plotting location [ lat, lon, val ] = [ "
-              << it_loc->lat << ", " << it_loc->lon << ", " << it_loc->val << " ]\n";
+              << it_loc->lat << ", " << it_loc->lon << ", "
+              << it_loc->val << " ]\n";
 
       } // end locations
    } // end point_opts
@@ -686,9 +644,7 @@ void create_plot() {
 
 void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
 
-   //
    // Only plot one colorbar
-   //
    if(added_colorbar) {
       mlog << Warning << "\nadd_colorbar()-> "
            << "only one colorbar can be plotted.\n\n";
@@ -703,19 +659,17 @@ void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
    plot.comment("drawing colorbar image");
 
    Ppm image;
-   image.set_size_xy(1, num_cbar_vals);
+   image.set_size_xy(1, num_colorbar_vals);
    fill_colorbar_image(image, ct);
    draw_border(plot, box, 1.5);
 
    RenderInfo render_info;
-   render_info.set_mag(box.width(), box.height() / num_cbar_vals);
+   render_info.set_mag(box.width(), box.height() / num_colorbar_vals);
    render_info.set_ll(box.left(), box.bottom());
    render_info.add_filter(ASCII85Encode);
    render(plot, image, render_info);
 
-   //
    // Annotate the colorbar
-   //
    plot.choose_font(11, 8.0);
 
    tick_m = (box.top() - box.bottom()) / (num_ticks - 1);
@@ -735,7 +689,8 @@ void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
       // Put the value centered at this tick mark
       cs.format("%g", val_m * i + ct.data_min(bad_data_double));
 
-      plot.write_centered_text(2, 1, x2 + 2.5, y1, 0.0, 0.5, cs.c_str());
+      plot.write_centered_text(2, 1, x2 + 2.5, y1, 0.0, 0.5,
+                               cs.c_str());
    }
 
    return;
@@ -765,16 +720,18 @@ void usage() {
         << "config file defining plotting options (optional).\n"
         << "\t\t\"-point_obs file\" specifies additional point "
         << "observation files to be plotted (optional).\n"
-        << "\t\t\tNote that command line settings override config file options.\n"
-        << "\t\t\"-plot_grid string\" is a named grid, gridded data file, "
-        << "or grid specification string (optional).\n"
+        << "\t\t\tNote that command line settings override config file "
+        << "options.\n"
+        << "\t\t\"-plot_grid string\" is a named grid, gridded data "
+        << "file, or grid specification string (optional).\n"
         << "\t\t\"-gc code\" is the GRIB code(s) to be plotted "
         << "(optional).\n"
-        << "\t\t\"-obs_var name\" is the variable name(s) to be plotted "
+        << "\t\t\"-obs_var name\" is the variable name to be plotted "
         << "(optional).\n"
-        << "\t\t\"-msg_typ name\" is the message type(s) to be "
-        << "plotted (optional).\n"
-        << "\t\t\"-dotsize val\" sets a constant dotsize value (optional).\n"
+        << "\t\t\"-msg_typ name\" is the message type to be plotted "
+        << "(optional).\n"
+        << "\t\t\"-dotsize val\" sets a constant dotsize value "
+        << "(optional).\n"
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
         << "\t\t\"-v level\" overrides the default level of logging ("
@@ -786,57 +743,49 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a)
-{
+void set_config(const StringArray & a) {
     config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_point_obs(const StringArray & a)
-{
+void set_point_obs(const StringArray & a) {
    nc_file.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_plot_grid(const StringArray & a)
-{
+void set_plot_grid(const StringArray & a) {
    plot_grid_string = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_title(const StringArray & a)
-{
+void set_title(const StringArray & a) {
    title_string = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_grib_code(const StringArray & a)
-{
+void set_grib_code(const StringArray & a) {
    ivar.add(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_obs_var(const StringArray & a)
-{
+void set_obs_var(const StringArray & a) {
    svar.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_msg_type(const StringArray & a)
-{
+void set_msg_type(const StringArray & a) {
    ityp.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_dotsize(const StringArray & a)
-{
+void set_dotsize(const StringArray & a) {
    dotsize = atof(a[0].c_str());
 }
 
