@@ -170,6 +170,7 @@ void process_point_obs(const char *point_obs_filename) {
    int i, h, v;
    int   obs_hid_block[DEF_NC_BUFFER_SIZE];
    int   obs_vid_block[DEF_NC_BUFFER_SIZE];
+   int   obs_qty_block[DEF_NC_BUFFER_SIZE];
    float obs_lvl_block[DEF_NC_BUFFER_SIZE];
    float obs_hgt_block[DEF_NC_BUFFER_SIZE];
    float obs_val_block[DEF_NC_BUFFER_SIZE];
@@ -199,6 +200,7 @@ void process_point_obs(const char *point_obs_filename) {
    NetcdfObsVars obsVars;
    read_nc_dims_vars(obsVars, f_in);
    bool use_var_id = obsVars.use_var_id;
+   bool use_qty_idx = IS_VALID_NC(obsVars.obs_qty_tbl_var);
 
    //
    // Print warning about ineffective command line arguments
@@ -278,13 +280,13 @@ void process_point_obs(const char *point_obs_filename) {
    long lengths_1D[1] = { 1 };
 
    if(use_var_id) {
-      NcDim bufr_var_dim = get_nc_dim(f_in, nc_dim_nvar);
-      long var_count = get_dim_size(&bufr_var_dim);
-      char obs_var_str[var_count][strl_len];
       NcVar obs_var_var = get_nc_var(f_in, nc_var_obs_var);
+      long var_count = get_dim_size(&obs_var_var, 0);
+      long var_len = get_dim_size(&obs_var_var, 1);
+      char obs_var_str[var_count][var_len];
 
       lengths[0] = var_count;
-      lengths[1] = strl_len;
+      lengths[1] = var_len;
       if(!get_nc_data(&obs_var_var, (char *)&obs_var_str[0], lengths, offsets)) {
          mlog << Error << "\nprocess_point_obs() -> "
               << "trouble getting " << nc_var_obs_var << "\n\n";
@@ -295,6 +297,28 @@ void process_point_obs(const char *point_obs_filename) {
       }
    }
 
+   long qty_len;
+   if(use_qty_idx) {
+      qty_len = get_dim_size(&obsVars.obs_qty_tbl_var, 1);
+      long qty_count = get_dim_size(&obsVars.obs_qty_tbl_var, 0);
+      char obs_var_str[qty_count][qty_len];
+
+      lengths[0] = qty_count;
+      lengths[1] = qty_len;
+      if(!get_nc_data(&obsVars.obs_qty_tbl_var, (char *)obs_var_str, lengths, offsets)) {
+         mlog << Error << "\nprocess_point_obs() -> "
+              << "trouble getting " << nc_var_obs_qty_tbl << "\n\n";
+         exit(1);
+      }
+      for(int index=0; index<qty_count; index++) {
+         qty_list.add(obs_var_str[index]);
+      }
+   }
+   else {
+      qty_len = get_dim_size(&obsVars.obs_qty_var, 1);
+   }
+
+   char qty_str_block[DEF_NC_BUFFER_SIZE][qty_len];
    for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
       buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ?
                   DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
@@ -304,7 +328,7 @@ void process_point_obs(const char *point_obs_filename) {
       offsets_1D[0] = i_start;
       lengths_1D[0] = buf_size;
       if(use_obs_arr) {
-        lengths[1] = obs_arr_len;
+         lengths[1] = obs_arr_len;
 
          // Read the current observation message
          if(!get_nc_data(&obsVars.obs_arr_var, (float *) &obs_arr_block[0],
@@ -313,6 +337,18 @@ void process_point_obs(const char *point_obs_filename) {
                  << "trouble getting obs_arr\n\n";
             exit(1);
          }
+
+         lengths[1] = qty_len;
+         if(!get_nc_data(&obsVars.obs_qty_var, (char *)qty_str_block, lengths, offsets)) {
+            mlog << Error << "\nprocess_point_obs() -> "
+                 << "trouble getting obs_qty\n\n";
+            exit(1);
+         }
+         qty_list.clear();
+         for(int index=0; index<buf_size; index++) {
+            qty_list.add(qty_str_block[index]);
+         }
+         lengths[1] = obs_arr_len;
       }
       else {
          // Read the current observation message
@@ -342,6 +378,13 @@ void process_point_obs(const char *point_obs_filename) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "trouble getting obs_val\n\n";
             exit(1);
+         }
+         if (use_qty_idx) {
+            if(!get_nc_data(&obsVars.obs_qty_var, (int *)obs_qty_block, lengths_1D, offsets_1D)) {
+               mlog << Error << "\nprocess_point_obs() -> "
+                    << "trouble getting obs_qty\n\n";
+               exit(1);
+            }
          }
       }
 
@@ -373,7 +416,7 @@ void process_point_obs(const char *point_obs_filename) {
          typ_idx = (use_obs_arr ? h : header_data.typ_idx_array[h]);
          sid_idx = (use_obs_arr ? h : header_data.sid_idx_array[h]);
          vld_idx = (use_obs_arr ? h : header_data.vld_idx_array[h]);
-          
+
          // Store data in an observation object
          Observation cur_obs(
             header_data.typ_array[typ_idx],          // message type
@@ -385,7 +428,7 @@ void process_point_obs(const char *point_obs_filename) {
             header_data.elv_array[h],                // elevation
                                                      // TODO: need to parse quality
                                                      // string instead of using na_str!
-            na_string,                               // quality flag
+            (use_qty_idx ? qty_list[obs_qty_block[i_offset]] : qty_list[i_offset]),  // quality flag
             (use_var_id ? bad_data_int : v),         // grib code
             (double) obs_arr[2],                     // pressure
             (double) obs_arr[3],                     // height
