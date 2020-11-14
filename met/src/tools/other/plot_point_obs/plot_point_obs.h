@@ -85,6 +85,7 @@ static StringArray  ityp;
 static IntArray     ivar;
 static StringArray  svar;
 static StringArray  var_list;
+static StringArray  qty_list;
 
 static ConcatString         config_filename;
 static PlotPointObsConfInfo conf_info;
