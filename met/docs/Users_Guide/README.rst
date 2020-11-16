@@ -1,7 +1,8 @@
 .. _README:
 
-README - Configuration File Overview
-====================================
+======================================
+ README - Configuration File Overview
+======================================
 
 The configuration files that control many of the MET tools contain formatted
 ASCII text. This format has been updated for MET version |version| and
@@ -288,11 +289,11 @@ References:
 
 
 Configuration settings used by the MET tools
-____________________________________________
+============================================
 
 
 Settings common to multiple tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 **exit_on_warning**
 
@@ -2184,10 +2185,10 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
   }
 
 Settings specific to individual tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 EnsembleStatConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **ens**
 
@@ -2478,7 +2479,7 @@ used for random assignment of ranks when they are tied.
   }
 
 MODEAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MODE line options are used to create filters that determine which MODE output
 lines are read in and processed. The MODE line options are numerous. They
@@ -2816,7 +2817,7 @@ MET User's Guide for a description of these attributes.
 
 
 MODEConfig_default
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 **quilt**
 
@@ -3105,7 +3106,7 @@ much more flexible "regrid" option may be used instead.
   shift_right = 0;
 
 PB2NCConfig_default
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 following criteria:
@@ -3403,7 +3404,7 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
   event_stack_flag = TOP;
 
 SeriesAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **block_size**
 
@@ -3452,7 +3453,7 @@ grid is large.
   }
 
 STATAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **jobs**
 
@@ -3474,6 +3475,8 @@ Where "job_name" is set to one of the following:
   "-dump_row" argument.
   Required Args: -dump_row
 
+|    
+
 * "summary"
   
   To compute summary information for a set of statistics.
@@ -3491,16 +3494,18 @@ Where "job_name" is set to one of the following:
 	   
   *  apply fisher transform
      (applied to columns listed in "wmo_fisher_stats")
-	   
+
+|
+
   The columns of data to be summarized are specified in one of two
   ways:
 	 
-  * Specify the -line_type option once and specify one or more
-
-  * column names.
+  * Specify the -line_type option once and specify one or more column names.
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
+|     
+    
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3546,6 +3551,8 @@ Where "job_name" is set to one of the following:
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
+  
+| 
 
 * "aggregate_stat"
   
@@ -3658,6 +3665,8 @@ Where "job_name" is set to one of the following:
           (b) means weights of 8, 6, 4, 2 for the lead times.
 
   Required Args: None
+
+|
 
 * "ramp"
   
@@ -3908,7 +3917,7 @@ confidence intervals computed for the aggregated statistics.
   vif_flag = FALSE;
 
 WaveletStatConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **grid_decomp_flag**
 
@@ -3991,7 +4000,7 @@ similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
 
 WWMCARegridConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **to_grid**
 
