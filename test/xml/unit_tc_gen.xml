@@ -22,7 +22,7 @@
       -config &CONFIG_DIR;/TCGenConfig_2016 \
       -out &OUTPUT_DIR;/tc_gen/tc_gen_2016 \
       -log &OUTPUT_DIR;/tc_gen/tc_gen_2016.log \
-      -v 2
+      -v 5 
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016.stat</stat>
