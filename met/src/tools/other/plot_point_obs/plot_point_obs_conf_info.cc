@@ -364,6 +364,7 @@ void PlotPointObsConfInfo::clear() {
    grid_data.clear();
    grid_plot_info.clear();
    point_opts.clear();
+   do_colorbar = false;
 
    // Delete allocated memory
    if(grid_data_info) { delete grid_data_info; grid_data_info = 0; }
@@ -490,6 +491,9 @@ void PlotPointObsConfInfo::process_config(
          grid_plot_info = parse_conf_plot_info(
                              dict->lookup_dictionary(
                                 conf_key_grid_plot_info));
+
+         // Check for a colorbar
+         if(grid_plot_info.colorbar_flag) do_colorbar = true;
       }
 
       // Cleanup
@@ -512,6 +516,11 @@ void PlotPointObsConfInfo::process_config(
    for(i=0; i<dict->n_entries(); i++) {
       opt.process_config(*((*dict)[i]->dict_value()));
       point_opts.push_back(opt);
+
+      // Check for a colorbar
+      if(opt.fill_plot_info.flag && opt.fill_plot_info.colorbar_flag) {
+         do_colorbar = true;
+      }
    }
    
    return;

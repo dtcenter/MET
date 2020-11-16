@@ -152,6 +152,8 @@ class PlotPointObsConfInfo {
       // Options for plotting point data
       vector<PlotPointObsOpt> point_opts;
 
+      bool do_colorbar;
+
       //////////////////////////////////////////////////////////////////
 
       void clear();

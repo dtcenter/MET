@@ -460,9 +460,17 @@ void create_plot() {
    // Set plotting dimensions
    page.set_llwh(0.0, 0.0, plot.page_width(), plot.page_height());
 
-   view.set_llwh(1.0 * one_inch, 0.5 * one_inch,
-                 page.width()  - 2.5 * one_inch,
-                 page.height() - 1.5 * one_inch);
+   // Need more room for a colorbar
+   if(conf_info.do_colorbar) {
+      view.set_llwh(1.0 * one_inch, 0.5 * one_inch,
+                    page.width()  - 2.5 * one_inch,
+                    page.height() - 1.5 * one_inch);
+   }
+   else {
+      view.set_llwh(0.5 * one_inch, 0.5 * one_inch,
+                    page.width()  - 1.0 * one_inch,
+                    page.height() - 1.5 * one_inch);
+   }
 
    // Calculate how much to magnify the map to get it to fill the view
    // box without distorting the map. e.g. it will either bump the top
