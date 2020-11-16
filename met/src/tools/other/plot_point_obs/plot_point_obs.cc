@@ -160,7 +160,7 @@ void process_point_obs(const char *point_obs_filename) {
    mlog << Debug(1) << "Reading point observation file: "
         << point_obs_filename << "\n";
 
-   NcFile * f_in = open_ncfile(nc_file[0].c_str());
+   NcFile * f_in = open_ncfile(point_obs_filename);
 
    if(!f_in || IS_INVALID_NC_P(f_in)) {
       mlog << Error << "\nprocess_point_obs() -> "
@@ -460,9 +460,9 @@ void create_plot() {
    // Set plotting dimensions
    page.set_llwh(0.0, 0.0, plot.page_width(), plot.page_height());
 
-   view.set_llwh(one_inch, one_inch,
-                 page.width()  - 2.0 * one_inch,
-                 page.height() - 3.0 * one_inch);
+   view.set_llwh(1.0 * one_inch, 0.5 * one_inch,
+                 page.width()  - 2.5 * one_inch,
+                 page.height() - 1.5 * one_inch);
 
    // Calculate how much to magnify the map to get it to fill the view
    // box without distorting the map. e.g. it will either bump the top
@@ -471,12 +471,12 @@ void create_plot() {
    mag = calc_mag(grid_bb, view);
 
    map_box.set_llwh(
-      view.left() + 0.5*view.width() - 0.5*mag*grid_bb.width(),
+      view.left()   + 0.5*view.width()  - 0.5*mag*grid_bb.width(),
       view.bottom() + 0.5*view.height() - 0.5*mag*grid_bb.height(),
       mag*grid_bb.width(), mag*grid_bb.height());
 
    cbar_box.set_llwh(map_box.right() + 0.125 * one_inch,
-                     map_box.bottom(), 0.5 * one_inch,
+                     map_box.bottom(), 0.5   * one_inch,
                      map_box.height());
 
    // Add a title string
@@ -492,7 +492,7 @@ void create_plot() {
    }
    plot.choose_font(31, 24.0);
    plot.write_centered_text(1, 1, 0.5 * page.width(),
-                            map_box.top() + one_inch, 0.5, 0.5,
+                            map_box.top() + 0.5 * one_inch, 0.5, 0.5,
                             cs.c_str());
    
    // Plot gridded data, if provided

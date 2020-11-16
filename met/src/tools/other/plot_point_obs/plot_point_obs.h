@@ -61,7 +61,7 @@ static const char *program_name = "plot_point_obs";
 static const char *DEFAULT_CONFIG_FILENAME =
    "MET_BASE/config/PlotPointObsConfig_default";
 
-static const double line_width = 2.0;
+static const double line_width = 0.5;
 
 static const int num_colorbar_vals = 300;
 

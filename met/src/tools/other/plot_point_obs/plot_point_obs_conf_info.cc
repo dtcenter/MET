@@ -204,6 +204,7 @@ void PlotPointObsOpt::process_config(Dictionary &dict) {
 
    // Load the color table
    if(fill_plot_info.flag) {
+      fill_point = true;
       fill_ctable.read(
          replace_path(fill_plot_info.color_table).c_str());
       if(fill_plot_info.plot_min != 0.0 ||
