@@ -66,8 +66,9 @@ void update_pdf(
 
     for(int i = 0; i < dp.nx(); i++) {
         for(int j = 0; j < dp.ny(); j++) {
-            if(!mp.s_is_on(i, j)) continue;
             double value = dp.get(i, j);
+            if(!mp.s_is_on(i, j) ||
+               is_bad_data(value)) continue;
             int k = floor((value - min) / delta);
             if(k < 0) k = 0;
             if(k >= pdf.size()) k = pdf.size() - 1;
@@ -92,12 +93,14 @@ void update_joint_pdf(
 
     for(int i = 0; i < dp_A.nx(); i++) {
         for(int j = 0; j < dp_A.ny(); j++) {
-            if(!mp.s_is_on(i, j)) continue;
             double value_A = dp_A.get(i, j);
+            double value_B = dp_B.get(i, j);
+            if(!mp.s_is_on(i, j)    ||
+               is_bad_data(value_A) ||
+               is_bad_data(value_B)) continue;
             int k_A = floor((value_A - min_A) / delta_A);
             if(k_A < 0) k_A = 0;
             if(k_A >= n_A) k_A = n_A - 1;
-            double value_B = dp_B.get(i, j);
             int k_B = floor((value_B - min_B) / delta_B);
             if(k_B < 0) k_B = 0;
             if(k_B >= n_B) k_B = n_B - 1;
