@@ -415,13 +415,11 @@ _____________________
      color_table = "MET_BASE/colortables/met_default.ctable";
      plot_min = 0.0;
      plot_max = 0.0;
-     colorbar_spacing = 1;
   }
   obs_raw_plot = {
      color_table = "MET_BASE/colortables/met_default.ctable";
      plot_min = 0.0;
      plot_max = 0.0;
-     colorbar_spacing = 1;
   }
   object_plot = {
      color_table = "MET_BASE/colortables/mode_obj.ctable";
@@ -429,7 +427,7 @@ _____________________
 
 Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`Data IO MET Configuration File Options`.
 
-The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The **colorbar_spacing** entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
+The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar.
 
 
 _____________________
