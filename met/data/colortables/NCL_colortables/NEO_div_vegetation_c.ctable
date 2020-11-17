@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "NEO_div_vegetation_c.rgb"
+//
 0.0000 0.0039 { 121,  91,  19 }
 0.0039 0.0078 { 134,  86,  20 }
 0.0078 0.0117 { 138,  85,  19 }

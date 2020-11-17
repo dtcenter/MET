@@ -62,8 +62,12 @@ else:
 
 ctable = open(ctable_out, 'w')
 
-n = rgb.shape[0]
+ctable.writelines("//\n" + \
+                  "// Derived from NCL colormap \"" + \
+                   os.path.basename(rgb_in) + "\"\n" + \
+                  "//\n")
 
+n = rgb.shape[0]
 for i in range(n):
     if rgb.max() > 1:
         r, g, b = rgb[i]

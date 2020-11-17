@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "WhiteYellowOrangeRed.rgb"
+//
 0.0000 0.0039 { 255, 255, 255 }
 0.0039 0.0079 { 255, 255, 253 }
 0.0079 0.0118 { 255, 254, 251 }

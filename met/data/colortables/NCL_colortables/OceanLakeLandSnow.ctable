@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "OceanLakeLandSnow.rgb"
+//
 0.0000 0.0039 {  24, 116, 205 }
 0.0039 0.0079 { 135, 206, 255 }
 0.0079 0.0118 {  38, 103,  40 }

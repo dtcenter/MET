@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "cmocean_thermal.rgb"
+//
 0.0000 0.0039 {   4,  35,  51 }
 0.0039 0.0078 {   4,  36,  53 }
 0.0078 0.0117 {   4,  37,  55 }

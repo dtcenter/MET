@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "SVG_foggy_sunrise.rgb"
+//
 0.0000 0.0045 {  90,  69,  88 }
 0.0045 0.0091 {  94,  72,  92 }
 0.0091 0.0136 {  97,  74,  93 }

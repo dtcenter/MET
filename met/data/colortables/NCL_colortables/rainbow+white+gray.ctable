@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "rainbow+white+gray.rgb"
+//
 0.0000 0.0042 {   0,   0,   0 }
 0.0042 0.0084 {   4,   0,   3 }
 0.0084 0.0126 {   9,   0,   7 }

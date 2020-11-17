@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "GMT_relief_oceanonly.rgb"
+//
 0.0000 0.0063 {   0,   0,   1 }
 0.0063 0.0125 {   0,   1,   4 }
 0.0125 0.0187 {   0,   1,   6 }

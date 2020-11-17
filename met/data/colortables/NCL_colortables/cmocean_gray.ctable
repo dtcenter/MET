@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "cmocean_gray.rgb"
+//
 0.0000 0.0039 {   0,   0,   0 }
 0.0039 0.0078 {   0,   0,   0 }
 0.0078 0.0117 {   0,   0,   0 }

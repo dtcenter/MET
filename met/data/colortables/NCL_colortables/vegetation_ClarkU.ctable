@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "vegetation_ClarkU.rgb"
+//
 0.0000 0.0039 {   0,   0,   0 }
 0.0039 0.0078 {  15,   5,   9 }
 0.0078 0.0117 {  31,  10,  18 }

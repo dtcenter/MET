@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "BlueWhiteOrangeRed.rgb"
+//
 0.0000 0.0039 {  27,  44,  98 }
 0.0039 0.0079 {  27,  46, 101 }
 0.0079 0.0118 {  28,  48, 104 }

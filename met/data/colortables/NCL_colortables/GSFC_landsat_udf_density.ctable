@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "GSFC_landsat_udf_density.rgb"
+//
 0.0000 0.0909 { 233, 255, 190 }
 0.0909 0.1818 { 153, 255, 119 }
 0.1818 0.2727 {  56, 224,   9 }

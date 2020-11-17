@@ -1,2 +1,5 @@
+//
+// Derived from NCL colormap "precip_diff_1lev.rgb"
+//
 0.0000 0.5000 {  83, 189, 159 }
 0.5000 1.0000 { 225, 165, 100 }
