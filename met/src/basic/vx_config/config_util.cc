@@ -266,10 +266,10 @@ ConcatString parse_conf_version(Dictionary *dict) {
 ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
                                bool check_empty) {
    ConcatString s;
+   const char *method_name = "parse_conf_string() -> ";
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_string() -> "
-           << "empty dictionary!\n\n";
+      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
       exit(1);
    }
 
@@ -278,7 +278,7 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
 
       // Check for an empty string
       if(check_empty && s.empty()) {
-         mlog << Error << "\nparse_conf_string() -> "
+         mlog << Error << "\n" << method_name
               << "The \"" << conf_key << "\" entry (\"" << s
               << "\") cannot be empty.\n\n";
          exit(1);
@@ -286,7 +286,7 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
 
       // Check for embedded whitespace in non-empty strings
       if(!s.empty() && check_reg_exp(ws_reg_exp, s.c_str()) == true) {
-         mlog << Error << "\nparse_conf_string() -> "
+         mlog << Error << "\n" << method_name
               << "The \"" << conf_key << "\" entry (\"" << s
               << "\") cannot contain embedded whitespace.\n\n";
          exit(1);
@@ -294,6 +294,18 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
    }
 
    return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_string_array(Dictionary *dict, const char *conf_key, const char *caller) {
+   StringArray sa, cur, sid_sa;
+   if(!dict) {
+      mlog << Error << "\n" << caller << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   return dict->lookup_string_array(conf_key);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -512,20 +524,14 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
-   StringArray sa;
+   const char *method_name = "parse_conf_tc_model() -> ";
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_tc_model() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   sa = dict->lookup_string_array(conf_key_model);
+   StringArray sa = parse_conf_string_array(dict, conf_key_model, method_name);
 
    // Print a warning if AVN appears in the model list
    for(int i=0; i<sa.n(); i++) {
       if(sa[i].find("AVN") != string::npos) {
-         mlog << Warning << "\nparse_conf_tc_model() -> "
+         mlog << Warning << "\n" << method_name
               << "Requesting tropical cyclone model name \""  << sa[i]
               << "\" will yield no results since \"AVN\" is automatically "
               << "replaced with \"GFS\" when reading ATCF inputs. Please use "
@@ -540,19 +546,13 @@ StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
-   StringArray sa;
+   const char *method_name = "parse_conf_message_type() -> ";
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_message_type() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   sa = dict->lookup_string_array(conf_key_message_type);
+   StringArray sa = parse_conf_string_array(dict, conf_key_message_type, method_name);
 
    // Check that at least one message type is provided
    if(error_out && sa.n() == 0) {
-      mlog << Error << "\nparse_conf_message_type() -> "
+      mlog << Error << "\n" << method_name
            << "At least one message type must be provided.\n\n";
       exit(1);
    }
@@ -566,14 +566,9 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
    StringArray sa, cur, sid_sa;
    ConcatString mask_name;
    int i;
+   const char *method_name = "parse_conf_sid_list() -> ";
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_sid_list() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   sa = dict->lookup_string_array(conf_key);
+   sa = parse_conf_string_array(dict, conf_key, method_name);
 
    // Parse station ID's to exclude from each entry
    for(i=0; i<sa.n(); i++) {
@@ -581,7 +576,7 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
       sid_sa.add(cur);
    }
 
-   mlog << Debug(4) << "parse_conf_sid_list() -> "
+   mlog << Debug(4) << method_name
         << "Station ID \"" << conf_key << "\" list contains "
         << sid_sa.n() << " entries.\n";
 
@@ -772,15 +767,9 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_obs_qty(Dictionary *dict) {
-   StringArray sa;
+   const char *method_name = "parse_conf_obs_qty() -> ";
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_obs_qty() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   sa = dict->lookup_string_array(conf_key_obs_qty);
+   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
 
    return(sa);
 }
@@ -994,15 +983,15 @@ void parse_add_conf_key_value_map(
 
 
 map<ConcatString,ConcatString> parse_conf_key_value_map(
-      Dictionary *dict, const char *conf_key_map_name) {
+      Dictionary *dict, const char *conf_key_map_name, const char *caller) {
    Dictionary *msg_typ_dict = (Dictionary *) 0;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    int i;
+   const char *method_name = (0 != caller) ? caller : "parse_conf_key_value_map() -> ";
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_key_value_type_map() -> "
-           << "empty dictionary!\n\n";
+      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
       exit(1);
    }
 
@@ -1017,7 +1006,7 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
       val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m.count(key) >= 1) {
-         mlog << Warning << "\nparse_conf_key_value_type_map() -> "
+         mlog << Warning << "\n" << method_name
               << "found multiple entries for key \""
               << key << "\"!\n\n";
       }
@@ -1029,21 +1018,18 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    return(m);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
-   return parse_conf_key_value_map(dict, conf_key_message_type_map);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
-map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict) {
+map<ConcatString,StringArray> parse_conf_key_values_map(
+      Dictionary *dict, const char *conf_key, const char *caller) {
+   StringArray sa;
    map<ConcatString,ConcatString> cs_map;
    map<ConcatString,ConcatString>::const_iterator it;
    map<ConcatString,StringArray> sa_map;
-   StringArray sa;
+   const char *method_name = (0 != caller) ? caller : "parse_conf_key_values_map() -> ";
 
-   cs_map = parse_conf_key_value_map(dict, conf_key_message_type_group_map);
+   cs_map = parse_conf_key_value_map(dict, conf_key, method_name);
 
    // Convert input comma-separated strings to StringArray
    for(it=cs_map.begin(); it!= cs_map.end(); it++) {
@@ -1054,12 +1040,40 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
    return sa_map;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
+   return parse_conf_key_value_map(dict, conf_key_message_type_map);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_message_type_group_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_message_type_group_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_metadata_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
    map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
    parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
    return m;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_name_map() -> ";
+   return parse_conf_key_value_map(dict, conf_key_obs_name_map);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
