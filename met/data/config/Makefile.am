@@ -43,6 +43,7 @@ config_DATA = \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
+	IODA2NCConfig_efault \
 	README \
 	README_TC
 
