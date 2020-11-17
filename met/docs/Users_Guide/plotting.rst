@@ -20,6 +20,7 @@ The usage statement for the plot_point_obs utility is shown below:
          ps_file
          [-config config_file]
          [-point_obs file]
+         [-title string]
          [-plot_grid name]
          [-gc code] or [-obs_var name]
          [-msg_typ name]
@@ -45,15 +46,17 @@ Optional arguments for plot_point_obs
 
 5. The **-plot_grid name** option defines the grid for plotting as a named grid, the path to a gridded data file, or an explicit grid specification string. This overrides the default global plotting grid. If configuring the tool to plot a base image, the path to the input gridded data file should be specified here.
 
-6. The **-gc code** and **-obs_var name** options specify observation types to be plotted. These overrides the corresponding configuration file entries.
+6. The **-title string** option specifies the plot title string.
 
-7. The **-msg_typ name** option specifies the message type to be plotted. This overrides the corresponding configuration file entry.
+7. The **-gc code** and **-obs_var name** options specify observation types to be plotted. These overrides the corresponding configuration file entries.
 
-8. The **-dotsize val** option sets the dot size. This overrides the corresponding configuration file entry.
+8. The **-msg_typ name** option specifies the message type to be plotted. This overrides the corresponding configuration file entry.
 
-7. The **-log file** option directs output and errors to the specified log file.
+9. The **-dotsize val** option sets the dot size. This overrides the corresponding configuration file entry.
 
-8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+10. The **-log file** option directs output and errors to the specified log file.
+
+11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the plot_point_obs calling sequence is shown below:
 
