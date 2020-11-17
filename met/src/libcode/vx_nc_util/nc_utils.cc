@@ -1123,7 +1123,7 @@ double get_nc_time(NcVar * var, const int index) {
             break;
          case NC_BYTE:
             var->getVar(start, count, &vb);
-            k = (double)vs;
+            k = (double)vb;
             break;
          case NC_INT:
             var->getVar(start, count, &vi);
