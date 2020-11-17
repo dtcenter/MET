@@ -151,7 +151,15 @@ static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
 static void cleanup_hdr_buf(char *hdr_buf, int buf_len);
-
+static bool check_core_data(const bool, const bool, StringArray &, StringArray &);
+static bool check_missing_thresh(float value);
+static ConcatString find_meta_name(StringArray, StringArray);
+static bool get_meta_data_float(NcFile *, StringArray &, const char *, float *, const int);
+static bool get_meta_data_strings(NcFile *, const ConcatString, char *);
+static bool get_obs_data_float(NcFile *, const ConcatString, 
+                               NcVar *, float *, int *, const int);
+static bool has_postfix(std::string const &, std::string const &);
+    
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -325,171 +333,11 @@ void open_netcdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-
-bool check_missing_thresh(float value) {
-   bool check = false;
-   for(int idx=0; idx<conf_info.missing_thresh.n(); idx++) {
-      if(conf_info.missing_thresh[idx].check(value)) {
-          check = true;
-          break;
-      }
-   }
-   return check;
-}
-
-bool has_postfix(std::string const &str_buf, std::string const &postfix) {
-   if(str_buf.length() >= postfix.length()) {
-      return (0 == str_buf.compare(str_buf.length() - postfix.length(), postfix.length(), postfix));
-   } else {
-      return false;
-   }
-}
-
-ConcatString find_meta_name(StringArray metadata_names, StringArray config_names) {
-   ConcatString metadata_name;
-   
-   for(int idx =0; idx<config_names.n(); idx++) {
-      if(metadata_names.has(config_names[idx])) {
-         metadata_name = config_names[idx];
-         break;
-      }
-   }
-   return metadata_name;
-}
-
-
-bool get_meta_data_float(NcFile *f_in, StringArray &metadata_vars,
-                         const char *metadata_key, float *metadata_buf,
-                         const int nlocs) {
-   bool status = false;
-   static const char *method_name = "get_meta_data_float() -> ";
-   
-   ConcatString metadata_name = find_meta_name(
-        metadata_vars, conf_info.metadata_map[metadata_key]);
-   if(metadata_name.length() > 0) {
-      ConcatString ioda_name = metadata_name;
-      ioda_name.add("@MetaData");
-      NcVar meta_var = get_var(f_in, ioda_name.c_str());
-      if(IS_VALID_NC(meta_var)) {
-         status = get_nc_data(&meta_var, metadata_buf, nlocs);
-         if(!status) mlog << Debug(3) << method_name
-                           << "trouble getting " << metadata_name << "\n";
-      }
-   }
-   else mlog << Warning << "\n" << method_name
-             << "Metadata for " << metadata_key << " does not exist!\n\n";
-   if(status) {
-      for(int idx=0; idx<nlocs; idx++)
-         if(check_missing_thresh(metadata_buf[idx])) metadata_buf[idx] = bad_data_float;
-   }
-   else {
-      for(int idx=0; idx<nlocs; idx++)
-         metadata_buf[idx] = bad_data_float;
-   }
-   return status;
-}
-
-bool get_meta_data_strings(NcFile *f_in, const ConcatString metadata_name,
-                           char *metadata_buf) {
-   bool status = false;
-   static const char *method_name = "get_meta_data_strings() -> ";
-
-   ConcatString ioda_name = metadata_name;
-   ioda_name.add("@MetaData");
-   NcVar meta_var = get_var(f_in, ioda_name.c_str());
-   if(IS_VALID_NC(meta_var)) {
-      status = get_nc_data(&meta_var, metadata_buf);
-      if(!status) {
-         mlog << Error << "\n" << method_name << " -> "
-              << "trouble getting " << metadata_name << "\n\n";
-         exit(1);
-      }
-   }
-   return status;
-}
-
-bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
-                        NcVar *obs_var, float *obs_buf, int *qc_buf,
-                        const int nlocs) {
-   bool status = false;
-   static const char *method_name = "get_obs_data_float() -> ";
-   
-   if(IS_VALID_NC_P(obs_var)) {
-      status = get_nc_data(obs_var, obs_buf, nlocs);
-      if(status) {
-         for(int idx=0; idx<nlocs; idx++)
-            if(check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_float;
-      }
-      else mlog << Error << "\n" << method_name
-                << "trouble getting " << var_name << "\n\n";
-   }
-   else mlog << Error << "\n" << method_name
-             << var_name << "@ObsValue does not exist!\n\n";
-   if(!status) exit(1);
-   
-   status = false;
-   if(var_name.length() > 0) {
-      ConcatString ioda_name = var_name;
-      ioda_name.add("@PreQC");
-      NcVar qc_var = get_var(f_in, ioda_name.c_str());
-      if(IS_VALID_NC(qc_var)) {
-         status = get_nc_data(&qc_var, qc_buf, nlocs);
-         if(!status) mlog << Warning << "\n" << method_name
-                           << "trouble getting " << ioda_name << "\n\n";
-      }
-      else mlog << Warning << "\n" << method_name
-                << "\"" << ioda_name << "\" does not exist!\n\n";
-   }
-   if(status) {
-      for(int idx=0; idx<nlocs; idx++)
-         if(check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_float;
-   }
-   else {
-      for(int idx=0; idx<nlocs; idx++)
-         qc_buf[idx] = bad_data_int;
-   }
-   return status;
-}
-
-bool check_core_data(const bool has_msg_type, const bool has_station_id,
-                     StringArray &dim_names, StringArray &metadata_vars) {
-   bool is_netcdf_ready = true;
-   static const char *method_name = "check_core_data() -> ";
-   
-   for(int idx=0; idx<core_dims.n(); idx++) {
-      if(!dim_names.has(core_dims[idx])) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core dimension \"" << core_dims[idx] << "\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-
-   if(has_msg_type || has_station_id) {
-      if(!dim_names.has("nstring")) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core dimension \"nstring\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-
-   for(int idx=0; idx<core_vars.n(); idx++) {
-      if(!metadata_vars.has(core_vars[idx])) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core variable  \"" << core_vars[idx] << "\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-   return is_netcdf_ready;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void process_ioda_file(int i_pb) {
-   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
-   int i, idx, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
+   int npbmsg, npbmsg_total;
+   int idx, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_nobs;
-   //int lv, ev, ev_temp, kk, len1, len2;
    double   x, y;
 
    unixtime file_ut;
@@ -506,12 +354,8 @@ void process_ioda_file(int i_pb) {
    char     hdr_typ[max_str_len];
    ConcatString hdr_sid;
    char     modified_hdr_typ[max_str_len];
-   double   hdr_lat = bad_data_double;
-   double   hdr_lon = bad_data_double;
-   double   hdr_elv = bad_data_double;
+   double   hdr_lat, hdr_lon, hdr_elv;
    unixtime hdr_vld_ut;
-
-   float    quality_mark, dl_category;
    float    obs_arr[OBS_ARRAY_LEN];
 
    const int debug_level_for_performance = 3;
@@ -621,7 +465,7 @@ void process_ioda_file(int i_pb) {
    if(dim_names.has("ndatetime")) ndatetime = get_dim_value(f_in, "ndatetime", error_out);
    else {
       NcDim datetime_dim = get_nc_dim(&in_hdr_vld_var, 1);
-      if(IS_VALID_NC(datetime_dim)) ndatetime = get_dim_size(&datetime_dim);
+      ndatetime = IS_VALID_NC(datetime_dim) ? get_dim_size(&datetime_dim) : nstring;
       mlog << Debug(3) << "\n" << method_name << "-> "
            << "ndatetime dimension does not exist!\n";
    }
@@ -685,7 +529,6 @@ void process_ioda_file(int i_pb) {
    else raw_var_names = obs_var_names;
    if(obs_var_names.n() > 0) obs_var_names.clear();
 
-   bool status;
    NcVar obs_var, qc_var;
    ConcatString unit_attr;
    ConcatString desc_attr;
@@ -702,7 +545,7 @@ void process_ioda_file(int i_pb) {
       v_obs_data.push_back(obs_data);
       unit_attr.clear();
       desc_attr.clear();
-      status = get_obs_data_float(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs);
+      get_obs_data_float(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs);
       if(IS_VALID_NC(obs_var)) {
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
@@ -719,10 +562,8 @@ void process_ioda_file(int i_pb) {
    // Initialize counts
    i_ret   = n_file_obs = i_msg      = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
-   rej_elv = 0;
+   rej_elv = rej_nobs   = 0;
 
-   //processed_count = 0;
-   int buf_nlev;
    bool showed_progress = false;
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
@@ -738,7 +579,6 @@ void process_ioda_file(int i_pb) {
    }
    mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
 
-   bool     is_same_header;
    int      bin_count = nint(npbmsg/20.0);
    unixtime prev_hdr_vld_ut = (unixtime) 0;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
@@ -895,14 +735,14 @@ void process_ioda_file(int i_pb) {
             rej_grid++;
             continue;
          }
-      }
 
-      // Include the area mask rejection counts with the polyline since
-      // it is specified using the mask.poly config option.
-      if(apply_area_mask) {
-         if(!conf_info.area_mask.s_is_on(nint(x), nint(y))) {
-            rej_poly++;
-            continue;
+         // Include the area mask rejection counts with the polyline since
+         // it is specified using the mask.poly config option.
+         if(apply_area_mask) {
+            if(!conf_info.area_mask.s_is_on(nint(x), nint(y))) {
+               rej_poly++;
+               continue;
+            }
          }
       }
 
@@ -962,7 +802,6 @@ void process_ioda_file(int i_pb) {
       if(mlog.verbosity_level() >= debug_level_for_performance) {
          end_t = clock();
          log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
-         start_t = clock();
       }
       cout << log_message << "\n";
    }
@@ -1021,7 +860,8 @@ void process_ioda_file(int i_pb) {
    delete [] hdr_elv_arr;
    delete [] obs_pres_arr;
    delete [] obs_hght_arr;
-   //delete [] air_temperature;
+   if (hdr_msg_types) delete [] hdr_msg_types;
+   if (hdr_station_ids) delete [] hdr_station_ids;
    delete [] hdr_vld_block;
    for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
    for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
@@ -1198,6 +1038,175 @@ bool keep_valid_time(const unixtime ut,
    }
 
    return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_core_data(const bool has_msg_type, const bool has_station_id,
+                     StringArray &dim_names, StringArray &metadata_vars) {
+   bool is_netcdf_ready = true;
+   static const char *method_name = "check_core_data() -> ";
+   
+   for(int idx=0; idx<core_dims.n(); idx++) {
+      if(!dim_names.has(core_dims[idx])) {
+         mlog << Error << "\n" << method_name << "-> "
+              << "core dimension \"" << core_dims[idx] << "\" is missing.\n\n";
+         is_netcdf_ready = false;
+      }
+   }
+
+   if(has_msg_type || has_station_id) {
+      if(!dim_names.has("nstring")) {
+         mlog << Error << "\n" << method_name << "-> "
+              << "core dimension \"nstring\" is missing.\n\n";
+         is_netcdf_ready = false;
+      }
+   }
+
+   for(int idx=0; idx<core_vars.n(); idx++) {
+      if(!metadata_vars.has(core_vars[idx])) {
+         mlog << Error << "\n" << method_name << "-> "
+              << "core variable  \"" << core_vars[idx] << "\" is missing.\n\n";
+         is_netcdf_ready = false;
+      }
+   }
+   return is_netcdf_ready;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_missing_thresh(float value) {
+   bool check = false;
+   for(int idx=0; idx<conf_info.missing_thresh.n(); idx++) {
+      if(conf_info.missing_thresh[idx].check(value)) {
+          check = true;
+          break;
+      }
+   }
+   return check;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString find_meta_name(StringArray metadata_names, StringArray config_names) {
+   ConcatString metadata_name;
+   
+   for(int idx =0; idx<config_names.n(); idx++) {
+      if(metadata_names.has(config_names[idx])) {
+         metadata_name = config_names[idx];
+         break;
+      }
+   }
+   return metadata_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_meta_data_float(NcFile *f_in, StringArray &metadata_vars,
+                         const char *metadata_key, float *metadata_buf,
+                         const int nlocs) {
+   bool status = false;
+   static const char *method_name = "get_meta_data_float() -> ";
+   
+   ConcatString metadata_name = find_meta_name(
+        metadata_vars, conf_info.metadata_map[metadata_key]);
+   if(metadata_name.length() > 0) {
+      ConcatString ioda_name = metadata_name;
+      ioda_name.add("@MetaData");
+      NcVar meta_var = get_var(f_in, ioda_name.c_str());
+      if(IS_VALID_NC(meta_var)) {
+         status = get_nc_data(&meta_var, metadata_buf, nlocs);
+         if(!status) mlog << Debug(3) << method_name
+                           << "trouble getting " << metadata_name << "\n";
+      }
+   }
+   else mlog << Warning << "\n" << method_name
+             << "Metadata for " << metadata_key << " does not exist!\n\n";
+   if(status) {
+      for(int idx=0; idx<nlocs; idx++)
+         if(check_missing_thresh(metadata_buf[idx])) metadata_buf[idx] = bad_data_float;
+   }
+   else {
+      for(int idx=0; idx<nlocs; idx++)
+         metadata_buf[idx] = bad_data_float;
+   }
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_meta_data_strings(NcFile *f_in, const ConcatString metadata_name,
+                           char *metadata_buf) {
+   bool status = false;
+   static const char *method_name = "get_meta_data_strings() -> ";
+
+   ConcatString ioda_name = metadata_name;
+   ioda_name.add("@MetaData");
+   NcVar meta_var = get_var(f_in, ioda_name.c_str());
+   if(IS_VALID_NC(meta_var)) {
+      status = get_nc_data(&meta_var, metadata_buf);
+      if(!status) {
+         mlog << Error << "\n" << method_name << " -> "
+              << "trouble getting " << metadata_name << "\n\n";
+         exit(1);
+      }
+   }
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
+                        NcVar *obs_var, float *obs_buf, int *qc_buf,
+                        const int nlocs) {
+   bool status = false;
+   static const char *method_name = "get_obs_data_float() -> ";
+   
+   if(IS_VALID_NC_P(obs_var)) {
+      status = get_nc_data(obs_var, obs_buf, nlocs);
+      if(status) {
+         for(int idx=0; idx<nlocs; idx++)
+            if(check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_float;
+      }
+      else mlog << Error << "\n" << method_name
+                << "trouble getting " << var_name << "\n\n";
+   }
+   else mlog << Error << "\n" << method_name
+             << var_name << "@ObsValue does not exist!\n\n";
+   if(!status) exit(1);
+   
+   status = false;
+   if(var_name.length() > 0) {
+      ConcatString ioda_name = var_name;
+      ioda_name.add("@PreQC");
+      NcVar qc_var = get_var(f_in, ioda_name.c_str());
+      if(IS_VALID_NC(qc_var)) {
+         status = get_nc_data(&qc_var, qc_buf, nlocs);
+         if(!status) mlog << Warning << "\n" << method_name
+                           << "trouble getting " << ioda_name << "\n\n";
+      }
+      else mlog << Warning << "\n" << method_name
+                << "\"" << ioda_name << "\" does not exist!\n\n";
+   }
+   if(status) {
+      for(int idx=0; idx<nlocs; idx++)
+         if(check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_float;
+   }
+   else {
+      for(int idx=0; idx<nlocs; idx++)
+         qc_buf[idx] = bad_data_int;
+   }
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_postfix(std::string const &str_buf, std::string const &postfix) {
+   if(str_buf.length() >= postfix.length()) {
+      return (0 == str_buf.compare(str_buf.length() - postfix.length(), postfix.length(), postfix));
+   } else {
+      return false;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
