@@ -260,21 +260,21 @@ Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_
 
 **-\\-enable-lidar2nc**
 
-Enable compilation of utilities using lidar2nc.
+Enable compilation of utilities using the LIDAR2NC tool.
 
 **-\\-enable-modis**
 
-Enable compilation of modis_regrid. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
+Enable compilation of the Modis-Regrid tool. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
 
 **-\\-enable-mode_graphics**
 
-Enable compilation of mode_graphics. Requires $MET_CAIRO and $MET_FREETYPE.
+Enable compilation of the MODE-Graphics tool. Requires $MET_CAIRO and $MET_FREETYPE.
 
 **-\\-disable-block4**
 
 Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBUFR files.
 
-Run the configure script with the --help argument to see the full list of configuration options.
+Run the configure script with the **--help** argument to see the full list of configuration options.
 
 Make Targets
 ~~~~~~~~~~~~
@@ -306,4 +306,4 @@ Once the MET package has been built successfully, the user is encouraged to run 
 
 3. When the test script is finished, type 'CTRL-C' to quit the tail. Look in "out" to find the output files for these tests. Each tool has a separate, appropriately named subdirectory for its output files. 
 
-4. In particular, check that the PB2NC tool ran without error. If there was an error, run "make clean" then rerun your configure command adding "--disable-block4" to your configure command line and rebuild MET.
+4. In particular, check that the PB2NC tool ran without error. If there was an error, run "make clean" then rerun your configure command adding **--disable-block4** to your configure command line and rebuild MET.

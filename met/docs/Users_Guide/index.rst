@@ -36,7 +36,7 @@ Available at: `MET releases <https://github.com/dtcenter/MET/releases>`_
 
 **Acknowledgments**
 
-We thank the the National Science Foundation (NSF) along with three organizations within the National Oceanic and Atmospheric Administration (NOAA): 1) Office of Atmospheric Research (OAR); 2) Next Generation Global Prediction System project (NGGPS); and 3) United State Weather Research Program (USWRP), the United States Air Force (USAF), and the United States Department of Energy (DOE) for their support of this work. Funding for the development of MET-TC is from the NOAA's Hurricane Forecast Improvement Project (HFIP) through the Developmental Testbed Center (DTC). Funding for the expansion of capability to address many methods pertinent to global and climate simulations was provided by NOAA's Next Generation Global Prediction System (NGGPS) and NSF Earth System Model 2 (EaSM2) projects. We would like to thank James Franklin at the National Hurricane Center (NHC) for his insight into the original development of the existing NHC verification software. Thanks also go to the staff at the Developmental Testbed Center for their help, advice, and many types of support. We released METv1.0 in January 2008 and would not have made a decade of cutting-edge verification support without those who participated in the original MET planning workshops and the now dis-banded verification advisory group (Mike Baldwin, Matthew Sittel, Elizabeth Ebert, Geoff DiMego, Chris Davis, and Jason Knievel).
+We thank the National Science Foundation (NSF) along with three organizations within the National Oceanic and Atmospheric Administration (NOAA): 1) Office of Atmospheric Research (OAR); 2) Next Generation Global Prediction System project (NGGPS); and 3) United State Weather Research Program (USWRP), the United States Air Force (USAF), and the United States Department of Energy (DOE) for their support of this work. Funding for the development of MET-TC is from the NOAA's Hurricane Forecast Improvement Project (HFIP) through the Developmental Testbed Center (DTC). Funding for the expansion of capability to address many methods pertinent to global and climate simulations was provided by NOAA's Next Generation Global Prediction System (NGGPS) and NSF Earth System Model 2 (EaSM2) projects. We would like to thank James Franklin at the National Hurricane Center (NHC) for his insight into the original development of the existing NHC verification software. Thanks also go to the staff at the Developmental Testbed Center for their help, advice, and many types of support. We released METv1.0 in January 2008 and would not have made a decade of cutting-edge verification support without those who participated in the original MET planning workshops and the now dis-banded verification advisory group (Mike Baldwin, Matthew Sittel, Elizabeth Ebert, Geoff DiMego, Chris Davis, and Jason Knievel).
 
 The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC is sponsored by the National Oceanic and Atmospheric Administration (NOAA), the United States Air Force, and the National Science Foundation (NSF). NCAR is sponsored by the National Science Foundation (NSF).
 		  
@@ -69,6 +69,8 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    tc-rmw
    rmw-analysis
    plotting
+   README
+   README_TC
    refs
    appendixA
    appendixB
