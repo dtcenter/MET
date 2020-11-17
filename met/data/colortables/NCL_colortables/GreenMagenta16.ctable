@@ -1,5 +1,3 @@
-// Green to Magenta, 16 steps
-// Taken from Department of Geography, University of Oregon
 0.0000 0.0625 {   0,  80,   0 }
 0.0625 0.1250 {   0, 134,   0 }
 0.1250 0.1875 {   0, 187,   0 }

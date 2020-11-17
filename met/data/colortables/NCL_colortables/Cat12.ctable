@@ -1,5 +1,3 @@
-// Categorical 12-step scheme, after ColorBrewer 11-step Paired Scheme
-// Taken from Department of Geography, University of Oregon
 0.0000 0.0833 { 255, 191, 127 }
 0.0833 0.1667 { 255, 127,   0 }
 0.1667 0.2500 { 255, 255, 153 }
