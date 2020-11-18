@@ -396,8 +396,8 @@ void process_ioda_file(int i_pb) {
    // Initialize
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
-   min_time_str[0] = bad_data_char;
-   max_time_str[0] = bad_data_char;
+   min_time_str[0] = NULL;
+   max_time_str[0] = NULL;
 
    // Set the file name for the IODA file
    file_name << ioda_files[i_pb];
@@ -429,8 +429,10 @@ void process_ioda_file(int i_pb) {
          mlog << Debug(6) << method_name << "ObsValue var: " << obs_value_vars[idx] << "\n";
    }
 
-   ConcatString msg_type_name = find_meta_name(metadata_vars, conf_info.metadata_map[conf_key_message_type]);
-   ConcatString station_id_name = find_meta_name(metadata_vars, conf_info.metadata_map[conf_key_station_id]);
+   ConcatString msg_type_name = find_meta_name(metadata_vars,
+                                               conf_info.metadata_map[conf_key_message_type]);
+   ConcatString station_id_name = find_meta_name(metadata_vars,
+                                                 conf_info.metadata_map[conf_key_station_id]);
 
    bool has_msg_type = 0 < msg_type_name.length();
    bool has_station_id = 0 < station_id_name.length();
@@ -656,7 +658,7 @@ void process_ioda_file(int i_pb) {
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
          strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring);
-         hdr_typ[nstring] = 0;
+         hdr_typ[nstring] = NULL;
          // Null terminate the message type string
          cleanup_hdr_buf(hdr_typ, nstring);
 
@@ -679,11 +681,13 @@ void process_ioda_file(int i_pb) {
          else {
             strncpy(modified_hdr_typ, hdr_typ, buf_len);
          }
+         modified_hdr_typ[buf_len-1] = NULL;
       }
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
          strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring);
+         tmp_sid[nstring] = NULL;
          cleanup_hdr_buf(tmp_sid, nstring);
          hdr_sid = tmp_sid;
       }
