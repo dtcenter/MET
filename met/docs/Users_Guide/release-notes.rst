@@ -8,7 +8,7 @@ https://github.com/dtcenter/MET/issues
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
-- See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/68?closed=1>`_).
+- See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/68?closed=1>`_.
 - Fix Grid-Diag to correctly ignore missing data values (`#1562 <http://github.com/dtcenter/MET/issues/1562>`_).
 - Fix ncdump in the MET Docker image (`#1554 <http://github.com/dtcenter/MET/issues/1554>`_).
 - Fix bug in the MODE CTS output when running multiple convolution radii and thresholds (`#1547 <http://github.com/dtcenter/MET/issues/1547>`_).
