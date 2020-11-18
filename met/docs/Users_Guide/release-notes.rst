@@ -8,6 +8,7 @@ https://github.com/dtcenter/MET/issues
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
+- See complete list of `GitHub Issues <https://github.com/dtcenter/MET/issues?q=is%3Aissue+milestone%3A%22MET+9.1.1+%28bugfix%29%22+is%3Aclosed>`_).
 - Fix Grid-Diag to correctly ignore missing data values (`#1562 <http://github.com/dtcenter/MET/issues/1562>`_).
 - Fix ncdump in the MET Docker image (`#1554 <http://github.com/dtcenter/MET/issues/1554>`_).
 - Fix bug in the MODE CTS output when running multiple convolution radii and thresholds (`#1547 <http://github.com/dtcenter/MET/issues/1547>`_).
@@ -17,7 +18,7 @@ Version |version| release notes (|release_date|)
 - Fix Ensemble-Stat logic when multiple ensemble members contain no valid data (`#1475 <http://github.com/dtcenter/MET/issues/1475>`_).
 - Add error message to state that python embedding pickling logic is not yet supported (`#1472 <http://github.com/dtcenter/MET/issues/1472>`_).
 - Fix TC-Gen to correctly handle the lead_window configuration file filtering option (`#1465 <http://github.com/dtcenter/MET/issues/1465>`_).
-- Correct the madi2nc log message for ACARS input, not ACARS profiler (`#1409 <http://github.com/dtcenter/MET/issues/1409>`_).
+- Fix the madis2nc log message for ACARS input, not ACARS profiler input (`#1409 <http://github.com/dtcenter/MET/issues/1409>`_).
 
 Version 9.1 release notes (20200810)
 ------------------------------------
