@@ -1,3 +1,6 @@
+//
+// Derived from NCL colormap "nrl_sirkes_nowhite.rgb"
+//
 0.0000 0.0526 {   0,  97, 128 }
 0.0526 0.1053 {   0, 128, 161 }
 0.1053 0.1579 {   0, 161, 191 }

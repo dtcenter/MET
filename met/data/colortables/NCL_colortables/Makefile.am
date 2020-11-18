@@ -21,59 +21,273 @@ nclctabledir = $(pkgdatadir)/colortables/NCL_colortables
 nclctable_DATA = \
 	3gauss.ctable \
 	3saw.ctable \
-	amwg.ctable \
 	BkBlAqGrYeOrReViWh200.ctable \
+	BlAqGrWh2YeOrReVi22.ctable \
 	BlAqGrYeOrRe.ctable \
 	BlAqGrYeOrReVi200.ctable \
 	BlGrYeOrReVi200.ctable \
 	BlRe.ctable \
+	BlWhRe.ctable \
 	BlueDarkOrange18.ctable \
 	BlueDarkRed18.ctable \
 	BlueGreen14.ctable \
 	BlueRed.ctable \
 	BlueRedGray.ctable \
-	BlWhRe.ctable \
+	BlueWhiteOrangeRed.ctable \
+	BlueYellowRed.ctable \
 	BrownBlue12.ctable \
+	CBR_coldhot.ctable \
+	CBR_drywet.ctable \
+	CBR_set3.ctable \
+	CBR_wet.ctable \
 	Cat12.ctable \
-	cosam12.ctable \
-	cosam.ctable \
-	detail.ctable \
-	extrema.ctable \
+	GHRSST_anomaly.ctable \
+	GMT_cool.ctable \
+	GMT_copper.ctable \
+	GMT_drywet.ctable \
+	GMT_gebco.ctable \
+	GMT_globe.ctable \
+	GMT_gray.ctable \
+	GMT_haxby.ctable \
+	GMT_hot.ctable \
+	GMT_jet.ctable \
+	GMT_nighttime.ctable \
+	GMT_no_green.ctable \
+	GMT_ocean.ctable \
+	GMT_paired.ctable \
+	GMT_panoply.ctable \
+	GMT_polar.ctable \
+	GMT_red2green.ctable \
+	GMT_relief.ctable \
+	GMT_relief_oceanonly.ctable \
+	GMT_seis.ctable \
+	GMT_split.ctable \
+	GMT_topo.ctable \
+	GMT_wysiwyg.ctable \
+	GMT_wysiwygcont.ctable \
+	GSFC_landsat_udf_density.ctable \
+	GrayWhiteGray.ctable \
 	GreenMagenta16.ctable \
 	GreenYellow.ctable \
-	helix1.ctable \
+	MPL_Accent.ctable \
+	MPL_Blues.ctable \
+	MPL_BrBG.ctable \
+	MPL_BuGn.ctable \
+	MPL_BuPu.ctable \
+	MPL_Dark2.ctable \
+	MPL_GnBu.ctable \
+	MPL_Greens.ctable \
+	MPL_Greys.ctable \
+	MPL_OrRd.ctable \
+	MPL_Oranges.ctable \
+	MPL_PRGn.ctable \
+	MPL_Paired.ctable \
+	MPL_Pastel1.ctable \
+	MPL_Pastel2.ctable \
+	MPL_PiYG.ctable \
+	MPL_PuBu.ctable \
+	MPL_PuBuGn.ctable \
+	MPL_PuOr.ctable \
+	MPL_PuRd.ctable \
+	MPL_Purples.ctable \
+	MPL_RdBu.ctable \
+	MPL_RdGy.ctable \
+	MPL_RdPu.ctable \
+	MPL_RdYlBu.ctable \
+	MPL_RdYlGn.ctable \
+	MPL_Reds.ctable \
+	MPL_Set1.ctable \
+	MPL_Set2.ctable \
+	MPL_Set3.ctable \
+	MPL_Spectral.ctable \
+	MPL_StepSeq.ctable \
+	MPL_YlGn.ctable \
+	MPL_YlGnBu.ctable \
+	MPL_YlOrBr.ctable \
+	MPL_YlOrRd.ctable \
+	MPL_afmhot.ctable \
+	MPL_autumn.ctable \
+	MPL_bone.ctable \
+	MPL_brg.ctable \
+	MPL_bwr.ctable \
+	MPL_cool.ctable \
+	MPL_coolwarm.ctable \
+	MPL_copper.ctable \
+	MPL_cubehelix.ctable \
+	MPL_flag.ctable \
+	MPL_gist_earth.ctable \
+	MPL_gist_gray.ctable \
+	MPL_gist_heat.ctable \
+	MPL_gist_ncar.ctable \
+	MPL_gist_rainbow.ctable \
+	MPL_gist_stern.ctable \
+	MPL_gist_yarg.ctable \
+	MPL_gnuplot.ctable \
+	MPL_gnuplot2.ctable \
+	MPL_hot.ctable \
+	MPL_hsv.ctable \
+	MPL_jet.ctable \
+	MPL_ocean.ctable \
+	MPL_pink.ctable \
+	MPL_prism.ctable \
+	MPL_rainbow.ctable \
+	MPL_s3pcpn.ctable \
+	MPL_s3pcpn_l.ctable \
+	MPL_seismic.ctable \
+	MPL_spring.ctable \
+	MPL_sstanom.ctable \
+	MPL_summer.ctable \
+	MPL_terrain.ctable \
+	MPL_viridis.ctable \
+	MPL_winter.ctable \
+	NCV_banded.ctable \
+	NCV_blu_red.ctable \
+	NCV_blue_red.ctable \
+	NCV_bright.ctable \
+	NCV_gebco.ctable \
+	NCV_jaisnd.ctable \
+	NCV_jet.ctable \
+	NCV_manga.ctable \
+	NCV_rainbow2.ctable \
+	NCV_roullet.ctable \
+	NEO_div_vegetation_a.ctable \
+	NEO_div_vegetation_b.ctable \
+	NEO_div_vegetation_c.ctable \
+	NEO_modis_ndvi.ctable \
+	NOC_ndvi.ctable \
+	OceanLakeLandSnow.ctable \
+	SVG_Gallet13.ctable \
+	SVG_Lindaa06.ctable \
+	SVG_Lindaa07.ctable \
+	SVG_bhw3_22.ctable \
+	SVG_es_landscape_79.ctable \
+	SVG_feb_sunrise.ctable \
+	SVG_foggy_sunrise.ctable \
+	SVG_fs2006.ctable \
+	StepSeq25.ctable \
+	UKM_hadcrut.ctable \
+	ViBlGrWhYeOrRe.ctable \
+	WhBlGrYeRe.ctable \
+	WhBlReWh.ctable \
+	WhViBlGrYeOrRe.ctable \
+	WhViBlGrYeOrReWh.ctable \
+	WhiteBlue.ctable \
+	WhiteBlueGreenYellowRed.ctable \
+	WhiteGreen.ctable \
+	WhiteYellowOrangeRed.ctable \
+	amwg.ctable \
+	amwg256.ctable \
+	amwg_blueyellowred.ctable \
+	cb_9step.ctable \
+	cb_rainbow.ctable \
+	cb_rainbow_inv.ctable \
+	circular_0.ctable \
+	circular_1.ctable \
+	circular_2.ctable \
+	cividis.ctable \
+	cmocean_algae.ctable \
+	cmocean_amp.ctable \
+	cmocean_balance.ctable \
+	cmocean_curl.ctable \
+	cmocean_deep.ctable \
+	cmocean_delta.ctable \
+	cmocean_dense.ctable \
+	cmocean_gray.ctable \
+	cmocean_haline.ctable \
+	cmocean_ice.ctable \
+	cmocean_matter.ctable \
+	cmocean_oxy.ctable \
+	cmocean_phase.ctable \
+	cmocean_solar.ctable \
+	cmocean_speed.ctable \
+	cmocean_tempo.ctable \
+	cmocean_thermal.ctable \
+	cmocean_turbid.ctable \
+	cmp_b2r.ctable \
+	cmp_flux.ctable \
+	cmp_haxby.ctable \
+	cosam.ctable \
+	cosam12.ctable \
+	cyclic.ctable \
+	default.ctable \
+	detail.ctable \
+	drought_severity.ctable \
+	example.ctable \
+	extrema.ctable \
+	grads_default.ctable \
+	grads_rainbow.ctable \
+	gscyclic.ctable \
+	gsdtol.ctable \
+	gsltod.ctable \
+	gui_default.ctable \
 	helix.ctable \
+	helix1.ctable \
+	hlu_default.ctable \
+	hotcold_18lev.ctable \
+	hotcolr_19lev.ctable \
 	hotres.ctable \
+	lithology.ctable \
+	matlab_hot.ctable \
+	matlab_hsv.ctable \
+	matlab_jet.ctable \
+	matlab_lines.ctable \
+	mch_default.ctable \
+	ncl_default.ctable \
 	ncview_default.ctable \
+	nice_gfdl.ctable \
 	nrl_sirkes.ctable \
 	nrl_sirkes_nowhite.ctable \
+	perc2_9lev.ctable \
+	percent_11lev.ctable \
 	posneg_1.ctable \
 	posneg_2.ctable \
 	prcp_1.ctable \
 	prcp_2.ctable \
 	prcp_3.ctable \
+	precip2_15lev.ctable \
+	precip2_17lev.ctable \
+	precip3_16lev.ctable \
+	precip4_11lev.ctable \
+	precip4_diff_19lev.ctable \
+	precip_11lev.ctable \
+	precip_diff_12lev.ctable \
+	precip_diff_1lev.ctable \
+	psgcap.ctable \
+	radar.ctable \
 	radar_1.ctable \
-	rainbow.ctable \
 	rainbow+gray.ctable \
-	rainbow+white.ctable \
 	rainbow+white+gray.ctable \
+	rainbow+white.ctable \
+	rainbow.ctable \
+	rh_19lev.ctable \
+	seaice_1.ctable \
+	seaice_2.ctable \
 	so4_21.ctable \
 	so4_23.ctable \
-	StepSeq25.ctable \
-	tbr_240-300.ctable \
+	spread_15lev.ctable \
+	srip_reanalysis.ctable \
+	sunshine_9lev.ctable \
+	sunshine_diff_12lev.ctable \
+	t2m_29lev.ctable \
 	tbrAvg1.ctable \
 	tbrStd1.ctable \
+	tbrVar1.ctable \
+	tbr_240-300.ctable \
 	tbr_stdev_0-30.ctable \
 	tbr_var_0-500.ctable \
-	tbrVar1.ctable \
+	temp1.ctable \
+	temp_19lev.ctable \
+	temp_diff_18lev.ctable \
+	temp_diff_1lev.ctable \
+	testcmap.ctable \
 	thelix.ctable \
-	ViBlGrWhYeOrRe.ctable \
+	topo_15lev.ctable \
+	uniform.ctable \
+	vegetation_ClarkU.ctable \
+	vegetation_modis.ctable \
 	wgne15.ctable \
 	wh-bl-gr-ye-re.ctable \
-	WhBlGrYeRe.ctable \
-	WhBlReWh.ctable \
-	WhViBlGrYeOrRe.ctable \
-	WhViBlGrYeOrReWh.ctable \
+	wind_17lev.ctable \
 	wxpEnIR.ctable
 
 EXTRA_DIST = ${nclctable_DATA}

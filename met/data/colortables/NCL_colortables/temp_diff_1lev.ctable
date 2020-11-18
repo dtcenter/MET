@@ -1,0 +1,5 @@
+//
+// Derived from NCL colormap "temp_diff_1lev.rgb"
+//
+0.0000 0.5000 { 240,  60,  43 }
+0.5000 1.0000 {  33, 113, 181 }

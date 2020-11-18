@@ -1,5 +1,6 @@
-// Brown to Blue, 12 steps
-// Taken from Department of Geography, University of Oregon
+//
+// Derived from NCL colormap "BrownBlue12.rgb"
+//
 0.0000 0.0833 {  51,  25,   0 }
 0.0833 0.1667 { 102,  47,   0 }
 0.1667 0.2500 { 153,  96,  53 }
