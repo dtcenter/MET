@@ -1289,12 +1289,14 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    for (int index=0; index<data_count; index++) {
       int len, len2;
       const string string_data= strArray[index];
-      
+
       processed_count++;
       len  = string_data.length();
       len2 = strnlen(data_buf[buf_index], str_len);
-      if (len2 < len) len2 = len;
       strncpy(data_buf[buf_index], string_data.c_str(), len);
+      // Make sure NULL terminated string
+      if(len < str_len) data_buf[buf_index][len] = bad_data_char;
+      //Cleanup garbage characters
       for (int idx=len; idx<len2; idx++)
          data_buf[buf_index][idx] = bad_data_char;
 
