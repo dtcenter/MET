@@ -335,7 +335,7 @@ void open_netcdf() {
 
 void process_ioda_file(int i_pb) {
    int npbmsg, npbmsg_total;
-   int idx, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
+   int idx, i_msg, i_read, n_file_obs, i_ret, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_nobs;
    double   x, y;
