@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/model_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="mode_multivar_fake_data">
+    <exec>&MET_BIN;/mode</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/fcst_files \
+      &DATA_DIR_MODEL;/obs_files \
+      &DATA_DIR_MODEL;/fake_data_config \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/f_super.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/o_super.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>
