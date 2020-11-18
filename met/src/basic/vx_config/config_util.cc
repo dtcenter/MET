@@ -2000,6 +2000,16 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void PlotInfo::clear() {
+   flag = true; // enabled by default
+   color_table.clear();
+   plot_min = bad_data_double;
+   plot_max = bad_data_double;
+   colorbar_flag = true; // plot colorbar by default
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 PlotInfo parse_conf_plot_info(Dictionary *dict) {
    PlotInfo info;
 
@@ -2008,6 +2018,10 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
+
+   // Get the flag, true if not present
+   info.flag = dict->lookup_bool(conf_key_flag, false);
+   if(!dict->last_lookup_status()) info.flag = true;
 
    // Get the color table
    info.color_table = dict->lookup_string(conf_key_color_table);
@@ -2020,17 +2034,9 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
    info.plot_max = dict->lookup_double(conf_key_plot_max, false);
    if(is_bad_data(info.plot_max)) info.plot_max = 0.0;
 
-   // Get the colorbar spacing, 1 if not present
-   info.colorbar_spacing = dict->lookup_int(conf_key_colorbar_spacing, false);
-   if(is_bad_data(info.colorbar_spacing)) info.colorbar_spacing = 1;
-
-   // Check that the colorbar spacing is set >= 1
-   if(info.colorbar_spacing < 1) {
-      mlog << Error << "\nparse_conf_plot_info() -> "
-           << "the colorbar_spacing (" << info.colorbar_spacing
-           << ") must be set >= 1.\n\n";
-      exit(1);
-   }
+   // Get the colorbar flag, true if not present
+   info.colorbar_flag = dict->lookup_bool(conf_key_colorbar_flag, false);
+   if(!dict->last_lookup_status()) info.colorbar_flag = true;
 
    return(info);
 }

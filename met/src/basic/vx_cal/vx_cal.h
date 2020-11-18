@@ -115,6 +115,8 @@ extern  ConcatString make_timestring(unixtime);
 
 extern  unixtime timestring_to_unix(const char *);
 
+extern  time_t timestring_to_time_t(const char *);
+
 extern  ConcatString HH(int hours);
 
 extern  int          timestring_to_sec(const char *);
