@@ -1,5 +1,6 @@
-// Blue to Green
-// Taken from Department of Geography, University of Oregon
+//
+// Derived from NCL colormap "BlueGreen14.rgb"
+//
 0.0000 0.0714 {   0,   0, 255 }
 0.0714 0.1429 {  51,  51, 255 }
 0.1429 0.2143 { 101, 101, 255 }

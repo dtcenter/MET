@@ -120,9 +120,6 @@ struct NcDataBuffer {
    float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
    char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
    
-   //StringArray   hdr_typ_array;
-   //StringArray   hdr_sid_array;
-   //StringArray   hdr_vld_array;
    StringArray  qty_data_array;
    int   hdr_typ_buf[OBS_BUFFER_SIZE];
    int   hdr_sid_buf[OBS_BUFFER_SIZE];
