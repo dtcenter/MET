@@ -90,17 +90,19 @@ In the dictionary, valid time, initialization time, lead time and accumulation t
 
 The supported grid **type** strings are described below:
 
-- **Lambert Conformal** grid dictionary entries:
-  - type                           ("Lambert Conformal")
-  - name                           (string)
-  - hemisphere                     (string: "N" or "S")
-  - scale_lat_1, scale_lat_2       (double)
-  - lat_pin, lon_pin, x_pin, y_pin (double)
-  - lon_orient                     (double)
-  - d_km, r_km                     (double)
-  - nx, ny                         (int)
+• **Lambert Conformal** grid dictionary entries:
+
+  • type                           ("Lambert Conformal")
+  • name                           (string)
+  • hemisphere                     (string: "N" or "S")
+  • scale_lat_1, scale_lat_2       (double)
+  • lat_pin, lon_pin, x_pin, y_pin (double)
+  • lon_orient                     (double)
+  • d_km, r_km                     (double)
+  • nx, ny                         (int)
 
 • **Polar Stereographic** grid dictionary entries:
+
   • type                           ("Polar Stereographic")
   • name                           (string)
   • hemisphere                     (string: "N" or "S")
@@ -111,6 +113,7 @@ The supported grid **type** strings are described below:
   • nx, ny                         (int)
 
 • **Mercator** grid dictionary entries:
+
   • type   ("Mercator")
   • name   (string)
   • lat_ll (double)
@@ -120,6 +123,7 @@ The supported grid **type** strings are described below:
   • nx, ny (int)
 
 • **LatLon** grid dictionary entries:
+
   • type                 ("LatLon")
   • name                 (string)
   • lat_ll, lon_ll       (double)
@@ -127,6 +131,7 @@ The supported grid **type** strings are described below:
   • Nlat, Nlon           (int)
 
 • **Rotated LatLon** grid dictionary entries:
+
   • type                                     ("Rotated LatLon")
   • name                                     (string)
   • rot_lat_ll, rot_lon_ll                   (double)
@@ -136,6 +141,7 @@ The supported grid **type** strings are described below:
   • aux_rotation                             (double)
 
 • **Gaussian** grid dictionary entries:
+
   • type     ("Gaussian")
   • name     (string)
   • lon_zero (double)
