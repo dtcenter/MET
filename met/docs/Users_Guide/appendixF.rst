@@ -90,17 +90,17 @@ In the dictionary, valid time, initialization time, lead time and accumulation t
 
 The supported grid **type** strings are described below:
 
-• Lambert Conformal grids are defined by:
-  • type                           ("Lambert Conformal")
-  • name                           (string)
-  • hemisphere                     (string: "N" or "S")
-  • scale_lat_1, scale_lat_2       (double)
-  • lat_pin, lon_pin, x_pin, y_pin (double)
-  • lon_orient                     (double)
-  • d_km, r_km                     (double)
-  • nx, ny                         (int)
+- **Lambert Conformal** grid dictionary entries:
+  - type                           ("Lambert Conformal")
+  - name                           (string)
+  - hemisphere                     (string: "N" or "S")
+  - scale_lat_1, scale_lat_2       (double)
+  - lat_pin, lon_pin, x_pin, y_pin (double)
+  - lon_orient                     (double)
+  - d_km, r_km                     (double)
+  - nx, ny                         (int)
 
-• Polar Stereographic grids are defined by:
+• **Polar Stereographic** grid dictionary entries:
   • type                           ("Polar Stereographic")
   • name                           (string)
   • hemisphere                     (string: "N" or "S")
@@ -110,7 +110,7 @@ The supported grid **type** strings are described below:
   • d_km, r_km                     (double)
   • nx, ny                         (int)
 
-• Mercator grids are defined by:
+• **Mercator** grid dictionary entries:
   • type   ("Mercator")
   • name   (string)
   • lat_ll (double)
@@ -119,14 +119,14 @@ The supported grid **type** strings are described below:
   • lon_ur (double)
   • nx, ny (int)
 
-• LatLon grids are defined by:
+• **LatLon** grid dictionary entries:
   • type                 ("LatLon")
   • name                 (string)
   • lat_ll, lon_ll       (double)
   • delta_lat, delta_lon (double)
   • Nlat, Nlon           (int)
 
-• Rotated LatLon grids are defined by:
+• **Rotated LatLon** grid dictionary entries:
   • type                                     ("Rotated LatLon")
   • name                                     (string)
   • rot_lat_ll, rot_lon_ll                   (double)
@@ -135,11 +135,13 @@ The supported grid **type** strings are described below:
   • true_lat_south_pole, true_lon_south_pole (double)
   • aux_rotation                             (double)
 
-• Gaussian grids are defined by:
+• **Gaussian** grid dictionary entries:
   • type     ("Gaussian")
   • name     (string)
   • lon_zero (double)
   • nx, ny   (int)
+
+Additional information about supported grids can be found in :ref:`appendixB`.
 
 **Using Xarray Objects**
 
