@@ -244,7 +244,7 @@ ______________________
      cts = BOTH;
   }
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
-  version    = "V9.0";
+  version    = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
 

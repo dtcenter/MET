@@ -2111,7 +2111,7 @@ the MET code being run. This value should generally not be modified.
 
 .. code-block:: none
 		
-  version = "V6.0";
+  version = "VN.N";
 
 **time_summary**
 		
