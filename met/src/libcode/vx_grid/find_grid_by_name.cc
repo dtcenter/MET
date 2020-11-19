@@ -28,6 +28,8 @@ static bool parse_lambert_grid(const StringArray &, Grid &);
 
 static bool parse_latlon_grid(const StringArray &, Grid &);
 
+static bool parse_rotlatlon_grid(const StringArray &, Grid &);
+
 static bool parse_stereographic_grid(const StringArray &, Grid &);
 
 static bool parse_mercator_grid(const StringArray &, Grid &);
@@ -207,12 +209,13 @@ bool status = false;
    //  parse supported projection types
    //
 
-     if ( strcasecmp(grid_strings[0].c_str(), "lambert")  == 0 )  status = parse_lambert_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "latlon")   == 0 )  status = parse_latlon_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "stereo")   == 0 )  status = parse_stereographic_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "mercator") == 0 )  status = parse_mercator_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "gaussian") == 0 )  status = parse_gaussian_grid(grid_strings, g);
-else                                                              status = false;
+     if ( strcasecmp(grid_strings[0].c_str(), "lambert")   == 0 )  status = parse_lambert_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "latlon")    == 0 )  status = parse_latlon_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "rotlatlon") == 0 )  status = parse_rotlatlon_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "stereo")    == 0 )  status = parse_stereographic_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "mercator")  == 0 )  status = parse_mercator_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "gaussian")  == 0 )  status = parse_gaussian_grid(grid_strings, g);
+else                                                               status = false;
 
    //
    //  done
@@ -527,6 +530,97 @@ if ( !west_longitude_positive )  {
 }
 
 ToGrid = new Grid ( ldata );
+
+g = *ToGrid;
+
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+
+
+   //
+   //  done
+   //
+
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
+
+{
+
+Grid * ToGrid = (Grid *) 0;
+
+RotatedLatLonData rdata;
+
+const int N = grid_strings.n_elements();
+
+if ( N != 10 )  {
+
+   mlog << Error << "\nparse_rotlatlon_grid() -> "
+        << "rotatedlatlon grid spec should have 10 entries\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+int Nx, Ny;
+double lat_ll, lon_ll, delta_lat, delta_lon;
+double true_lat_sp, true_lon_sp, aux_rot;
+
+
+j = 1;
+
+   //
+   //  get info from the strings
+   //
+
+Nx          = atoi(grid_strings[j++].c_str());
+Ny          = atoi(grid_strings[j++].c_str());
+
+lat_ll      = atof(grid_strings[j++].c_str());
+lon_ll      = atof(grid_strings[j++].c_str());
+
+delta_lat   = atof(grid_strings[j++].c_str());
+delta_lon   = atof(grid_strings[j++].c_str());
+
+true_lat_sp = atof(grid_strings[j++].c_str());
+true_lon_sp = atof(grid_strings[j++].c_str());
+aux_rot     = atof(grid_strings[j++].c_str());
+
+   //
+   //  load up the struct
+   //
+
+rdata.name = "To (rotlatlon)";
+
+rdata.rot_lat_ll = lat_ll;
+rdata.rot_lon_ll = lon_ll;
+
+rdata.delta_rot_lat = delta_lat;
+rdata.delta_rot_lon = delta_lon;
+
+rdata.Nlat = Ny;
+rdata.Nlon = Nx;
+
+rdata.true_lat_south_pole = true_lat_sp;
+rdata.true_lon_south_pole = true_lon_sp;
+
+rdata.aux_rotation = aux_rot;
+
+if ( !west_longitude_positive )  {
+
+   rdata.rot_lon_ll *= -1.0;
+   rdata.true_lon_south_pole *= -1.0;
+
+}
+
+ToGrid = new Grid ( rdata );
 
 g = *ToGrid;
 
