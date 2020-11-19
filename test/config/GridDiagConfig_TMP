@@ -2,7 +2,7 @@
 //
 // Grid-Diag configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, see the README file in the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ data = {
 
 mask = {
    grid = "";
-   poly = "MET_BASE/poly/CONUS.poly";
+   poly = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

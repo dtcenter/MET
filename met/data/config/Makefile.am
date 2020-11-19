@@ -42,7 +42,8 @@ config_DATA = \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
-	Point2GridConfig_default
+	Point2GridConfig_default \
+	PlotPointObsConfig_default
 
 EXTRA_DIST = ${config_DATA}
 
