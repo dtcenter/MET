@@ -124,6 +124,21 @@
     </output>
   </test>
 
+  <test name="regrid_data_plane_GFS_ROTLATLON_GRID_SPEC">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
+      "rotlatlon 420 408 -7.542 8.326 0.035999 0.035999 -34.515 -22.179 0" \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_ROTLATLON_GRID_SPEC.nc \
+      -field 'name="TMP"; level="P500";' \
+      -method BILIN -width 2 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_ROTLATLON_GRID_SPEC.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="regrid_data_plane_GFS_TO_HMT_BILIN">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \

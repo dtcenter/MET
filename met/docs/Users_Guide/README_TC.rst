@@ -166,7 +166,7 @@ The value should generally not be modified.
 
 .. code-block:: none
 		
-  version = "V10.0";
+  version = "VN.N";
 
 
 Settings specific to individual tools
