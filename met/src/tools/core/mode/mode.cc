@@ -265,7 +265,7 @@ cout << "\n\n"
 
      << "\twhere\n"
 
-     << "\t\t\"fcst\" is the name of a file containing the forecaset files to be used (required)\n"
+     << "\t\t\"fcst\" is the name of a file containing the forecast files to be used (required)\n"
      << "\t\t\"obs\"  is the name of a file containing the observation files to be used (required)\n"
      << "\t\t\"config\" is a MODEConfig file "
      << "containing the desired configuration settings (required).\n\n"
