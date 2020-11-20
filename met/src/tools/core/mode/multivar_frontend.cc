@@ -1,27 +1,18 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-// static const char f_multivar_program [] = "#1 && #2 && #3";
-// static const char o_multivar_program [] = "#1 && #2 && #3";
-
-static const char fcst_super_nc_filename [] = "f_super.nc";
-static const char  obs_super_nc_filename [] = "o_super.nc";
-
-static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char fcst_super_nc_filename [] = "f_super.nc";
+static const char  obs_super_nc_filename [] = "o_super.nc";
+
+static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -49,6 +40,7 @@ using namespace std;
 
 #include "combine_boolplanes.h"
 #include "objects_from_netcdf.h"
+#include "parse_file_list.h"
 
 
 using namespace netCDF;
@@ -58,10 +50,6 @@ using namespace netCDF;
 
 
 static ConcatString program_name;
-
-// static const char mode_path [] = "/d3/personal/randy/github/feature_1184_dryline/MET/met/src/tools/core/mode/mode";   //  hardwired for now
-
-// static const char mode_path [] = "/d3/personal/randy/github/new/MET/met/src/tools/core/mode/mode";   //  hardwired for now
 
 static const char sep [] = "====================================================\n";
 
@@ -82,8 +70,6 @@ extern void usage();
 
 
 static void read_config(const string & filename);
-
-static void get_filename_list(const char * fof_name, StringArray &);
 
 static void run_command(const ConcatString & command);
 
@@ -139,13 +125,9 @@ if ( config.obs_multivar_logic.empty() )  {
   //  make sure the multivar logic programs are in the config file
   //
 
-// cout << "fcst_multivar_logic = \"" << config.fcst_multivar_logic << "\"\n";
-// cout << " obs_multivar_logic = \"" << config.obs_multivar_logic  << "\"\n";
 
-
-get_filename_list(fcst_fof.c_str(), fcst_filenames);
-get_filename_list( obs_fof.c_str(),  obs_filenames);
-
+fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
+ obs_filenames = parse_ascii_file_list(obs_fof.c_str());
 
 if ( fcst_filenames.n() != obs_filenames.n() )  {
 
@@ -191,8 +173,6 @@ for (j=0; j<n_files; ++j)  {
 
    command << " -field_index " << j;
 
-   // cout << "\n\n  command = \"" << command.text() << "\"\n\n" << flush;
-
    run_command(command);
 
    mlog << Debug(1) << "\n finished mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
@@ -205,12 +185,9 @@ for (j=0; j<n_files; ++j)  {
 
 mlog << Debug(1) << "\n finished with individual mode runs " << sep << '\n';
 
-// nc_files.dump(cout, 1);
-
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
 BoolPlane f_result, o_result;
-// char junk[256];
 Pgm image;
 
    //
@@ -221,27 +198,11 @@ for (j=0; j<n_files; ++j)  {
 
    objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
 
-/*
-   snprintf(junk, sizeof(junk), "f_%02d.pgm", j);
-
-   boolplane_to_pgm(f_plane[j], image);
-
-   image.write(junk);
-  
-   snprintf(junk, sizeof(junk), "o_%02d.pgm", j);
-
-   boolplane_to_pgm(o_plane[j], image);
-
-   image.write(junk);
-*/
-
 }
 
    //
    //  combine the objects into super-objects
    //
-
-// cout << "f = \"" << conf.
 
 BoolCalc f_calc, o_calc ;
 const int nx = f_plane[0].nx();
@@ -249,9 +210,6 @@ const int ny = f_plane[0].ny();
 
 f_calc.set(config.fcst_multivar_logic.text());
 o_calc.set(config.obs_multivar_logic.text());
-
-// f_calc.dump_program(cout);
-// o_calc.dump_program(cout);
 
 f_result.set_size(nx, ny);
 o_result.set_size(nx, ny);
@@ -295,48 +253,11 @@ run_command(command);
 replace_data(f_result, fcst_super_nc_filename);
 replace_data(o_result,  obs_super_nc_filename);
 
-
    //
    //  done
    //
 
 return ( 0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_filename_list(const char * fof_name, StringArray & a)
-
-{
-
-ifstream in;
-char line[PATH_MAX + 10];
-
-in.open(fof_name);
-
-if ( ! in )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": get_filename_list() -> "
-        << "unable to open input file \"" << fof_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-while ( in.getline(line, sizeof(line)) )  {
-
-   a.add((string) line);
-
-}
-
-
-
-
-return;
 
 }
 
@@ -376,8 +297,6 @@ void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filename)
 
 {
 
-// ConcatString path;
-
 NcFile nc((string) fcst_super_nc_filename, NcFile::write, NcFile::classic);
 
    //
@@ -412,8 +331,6 @@ cout << "\n\n    var_name = \"" << var_name << "\"\n\n" << flush;
 
 int x, y, n;
 NcVar data_var = nc.getVar(var_name.text());
-// NcDim lat_dim  = nc.getDim("lat");
-// NcDim lon_dim  = nc.getDim("lon");
 const int nx = bp.nx();
 const int ny = bp.ny();
 const int nxy = nx*ny;
@@ -437,9 +354,6 @@ for (x=0; x<nx; ++x)  {
 
 data_var.putVar(buf);
 
-
-
-
    //
    //  done
    //
@@ -460,11 +374,9 @@ void read_config(const string & filename)
 
 ConcatString path;
 
-
 path = replace_path(mode_default_config);
 
 config.read_config(path.c_str(), filename.c_str());
-
 
 return;
 
