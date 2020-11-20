@@ -686,7 +686,7 @@ The output from this job consists of three lines, the first two of which contain
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 
-See :ref:`config_options` directory for a detailed description of the job command options available for ramp job type.
+See :numref:`config_options` for a detailed description of the job command options available for ramp job type.
 
 The default output for this job is contingency table counts and statistics (**-out_line_type CTC,CTS**). Matched pair information may also be output by requesting MPR output (**-out_line_type CTC,CTS,MPR**).
 
