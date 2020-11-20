@@ -3,7 +3,7 @@
 Tropical Cyclone Configuration Options
 ======================================
 
-See :numref:`config_options`
+See :numref:`config_options` for a description of the configuration file syntax.
 
 Configuration settings common to multiple tools
 _______________________________________________
