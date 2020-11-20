@@ -106,7 +106,7 @@ ____________________
   match_points = TRUE;
   version      = "VN.N";
 
-The configuration options listed above are common to multiple MET tools and are described in :numref:`Data IO MET-TC Configuration File Options`.
+The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options_tc`.
 
 ____________________
 

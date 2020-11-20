@@ -251,26 +251,8 @@ The following is a summary of the input and output formats for each of the tools
 Configuration File Details
 __________________________
 
-Part of the strength of MET is the leveraging of capability across tools. There are several config options that are common to many of the tools. They are described in this section.
+Part of the strength of MET is the leveraging of capability across tools. There are several configuration options that are common to many of the tools.
 
 Many of the MET tools use a configuration file to set parameters. This prevents the command line from becoming too long and cumbersome and makes the output easier to duplicate.
 
-Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the sections for those tools. In addition, these configuration settings are described in the *README* file and the *README_TC* file for the MET-Tropical Cyclone tools.
-
-.. _Data IO MET Configuration File Options:
-
-MET Configuration File Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The information listed below may also be found in the *README* file.
-
-:ref:`README`
-
-.. _Data IO MET-TC Configuration File Options:
-
-MET-TC Configuration File Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The information listed below may also be found in the *README_TC* file.
-
-:ref:`README_TC`
+Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the sections for those tools. In addition, these configuration settings are described in :ref:`config_options` and :ref:`config_options_tc`.

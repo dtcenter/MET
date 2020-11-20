@@ -1,9 +1,9 @@
-.. _README_TC:
+.. _config_options_tc:
 
-README_TC Configuration File Overview
-=====================================
+Tropical Cyclone Configuration Options
+======================================
 
-See :ref:`README`
+See :numref:`config_options`
 
 Configuration settings common to multiple tools
 _______________________________________________

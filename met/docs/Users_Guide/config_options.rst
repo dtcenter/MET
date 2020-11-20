@@ -1,17 +1,17 @@
-.. _README:
+.. _config_options:
 
-======================================
- README - Configuration File Overview
-======================================
+
+Configuration File Overview
+===========================
 
 The configuration files that control many of the MET tools contain formatted
 ASCII text. This format has been updated for MET version |version| and
 continues to be used in subsequent releases.
 
-Settings common to multiple tools are described in the top part of this README
+Settings common to multiple tools are described in the top part of this
 file and settings specific to individual tools are described beneath the common
-settings. Please refer to the MET User's Guide in the "doc" directory for more
-details about the settings if necessary.
+settings. Please refer to the MET User's Guide for more details about the
+settings if necessary.
 
 A configuration file entry is an entry name, followed by an equal sign (=),
 followed by an entry value, and is terminated by a semicolon (;). The
@@ -288,12 +288,8 @@ References:
 |
 
 
-Configuration settings used by the MET tools
-============================================
-
-
 Settings common to multiple tools
----------------------------------
+_________________________________
 
 **exit_on_warning**
 
@@ -2174,7 +2170,7 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
   }
 
 Settings specific to individual tools
--------------------------------------
+_____________________________________
 
 EnsembleStatConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

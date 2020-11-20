@@ -66,7 +66,7 @@ _____________________
   mask          = { grid = ""; poly = ""; }
   version       = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _____________________
 
