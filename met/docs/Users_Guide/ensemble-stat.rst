@@ -147,7 +147,7 @@ ____________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _____________________
 
@@ -244,7 +244,7 @@ ____________________
   prob_cat_thresh    = [];
 
 
-Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`Data IO MET Configuration File Options`. The following are some special considerations for the Ensemble-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Ensemble-Stat tool.
 
 
 The **ens** and **fcst** dictionaries do not need to include the same fields. Users may specify any number of ensemble fields to be summarized, but generally there are many fewer fields with verifying observations available. The **ens** dictionary specifies the fields to be summarized while the **fcst** dictionary specifies the fields to be verified.
@@ -396,7 +396,7 @@ The **rng** group defines the random number generator **type** and **seed** to b
 The **seed** variable may be set to a specific value to make the assignment of ranks fully repeatable. When left empty, as shown above, the random number generator seed is chosen automatically which will lead to slightly different bootstrap confidence intervals being computed each time the data is run.
 
 
-Refer to the description of the **boot** entry in :numref:`Data IO MET Configuration File Options` for more details on the random number generator.
+Refer to the description of the **boot** entry in :numref:`config_options` for more details on the random number generator.
 
 
 ensemble_stat output
