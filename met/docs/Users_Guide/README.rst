@@ -1,7 +1,8 @@
 .. _README:
 
-README - Configuration File Overview
-====================================
+======================================
+ README - Configuration File Overview
+======================================
 
 The configuration files that control many of the MET tools contain formatted
 ASCII text. This format has been updated for MET version |version| and
@@ -288,11 +289,11 @@ References:
 
 
 Configuration settings used by the MET tools
-____________________________________________
+============================================
 
 
 Settings common to multiple tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 **exit_on_warning**
 
@@ -451,18 +452,7 @@ using the following entries:
     
   * to_grid = "path"; To regrid both to a grid defined by a file.
     
-  * to_grid = "spec"; To define a grid specified as follows:
-    
-    * lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-      [standard_parallel_2] N|S
-      
-    * stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-      
-    * latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
-      
-    * mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-      
-    * gaussian lon_zero Nx Ny
+  * to_grid = "spec"; To define a grid specification string, as described in :ref:`appendixB`.
 
 * The "vld_thresh" entry specifies a proportion between 0 and 1 to define
   the required ratio of valid data points. When regridding, compute
@@ -2064,12 +2054,16 @@ forecast field:
   are not both set to 0, the MET tools will rescale the colortable using
   their values.
 
+* When applicable, the "colorbar_flag" enables the creation of a colorbar
+  for this plot.
+
 .. code-block:: none
 		
   fcst_raw_plot = {
-     color_table = "MET_BASE/colortables/met_default.ctable";
-     plot_min = 0.0;
-     plot_max = 0.0;
+     color_table   = "MET_BASE/colortables/met_default.ctable";
+     plot_min      = 0.0;
+     plot_max      = 0.0;
+     colorbar_flag = TRUE;
   }
 
 
@@ -2106,7 +2100,7 @@ the MET code being run. This value should generally not be modified.
 
 .. code-block:: none
 		
-  version = "V6.0";
+  version = "VN.N";
 
 **time_summary**
 		
@@ -2180,10 +2174,10 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
   }
 
 Settings specific to individual tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 EnsembleStatConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **ens**
 
@@ -2474,7 +2468,7 @@ used for random assignment of ranks when they are tied.
   }
 
 MODEAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MODE line options are used to create filters that determine which MODE output
 lines are read in and processed. The MODE line options are numerous. They
@@ -2812,7 +2806,7 @@ MET User's Guide for a description of these attributes.
 
 
 MODEConfig_default
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 **quilt**
 
@@ -3101,7 +3095,7 @@ much more flexible "regrid" option may be used instead.
   shift_right = 0;
 
 PB2NCConfig_default
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 following criteria:
@@ -3399,7 +3393,7 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
   event_stack_flag = TOP;
 
 SeriesAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **block_size**
 
@@ -3448,7 +3442,7 @@ grid is large.
   }
 
 STATAnalysisConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **jobs**
 
@@ -3470,6 +3464,8 @@ Where "job_name" is set to one of the following:
   "-dump_row" argument.
   Required Args: -dump_row
 
+|    
+
 * "summary"
   
   To compute summary information for a set of statistics.
@@ -3487,16 +3483,18 @@ Where "job_name" is set to one of the following:
 	   
   *  apply fisher transform
      (applied to columns listed in "wmo_fisher_stats")
-	   
+
+|
+
   The columns of data to be summarized are specified in one of two
   ways:
 	 
-  * Specify the -line_type option once and specify one or more
-
-  * column names.
+  * Specify the -line_type option once and specify one or more column names.
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
+|     
+    
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3542,6 +3540,8 @@ Where "job_name" is set to one of the following:
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
+  
+| 
 
 * "aggregate_stat"
   
@@ -3654,6 +3654,8 @@ Where "job_name" is set to one of the following:
           (b) means weights of 8, 6, 4, 2 for the lead times.
 
   Required Args: None
+
+|
 
 * "ramp"
   
@@ -3904,7 +3906,7 @@ confidence intervals computed for the aggregated statistics.
   vif_flag = FALSE;
 
 WaveletStatConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **grid_decomp_flag**
 
@@ -3987,29 +3989,11 @@ similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
 
 WWMCARegridConfig_default
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **to_grid**
 
-Specify the grid to which the data should be interpolated in one of the
-following ways:
-
-* Name ("GNNN" where NNN indicates the three digit NCEP grid number)
-
-* lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-  [standard_parallel_2] N|S
-
-* stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-
-* latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
-
-* mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-
-* gaussian lon_zero Nx Ny
-
-.. code-block:: none
-		
-  to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
+Please see the description of the "to_grid" entry in the "regrid" dictionary above.
 
 **NetCDF output information**  
   

@@ -521,6 +521,29 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+time_t timestring_to_time_t(const char * text) {
+
+int month, day, year, hour, minute, second;
+
+unix_to_mdyhms(timestring_to_unix(text),
+               month, day, year, hour, minute, second);
+
+struct tm time_struct;
+memset(&time_struct, 0, sizeof(time_struct));
+time_struct.tm_year = year - 1900;
+time_struct.tm_mon  = month - 1;
+time_struct.tm_mday = day;
+time_struct.tm_hour = hour;
+time_struct.tm_min  = minute;
+time_struct.tm_sec  = second;
+
+return ( timegm(&time_struct) );
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool is_datestring(const char * text)
 
 {

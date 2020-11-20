@@ -346,10 +346,13 @@ struct HiRAInfo {
 //
 
 struct PlotInfo {
+   bool         flag;             // Enable options
    ConcatString color_table;      // Color table file
    double       plot_min;         // Minimum plot value
    double       plot_max;         // Maximum plot value
-   int          colorbar_spacing; // Spacing of colors in the colorbar
+   bool         colorbar_flag;    // Turn on/off plotting the colorbar
+
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -590,7 +593,7 @@ static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
 static const char conf_key_color_table[]       = "color_table";
 static const char conf_key_plot_min[]          = "plot_min";
 static const char conf_key_plot_max[]          = "plot_max";
-static const char conf_key_colorbar_spacing[]  = "colorbar_spacing";
+static const char conf_key_colorbar_flag[]     = "colorbar_flag";
 static const char conf_key_map_data_source[]   = "map_data.source";
 static const char conf_key_file_name[]         = "file_name";
 static const char conf_key_line_color[]        = "line_color";
@@ -969,6 +972,22 @@ static const char conf_key_write_pixel_age[] = "write_pixel_age";
 
 static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
+
+//
+// Plot-Point-Obs specific parameter values names
+//
+
+static const char conf_key_grid_data[]      = "grid_data";
+static const char conf_key_point_data[]     = "point_data";
+static const char conf_key_msg_typ[]        = "msg_typ";
+static const char conf_key_obs_gc[]         = "obs_gc";
+static const char conf_key_elv_thresh[]     = "elv_thresh";
+static const char conf_key_hgt_thresh[]     = "hgt_thresh";
+static const char conf_key_prs_thresh[]     = "prs_thresh";
+static const char conf_key_dotsize[]        = "dotsize";
+static const char conf_key_fill_color[]     = "fill_color";
+static const char conf_key_fill_plot_info[] = "fill_plot_info";
+static const char conf_key_grid_plot_info[] = "grid_plot_info";
 
 //
 // MET-TC specific parameter key names

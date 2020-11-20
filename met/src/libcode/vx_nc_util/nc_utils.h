@@ -323,6 +323,7 @@ extern bool   get_dim(const NcFile *, const ConcatString &, int &, bool error_ou
 extern int    get_dim_count(const NcVar *);
 extern int    get_dim_count(const NcFile *);
 extern int    get_dim_size(const NcDim *);
+extern int    get_dim_size(const NcVar *, const int dim_offset);
 extern int    get_dim_value(const NcFile *, const string &, const bool error_out = false);
 extern NcDim  get_nc_dim(const NcFile *, const string &dim_name);
 extern NcDim  get_nc_dim(const NcVar *, const string &dim_name);

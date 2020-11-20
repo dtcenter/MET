@@ -292,7 +292,7 @@ _________________________
 
 The **rirw** field specifies those track points for which rapid intensification (RI) or rapid weakening (RW) occurred, based on user defined RI/RW thresholds. The **track** entry specifies that RI/RW is not turned on **(NONE)**, is computed based on the bmodel only **(BDECK)**, is computed based on the amodel only **(ADECK)**, or computed when both the amodel and bmodel (the union of the two) indicate RI/RW (BOTH). If **track** is set to **ADECK, BDECK**, or **BOTH**, only tracks exhibiting rapid intensification will be retained. Rapid intensification is officially defined as when the change in the maximum wind speed over a 24-hour period is greater than or equal to 30 kts. This is the default setting, however flexibility in this definition is provided through the use of the **time, exact** and **thresh** options. The **time** field specifies the time window (HH[MMSS] format) for which the RI/RW occurred. The **exact** field specifies whether to only count RI/RW when the intensity change is over the exact time window (TRUE), which follows the official RI definition, or if the intensity threshold is met anytime during the time window (FALSE). Finally, the **thresh** field specifies the user defined intensity threshold (where ">=" indicates RI, and "<=" indicates RW). 
 
-Using the **-rirw_track, -rirw_time_adeck, -rirw_time_bdeck, -rirw_exact_adeck, -rirw_exact_bdeck, -rirw_thresh_adeck, -rirw_thresh_bdeck** options within the job command lines may further refine these selections. See README_TC in data/config for how to use these options.
+Using the **-rirw_track, -rirw_time_adeck, -rirw_time_bdeck, -rirw_exact_adeck, -rirw_exact_bdeck, -rirw_thresh_adeck, -rirw_thresh_bdeck** options within the job command lines may further refine these selections. See :ref:`README_TC` for how to use these options.
 
 _________________________
 
@@ -342,7 +342,7 @@ _________________________
 
   jobs = [];
 
-The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. There are three types of jobs available including *filter, summary, and rirw.* Please refer to the README_TC in data/config for details on how to call each job. The format for an analysis job is as follows:
+The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. There are three types of jobs available including *filter, summary, and rirw.* Please refer to the :ref:`README_TC` for details on how to call each job. The format for an analysis job is as follows:
 
 _________________________
 
