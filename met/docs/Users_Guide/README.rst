@@ -452,18 +452,7 @@ using the following entries:
     
   * to_grid = "path"; To regrid both to a grid defined by a file.
     
-  * to_grid = "spec"; To define a grid specified as follows:
-    
-    * lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-      [standard_parallel_2] N|S
-      
-    * stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-      
-    * latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
-      
-    * mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-      
-    * gaussian lon_zero Nx Ny
+  * to_grid = "spec"; To define a grid specification string, as described in :ref:`appendixB`.
 
 * The "vld_thresh" entry specifies a proportion between 0 and 1 to define
   the required ratio of valid data points. When regridding, compute
@@ -2111,7 +2100,7 @@ the MET code being run. This value should generally not be modified.
 
 .. code-block:: none
 		
-  version = "V6.0";
+  version = "VN.N";
 
 **time_summary**
 		
@@ -4004,25 +3993,7 @@ WWMCARegridConfig_default
 
 **to_grid**
 
-Specify the grid to which the data should be interpolated in one of the
-following ways:
-
-* Name ("GNNN" where NNN indicates the three digit NCEP grid number)
-
-* lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-  [standard_parallel_2] N|S
-
-* stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-
-* latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
-
-* mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-
-* gaussian lon_zero Nx Ny
-
-.. code-block:: none
-		
-  to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
+Please see the description of the "to_grid" entry in the "regrid" dictionary above.
 
 **NetCDF output information**  
   
