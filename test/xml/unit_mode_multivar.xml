@@ -16,13 +16,20 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-  <test name="mode_multivar_fake_data">
-    <exec>&MET_BIN;/mode</exec>
+  <test name="mode_multivar_FAKE_DATA">
+    <exec>echo "&DATA_DIR_MODEL;/mode_multivar/alpha_fcst.nc \
+                &DATA_DIR_MODEL;/mode_multivar/beta_fcst.nc \
+                &DATA_DIR_MODEL;/mode_multivar/gamma_fcst.nc" \
+                > &OUTPUT_DIR;/mode_multivar/input_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/mode_multivar/alpha_obs.nc \
+                &DATA_DIR_MODEL;/mode_multivar/beta_obs.nc \
+                &DATA_DIR_MODEL;/mode_multivar/gamma_obs.nc" \
+                > &OUTPUT_DIR;/mode_multivar/input_obs_file_list; \
+          &MET_BIN;/mode</exec>
     <param> \
-      -subtract \
-      &DATA_DIR_MODEL;/fcst_files \
-      &DATA_DIR_MODEL;/obs_files \
-      &DATA_DIR_MODEL;/fake_data_config \
+      &OUTPUT_DIR;/mode_multivar/input_fcst_file_list \
+      &OUTPUT_DIR;/mode_multivar/input_obs_file_list \
+      &CONFIG_DIR;/MODEConfig_multivar_fake_data \
       -v 2
     </param>
     <output>
