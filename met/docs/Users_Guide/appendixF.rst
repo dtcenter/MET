@@ -86,7 +86,68 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
      }
 
 
-In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Note that the **grid** entry in the **attrs** dictionary is itself a dictionary.
+In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary is itself a dictionary.
+
+The supported grid **type** strings are described below:
+
+• **Lambert Conformal** grid dictionary entries:
+
+  • type                           ("Lambert Conformal")
+  • name                           (string)
+  • hemisphere                     (string: "N" or "S")
+  • scale_lat_1, scale_lat_2       (double)
+  • lat_pin, lon_pin, x_pin, y_pin (double)
+  • lon_orient                     (double)
+  • d_km, r_km                     (double)
+  • nx, ny                         (int)
+
+• **Polar Stereographic** grid dictionary entries:
+
+  • type                           ("Polar Stereographic")
+  • name                           (string)
+  • hemisphere                     (string: "N" or "S")
+  • scale_lat                      (double)
+  • lat_pin, lon_pin, x_pin, y_pin (double)
+  • lon_orient                     (double)
+  • d_km, r_km                     (double)
+  • nx, ny                         (int)
+
+• **Mercator** grid dictionary entries:
+
+  • type   ("Mercator")
+  • name   (string)
+  • lat_ll (double)
+  • lon_ll (double)
+  • lat_ur (double)
+  • lon_ur (double)
+  • nx, ny (int)
+
+• **LatLon** grid dictionary entries:
+
+  • type                 ("LatLon")
+  • name                 (string)
+  • lat_ll, lon_ll       (double)
+  • delta_lat, delta_lon (double)
+  • Nlat, Nlon           (int)
+
+• **Rotated LatLon** grid dictionary entries:
+
+  • type                                     ("Rotated LatLon")
+  • name                                     (string)
+  • rot_lat_ll, rot_lon_ll                   (double)
+  • delta_rot_lat, delta_rot_lon             (double)
+  • Nlat, Nlon                               (int)
+  • true_lat_south_pole, true_lon_south_pole (double)
+  • aux_rotation                             (double)
+
+• **Gaussian** grid dictionary entries:
+
+  • type     ("Gaussian")
+  • name     (string)
+  • lon_zero (double)
+  • nx, ny   (int)
+
+Additional information about supported grids can be found in :ref:`appendixB`.
 
 **Using Xarray Objects**
 
