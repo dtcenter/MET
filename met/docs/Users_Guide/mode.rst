@@ -8,7 +8,7 @@ MODE Tool
 Introduction
 ____________
 
-This section provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in :ref:`Davis et al. (2006a,b) <Davis-2006>`, :ref:`Brown et al. (2007) <Brown-2007>` and :ref:`Bullock et al. (2016) <Bullock-2016>`.
+This section provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in :ref:`Davis et al. 2006a,b <Davis-2006>`, :ref:`Brown et al. 2007 <Brown-2007>` and :ref:`Bullock et al. 2016 <Bullock-2016>`.
 
 MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (*e.g.*, clouds, convection). MODE is only one of a number of different approaches that have been developed in recent years to meet these needs. In the future, we expect that the MET package will include additional methods. References for many of these methods are provided at the `MesoVict website <http://www.rap.ucar.edu/projects/icp/index.html.>`_.
 
