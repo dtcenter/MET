@@ -6,12 +6,12 @@ Plotting and Graphics Support
 Plotting Utilities
 __________________
 
-This section describes how to check your data files using plotting utilities. Point observations can be plotted using the plot_point_obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
+This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot_Point_Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the plot_point_obs utility is shown below:
+The usage statement for the Plot_Point_Obs utility is shown below:
 
 .. code-block:: none
 
@@ -251,7 +251,7 @@ In the first example, the Plot-Data-Plane tool will process the input test.grb f
 plot_mode_field usage
 ~~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the Plot-MODE-Field utility is shown below:
+The usage statement for the plot_mode_field utility is shown below:
 
 .. code-block:: none
 		
@@ -263,7 +263,7 @@ The usage statement for the Plot-MODE-Field utility is shown below:
          [-log file]
          [-v level]
 
-**plot_mode_field** has four required arguments and can take optional ones. 
+plot_mode_field has four required arguments and can take optional ones. 
 
 Required arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -283,7 +283,7 @@ Optional arguments for plot_mode_field
 
 6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the **plot_mode_field** calling sequence is shown below:
+An example of the plot_mode_field calling sequence is shown below:
 
 .. code-block:: none
 		
