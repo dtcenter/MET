@@ -975,7 +975,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 All of these measures are defined in :numref:`categorical variables`.
 
-In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean 2008 <Roberts-2008>`. Roberts and Lean (2008) also present an application of the methodology.
+In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean (2008) <Roberts-2008>`. Roberts and Lean (2008) also present an application of the methodology.
 
 Fractions Brier Score
 ~~~~~~~~~~~~~~~~~~~~~
