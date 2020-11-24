@@ -140,7 +140,7 @@ Often, the neighborhood size is chosen so that multiple models to be compared ha
 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~
 
-The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and at Collaboration for Australian Weather and Climate Research.  Forecast Verification - `Issues, Methods and FAQ web page. <https://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_
+The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>` and at Collaboration for Australian Weather and Climate Research.  Forecast Verification - `Issues, Methods and FAQ web page. <https://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_
 
 In addition to these verification measures, the Point-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :numref:`Appendix C, Section %s <appendixC>`.
 
@@ -243,7 +243,7 @@ MET provides parametric confidence intervals based on assumptions of normality f
 
 MET provides non-parametric bootstrap confidence intervals for many categorical and continuous statistics. Kendall's Tau and Spearman's Rank correlation coefficients are the only exceptions. Computing bootstrap confidence intervals for these statistics would be computationally unrealistic.
 
-For more information on confidence intervals pertaining to verification measures, see :ref:`Wilks (2011) <Wilks-2011>`, :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and Bradley (2008).
+For more information on confidence intervals pertaining to verification measures, see :ref:`Wilks (2011) <Wilks-2011>`, :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>` and Bradley (2008).
 
 .. _tc-stat_practical-information:
 
