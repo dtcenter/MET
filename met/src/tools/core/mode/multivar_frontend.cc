@@ -217,13 +217,13 @@ o_result.set_size(nx, ny);
 combine_boolplanes(f_plane, n_files, f_calc, f_result);
 combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
-boolplane_to_pgm(f_result, image);
-
-image.write("f_result.pgm");
-
-boolplane_to_pgm(o_result, image);
-
-image.write("o_result.pgm");
+// boolplane_to_pgm(f_result, image);
+// 
+// image.write("f_result.pgm");
+// 
+// boolplane_to_pgm(o_result, image);
+// 
+// image.write("o_result.pgm");
 
    //
    //  copy one of the input mode files to
