@@ -106,65 +106,6 @@ class ModeConfInfo {
 
    /////////////////////////////////////////////////////////////////////
 
-         //
-         //  fcst member data
-         //
-/*
-      int            fcst_conv_radius;         // Convolution radius in grid squares
-      double         fcst_vld_thresh;          // Minimum ratio of valid data points in the convolution area
-
-      VarInfo *      fcst_info;                // allocated
-      IntArray       fcst_conv_radius_array;   // List of convolution radii in grid squares
-
-      ThreshArray    fcst_conv_thresh_array;   // List of conv thresholds to use
-      ThreshArray    fcst_merge_thresh_array;  // Lower convolution threshold used for double merging method
-      SingleThresh   fcst_conv_thresh;         // Convolution threshold to define objects
-      SingleThresh   fcst_merge_thresh;        // Lower convolution threshold used for double merging method
-
-      MergeType      fcst_merge_flag;          // Define which merging methods should be employed
-
-      PlotInfo       fcst_raw_pi;              // Raw forecast plotting info
-
-         //
-         //  fcst member functions
-         //
-
-      void           set_fcst_merge_thresh_by_index (int);
-      int            n_fcst_merge_threshs () const;
-      bool           need_fcst_merge_thresh () const;   //  mergetype is both or thresh
-      AttrFilterMap  fcst_filter_attr_map;              // Discard objects that don't meet these attribute thresholds
-*/
-   /////////////////////////////////////////////////////////////////////
-
-         //
-         //  obs member data
-         //
-/*
-      int            obs_conv_radius;
-      double         obs_vld_thresh;
-
-      VarInfo *      obs_info;              // allocated
-      IntArray       obs_conv_radius_array;
-
-      ThreshArray    obs_conv_thresh_array;
-      ThreshArray    obs_merge_thresh_array;
-      SingleThresh   obs_conv_thresh;
-      SingleThresh   obs_merge_thresh;
-
-      MergeType      obs_merge_flag;
-
-      PlotInfo       obs_raw_pi;             // Raw observation plotting info
-
-         //
-         //  obs member functions
-         //
-
-      void           set_obs_merge_thresh_by_index  (int);
-      int            n_obs_merge_threshs  () const;
-      bool           need_obs_merge_thresh  () const;   //  mergetype is both or thresh
-      AttrFilterMap  obs_filter_attr_map;
-*/
-   /////////////////////////////////////////////////////////////////////
 
          //
          //  configuration file

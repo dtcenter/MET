@@ -11,9 +11,10 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS    = mode
-mode_SOURCES = mode.cc \
+mode_SOURCES = mode_usage.cc \
 	mode_frontend.cc \
 	multivar_frontend.cc \
+     mode.cc \
 	combine_boolplanes.cc \
 	objects_from_netcdf.cc \
 	mode_ps_file.cc \

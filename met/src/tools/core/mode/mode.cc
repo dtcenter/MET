@@ -72,7 +72,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "mode_exec.h"
+#include "string_array.h"
+#include "mode_usage.h"
+#include "mode_conf_info.h"
 
 #ifdef WITH_PYTHON
 #include "global_python.h"
@@ -94,24 +96,23 @@ using namespace std;
 extern int     mode_frontend(const StringArray &);
 extern int multivar_frontend(const StringArray &);
 
-
-///////////////////////////////////////////////////////////////////////
-
-
-void usage();   //  needs external linkage
+extern const char * const program_name;   
 
 
 ///////////////////////////////////////////////////////////////////////
 
 
-static const char program_name [] = "mode";
+   //
+   //  these need external linkage
+   //
 
-static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
+const char * const program_name = "mode";   
+
+
+///////////////////////////////////////////////////////////////////////
+
 
 static const char default_config_filename [] = "MET_BASE/config/MODEConfig_default";
-
-static void singlevar_usage();
-static void multivar_usage();
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -121,7 +122,7 @@ int main(int argc, char * argv [])
 
 {
 
-if ( argc == 1 )  usage();
+if ( argc == 1 )  both_usage();
 
 int j;
 int status;
@@ -131,7 +132,6 @@ string s;
 bool has_field_index = false;
 const char * const user_config_filename = argv[3];
 
-file_id = 0;   //  I hate having to do this
 
 for (j=0; j<argc; ++j)  {
 
@@ -167,114 +167,4 @@ return ( status );
 ///////////////////////////////////////////////////////////////////////
 
 
-void usage()
 
-{
-
-
-cout << "\n*** Model Evaluation Tools (MET" << met_version << ") ***\n\n";
-
-
-cout << "if singlevar mode:\n"
-        "==================\n";
-
-
-singlevar_usage();
-
-
-cout << "if multivar mode:\n"
-     << "=================\n";
-
-
-multivar_usage();
-
-
-exit ( 1 );
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void singlevar_usage()
-
-{
-
-
-cout << "\n\n"
-     << "Usage: " << program_name << "\n"
-     << "\tfcst_file\n"
-     << "\tobs_file\n"
-     << "\tconfig_file\n"
-     << "\t[-config_merge merge_config_file]\n"
-     << "\t[-outdir path]\n"
-     << "\t[-log file]\n"
-     << "\t[-v level]\n"
-     << "\t[-compress level]\n\n"
-
-     << "\twhere\n"
-
-     << "\t\t\"fcst_file\" is a gridded forecast file "
-     << "containing the field to be verified (required).\n"
-
-     << "\t\t\"obs_file\" is a gridded observation file "
-     << "containing the verifying field (required).\n"
-
-     << "\t\t\"config_file\" is a MODEConfig file "
-     << "containing the desired configuration settings (required).\n"
-
-     << "\t\t\"-config_merge merge_config_file\" overrides the default "
-     << "fuzzy engine settings for merging within the fcst/obs fields "
-     << "(optional).\n"
-
-     << "\t\t\"-outdir path\" overrides the default output directory ("
-     << mode_exec.out_dir << ") (optional).\n"
-
-     << "\t\t\"-log file\" outputs log messages to the specified "
-     << "file (optional).\n"
-
-     << "\t\t\"-v level\" overrides the default level of logging ("
-     << mlog.verbosity_level() << ") (optional).\n"
-
-     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-     << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n" 
-
-     << flush;
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void multivar_usage()
-
-{
-
-cout << "\n\n"
-     << "\tUsage:  "
-     << program_name
-     << " fcst obs config "
-     << "[ mode_options ]\n\n"
-
-     << "\twhere\n"
-
-     << "\t\t\"fcst\" is the name of a file containing the forecast files to be used (required)\n"
-     << "\t\t\"obs\"  is the name of a file containing the observation files to be used (required)\n"
-     << "\t\t\"config\" is a MODEConfig file "
-     << "containing the desired configuration settings (required).\n\n"
-
-     << flush;
-
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////

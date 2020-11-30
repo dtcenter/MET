@@ -74,6 +74,7 @@ using namespace std;
 
 #include "string_array.h"
 
+#include "mode_usage.h"
 #include "mode_exec.h"
 
 #ifdef WITH_PYTHON
@@ -93,9 +94,12 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 
 
-static const char program_name [] = "mode";
+extern const char * const program_name;
 
 static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
+
+
+void singlevar_usage();   //  this needs external linkage
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -107,12 +111,6 @@ static const char * default_out_dir = ".";
 static int compress_level = -1;
 
 static int field_index = -1;
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-extern void usage();
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -284,13 +282,13 @@ void process_command_line(const StringArray & argv)
    mode_exec.out_dir = replace_path(default_out_dir);
 
    // Check for zero arguments
-   if(argc == 1) usage();
+   if(argc == 1) singlevar_usage();
 
    // Parse the command line into tokens
    cline.set(argv);
 
    // Set the usage function
-   cline.set_usage(usage);
+   cline.set_usage(singlevar_usage);
 
    // Add the options function calls
    cline.add(set_config_merge_file, "-config_merge", 1);
@@ -310,7 +308,7 @@ void process_command_line(const StringArray & argv)
 
    // Check for error. There should be three arguments left:
    // forecast, observation, and config filenames
-   if(cline.n() != 3) usage();
+   if(cline.n() != 3) singlevar_usage();
 
    // Store the input forecast and observation file names
    mode_exec.fcst_file         = cline[0];
@@ -384,6 +382,59 @@ return;
 
 }
 
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void singlevar_usage()
+
+{
+
+cout << "\n\n"
+     << "Usage: " << program_name << "\n"
+     << "\tfcst_file\n"
+     << "\tobs_file\n"
+     << "\tconfig_file\n"
+     << "\t[-config_merge merge_config_file]\n"
+     << "\t[-outdir path]\n"
+     << "\t[-log file]\n"
+     << "\t[-v level]\n"
+     << "\t[-compress level]\n\n"
+
+     << "\twhere\n"
+
+     << "\t\t\"fcst_file\" is a gridded forecast file "
+     << "containing the field to be verified (required).\n"
+
+     << "\t\t\"obs_file\" is a gridded observation file "
+     << "containing the verifying field (required).\n"
+
+     << "\t\t\"config_file\" is a MODEConfig file "
+     << "containing the desired configuration settings (required).\n"
+
+     << "\t\t\"-config_merge merge_config_file\" overrides the default "
+     << "fuzzy engine settings for merging within the fcst/obs fields "
+     << "(optional).\n"
+
+     << "\t\t\"-outdir path\" overrides the default output directory ("
+     << mode_exec.out_dir << ") (optional).\n"
+
+     << "\t\t\"-log file\" outputs log messages to the specified "
+     << "file (optional).\n"
+
+     << "\t\t\"-v level\" overrides the default level of logging ("
+     << mlog.verbosity_level() << ") (optional).\n"
+
+     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+     << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n"
+
+     << flush;
+
+
+return;
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
