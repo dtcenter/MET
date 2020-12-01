@@ -555,9 +555,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_dump_path, "-dump", 1);
    cline.add(set_collect_metadata, "-index",  0);
    cline.add(set_target_variables, "-obs_var", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress, "-compress",  1);
 
    // Parse the command line
    cline.parse();
