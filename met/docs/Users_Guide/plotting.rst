@@ -6,12 +6,12 @@ Plotting and Graphics Support
 Plotting Utilities
 __________________
 
-This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot_Point_Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
+This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot-Point-Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the Plot_Point_Obs utility is shown below:
+The usage statement for the Plot-Point-Obs utility is shown below:
 
 .. code-block:: none
 
