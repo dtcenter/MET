@@ -1047,8 +1047,8 @@ The results of the distance map verification approaches that are included in the
 Baddeley's :math:`\Delta` Metric and Hausdorff Distance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called “BADDELEY” and “HAUSDOR
-FF” in the DMAP output :numref:`table_GS_format_info_DMAP`
+Called “BADDELEY” and “HAUSDORFF” in the DMAP 
+output :numref:`table_GS_format_info_DMAP`
 
 The Baddeley's :math:`\Delta` Metric is given by
 
