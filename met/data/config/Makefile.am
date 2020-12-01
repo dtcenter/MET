@@ -25,6 +25,7 @@ config_DATA = \
 	EnsembleStatConfig_default \
 	GridStatConfig_default \
 	GridDiagConfig_default \
+	IODA2NCConfig_default \
 	Madis2NcConfig_default \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \
@@ -43,7 +44,6 @@ config_DATA = \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
-	IODA2NCConfig_default \
 	README \
 	README_TC
 
