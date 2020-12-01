@@ -553,7 +553,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_nmsg, "-nmsg", 1);
    cline.add(set_dump_path, "-dump", 1);
-   cline.add(set_collect_metadata,  "-index",  0);
+   cline.add(set_collect_metadata, "-index",  0);
    cline.add(set_target_variables, "-obs_var", 1);
    cline.add(set_target_variables, "-vars", 1);
    cline.add(set_logfile, "-log", 1);
