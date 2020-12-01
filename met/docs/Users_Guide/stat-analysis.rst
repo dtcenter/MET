@@ -218,7 +218,7 @@ Optional arguments for stat_analysis
 
 7. The **-v level** indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging. 
 
-An example of the **stat_analysis** calling sequence is shown below.
+An example of the stat_analysis calling sequence is shown below.
 
 .. code-block:: none
 

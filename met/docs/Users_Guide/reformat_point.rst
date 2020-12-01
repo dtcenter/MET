@@ -878,11 +878,9 @@ Required arguments for point2grid
 
 2. The **to_grid** argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
 
-
 3. The **output_filename** argument is the name of the output NetCDF file to be written.
 
-
-4. The **-field string** argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, “AOD_Smoke” or “AOD_Dust”: getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
+4. The **-field** string argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, “AOD_Smoke” or “AOD_Dust”: getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
 
 
 Optional arguments for point2grid
@@ -898,24 +896,17 @@ Optional arguments for point2grid
 
 9. The **-gaussian_dx n** option defines the distance interval for Gaussian smoothing. The default is 81.271 km. Ignored if the method is not GAUSSIAN or MAXGAUSS.
 
-
 10. The **-gaussian_radius** n option defines the radius of influence for Gaussian interpolation. The default is 120. Ignored if the method is not GAUSSIAN or MAXGAUSS.
 
-
-11.The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
-
+11. The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
 
 12. The **-vld_thresh n** option sets the required ratio of valid data for regridding. The default is 0.5.
 
-
 13. The **-name list** option specifies a comma-separated list of output variable names for each field specified.
-
 
 14. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-
 15. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
-
 
 16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 

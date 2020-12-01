@@ -168,7 +168,7 @@ The following are valid baselines for the **best_baseline** field:
 
 **BTCLIP**: Neumann original 3-day CLIPER in best track mode. Used for the Atlantic basin only. Specify model as BCLP.
 
-**BTCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>` in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
+**BTCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>`) in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
 
 **BTCLIPA**: Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track mode. Used for Atlantic basin only. Specify model as BCLA.
 

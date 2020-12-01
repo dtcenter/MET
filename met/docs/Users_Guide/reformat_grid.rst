@@ -521,7 +521,7 @@ ____________________________
 
   regrid = { ... }
 
-See the **regrid entry** in :numref:Configuration File Details` for a description of the configuration file entries that control regridding.
+See the **regrid entry** in :numref:`Configuration File Details` for a description of the configuration file entries that control regridding.
 
 ____________________________
 
