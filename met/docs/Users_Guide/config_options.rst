@@ -165,17 +165,17 @@ integer types have been defined in the ConfigConstants file. These integer
 names may be used on the right-hand side for many configuration file entries.
 
 Each of the configurable MET tools expects a certain set of configuration
-entries. Examples of the MET configuration files can be found in data/config
-and scripts/config.
+entries. Examples of the MET configuration files can be found in *data/config*
+and *scripts/config*.
 
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
 
-   1. Reads share/met/config/ConfigConstants to define constants.
+   1. Reads *share/met/config/ConfigConstants* to define constants.
 
-   2. If the tool produces PostScript output, it reads share/met/config/ConfigMapData to define the map data to be plotted.
+   2. If the tool produces PostScript output, it reads *share/met/config/ConfigMapData* to define the map data to be plotted.
 
-   3. Reads the default configuration file for the tool from share/met/config.
+   3. Reads the default configuration file for the tool from *share/met/config*.
 
    4. Reads the user-specified configuration file from the command line.
 
@@ -186,7 +186,7 @@ line really only needs to contain entries that differ from the defaults.
 Any of the configuration entries may be overwritten by the user-specified
 configuration file. For example, the map data to be plotted may be included in
 the user-specified configuration file and override the default settings defined
-in the share/met/config/ConfigMapData file.
+in the *share/met/config/ConfigMapData* file.
 
 The configuration file language supports the use of environment variables. They
 are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
@@ -209,7 +209,7 @@ instead of the one defined at compilation time.
 
 The MET_OBS_ERROR_TABLE environment variable can be set to specify the location
 of an ASCII file defining observation error information. The default table can
-be found in the installed share/met/table_files/obs_error_table.txt. This
+be found in the installed *share/met/table_files/obs_error_table.txt*. This
 observation error logic is applied in Ensemble-Stat to perturb ensemble member
 values and/or define observation bias corrections.
 
@@ -243,7 +243,7 @@ The custom GRIB tables are read prior to the default tables and their settings
 take precedence.
 
 At runtime, the MET tools read default GRIB tables from the installed
-share/met/table_files directory, and their file formats are described below:
+*share/met/table_files* directory, and their file formats are described below:
 
 GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB1".
@@ -613,7 +613,7 @@ to be verified. This dictionary may include the following entries:
     include any of the built-in math functions (e.g. sqrt, log10)
     described above.
     Several standard unit conversion functions are already defined in
-    data/config/ConfigConstants.
+    *data/config/ConfigConstants*.
     Examples of user-defined conversion functions include:
 
     .. code-block:: none
@@ -1293,7 +1293,7 @@ in the following ways:
     "poly_name lat1 lon1 lat2 lon2... latn lonn"
 
     Several masking polygons used by NCEP are predefined in the
-    installed share/met/poly directory. Creating a new polygon is as
+    installed *share/met/poly* directory. Creating a new polygon is as
     simple as creating a text file with a name for the polygon followed
     by the lat/lon points which define its boundary. Adding a new masking
     polygon requires no code changes and no recompiling. Internally, the
@@ -2028,7 +2028,7 @@ an array of strings, even if the values themselves are numeric.
 
 The "met_data_dir" entry specifies the location of the internal MET data
 sub-directory which contains data files used when generating plots. It
-should be set to the installed share/met directory so the MET tools can
+should be set to the installed *share/met* directory so the MET tools can
 locate the static data files they need at run time.
 
 .. code-block:: none
@@ -2352,7 +2352,7 @@ May be set separately in each "obs.field" entry.
 The obs_error dictionary controls how observation error information should be
 handled. Observation error information can either be specified directly in
 the configuration file or by parsing information from an external table file.
-By default, the MET_BASE/data/table_files/obs_error_table.txt file is read
+By default, the *MET_BASE/data/table_files/obs_error_table.txt* file is read
 but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment
 variable at runtime.
 
