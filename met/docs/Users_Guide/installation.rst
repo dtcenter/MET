@@ -160,31 +160,31 @@ The $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the librar
 
 The following environment variables should also be set:
 
-   \- Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC to point to the directory with the NetCDF include files and set $MET_NETCDFLIB to point to the directory with the NetCDF library files. Note that the files for both NetCDF-C and NetCDF-CXX must be installed in the same include and library directories.
+* Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC to point to the directory with the NetCDF include files and set $MET_NETCDFLIB to point to the directory with the NetCDF library files. Note that the files for both NetCDF-C and NetCDF-CXX must be installed in the same include and library directories.
 
-   \- Set $MET_HDF5 to point to the main HDF5 directory.
+* Set $MET_HDF5 to point to the main HDF5 directory.
 
-   \- Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB to point to the directory with the BUFR library files. Because we don't use any BUFR library include files, you don't need to specify $MET_BUFRINC.
+* Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB to point to the directory with the BUFR library files. Because we don't use any BUFR library include files, you don't need to specify $MET_BUFRINC.
 
-   \- Set $MET_GSL to point to the main GSL directory, or set $MET_GSLINC to point to the directory with the GSL include files and set $MET_GSLLIB to point to the directory with the GSL library files.
+* Set $MET_GSL to point to the main GSL directory, or set $MET_GSLINC to point to the directory with the GSL include files and set $MET_GSLLIB to point to the directory with the GSL library files.
 
-   \- If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB to point to the main GRIB2C directory which contains both the include and library files. These are used instead of $MET_GRIB2C since the main GRIB2C directory does not contain include and lib subdirectories.
+* If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB to point to the main GRIB2C directory which contains both the include and library files. These are used instead of $MET_GRIB2C since the main GRIB2C directory does not contain include and lib subdirectories.
 
-   \- If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the python library file and indicate the name of that file. For example:
+* If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the python library file and indicate the name of that file. For example:
 
-.. code-block:: none
+  .. code-block:: none
 
-  MET_PYTHON_CC='-I/usr/include/python3.6'
+    MET_PYTHON_CC='-I/usr/include/python3.6'
+    MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
 
-  MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
+  For more information about Python support in MET, please refer to :numref:`Appendix F, Section %s <appendixF>`.
 
-For more information about Python support in MET, please refer to :numref:`Appendix F, Section %s <appendixF>`.
 
-   \- If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the main HDF4 directory, or set $MET_HDFINC to point to the directory with the HDF4 include files and set $MET_HDFLIB to point to the directory with the HDF4 library files. Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEOSINC to point to the directory with the HDF EOS include files and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library files.
+* If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the main HDF4 directory, or set $MET_HDFINC to point to the directory with the HDF4 include files and set $MET_HDFLIB to point to the directory with the HDF4 library files. Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEOSINC to point to the directory with the HDF EOS include files and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library files.
 
-   \- If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo directory, or set$MET_CAIROINC to point to the directory with the Cairo include files and set $MET_CAIROLIB to point to the directory with the Cairo library files. Also, set $MET_FREETYPE to point to the main FreeType directory, or set $MET_FREETYPEINC to point to the directory with the FreeType include files and set $MET_FREETYPELIB to point to the directory with the FreeType library files.
+* If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo directory, or set$MET_CAIROINC to point to the directory with the Cairo include files and set $MET_CAIROLIB to point to the directory with the Cairo library files. Also, set $MET_FREETYPE to point to the main FreeType directory, or set $MET_FREETYPEINC to point to the directory with the FreeType include files and set $MET_FREETYPELIB to point to the directory with the FreeType library files.
 
-   \- When running MODE Graphics, set $MET_FONT_DIR to the directory containing font data required at runtime. A link to the tarball containing this font data can be found on the MET website.
+*  When running MODE Graphics, set $MET_FONT_DIR to the directory containing font data required at runtime. A link to the tarball containing this font data can be found on the MET website.
 
 For ease of use, you should define these in your .cshrc or equivalent file.
 
