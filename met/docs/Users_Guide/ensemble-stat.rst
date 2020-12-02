@@ -76,7 +76,7 @@ Required arguments ensemble_stat
 
 2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
 
-3. The **config_file** is an EnsembleStatConfig file containing the desired configuration settings.
+3. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
 
 Optional arguments for ensemble_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

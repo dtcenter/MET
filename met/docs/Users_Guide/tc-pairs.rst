@@ -81,7 +81,7 @@ The TC-Pairs tool implements the following logic:
 tc_pairs configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the TC-Pairs tool named **'TCPairsConfig_default'** can be found in the installed **share/met/config/** directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the TC-Pairs tool named **TCPairsConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 The contents of the tc_pairs configuration file are described below.
 
