@@ -9,17 +9,17 @@ For more detail on generating GSI diagnostic files and their contents, see the `
 
 When MET reads GSI diagnostic files, the innovation (O-B; generated prior to the first outer loop) or analysis increment (O-A; generated after the final outer loop) is split into separate values for the observation (OBS) and the forecast (FCST), where the forecast value corresponds to the background (O-B) or analysis (O-A).
 
-MET includes two tools for processing GSI diagnostic files. The gsid2mpr tool reformats individual GSI diagnostic files into the MET matched pair (MPR) format, similar to the output of the Point-Stat tool. The gsidens2orank tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The output of both tools may be passed to the Stat-Analysis tool to compute a wide variety of continuous, categorical, and ensemble statistics.
+MET includes two tools for processing GSI diagnostic files. The GSID2MPR tool reformats individual GSI diagnostic files into the MET matched pair (MPR) format, similar to the output of the Point-Stat tool. The GSIDENS2ORANK tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The output of both tools may be passed to the Stat-Analysis tool to compute a wide variety of continuous, categorical, and ensemble statistics.
 
 GSID2MPR tool
 _____________
 
-This section describes how to run the tool gsid2mpr tool. The gsid2mpr tool reformats one or more GSI diagnostic files into an ASCII matched pair (MPR) format, similar to the MPR output of the Point-Stat tool. The output MPR data may be passed to the Stat-Analysis tool to compute a wide variety of continuous or categorical statistics.
+This section describes how to run the tool GSID2MPR tool. The GSID2MPR tool reformats one or more GSI diagnostic files into an ASCII matched pair (MPR) format, similar to the MPR output of the Point-Stat tool. The output MPR data may be passed to the Stat-Analysis tool to compute a wide variety of continuous or categorical statistics.
 
 gsid2mpr usage
 ~~~~~~~~~~~~~~
 
-The usage statement for the gsid2mpr tool is shown below:
+The usage statement for the GSID2MPR tool is shown below:
 
 .. code-block:: none
 		
@@ -34,7 +34,7 @@ The usage statement for the gsid2mpr tool is shown below:
          [-log file]
          [-v level]
 
-gsid2mpr has one required argument and and accepts several optional ones.
+gsid2mpr has one required argument and accepts several optional ones.
 
 Required arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -68,14 +68,14 @@ An example of the gsid2mpr calling sequence is shown below:
   -set_hdr MODEL GSI_MEM001 \
   -outdir out
 
-In this example, the gsid2mpr tool will process a single input file named **diag_conv_ges.mem001** file, set the output **MODEL** header column to **GSI_MEM001**, and write output to the **out** directory. The output file is named the same as the input file but a **.stat** suffix is added to indicate its format.
+In this example, the GSID2MPR tool will process a single input file named **diag_conv_ges.mem001** file, set the output **MODEL** header column to **GSI_MEM001**, and write output to the **out** directory. The output file is named the same as the input file but a **.stat** suffix is added to indicate its format.
 
 gsid2mpr output
 ~~~~~~~~~~~~~~~
 
-The gsid2mpr tool performs a simple reformatting step and thus requires no configuration file. It can read both conventional and radiance binary GSI diagnostic files. Support for additional GSI diagnostic file type may be added in future releases. Conventional files are determined by the presence of the string **conv** in the filename. Files that are not conventional are assumed to contain radiance data. Multiple files of either type may be passed in a single call to the gsid2mpr tool. For each input file, an output file will be generated containing the corresponding matched pair data.
+The GSID2MPR tool performs a simple reformatting step and thus requires no configuration file. It can read both conventional and radiance binary GSI diagnostic files. Support for additional GSI diagnostic file type may be added in future releases. Conventional files are determined by the presence of the string **conv** in the filename. Files that are not conventional are assumed to contain radiance data. Multiple files of either type may be passed in a single call to the GSID2MPR tool. For each input file, an output file will be generated containing the corresponding matched pair data.
 
-The gsid2mpr tool writes the same set of MPR output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the MPR line which depend on the input file type. Those additional columns are described in the following tables.
+The GSID2MPR tool writes the same set of MPR output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the MPR line which depend on the input file type. Those additional columns are described in the following tables.
 
 
 .. list-table:: Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
@@ -245,12 +245,12 @@ In this example, the Stat-Analysis tool will read MPR lines from the input file 
 GSIDENS2ORANK tool
 __________________
 
-This section describes how to run the gsidens2orank tool. The gsidens2orank tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The ORANK line type contains ensemble matched pair information and is analogous to the MPR line type for a deterministic model. The output ORANK data may be passed to the Stat-Analysis tool to compute ensemble statistics.
+This section describes how to run the GSIDENS2ORANK tool. The GSIDENS2ORANK tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The ORANK line type contains ensemble matched pair information and is analogous to the MPR line type for a deterministic model. The output ORANK data may be passed to the Stat-Analysis tool to compute ensemble statistics.
 
 gsidens2orank usage
 ~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the gsidens2orank tool is shown below:
+The usage statement for the GSIDENS2ORANK tool is shown below:
 
 .. code-block:: none
 		
@@ -303,14 +303,14 @@ An example of the gsidens2orank calling sequence is shown below:
   -ens_mean diag_conv_ges.ensmean \
   -out diag_conv_ges_ens_mean_orank.txt
 
-In this example, the gsidens2orank tool will process all of the ensemble members whose file name **matches diag_conv_ges.mem\*,** write output to the file named **diag_conv_ges_ens_mean_orank.txt**, and populate the output **ENS_MEAN** column with the values found in the **diag_conv_ges.ensmean** file rather than computing the ensemble mean values from the ensemble members on the fly.
+In this example, the GSIDENS2ORANK tool will process all of the ensemble members whose file name **matches diag_conv_ges.mem\*,** write output to the file named **diag_conv_ges_ens_mean_orank.txt**, and populate the output **ENS_MEAN** column with the values found in the **diag_conv_ges.ensmean** file rather than computing the ensemble mean values from the ensemble members on the fly.
 
 gsidens2orank output
 ~~~~~~~~~~~~~~~~~~~~
 
-The gsidens2orank tool performs a simple reformatting step and thus requires no configuration file. The multiple files passed to it are interpreted as members of the same ensemble. Therefore, each call to the tool processes exactly one ensemble. All input ensemble GSI diagnostic files must be of the same type. Mixing conventional and radiance files together will result in a runtime error. The gsidens2orank tool processes each ensemble member and keeps track of the observations it encounters. It constructs a list of the ensemble values corresponding to each observation and writes an output ORANK line listing the observation value, its rank, and all the ensemble values. The random number generator is used by the gsidens2orank tool to randomly assign a rank value in the case of ties.
+The GSIDENS2ORANK tool performs a simple reformatting step and thus requires no configuration file. The multiple files passed to it are interpreted as members of the same ensemble. Therefore, each call to the tool processes exactly one ensemble. All input ensemble GSI diagnostic files must be of the same type. Mixing conventional and radiance files together will result in a runtime error. The GSIDENS2ORANK tool processes each ensemble member and keeps track of the observations it encounters. It constructs a list of the ensemble values corresponding to each observation and writes an output ORANK line listing the observation value, its rank, and all the ensemble values. The random number generator is used by the GSIDENS2ORANK tool to randomly assign a rank value in the case of ties.
 
-The gsid2mpr tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the gsid2mpr tool. Those additional columns are described in the following tables.
+The GSID2MPR tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the GSID2MPR tool. Those additional columns are described in the following tables.
 
 .. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
   :widths: auto

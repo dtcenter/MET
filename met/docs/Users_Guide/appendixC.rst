@@ -251,14 +251,14 @@ OR measures the ratio of the odds of a forecast of the event being correct to th
 
 .. math:: \text{OR } = \frac{n_{11} \times n_{00}}{n_{10} \times n_{01}} = \frac{(\frac{\text{POD}}{1 - \text{POD}})}{(\frac{\text{POFD}}{1 - \text{POFD}})}.
 
-OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (:ref:`Stephenson 2000 <Stephenson-2000>`).
+OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (:ref:`Stephenson, 2000 <Stephenson-2000>`).
 
 Logarithm of the Odds Ratio (LODDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "LODDS" in CTS output :numref:`table_PS_format_info_CTS`
 
-LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (:ref:`Stephenson 2000 <Stephenson-2000>`). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
+LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (:ref:`Stephenson, 2000 <Stephenson-2000>`). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
 
 Odds Ratio Skill Score (ORSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -269,7 +269,7 @@ ORSS is a skill score based on the odds ratio. ORSS is defined as
 
 .. math:: \text{ORSS } = \frac{OR - 1}{OR + 1}.
 
-ORSS is sometimes also referred to as Yule's Q. (:ref:`Stephenson 2000 <Stephenson-2000>`).
+ORSS is sometimes also referred to as Yule's Q. (:ref:`Stephenson, 2000 <Stephenson-2000>`).
 
 Extreme Dependency Score (EDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,7 +280,7 @@ The extreme dependency score measures the association between forecast and obser
 
 .. math:: \text{EDS } = \frac{2 ln(\frac{n_{11} + n_{01}}{T})}{ln(\frac{n_{11}}{T})} - 1.
 
-EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (:ref:`Stephenson et al, 2008 <Stephenson-2008>`).
+EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (:ref:`Stephenson et al., 2008 <Stephenson-2008>`).
 
 Extreme Dependency Index (EDI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -324,7 +324,7 @@ Bias Adjusted Gilbert Skill Score (GSS)
 
 Called "BAGSS" in CTS output :numref:`table_PS_format_info_CTS`
 
-BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (:ref:`Brill and Mesinger, 2009<Brill-2009>`).
+BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (:ref:`Brill and Mesinger, 2009 <Brill-2009>`).
 
 Economic Cost Loss Relative Value (ECLV)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,7 +344,7 @@ For cost / loss ratio above the base rate, the ECLV is defined as:
 MET verification measures for continuous variables
 __________________________________________________
 
-For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
+For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
@@ -567,7 +567,7 @@ Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 
 The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
 
-The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al, 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
+The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al., 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
@@ -655,7 +655,7 @@ Gradient values
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :numref:`table_GS_format_info_GRAD`
 
-These statistics are only computed by the Grid_Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
+These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
 .. math:: \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
 
@@ -797,7 +797,7 @@ Calibration
 
 Called "CALIBRATION" in PJC output :numref:`table_PS_format_info_PJC`
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks (2011) <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
+Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks, (2011) <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
 
 .. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
@@ -879,7 +879,7 @@ CRPS
 
 Called "CRPS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -907,7 +907,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{\sigma^2}.
 
@@ -975,7 +975,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 All of these measures are defined in :numref:`categorical variables`.
 
-In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean 2008 <Roberts-2008>`. Roberts and Lean (2008) also present an application of the methodology.
+In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean (2008) <Roberts-2008>`.  :ref:`Roberts and Lean (2008) <Roberts-2008>` also present an application of the methodology.
 
 Fractions Brier Score
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1047,7 +1047,8 @@ The results of the distance map verification approaches that are included in the
 Baddeley's :math:`\Delta` Metric and Hausdorff Distance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called “BADDELEY” and “HAUSDORFF” in the DMAP output :numref:`table_GS_format_info_DMAP`
+Called “BADDELEY” and “HAUSDORFF” in the DMAP 
+output :numref:`table_GS_format_info_DMAP`
 
 The Baddeley's :math:`\Delta` Metric is given by
 

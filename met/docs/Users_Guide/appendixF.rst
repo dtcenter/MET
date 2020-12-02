@@ -86,7 +86,68 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
      }
 
 
-In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Note that the **grid** entry in the **attrs** dictionary is itself a dictionary.
+In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary is itself a dictionary.
+
+The supported grid **type** strings are described below:
+
+• **Lambert Conformal** grid dictionary entries:
+
+  • type                           ("Lambert Conformal")
+  • name                           (string)
+  • hemisphere                     (string: "N" or "S")
+  • scale_lat_1, scale_lat_2       (double)
+  • lat_pin, lon_pin, x_pin, y_pin (double)
+  • lon_orient                     (double)
+  • d_km, r_km                     (double)
+  • nx, ny                         (int)
+
+• **Polar Stereographic** grid dictionary entries:
+
+  • type                           ("Polar Stereographic")
+  • name                           (string)
+  • hemisphere                     (string: "N" or "S")
+  • scale_lat                      (double)
+  • lat_pin, lon_pin, x_pin, y_pin (double)
+  • lon_orient                     (double)
+  • d_km, r_km                     (double)
+  • nx, ny                         (int)
+
+• **Mercator** grid dictionary entries:
+
+  • type   ("Mercator")
+  • name   (string)
+  • lat_ll (double)
+  • lon_ll (double)
+  • lat_ur (double)
+  • lon_ur (double)
+  • nx, ny (int)
+
+• **LatLon** grid dictionary entries:
+
+  • type                 ("LatLon")
+  • name                 (string)
+  • lat_ll, lon_ll       (double)
+  • delta_lat, delta_lon (double)
+  • Nlat, Nlon           (int)
+
+• **Rotated LatLon** grid dictionary entries:
+
+  • type                                     ("Rotated LatLon")
+  • name                                     (string)
+  • rot_lat_ll, rot_lon_ll                   (double)
+  • delta_rot_lat, delta_rot_lon             (double)
+  • Nlat, Nlon                               (int)
+  • true_lat_south_pole, true_lon_south_pole (double)
+  • aux_rotation                             (double)
+
+• **Gaussian** grid dictionary entries:
+
+  • type     ("Gaussian")
+  • name     (string)
+  • lon_zero (double)
+  • nx, ny   (int)
+
+Additional information about supported grids can be found in :ref:`appendixB`.
 
 **Using Xarray Objects**
 
@@ -102,7 +163,7 @@ On the command line for any of the MET tools which will be obtaining its data fr
 
 ___________________
 
-Listed below is an example of running the **plot_data_plane** tool to call a Python script for data that is included with the MET release tarball. Assuming the MET executables are in your path, this example may be run from the top-level MET source code directory.
+Listed below is an example of running the Plot-Data-Plane tool to call a Python script for data that is included with the MET release tarball. Assuming the MET executables are in your path, this example may be run from the top-level MET source code directory.
 
 .. code-block:: none
 
@@ -110,7 +171,7 @@ Listed below is an example of running the **plot_data_plane** tool to call a Pyt
     'name="scripts/python/read_ascii_numpy.py data/python/fcst.txt FCST";' \
     -title "Python enabled plot_data_plane"
     
-The first argument for the **plot_data_plane** tool is the gridded data file to be read. When calling a NumPy Python script, set this to the constant string PYTHON_NUMPY. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the Python script to be run along with command line arguments. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages.
+The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling a NumPy Python script, set this to the constant string PYTHON_NUMPY. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the Python script to be run along with command line arguments. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages.
 
 .. code-block:: none
 		
@@ -130,7 +191,7 @@ The first argument for the **plot_data_plane** tool is the gridded data file to 
 
 The second option was added to support the use of Python embedding in tools which read multiple input files. Option 1 reads a single field of data from a single source, whereas tools like Ensemble-Stat, Series-Analysis, and MTD read data from multiple input files. While option 2 can be used in any of the MET tools, it is required for Python embedding in Ensemble-Stat, Series-Analysis, and MTD.
 
-On the command line for any of the MET tools, specify the path to the input gridded data file(s) as the usage statement for the tool indicates. Do **not** substitute in PYTHON_NUMPY or PYTHON_XARRAY on the command line. In the config file dictionary set the **file_type** entry to either PYTHON_NUMPY or PYTHON_XARRAY to activate the Python embedding logic. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, list the Python script to be run followed by any command line arguments for that script. However, in the Python command, replace the name of the input gridded data file with the constant string MET_PYTHON_INPUT_ARG. When looping over multiple input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the file currently being processed. The example **plot_data_plane** command listed below yields the same result as the example shown above, but using the option 2 logic instead.
+On the command line for any of the MET tools, specify the path to the input gridded data file(s) as the usage statement for the tool indicates. Do **not** substitute in PYTHON_NUMPY or PYTHON_XARRAY on the command line. In the config file dictionary set the **file_type** entry to either PYTHON_NUMPY or PYTHON_XARRAY to activate the Python embedding logic. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, list the Python script to be run followed by any command line arguments for that script. However, in the Python command, replace the name of the input gridded data file with the constant string MET_PYTHON_INPUT_ARG. When looping over multiple input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the file currently being processed. The example plot_data_plane command listed below yields the same result as the example shown above, but using the option 2 logic instead.
 
 The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists on the command line, as do some other MET tools. Typically, the ASCII file list contains a list of files which actually exist on your machine and should be read as input. For Python embedding, these tools loop over the ASCII file list entries, set MET_PYTHON_INPUT_ARG to that string, and execute the Python script. This only allows a single command line argument to be passed to the Python script. However multiple arguments may be concatenated together using some delimiter, and the Python script can be defined to parse arguments using that delimiter. When file lists are constructed in this way, the entries will likely not be files which actually exist on your machine. In this case, users should place the constant string "file_list" on the first line of their ASCII file lists. This will ensure that the MET tools will parse the file list properly.
 

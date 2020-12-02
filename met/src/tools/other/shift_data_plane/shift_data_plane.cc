@@ -82,8 +82,6 @@ static void set_to(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
 static void set_width(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -124,14 +122,12 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_from,      "-from",   2);
-   cline.add(set_to,        "-to",     2);
-   cline.add(set_method,    "-method", 1);
-   cline.add(set_width,     "-width",  1);
-   cline.add(set_shape, 	  "-shape",  1);
-   cline.add(set_logfile,   "-log",    1);
-   cline.add(set_verbosity, "-v",      1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_from,     "-from",     2);
+   cline.add(set_to,       "-to",       2);
+   cline.add(set_method,   "-method",   1);
+   cline.add(set_width,    "-width",    1);
+   cline.add(set_shape,    "-shape",    1);
+   cline.add(set_compress, "-compress", 1);
 
    // Parse the command line
    cline.parse();
@@ -454,25 +450,8 @@ void set_width(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_shape(const StringArray &a) {
-	GridTemplateFactory gtf;
-	Shape = gtf.string2Enum(a[0]);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray &a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray &a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
+   GridTemplateFactory gtf;
+   Shape = gtf.string2Enum(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

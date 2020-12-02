@@ -119,7 +119,7 @@ As described in the introduction to this section, two additional utilities are s
 MET directory structure
 _______________________
 
-The top-level MET directory consists of a README file, Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in :numref:`Install_Building-the-MET`.
+The top-level MET directory consists of  Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in :numref:`Install_Building-the-MET`.
 
 When MET has been successfully built and installed, the installation directory contains two subdirectories. The bin/ directory contains executables for each module of MET as well as several plotting utilities. The share/met/ directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The colortables/, map/, and ps/ subdirectories contain data used in creating PostScript plots for several MET tools. The poly/ subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in :numref:`Appendix B, Section %s <appendixB>`. The config/ directory contains default configuration files for the MET tools. The python/ subdirectory contains sample scripts used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The table_files/ and tc_data/ subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The Rscripts/ subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET scripts/Rscripts directory, other than it is the installed location. The wrappers/ subdirectory contains code used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`).
 
@@ -260,21 +260,21 @@ Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_
 
 **-\\-enable-lidar2nc**
 
-Enable compilation of utilities using lidar2nc.
+Enable compilation of utilities using the LIDAR2NC tool.
 
 **-\\-enable-modis**
 
-Enable compilation of modis_regrid. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
+Enable compilation of the Modis-Regrid tool. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
 
 **-\\-enable-mode_graphics**
 
-Enable compilation of mode_graphics. Requires $MET_CAIRO and $MET_FREETYPE.
+Enable compilation of the MODE-Graphics tool. Requires $MET_CAIRO and $MET_FREETYPE.
 
 **-\\-disable-block4**
 
 Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBUFR files.
 
-Run the configure script with the --help argument to see the full list of configuration options.
+Run the configure script with the **--help** argument to see the full list of configuration options.
 
 Make Targets
 ~~~~~~~~~~~~
@@ -306,4 +306,4 @@ Once the MET package has been built successfully, the user is encouraged to run 
 
 3. When the test script is finished, type 'CTRL-C' to quit the tail. Look in "out" to find the output files for these tests. Each tool has a separate, appropriately named subdirectory for its output files. 
 
-4. In particular, check that the PB2NC tool ran without error. If there was an error, run "make clean" then rerun your configure command adding "--disable-block4" to your configure command line and rebuild MET.
+4. In particular, check that the PB2NC tool ran without error. If there was an error, run "make clean" then rerun your configure command adding **--disable-block4** to your configure command line and rebuild MET.

@@ -91,9 +91,7 @@ static int compress_level = -1;
 
 static void usage();
 
-static void set_logfile   (const StringArray &);
 static void set_outfile   (const StringArray &);
-static void set_verbosity (const StringArray &);
 static void set_compress  (const StringArray &);
 
 static void process_calipso_file (NcFile *, const char * filename);
@@ -124,10 +122,8 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_outfile,   "-out",       1);
-cline.add(set_logfile,   "-log",       1);
-cline.add(set_verbosity, "-v",         1);
-cline.add(set_compress,  "-compress",  1);
+cline.add(set_outfile,  "-out",       1);
+cline.add(set_compress, "-compress",  1);
 
 cline.parse();
 
@@ -196,20 +192,6 @@ exit (1);
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_logfile(const StringArray & a)
-
-{
-
-mlog.open_log_file(a[0]);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void set_outfile(const StringArray & a)
 
 {
@@ -223,18 +205,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void set_verbosity(const StringArray & a)
-
-{
-
-mlog.set_verbosity_level(atoi(a[0].c_str()));
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a)
 

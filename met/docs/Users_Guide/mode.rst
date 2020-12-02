@@ -195,7 +195,7 @@ _____________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 
 _____________________
@@ -239,9 +239,9 @@ _____________________
   }
   obs = fcst; 
 
-The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`Data IO MET Configuration File Options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
+The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
 
-The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`Data IO MET Configuration File Options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
+The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`config_options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
 The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
 
@@ -329,7 +329,7 @@ _____________________
      poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
   }
 
-Defining a **grid** and **poly** masking region is described in :numref:`Data IO MET Configuration File Options`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
+Defining a **grid** and **poly** masking region is described in :numref:`config_options`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
 
 The **grid_flag** and **poly_flag** entries specify how the grid and polyline masking should be applied:
 
@@ -415,21 +415,19 @@ _____________________
      color_table = "MET_BASE/colortables/met_default.ctable";
      plot_min = 0.0;
      plot_max = 0.0;
-     colorbar_spacing = 1;
   }
   obs_raw_plot = {
      color_table = "MET_BASE/colortables/met_default.ctable";
      plot_min = 0.0;
      plot_max = 0.0;
-     colorbar_spacing = 1;
   }
   object_plot = {
      color_table = "MET_BASE/colortables/mode_obj.ctable";
   }
 
-Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`Data IO MET Configuration File Options`.
+Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`config_options`.
 
-The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The **colorbar_spacing** entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
+The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar.
 
 
 _____________________

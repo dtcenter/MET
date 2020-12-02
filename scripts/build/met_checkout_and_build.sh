@@ -84,7 +84,7 @@ run_command() {
   return ${STATUS}
 }
 
-# Run svn info to update contents of version.txt
+# Use the Git info to define version.txt
 get_git_info() {
   echo "CALLING: git config, git rev-parse, and git log"
   git config --get remote.origin.url | sed -r 's/^/Repository:\t\t/g'       > met/data/version.txt

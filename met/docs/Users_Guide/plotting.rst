@@ -6,21 +6,24 @@ Plotting and Graphics Support
 Plotting Utilities
 __________________
 
-This section describes how to check your data files using plotting utilities. Point observations can be plotted using the plot_point_obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
+This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot-Point-Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the plot_point_obs utility is shown below:
+The usage statement for the Plot-Point-Obs utility is shown below:
 
 .. code-block:: none
-		
+
   Usage: plot_point_obs
          nc_file
          ps_file
-         [-gc code]
+         [-config config_file]
+         [-point_obs file]
+         [-title string]
+         [-plot_grid name]
+         [-gc code] or [-obs_var name]
          [-msg_typ name]
-         [-data_file name]
          [-dotsize val]
          [-log file]
          [-v level]
@@ -30,24 +33,30 @@ plot_point_obs has two required arguments and can take optional ones.
 Required arguments for plot_point_obs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **nc_file** argument indicates the name of the file to be plotted.
+1. The **nc_file** argument indicates the name of the point observation file to be plotted. This file is the output from one of the point pre-processing tools, such as pb2nc.
 
 2. The **ps_file** argument indicates the name given to the output file containing the plot.
 
 Optional arguments for plot_point_obs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-gc code** is the GRIB code(s) to be plotted.
+3. The **-config config_file** option specifies the configuration file to be used. The contents of the optional configuration file are discussed below.
 
-4. The **-msg_typ name** is the message type(s) to be plotted.
+4. The **-point_obs file** option is used to pass additional NetCDF point observation files to be plotted.
 
-5. The **-data_file name** is a data file whose grid should be used for the plot. 
+5. The **-plot_grid name** option defines the grid for plotting as a named grid, the path to a gridded data file, or an explicit grid specification string. This overrides the default global plotting grid. If configuring the tool to plot a base image, the path to the input gridded data file should be specified here.
 
-6. The **-dotsize val** option overrides the default dot size value (1). 
+6. The **-title string** option specifies the plot title string.
 
-7. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+7. The **-gc code** and **-obs_var name** options specify observation types to be plotted. These overrides the corresponding configuration file entries.
 
-8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+8. The **-msg_typ name** option specifies the message type to be plotted. This overrides the corresponding configuration file entry.
+
+9. The **-dotsize val** option sets the dot size. This overrides the corresponding configuration file entry.
+
+10. The **-log file** option directs output and errors to the specified log file.
+
+11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the plot_point_obs calling sequence is shown below:
 
@@ -55,7 +64,132 @@ An example of the plot_point_obs calling sequence is shown below:
 
   plot_point_obs sample_pb.nc sample_data.ps
 
-In this example, the plot_point_obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
+In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
+
+plot_point_obs configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default configuration file for the Plot-Point-Obs tool named **PlotPointObsConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
+
+Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+
+______________________
+
+.. code-block:: none
+
+  grid_data = {
+
+     field = [];
+
+     grid_plot_info = {
+        color_table   = "MET_BASE/colortables/met_default.ctable";
+        plot_min      = 0.0;
+        plot_max      = 0.0;
+        colorbar_flag = TRUE;
+     }
+  }
+
+The **grid_data** dictionary defines a gridded field of data to be plotted as a base image prior to plotting point locations on top of it. The data to be plotted is specified by the **field** array. If **field** is empty, no base image will be plotted. If **field** has length one, the requested data will be read from the input file specified by the **-plot_grid** command line argument.
+
+The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
+
+______________________
+
+.. code-block:: none
+
+  point_data = [
+    { fill_color = [ 255, 0, 0 ]; }
+  ];
+
+The **point_data** entry is an array of dictionaries. Each dictionary may include a list of filtering, data processing, and plotting options, described below. For each input point observation, the tool checks the **point_data** filtering options in the order specified. The point information is added to the first matching array entry. The default entry simply specifies that all points be plotted red.
+
+______________________
+
+.. code-block:: none
+
+  msg_typ     = [];
+  sid_inc     = [];
+  sid_exc     = [];
+  obs_var     = [];
+  obs_quality = [];
+  
+The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station id's to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
+
+______________________
+
+.. code-block:: none
+
+  obs_gc      = [];
+
+When using older point observation files which have GRIB codes, the **obs_gc** entry specifies a list of integer GRIB codes to be included.
+
+______________________
+
+.. code-block:: none
+
+  valid_beg   = "";
+  valid_end   = "";
+
+The **valid_beg** and **valid_end** options are time strings which specify a range of dates to be included. When left to their default empty strings no time filtering is applied.
+
+______________________
+
+.. code-block:: none
+
+  lat_thresh  = NA;
+  lon_thresh  = NA;
+  elv_thresh  = NA;
+  hgt_thresh  = NA;
+  prs_thresh  = NA;
+  obs_thresh  = NA;
+
+The options listed above define filtering thresholds for the input point observation values. The default NA thresholds always evaluate to true and therefore apply no filtering. The **lat_thresh** and **lon_thresh** thresholds filter the latitude and longitude of the point observations, respectively. The **elv_thresh** threshold filters by the station elevation. The **hgt_thresh** and **prs_thresh** thresholds filter by the observation height and pressure level. The **obs_thresh** threshold filters by the observation value.
+
+______________________
+
+.. code-block:: none
+
+  convert(x)    = x;
+  censor_thresh = [];
+  censor_val    = [];
+  
+The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`config_options`.
+
+______________________
+
+.. code-block:: none
+
+   dotsize(x) = 10;
+
+The **dotsize(x)** function defines the size of the circle to be plotted as a function of the observation value. The default setting shown above defines the dot size as a constant value.
+
+______________________
+
+.. code-block:: none
+
+  line_color = [];
+  line_width = 1;
+
+The **line_color** and **line_width** entries define the color and thickness of the outline for each circle plotted. When **line_color** is left as an empty array, no outline is drawn. Otherwise, **line_color** should be specified using 3 intergers between 0 and 255 to define the red, green, and blue components of the color.
+
+______________________
+
+.. code-block:: none
+
+  fill_color = [];
+  fill_plot_info = { // Overrides fill_color
+    flag          = FALSE;
+    color_table   = "MET_BASE/colortables/met_default.ctable";
+    plot_min      = 0.0;
+    plot_max      = 0.0;
+    colorbar_flag = TRUE;
+  }
+
+The circles are filled in based on the setting of the **fill_color** and **fill_plot_info** entries. As described above for **line_color**, if **fill_color** is empty, the points are not filled in. Otherwise, **fill_color** must be specified using 3 integers between 0 and 255. If **fill_plot_info.flag** is set to true, then its settings override **fill_color**. The **fill_plot_info** dictionary defines a colortable which is used to determine the color to be used based on the observation value.
+
+Users are encouraged to define as many **point_data** array entries as needed to filter and plot the input observations in the way they would like. Each point observation is plotted using the options specified in the first matching array entry. Note that the filtering, processing, and plotting options specified inside each **point_data** array entry take precedence over ones specified at the higher level of configuration file context.
+
+For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **plot_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
 
 .. _plot_data_plane-usage:
 
@@ -76,7 +210,7 @@ The usage statement for the plot_data_plane utility is shown below:
          [-log file]
          [-v level]
 
-**plot_data_plane** has two required arguments and can take optional ones. 
+plot_data_plane has two required arguments and can take optional ones. 
 
 Required arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -100,13 +234,13 @@ Optional arguments for plot_data_plane
 
 8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the **plot_data_plane** calling sequence is shown below:
+An example of the plot_data_plane calling sequence is shown below:
 
 .. code-block:: none
 		
   plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";'
 
-A second example of the **plot_data_plane** calling sequence is shown below:
+A second example of the plot_data_plane calling sequence is shown below:
 
 .. code-block:: none
 		
@@ -117,7 +251,7 @@ In the first example, the Plot-Data-Plane tool will process the input test.grb f
 plot_mode_field usage
 ~~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the **plot_mode_field** utility is shown below:
+The usage statement for the plot_mode_field utility is shown below:
 
 .. code-block:: none
 		
@@ -129,7 +263,7 @@ The usage statement for the **plot_mode_field** utility is shown below:
          [-log file]
          [-v level]
 
-**plot_mode_field** has four required arguments and can take optional ones. 
+plot_mode_field has four required arguments and can take optional ones. 
 
 Required arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -149,7 +283,7 @@ Optional arguments for plot_mode_field
 
 6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the **plot_mode_field** calling sequence is shown below:
+An example of the plot_mode_field calling sequence is shown below:
 
 .. code-block:: none
 		

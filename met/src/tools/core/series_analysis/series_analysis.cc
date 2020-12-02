@@ -111,8 +111,6 @@ static void set_both_files(const StringArray &);
 static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
-static void set_log_file(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
 static void parse_long_names();
@@ -159,8 +157,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_paired,      "-paired", 0);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
-   cline.add(set_log_file,    "-log",    1);
-   cline.add(set_verbosity,   "-v",      1);
    cline.add(set_compress,    "-compress", 1);
 
    // Parse the command line
@@ -168,6 +164,13 @@ void process_command_line(int argc, char **argv) {
 
    // Check for error. There should be zero arguments left.
    if(cline.n() != 0) usage();
+
+   // Warn about log output
+   if(mlog.verbosity_level() >= 3) {
+      mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
+           << "produces excessive log output and can slow the runtime "
+           << "considerably.\n\n";
+   }
 
    // Check that the required arguments have been set.
    if(fcst_files.n() == 0) {
@@ -2281,28 +2284,6 @@ void set_out_file(const StringArray & a) {
 
 void set_config_file(const StringArray & a) {
    config_file = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_log_file(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
-
-   if(mlog.verbosity_level() >= 3) {
-      mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
-           << "produces excessive log output and can slow the runtime "
-           << "considerably.\n\n";
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////

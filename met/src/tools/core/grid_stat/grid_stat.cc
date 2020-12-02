@@ -173,8 +173,6 @@ static void clean_up();
 
 static void usage();
 static void set_outdir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
                             const ConcatString &filename);
@@ -219,10 +217,8 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_outdir,    "-outdir", 1);
-   cline.add(set_logfile,   "-log",    1);
-   cline.add(set_verbosity, "-v",      1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_outdir,   "-outdir",   1);
+   cline.add(set_compress, "-compress", 1);
 
    // Parse the command line
    cline.parse();
@@ -2954,22 +2950,6 @@ void usage() {
 
 void set_outdir(const StringArray & a) {
    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

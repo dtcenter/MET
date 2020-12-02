@@ -50,16 +50,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-static void create_image(Ppm &, const Grid &, const DataPlane &, const ColorTable &);
-
-static void draw_border(PSfile &, const Box &, double linewidth);
-
-static void fill_colorbar_image(Ppm &, const ColorTable &);
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
                      const Grid & grid, const ConcatString & title,
                      const ColorTable & colortable, MetConfig *conf,

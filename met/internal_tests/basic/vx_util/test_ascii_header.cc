@@ -31,7 +31,6 @@ StringArray  ColNames;
 IntArray     ColOffsets;
 int          Dim = 0;
 
-static void set_verbosity   (const StringArray &);
 static void set_name        (const StringArray &);
 static void set_offset      (const StringArray &);
 static void set_dim         (const StringArray &);
@@ -50,7 +49,6 @@ int main(int argc, char * argv []) {
    cline.add(set_name,        "-name",        1);
    cline.add(set_offset,      "-offset",     -1);
    cline.add(set_dim,         "-dim",         1);
-   cline.add(set_verbosity,   "-v",           1);
    cline.parse();
 
    // Check for required arguments: version, data_type, line_type
@@ -102,12 +100,6 @@ void usage() {
    exit(1);
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

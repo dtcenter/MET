@@ -1437,8 +1437,7 @@ bool get_nc_data(NcVar *var, float *data) {
       else {
          int cell_count = 1;
          for (int idx=0; idx<var->getDimCount();idx++) {
-            NcDim dim = var->getDim(idx);
-            cell_count *= get_dim_size(&dim);
+            cell_count *= get_dim_size(var, idx);
          }
 
          float add_offset = 0.;
@@ -1721,8 +1720,7 @@ bool get_nc_data(NcVar *var, double *data) {
       else {
          int cell_count = 1;
          for (int idx=0; idx<var->getDimCount();idx++) {
-            NcDim dim = var->getDim(idx);
-            cell_count *= get_dim_size(&dim);
+            cell_count *= get_dim_size(var, idx);
          }
 
          double add_offset = 0.;
@@ -1958,8 +1956,7 @@ bool get_nc_data(NcVar *var, uchar *data) {
    else if (NC_BYTE == data_type && has_unsigned_attribute(var)) {
       int cell_count = 1;
       for (int idx=0; idx<var->getDimCount(); idx++) {
-         NcDim dim = var->getDim(idx);
-         cell_count *= get_dim_size(&dim);
+         cell_count *= get_dim_size(var, idx);
       }
       ncbyte *signed_data = new ncbyte[cell_count];
       return_status = _get_nc_data(var, signed_data);
@@ -3158,6 +3155,18 @@ int get_dim_count(const NcVar *var) {
 int get_dim_size(const NcDim *dim) {
 
    return( IS_INVALID_NC_P(dim) ? -1 : dim->getSize() );
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_dim_size(const NcVar *var, const int dim_offset) {
+   int dim_size = -1;
+   if(IS_VALID_NC_P(var)) {
+      NcDim nc_dim = get_nc_dim(var, dim_offset);
+      if (IS_VALID_NC(nc_dim)) dim_size = nc_dim.getSize();
+   }
+
+   return( dim_size );
 }
 
 ////////////////////////////////////////////////////////////////////////

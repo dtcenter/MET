@@ -930,6 +930,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
    }  //  END:  while( read_grib2_record() )
 
+   mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - "
+        << "processed " << rec_num - 1 << " records from GRIB2 file: "
+        << Filename << "\n";
+
    return;
 }
 

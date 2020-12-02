@@ -149,8 +149,6 @@ static void      set_height(const StringArray &);
 static void      set_width(const StringArray &);
 static void      set_value(const StringArray &);
 static void      set_name(const StringArray &);
-static void      set_logfile(const StringArray &);
-static void      set_verbosity(const StringArray &);
 static void      set_compress(const StringArray &);
 static void      set_shapeno(const StringArray &);
 
