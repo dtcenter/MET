@@ -98,6 +98,7 @@ extern  void         unix_to_yyyymmdd_hhmmss(unixtime, char *);
 extern  ConcatString unix_to_yyyymmdd_hhmmss(unixtime);
 
 extern  unixtime yyyymmdd_hhmmss_to_unix(const char *);
+extern  unixtime yyyymmddThhmmss_to_unix(const char *);
 
 extern  unixtime yyyymmdd_hh_to_unix(const char *);
 
@@ -139,6 +140,8 @@ extern  bool is_yyyymmddhhmmss(const char * text);
 extern  bool is_yyyymmdd_hh(const char * text);
 
 extern  bool is_yyyymmdd_hhmmss(const char * text);
+
+extern  bool is_yyyymmddThhmmss(const char * text);
 
 extern  bool is_hhmmss(const char * text);
 
