@@ -121,7 +121,7 @@ In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in t
 tc_stat configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed **share/met/config** directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The contents of the tc_stat configuration file are described below.
 

@@ -76,7 +76,7 @@ The TC-Gen tool implements the following logic:
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed share/met/config directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The tc_gen configuration file is divided into three main sections: criteria to define genesis events, options to subset and filter those events, and options to control the output. The contents of this configuration file are described below.
 
