@@ -14,7 +14,7 @@ MET includes two tools for processing GSI diagnostic files. The GSID2MPR tool re
 GSID2MPR tool
 _____________
 
-This section describes how to run the tool GSID2MPR tool. The GSID2MPR tool reformats one or more GSI diagnostic files into an ASCII matched pair (MPR) format, similar to the MPR output of the Point-Stat tool. The output MPR data may be passed to the Stat-Analysis tool to compute a wide variety of continuous or categorical statistics.
+This section describes how to run the GSID2MPR tool. The GSID2MPR tool reformats one or more GSI diagnostic files into an ASCII matched pair (MPR) format, similar to the MPR output of the Point-Stat tool. The output MPR data may be passed to the Stat-Analysis tool to compute a wide variety of continuous or categorical statistics.
 
 gsid2mpr usage
 ~~~~~~~~~~~~~~
