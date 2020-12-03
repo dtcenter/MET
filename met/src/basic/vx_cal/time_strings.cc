@@ -223,6 +223,50 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+unixtime yyyymmddThhmmss_to_unix(const char * text)
+
+{
+
+int month, day, year, hour, minute, second;
+unixtime t;
+char junk[32];
+
+
+substring_vx_cal(text, junk, 0, 3);
+
+year = atoi(junk);
+
+substring_vx_cal(text, junk, 5, 6);
+
+month = atoi(junk);
+
+substring_vx_cal(text, junk, 8, 9);
+
+day = atoi(junk);
+
+substring_vx_cal(text, junk, 11, 12);
+
+hour = atoi(junk);
+
+substring_vx_cal(text, junk, 14, 15);
+
+minute = atoi(junk);
+
+substring_vx_cal(text, junk, 17, 18);
+
+second = atoi(junk);
+
+
+t = mdyhms_to_unix(month, day, year, hour, minute, second);
+
+return ( t );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime yyyymmdd_hh_to_unix(const char * text)
 
 {
@@ -497,6 +541,7 @@ else if ( strlen(text) == 0 ) {
 }
 else if ( strcmp(text, bad_data_str) == 0 ||
           strcmp(text, na_str      ) == 0 )  t = (unixtime) 0;
+else if ( is_yyyymmddThhmmss (text)       )  t = yyyymmddThhmmss_to_unix (text);
 else if ( is_yyyymmdd_hhmmss (text)       )  t = yyyymmdd_hhmmss_to_unix (text);
 else if ( is_yyyymmdd_hh     (text)       )  t = yyyymmdd_hh_to_unix     (text);
 else if ( is_yyyymmddhhmmss  (text)       )  t = yyyymmddhhmmss_to_unix  (text);
@@ -549,6 +594,7 @@ bool is_datestring(const char * text)
 {
 
 return ( is_yyyymmdd_hhmmss(text) ||
+         is_yyyymmddThhmmss(text) ||
          is_yyyymmdd_hh(text)     ||
          is_yyyymmddhhmmss(text)  ||
          is_yyyymmddhhmm(text)    ||
@@ -626,6 +672,18 @@ bool is_yyyymmdd_hhmmss(const char * text)
 {
 
 return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{6\\}$", text) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_yyyymmddThhmmss(const char * text)
+
+{
+
+return ( check_reg_exp("^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}T[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}Z$", text) );
 
 }
 
