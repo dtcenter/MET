@@ -155,6 +155,6 @@ duplicate_flag = ${DUPLICATE_FLAG};
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
