@@ -218,7 +218,7 @@ Optional arguments for stat_analysis
 
 7. The **-v level** indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging. 
 
-An example of the **stat_analysis** calling sequence is shown below.
+An example of the stat_analysis calling sequence is shown below.
 
 .. code-block:: none
 
@@ -270,7 +270,7 @@ ________________________
   tmp_dir        = "/tmp";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ___________________
 
@@ -471,7 +471,7 @@ ___________________
 
   out_alpha = 0.05;
 
-This entry specifies the alpha value to be used when computing confidence intervals for output statistics. It is similar to the **ci_alpha** entry described in :numref:`Data IO MET Configuration File Options`.
+This entry specifies the alpha value to be used when computing confidence intervals for output statistics. It is similar to the **ci_alpha** entry described in :numref:`config_options`.
 
 ___________________
 
@@ -514,7 +514,7 @@ This job command option is extremely useful. It can be used multiple times to sp
   -column_thresh col_name thresh
   -column_str    col_name string
 
-The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`Data IO MET Configuration File Options`.
+The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
 		
@@ -550,7 +550,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :numref:`Data IO MET Configuration File Options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :numref:`config_options`.
 
 .. code-block:: none
 
@@ -686,7 +686,7 @@ The output from this job consists of three lines, the first two of which contain
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 
-See the README file in the installed share/met/config directory for a detailed description of the job command options available for ramp job type.
+See :numref:`config_options` for a detailed description of the job command options available for ramp job type.
 
 The default output for this job is contingency table counts and statistics (**-out_line_type CTC,CTS**). Matched pair information may also be output by requesting MPR output (**-out_line_type CTC,CTS,MPR**).
 

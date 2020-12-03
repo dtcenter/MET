@@ -46,13 +46,16 @@ extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString> parse_conf_key_value_map(
-                            Dictionary *dict, const char *conf_key_map_name);
+                            Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern map<ConcatString,StringArray>
                        parse_conf_message_type_group_map(Dictionary *dict);
+extern map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_obs_bufr_map(Dictionary *dict);
+extern map<ConcatString,ConcatString>
+                       parse_conf_obs_name_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);

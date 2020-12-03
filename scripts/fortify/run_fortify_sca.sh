@@ -34,7 +34,7 @@ if [[ $# -lt 1 ]]; then usage; exit; fi
 
 # Check that FORTIFY_BIN is defined
 if [ -z ${FORTIFY_BIN+x} ]; then
-  echo "ERROR: ${FORTIFY_BIN} must be set"
+  echo "ERROR: FORTIFY_BIN must be set"
   exit 1
 fi
 

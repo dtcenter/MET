@@ -8,7 +8,7 @@ Wavelet-Stat Tool
 Introduction
 ____________
 
-The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This section describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by :ref:`Casati et al (2004) <Casati-2004>`.
+The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This section describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by :ref:`Casati et al. (2004) <Casati-2004>`.
 
 The Intensity-Scale technique is one of the recently developed verification approaches that focus on verification of forecasts defined over spatial domains. Spatial verification approaches, as opposed to point-by-point verification approaches, aim to account for the presence of features and for the coherent spatial structure characterizing meteorological fields. Since these approaches account for the intrinsic spatial correlation existing between nearby grid-points, they do not suffer from point-by-point comparison related verification issues, such as double penalties. Spatial verification approaches aim to account for the observation and forecast time-space uncertainties, and aim to provide feedback on the forecast error in physical terms.
 
@@ -26,7 +26,7 @@ __________________________________
 The method
 ~~~~~~~~~~
 
-:ref:`Casati et al (2004) <Casati-2004>` applied the Intensity-Scale verification to preprocessed and re-calibrated (unbiased) data. The preprocessing was aimed to mainly normalize the data, and defined categorical thresholds so that each categorical bin had a similar sample size. The recalibration was performed to eliminate the forecast bias. Preprocessing and recalibration are not strictly necessary for the application of the Intensity-Scale technique. The MET Intensity-Scale Tool does not perform either, and applies the Intensity-Scale approach to biased forecasts, for categorical thresholds defined by the user.
+:ref:`Casati et al. (2004) <Casati-2004>` applied the Intensity-Scale verification to preprocessed and re-calibrated (unbiased) data. The preprocessing was aimed to mainly normalize the data, and defined categorical thresholds so that each categorical bin had a similar sample size. The recalibration was performed to eliminate the forecast bias. Preprocessing and recalibration are not strictly necessary for the application of the Intensity-Scale technique. The MET Intensity-Scale Tool does not perform either, and applies the Intensity-Scale approach to biased forecasts, for categorical thresholds defined by the user.
 
 The Intensity Scale approach can be summarized in the following 5 steps:
 
@@ -42,9 +42,9 @@ The Intensity Scale approach can be summarized in the following 5 steps:
 
 **Note** that the MSE of the original binary fields is equal to the proportion of the counts of misses (**c/n**) and false alarms (**b/n**) for the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: :math:`{MSE}(t)=(b+c)/n`. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (:numref:`contingency_table_counts`).
 
-4. The MSE for the random binary forecast and observation fields is estimated by :math:`{MSE}(t) {random}= {FBI}*{Br}*(1-{Br}) + {Br}*(1- {FBI}*{Br})`, where  :math:`{FBI}=(a+b)/(a+c)` is the frequency bias index and :math:`{Br}=(a+c)/n` is the sample climatology from the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the :ref:`Murphy and Winkler (1987) <Murphy-1987>` framework, applying the Bayes' theorem to express the joint probabilities **b/n** and **c/n** as product of the marginal and conditional probability (e.g. :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`; :ref:`Wilks, (2010) <Wilks-2010>`), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that **b/n** and **c/n** are equal to the product of the corresponding marginal probabilities solely.
+4. The MSE for the random binary forecast and observation fields is estimated by :math:`{MSE}(t) {random}= {FBI}*{Br}*(1-{Br}) + {Br}*(1- {FBI}*{Br})`, where  :math:`{FBI}=(a+b)/(a+c)` is the frequency bias index and :math:`{Br}=(a+c)/n` is the sample climatology from the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the :ref:`Murphy and Winkler (1987) <Murphy-1987>` framework, applying the Bayes' theorem to express the joint probabilities **b/n** and **c/n** as product of the marginal and conditional probability (e.g. :ref:`Jolliffe and Stephenson, 2012 <Jolliffe-2012>`; :ref:`Wilks, 2010 <Wilks-2010>`), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that **b/n** and **c/n** are equal to the product of the corresponding marginal probabilities solely.
 
-5. For each threshold (**t**) and scale component (**j**), the skill score based on the MSE of binary forecast and observation scale components is evaluated (:numref:`wavelet-stat_Intensity_Scale_skill_score_NIMROD`). The standard skill score definition as in :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>` or :ref:`Wilks, (2010) <Wilks-2010>` is used, and random chance is used as reference forecast. The MSE for the random binary forecast is equipartitioned on the **n+1** scales to evaluate the skill score: :math:`{SS} (t,j)=1- {MSE}(t,j)*(n+1)/ {MSE}(t) {random}`
+5. For each threshold (**t**) and scale component (**j**), the skill score based on the MSE of binary forecast and observation scale components is evaluated (:numref:`wavelet-stat_Intensity_Scale_skill_score_NIMROD`). The standard skill score definition as in :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>` or :ref:`Wilks (2010) <Wilks-2010>` is used, and random chance is used as reference forecast. The MSE for the random binary forecast is equipartitioned on the **n+1** scales to evaluate the skill score: :math:`{SS} (t,j)=1- {MSE}(t,j)*(n+1)/ {MSE}(t) {random}`
 
 The Intensity-Scale (IS) skill score evaluates the forecast skill as a function of the precipitation intensity and of the spatial scale of the error. Positive values of the IS skill score are associated with a skillful forecast, whereas negative values are associated with no skill. Usually large scales exhibit positive skill (large scale events, such as fronts, are well predicted), whereas small scales exhibit negative skill (small scale events, such as convective showers, are less predictable), and the smallest scale and highest thresholds exhibit the worst skill. For the NIMROD case illustrated note the negative skill associated with the 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced almost its entire length.
 
@@ -224,7 +224,7 @@ _______________________
   output_prefix     = "";
   version           = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _______________________
 
@@ -256,7 +256,7 @@ _______________________
      member = 2;
   }
 
-The **wavelet_flag** and **wavelet_k** variables specify the type and shape of the wavelet to be used for the scale decomposition. The :ref:`Casati et al (2004) <Casati-2004>` method uses a Haar wavelet which is a good choice for discontinuous fields like precipitation. However, users may choose to apply any wavelet family/shape that is available in the GNU Scientific Library. Values for the **wavelet_flag** variable, and associated choices for k, are described below:
+The **wavelet_flag** and **wavelet_k** variables specify the type and shape of the wavelet to be used for the scale decomposition. The :ref:`Casati et al. (2004) <Casati-2004>` method uses a Haar wavelet which is a good choice for discontinuous fields like precipitation. However, users may choose to apply any wavelet family/shape that is available in the GNU Scientific Library. Values for the **wavelet_flag** variable, and associated choices for k, are described below:
 
 • **HAAR** for the Haar wavelet (member = 2).
 

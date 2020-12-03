@@ -90,7 +90,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
 series_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The default configuration file for the Series-Analysis tool named *SeriesAnalysisConfig_default* can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Series-Analysis tool named **SeriesAnalysisConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -114,7 +114,7 @@ ____________________
   tmp_dir        = "/tmp";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ____________________
 

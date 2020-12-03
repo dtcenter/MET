@@ -80,7 +80,7 @@ _______________________
   }
   regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
 
 _______________________
 

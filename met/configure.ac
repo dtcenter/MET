@@ -547,6 +547,26 @@ else
     AC_MSG_NOTICE([grid_stat will not be compiled])
 fi
 
+# ioda2nc
+
+AC_ARG_ENABLE(ioda2nc,
+	  [AS_HELP_STRING([--disable-ioda2nc], [Disable compilation of ioda2nc])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_IODA2NC="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-ioda2nc) ;;
+   esac],
+  [ENABLE_IODA2NC="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_IODA2NC], [test "x$ENABLE_IODA2NC" = "xyes"])
+
+if test "x$ENABLE_IODA2NC" = "xyes"; then
+    AC_DEFINE([ENABLE_IODA2NC], [], ["build ioda2nc"])
+    AC_MSG_NOTICE([ioda2nc will be compiled])
+else
+    AC_MSG_NOTICE([ioda2nc will not be compiled])
+fi
+
 # madis2nc
 
 AC_ARG_ENABLE(madis2nc,
@@ -1206,6 +1226,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/lidar2nc/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/gis_utils/Makefile
+                 src/tools/other/ioda2nc/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
