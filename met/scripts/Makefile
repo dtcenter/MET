@@ -56,6 +56,7 @@ include $(MK_DIR)/grib2.mk
 include $(MK_DIR)/grid_stat.mk
 include $(MK_DIR)/gis_utils.mk
 include $(MK_DIR)/gsi_tools.mk
+include $(MK_DIR)/ioda2nc.mk
 include $(MK_DIR)/lidar2nc.mk
 include $(MK_DIR)/madis2nc.mk
 include $(MK_DIR)/mode.mk
