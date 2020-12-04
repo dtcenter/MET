@@ -536,6 +536,8 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             rotate_winds(vinfo_grib_winds, cur_plane);
          }
 
+         if(status) status = process_data_plane(&vinfo, cur_plane);
+
          if(!status) {
             cur_plane.clear();
             lower = upper = bad_data_int;
@@ -543,9 +545,6 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                  << "Can't read record number " << i+1
                  << " from GRIB file \"" << filename() << "\".\n\n";
             continue;
-         }
-         else {
-            process_data_plane(&vinfo, cur_plane);
          }
 
          // Add current record to the data plane array
@@ -712,7 +711,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
          // Read current record
          status = get_data_plane(r, plane);
 
-         if(status) process_data_plane(&vinfo_grib, plane);
+         if(status) status = process_data_plane(&vinfo_grib, plane);
 
          break;
       }

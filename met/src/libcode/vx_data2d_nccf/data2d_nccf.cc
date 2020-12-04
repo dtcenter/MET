@@ -270,7 +270,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       status = false;
     }
 
-    process_data_plane(&vinfo, plane);
+    status = process_data_plane(&vinfo, plane);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 
@@ -287,21 +287,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
     if (info->units_att.length() > 0)
       vinfo.set_units(info->units_att.c_str());
-
-    //  print a report
-    double plane_min, plane_max;
-    plane.data_range(plane_min, plane_max);
-    mlog << Debug(4) << "\n"
-         << "Data plane information:\n"
-         << "      plane min: " << plane_min << "\n"
-         << "      plane max: " << plane_max << "\n"
-         << "     valid time: " << unix_to_yyyymmdd_hhmmss(plane.valid()) << "\n"
-         << "      lead time: " << sec_to_hhmmss(plane.lead()) << "\n"
-         << "      init time: " << unix_to_yyyymmdd_hhmmss(plane.init()) << "\n"
-         << "     accum time: " << sec_to_hhmmss(plane.accum()) << "\n";
   }
-
-
 
   return status;
 }
