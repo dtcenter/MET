@@ -11,7 +11,7 @@ This section describes how to check your data files using plotting utilities. Po
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the Plot_Point_Obs utility is shown below:
+The usage statement for the Plot-Point-Obs utility is shown below:
 
 .. code-block:: none
 
