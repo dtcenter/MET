@@ -1416,6 +1416,7 @@ void _apply_scale_factor(float *data, const T *packed_data,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data) {
+   clock_t start_clock = clock();
    bool return_status = false;
    static const char *method_name = "get_nc_data(NcVar *, float *) ";
 
@@ -1621,6 +1622,10 @@ bool get_nc_data(NcVar *var, float *data) {
       }
       return_status = true;
    }
+
+   mlog << Debug(6) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC)
+        << " seconds for " << GET_NC_NAME_P(var) << "\n";
    return(return_status);
 }
 
