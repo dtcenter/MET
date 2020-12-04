@@ -18,6 +18,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <ctime>
 #include <string>
 #include <time.h>
 
@@ -754,6 +755,7 @@ int NcCfFile::lead_time() const
 
 double NcCfFile::getData(NcVar * var, const LongArray & a) const
 {
+  clock_t start_clock = clock();
   static const string method_name
       = "NcCfFile::getData(NcVar *, const LongArray &) -> ";
   if (!args_ok(a))
@@ -863,6 +865,9 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   //  done
 
+  mlog << Debug(6) << method_name << "took "
+       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+
   return d;
 }
 
@@ -872,6 +877,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
 bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 {
+  clock_t start_clock = clock();
   static const string method_name_short
       = "NcCfFile::getData(NcVar*, LongArray&, DataPlane&) ";
   static const string method_name
@@ -1079,10 +1085,12 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
       plane.set(value, x, y_offset);
 
-    }   //  for y
-  }   //  for x
+    }   //  for x
+  }   //  for y
 
   //  done
+  mlog << Debug(6) << method_name << "took "
+       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
   return true;
 }
