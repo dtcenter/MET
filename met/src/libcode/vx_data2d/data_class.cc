@@ -321,8 +321,7 @@ if ( ! vinfo )  return ( false );
 
 if ( dp.is_all_bad_data() )  {
 
-   mlog << Debug(3) << "Found no valid data values in field \""
-        << vinfo->magic_str() << "\".\n";
+   mlog << Debug(3) << "No valid data found in input data plane!\n";
 
    return ( false );
 
