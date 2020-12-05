@@ -212,7 +212,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
           do_stop = false;
           dimension[time_dim_slot] = 0;
           mlog << Warning << "\n" << method_name << "returns the first available time for \""
-               << vinfo.req_name() << "\" variable).\n\n";
+               << vinfo.req_name() << "\" variable.\n\n";
         }
         else
           mlog << Warning << "\n" << method_name << "the requested offset "
