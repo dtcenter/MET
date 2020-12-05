@@ -372,13 +372,12 @@ if ( mlog.verbosity_level() >= 4 ) {
    dp.data_range(min_v, max_v);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
-        << "           name: " << vinfo->magic_str() << "\n"
         << "      plane min: " << min_v << "\n"
         << "      plane max: " << max_v << "\n"
         << "     valid time: " << unix_to_yyyymmdd_hhmmss(dp.valid()) << "\n"
         << "      lead time: " << sec_to_hhmmss(dp.lead()) << "\n"
         << "      init time: " << unix_to_yyyymmdd_hhmmss(dp.init()) << "\n"
-        << "     accum time: " << sec_to_hhmmss(dp.accum()) << "\n";
+        << "     accum time: " << sec_to_hhmmss(dp.accum()) << "\n\n";
 
 }
 
