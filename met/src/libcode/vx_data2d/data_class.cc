@@ -309,11 +309,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
+bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 
 {
 
-if ( ! vinfo )  return;
+if ( ! vinfo )  return ( false );
+
+   //
+   // Check for no valid input data
+   //
+
+if ( dp.is_all_bad_data() )  {
+
+   mlog << Debug(3) << "No valid data found in input data plane!\n";
+
+   return ( false );
+
+}
 
    //
    // Apply shift to the right logic
@@ -349,7 +361,26 @@ if ( vinfo->grid_attr().nxy() > 0 )  {
 
 }
 
-return;
+   //
+   // Print a data summary
+   //
+
+if ( mlog.verbosity_level() >= 4 ) {
+
+   double min_v, max_v;
+   dp.data_range(min_v, max_v);
+   mlog << Debug(4) << "\n"
+        << "Data plane information:\n"
+        << "      plane min: " << min_v << "\n"
+        << "      plane max: " << max_v << "\n"
+        << "     valid time: " << unix_to_yyyymmdd_hhmmss(dp.valid()) << "\n"
+        << "      lead time: " << sec_to_hhmmss(dp.lead()) << "\n"
+        << "      init time: " << unix_to_yyyymmdd_hhmmss(dp.init()) << "\n"
+        << "     accum time: " << sec_to_hhmmss(dp.accum()) << "\n\n";
+
+}
+
+return ( true );
 
 }
 
