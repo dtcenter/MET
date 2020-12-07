@@ -7,8 +7,8 @@ describes the bugfix, enhancement, or new feature: `MET Git-Hub issues. <https:/
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
-Version 10.0.0-beta2 release notes (20201207)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Version `10.0-beta2 <https://github.com/dtcenter/MET/projects/24>`_ release notes (20201207)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Repository and build:
    * Switch from tagging releases as met-X.Y.Z to vX.Y.Z instead (`#1541 <http://github.com/dtcenter/MET/issues/1541>`_).
@@ -34,8 +34,8 @@ Version 10.0.0-beta2 release notes (20201207)
    * Add new ioda2nc tool (`#1355 <http://github.com/dtcenter/MET/issues/1355>`_).
    * Incremental development toward the Multivariate MODE tool (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
 
-Version 10.0-beta1 release notes (20201022)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Version `10.0-beta1 <https://github.com/dtcenter/MET/projects/20>`_ release notes (20201022)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Bugfixes since the version 9.1 release:
   
