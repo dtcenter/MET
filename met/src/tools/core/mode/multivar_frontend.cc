@@ -63,6 +63,12 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
+extern int mode_frontend(const StringArray &);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern const char * const program_name;
 
 
@@ -159,7 +165,7 @@ if ( fcst_filenames.n() != obs_filenames.n() )  {
 const int n_files = fcst_filenames.n();
 ConcatString mode_args;
 ConcatString command;
-StringArray a, nc_files;
+StringArray a, nc_files, mode_argv;
 int status;
 char junk [256];
 
@@ -211,12 +217,25 @@ for (j=0; j<n_files; ++j)  {
       //  build the command for running mode
       //
 
+   mode_argv.clear();
+
+   mode_argv.add(mode_path);
+   mode_argv.add(fcst_filenames[j]);
+   mode_argv.add(obs_filenames[j]);
+   mode_argv.add(config_file);
+
    command << cs_erase
            << mode_path         << ' '
            << fcst_filenames[j] << ' '
            <<  obs_filenames[j] << ' '
            << config_file;
 
+   mode_argv.add("-v");
+   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+   mode_argv.add(junk);
+
+   mode_argv.add("-outdir");
+   mode_argv.add(dir);
 
    command << " -v " << mlog.verbosity_level();
 
@@ -228,6 +247,9 @@ for (j=0; j<n_files; ++j)  {
    // 
    // }
 
+   mode_argv.add("-field_index");
+   snprintf(junk, sizeof(junk), "%d", j);
+   mode_argv.add(junk);
 
    command << " -field_index " << j;
 
@@ -235,7 +257,11 @@ for (j=0; j<n_files; ++j)  {
       //  run mode
       //
 
+   mlog << Debug(1) << "command is \"" << command << "\"\n\n";
+
    run_command(command);
+
+   // (void) mode_frontend(mode_argv);
 
    mlog << Debug(1) << "\n finished mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
 
@@ -371,8 +397,6 @@ void run_command(const ConcatString & command)
 {
 
 int status;
-
-cout << "command = \"" << command << "\"\n" << flush;
 
 status = system(command.text());
 

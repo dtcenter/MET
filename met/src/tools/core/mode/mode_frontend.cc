@@ -96,7 +96,7 @@ using namespace std;
 
 extern const char * const program_name;
 
-static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
+static ModeExecutive * mode_exec = 0;
 
 
 void singlevar_usage();   //  this needs external linkage
@@ -148,17 +148,21 @@ set_new_handler(oom);
    // Process the command line arguments
    //
 
+mode_exec = new ModeExecutive;
+
 process_command_line(Argv);
+
+
 
    //
    // Process the forecast and observation files
    //
 
-ModeConfInfo & conf = mode_exec.engine.conf_info;
+ModeConfInfo & conf = mode_exec->engine.conf_info;
 
 if ( field_index >= 0 )  conf.set_field_index(field_index);
 
-mode_exec.setup_fcst_obs_data();
+mode_exec->setup_fcst_obs_data();
 
 if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
 
@@ -173,7 +177,7 @@ if ( conf.quilt )  {
 
 }
 
-mode_exec.clear();
+// mode_exec.clear();
 
    //
    //  done
@@ -182,6 +186,8 @@ mode_exec.clear();
 #ifdef  WITH_PYTHON
    GP.finalize();
 #endif
+
+if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
 return ( 0 );
 
@@ -195,7 +201,7 @@ void do_straight()
 
 {
 
-const ModeConfInfo & conf = mode_exec.engine.conf_info;
+const ModeConfInfo & conf = mode_exec->engine.conf_info;
 
 const int NCT = conf.n_conv_threshs();
 const int NCR = conf.n_conv_radii();
@@ -215,11 +221,11 @@ int index;
 
 for (index=0; index<NCT; ++index)  {
 
-   mode_exec.do_conv_thresh(index, index);
+   mode_exec->do_conv_thresh(index, index);
 
-   mode_exec.do_match_merge();
+   mode_exec->do_match_merge();
 
-   mode_exec.process_output();
+   mode_exec->process_output();
 
 }
 
@@ -243,15 +249,15 @@ void do_quilt()
 int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
 
-for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
+for (r_index=0; r_index<(mode_exec->n_conv_radii()); ++r_index)  {
 
-   for (t_index=0; t_index<(mode_exec.n_conv_threshs()); ++t_index)  {
+   for (t_index=0; t_index<(mode_exec->n_conv_threshs()); ++t_index)  {
 
-      mode_exec.do_conv_thresh(r_index, t_index);
+      mode_exec->do_conv_thresh(r_index, t_index);
 
-      mode_exec.do_match_merge();
+      mode_exec->do_match_merge();
 
-      mode_exec.process_output();
+      mode_exec->process_output();
 
    }
 
@@ -279,7 +285,7 @@ void process_command_line(const StringArray & argv)
 
 
    // Set the default output directory
-   mode_exec.out_dir = replace_path(default_out_dir);
+   mode_exec->out_dir = replace_path(default_out_dir);
 
    // Check for zero arguments
    if(argc == 1) singlevar_usage();
@@ -311,11 +317,11 @@ void process_command_line(const StringArray & argv)
    if(cline.n() != 3) singlevar_usage();
 
    // Store the input forecast and observation file names
-   mode_exec.fcst_file         = cline[0];
-   mode_exec.obs_file          = cline[1];
-   mode_exec.match_config_file = cline[2];
+   mode_exec->fcst_file         = cline[0];
+   mode_exec->obs_file          = cline[1];
+   mode_exec->match_config_file = cline[2];
 
-   mode_exec.init();
+   mode_exec->init();
 
    return;
 
@@ -325,14 +331,14 @@ void process_command_line(const StringArray & argv)
 
 void set_config_merge_file(const StringArray & a)
 {
-   mode_exec.merge_config_file = a[0];
+   mode_exec->merge_config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_outdir(const StringArray & a)
 {
-   mode_exec.out_dir = a[0];
+   mode_exec->out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -418,7 +424,7 @@ cout << "\n\n"
      << "(optional).\n"
 
      << "\t\t\"-outdir path\" overrides the default output directory ("
-     << mode_exec.out_dir << ") (optional).\n"
+     << mode_exec->out_dir << ") (optional).\n"
 
      << "\t\t\"-log file\" outputs log messages to the specified "
      << "file (optional).\n"
@@ -427,7 +433,7 @@ cout << "\n\n"
      << mlog.verbosity_level() << ") (optional).\n"
 
      << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-     << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n"
+     << mode_exec->engine.conf_info.get_compression_level() << ") (optional).\n\n"
 
      << flush;
 
