@@ -91,7 +91,7 @@ Please see `NCEP's website for a description and plot of these predefined grids 
 Polylines for NCEP Regions
 __________________________
 
-Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed share/met/poly directory. Users may also easily define their own lat/lon polyline files.
+Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed *share/met/poly* directory. Users may also easily define their own lat/lon polyline files.
 
 See `NCEP's website for a description and plot of these predefined verification regions <http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html>`_. 
 

@@ -183,7 +183,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
          status = false;
       }
 
-      process_data_plane(&vinfo, plane);
+      status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);

@@ -55,7 +55,7 @@ A. MET considers north latitude and east longitude positive. Latitudes have rang
 Troubleshooting
 _______________
 
-The first place to look for help with individual commands is this user's guide or the usage statements that are provided with the tools. Usage statements for the individual MET tools are available by simply typing the name of the executable in MET's **bin/** directory. Example scripts available in the MET's **scripts/** directory show examples of how one might use these commands on example datasets. Here are suggestions on other things to check if you are having problems installing or running MET.
+The first place to look for help with individual commands is this user's guide or the usage statements that are provided with the tools. Usage statements for the individual MET tools are available by simply typing the name of the executable in MET's *bin/* directory. Example scripts available in the MET's *scripts/* directory show examples of how one might use these commands on example datasets. Here are suggestions on other things to check if you are having problems installing or running MET.
 
 **MET won't compile**
 
@@ -81,7 +81,7 @@ The first place to look for help with individual commands is this user's guide o
 
 **Error while loading shared libraries**
 
-* Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive the following error: “./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot open shared object file: No such file or directory”, you should add the path to the gsl lib (for example, /home/user/MET/gsl-2.1/lib) to your LD_LIBRARY_PATH.
+* Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive the following error: “./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot open shared object file: No such file or directory”, you should add the path to the gsl lib (for example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
 
 **General troubleshooting**
 
