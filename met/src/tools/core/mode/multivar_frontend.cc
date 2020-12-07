@@ -72,7 +72,7 @@ extern int mode_frontend(const StringArray &);
 extern const char * const program_name;
 
 
-static const char sep [] = "====================================================\n";
+static const char sep [] = "====================================================";
 
 static const char tab [] = "   ";
 
@@ -169,7 +169,7 @@ StringArray a, nc_files, mode_argv;
 int status;
 char junk [256];
 
-mlog << Debug(2) << '\n' << sep << '\n';
+mlog << Debug(2) << "\n" << sep << "\n";
 
    //
    //  do the individual mode runs
@@ -179,7 +179,7 @@ for (j=0; j<n_files; ++j)  {
 
    mlog << Debug(2) 
         << "\n starting mode run " << (j + 1) << " of " << n_files
-        << '\n' << sep << '\n';
+        << "\n" << sep << "\n";
 
       //
       //  test to see of the output directory for this
@@ -265,7 +265,7 @@ for (j=0; j<n_files; ++j)  {
    // (void) mode_frontend(mode_argv);
 
    mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
-        << '\n' << sep << '\n';
+        << "\n" << sep << "\n";
 
    a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
 
@@ -274,7 +274,7 @@ for (j=0; j<n_files; ++j)  {
 }   //  for j
 
 mlog << Debug(2) << "\n finished with individual mode runs "
-     << '\n' << sep << '\n';
+     << "\n" << sep << "\n";
 
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
@@ -483,6 +483,9 @@ NcFile nc;
 int x, y, n;
 float * data = 0;
 const Grid & grid = met.grid;
+
+mlog << Debug(1)
+     << "Creating NetCDF Output file: " << path << "\n";
 
 nc.open(string(path), NcFile::replace, NcFile::classic);
 
