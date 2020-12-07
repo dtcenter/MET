@@ -6,12 +6,12 @@ Plotting and Graphics Support
 Plotting Utilities
 __________________
 
-This section describes how to check your data files using plotting utilities. Point observations can be plotted using the plot_point_obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
+This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot-Point-Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the plot_point_obs utility is shown below:
+The usage statement for the Plot-Point-Obs utility is shown below:
 
 .. code-block:: none
 
@@ -64,7 +64,7 @@ An example of the plot_point_obs calling sequence is shown below:
 
   plot_point_obs sample_pb.nc sample_data.ps
 
-In this example, the plot_point_obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
+In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
 
 plot_point_obs configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,7 +91,7 @@ ______________________
 
 The **grid_data** dictionary defines a gridded field of data to be plotted as a base image prior to plotting point locations on top of it. The data to be plotted is specified by the **field** array. If **field** is empty, no base image will be plotted. If **field** has length one, the requested data will be read from the input file specified by the **-plot_grid** command line argument.
 
-The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`Data IO MET Configuration File Options`.
+The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
 
 ______________________
 
@@ -153,7 +153,7 @@ ______________________
   censor_thresh = [];
   censor_val    = [];
   
-The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`Data IO MET Configuration File Options`.
+The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`config_options`.
 
 ______________________
 
@@ -210,7 +210,7 @@ The usage statement for the plot_data_plane utility is shown below:
          [-log file]
          [-v level]
 
-**plot_data_plane** has two required arguments and can take optional ones. 
+plot_data_plane has two required arguments and can take optional ones. 
 
 Required arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -234,13 +234,13 @@ Optional arguments for plot_data_plane
 
 8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the **plot_data_plane** calling sequence is shown below:
+An example of the plot_data_plane calling sequence is shown below:
 
 .. code-block:: none
 		
   plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";'
 
-A second example of the **plot_data_plane** calling sequence is shown below:
+A second example of the plot_data_plane calling sequence is shown below:
 
 .. code-block:: none
 		
@@ -251,7 +251,7 @@ In the first example, the Plot-Data-Plane tool will process the input test.grb f
 plot_mode_field usage
 ~~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the **plot_mode_field** utility is shown below:
+The usage statement for the plot_mode_field utility is shown below:
 
 .. code-block:: none
 		
@@ -263,7 +263,7 @@ The usage statement for the **plot_mode_field** utility is shown below:
          [-log file]
          [-v level]
 
-**plot_mode_field** has four required arguments and can take optional ones. 
+plot_mode_field has four required arguments and can take optional ones. 
 
 Required arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -283,7 +283,7 @@ Optional arguments for plot_mode_field
 
 6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the **plot_mode_field** calling sequence is shown below:
+An example of the plot_mode_field calling sequence is shown below:
 
 .. code-block:: none
 		

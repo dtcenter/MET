@@ -20,7 +20,7 @@ The other option for operating the analysis tool is “bycase”. Given initial 
 Practical information
 _____________________
 
-The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the **mode_analysis** usage statement, required arguments, and optional arguments.
+The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the mode_analysis usage statement, required arguments, and optional arguments.
 
 .. _mode_analysis-usage:
 
@@ -59,7 +59,7 @@ Specifying **-bycase** will produce a table of metrics for each case undergoing 
 Optional arguments for mode_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **mode_analysis** options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
+3. The mode_analysis options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
 
 Analysis options
 ^^^^^^^^^^^^^^^^

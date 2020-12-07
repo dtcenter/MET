@@ -25,6 +25,7 @@ config_DATA = \
 	EnsembleStatConfig_default \
 	GridStatConfig_default \
 	GridDiagConfig_default \
+	IODA2NCConfig_default \
 	Madis2NcConfig_default \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \

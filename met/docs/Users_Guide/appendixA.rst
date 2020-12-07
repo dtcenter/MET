@@ -44,7 +44,7 @@ A. Currently, very few graphics are included. The plotting tools (plot_point_obs
 
 **Q. How do I find the version of the tool I am using?**
 
-A. Type the name of the tool followed by -version. For example, type “pb2nc -version”.
+A. Type the name of the tool followed by **-version**. For example, type “pb2nc **-version**”.
 
 **Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?**
 

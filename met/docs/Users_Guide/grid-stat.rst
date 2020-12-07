@@ -55,12 +55,12 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis fie
 Statistical confidence intervals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
+The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron, 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
 
 Grid weighting
 ~~~~~~~~~~~~~~
 
-When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`Data IO MET Configuration File Options` for more information.
+When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`config_options` for more information.
 
 Neighborhood methods
 ~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +78,7 @@ The MET software will compute the full one-dimensional Fourier transform, then d
 
 Decomposition via Fourier transform allows the user to evaluate the model separately at each spatial frequency. As an example, the Fourier analysis allows users to examine the "dieoff", or reduction, in anomaly correlation of geopotential height at various levels for bands of waves. A band of low wave numbers, say 0 - 3, represent larger frequency components, while a band of higher wave numbers, for example 70 - 72, represent smaller frequency components. Generally, anomaly correlation should be higher for frequencies with low wave numbers than for frequencies with high wave numbers, hence the "dieoff".
 
-Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al, 2004 <Casati-2004>`; :ref:`Weniger et al 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
+Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al., 2004 <Casati-2004>`; :ref:`Weniger et al., 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
 Gradient Statistics
 ~~~~~~~~~~~~~~~~~~~
@@ -196,7 +196,7 @@ In the second example, the Grid-Stat tool will verify the model data in the samp
 grid_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
+The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
 Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -227,7 +227,7 @@ __________________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ___________________________
 

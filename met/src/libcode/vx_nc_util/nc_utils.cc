@@ -195,15 +195,26 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
-      if (attType == NC_CHAR) {
-         string att_value;
-         att->getValues(att_value);
-         value = att_value;
+      if (attType == NC_CHAR || attType == NC_STRING) {
+         try {
+            string att_value;
+            att->getValues(att_value);
+            value = att_value;
+         }
+         catch (exceptions::NcChar ex) {
+            value = "";
+            // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
+            mlog << Warning << "\n" << method_name
+                 << "Exception: " << ex.what() << "\n"
+                 << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
+                 << GET_NC_TYPE_NAME_P(att) << " type).\n"
+                 << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+         }
       }
       else { // MET-788: to handle a custom modified NetCDF
          mlog << Error << "\n" << method_name
               << "Please convert data type of \"" << GET_NC_NAME_P(att)
-              << "\" to NC_CHAR type.\n\n";
+              << "\" " << GET_NC_TYPE_NAME_P(att) << " to NC_CHAR type.\n\n";
          exit(1);
       }
       status = true;
@@ -474,12 +485,7 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
    att = get_nc_att(var, att_name);
 
    // Look for a match
-   if(IS_VALID_NC_P(att)) {
-      string attr_value;
-      att->getValues(attr_value);
-      att_val = attr_value.c_str();
-      status = true;
-   }
+   status = get_att_value_chars(att, att_val);
    if (att) delete att;
 
    return(status);
@@ -1117,7 +1123,7 @@ double get_nc_time(NcVar * var, const int index) {
             break;
          case NC_BYTE:
             var->getVar(start, count, &vb);
-            k = (double)vs;
+            k = (double)vb;
             break;
          case NC_INT:
             var->getVar(start, count, &vi);

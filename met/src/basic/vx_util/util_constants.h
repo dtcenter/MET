@@ -18,29 +18,28 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Released versions of MET
-static const char met_version_10_0[]  = "V10.0";
-static const char met_version_9_1[]   = "V9.1";
-static const char met_version_9_0[]   = "V9.0";
-static const char met_version_8_1[]   = "V8.1";
-static const char met_version_8_0[]   = "V8.0";
-static const char met_version_7_0[]   = "V7.0";
-static const char met_version_6_1[]   = "V6.1";
-static const char met_version_6_0[]   = "V6.0";
-static const char met_version_5_2[]   = "V5.2";
-static const char met_version_5_1[]   = "V5.1";
-static const char met_version_5_0[]   = "V5.0";
-static const char met_version_4_1[]   = "V4.1";
-static const char met_version_4_0[]   = "V4.0";
-static const char met_version_3_1[]   = "V3.1";
-static const char met_version_3_0_1[] = "V3.0.1";
-static const char met_version_3_0[]   = "V3.0";
-static const char met_version_2_0[]   = "V2.0";
-static const char met_version_1_1[]   = "V1.1";
+static const char met_version_10_0_0[] = "V10.0.0";
+static const char met_version_9_1[]    = "V9.1";
+static const char met_version_9_0[]    = "V9.0";
+static const char met_version_8_1[]    = "V8.1";
+static const char met_version_8_0[]    = "V8.0";
+static const char met_version_7_0[]    = "V7.0";
+static const char met_version_6_1[]    = "V6.1";
+static const char met_version_6_0[]    = "V6.0";
+static const char met_version_5_2[]    = "V5.2";
+static const char met_version_5_1[]    = "V5.1";
+static const char met_version_5_0[]    = "V5.0";
+static const char met_version_4_1[]    = "V4.1";
+static const char met_version_4_0[]    = "V4.0";
+static const char met_version_3_1[]    = "V3.1";
+static const char met_version_3_0_1[]  = "V3.0.1";
+static const char met_version_3_0[]    = "V3.0";
+static const char met_version_2_0[]    = "V2.0";
+static const char met_version_1_1[]    = "V1.1";
 
 ////////////////////////////////////////////////////////////////////////
 
-// static const char * const met_version    = met_version_10_0;
-static const char * const met_version    = met_version_9_0;
+static const char * const met_version    = met_version_10_0_0;
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
