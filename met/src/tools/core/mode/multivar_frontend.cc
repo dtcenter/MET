@@ -329,8 +329,12 @@ if ( ! met.open(path.text()) )  {
 
 }
 
-write_output_nc_file(fcst_super_nc_filename, met, f_result);
-write_output_nc_file( obs_super_nc_filename, met, o_result);
+ConcatString fcst_file, obs_file;
+fcst_file << outdir << "/" << fcst_super_nc_filename;
+ obs_file << outdir << "/" <<  obs_super_nc_filename;
+
+write_output_nc_file(fcst_file.text(), met, f_result);
+write_output_nc_file( obs_file.text(), met, o_result);
 
    //
    //  done
