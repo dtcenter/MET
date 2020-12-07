@@ -169,7 +169,7 @@ StringArray a, nc_files, mode_argv;
 int status;
 char junk [256];
 
-mlog << Debug(1) << '\n' << sep << '\n';
+mlog << Debug(2) << '\n' << sep << '\n';
 
    //
    //  do the individual mode runs
@@ -177,9 +177,9 @@ mlog << Debug(1) << '\n' << sep << '\n';
 
 for (j=0; j<n_files; ++j)  {
 
-   mlog << Debug(1) 
-        << "\n starting mode run " << (j + 1) << " of " << n_files << '\n'
-        << sep << '\n';
+   mlog << Debug(2) 
+        << "\n starting mode run " << (j + 1) << " of " << n_files
+        << '\n' << sep << '\n';
 
       //
       //  test to see of the output directory for this
@@ -196,7 +196,7 @@ for (j=0; j<n_files; ++j)  {
 
    if ( ! directory_exists(dir.c_str()) )  {
 
-      mlog << Debug(1)
+      mlog << Debug(2)
            << program_name << ": creating output directory \""
            << dir << "\"\n\n";
 
@@ -257,13 +257,15 @@ for (j=0; j<n_files; ++j)  {
       //  run mode
       //
 
-   mlog << Debug(1) << "command is \"" << command << "\"\n\n";
+   mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
 
    run_command(command);
 
+   // [TODO] MET #1238: run MODE in memory instead of via system calls.
    // (void) mode_frontend(mode_argv);
 
-   mlog << Debug(1) << "\n finished mode run " << (j + 1) << " of " << n_files << ' ' << sep << '\n';
+   mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
+        << '\n' << sep << '\n';
 
    a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
 
@@ -271,7 +273,8 @@ for (j=0; j<n_files; ++j)  {
 
 }   //  for j
 
-mlog << Debug(1) << "\n finished with individual mode runs " << sep << '\n';
+mlog << Debug(2) << "\n finished with individual mode runs "
+     << '\n' << sep << '\n';
 
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
