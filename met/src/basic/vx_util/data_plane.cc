@@ -279,6 +279,26 @@ void DataPlane::set_accum(int s) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool DataPlane::is_all_bad_data() const {
+   int j;
+   bool status = true;
+
+   //
+   // Check for no valid data
+   //
+
+   for(j=0; j<Nxy; ++j) {
+      if( !is_bad_data(Data[j]) ) {
+         status = false;
+         break;
+      }
+   }
+
+   return(status);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 double DataPlane::get(int x, int y) const {
    int n;
 

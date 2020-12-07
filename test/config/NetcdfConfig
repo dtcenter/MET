@@ -2,7 +2,7 @@
 //
 // ASCII2NC configuration file.
 //
-// For additional information, see the README file in the MET User's Guide.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -12,4 +12,4 @@
 
 nc_compression = 2;
 
-version = "V10.0";
+version = "V10.0.0";

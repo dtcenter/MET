@@ -304,7 +304,7 @@ An example of the point_stat calling sequence is shown below:
   sample_pb.nc \
   PointStatConfig
 
-In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the PointStatConfig file.
+In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the **PointStatConfig file**.
 
 point_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -345,11 +345,11 @@ ________________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _________________________
 
-Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`Data IO MET Configuration File Options`. The following are some special considerations for the Point-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Point-Stat tool.
 
 The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
 

@@ -49,7 +49,7 @@ Optional arguments for tc_rmw
 tc_rmw configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' can be found in the installed **share/met/config/** directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the TC-RMW tool named **TCRMWConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 _______________________
 
@@ -80,7 +80,7 @@ _______________________
   }
   regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
 
 _______________________
 

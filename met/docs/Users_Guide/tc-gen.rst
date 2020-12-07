@@ -76,7 +76,7 @@ The TC-Gen tool implements the following logic:
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed share/met/config directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The tc_gen configuration file is divided into three main sections: criteria to define genesis events, options to subset and filter those events, and options to control the output. The contents of this configuration file are described below.
 
@@ -151,7 +151,7 @@ ______________________
 
   desc = "NA";
 
-The **desc** configuration option is common to many MET tools and is described in :numref:`Data IO MET Configuration File Options`.
+The **desc** configuration option is common to many MET tools and is described in :numref:`config_options`.
 
 ______________________
 
@@ -246,12 +246,12 @@ ______________________
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
   version    = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
 
 tc_gen output
 ~~~~~~~~~~~~~
 
-TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, “./tc_gen” writes output files in the current working directory named “tc_gen.stat” and, optionally, “tc_gen_fho.txt”, “tc_gen_ctc.txt”, and “tc_gen_cts.txt”. The contents of these output files are described in section :numref:`point_stat-output`.
+TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, and **tc_gen_cts.txt**. The contents of these output files are described in section :numref:`point_stat-output`.
 
 Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in :numref:`stat-analysis`.
 

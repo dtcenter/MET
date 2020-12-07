@@ -160,7 +160,7 @@ An example of the MODE calling sequence is listed below:
   sample_obs.grb \
   MODEConfig_grb
 
-In Example 1, the MODE tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the MODEConfig_grb file.
+In Example 1, the MODE tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the **MODEConfig_grb** file.
 
 A second example of the MODE calling sequence is presented below:
 
@@ -172,14 +172,14 @@ A second example of the MODE calling sequence is presented below:
   sample_obs.nc \
   MODEConfig_nc
 
-In Example 2, the MODE tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine using the observations in the sample_obs.nc NetCDF output of pcp_combine, using the configuration options specified in the MODEConfig_nc file. Since the model and observation files contain only a single field of accumulated precipitation, the MODEConfig_nc file should specify that accumulated precipitation be verified.
+In Example 2, the MODE tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine using the observations in the sample_obs.nc NetCDF output of pcp_combine, using the configuration options specified in the **MODEConfig_nc** file. Since the model and observation files contain only a single field of accumulated precipitation, the **MODEConfig_nc** file should specify that accumulated precipitation be verified.
 
 .. _MODE-configuration-file:
 
 mode configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the MODE tool, MODEConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of MODEConfig_default and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
+The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
 Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -195,7 +195,7 @@ _____________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 
 _____________________
@@ -239,9 +239,9 @@ _____________________
   }
   obs = fcst; 
 
-The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`Data IO MET Configuration File Options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
+The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
 
-The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`Data IO MET Configuration File Options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
+The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`config_options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
 The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
 
@@ -329,7 +329,7 @@ _____________________
      poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
   }
 
-Defining a **grid** and **poly** masking region is described in :numref:`Data IO MET Configuration File Options`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
+Defining a **grid** and **poly** masking region is described in :numref:`config_options`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
 
 The **grid_flag** and **poly_flag** entries specify how the grid and polyline masking should be applied:
 
@@ -425,7 +425,7 @@ _____________________
      color_table = "MET_BASE/colortables/mode_obj.ctable";
   }
 
-Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`Data IO MET Configuration File Options`.
+Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`config_options`.
 
 The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar.
 

@@ -2,7 +2,7 @@
 //
 // Point-Stat configuration file.
 //
-// For additional information, see the README file in the MET User's Guide.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -209,7 +209,7 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V10.0";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -2,7 +2,7 @@
 //
 // MADIS2NC configuration file.
 //
-// For additional information, see the README file in the MET User's Guide.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -34,4 +34,4 @@ time_summary = {
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V10.0";
+version = "V10.0.0";

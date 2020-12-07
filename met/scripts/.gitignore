@@ -5,6 +5,7 @@ grib2
 grid_stat
 gis_utils
 gsi_tools
+ioda2nc
 lidar2nc
 madis2nc
 mode_analysis

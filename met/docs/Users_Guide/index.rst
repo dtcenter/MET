@@ -47,6 +47,8 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    overview
    installation
    data_io
+   config_options
+   config_options_tc
    reformat_point
    reformat_grid
    masking
@@ -69,8 +71,6 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    tc-rmw
    rmw-analysis
    plotting
-   README
-   README_TC
    refs
    appendixA
    appendixB
