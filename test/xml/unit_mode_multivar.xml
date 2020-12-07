@@ -30,6 +30,7 @@
       &OUTPUT_DIR;/mode_multivar/input_fcst_file_list \
       &OUTPUT_DIR;/mode_multivar/input_obs_file_list \
       &CONFIG_DIR;/MODEConfig_multivar_fake_data \
+      -outdir &OUTPUT_DIR;/mode_multivar \
       -v 2
     </param>
     <output>
