@@ -162,7 +162,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
-      process_data_plane(&vinfo, plane);
+      status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -255,7 +255,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
             status = false;
          }
 
-         process_data_plane(&vinfo, cur_plane);
+         status = process_data_plane(&vinfo, cur_plane);
 
          // Add current plane to the data plane array
          plane_array.add(cur_plane, pressure, pressure);

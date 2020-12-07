@@ -210,9 +210,9 @@ The ASCII2NC tool supports the “-format python” option. With this option, po
 
 The **read_ascii_point.py** sample script can be found in:
 
-• MET installation directory in **MET_BASE/python**.
+• MET installation directory in *MET_BASE/python*.
 
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in **met/scripts/python**.
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
 
 Python Embedding for MPR data
 _____________________________
@@ -221,6 +221,6 @@ The Stat-Analysis tool supports the “-lookin python” option. With this optio
 
 The **read_ascii_mpr.py** sample script can be found in:
 
-• MET installation directory in **MET_BASE/python**.
+• MET installation directory in *MET_BASE/python*.
 
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in **met/scripts/python**.
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
