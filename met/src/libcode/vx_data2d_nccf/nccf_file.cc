@@ -993,10 +993,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   }
 
   //  get the data
-  int    i[nx];
-  short  s[nx];
-  float  f[nx];
-  double d[nx];
+  int    *i;
+  short  *s;
+  double *d;
+  const int plane_size = nx * ny;
+  float  *f = new float[plane_size];
 
   size_t dim_size;
   long offsets[dim_count];
@@ -1016,6 +1017,9 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   offsets[x_slot] = 0;
   lengths[x_slot] = nx;
+  offsets[y_slot] = 0;
+  lengths[y_slot] = ny;
+
   float add_offset = 0.f;
   float scale_factor = 1.f;
   NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
@@ -1028,65 +1032,83 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (att_scale_factor) delete att_scale_factor;
 
   int type_id = GET_NC_TYPE_ID_P(v);
-  for (int y=0; y<ny; ++y)  {
-    offsets[y_slot] = y;
-    switch ( type_id )  {
+  bool do_scale_factor = add_offset != 0.0 || scale_factor != 1.0;
 
-      case NcType::nc_SHORT:
-        get_nc_data(v, (short *)&s, lengths, offsets);
-        for (int x=0; x<nx; ++x)  {
-          d[x] = (double)s[x];
+  switch ( type_id )  {
+
+    case NcType::nc_SHORT:
+      s = new short[plane_size];
+      get_nc_data(v, s, lengths, offsets);
+      for (int x=0; x<plane_size; ++x) f[x] = (float)s[x];
+      delete [] s;
+      break;
+
+    case NcType::nc_INT:
+      i = new int[plane_size];
+      get_nc_data(v, i, lengths, offsets);
+      for (int x=0; x<plane_size; ++x) f[x] = (float)i[x];
+      delete [] i;
+      break;
+
+    case NcType::nc_FLOAT:
+      get_nc_data(v, f, lengths, offsets);
+      break;
+
+    case NcType::nc_DOUBLE:
+      d = new double[plane_size];
+      get_nc_data(v, d, lengths, offsets);
+      for (int x=0; x<plane_size; ++x) f[x] = (float)d[x];
+      delete [] d;
+      break;
+  
+    default:
+      mlog << Error << "\n" << method_name
+           << " bad type [" << GET_NC_TYPE_NAME_P(v)
+           << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+      exit ( 1 );
+      break;
+  
+  }   //  switch
+
+  int offset = 0;
+  if( x_slot > y_slot ) {
+    for (int y=0; y<ny; ++y) {
+      y_offset = y;
+      if (swap_to_north) y_offset = ny - 1 - y;
+
+      for (int x = 0; x< nx; ++x) {
+        float value = f[offset++];
+    
+        if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
+           value = bad_data_double;
         }
-        break;
+        else if( do_scale_factor ) value = value * scale_factor + add_offset;
+    
+        plane.set(value, x, y_offset);
+    
+      }   //  for x
+    }   //  for y
+  }
+  else {
+    for (int x = 0; x< nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+        y_offset = y;
+        if (swap_to_north) y_offset = ny - 1 - y;
 
-      case NcType::nc_INT:
-        get_nc_data(v, (int *)&i, lengths, offsets);
-        for (int x=0; x<nx; ++x)  {
-          d[x] = (double)i[x];
+        float value = f[offset++];
+
+        if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
+           value = bad_data_double;
         }
-        break;
-
-      case NcType::nc_FLOAT:
-        get_nc_data(v, (float *)&f, lengths, offsets);
-        for (int x=0; x<nx; ++x)  {
-          d[x] = (double)f[x];
-        }
-        break;
-
-      //case ncDouble:
-      case NcType::nc_DOUBLE:
-        get_nc_data(v, (double *)&d, lengths, offsets);
-        break;
-
-      default:
-        mlog << Error << "\n" << method_name
-             << " bad type [" << GET_NC_TYPE_NAME_P(v)
-             << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-        exit ( 1 );
-        break;
-
-    }   //  switch
-
-    LongArray b = a;
-    y_offset = y;
-    if (swap_to_north) y_offset = ny - 1 - y;
-
-    for (int x = 0; x< nx; ++x)
-    {
-      //double value = getData(v, b);
-      double value = d[x];
-
-      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-         value = bad_data_double;
-      }
-      else if (add_offset != 0.0 || scale_factor != 1.0) {
-         value = value * scale_factor + add_offset;
-      }
-
-      plane.set(value, x, y_offset);
-
+        else if( do_scale_factor ) value = value * scale_factor + add_offset;
+    
+        plane.set(value, x, y_offset);
+    
+      }   //  for y
     }   //  for x
-  }   //  for y
+  }
+
+  delete [] f;
 
   //  done
   mlog << Debug(6) << method_name << "took "
