@@ -175,14 +175,14 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config,
 static unixtime find_valid_time(NcFile *nc_in);
 static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid);
 static void get_grid_mapping(Grid fr_grid, Grid to_grid,
-            IntArray *cellMapping, ConcatString geostationary_file);
+                             IntArray *cellMapping, ConcatString geostationary_file);
 static int  get_lat_count(NcFile *);
 static int  get_lon_count(NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
                              bool exit_if_error=true);
 static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
 static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
-            ConcatString regrid_name, bool grid_map=true);
+                                                ConcatString regrid_name);
 static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
             Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
@@ -608,7 +608,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
-   IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_point_file() -> ";
 
    if (!get_dim(nc_in, ConcatString(nc_dim_nhdr), nhdr, true)) {
@@ -709,8 +708,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
 
       // Loop through the requested fields
+      bool mapping_ready = false;
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
+      IntArray *cellMapping = new IntArray[nx * ny];
 
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
@@ -874,13 +875,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                else obs_count_non_zero_from++;
             }
          }
-         if (cellMapping) {
-            delete [] cellMapping;
-            cellMapping = (IntArray *)0;
+         if( ! mapping_ready ) {
+            mapping_ready = get_grid_mapping(to_grid, cellMapping, var_index_array,
+                                             obs_hids, hdr_lats, hdr_lons);
          }
-         cellMapping = new IntArray[nx * ny];
-         if (get_grid_mapping(to_grid, cellMapping, var_index_array,
-               obs_hids, hdr_lats, hdr_lons)) {
+         if( mapping_ready ) {
             int from_index;
             IntArray cellArray;
             NumArray dataArray;
@@ -912,6 +911,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   if (0 < cellArray.n()) {
                      valid_count = 0;
                      dataArray.clear();
+                     dataArray.extend(cellArray.n());
                      for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
                         data_value = obs_vals[from_index];
@@ -1110,7 +1110,6 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    clock_t start_clock =  clock();
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
-
    static const char *method_name = "process_point_file_with_latlon() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
@@ -1286,6 +1285,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             if (0 < cellArray.n()) {
                int valid_cnt = 0;
                dataArray.clear();
+               dataArray.extend(cellArray.n());
                for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                   from_index = cellArray[dIdx];
                   data_value = from_data[from_index];
@@ -1505,16 +1505,12 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
    NcFile *nc_adp = (NcFile *)0;
-   IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_goes_file() ";
 
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
-   ConcatString grid_map_file(tmp_dir);
-   grid_map_file.add("/");
-   grid_map_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name, false));
+   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
 
    // Open ADP file if exists
    if (0 < AdpFilename.length() && file_exists(AdpFilename.c_str())) {
@@ -1531,7 +1527,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    valid_time = find_valid_time(nc_in);
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
-   cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
+   IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, geostationary_file);
 
    // Loop through the requested fields
@@ -1548,7 +1544,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
       regrid_goes_variable(nc_in, vinfo, fr_dp, to_dp,
-            fr_grid, to_grid, cellMapping, nc_adp);
+                           fr_grid, to_grid, cellMapping, nc_adp);
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1654,11 +1650,12 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    float max_lat=-90.0;
    float min_lon=360.0;
    float max_lon=-360.0;
+   static const char *method_name = "check_lat_lon() ";
    for (int idx=0; idx<data_size; idx++) {
       if (cnt_printed < 10 && latitudes[idx] > MISSING_LATLON
-            && longitudes[idx] > MISSING_LATLON) {
-         mlog << Debug(7) << "  index: " << idx <<  " lat: " << latitudes[idx]
-                          << ", lon: " << longitudes[idx] << "\n";
+          && longitudes[idx] > MISSING_LATLON) {
+         mlog << Debug(7) << method_name << " index: " << idx <<  " lat: "
+              << latitudes[idx] << ", lon: " << longitudes[idx] << "\n";
          cnt_printed++;
       }
       if (latitudes[idx] <= MISSING_LATLON) cnt_missing_lat++;
@@ -1674,11 +1671,11 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
          if (max_lon < longitudes[idx]) max_lon = longitudes[idx];
       }
    }
-   mlog << Debug(7) << "\n Count: missing - lat: " << cnt_missing_lat
-        << ", lon: " << cnt_missing_lon << "\n"
-        << "        invalid - lat: " << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
-        << "     LAT min: " << min_lat << ", max: " << max_lat << "\n"
-        << "    LONG min: " << min_lon << ", max: " << max_lon << "\n";
+   mlog << Debug(7) << method_name << "Count: missing -> lat: " << cnt_missing_lat
+        << ", lon: " << cnt_missing_lon << "   invalid -> lat: "
+        << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
+        << method_name << "  LAT: " << min_lat << " to " << max_lat << "\n"
+        << method_name << " LONG: " << min_lon << " to " << max_lon << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1712,8 +1709,7 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
       hdr_idx = obs_hids[obs_idx];
       lat = hdr_lats[hdr_idx];
       lon = hdr_lons[hdr_idx];
-      if(lat < MISSING_LATLON) continue;
-      if(lon < MISSING_LATLON) continue;
+      if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
       to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
       idx_x = nint(x);
       idx_y = nint(y);
@@ -1740,9 +1736,9 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void get_grid_mapping(DataPlane from_dp, DataPlane to_dp, Grid to_grid,
-                             IntArray *cellMapping, float *latitudes,
-                             float *longitudes, int from_lat_count, int from_lon_count) {
+static void get_grid_mapping_latlon(
+      DataPlane from_dp, DataPlane to_dp, Grid to_grid, IntArray *cellMapping,
+      float *latitudes, float *longitudes, int from_lat_count, int from_lon_count) {
    double x, y;
    float lat, lon;
    int idx_x, idx_y, to_offset;
@@ -1750,32 +1746,76 @@ static void get_grid_mapping(DataPlane from_dp, DataPlane to_dp, Grid to_grid,
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
+   int to_size  = to_lat_count * to_lon_count;
    int data_size  = from_lat_count * from_lon_count;
-   static const char *method_name = "get_grid_mapping(latitudes, longitudes) ";
+   static const char *method_name = "get_grid_mapping(lats, lons) ";
 
+   int *to_cell_counts = new int[to_size];
+   int *mapping_indices = new int[data_size];
+   for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
+   for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
+
+   clock_t start_loop =  clock();
+   //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
          int coord_offset = from_dp.two_to_one(yIdx, xIdx);
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
-         if(lat < MISSING_LATLON) continue;
-         if(lon < MISSING_LATLON) continue;
-         if (lon > 180) lon -= 360;
-         if (lon < -180) lon += 360;
+         if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
          to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
          idx_x = nint(x);
          idx_y = nint(y);
-
          if (0 <= idx_x && idx_x < to_lon_count && 0 <= idx_y && idx_y < to_lat_count) {
             to_offset = to_dp.two_to_one(idx_x, idx_y);
-            cellMapping[to_offset].add(coord_offset);
+            mapping_indices[coord_offset] = to_offset;
+            to_cell_counts[to_offset] += 1;
             count_in_grid++;
          }
       }
    }
+   mlog << Debug(LEVEL_FOR_PERFORMANCE+2) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds for mapping cells\n";
+
+   // Count the mapping cells for each to_cell and prepare IntArray
+   int max_count = 0;
+   clock_t tmp_clock =  clock();
+   for (int xIdx=0; xIdx<to_size; xIdx++) {
+      int cell_count = to_cell_counts[xIdx];
+      if( cell_count > 0 ) {
+         cellMapping[xIdx].extend(cell_count+1);
+         if( cell_count > 32768 ) {
+            mlog << Debug(LEVEL_FOR_PERFORMANCE+1) << method_name
+                 << "extent IntArray to " << cell_count << " at " << xIdx << "\n";
+         }
+         if( max_count < cell_count ) max_count = cell_count;
+      }
+      else if( cell_count < 0 ) {
+         mlog << Error << method_name
+              << "the mapping cell count can not be negative "
+              << cell_count << " at " << xIdx << "\n";
+      }
+   }
+   mlog << Debug(LEVEL_FOR_PERFORMANCE+1) << method_name << "took "
+        << (clock()-tmp_clock)/double(CLOCKS_PER_SEC)
+        << " seconds for extending IntArray (max_cells=" << max_count << ")\n";
+
+   // Build cell mapping
+   for (int xIdx=0; xIdx<data_size; xIdx++) {
+      to_offset = mapping_indices[xIdx];
+      if( to_offset == bad_data_int ) continue;
+      if( to_offset < 0 || to_offset >= to_size ) {
+         mlog << Error << method_name << "the mapped cell is out of range: "
+              << to_offset << " at " << xIdx << "\n";
+      }
+      else cellMapping[to_offset].add(xIdx);
+   }
+   delete [] to_cell_counts;
+   delete [] mapping_indices;
+
    mlog << Debug(3) << method_name << " within grid: " << count_in_grid
-        << " out of " << data_size << " (" << count_in_grid*100/data_size << "%)\n";
+        << " out of " << data_size << " (" << 1.0*count_in_grid/data_size*100 << "%)\n";
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 }
@@ -1813,11 +1853,13 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       float *latitudes  = new float[data_size];
       float *longitudes = new float[data_size];
       status = get_nc_data(&var_lat, latitudes);
-      if (status) status = get_nc_data(&var_lon, longitudes);
-      if (status) get_grid_mapping(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                   longitudes, from_lat_count, from_lon_count);
-      if (latitudes)  delete [] latitudes;
-      if (longitudes) delete [] longitudes;
+      if( status ) status = get_nc_data(&var_lon, longitudes);
+      if( status ) {
+         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
+                                 longitudes, from_lat_count, from_lon_count);
+      }
+      if( latitudes )  delete [] latitudes;
+      if( longitudes ) delete [] longitudes;
    }   //  if data_size > 0
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1869,17 +1911,11 @@ ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
-   ConcatString grid_map_file(tmp_dir);
-   grid_map_file.add("/");
-   grid_map_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name, false));
-   if (file_exists(grid_map_file.c_str())) {
-      run_string << grid_map_file;
-   }
-   else if (get_env(key_geostationary_data, env_coord_name) &&
-            env_coord_name.nonempty() &&
-            file_exists(env_coord_name.c_str())) {
+   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
+   if (get_env(key_geostationary_data, env_coord_name)
+       && env_coord_name.nonempty()
+       && file_exists(env_coord_name.c_str())) {
       run_string << env_coord_name;
    }
    else if (file_exists(geostationary_file.c_str())) {
@@ -1932,8 +1968,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    int data_size  = from_lat_count * from_lon_count;
    mlog << Debug(4) << method_name << " data_size (ny*nx): " << data_size
         << " = " << from_lat_count << " * " << from_lon_count << "\n"
-        << "                    target grid (nx,ny)="
-        << to_lon_count << "," << to_lat_count << "\n";
+        << "                    target grid (nx,ny): " << to_lon_count * to_lat_count
+        << " = " << to_lon_count << " * " << to_lat_count << "\n";
 
    from_dp.set_size(from_lon_count, from_lat_count);
    to_dp.set_size(to_lon_count, to_lat_count);
@@ -2031,8 +2067,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
          mlog << Error << method_name << " Fail to get longitudes\n";
       else {
          check_lat_lon(data_size, latitudes, longitudes);
-         get_grid_mapping(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                          longitudes, from_lat_count, from_lon_count);
+         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
+                                 longitudes, from_lat_count, from_lon_count);
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
@@ -2085,7 +2121,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
 
 
 static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
-      ConcatString regrid_name, bool grid_map) {
+                                                ConcatString regrid_name) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -2107,18 +2143,7 @@ static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
             << "_" << int(info.gi->x_image_bounds[0] * factor_float_to_int)
             << "_" << int(info.gi->y_image_bounds[0] * factor_float_to_int);
    }
-   if (grid_map) {
-      geo_data_filename << "_to_";
-      if (file_exists(regrid_name.c_str())) {
-          StringArray file_names = regrid_name.split("\\/");
-          geo_data_filename << file_names[file_names.n()-1];
-      }
-      else geo_data_filename << to_grid.name();
-      geo_data_filename << ".grid_map";
-   }
-   else {
-      geo_data_filename << ".nc";
-   }
+   geo_data_filename << ".nc";
    return geo_data_filename;
 }
 
@@ -2274,6 +2299,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
          if (0 < cellArray.n()) {
             int valid_count = 0;
             dataArray.clear();
+            dataArray.extend(cellArray.n());
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
                data_value = from_data[from_index];
