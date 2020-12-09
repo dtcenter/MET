@@ -132,13 +132,6 @@ References
 |   forecasts. *Monthly Weather Review*, 129, 550-560.
 | 
 
-.. _Hogan-2009:
-
-| Hogan, R., E. O'Connor, and A. Illingworth, 2009: Verification of
-|   cloud-fraction forecasts. *Quarterly Journal of the Royal*
-|   *Meteorological Society*, 135, 1494-1511.
-| 
-
 .. _Jolliffe-2012:
 
 | Jolliffe, I.T., and D.B. Stephenson, 2012: *Forecast verification. A*
