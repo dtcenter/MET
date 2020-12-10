@@ -2,7 +2,7 @@
 //
 // ASCII2NC configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,4 +49,4 @@ message_type_map = [
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V9.1";
+version = "V10.0.0";

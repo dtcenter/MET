@@ -6,7 +6,7 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlines in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
+The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
 
 Statistical aspects
 ___________________
@@ -20,12 +20,12 @@ Care should be taken when interpreting the statistics for filtered data. In some
 Practical information
 _____________________
 
-This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for **tc_gen**.
+This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for tc_gen.
 
 tc_gen usage
 ~~~~~~~~~~~~
 
-The usage statement for **tc_gen** is shown below:
+The usage statement for tc_gen is shown below:
 
 .. code-block:: none
 
@@ -76,7 +76,7 @@ The TC-Gen tool implements the following logic:
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed share/met/config directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Gen** tool named **TCGenConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The tc_gen configuration file is divided into three main sections: criteria to define genesis events, options to subset and filter those events, and options to control the output. The contents of this configuration file are described below.
 
@@ -135,7 +135,7 @@ ______________________
      mslp_thresh = NA;
   }
 
-The **best_genesis** and **oper_genesis** dictionaries defines genesis criteria for the BEST and operational tracks, respectively. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST and operational tracks.
+The **best_genesis** and **oper_genesis** dictionaries define genesis criteria for the BEST and operational tracks, respectively. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST and operational tracks.
 
 ______________________
 
@@ -151,7 +151,7 @@ ______________________
 
   desc = "NA";
 
-The **desc** configuration option is common to many MET tools and is described in :numref:`Data IO MET Configuration File Options`.
+The **desc** configuration option is common to many MET tools and is described in :numref:`config_options`.
 
 ______________________
 
@@ -177,7 +177,7 @@ ______________________
   init_beg = "";
   init_end = "";
 
-The **init_beg** and **init_end** entries are strings in YYYYMMDD[_HH[MMSS]] format which defining which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
+The **init_beg** and **init_end** entries are strings in YYYYMMDD[_HH[MMSS]] format which defines which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
 ______________________
 
@@ -212,7 +212,7 @@ ______________________
 
   dland_thresh = NA;
 
-The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (**NA**) always evaluate to true.
+The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (**NA**) always evaluates to true.
 
 ______________________
 
@@ -244,14 +244,14 @@ ______________________
      cts = BOTH;
   }
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
-  version    = "V9.0";
+  version    = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
 
 tc_gen output
 ~~~~~~~~~~~~~
 
-TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, “./tc_gen” writes output files in the current working directory named “tc_gen.stat” and, optionally, “tc_gen_fho.txt”, “tc_gen_ctc.txt”, and “tc_gen_cts.txt”. The contents of these output files are described in section :numref:`point_stat-output`.
+TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, and **tc_gen_cts.txt**. The contents of these output files are described in section :numref:`point_stat-output`.
 
 Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in :numref:`stat-analysis`.
 

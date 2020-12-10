@@ -122,7 +122,6 @@ enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
 
 // Variables for top-level command line arguments
 static RunCommand run_command = sum;
-static int verbosity = 2;
 
 // Variables common to all commands
 static int          n_files;
@@ -190,8 +189,6 @@ static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
 static void set_derive(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_field(const StringArray & a);
@@ -291,19 +288,12 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_name,       "-name",       1);
    cline.add(set_name,       "-varname",    1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_logfile,    "-log",        1);
-   cline.add(set_verbosity,  "-v",          1);
    cline.add(set_compress,   "-compress",   1);
 
    //
    // Parse the command line.
    //
    cline.parse();
-
-   //
-   // Set the verbosity level.
-   //
-   mlog.set_verbosity_level(verbosity);
 
    //
    // Process the specific command arguments.
@@ -1542,7 +1532,7 @@ void usage() {
         << "(optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional).\n"
+        << mlog.verbosity_level() << ") (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of "
         << "NetCDF variable ("  << config.nc_compression()
@@ -1655,22 +1645,6 @@ void set_derive(const StringArray & a) {
       }
       derive_list.add(sa[i]);
    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   verbosity = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

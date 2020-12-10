@@ -191,9 +191,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       plane = plane_array[0];
 
-      process_data_plane(vinfo_g2, plane);
-
-      return true;
+      return(process_data_plane(vinfo_g2, plane));
 
    }  //  END: if( 1 > listMatch.size() )
 
@@ -235,7 +233,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    //  check the data plane for wind rotation
    plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
 
-   if(read_success) process_data_plane(vinfo_g2, plane);
+   if(read_success) read_success = process_data_plane(vinfo_g2, plane);
 
    return read_success;
 }
@@ -350,9 +348,9 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
 
-      process_data_plane(vinfo_g2, plane);
-
-      plane_array.add(plane, lvl_lower, lvl_upper);
+      if(process_data_plane(vinfo_g2, plane)) {
+         plane_array.add(plane, lvl_lower, lvl_upper);
+      }
    }
 
    return num_read;
@@ -929,6 +927,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
       offset = offset_next;
 
    }  //  END:  while( read_grib2_record() )
+
+   mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - "
+        << "processed " << rec_num - 1 << " records from GRIB2 file: "
+        << Filename << "\n";
 
    return;
 }

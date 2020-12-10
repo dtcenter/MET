@@ -2,6 +2,8 @@
 //
 // TC-Gen configuration file.
 //
+// For additional information, please see the MET User's Guide.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -202,4 +204,4 @@ dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V9.1";
+version = "V10.0.0";

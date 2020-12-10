@@ -27,16 +27,16 @@ Ensemble statistics
 
 Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (:ref:`Hamill, 2001 <Hamill-2001>`). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
 
-Often, the goal of ensemble forecasting is to reproduce the distribution of observations using a set of many forecasts. In other words, the ensemble members represent the set of all possible outcomes. When this is true, the spread of the ensemble is identical to the error in the mean forecast. Though this rarely occurs in practice, the spread / skill relationship is still typically assessed for ensemble forecasts (:ref:`Barker, 1991 <Barker-1991>`; :ref:`Buizza, 1997 <Buizza-1997>`). MET calculates the spread and skill in user defined categories according to :ref:`Eckel et al, 2012 <Eckel-2012>`.
+Often, the goal of ensemble forecasting is to reproduce the distribution of observations using a set of many forecasts. In other words, the ensemble members represent the set of all possible outcomes. When this is true, the spread of the ensemble is identical to the error in the mean forecast. Though this rarely occurs in practice, the spread / skill relationship is still typically assessed for ensemble forecasts (:ref:`Barker, 1991 <Barker-1991>`; :ref:`Buizza,1997 <Buizza-1997>`). MET calculates the spread and skill in user defined categories according to :ref:`Eckel et al. (2012) <Eckel-2012>`.
 
 The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
 
-The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
+The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
 Ensemble observation error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in Candile and Talagrand (2008) can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
+In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>`. can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
 Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
 
@@ -76,7 +76,7 @@ Required arguments ensemble_stat
 
 2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
 
-3. The **config_file** is an EnsembleStatConfig file containing the desired configuration settings.
+3. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
 
 Optional arguments for ensemble_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,7 +117,7 @@ In this example, the Ensemble-Stat tool will process six forecast files specifie
 ensemble_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed **share/met/config** directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
+The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -147,7 +147,7 @@ ____________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _____________________
 
@@ -244,7 +244,7 @@ ____________________
   prob_cat_thresh    = [];
 
 
-Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`Data IO MET Configuration File Options`. The following are some special consideration for the Ensemble-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Ensemble-Stat tool.
 
 
 The **ens** and **fcst** dictionaries do not need to include the same fields. Users may specify any number of ensemble fields to be summarized, but generally there are many fewer fields with verifying observations available. The **ens** dictionary specifies the fields to be summarized while the **fcst** dictionary specifies the fields to be verified.
@@ -274,7 +274,7 @@ __________________
 The **obs_error** dictionary controls how observation error information should be handled. This dictionary may be set separately for each **obs.field** entry. Observation error information can either be specified directly in the configuration file or by parsing information from an external table file. By default, the **MET_BASE/data/table_files/obs_error_table.txt** file is read but this may be overridden by setting the **$MET_OBS_ERROR_TABLE** environment variable at runtime.
 
 
-The **flag** entry toggles the observation error logic on (**TRUE**) and off (**FALSE**). When flag is TRUE, random observation error perturbations are applied to the ensemble member values. No perturbation is applied to the observation values but the bias scale and offset values, if specified, are applied.
+The **flag** entry toggles the observation error logic on (**TRUE**) and off (**FALSE**). When the **flag** is **TRUE**, random observation error perturbations are applied to the ensemble member values. No perturbation is applied to the observation values but the bias scale and offset values, if specified, are applied.
 
 
 The **dist_type** entry may be set to **NONE, NORMAL, LOGNORMAL, EXPONENTIAL,CHISQUARED, GAMMA, UNIFORM**, or **BETA**. The default value of **NONE** indicates that the observation error table file should be used rather than the configuration file settings.
@@ -396,7 +396,7 @@ The **rng** group defines the random number generator **type** and **seed** to b
 The **seed** variable may be set to a specific value to make the assignment of ranks fully repeatable. When left empty, as shown above, the random number generator seed is chosen automatically which will lead to slightly different bootstrap confidence intervals being computed each time the data is run.
 
 
-Refer to the description of the **boot** entry in :numref:`Data IO MET Configuration File Options` for more details on the random number generator.
+Refer to the description of the **boot** entry in :numref:`config_options` for more details on the random number generator.
 
 
 ensemble_stat output
@@ -408,7 +408,7 @@ ensemble_stat can produce output in STAT, ASCII, and NetCDF formats. The ASCII o
 The output STAT file is named using the following naming convention:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix and YYYYMMDD_HHMMSSV indicates the forecast valid time. Note that the forecast lead time is not included in the output file names since it would not be well-defined for time-lagged ensembles. When verifying multiple lead times for the same valid time, users should either write the output to separate directories or specify a output prefix to ensure unique file names.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix and YYYYMMDD_HHMMSSV indicates the forecast valid time. Note that the forecast lead time is not included in the output file names since it would not be well-defined for time-lagged ensembles. When verifying multiple lead times for the same valid time, users should either write the output to separate directories or specify an output prefix to ensure unique file names.
 
 
 The output ASCII files are named similarly:
@@ -796,7 +796,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The unperturbed ensemble mean value
   * - Last-4
     - CLIMO
-    - The value of the inluded climatology
+    - The value of the included climatology
   * - Last-3
     - SPREAD
     - The spread (standard deviation) of the unperturbed ensemble member values

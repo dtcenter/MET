@@ -31,7 +31,7 @@ Measures for continuous variables
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
-A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
+A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,12 +55,12 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis fie
 Statistical confidence intervals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
+The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron, 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
 
 Grid weighting
 ~~~~~~~~~~~~~~
 
-When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`Data IO MET Configuration File Options` for more information.
+When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`config_options` for more information.
 
 Neighborhood methods
 ~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +78,7 @@ The MET software will compute the full one-dimensional Fourier transform, then d
 
 Decomposition via Fourier transform allows the user to evaluate the model separately at each spatial frequency. As an example, the Fourier analysis allows users to examine the "dieoff", or reduction, in anomaly correlation of geopotential height at various levels for bands of waves. A band of low wave numbers, say 0 - 3, represent larger frequency components, while a band of higher wave numbers, for example 70 - 72, represent smaller frequency components. Generally, anomaly correlation should be higher for frequencies with low wave numbers than for frequencies with high wave numbers, hence the "dieoff".
 
-Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al, 2004 <Casati-2004>`; :ref:`Weniger et al 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
+Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al., 2004 <Casati-2004>`; :ref:`Weniger et al., 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
 Gradient Statistics
 ~~~~~~~~~~~~~~~~~~~
@@ -177,7 +177,7 @@ An example of the grid_stat calling sequence is listed below:
   sample_obs.grb \
   GridStatConfig
 
-In Example 1, the Grid-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the GridStatConfig file.
+In Example 1, the Grid-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the **GridStatConfig** file.
 
 A second example of the grid_stat calling sequence is listed below:
 
@@ -189,14 +189,14 @@ A second example of the grid_stat calling sequence is listed below:
   sample_obs.nc
   GridStatConfig
 
-In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of **pcp_combine**, using the observations in the sample_obs.nc NetCDF output of **pcp_combine**, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
+In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the **GridStatConfig** file. Because the model and observation files contain only a single field of accumulated precipitation, the **GridStatConfig** file should be configured to specify that only accumulated precipitation be verified.
 
 .. _grid_stat-configuration-file:
 
 grid_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed **share/met/config** directory. Other versions of the configuration file are included in **scripts/config**. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
+The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
 Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -227,7 +227,7 @@ __________________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ___________________________
 
@@ -244,7 +244,7 @@ ___________________________
 	 
 The **nbrhd** dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** value specifies the width of the square or diameter of the circle as an odd integer.
 
-The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always to be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
+The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
 
 The **vld_thresh** entry contains a number between 0 and 1. When performing neighborhood verification over some neighborhood of points the ratio of the number of valid data points to the total number of points in the neighborhood is computed. If that ratio is greater than this threshold, that value is included in the neighborhood verification. Setting this threshold to 1, which is the default, requires that the entire neighborhood must contain valid data. This variable will typically come into play only along the boundaries of the verification region chosen.
 
@@ -622,16 +622,16 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
   * - 95-99
     - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
-    - Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+    - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 100-104
     - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL SEDS _BCU
-    - Symmetric Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+    - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 105-109
     - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
-    - Extreme Depenency Index including normal and bootstrap upper and lower confidence limits
+    - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 110-114
     - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL,SEDI _BCU
-    - Symmetric Extremal Depenency Index including normal and bootstrap upper and lower confidence limits
+    - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
@@ -851,4 +851,4 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
     - List the gradient of the forecast and observation fields computed in the grid-x and grid-y directions where DX and DY indicate the gradient direction and size.
 
 
-The STAT output files described for **grid_stat** may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by **grid_stat**, please see :numref:`stat-analysis`. 
+The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`. 

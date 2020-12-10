@@ -33,7 +33,7 @@ grid_diag has required arguments and can accept several optional arguments.
 Required arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing list of file names to be used.
+1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used.
 
 When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
 
@@ -53,7 +53,7 @@ Optional arguments for grid_diag
 grid_diag configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Diag tool named 'GridDiagConfig_default' can be found in the installed **share/met/config/ directory**. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Grid-Diag tool named **GridDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 _____________________
 
@@ -66,7 +66,7 @@ _____________________
   mask          = { grid = ""; poly = ""; }
   version       = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 _____________________
 

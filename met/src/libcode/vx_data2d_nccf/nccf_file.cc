@@ -26,7 +26,6 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nccf_file.h"
-#include "nc_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -162,6 +161,7 @@ bool NcCfFile::open(const char * filepath)
 {
   unixtime ut;
   int sec_per_unit;
+  const char *method_name = "NcCfFile::open() -> ";
 
   // Close any open files and clear out the associated members
 
@@ -226,13 +226,13 @@ bool NcCfFile::open(const char * filepath)
     get_att_str( Var[j], (string)"long_name",  Var[j].long_name_att );
     get_att_str( Var[j], (string)"units",      Var[j].units_att     );
 
-    if (get_nc_att(Var[j].var, (string)"axis", att_value)) {
+    if (get_nc_att_value(Var[j].var, (string)"axis", att_value)) {
       if ( "T" == att_value ||  "time" == att_value ) {
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
       }
     }
-    if (get_nc_att(Var[j].var, (string)"standard_name", att_value)) {
+    if (get_nc_att_value(Var[j].var, (string)"standard_name", att_value)) {
       if ( "time" == att_value ) {
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
@@ -260,18 +260,18 @@ bool NcCfFile::open(const char * filepath)
   if (IS_INVALID_NC_P(valid_time_var))
   {
 
-    mlog << Debug(4) << "NcCfFile::open() -> "
+    mlog << Debug(4) << method_name
          << "could not extract valid time from the "
          << "\"time\" variable.\n";
 
     // Time not in file, get from file name
     if ((ut = get_valid_time_from_file_path(filepath)) == 0)
     {
-       mlog << Debug(4) << "NcCfFile::open() -> "
+       mlog << Debug(4) << method_name
             << "could not extract valid time from file name.\n";
     }
     if( ut == 0 ) {
-       mlog << Warning << "\nNcCfFile::open() -> "
+       mlog << Warning << "\n" << method_name
             << "could not determine the valid time, using 0.\n\n";
     }
     ValidTime.add(ut);
@@ -281,7 +281,7 @@ bool NcCfFile::open(const char * filepath)
     // Store the dimension for the time variable as the time dimension
     if (get_dim_count(valid_time_var) > 0) {
        NcDim tDim = get_nc_dim(valid_time_var, 0);
-       if (!IS_INVALID_NC(tDim)) {
+       if (IS_VALID_NC(tDim)) {
          _tDim = new NcDim(tDim);
          t_dim_name = GET_NC_NAME(tDim).c_str();
        }
@@ -289,20 +289,20 @@ bool NcCfFile::open(const char * filepath)
 
     // Parse the units for the time variable.
     NcVarAtt *units_att = get_nc_att(valid_time_var, (string)"units", false);
-    if (!IS_INVALID_NC_P(units_att))
+    if (IS_VALID_NC_P(units_att))
     {
       get_att_value_chars(units_att, units);
 
       if (units.length() == 0)
       {
-         mlog << Warning << "\nNcCfFile::open() -> "
+         mlog << Warning << "\n" << method_name
               << "the \"time\" variable must contain a \"units\" attribute. "
               << "Using valid time of 0\n\n";
          ut = sec_per_unit = 0;
       }
       else
       {
-         mlog << Debug(4) << "NcCfFile::open() -> "
+         mlog << Debug(4) << method_name
               << "parsing units for the time variable \"" << units << "\"\n";
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
@@ -320,7 +320,7 @@ bool NcCfFile::open(const char * filepath)
     bool no_leap_year = get_att_no_leap_year(valid_time_var);
     for(int i=0; i<n_times; i++)
     {
-      double time_value = get_double_var(valid_time_var, i);
+      double time_value = get_nc_time(valid_time_var, i);
       ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_value, no_leap_year));
     }
   }
@@ -329,14 +329,14 @@ bool NcCfFile::open(const char * filepath)
   if (IS_INVALID_NC(init_time_var))
   {
 
-    mlog << Debug(4) << "NcCfFile::open() -> "
+    mlog << Debug(4) << method_name
          << "could not extract init time from the "
          << "\"forecast_reference_time\" variable.\n";
 
     // Time not in file, get from file name
     if ((InitTime = get_init_time_from_file_path(filepath)) == 0)
     {
-      mlog << Debug(4) << "NcCfFile::open() -> "
+      mlog << Debug(4) << method_name
            << "could not extract init time from file name.\n";
     }
   }
@@ -345,19 +345,19 @@ bool NcCfFile::open(const char * filepath)
 
     // Parse the units for the time variable.
     NcVarAtt *units_att = get_nc_att(&init_time_var, (string)"units");
-    if (!IS_INVALID_NC_P(units_att))
+    if (IS_VALID_NC_P(units_att))
     {
       get_att_value_chars(units_att, units);
 
       if (units.length() == 0)
       {
-         mlog << Warning << "\nNcCfFile::open() -> "
+         mlog << Warning << "\n" << method_name
               << "the \"forecast_reference_time\" variable must contain a \"units\" attribute.\n\n";
          ut = sec_per_unit = 0;
       }
       else
       {
-         mlog << Debug(4) << "NcCfFile::open() -> "
+         mlog << Debug(4) << method_name
               << "parsing units for the forecast_reference_time variable \"" << units << "\"\n";
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
@@ -369,7 +369,7 @@ bool NcCfFile::open(const char * filepath)
 
     if (units_att) delete units_att;
 
-    double time_value = get_double_var(&init_time_var,(int)0);
+    double time_value = get_nc_time(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
 
     //bool no_leap_year = get_att_no_leap_year(&init_time_var);
@@ -783,14 +783,11 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   for (int k=0; k<dim_count; k++) {
     int dim_size = var->getDim(k).getSize();
     if (dim_size < a[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < a[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << a[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(var) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << a[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(var) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
@@ -800,7 +797,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   float scale_factor = 1.f;
   NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
   NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-  if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
+  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
     add_offset = get_att_value_float(att_add_offset);
     scale_factor = get_att_value_float(att_scale_factor);
   }
@@ -851,7 +848,6 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
            << "bad type [" << GET_NC_TYPE_NAME_P(var)
            << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit(1);
-      break;
     }
   }   //  switch
   if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
@@ -1004,14 +1000,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     lengths[k] = 1;
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
-      int sec_per_unit = 0;
-      if (dim_size < offsets[k]) {
-        mlog << Error << "\n" << method_name
-             << "offset (" << offsets[k] << ") at " << k
-             << "th dimension (" << long(dim_size) << ") is too big for variable \""
-             << GET_NC_NAME_P(v) << "\"\n\n";
-        exit ( 1 );
-      }
+      mlog << Error << "\n" << method_name
+           << "offset (" << offsets[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(v) << "\"\n\n";
+      exit ( 1 );
     }
   }
 
@@ -1021,7 +1014,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   float scale_factor = 1.f;
   NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
   NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-  if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
+  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
     add_offset = get_att_value_float(att_add_offset);
     scale_factor = get_att_value_float(att_scale_factor);
   }
@@ -1157,7 +1150,11 @@ void NcCfFile::read_netcdf_grid()
   // grids, but with how the gridded information is used in MET, I'm making the
   // assumption that all fields are on the same grid.
 
+  bool ignore;
+  int max_dim = 0;
   NcVar *data_var = 0;
+  NcVar *tmp_data_var = 0;
+  IntArray var_index_list;
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1176,35 +1173,64 @@ void NcCfFile::read_netcdf_grid()
     // Skip the latitude and longitude variables, if they are present
 
     NcVarAtt *std_name_att = get_nc_att(var, (string)"standard_name");
+    bool has_standard_name = IS_VALID_NC_P(std_name_att);
 
-    if (!IS_INVALID_NC_P(std_name_att))
+    ignore = false;
+    if (has_standard_name)
     {
       ConcatString std_name;
       get_att_value_chars(std_name_att, std_name);
 
-      if (std_name == "" ||
-           std_name == "latitude" ||
-	  std_name == "longitude" ) {
-        if (std_name_att) delete std_name_att;
-	continue;
+      if (std_name == "" || std_name == "latitude"
+          || std_name == "longitude" || std_name == "time") {
+        ignore = true;
       }
     }
-
     if (std_name_att) delete std_name_att;
+    if (ignore) continue;
+
+    if (max_dim < num_dims) max_dim = num_dims;
+
+    NcVarAtt *nc_attr = get_nc_att(var, (string)"coordinates");
+    if (IS_VALID_NC_P(nc_attr)) {
+      if (nc_attr) delete nc_attr;
+      data_var = var;
+      break;
+    }
+    if (nc_attr) delete nc_attr;
 
     // If we get here, this should be a gridded data variable
-
-    data_var = var;
-    break;
+    if (tmp_data_var == 0) tmp_data_var = var;
+    if (!has_standard_name) continue;   // Skip if no standard name
+    var_index_list.add(i);
 
   } /* endfor - i */
 
+  if (data_var == 0)
+  {
+    for (int i = 0; i < var_index_list.n(); ++i)
+    {
+      // Get a pointer to the variable
+      NcVar *var = Var[i].var;
+    
+      // Exclude with less dimensions
+      if (get_dim_count(var) < max_dim) continue;
+    
+      // If we get here, this should be a gridded data variable
+      data_var = var;
+      break;
+    
+    } /* endfor - i */
+  }
+  
+  if (data_var == 0) data_var = tmp_data_var;
+  
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
 
   NcVarAtt *grid_mapping_att = get_nc_att(data_var, (string)"grid_mapping");
 
-  if (!IS_INVALID_NC_P(grid_mapping_att))
+  if (IS_VALID_NC_P(grid_mapping_att))
   {
     get_grid_from_grid_mapping(grid_mapping_att);
     if (grid_mapping_att) delete grid_mapping_att;
@@ -1869,25 +1895,33 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   // As a sanity check, make sure that the deltas are constant through the
   // entire grid.  CF compliancy doesn't require this, but MET does.
 
-  for (int i = 1; i < lat_counts; ++i)
-  {
-    double curr_delta = lat_values[i] - lat_values[i-1];
-    if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
-    {
-      mlog << Error << "\n" << method_name << " -> "
-           << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
-      exit(1);
-    }
+  ConcatString point_nccf;
+  bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
+  if (!skip_sanity_check) {
+    get_env(nc_att_met_point_nccf, point_nccf);
+    skip_sanity_check = point_nccf == "yes";
   }
-
-  for (int i = 1; i < lon_counts; ++i)
-  {
-    double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
-    if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+  if (!skip_sanity_check) {
+    for (int i = 1; i < lat_counts; ++i)
     {
-      mlog << Error << "\n" << method_name << " -> "
-           << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
-      exit(1);
+      double curr_delta = lat_values[i] - lat_values[i-1];
+      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
+        exit(1);
+      }
+    }
+    
+    for (int i = 1; i < lon_counts; ++i)
+    {
+      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
+      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+        exit(1);
+      }
     }
   }
 
@@ -2548,10 +2582,13 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   // Find the a lat/lon grid from the coordinates attribute.
   // Get the dimensions from the coordinate variables.
 
+  mlog << Debug(6) << "\n" << method_name << " -> "
+       << "collect GRID infor from \"" << GET_NC_NAME_P(data_var) << "\".\n\n";
+       
   NcVarAtt *coordinates_att = get_nc_att(data_var, (string)"coordinates");
 
-  if (!IS_INVALID_NC_P(coordinates_att)) {
-    ConcatString coordinates_value, units_value;
+  if (IS_VALID_NC_P(coordinates_att)) {
+    ConcatString coordinates_value, units_value, axis_value;
     NcVarAtt *missing_value_att = (NcVarAtt*) 0;
     get_att_value_chars(coordinates_att, coordinates_value);
     StringArray sa = coordinates_value.split(" ");
@@ -2568,19 +2605,26 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       is_x_dim_var = is_y_dim_var = false;
       for (int cIdx = 0; cIdx<count; cIdx++) {
         if ( Var[var_num].name == sa[cIdx]) {
-          if (get_nc_att(Var[var_num].var, (string)"units", units_value)) {
+          if (get_nc_att_value(Var[var_num].var, (string)"units", units_value)) {
             if (is_nc_unit_latitude(units_value.c_str())) {
               y_dim_var_name = sa[cIdx];
               is_y_dim_var = true;
+              mlog << Debug(4) << method_name << " -> "
+                   << "found the latitude variable \"" << Var[var_num].name << "\"\n";
             }
             else if (is_nc_unit_longitude(units_value.c_str())) {
               x_dim_var_name = sa[cIdx];
               is_x_dim_var = true;
+              mlog << Debug(4) << method_name << " -> "
+                   << "found the longitude variable \"" << Var[var_num].name << "\"\n";
             }
-            else {
-              mlog << Warning << "\nNcCfFile::get_grid_from_coordinates() -> "
-                   << "unknown units [" << units_value << "] from ["
-                   << Var[var_num].name << "]\n\n";
+            else if (!is_nc_unit_time(units_value.c_str())) {
+              if (!get_nc_att_value(Var[var_num].var, (string)"axis", axis_value)
+                  || (axis_value != "Z" && axis_value != "z")) {
+                mlog << Debug(4) << "\n" << method_name << " -> "
+                     << "unknown units [" << units_value << "] for the coordinate variable ["
+                     << Var[var_num].name << "]\n\n";
+              }
             }
           }
           break;
@@ -2589,14 +2633,14 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       if (is_y_dim_var || Var[var_num].name == y_dim_var_name) {
         _yCoordVar = Var[var_num].var;
         missing_value_att = get_nc_att(_yCoordVar, (string)"_FillValue");
-        if (!IS_INVALID_NC_P(missing_value_att)) {
+        if (IS_VALID_NC_P(missing_value_att)) {
           lat_missing_value = get_att_value_double(missing_value_att);
         }
       }
       else if (is_x_dim_var || Var[var_num].name == x_dim_var_name) {
         _xCoordVar = Var[var_num].var;
         missing_value_att = get_nc_att(_xCoordVar, (string)"_FillValue");
-        if (!IS_INVALID_NC_P(missing_value_att)) {
+        if (IS_VALID_NC_P(missing_value_att)) {
           lon_missing_value = get_att_value_double(missing_value_att);
         }
       }
@@ -2697,31 +2741,40 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // As a sanity check, make sure that the deltas are constant through the
     // entire grid.  CF compliancy doesn't require this, but MET does.
 
-    for (int i = 1; i < (int)lat_counts; ++i)
-    {
-      if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
-      double curr_delta = lat_values[i] - lat_values[i-1];
-      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
-      {
-        mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
-        if (coordinates_att) delete coordinates_att;
-        exit(1);
-      }
+    ConcatString point_nccf;
+    bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
+    if (!skip_sanity_check) {
+      get_env(nc_att_met_point_nccf, point_nccf);
+      skip_sanity_check = point_nccf == "yes";
     }
-
-    for (int i = 1; i < (int)lon_counts; ++i)
-    {
-      if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
-      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
-      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+    if (!skip_sanity_check) {
+      for (int i = 1; i < (int)lat_counts; ++i)
       {
-        mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
-        if (coordinates_att) delete coordinates_att;
-        exit(1);
+        if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
+            (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
+        double curr_delta = lat_values[i] - lat_values[i-1];
+        if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+        {
+          mlog << Error << "\n" << method_name << " -> "
+               << "MET can only process Latitude/Longitude files where the lat delta is constant (dlat="
+               << dlat <<", dlon=" << dlon << ")\n\n";
+          if (coordinates_att) delete coordinates_att;
+          exit(1);
+        }
+      }
+      
+      for (int i = 1; i < (int)lon_counts; ++i)
+      {
+        if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
+            (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
+        double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
+        if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+        {
+          mlog << Error << "\n" << method_name << " -> "
+               << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+          if (coordinates_att) delete coordinates_att;
+          exit(1);
+        }
       }
     }
 
@@ -2770,7 +2823,6 @@ bool NcCfFile::get_grid_from_dimensions()
   NcVar coord_var;
   const NcVarAtt units_att;
   ConcatString dim_units;
-  string dim_units_str;
   ConcatString dim_name;
   for (int dim_num = 0; dim_num < _numDims; ++dim_num)
   {
@@ -2982,73 +3034,6 @@ bool NcCfFile::get_grid_from_dimensions()
   if (dlat < 0) grid.set_swap_to_north(true);
 
   return true;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void parse_cf_time_string(const char *str, unixtime &ref_ut,
-                          int &sec_per_unit) {
-
-   // Initialize
-   ref_ut = sec_per_unit = 0;
-
-   // Check for expected time string format:
-   //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
-   if(!check_reg_exp(nc_time_unit_exp, str)) {
-      mlog << Warning << "\nparse_cf_time_string() -> "
-           << "unexpected NetCDF CF convention time unit \""
-           << str << "\"\n\n";
-      return;
-   }
-   else {
-      // Tokenize the input string
-      // Parse using spaces or 'T' for timestrings such as:
-      //   minutes since 2016-01-28T12:00:00Z
-      //   seconds since 1977-08-07 12:00:00Z
-      StringArray tok;
-      tok.parse_delim(str, " T");
-      tok.set_ignore_case(true);
-
-      // Determine the time step
-           if(tok.has("second")  ||
-              tok.has("seconds") ||
-              tok.has("s"))      sec_per_unit = 1;
-      else if(tok.has("minute")  ||
-              tok.has("minutes") ||
-              tok.has("min"))    sec_per_unit = 60;
-      else if(tok.has("hour")    ||
-              tok.has("hours")   ||
-              tok.has("hr")      ||
-              tok.has("h"))      sec_per_unit = 3600;
-      else if(tok.has("day")     ||
-              tok.has("days")    ||
-              tok.has("d"))      sec_per_unit = 86400;
-      else {
-         mlog << Warning << "\nparse_cf_time_string() -> "
-              << "Unsupported time step in the CF convention time unit \""
-              << str << "\"\n\n";
-         return;
-      }
-
-      // Parse the reference time
-      StringArray ymd, hms;
-      ymd.parse_delim(tok[2], "-");
-      if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
-      else                     hms.parse_delim("00:00:00", ":");
-      ref_ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
-                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
-                              hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
-                              hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
-   }
-
-   mlog << Debug(4) << "parse_cf_time_string() -> "
-        << "parsed NetCDF CF convention time unit string \"" << str
-        << "\" as a reference time of " << unix_to_yyyymmdd_hhmmss(ref_ut)
-        << " and " << sec_per_unit << " second(s) per time step.\n";
-
-   return;
 }
 
 

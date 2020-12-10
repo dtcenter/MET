@@ -13,7 +13,7 @@ The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF f
 Practical information
 _____________________
 
-This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run **tc_pairs** on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
+This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run tc_pairs on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
 
 tc_pairs usage
 ~~~~~~~~~~~~~~
@@ -81,7 +81,7 @@ The TC-Pairs tool implements the following logic:
 tc_pairs configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the TC-Pairs tool named **'TCPairsConfig_default'** can be found in the installed **share/met/config/** directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the TC-Pairs tool named **TCPairsConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 The contents of the tc_pairs configuration file are described below.
 
@@ -106,7 +106,7 @@ ____________________
   match_points = TRUE;
   version      = "VN.N";
 
-The configuration options listed above are common to multiple MET tools and are described in :numref:`Data IO MET-TC Configuration File Options`.
+The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options_tc`.
 
 ____________________
 
@@ -168,7 +168,7 @@ The following are valid baselines for the **best_baseline** field:
 
 **BTCLIP**: Neumann original 3-day CLIPER in best track mode. Used for the Atlantic basin only. Specify model as BCLP.
 
-**BTCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>` in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
+**BTCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>`) in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
 
 **BTCLIPA**: Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track mode. Used for Atlantic basin only. Specify model as BCLA.
 
@@ -211,7 +211,7 @@ ____________________
 
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 
-The **dland_file** string specifies the path of the NetCDF format file (default file: dland_global_tenth_degree.nc) to be used for the distance to land check in the **tc_pairs code**. This file is generated using tc_dland (default file provided in installed **share/met/tc_data** directory).
+The **dland_file** string specifies the path of the NetCDF format file (default file: dland_global_tenth_degree.nc) to be used for the distance to land check in the tc_pairs code. This file is generated using tc_dland (default file provided in installed *share/met/tc_data* directory).
 
 ____________________
 
@@ -222,7 +222,7 @@ ____________________
      time_offset = -14400;
   }
 
-The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed **share/met/tc_data/** directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
+The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in effect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed *share/met/tc_data/* directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
 .. code-block:: none
 

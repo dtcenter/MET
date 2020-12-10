@@ -2,7 +2,7 @@
 //
 // MODE configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -208,14 +208,12 @@ fcst_raw_plot = {
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
    plot_max         = 25.4;
-   colorbar_spacing = 1;
 }
 
 obs_raw_plot = {
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
    plot_max         = 25.4;
-   colorbar_spacing = 1;
 }
 
 object_plot = {
@@ -244,6 +242,6 @@ ct_stats_flag   = TRUE;
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "python_mixed";
-version        = "V9.1";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

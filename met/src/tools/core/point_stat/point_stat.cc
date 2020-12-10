@@ -155,8 +155,6 @@ static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -217,8 +215,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
    cline.add(set_outdir,             "-outdir",        1);
-   cline.add(set_logfile,            "-log",           1);
-   cline.add(set_verbosity,          "-v",             1);
 
    // Parse the command line
    cline.parse();
@@ -719,7 +715,6 @@ void process_obs_file(int i_nc) {
 
    int obs_count = get_dim_size(&obs_vars.obs_dim);
    int hdr_count = get_dim_size(&obs_vars.hdr_dim);
-   int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
 
    mlog << Debug(2)
         << "Searching " << obs_count
@@ -1009,7 +1004,7 @@ void process_scores() {
                     << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
                     << "Observations processed    = " << conf_info.vx_opt[i].vx_pd.n_try << "\n"
                     << "Rejected: station id      = " << conf_info.vx_opt[i].vx_pd.rej_sid << "\n"
-                    << "Rejected: obs type        = " << conf_info.vx_opt[i].vx_pd.rej_gc << "\n"
+                    << "Rejected: obs var name    = " << conf_info.vx_opt[i].vx_pd.rej_var << "\n"
                     << "Rejected: valid time      = " << conf_info.vx_opt[i].vx_pd.rej_vld << "\n"
                     << "Rejected: bad obs value   = " << conf_info.vx_opt[i].vx_pd.rej_obs << "\n"
                     << "Rejected: off the grid    = " << conf_info.vx_opt[i].vx_pd.rej_grd << "\n"
@@ -2187,24 +2182,6 @@ void set_obs_valid_end_time(const StringArray & a)
 void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

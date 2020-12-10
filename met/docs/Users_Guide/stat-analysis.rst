@@ -28,7 +28,7 @@ The Stat-Analysis “summary” job produces summary information for columns of 
 
 Confidence intervals are computed for the mean and standard deviation of the column of data. For the mean, the confidence interval is computed two ways - based on an assumption of normality and also using the bootstrap method. For the standard deviation, the confidence interval is computed using the bootstrap method. In this application of the bootstrap method, the values in the column of data being summarized are resampled, and for each replicated sample, the mean and standard deviation are computed.
 
-The columns to be summarized can be specified in one of two ways. Use the **-line_type** option exactly once to specify a single input line type and use the **-column** option one or more times to select the columns of data to be summarized. Alternatively, use the **-column** option one or more times formatting the entries as **LINE_TYPE:COLUMN**. For example, the RMSE column from the CNT line type can be selected using **-line_type CNT -column RMSE** or using **-column CNT:RMSE**. With the second option, columns from multiple input line types may be selected. For example, **-column CNT:RMSE,CNT:MAE,CTS:CSI** select two CNT columns one CTS column.
+The columns to be summarized can be specified in one of two ways. Use the **-line_type** option exactly once to specify a single input line type and use the **-column** option one or more times to select the columns of data to be summarized. Alternatively, use the **-column** option one or more times formatting the entries as **LINE_TYPE:COLUMN**. For example, the RMSE column from the CNT line type can be selected using **-line_type CNT -column RMSE** or using **-column CNT:RMSE**. With the second option, columns from multiple input line types may be selected. For example, **-column CNT:RMSE,CNT:MAE,CTS:CSI** select two CNT columns and one CTS column.
 
 The WMO mean values are computed in one of three ways, as determined by the configuration file settings for **wmo_sqrt_stats** and **wmo_fisher_stats**. The statistics listed in the first option are square roots. When computing WMO means, the input values are first squared, then averaged, and the square root of the average value is reported. The statistics listed in the second option are correlations to which the Fisher transformation is applied. For any statistic not listed, the WMO mean is computed as a simple arithmetic mean. The **WMO_TYPE** output column indicates the method applied (**SQRT, FISHER**, or **MEAN**). The **WMO_MEAN** and **WMO_WEIGHTED_MEAN** columns contain the unweighted and weighted means, respectively. The value listed in the **TOTAL** column of each input line is used as the weight.
 
@@ -201,7 +201,7 @@ In the usage statement for the Stat-Analysis tool, some additional terminology i
 Required arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in “.stat”) or any explicit file name with any suffix (such as “_ctc.txt”) to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If “-lookin python” is used, it must be followed a Python embedding script and any command line arguments it takes. Python embedding can be used to pass matched pair (MPR) lines as input to Stat-Analysis.
+1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in “.stat”) or any explicit file name with any suffix (such as “_ctc.txt”) to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If “-lookin python” is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass matched pair (MPR) lines as input to Stat-Analysis.
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** is described in :numref:`stat_analysis-configuration-file`
 
@@ -218,14 +218,14 @@ Optional arguments for stat_analysis
 
 7. The **-v level** indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging. 
 
-An example of the **stat_analysis** calling sequence is shown below.
+An example of the stat_analysis calling sequence is shown below.
 
 .. code-block:: none
 
   stat_analysis -lookin ../out/point_stat \
   -config STATAnalysisConfig
 
-In this example, the Stat-Analysis tool will search for valid STAT lines located in the **../out/point_stat** directory that meet the options specified in the configuration file, **config/STATAnalysisConfig**.
+In this example, the Stat-Analysis tool will search for valid STAT lines located in the *../out/point_stat* directory that meet the options specified in the configuration file, *config/STATAnalysisConfig*.
 
 .. _StA-pyembed:
 
@@ -248,11 +248,11 @@ In this example, rather than passing the MPR output lines from Point-Stat direct
 stat_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed **share/met/config** directory. The version used for the example run in :numref:`installation` is also available in **scripts/config**. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
+The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
 
 The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
 
-Most of the user-specified parameters listed in the Stat-Analysis configuration file are used to filter the ASCII statistical output from the MET statistics tools down to a desired subset of lines over which statistics are to be computed. Only output that meet all of the parameters specified in the Stat-Analysis configuration file will be retained.
+Most of the user-specified parameters listed in the Stat-Analysis configuration file are used to filter the ASCII statistical output from the MET statistics tools down to a desired subset of lines over which statistics are to be computed. Only output that meets all of the parameters specified in the Stat-Analysis configuration file will be retained.
 
 The Stat-Analysis tool actually performs a two step process when reading input data. First, it stores the filtering information defined top section of the configuration file. It applies that filtering criteria when reading the input STAT data and writes the filtered data out to a temporary file. Second, each job defined in the **jobs** entry reads data from that temporary file and performs the task defined for the job. After all jobs have run, the Stat-Analysis tool deletes the temporary file.
 
@@ -270,7 +270,7 @@ ________________________
   tmp_dir        = "/tmp";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ___________________
 
@@ -471,7 +471,7 @@ ___________________
 
   out_alpha = 0.05;
 
-This entry specifies the alpha value to be used when computing confidence intervals for output statistics. It is similar to the **ci_alpha** entry describe in :numref:`Data IO MET Configuration File Options`.
+This entry specifies the alpha value to be used when computing confidence intervals for output statistics. It is similar to the **ci_alpha** entry described in :numref:`config_options`.
 
 ___________________
 
@@ -498,13 +498,13 @@ The variance inflation factor (VIF) flag indicates whether to apply a first orde
 
 ___________________
 
-The Stat-Analysis tool support several additional job command options which may be specified either on the command line when running a single job or within the **jobs** entry within the configuration file. These additional options are described below:
+The Stat-Analysis tool supports several additional job command options which may be specified either on the command line when running a single job or within the **jobs** entry within the configuration file. These additional options are described below:
 
 .. code-block:: none
 
   -by col_name
 
-This job command option is extremely useful. It can used multiple times to specify a list of STAT header column names. When reading each input line, the Stat-Analysis tool concatenates together the entries in the specified columns and keeps track of the unique cases. It applies the logic defined for that job to each unique subset of data. For example, if your output was run over many different model names and masking regions, specify **-by MODEL,VX_MASK** to get output for each unique combination rather than having to run many very similar jobs.
+This job command option is extremely useful. It can be used multiple times to specify a list of STAT header column names. When reading each input line, the Stat-Analysis tool concatenates together the entries in the specified columns and keeps track of the unique cases. It applies the logic defined for that job to each unique subset of data. For example, if your output was run over many different model names and masking regions, specify **-by MODEL,VX_MASK** to get output for each unique combination rather than having to run many very similar jobs.
 
 .. code-block:: none
 		
@@ -514,19 +514,19 @@ This job command option is extremely useful. It can used multiple times to speci
   -column_thresh col_name thresh
   -column_str    col_name string
 
-The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`Data IO MET Configuration File Options`.
+The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
 		
   -dump_row file
 
-Each analysis job is performed over a subset of the input data. Filtering the input data down to a desired subset is often an iterative process. The **-dump_row** option may be used for each job to specify the name of an output file to which the exact subset of data used for that job will be written. When initially constructing Stat-Analysis jobs, users are strongly encouraged to use the option and check it contents to ensure that the analysis was actually done over the intended subset.
+Each analysis job is performed over a subset of the input data. Filtering the input data down to a desired subset is often an iterative process. The **-dump_row** option may be used for each job to specify the name of an output file to which the exact subset of data used for that job will be written. When initially constructing Stat-Analysis jobs, users are strongly encouraged to use the option and check its contents to ensure that the analysis was actually done over the intended subset.
 
 .. code-block:: none
 		
   -out_line_type name
 
-This option specifies the desired output line type for the the **aggregate_stat** job type.
+This option specifies the desired output line type for the **aggregate_stat** job type.
 
 .. code-block:: none
 		
@@ -535,7 +535,7 @@ This option specifies the desired output line type for the the **aggregate_stat*
 
 The Stat-Analysis tool writes its output to either standard out or the file specified using the **-out** command line option. However that output lacks the standard STAT header columns. The **-out_stat** job command option may be used for each job to specify the name of an output file to which full STAT output lines should be written. Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as “mask1”, “mask2”, and “mask3”. The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: “mask1,mask2,mask3”. Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as “-set_hdr VX_MASK all_three_masks”.
 
-When using the “-out_stat” option to create a .stat output file and stratifying results using one or more “-by” job command options, those columns may be referenced in the “-set_hdr” option. When using mulitple “-by” options, use “CASE” to reference the full case information string:
+When using the “-out_stat” option to create a .stat output file and stratifying results using one or more “-by” job command options, those columns may be referenced in the “-set_hdr” option. When using multiple “-by” options, use “CASE” to reference the full case information string:
 
 .. code-block:: none
 		
@@ -550,7 +550,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :numref:`Data IO MET Configuration File Options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :numref:`config_options`.
 
 .. code-block:: none
 
@@ -686,7 +686,7 @@ The output from this job consists of three lines, the first two of which contain
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 
-See the README file in the installed share/met/config directory for a detailed description of the job command options available for ramp job type.
+See :numref:`config_options` for a detailed description of the job command options available for ramp job type.
 
 The default output for this job is contingency table counts and statistics (**-out_line_type CTC,CTS**). Matched pair information may also be output by requesting MPR output (**-out_line_type CTC,CTS,MPR**).
 

@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    05/17/19  Halley Gotway   New
+//   001    10/21/21  Halley Gotway   Fix for MET #1465
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -74,8 +75,6 @@ static void   set_genesis          (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
-static void   set_logfile          (const StringArray &);
-static void   set_verbosity        (const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -110,12 +109,10 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add function calls for the arguments
-   cline.add(set_genesis,   "-genesis", -1);
-   cline.add(set_track,     "-track",   -1);
-   cline.add(set_config,    "-config",   1);
-   cline.add(set_out,       "-out",      1);
-   cline.add(set_logfile,   "-log",      1);
-   cline.add(set_verbosity, "-v",        1);
+   cline.add(set_genesis, "-genesis", -1);
+   cline.add(set_track,   "-track",   -1);
+   cline.add(set_config,  "-config",   1);
+   cline.add(set_out,     "-out",      1);
 
    // Parse the command line
    cline.parse();
@@ -404,7 +401,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                      << " genesis at (" << bga[i].lat() << ", "
                      << bga[i].lon() << ") for "
                      << unix_to_yyyymmdd_hhmmss(ut)
-                     << " initialization "
+                     << " initialization, "
                      << (bga[i].genesis_time() - ut)/sec_per_hour
                      << " lead matches " << fga[j].technique() << " "
                      << unix_to_yyyymmdd_hhmmss(fga[j].genesis_time())
@@ -421,7 +418,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                  << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
                  << " genesis at (" << bga[i].lat() << ", "
                  << bga[i].lon() << ") for "
-                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization "
+                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization, "
                  << (bga[i].genesis_time() - ut)/sec_per_hour
                  << " lead is a MISS.\n";
             info.cts_info.cts.inc_fn_oy();
@@ -554,21 +551,6 @@ void process_track_files(const StringArray &files,
             continue;
          }
 
-         // Check the model genesis event criteria
-         if(!is_anly) {
-
-            // Check the lead time window
-            if(tracks[j][0].lead() < conf_info.LeadSecBeg ||
-               tracks[j][0].lead() > conf_info.LeadSecEnd) {
-               continue;
-            }
-
-            // Check the minimum duration
-            if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
-               continue;
-            }
-         }
-
          // Select the genesis event filtering criteria
          if(tracks[j].is_best_track())      event_info = &conf_info.BestEventInfo;
          else if(tracks[j].is_oper_track()) event_info = &conf_info.OperEventInfo;
@@ -584,6 +566,25 @@ void process_track_files(const StringArray &files,
          } // end for k
 
          if(!keep) continue;
+
+         // Check the model genesis event criteria
+         if(!is_anly) {
+
+            // Check the lead time window
+            if(tracks[j][k].lead() < conf_info.LeadSecBeg ||
+               tracks[j][k].lead() > conf_info.LeadSecEnd) {
+               mlog << Debug(6) << "Skipping genesis event for lead time "
+                    << tracks[j][k].lead()/sec_per_hour << ".\n";
+               continue;
+            }
+
+            // Check the minimum duration
+            if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
+               mlog << Debug(6) << "Skipping genesis event for track duration of "
+                    << tracks[j].duration()/sec_per_hour << ".\n";
+               continue;
+            }
+         }
 
          // Store the genesis event
          genesis.add(tracks[j], k);
@@ -935,22 +936,6 @@ void set_config(const StringArray & a) {
 
 void set_out(const StringArray & a) {
    out_base = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

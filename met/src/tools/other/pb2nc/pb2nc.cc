@@ -401,8 +401,6 @@ static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_collect_metadata(const StringArray &);
 static void   set_target_variables(const StringArray & a);
-static void   set_logfile(const StringArray &);
-static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
 
 static void   display_bufr_variables(const StringArray &, const StringArray &,
@@ -553,11 +551,9 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_nmsg, "-nmsg", 1);
    cline.add(set_dump_path, "-dump", 1);
-   cline.add(set_collect_metadata,  "-index",  0);
+   cline.add(set_collect_metadata, "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress, "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -677,21 +673,21 @@ void get_variable_info(const char* tbl_filename) {
          if ('0' != line[BUFR_NUMBER_START]) continue;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = bad_data_char;
+         var_name[BUFR_NAME_LEN] = NULL;
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = '\0';
+            var_name[idx] = NULL;
          }
          if (0 == strlen(var_name)) continue;
 
          var_count1++;
          strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
-         var_desc[BUFR_DESCRIPTION_LEN] = bad_data_char;
+         var_desc[BUFR_DESCRIPTION_LEN] = NULL;
          for (int idx=(BUFR_DESCRIPTION_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_desc[idx] = '\0';
+            var_desc[idx] = NULL;
          }
          mlog << Debug(10) << method_name << " sec. 1 var: ["
               << var_name << "] \tdesc: [" << var_desc << "]\n";
@@ -705,20 +701,20 @@ void get_variable_info(const char* tbl_filename) {
          if (NULL == strstr(line,"EVENT")) continue;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = bad_data_char;
+         var_name[BUFR_NAME_LEN] = NULL;
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = '\0';
+            var_name[idx] = NULL;
          }
          //if (NULL == strstr(var_name,"EVENT")) continue;
 
          strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN);
-         var_desc[BUFR_SEQUENCE_LEN] = bad_data_char;
+         var_desc[BUFR_SEQUENCE_LEN] = NULL;
          for (int idx=(BUFR_SEQUENCE_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_desc[idx] = '\0';
+            var_desc[idx] = NULL;
          }
          mlog << Debug(10) << method_name << " event: ["
               << var_name << "] \tdesc: [" << var_desc << "]\n";
@@ -733,10 +729,10 @@ void get_variable_info(const char* tbl_filename) {
          if ('-' == line[BUFR_NAME_START]) break;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = bad_data_char;
+         var_name[BUFR_NAME_LEN] = NULL;
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = '\0';
+            var_name[idx] = NULL;
          }
 
          if (NULL != strstr(line,"CCITT IA5")) {
@@ -745,12 +741,12 @@ void get_variable_info(const char* tbl_filename) {
          }
          else {
             strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN);
-            var_unit_str[BUFR_UNIT_LEN] = bad_data_char;
+            var_unit_str[BUFR_UNIT_LEN] = NULL;
             for (int idx=(BUFR_UNIT_LEN-1); idx>=0; idx--) {
                if (' ' != var_unit_str[idx] && '|' != var_unit_str[idx]) {
                   break;
                }
-               var_unit_str[idx] = '\0';
+               var_unit_str[idx] = NULL;
             }
             var_names.add(var_name);
             var_units.add(var_unit_str);
@@ -862,8 +858,8 @@ void process_pbfile(int i_pb) {
    // Initialize
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
-   min_time_str[0] = bad_data_char;
-   max_time_str[0] = bad_data_char;
+   min_time_str[0] = NULL;
+   max_time_str[0] = NULL;
 
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
@@ -1003,11 +999,11 @@ void process_pbfile(int i_pb) {
 
    bool     is_same_header;
    unixtime prev_hdr_vld_ut = (unixtime) 0;
-   float    prev_quality_mark;
    char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
    map<float, float*> pqtzuv_map_tq;
    map<float, float*> pqtzuv_map_uv;
+   vector<float*> pqtzuv_list;
 
    // Initialize
    prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
@@ -1048,6 +1044,7 @@ void process_pbfile(int i_pb) {
       // Get the next PrepBufr message (header only)
       ireadns_(&unit, hdr_typ, &i_date);
       readpb_hdr_(&unit, &i_ret, hdr);
+      hdr_typ[max_str_len-1] = 0;
 
       snprintf(time_str, sizeof(time_str), "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
@@ -1280,6 +1277,7 @@ void process_pbfile(int i_pb) {
       // Get the next PrepBufr message
       readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
 
+      int max_buf = sizeof(modified_hdr_typ);
       // Special handling for "AIRNOW" and "ANOWPM"
       bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
                         0 == strcmp("ANOWPM", hdr_typ));
@@ -1289,16 +1287,14 @@ void process_pbfile(int i_pb) {
          mlog << Debug(6) << "\n" << method_name << " -> "
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
-         if (mappedMessageType.length() < HEADER_STR_LEN) {
-            strncpy(modified_hdr_typ, mappedMessageType.c_str(), sizeof(modified_hdr_typ));
-         }
-         else {
-            strncpy(modified_hdr_typ, mappedMessageType.c_str(), HEADER_STR_LEN);
-         }
+         if (mappedMessageType.length() > HEADER_STR_LEN) max_buf = HEADER_STR_LEN;
+         strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf);
       }
       else {
          strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ));
       }
+      if (max_buf >= max_str_len) max_buf--;
+      modified_hdr_typ[max_buf] = NULL;
 
       // Search through the observation values and store them as:
       //    HDR_ID GC LVL HGT OB
@@ -1596,6 +1592,7 @@ void process_pbfile(int i_pb) {
                     << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
                     << " " << hdr_typ << " " << hdr_sid << "\n";
             }
+            pqtzuv_list.push_back(tmp_pqtzuv);
          }
       } // end for lv
 
@@ -1840,14 +1837,12 @@ void process_pbfile(int i_pb) {
             
             insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                        hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
-         
-            std::map<float,float*>::iterator it;
-            for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
-               delete it->second;
+
+            for(vector<float *>::iterator it = pqtzuv_list.begin();
+                it != pqtzuv_list.end(); ++it) {
+               delete *it;
             }
-            for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
-               delete it->second;
-            }
+            pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
          }
@@ -1856,7 +1851,6 @@ void process_pbfile(int i_pb) {
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
          prev_hdr_elv = hdr_elv;
-         prev_quality_mark = quality_mark;
          strncpy(prev_hdr_typ, hdr_typ, strlen(not_assigned));
          strncpy(prev_hdr_sid, hdr_sid.c_str(), strlen(not_assigned));
       }
@@ -1883,15 +1877,12 @@ void process_pbfile(int i_pb) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                  hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
-      
-      //insert_pbl();
-      std::map<float,float*>::iterator it;
-      for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
-         delete it->second;
+
+      for(vector<float *>::iterator it = pqtzuv_list.begin();
+          it != pqtzuv_list.end(); ++it) {
+         delete *it;
       }
-      for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
-         delete it->second;
-      }
+      pqtzuv_list.clear();
       pqtzuv_map_tq.clear();
       pqtzuv_map_uv.clear();
    }
@@ -1901,7 +1892,7 @@ void process_pbfile(int i_pb) {
       if(mlog.verbosity_level() >= debug_level_for_performance) {
          end_t = clock();
          log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
-         start_t = clock();
+         //start_t = clock();
       }
       cout << log_message << "\n";
    }
@@ -2446,7 +2437,7 @@ void write_netcdf_hdr_data() {
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
    if (is_prepbufr) {
-      if (!nc_out_data.summary_info.flag || (nc_out_data.summary_info.flag && nc_out_data.summary_info.raw_data))
+      if (!nc_out_data.summary_info.flag || nc_out_data.summary_info.raw_data)
          create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
    }
 
@@ -2920,7 +2911,6 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
-   int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
@@ -3230,19 +3220,19 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
 
    if ((prev_pqtzuv[0] == cur_pqtzuv[0]) || (next_pqtzuv[0] == cur_pqtzuv[0])) {
       mlog << Error << method_name 
-              << "  Can't interpolate because of same pressure levels. prev: "
-              << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
-              << ", next: " <<  prev_pqtzuv[0] << "\n";
+           << "  Can't interpolate because of same pressure levels. prev: "
+           << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
+           << ", next: " <<  prev_pqtzuv[0] << "\n";
    }
    else {
       float p_ratio = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
       float p_ratio_log = (log(cur_pqtzuv[0]) - log(prev_pqtzuv[0]))
             / (log(next_pqtzuv[0]) - log(prev_pqtzuv[0]));
+      float ratio_pres = USE_LOG_INTERPOLATION ? p_ratio_log : p_ratio;
       for (int index=1; index < mxr8vt; index++) {
          if (is_eq(cur_pqtzuv[index], bad_data_float)) {
-            float prev_value, next_value, ratio_pres;
-            prev_value = prev_pqtzuv[index];
-            next_value = next_pqtzuv[index];
+            float prev_value = prev_pqtzuv[index];
+            float next_value = next_pqtzuv[index];
             if (is_eq(prev_value, bad_data_float) || is_eq(next_value, bad_data_float)) {
                if ((!IGNORE_Q_PBL && index==1) || (!IGNORE_Z_PBL && index==3)) {
                   mlog << Warning << method_name << "   Missing value for "
@@ -3253,7 +3243,6 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
                }
             }
             else {
-               ratio_pres = USE_LOG_INTERPOLATION ? p_ratio_log : p_ratio;
                cur_pqtzuv[index] = prev_value + (next_value - prev_value) * ratio_pres;
             }
          }
@@ -3451,6 +3440,7 @@ void usage() {
         << "\t[-nmsg n]\n"
         << "\t[-index]\n"
         << "\t[-dump path]\n"
+        << "\t[-obs_var var]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -3482,9 +3472,12 @@ void usage() {
         << "\"prepbufr_file\" should also be dumped to text files "
         << "in the directory specified (optional).\n"
 
+        << "\t\t\"-obs_var var1,...\" or multiple \"-obs_var var\" sets the variable list to be saved"
+        << " from input BUFR files (optional, default: all).\n"
+
         << "\t\t\"-index\" indicates that the meta data (available variables and headers)"
         << " is extracted from \"prepbufr_file\" (optional). "
-        << "No NetCDF outputs. \"-all\" or \"-vars\" is ignored.\n"
+        << "No NetCDF outputs. \"-obs_var\" is ignored.\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -3561,24 +3554,6 @@ void set_target_variables(const StringArray & a)
      ConcatString arg = a[0];
      bufr_target_variables = arg.split(",+ ");
    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a)
-{
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(const StringArray & a)
-{
-   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 //
 // Grid-Stat configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -213,6 +213,6 @@ nc_pairs_flag = {
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V9.1";
+version          = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

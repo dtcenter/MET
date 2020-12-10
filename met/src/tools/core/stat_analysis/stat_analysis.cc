@@ -87,8 +87,6 @@ static void usage();
 static void set_lookin_path(const StringArray &);
 static void set_out_filename(const StringArray &);
 static void set_tmp_dir(const StringArray &);
-static void set_logfile(const StringArray &);
-static void set_verbosity_level(const StringArray &);
 static void set_config_file(const StringArray &);
 static void process_search_dirs();
 static void process_stat_file(const char *, const STATAnalysisJob &, int &, int &);
@@ -106,7 +104,6 @@ static void clean_up();
 static void set_config(const char *);
 static void set_search_dir(const char *);
 static void set_out_file(const char *);
-static void set_verbosity(int);
 
 static void open_temps();
 
@@ -275,8 +272,6 @@ void parse_command_line(int &argc, char **argv) {
    cline.add(set_lookin_path, "-lookin", -1);
    cline.add(set_out_filename, "-out", 1);
    cline.add(set_tmp_dir, "-tmp_dir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity_level, "-v", 1);
    cline.add(set_config_file, "-config", 1);
 
    //
@@ -428,15 +423,6 @@ void set_out_file(const char *path) {
 
    mlog << Debug(1) << "Creating STAT-Analysis output file \""
         << out_file << "\"\n";
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity(int i) {
-
-   mlog.set_verbosity_level(i);
 
    return;
 }
@@ -842,22 +828,6 @@ void set_tmp_dir(const StringArray & a) {
    }
 
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_logfile(const StringArray & a) {
-   ConcatString filename;
-
-   filename = a[0];
-
-   mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_verbosity_level(const StringArray & a) {
-   set_verbosity(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

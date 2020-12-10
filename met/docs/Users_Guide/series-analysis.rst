@@ -11,7 +11,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal g
 Practical Information
 _____________________
 
-This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in the :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
+This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
 
 This tool computes statistics for exactly one series each time it is run. Multiple series may be processed by running the tool multiple times. The length of the series to be processed is determined by the first of the following that is greater than one: the number of forecast fields in the configuration file, the number of observation fields in the configuration file, the number of input forecast files, the number of input observation files. Several examples of defining series are described below.
 
@@ -80,7 +80,7 @@ In this example, the Series-Analysis tool will process the list of forecast and 
 series_analysis output
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the plot_data_plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
+The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the Plot-Data-Plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
 
 .. _series-analysis_Glibert_precip:
 
@@ -90,7 +90,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
 series_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The default configuration file for the Series-Analysis tool named *SeriesAnalysisConfig_default* can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Series-Analysis tool named **SeriesAnalysisConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -114,7 +114,7 @@ ____________________
   tmp_dir        = "/tmp";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 ____________________
 

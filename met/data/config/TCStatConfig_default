@@ -2,19 +2,23 @@
 //
 // TC-Stat configuration file.
 //
-// For additional information, see the MET_BASE/config/README_TC file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // The parameters listed below are used to filter the TC-STAT data down to the
-// desired subset of lines over which statistics are to be computed.  Only
-// those lines which meet ALL of the criteria specified will be retained.
+// desired subset of lines over which statistics are to be computed. Only those
+// lines which meet ALL of the criteria specified will be retained.
 //
 // The settings that are common to all jobs may be specified once at the top
-// level.  If no selection is listed for a parameter, that parameter will not
-// be used for filtering.  If multiple selections are listed for a parameter,
+// level. If no selection is listed for a parameter, that parameter will not
+// be used for filtering. If multiple selections are listed for a parameter,
 // the analyses will be performed on their union.
+//
+// Each configuration filtering option may be overridden by a corresponding
+// job command option of the same name, as described in the MET User's Guide:
+// https://dtcenter.github.io/MET/latest/Users_Guide/tc-stat.html 
 //
 
 //
@@ -35,27 +39,22 @@ storm_id = [];
 
 //
 // Stratify by the BASIN column.
-// May add using the "-basin" job command option.
 //
 basin = [];
 
 //
 // Stratify by the CYCLONE column.
-// May add using the "-cyclone" job command option.
 //
 cyclone = [];
 
 //
 // Stratify by the STORM_NAME column.
-// May add using the "-storm_name" job command option.
 //
 storm_name = [];
 
 //
 // Stratify by the INIT times.
 // Model initialization time windows to include or exclude
-// May modify using the "-init_beg", "-init_end", "-init_inc",
-// and "-init_exc" job command options.
 //
 init_beg = "";
 init_end = "";
@@ -155,8 +154,7 @@ landfall_end = "00";
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
-// tracks should be retained.  May modify using the "-match_points" job command
-// option.
+// tracks should be retained.
 //
 match_points = FALSE;
 
@@ -193,4 +191,4 @@ jobs = [];
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V9.1";
+version = "V10.0.0";

@@ -155,7 +155,7 @@ class Met2dDataFile : public Met2dData {
 
          //  post-process data after reading it
 
-      void process_data_plane(VarInfo *, DataPlane &);
+      bool process_data_plane(VarInfo *, DataPlane &);
 
 };
 

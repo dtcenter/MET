@@ -2,7 +2,7 @@
 //
 // Point-Stat configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -230,6 +230,6 @@ output_flag = {
 
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V9.1";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

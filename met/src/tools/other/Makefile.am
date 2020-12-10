@@ -82,6 +82,10 @@ if ENABLE_SHIFT_DATA_PLANE
   SUBDIRS += shift_data_plane
 endif
 
+if ENABLE_IODA2NC
+  SUBDIRS += ioda2nc
+endif
+
 SUBDIRS += grid_diag
 
 MAINTAINERCLEANFILES 	= Makefile.in

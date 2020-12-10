@@ -2,11 +2,9 @@
 //
 // ASCII2NC configuration file.
 //
+// For additional information, please see the MET User's Guide.
+//
 ////////////////////////////////////////////////////////////////////////////////
-
-//
-// The parameters listed below are used to summarize the ASCII data read in
-//
 
 //
 // The parameters listed below are used to summarize the ASCII data read in
@@ -14,4 +12,4 @@
 
 nc_compression = 2;
 
-version = "V9.1";
+version = "V10.0.0";

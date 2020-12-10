@@ -270,11 +270,7 @@ Python3_Script script(path.text());
    //     the user's script
    //
 
-if ( user_script_args.n() > 0 )  {
-
-   script.reset_argv(user_script_filename.text(), user_script_args);
-
-}
+script.reset_argv(user_script_filename.text(), user_script_args);
 
    //
    //  import the user's script as a module

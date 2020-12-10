@@ -2,7 +2,7 @@
 //
 // STAT-Analysis configuration file.
 //
-// For additional information, see the MET_BASE/config/README file.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -103,6 +103,6 @@ wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V9.1";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

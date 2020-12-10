@@ -6,7 +6,7 @@ TC-Stat Tool
 Introduction
 ____________
 
-The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw job** processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
+The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this user's guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw job** processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
 
 .. _Statistical-aspects:
 
@@ -70,7 +70,7 @@ Users may specify several job command options to configure the behavior of this 
 Practical information
 _____________________
 
-The following sections describe the usage statement, required arguments, and optional arguments for **tc_stat**.
+The following sections describe the usage statement, required arguments, and optional arguments for tc_stat.
 
 tc_stat usage
 ~~~~~~~~~~~~~
@@ -93,7 +93,7 @@ The usage statement for the TC-Stat tool includes the "job" term, which refers t
 Required arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin source** argument indicates the location of the input TCST files generated from **tc_pairs**. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
+1. The **-lookin source** argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in :numref:`tc_stat-configuration-file`.
 
@@ -108,20 +108,20 @@ Optional arguments for tc_stat
 
 6. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-An example of the **tc_stat** calling sequence is shown below:
+An example of the tc_stat calling sequence is shown below:
 
 .. code-block:: none
 
   tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for the job command line and :numref:`config_options_tc` for how to use them.
 
 .. _tc_stat-configuration-file:
 
 tc_stat configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed **share/met/config** directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The contents of the tc_stat configuration file are described below.
 
@@ -146,7 +146,7 @@ _________________________
   match_points = TRUE;
   version      = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET-TC Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options_tc`.
 
 Note that the options specified in the first section of the configuration file, prior to the job list, will be applied to every job specified in the joblist. However, if an individual job specifies an option listed above, it will be applied to that job. For example, if model = [ **"GFSI", "LGEM", "DSHP"** ]; is set at the top, but the job in the joblist sets the -model option to "**LGEM**", that job will only run using the LGEM model data.
 
@@ -233,7 +233,7 @@ Option 4. A forecast is verified when a watch/warning is NOT in effect
   column_str_name = ["WATCH_WARN"];
   column_str_val = ["NA"];
     
-Further information on the **column_str** and **init_str** fields is described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will stratify by a single or multiple types of warnings.
+Further information on the **column_str** and **init_str** fields are described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will be stratified by a single or multiple types of warnings.
 
 _________________________
 
@@ -292,7 +292,7 @@ _________________________
 
 The **rirw** field specifies those track points for which rapid intensification (RI) or rapid weakening (RW) occurred, based on user defined RI/RW thresholds. The **track** entry specifies that RI/RW is not turned on **(NONE)**, is computed based on the bmodel only **(BDECK)**, is computed based on the amodel only **(ADECK)**, or computed when both the amodel and bmodel (the union of the two) indicate RI/RW (BOTH). If **track** is set to **ADECK, BDECK**, or **BOTH**, only tracks exhibiting rapid intensification will be retained. Rapid intensification is officially defined as when the change in the maximum wind speed over a 24-hour period is greater than or equal to 30 kts. This is the default setting, however flexibility in this definition is provided through the use of the **time, exact** and **thresh** options. The **time** field specifies the time window (HH[MMSS] format) for which the RI/RW occurred. The **exact** field specifies whether to only count RI/RW when the intensity change is over the exact time window (TRUE), which follows the official RI definition, or if the intensity threshold is met anytime during the time window (FALSE). Finally, the **thresh** field specifies the user defined intensity threshold (where ">=" indicates RI, and "<=" indicates RW). 
 
-Using the **-rirw_track, -rirw_time_adeck, -rirw_time_bdeck, -rirw_exact_adeck, -rirw_exact_bdeck, -rirw_thresh_adeck, -rirw_thresh_bdeck** options within the job command lines may further refine these selections. See README_TC in data/config for how to use these options.
+Using the **-rirw_track, -rirw_time_adeck, -rirw_time_bdeck, -rirw_exact_adeck, -rirw_exact_bdeck, -rirw_thresh_adeck, -rirw_thresh_bdeck** options within the job command lines may further refine these selections. See :numref:`config_options_tc` for how to use these options.
 
 _________________________
 
@@ -342,7 +342,7 @@ _________________________
 
   jobs = [];
 
-The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. There are three types of jobs available including *filter, summary, and rirw.* Please refer to the README_TC in data/config for details on how to call each job. The format for an analysis job is as follows:
+The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. There are three types of jobs available including *filter, summary, and rirw.* Please refer to :numref:`config_options` for details on how to call each job. The format for an analysis job is as follows:
 
 _________________________
 
@@ -361,7 +361,7 @@ _________________________
 tc_stat output
 ~~~~~~~~~~~~~~
 
-The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each **tc_stat** job command is listed below.
+The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each tc_stat job command is listed below.
 
 **Job: Filter**
 
@@ -430,7 +430,7 @@ The RIRW job produces contingency table counts and statistics defined by identif
 
 • The **-rirw_time HH[MMSS]** option (or **-rirw_time_adeck** and **-rirw_time_bdeck** to specify different settings) defines the time window of interest. The default is 24 hours.
 
-• The **-rirw_exact bool** option (or **-rirw_exact_adeck** and **-rirw_exact_bdeck** to specify different settings) is a boolean defining whether the exact intensity change or maximum intensity change over that time window should be used. For rapid intensification, the maximum increase in computed. For rapid weakening, the maximum decrease is used. The default is true.
+• The **-rirw_exact bool** option (or **-rirw_exact_adeck** and **-rirw_exact_bdeck** to specify different settings) is a boolean defining whether the exact intensity change or maximum intensity change over that time window should be used. For rapid intensification, the maximum increase is computed. For rapid weakening, the maximum decrease is used. The default is true.
 
 • The **-rirw_thresh threshold** option (or **-rirw_thresh_adeck** and **-rirw_thresh_bdeck** to specify different settings) defines the intensity change event threshold. The default is greater than or equal to 30 kts.
 
@@ -454,6 +454,6 @@ The PROBRIRW job produces probabilistic contingency table counts and statistics 
 
 • The **-out_line_type** option defines the output data that should be written. This job can write PCT, PSTD, PJC, and PRC output line types. The default is PCT and PSTD.  Please see :numref:`table_PS_format_info_PCT` through :numref:`table_PS_format_info_PRC` for more details.
 
-Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or -column_thresh **RI_WINDOW ==24** option provide convenient ways avoiding this problem.
+Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since the BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or **-column_thresh RI_WINDOW ==24** option provide convenient ways avoiding this problem.
 
-Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probri_thresh option defines the probabilities of interest (e.g. **-probri_thresh 30**) and the **PROBRI_PROB** column name refers those probability values, regardless of their column number. For example, the job command options **-probri_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.
+Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probri_thresh option defines the probabilities of interest (e.g. **-probri_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probri_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.
