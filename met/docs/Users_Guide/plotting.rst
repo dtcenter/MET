@@ -216,7 +216,7 @@ ______________________
 
 The **grid_data** dictionary defines a gridded field of data to be plotted as a base image prior to plotting point locations on top of it. The data to be plotted is specified by the **field** array. If **field** is empty, no base image will be plotted. If **field** has length one, the requested data will be read from the input file specified by the **-plot_grid** command line argument.
 
-The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`Data IO MET Configuration File Options`.
+The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
 
 ______________________
 
@@ -278,7 +278,7 @@ ______________________
   censor_thresh = [];
   censor_val    = [];
   
-The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`Data IO MET Configuration File Options`.
+The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`config_options`.
 
 ______________________
 
