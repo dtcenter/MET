@@ -191,6 +191,131 @@ Users are encouraged to define as many **point_data** array entries as needed to
 
 For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **plot_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
 
+plot_point_obs configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default configuration file for the Plot-Point-Obs tool named **PlotPointObsConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
+
+Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+
+______________________
+
+.. code-block:: none
+
+  grid_data = {
+
+     field = [];
+
+     grid_plot_info = {
+        color_table   = "MET_BASE/colortables/met_default.ctable";
+        plot_min      = 0.0;
+        plot_max      = 0.0;
+        colorbar_flag = TRUE;
+     }
+  }
+
+The **grid_data** dictionary defines a gridded field of data to be plotted as a base image prior to plotting point locations on top of it. The data to be plotted is specified by the **field** array. If **field** is empty, no base image will be plotted. If **field** has length one, the requested data will be read from the input file specified by the **-plot_grid** command line argument.
+
+The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`Data IO MET Configuration File Options`.
+
+______________________
+
+.. code-block:: none
+
+  point_data = [
+    { fill_color = [ 255, 0, 0 ]; }
+  ];
+
+The **point_data** entry is an array of dictionaries. Each dictionary may include a list of filtering, data processing, and plotting options, described below. For each input point observation, the tool checks the **point_data** filtering options in the order specified. The point information is added to the first matching array entry. The default entry simply specifies that all points be plotted red.
+
+______________________
+
+.. code-block:: none
+
+  msg_typ     = [];
+  sid_inc     = [];
+  sid_exc     = [];
+  obs_var     = [];
+  obs_quality = [];
+  
+The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station id's to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
+
+______________________
+
+.. code-block:: none
+
+  obs_gc      = [];
+
+When using older point observation files which have GRIB codes, the **obs_gc** entry specifies a list of integer GRIB codes to be included.
+
+______________________
+
+.. code-block:: none
+
+  valid_beg   = "";
+  valid_end   = "";
+
+The **valid_beg** and **valid_end** options are time strings which specify a range of dates to be included. When left to their default empty strings no time filtering is applied.
+
+______________________
+
+.. code-block:: none
+
+  lat_thresh  = NA;
+  lon_thresh  = NA;
+  elv_thresh  = NA;
+  hgt_thresh  = NA;
+  prs_thresh  = NA;
+  obs_thresh  = NA;
+
+The options listed above define filtering thresholds for the input point observation values. The default NA thresholds always evaluate to true and therefore apply no filtering. The **lat_thresh** and **lon_thresh** thresholds filter the latitude and longitude of the point observations, respectively. The **elv_thresh** threshold filters by the station elevation. The **hgt_thresh** and **prs_thresh** thresholds filter by the observation height and pressure level. The **obs_thresh** threshold filters by the observation value.
+
+______________________
+
+.. code-block:: none
+
+  convert(x)    = x;
+  censor_thresh = [];
+  censor_val    = [];
+  
+The **convert(x)** function, **censor_thresh** option, and **censor_val** option may be specified separately for each **point_data** array entry to transform the observation values prior to plotting. These options are further described in :numref:`Data IO MET Configuration File Options`.
+
+______________________
+
+.. code-block:: none
+
+   dotsize(x) = 10;
+
+The **dotsize(x)** function defines the size of the circle to be plotted as a function of the observation value. The default setting shown above defines the dot size as a constant value.
+
+______________________
+
+.. code-block:: none
+
+  line_color = [];
+  line_width = 1;
+
+The **line_color** and **line_width** entries define the color and thickness of the outline for each circle plotted. When **line_color** is left as an empty array, no outline is drawn. Otherwise, **line_color** should be specified using 3 intergers between 0 and 255 to define the red, green, and blue components of the color.
+
+______________________
+
+.. code-block:: none
+
+  fill_color = [];
+  fill_plot_info = { // Overrides fill_color
+    flag          = FALSE;
+    color_table   = "MET_BASE/colortables/met_default.ctable";
+    plot_min      = 0.0;
+    plot_max      = 0.0;
+    colorbar_flag = TRUE;
+  }
+
+The circles are filled in based on the setting of the **fill_color** and **fill_plot_info** entries. As described above for **line_color**, if **fill_color** is empty, the points are not filled in. Otherwise, **fill_color** must be specified using 3 integers between 0 and 255. If **fill_plot_info.flag** is set to true, then its settings override **fill_color**. The **fill_plot_info** dictionary defines a colortable which is used to determine the color to be used based on the observation value.
+
+Users are encouraged to define as many **point_data** array entries as needed to filter and plot the input observations in the way they would like. Each point observation is plotted using the options specified in the first matching array entry. Note that the filtering, processing, and plotting options specified inside each **point_data** array entry take precedence over ones specified at the higher level of configuration file context.
+
+For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **plot_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
+
 .. _plot_data_plane-usage:
 
 plot_data_plane usage
@@ -224,7 +349,7 @@ Required arguments for plot_data_plane
 Optional arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-color_table color_table_name** overrides the default color table ("MET_BASE/colortables/met_default.ctable")
+4. The **-color_table color_table_name** overrides the default color table (*MET_BASE/colortables/met_default.ctable*)
 
 5. The **-plot_range min max** sets the minimum and maximum values to plot.
 
@@ -340,9 +465,9 @@ In addition to the traditional scores, MODE output allows more information to be
 TC-Stat tool example
 ~~~~~~~~~~~~~~~~~~~~
 
-There is a basic R script located in the MET installation, share/met/Rscripts/plot_tcmpr.R. The usage statement with a short description of the options for *plot_tcmpr.R* can be obtained by typing: Rscript *plot_tcmpr.R* with no additional arguments. The only required argument is the *-lookin* source, which is the path to the TC-Pairs TCST output files. The R script reads directly from the TC-Pairs output, and calls TC-Stat directly for filter jobs specified in the *"-filter options"* argument.
+There is a basic R script located in the MET installation, *share/met/Rscripts/plot_tcmpr.R*. The usage statement with a short description of the options for *plot_tcmpr.R* can be obtained by typing: Rscript *plot_tcmpr.R* with no additional arguments. The only required argument is the **-lookin** source, which is the path to the TC-Pairs TCST output files. The R script reads directly from the TC-Pairs output, and calls TC-Stat directly for filter jobs specified in the *"-filter options"* argument.
 
-In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the MET_INSTALL_DIR/share/met directory. In addition, the Tc-Stat tool under MET_INSTALL_DIR/bin must be in your system path.
+In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the *MET_INSTALL_DIR/share/met* directory. In addition, the Tc-Stat tool under *MET_INSTALL_DIR/bin* must be in your system path.
 
 The supplied R script can generate a number of different plot types including boxplots, mean, median, rank, and relative performance. Pairwise differences can be plotted for the boxplots, mean, and median. Normal confidence intervals are applied to all figures unless the no_ci option is set to TRUE. Below are two example plots generated from the tools.
 

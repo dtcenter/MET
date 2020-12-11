@@ -34,7 +34,7 @@ export TEST_OUT_DIR
    ##
 
 
-TESTS := $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
+TESTS := $(shell grep "define ENABLE_" ../config.h | grep -v "ENABLE_PYTHON" | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
 
 
 ########################################################################
@@ -56,6 +56,7 @@ include $(MK_DIR)/grib2.mk
 include $(MK_DIR)/grid_stat.mk
 include $(MK_DIR)/gis_utils.mk
 include $(MK_DIR)/gsi_tools.mk
+include $(MK_DIR)/ioda2nc.mk
 include $(MK_DIR)/lidar2nc.mk
 include $(MK_DIR)/madis2nc.mk
 include $(MK_DIR)/mode.mk

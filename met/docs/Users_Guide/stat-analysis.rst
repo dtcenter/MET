@@ -225,7 +225,7 @@ An example of the stat_analysis calling sequence is shown below.
   stat_analysis -lookin ../out/point_stat \
   -config STATAnalysisConfig
 
-In this example, the Stat-Analysis tool will search for valid STAT lines located in the **../out/point_stat** directory that meet the options specified in the configuration file, **config/STATAnalysisConfig**.
+In this example, the Stat-Analysis tool will search for valid STAT lines located in the *../out/point_stat* directory that meet the options specified in the configuration file, *config/STATAnalysisConfig*.
 
 .. _StA-pyembed:
 
@@ -248,7 +248,7 @@ In this example, rather than passing the MPR output lines from Point-Stat direct
 stat_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed **share/met/config** directory. The version used for the example run in :numref:`installation` is also available in **scripts/config**. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
+The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
 
 The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
 

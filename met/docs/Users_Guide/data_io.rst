@@ -255,4 +255,5 @@ Part of the strength of MET is the leveraging of capability across tools. There 
 
 Many of the MET tools use a configuration file to set parameters. This prevents the command line from becoming too long and cumbersome and makes the output easier to duplicate.
 
+
 The configuration file details are described in :ref:`config_options` and :ref:`config_options_tc`.

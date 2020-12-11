@@ -560,6 +560,7 @@ static const char conf_key_message_type_map[]       = "message_type_map";
 static const char conf_key_message_type_group_map[] = "message_type_group_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
+static const char conf_key_obs_name_map[]      = "obs_name_map";
 static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
@@ -619,6 +620,8 @@ static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
+static const char conf_key_metadata_map[]      = "metadata_map";
+static const char conf_key_missing_thresh[]    = "missing_thresh";
 
 //
 // Entries to override file metadata 
