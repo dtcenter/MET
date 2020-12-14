@@ -84,33 +84,41 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    vinfo_ens_type      = ens_type;
    vinfo_ens_number    = ens_number;
 
-   bool isEnsMatch = true;
-   // compare with ens config parameters only if this record is NCEP ensemble
-   if( ens_application == 1 && center == 7 && subcenter == 2 ){
-      ConcatString vinfo_ens = vinfo.ens();
-      if( !vinfo_ens.empty() ){
-         if( vinfo_ens == conf_key_grib_ens_hi_res_ctl ){
-            vinfo_ens_type = 1;
-            vinfo_ens_number = 1;
-         } else if( vinfo_ens == conf_key_grib_ens_low_res_ctl){
-            vinfo_ens_type = 1;
-            vinfo_ens_number = 2;
-         } else {
-            char sign = vinfo_ens.text()[0];
-            if( sign == '+') {
-               vinfo_ens_type = 3;
-            } else if ( sign == '-' ) {
-               vinfo_ens_type = 2;
-            }
-            char* ens_number_str  = new char[vinfo_ens.length() ];
-            strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length());
-            ens_number_str[vinfo_ens.length()-1] = (char) 0;
-            //  if the  string is numeric
-            if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number= atoi(ens_number_str);
+   // check the ensemble config parameters
+   bool isEnsMatch;
+   ConcatString vinfo_ens = vinfo.ens();
+   if( vinfo_ens.nonempty() ) {
+      if( vinfo_ens == conf_key_grib_ens_hi_res_ctl ) {
+         vinfo_ens_type = 1;
+         vinfo_ens_number = 1;
+      }
+      else if( vinfo_ens == conf_key_grib_ens_low_res_ctl ) {
+         vinfo_ens_type = 1;
+         vinfo_ens_number = 2;
+      }
+      else {
+         char sign = vinfo_ens.text()[0];
+         if(sign == '+') {
+            vinfo_ens_type = 3;
+         }
+         else if(sign == '-') {
+            vinfo_ens_type = 2;
+         }
+
+         char *ens_number_str = new char[vinfo_ens.length()];
+         strncpy(ens_number_str, vinfo_ens.text()+1,
+                 (size_t) vinfo_ens.length());
+         ens_number_str[vinfo_ens.length()-1] = (char) 0;
+
+         // if the string is numeric
+         if( check_reg_exp("^[0-9]*$", ens_number_str) ) {
+            vinfo_ens_number= atoi(ens_number_str);
             delete[] ens_number_str;
          }
+
          // if one of the parameters was not set - error
-         if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
+         if( is_bad_data(vinfo_ens_number) ||
+             is_bad_data(vinfo_ens_type) ) {
             mlog << Error << "\nis_prelim_match() -> "
                  << "unrecognized GRIB_ens value '" << vinfo_ens
                  << "' should be '" << conf_key_grib_ens_hi_res_ctl
@@ -119,8 +127,13 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
             exit(1);
          }
       }
-      isEnsMatch = ( vinfo_ens_type == ens_type && vinfo_ens_number == ens_number );
 
+      // check that both match
+      isEnsMatch = ( vinfo_ens_type   == ens_type &&
+                     vinfo_ens_number == ens_number );
+   }
+   else {
+      isEnsMatch = true;
    }
 
    // Check for matching parameters
@@ -129,7 +142,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
         vinfo_subcenter != subcenter ||
         !isEnsMatch )  return ( false );
 
-   // if p_flag is 'on' (probability field) and the request name is set - get the real name of the field from the begining of a request name
+   // if p_flag is 'on' (probability field) and the request name is set,
+   // get the real name of the field from the begining of a request name
    if( vinfo.p_flag () && !vinfo.req_name().empty())
    {
       field_name=vinfo.req_name().split ("(")[0];
@@ -142,7 +156,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    int tab_match = -1;
 
    // if the name is specified, use it
-   if( !field_name.empty() ){
+   if( !field_name.empty() ) {
 
       //  look up the name in the grib tables
       if( !GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
@@ -162,7 +176,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    else {
 
       //  if either the field name or the indices are specified, bail
-      if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ){
+      if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ) {
          mlog << Error << "\nis_prelim_match() -> "
               << "either name or GRIB1_ptv and GRIB1_code must be "
               << "specified in field information\n\n";
@@ -170,7 +184,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib1(code_for_lookup, vinfo_ptv, vinfo_center, vinfo_subcenter,tab) ){
+      if( !GribTable.lookup_grib1(code_for_lookup, vinfo_ptv, vinfo_center, vinfo_subcenter,tab) ) {
          //if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter, tab) )
          {
@@ -192,7 +206,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    //
 
 if ( !is_bad_data(vinfo.level().type_num()) &&
-     vinfo.level().type_num() != (int) pds->type ){
+     vinfo.level().type_num() != (int) pds->type ) {
 
    mlog << Debug(4)
         << "For GRIB record number " << g.rec_num
