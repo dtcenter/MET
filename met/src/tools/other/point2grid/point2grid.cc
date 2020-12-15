@@ -708,10 +708,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
 
       // Loop through the requested fields
-      bool mapping_ready = false;
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
-      IntArray *cellMapping = new IntArray[nx * ny];
+      IntArray *cellMapping = (IntArray *)0;
 
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
@@ -875,11 +874,14 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                else obs_count_non_zero_from++;
             }
          }
-         if( ! mapping_ready ) {
-            mapping_ready = get_grid_mapping(to_grid, cellMapping, var_index_array,
-                                             obs_hids, hdr_lats, hdr_lons);
+
+         if (cellMapping) {
+            for (int idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
+            delete [] cellMapping;
          }
-         if( mapping_ready ) {
+         cellMapping = new IntArray[nx * ny];
+         if( get_grid_mapping(to_grid, cellMapping, var_index_array,
+                              obs_hids, hdr_lats, hdr_lons) ) {
             int from_index;
             IntArray cellArray;
             NumArray dataArray;
