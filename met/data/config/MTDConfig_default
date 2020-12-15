@@ -2,7 +2,7 @@
 //
 // MODE Time Domain configuration file.
 //
-// For additional information, see the README file in the MET User's Guide.
+// For additional information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -232,6 +232,6 @@ txt_output = {
 
 output_prefix  = "";
 
-version        = "V10.0";
+version        = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

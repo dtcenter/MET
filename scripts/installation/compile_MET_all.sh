@@ -89,12 +89,24 @@ if [ -z ${MET_NETCDF} ]; then
 else
     COMPILE_NETCDF=0
 fi
-COMPILE_GSL=1
-COMPILE_HDF=1
-COMPILE_HDFEOS=1
+
+if [ -z ${MET_GSL} ]; then
+    COMPILE_GSL=1
+else
+    COMPILE_GSL=0
+fi
+
+COMPILE_HDF=0
+COMPILE_HDFEOS=0
 COMPILE_FREETYPE=0
 COMPILE_CAIRO=0
 COMPILE_MET=1
+
+if [ -z ${BIN_DIR_PATH} ]; then
+    BIN_DIR_PATH=${TEST_BASE}/bin
+else
+    BIN_DIR_PATH=${BIN_DIR_PATH}
+fi
 
 if [ -z ${USE_MET_TAR_FILE} ]; then    
     export USE_MET_TAR_FILE=TRUE
@@ -128,23 +140,77 @@ if [ ${USE_MODULES} == "TRUE" ]; then
 fi
 
 if [ ${COMPILER_FAMILY} == "gnu" ]; then
-  export CC=`which gcc`
-  export CXX=`which g++`
-  export FC=`which gfortran`
-  export F77=`which gfortran`
-  export F90=`which gfortran`
+    if [ -z ${CC} ]; then
+	export CC=`which gcc`
+    else
+	export CC=${CC}
+    fi
+    if [ -z ${CXX} ]; then
+	export CXX=`which g++`
+    else
+	export CXX=${CXX}
+    fi
+    if [ -z ${FC} ]; then
+	export FC=`which gfortran`
+    else
+	export FC=${FC}
+    fi
+    if [ -z ${F77} ]; then
+	export F77=`which gfortran`
+    else
+	export F77=${F77}
+    fi
+    if [ -z ${F90} ]; then
+	export F90=`which gfortran`
+    else
+	export F90=${F90}
+    fi
 elif [ ${COMPILER_FAMILY} == "pgi" ]; then
-  export CC=`which pgcc`
-  export CXX=`which pgc++`
-  export FC=`which pgf90`
-  export F77=`which pgf90`
-  export F90=`which pgf90`
+    if [ -z ${CC} ]; then
+	export CC=`which pgcc`
+    else
+	export CC=${CC}
+    fi
+    if [ -z ${CXX} ]; then
+	export CXX=`which pgc++`
+    else
+	export CXX=${CXX}
+    fi
+    if [ -z ${F90} ]; then
+	export F90=`which pgf90`
+	export F77=${F90}
+	export FC=${F90}
+    else
+	export F90=${F90}
+	export F77=${F90}
+	export FC=${F90}
+    fi
 elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]]; then
-  export CC=`which icc`
-  export CXX=`which icc`
-  export FC=`which ifort`
-  export F77=`which ifort`
-  export F90=`which ifort`
+    if [ -z ${CC} ]; then
+	export CC=`which icc`
+    else
+	export CC=${CC}
+    fi
+    if [ -z ${CXX} ]; then
+	export CXX=`which icc`
+    else
+	export CXX=${CXX}
+    fi
+    if [ -z ${FC} ]; then
+	export FC=`which ifort`
+    else
+	export FC=${FC}
+    fi
+    if [ -z ${F77} ]; then
+	export F77=`which ifort`
+    else
+	export F77=${F77}
+    fi
+    if [ -z ${F90} ]; then
+	export F90=`which ifort`
+    else
+	export F90=${F90}
+    fi
 else
   echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, PrgEnv-intel, or pgi"
   exit
@@ -659,17 +725,23 @@ if [ $COMPILE_MET -eq 1 ]; then
       export MET_NETCDF=${MET_NETCDF}
       export MET_HDF5=${MET_HDF5}
   fi
-  
-  export MET_GSL=${LIB_DIR}
+ 
+  if [ -z ${MET_GSL} ]; then
+      export MET_GSL=${LIB_DIR}
+  else
+      export MET_GSL=${MET_GSL}
+      export LD_LIBRARY_PATH=${MET_GSL}/lib:${LD_LIBRARY_PATH}
+  fi
+
   export MET_HDF=${LIB_DIR}
   export MET_HDFEOS=${LIB_DIR}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib"
+  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib:${MET_GSL}/lib"
   export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER}:${LIB_LIBPNG}:${LIB_Z}"
   export LDFLAGS="${LDFLAGS} -L${LIB_JASPER} -L${MET_HDF5}/lib"
-  #export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
+  export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
   if [ ${SET_D64BIT} == "TRUE" ]; then
@@ -684,7 +756,6 @@ if [ $COMPILE_MET -eq 1 ]; then
       export MET_FREETYPELIB=${LIB_DIR}/lib
   fi
       
-
   echo "MET Configuration settings..."
   printenv | egrep "^MET_" | sed -r 's/^/export /g'
   echo "LDFLAGS = ${LDFLAGS}"
@@ -696,19 +767,44 @@ if [ $COMPILE_MET -eq 1 ]; then
   echo "cd `pwd`"
   if [[ -z ${MET_PYTHON_CC} && -z ${MET_PYTHON_LD} ]]; then
       if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-	  echo "./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-	  ./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
+	  if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
+	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
+	  else
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1
+	  fi
       else
-	  echo "./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-	  ./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
+          if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
+	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
+	  else
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.lo\
+g 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1      
+	  fi
       fi
   else
       if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-	  echo "./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1"
-	  ./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
+	  if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
+g 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
+	  else  
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\               
+g 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
+          fi
       else
-	  echo "./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1"
-	  ./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
+          if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
+g 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
+	  else  
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\               
+g 2>&1"
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.log 2>&1
+          fi
       fi
   fi
 

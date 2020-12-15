@@ -34,7 +34,7 @@ Required arguments for rmw_analysis
 
 1. The **-data file_1 ... file_n | data_file_list** argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files.
 
-2. The **-config file** argument is the RMWAnalysisConfig to be used. The contents of the configuration file are discussed below.
+2. The **-config file** argument is the **RMWAnalysisConfig** to be used. The contents of the configuration file are discussed below.
 
 3. The **-out** file argument is the NetCDF output file to be written.
 
@@ -48,7 +48,7 @@ Optional arguments for rmw_analysis
 rmw_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the RMW-Analysis tool named 'RMWAnalysisConfig_default' can be found in the installed **share/met/config/** directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the RMW-Analysis tool named **RMWAnalysisConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 ______________________
 

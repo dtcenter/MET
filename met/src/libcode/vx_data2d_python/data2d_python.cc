@@ -360,6 +360,8 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
 }
 
+if ( status )  status = process_data_plane(&vinfo, Plane);
+
 if ( !status )  return ( false );
 
    //
@@ -418,6 +420,8 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
    status = open(cur_req_name.c_str());
 
 }
+
+if ( status )  status = process_data_plane(&vinfo, Plane);
 
 if ( !status )  return ( 0 );
 
