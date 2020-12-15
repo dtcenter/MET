@@ -49,8 +49,12 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
    ConcatString field_name = vinfo.name();
 
-   //clean up the code - exept for code 33 and 34 (UGRID and VGRID) and name WIND when we derive wind speed and direction
-   bool is_lookup_for_wind_components = (vinfo.code () == ugrd_grib_code || vinfo.code () == vgrd_grib_code) && field_name == "WIND";
+   // clean up the code - except for code 33 and 34 (UGRID and VGRID)
+   // and name WIND when we derive wind speed and direction
+   bool is_lookup_for_wind_components =
+      ( vinfo.code () == ugrd_grib_code || \
+        vinfo.code () == vgrd_grib_code ) && \
+      field_name == "WIND";
    if ( is_lookup_for_wind_components)
    {
       //set field_name to null to force lookup by code
@@ -81,13 +85,13 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    if(is_bad_data(vinfo_center))    vinfo_center    = center;
    if(is_bad_data(vinfo_subcenter)) vinfo_subcenter = subcenter;
 
-   vinfo_ens_type      = ens_type;
-   vinfo_ens_number    = ens_number;
+   vinfo_ens_type   = ens_type;
+   vinfo_ens_number = ens_number;
 
    // check the ensemble config parameters
-   bool isEnsMatch;
+   bool isEnsMatch = true;
    ConcatString vinfo_ens = vinfo.ens();
-   if( vinfo_ens.nonempty() ) {
+   if ( ens_application == 1 && vinfo_ens.nonempty() )  {
       if( vinfo_ens == conf_key_grib_ens_hi_res_ctl ) {
          vinfo_ens_type = 1;
          vinfo_ens_number = 1;
@@ -113,8 +117,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          // if the string is numeric
          if( check_reg_exp("^[0-9]*$", ens_number_str) ) {
             vinfo_ens_number= atoi(ens_number_str);
-            delete[] ens_number_str;
          }
+         delete[] ens_number_str;
 
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) ||
@@ -131,10 +135,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       // check that both match
       isEnsMatch = ( vinfo_ens_type   == ens_type &&
                      vinfo_ens_number == ens_number );
-   }
-   else {
-      isEnsMatch = true;
-   }
+
+   } // end if ensemble
 
    // Check for matching parameters
    if ( vinfo_ptv       != ptv       ||
