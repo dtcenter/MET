@@ -1282,7 +1282,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    // Initialize data_buf
    for (int indexX=0; indexX<buf_size; indexX++)
       for (int indexY=0; indexY<str_len; indexY++)
-        data_buf[indexX][indexY] = NULL;
+        data_buf[indexX][indexY] = 0;
 
    int buf_index = 0;
    int processed_count = 0;
@@ -1295,7 +1295,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
       len2 = strnlen(data_buf[buf_index], str_len);
       if (len2 < len) len2 = len;
       strncpy(data_buf[buf_index], string_data.c_str(), len);
-      if (len < str_len) data_buf[buf_index][len] = NULL;
+      if (len < str_len) data_buf[buf_index][len] = 0;
       for (int idx=len; idx<len2; idx++)
          data_buf[buf_index][idx] = bad_data_char;
 
