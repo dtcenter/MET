@@ -995,9 +995,9 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  get the data
   int    *i;
   short  *s;
-  double *d;
+  float  *f;
   const int plane_size = nx * ny;
-  float  *f = new float[plane_size];
+  double *d = new double[plane_size];
 
   size_t dim_size;
   long offsets[dim_count];
@@ -1039,26 +1039,26 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     case NcType::nc_SHORT:
       s = new short[plane_size];
       get_nc_data(v, s, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) f[x] = (float)s[x];
+      for (int x=0; x<plane_size; ++x) d[x] = (double)s[x];
       delete [] s;
       break;
 
     case NcType::nc_INT:
       i = new int[plane_size];
       get_nc_data(v, i, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) f[x] = (float)i[x];
+      for (int x=0; x<plane_size; ++x) d[x] = (double)i[x];
       delete [] i;
       break;
 
     case NcType::nc_FLOAT:
+      f = new float[plane_size];
       get_nc_data(v, f, lengths, offsets);
+      for (int x=0; x<plane_size; ++x) d[x] = (double)f[x];
+      delete [] f;
       break;
 
     case NcType::nc_DOUBLE:
-      d = new double[plane_size];
       get_nc_data(v, d, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) f[x] = (float)d[x];
-      delete [] d;
       break;
   
     default:
@@ -1077,7 +1077,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       if (swap_to_north) y_offset = ny - 1 - y;
 
       for (int x = 0; x< nx; ++x) {
-        float value = f[offset++];
+        double value = d[offset++];
     
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
@@ -1095,7 +1095,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         y_offset = y;
         if (swap_to_north) y_offset = ny - 1 - y;
 
-        float value = f[offset++];
+        double value = d[offset++];
 
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
@@ -1108,7 +1108,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }   //  for x
   }
 
-  delete [] f;
+  delete [] d;
 
   //  done
   mlog << Debug(6) << method_name << "took "
