@@ -607,7 +607,7 @@ bool GenesisInfoArray::add(const GenesisInfo &gi) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::has(const GenesisInfo &g) {
+bool GenesisInfoArray::has(const GenesisInfo &g) const {
 
    for(int i=0; i<Genesis.size(); i++) {
       if(g == Genesis[i]) return(true);
@@ -618,7 +618,7 @@ bool GenesisInfoArray::has(const GenesisInfo &g) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::has_storm(const GenesisInfo &g) {
+bool GenesisInfoArray::has_storm(const GenesisInfo &g) const {
 
    for(int i=0; i<Genesis.size(); i++) {
       if(g.is_storm(Genesis[i])) return(true);
@@ -629,19 +629,14 @@ bool GenesisInfoArray::has_storm(const GenesisInfo &g) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfoArray::set_dland(int n, double d) {
+bool GenesisInfoArray::has_storm_id(const ConcatString &s, int &i) const {
 
-   // Check range
-   if((n < 0) || (n >= Genesis.size())) {
-      mlog << Error
-           << "\nGenesisInfoArray::set_dland() -> "
-           << "range check error for index value " << n << "\n\n";
-      exit(1);
+   for(i=0; i<Genesis.size(); i++) {
+      if(Genesis[i].storm_id() == s) return(true);
    }
 
-   Genesis[n].set_dland(d);
-
-   return;
+   i = bad_data_int;
+   return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////

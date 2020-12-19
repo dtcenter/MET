@@ -209,9 +209,9 @@ class GenesisInfoArray {
          //
 
       bool add(const GenesisInfo &);
-      bool has(const GenesisInfo &);
-      bool has_storm(const GenesisInfo &);
-      void set_dland(int, double);
+      bool has(const GenesisInfo &) const;
+      bool has_storm(const GenesisInfo &) const;
+      bool has_storm_id(const ConcatString &, int &) const;
 
          //
          //  get stuff
