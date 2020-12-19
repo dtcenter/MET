@@ -26,45 +26,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for struct GenesisInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-void GenesisEventInfo::clear() {
-   Technique.clear();
-   Category.clear();
-   VMaxThresh.clear();
-   MSLPThresh.clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool GenesisEventInfo::is_keeper(const TrackPoint &p) {
-   bool keep = true;
-
-   // Check event category
-   if(Category.size() > 0 &&
-      std::count(Category.begin(), Category.end(), p.level()) == 0) {
-      keep = false;
-   }
-
-   // Check VMax threshold
-   if(VMaxThresh.get_type() != thresh_na &&
-      !VMaxThresh.check(p.v_max())) {
-      keep = false;
-   }
-
-   // Check MSLP threshold
-   if(MSLPThresh.get_type() != thresh_na &&
-      !MSLPThresh.check(p.mslp())) {
-      keep = false;
-   }
-
-   return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
 // Code for struct GenCTCInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +38,8 @@ GenCTCInfo::GenCTCInfo() {
 
 void GenCTCInfo::clear() {
    model.clear();
-   cts_info.clear();
+   cts_tech1.clear();
+   cts_tech2.clear();
    fbeg = fend = obeg = oend = (unixtime) 0;
 }
 
@@ -86,7 +48,8 @@ void GenCTCInfo::clear() {
 GenCTCInfo & GenCTCInfo::operator+=(const GenCTCInfo &g) {
 
    // Increment counts
-   cts_info.cts += g.cts_info.cts;
+   cts_tech1.cts += g.cts_tech1.cts;
+   cts_tech2.cts += g.cts_tech2.cts;
 
    // Keep track of the minimum and maximum times
    if(fbeg == 0 || g.fbeg < fbeg) fbeg = g.fbeg;
@@ -165,6 +128,7 @@ void TCGenVxOpt::clear() {
    DLandThresh.clear();
    GenesisSecBeg = GenesisSecEnd = bad_data_int;
    GenesisRadius = bad_data_double;
+   GenesisInitDSec = bad_data_int;
 
    return;
 }
@@ -229,6 +193,11 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
    // Conf: genesis_radius
    GenesisRadius = dict.lookup_double(conf_key_genesis_radius);
+
+   // Conf: genesis_init_diff
+   GenesisInitDSec = nint(
+      dict.lookup_double(conf_key_genesis_init_diff)
+      *sec_per_hour);
 
    return;
 }
@@ -348,7 +317,7 @@ void TCGenConfInfo::clear() {
    MinDur = bad_data_int;
    FcstEventInfo.clear();
    BestEventInfo.clear();
-   OperEventInfo.clear();
+   OperTechnique.clear();
    DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
@@ -414,9 +383,8 @@ void TCGenConfInfo::process_config() {
    dict = Conf.lookup_dictionary(conf_key_best_genesis);
    BestEventInfo = parse_conf_genesis_event_info(dict);
 
-   // Conf: oper_genesis
-   dict = Conf.lookup_dictionary(conf_key_oper_genesis);
-   OperEventInfo = parse_conf_genesis_event_info(dict);
+   // Conf: oper_technique
+   OperTechnique = Conf.lookup_string(conf_key_oper_technique);
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);
@@ -538,41 +506,6 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
    else                               dist = DLandData.get(x, y);
 
    return(dist);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Miscellaneous utility functions.
-//
-////////////////////////////////////////////////////////////////////////
-
-GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
-   GenesisEventInfo info;
-   StringArray sa;
-   int i;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_genesis_event_info() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   // Conf: technique (optional)
-   info.Technique = dict->lookup_string(conf_key_technique, false);
-
-   // Conf: category (optional)
-   sa = dict->lookup_string_array(conf_key_category, false);
-   for(i=0; i<sa.n(); i++) {
-      info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
-   }
-
-   // Conf: vmax_thresh
-   info.VMaxThresh = dict->lookup_thresh(conf_key_vmax_thresh);
-
-   // Conf: mslp_thresh
-   info.MSLPThresh = dict->lookup_thresh(conf_key_mslp_thresh);
-
-   return(info);
 }
 
 ////////////////////////////////////////////////////////////////////////

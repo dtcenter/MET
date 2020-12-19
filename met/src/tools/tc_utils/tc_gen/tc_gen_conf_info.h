@@ -41,27 +41,10 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
-//
-// Struct to store genesis event defintion criteria
-//
-
-struct GenesisEventInfo {
-   ConcatString         Technique;
-   vector<CycloneLevel> Category;
-   SingleThresh         VMaxThresh;
-   SingleThresh         MSLPThresh;
-
-   bool                 is_keeper(const TrackPoint &);
-   void                 clear();
-};
-
-extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
-
-////////////////////////////////////////////////////////////////////////
-
 struct GenCTCInfo {
    ConcatString model;
-   CTSInfo cts_info;
+   CTSInfo cts_tech1;
+   CTSInfo cts_tech2;
    unixtime fbeg, fend, obeg, oend;
 
    GenCTCInfo();
@@ -113,6 +96,7 @@ class TCGenVxOpt {
       // Temporal and spatial matching criteria
       int GenesisSecBeg, GenesisSecEnd;
       double GenesisRadius;
+      int GenesisInitDSec;
 
       //////////////////////////////////////////////////////////////////
 
@@ -156,7 +140,7 @@ class TCGenConfInfo {
       // Genesis event criteria
       GenesisEventInfo FcstEventInfo;
       GenesisEventInfo BestEventInfo;
-      GenesisEventInfo OperEventInfo;
+      ConcatString     OperTechnique;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;

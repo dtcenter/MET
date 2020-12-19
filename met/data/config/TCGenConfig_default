@@ -60,17 +60,9 @@ best_genesis = {
 }
 
 //
-// Operational track genesis event criteria.  Defined as tracks reaching the
-// specified intensity category, maximum wind speed threshold, and minimum
-// sea-level pressure threshold.  The operational track genesis time is valid
-// time of the first track point where all of these criteria are met.
+// Operational track technique name.
 //
-oper_genesis = {
-   technique   = "CARQ";
-   category    = [ "DB", "LO", "WV" ];
-   vmax_thresh = NA;
-   mslp_thresh = NA;
-}
+oper_technique = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -149,9 +141,15 @@ genesis_window = {
 }
 
 //
-// Genesis matching search radius in km.
+// Genesis matching search radius in km
 //
 genesis_radius = 300;
+
+//
+// Genesis versus initialization time offset in hours
+// JHG, what is a good default value?
+//
+genesis_init_diff = 24;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
