@@ -25,6 +25,24 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Struct to store genesis event defintion criteria
+//
+////////////////////////////////////////////////////////////////////////
+
+struct GenesisEventInfo {
+   ConcatString         Technique;
+   vector<CycloneLevel> Category;
+   SingleThresh         VMaxThresh;
+   SingleThresh         MSLPThresh;
+
+   bool                 is_genesis(const TrackPoint &) const;
+   void                 clear();
+};
+
+extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
+
+////////////////////////////////////////////////////////////////////////
+//
 // GenesisInfo class stores information about genesis events.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -88,7 +106,8 @@ class GenesisInfo {
 
       void set_storm_id();
       void set_dland(double);
-      bool set(const TrackInfo &, int);
+      bool set(const TrackInfo &,
+               const GenesisEventInfo *);
 
          //
          //  get stuff
@@ -114,7 +133,7 @@ class GenesisInfo {
       int                  lead_time()        const;
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
-      int                  valid_dur()        const;
+      int                  duration()         const;
       int                  n_points()         const;
       unixtime             warm_core_min()    const;
       unixtime             warm_core_max()    const;
@@ -124,9 +143,8 @@ class GenesisInfo {
          //  do stuff
          //
 
-      bool is_match(const GenesisInfo &,
-                    const double, const int, const int,
-                    double &, int &) const;
+      bool is_match(const TrackPoint &,
+                    const double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +169,7 @@ inline int                  GenesisInfo::lead_time()        const { return(LeadT
 inline int                  GenesisInfo::n_points()         const { return(NPoints);                      }
 inline unixtime             GenesisInfo::valid_min()        const { return(MinValidTime);                 }
 inline unixtime             GenesisInfo::valid_max()        const { return(MaxValidTime);                 }
-inline int                  GenesisInfo::valid_dur()        const { return((MinValidTime == 0 || MaxValidTime == 0 ?
+inline int                  GenesisInfo::duration()         const { return((MinValidTime == 0 || MaxValidTime == 0 ?
                                                                             bad_data_int : MaxValidTime - MinValidTime)); }
 inline unixtime             GenesisInfo::warm_core_min()    const { return(MinWarmCoreTime);              }
 inline unixtime             GenesisInfo::warm_core_max()    const { return(MaxWarmCoreTime);              }
@@ -190,8 +208,7 @@ class GenesisInfoArray {
          //  set stuff
          //
 
-      void add(const GenesisInfo &);
-      bool add(const TrackInfo &, int);
+      bool add(const GenesisInfo &);
       bool has(const GenesisInfo &);
       bool has_storm(const GenesisInfo &);
       void set_dland(int, double);
@@ -203,13 +220,6 @@ class GenesisInfoArray {
       const GenesisInfo & operator[](int) const;
       int n() const;
       int n_technique() const;
-
-         //
-         //  do stuff
-         //
-
-      int find_match(const GenesisInfo &,
-                     const double, const int, const int) const;
 
 };
 

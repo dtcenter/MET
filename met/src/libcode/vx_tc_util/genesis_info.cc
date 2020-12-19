@@ -20,6 +20,77 @@ using namespace std;
 #include "nav.h"
 
 #include "genesis_info.h"
+#include "vx_config.h"
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct GenesisEventInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+void GenesisEventInfo::clear() {
+   Technique.clear();
+   Category.clear();
+   VMaxThresh.clear();
+   MSLPThresh.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisEventInfo::is_genesis(const TrackPoint &p) const {
+   bool status = true;
+
+   // Check event category
+   if(Category.size() > 0 &&
+      std::count(Category.begin(), Category.end(), p.level()) == 0) {
+      status = false;
+   }
+
+   // Check VMax threshold
+   if(VMaxThresh.get_type() != thresh_na &&
+      !VMaxThresh.check(p.v_max())) {
+      status = false;
+   }
+
+   // Check MSLP threshold
+   if(MSLPThresh.get_type() != thresh_na &&
+      !MSLPThresh.check(p.mslp())) {
+      status = false;
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
+   GenesisEventInfo info;
+   StringArray sa;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_genesis_event_info() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: technique (optional)
+   info.Technique = dict->lookup_string(conf_key_technique, false);
+
+   // Conf: category (optional)
+   sa = dict->lookup_string_array(conf_key_category, false);
+   for(i=0; i<sa.n(); i++) {
+      info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
+   }
+
+   // Conf: vmax_thresh
+   info.VMaxThresh = dict->lookup_thresh(conf_key_vmax_thresh);
+
+   // Conf: mslp_thresh
+   info.MSLPThresh = dict->lookup_thresh(conf_key_mslp_thresh);
+
+   return(info);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -289,11 +360,27 @@ void GenesisInfo::set_dland(double d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::set(const TrackInfo &t, int i_point) {
+bool GenesisInfo::set(const TrackInfo &t,
+                      const GenesisEventInfo *event_info) {
    int i;
+   int i_point = bad_data_int;
 
    // Initialize
    clear();
+
+   // Check for NULL pointer
+   if(event_info == 0) return(false);
+
+   // Find genesis point
+   for(i=0; i<t.n_points(); i++) {
+      if(event_info->is_genesis(t[i])) {
+         i_point = i;
+         break;
+      }
+   }
+
+   // Return bad status if genesis was not found
+   if(is_bad_data(i_point)) return(false);
 
    // Store track type information
    IsBestTrack = t.is_best_track();
@@ -352,23 +439,12 @@ bool GenesisInfo::set(const TrackInfo &t, int i_point) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::is_match(const GenesisInfo &g,
-        const double rad, const int beg_sec, const int end_sec,
-        double &dist, int &diff) const {
-   bool keep = true;
+bool GenesisInfo::is_match(const TrackPoint &p,
+                           const double rad) const {
 
-   // Check for a match in time
-   diff = GenesisTime - g.GenesisTime;
-   if(diff < beg_sec || diff > end_sec) keep = false;
-
-   // Store the absolute value of the difference
-   diff = labs(diff);
-
-   // Check for a match in space
-   dist = gc_dist(Lat, Lon, g.Lat, g.Lon);
-   if(dist > rad) keep = false;
-
-   return(keep);
+   // Check for matching in time and space
+   return(GenesisTime == p.valid() &&
+          gc_dist(Lat, Lon, p.lat(), p.lon()) <= rad);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -506,38 +582,25 @@ const GenesisInfo & GenesisInfoArray::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfoArray::add(const GenesisInfo &g) {
-
-   Genesis.push_back(g);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool GenesisInfoArray::add(const TrackInfo &t, int i_point) {
-   GenesisInfo g;
-
-   // Attempt to create a genesis object
-   if(!g.set(t, i_point)) return(false);
+bool GenesisInfoArray::add(const GenesisInfo &gi) {
 
    // Ignore true duplicates
-   if(has(g)) {
+   if(has(gi)) {
       mlog << Warning << "\nGenesisInfoArray::add() -> "
-           << "Skipping duplicate genesis event:\n" << g.serialize()
+           << "Skipping duplicate genesis event:\n" << gi.serialize()
            << "\n\n";
       return(false);
    }
 
    // Print warning for matches
-   if(has_storm(g)) {
+   if(has_storm(gi)) {
       mlog << Warning << "\nGenesisInfoArray::add() -> "
            << "Including multiple genesis events for the same storm:\n"
-           << g.serialize() << "\n\n";
+           << gi.serialize() << "\n\n";
    }
 
    // Store the genesis object
-   add(g);
+   Genesis.push_back(gi);
 
    return(true);
 }
@@ -595,37 +658,6 @@ int GenesisInfoArray::n_technique() const {
    }
 
    return(n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int GenesisInfoArray::find_match(const GenesisInfo &g,
-       const double rad, const int beg_sec, const int end_sec) const {
-   int i, cur_diff;
-   double cur_dist;
-   int    i_match  = bad_data_int;
-   int    min_diff = bad_data_int;
-   double min_dist = bad_data_double;
-
-   // Loop over the array elements
-   for(i=0; i<Genesis.size(); i++) {
-
-       // Check for a match
-       if(Genesis[i].is_match(g, rad, beg_sec, end_sec,
-                              cur_dist, cur_diff)) {
-
-          // Set the first match or update the match for a smaller
-          // distance or the same distance but closer in time.
-          if(is_bad_data(i_match) || cur_dist < min_dist  ||
-             (is_eq(cur_dist, min_dist) && cur_diff < min_diff)) {
-              i_match  = i;
-              min_diff = cur_diff;
-              min_dist = cur_dist;
-          }
-       }
-   } // end for i
-
-   return(i_match);
 }
 
 ////////////////////////////////////////////////////////////////////////
