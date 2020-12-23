@@ -424,8 +424,8 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    else if(StormName.length() > 0 && name.length() > 0 &&
            StormName != name) {
       mlog << Debug(4)
-           << "Updating storm name from \"" << StormName << "\" to \""
-           << name << "\" for " << StormId << ".\n";
+           << "Updating " << StormId << " storm name from \""
+           << StormName << "\" to \"" << name << "\".\n";
       StormName = name;
    }
 

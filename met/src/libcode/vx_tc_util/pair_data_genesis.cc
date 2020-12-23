@@ -232,7 +232,7 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       mlog << Warning << "\nPairDataGenesis::add_gen_pair() -> "
            << "the forecast storm id (" << fgi->storm_id()
            << ") and BEST track storm id (" << bgi->storm_id()
-           << "do not match!\n\n";
+           << ") do not match!\n\n";
    }
 
    // Add the matched pair
