@@ -1,0 +1,116 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2020
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+////////////////////////////////////////////////////////////////////////
+
+#ifndef  __PAIR_DATA_GENESIS_H__
+#define  __PAIR_DATA_GENESIS_H__
+
+////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <vector>
+
+#include "vx_cal.h"
+#include "vx_math.h"
+#include "vx_util.h"
+
+#include "genesis_info.h"
+
+////////////////////////////////////////////////////////////////////////
+//
+// Class to store matched genesis pairs.
+//
+////////////////////////////////////////////////////////////////////////
+
+class PairDataGenesis {
+
+   private:
+
+      void init_from_scratch();
+      void assign(const PairDataGenesis &);
+
+      // Describe this verification task
+      ConcatString Desc;
+      ConcatString Mask;
+      ConcatString Model;
+
+      // Number of pairs
+      int NPair;
+
+      // Arrays of info for each pair
+      StringArray StormId;
+      TimeArray   InitTime;
+      IntArray    LeadTime;
+
+      vector<const GenesisInfo *> FcstGen;
+      vector<const GenesisInfo *> BestGen;
+
+      //////////////////////////////////////////////////////////////////
+   
+      bool has_gen(const vector<const GenesisInfo *>&,
+                   const GenesisInfo *, int &) const;
+      bool has_case(const ConcatString &, const unixtime,
+                    const int) const;
+
+   public:
+
+      PairDataGenesis();
+      ~PairDataGenesis();
+      PairDataGenesis(const PairDataGenesis &);
+      PairDataGenesis & operator=(const PairDataGenesis &);
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+   
+      // Set stuff
+      void set_desc (const ConcatString &);
+      void set_mask (const ConcatString &);
+      void set_model(const ConcatString &);
+
+      // Get stuff
+      ConcatString       desc()         const;
+      ConcatString       mask()         const;
+      ConcatString       model()        const;
+      int                n_pair()       const;
+      const std::string  storm_id (int) const;
+      unixtime           init     (int) const;
+      int                lead_time(int) const;
+      const GenesisInfo *fcst_gen (int) const;
+      const GenesisInfo *best_gen (int) const;
+
+      // Do stuff
+      bool has_fcst_gen(const GenesisInfo *, int &) const;
+      bool has_best_gen(const GenesisInfo *, int &) const;
+
+      void add_fcst_gen(const GenesisInfo *);
+      void add_best_gen(const GenesisInfo *,
+                        const int, const int, const int);
+      void add_gen_pair(const GenesisInfo *, const GenesisInfo *);
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline void PairDataGenesis::set_desc (const ConcatString &s) { Desc  = s; }
+inline void PairDataGenesis::set_mask (const ConcatString &s) { Mask  = s; }
+inline void PairDataGenesis::set_model(const ConcatString &s) { Model = s; }
+
+inline ConcatString      PairDataGenesis::desc()           const { return(Desc);        }
+inline ConcatString      PairDataGenesis::mask()           const { return(Mask);        }
+inline ConcatString      PairDataGenesis::model()          const { return(Model);       }
+inline int               PairDataGenesis::n_pair()         const { return(NPair);       }
+inline const std::string PairDataGenesis::storm_id (int i) const { return(StormId[i]);  }
+inline unixtime          PairDataGenesis::init(int i)      const { return(InitTime[i]); }
+inline int               PairDataGenesis::lead_time(int i) const { return(LeadTime[i]); }
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   /*  __PAIR_DATA_GENESIS_H__  */
+
+////////////////////////////////////////////////////////////////////////

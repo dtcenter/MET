@@ -37,6 +37,7 @@ using namespace std;
 #include <unistd.h>
 
 #include "tc_gen.h"
+#include "pair_data_genesis.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_statistics.h"
@@ -65,12 +66,16 @@ static void   process_best_tracks  (const StringArray &,
                                     TrackInfoArray &,
                                     TrackInfoArray &);
 
-static void   do_genesis_ctc       (int, const ConcatString &,
+static void   get_genesis_pairs    (int, const ConcatString &,
                                     const GenesisInfoArray &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     const TrackInfoArray &,
+                                    PairDataGenesis &);
+
+static void   do_genesis_ctc       (int, const PairDataGenesis &,
                                     GenCTCInfo &);
+
 static int    find_genesis_match   (const GenesisInfo &,
                                     const TrackInfoArray &,
                                     const TrackInfoArray & ,
@@ -139,9 +144,9 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for the minimum number of arguments
-   if(genesis_source.n() == 0 ||
-      track_source.n()   == 0 ||
-      config_file.length()        == 0) {
+   if(genesis_source.n()   == 0 ||
+      track_source.n()     == 0 ||
+      config_file.length() == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
            << "the \"-genesis\", \"-track\", and \"-config\" command "
@@ -188,10 +193,11 @@ void process_genesis() {
    StringArray track_files, track_files_model_suffix;
    GenesisInfoArray fcst_ga, best_ga, empty_ga;
    TrackInfoArray oper_ta, best_ta;
-   map<ConcatString,GenesisInfoArray> fcst_ga_map;
+   ConcatString model, cs;
+   map<ConcatString,GenesisInfoArray> model_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
-   ConcatString atcf_id, cs;
-   GenCTCInfo cur_info;
+   PairDataGenesis pairs;
+   GenCTCInfo ctc_info;
 
    // Get the list of genesis track files
    get_atcf_files(genesis_source, genesis_model_suffix, atcf_gen_reg_exp,
@@ -220,7 +226,7 @@ void process_genesis() {
    for(i=0; i<conf_info.n_vx(); i++) {
 
       // Initialize
-      fcst_ga_map.clear();
+      model_ga_map.clear();
 
       // Subset the forecast genesis events
       for(j=0; j<fcst_ga.n(); j++) {
@@ -229,26 +235,25 @@ void process_genesis() {
          if(!conf_info.VxOpt[i].is_keeper(fcst_ga[j])) continue;
 
          // Store the current forecast ATCF ID
-         atcf_id = fcst_ga[j].technique();
+         model = fcst_ga[j].technique();
 
          // Check specified forecast models
          if( conf_info.VxOpt[i].Model.n() > 0 &&
-            !conf_info.VxOpt[i].Model.has(atcf_id)) continue;
+            !conf_info.VxOpt[i].Model.has(model)) continue;
 
          // Add a new map entry, if necessary
-         if(fcst_ga_map.count(atcf_id) == 0) {
+         if(model_ga_map.count(model) == 0) {
             empty_ga.clear();
-            fcst_ga_map[atcf_id] = empty_ga;
+            model_ga_map[model] = empty_ga;
          }
 
          // Store the current genesis event
-         fcst_ga_map[atcf_id].add(fcst_ga[j]);
+         model_ga_map[model].add(fcst_ga[j]);
 
       } // end j
 
-      // Process the genesis events for each forecast model.
-      // Compare them to all unfiltered BEST and operational tracks.
-      for(j=0,it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++,j++) {
+      // Process the genesis events for each model.
+      for(j=0,it=model_ga_map.begin(); it!=model_ga_map.end(); it++,j++) {
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
               << ") " << ": Model " << j+1 << "] " << "For " << it->first
@@ -257,13 +262,19 @@ void process_genesis() {
               << conf_info.BestEventInfo.Technique << " and "
               << oper_ta.n() << " " << conf_info.OperTechnique
               << " tracks.\n";
-         do_genesis_ctc(i, it->first, it->second,
-                        best_ga, best_ta, oper_ta,
-                        cur_info);
 
-         // Write output for the current model
-         cur_info.model = it->first;
-         write_cts(i, cur_info);
+         // Get the pairs
+         get_genesis_pairs(i, it->first, it->second,
+                           best_ga, best_ta, oper_ta,
+                           pairs);
+
+         // Do the categorical verification
+         do_genesis_ctc(i, pairs, ctc_info);
+
+         // Write the statistical output model
+         ctc_info.model = it->first;
+         write_cts(i, ctc_info);
+         // JHG also write MPR
 
       } // end for j
 
@@ -271,6 +282,63 @@ void process_genesis() {
 
    // Finish output files
    finish_txt_files();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_genesis_pairs(int i_vx,
+                       const ConcatString     &model,
+                       const GenesisInfoArray &fga,
+                       const GenesisInfoArray &bga,
+                       const TrackInfoArray   &bta,
+                       const TrackInfoArray   &ota,
+                       PairDataGenesis        &gpd) {
+   int i, i_bta, i_bga;
+
+   // Initialize
+   gpd.clear();
+   gpd.set_desc (conf_info.VxOpt[i_vx].Desc);
+   gpd.set_mask (conf_info.VxOpt[i_vx].VxMaskName);
+   gpd.set_model(model);
+
+   // Loop over the model genesis events looking for pairs.
+   for(i=0; i<fga.n(); i++) {
+
+      // Search for a BEST track match
+      i_bta = find_genesis_match(fga[i], bta, ota,
+                                 conf_info.VxOpt[i_vx].GenesisRadius);
+
+      // Add the matched pair
+      if(!is_bad_data(i_bta)) {
+
+         // Find the genesis event for this BEST track
+         if(bga.has_storm_id(bta[i_bta].storm_id(), i_bga)) {
+            gpd.add_gen_pair(&fga[i], &bga[i_bga]);
+         }
+         else {
+            mlog << Warning << "\nget_genesis_pairs() -> "
+                 << "can't find the genesis event for the "
+                 << bta[i_bta].storm_id() << " BEST track!\n\n";
+         }
+      }
+      // Add the unmatched forecast
+      else {
+         gpd.add_fcst_gen(&fga[i]);
+      }
+   } // end for i fga
+
+   // Filter the BEST genesis events and define model opportunities
+   for(i=0; i<bga.n(); i++) {
+
+      // Check filters
+      if(!conf_info.VxOpt[i_vx].is_keeper(bga[i])) continue;
+
+      // Add pairs for the forecast opportunities
+      gpd.add_best_gen(&bga[i], conf_info.LeadSecBeg,
+                       conf_info.LeadSecEnd, conf_info.InitFreqSec);
+   }
 
    return;
 }
@@ -300,63 +368,82 @@ void process_genesis() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_genesis_ctc(int i_vx, const ConcatString &model,
-                    const GenesisInfoArray &fga,
-                    const GenesisInfoArray &bga,
-                    const TrackInfoArray   &bta,
-                    const TrackInfoArray   &ota,
-                    GenCTCInfo &info) {
-   int i, j, i_bta, i_bga, dsec;
+void do_genesis_ctc(int i_vx,
+                    const PairDataGenesis &pairs,
+                    GenCTCInfo &gci) {
+   int i, dsec;
    double dist;
-   unixtime ut, init_beg, init_end;
-   ConcatString desc;
-   vector<GenesisInfo> fga_bga_match;
+   ConcatString case_cs;
 
    // Initialize
-   info.clear();
+   gci.clear();
 
-   // Loop over the model genesis events.
-   // Determine HITS and FALSE ALARMS.
-   for(i=0; i<fga.n(); i++) {
+   // Loop over the pairs and score them
+   for(i=0; i<pairs.n_pair(); i++) {
 
-      desc << cs_erase
-           << fga[i].technique() << " "
-           << unix_to_yyyymmdd_hhmmss(fga[i].init())
-           << " initialization, "
-           << fga[i].lead_time()/sec_per_hour << " lead, "
-           << unix_to_yyyymmdd_hhmmss(fga[i].genesis_time())
-           << " genesis forecast at ("
-           << fga[i].lat() << ", " << fga[i].lon() << ")";
-      
-      // Keep track of timing info
-      info.add_fcst_valid(fga[i].valid_min(), fga[i].valid_max());
+      const GenesisInfo *fgi = pairs.fcst_gen(i);
+      const GenesisInfo *bgi = pairs.best_gen(i);
 
-      // Search for a BEST track match
-      i_bta = find_genesis_match(fga[i], bta, ota,
-                                 conf_info.VxOpt[i_vx].GenesisRadius);
-      if(!is_bad_data(i_bta) &&
-         bga.has_storm_id(bta[i_bta].storm_id(), i_bga)) {
+      case_cs << cs_erase
+              << pairs.model() << " "
+              << unix_to_yyyymmdd_hhmmss(pairs.init(i))
+              << " initialization, "
+              << pairs.lead_time(i)/sec_per_hour << " lead";
 
-         // Store the match
-         fga_bga_match.push_back(bga[i_bga]);
+      // Track the range of valid times
+      if(fgi) gci.add_fcst_valid(fgi->valid_min(), fgi->valid_max());
 
-         // Discard the case if the forecast initialization time
-         // is at or after the BEST track genesis time.
-         if(fga[i].init() >= bga[i_bga].genesis_time()) {
-            mlog << Debug(4) << "Discard " << desc
+      // Unmatched forecast genesis (FALSE ALARM)
+      if(fgi && !bgi) {
+
+         mlog << Debug(4) << case_cs << ", "
+              << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
+              << " genesis forecast at ("
+              << fgi->lat() << ", " << fgi->lon()
+              << ") is a technique 1 and 2 FALSE ALARM.\n";
+
+         // Increment the FALSE ALARM count for both techniques
+         gci.cts_tech1.cts.inc_fy_on();
+         gci.cts_tech2.cts.inc_fy_on();
+      }
+
+      // Unmatched BEST genesis (MISS)
+      else if(!fgi && bgi) {
+
+         mlog << Debug(4) << case_cs << ", "
+              << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
+              << " BEST track genesis at ("
+              << bgi->lat() << ", " << bgi->lon()
+              << ") is a technique 1 and 2 MISS.\n";
+         
+         // Increment the MISS count for both techniques
+         gci.cts_tech1.cts.inc_fn_oy();
+         gci.cts_tech2.cts.inc_fn_oy();
+
+      }
+      // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
+      else {
+
+         case_cs << ", " << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
+                 << " genesis forecast at (" << fgi->lat()
+                 << ", " << fgi->lon() << ") and BEST track genesis at ("
+                 << bgi->lat() << ", " << bgi->lon() << ")";
+
+         // Discard if the forecast init >= BEST genesis
+         if(fgi->init() >= bgi->genesis_time()) {
+            mlog << Debug(4) << "DISCARD " << case_cs
                  << " since the model initialization time is at or "
                  << "after the matching BEST track "
-                 << unix_to_yyyymmdd_hhmmss(bga[i_bga].genesis_time())
+                 << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
                  << " genesis time.\n";
-            continue;
          }
          // Check for a HIT
          else {
 
             // Compute time and space offsets
-            dsec = bga[i_bga].genesis_time() - fga[i].genesis_time();
-            dist = gc_dist(bga[i_bga].lat(), bga[i_bga].lon(),
-                           fga[i].lat(),     fga[i].lon());
+            dsec = bgi->genesis_time() - fgi->genesis_time();
+            dist = gc_dist(bgi->lat(), bgi->lon(),
+                           fgi->lat(), fgi->lon());
 
             // Technique 1:
             // HIT if forecast genesis time and location
@@ -364,26 +451,24 @@ void do_genesis_ctc(int i_vx, const ConcatString &model,
             if(dsec >= conf_info.VxOpt[i_vx].GenesisSecBeg &&
                dsec <= conf_info.VxOpt[i_vx].GenesisSecEnd &&
                dist <= conf_info.VxOpt[i_vx].GenesisRadius) {
-               mlog << Debug(4) << desc
-                    << " is a technique 1 HIT for "
-                    << bga[i_bga].technique() << " "
-                    << unix_to_yyyymmdd_hhmmss(bga[i_bga].genesis_time())
-                    << " genesis at (" << bga[i_bga].lat() << ", "
-                    << bga[i_bga].lon() << ").\n";
+
+               mlog << Debug(4) << case_cs
+                    << " is a technique 1 HIT.\n";
 
                // Increment the HIT count
-               info.cts_tech1.cts.inc_fy_oy();
+               gci.cts_tech1.cts.inc_fy_oy();
             }
             else {
-               mlog << Debug(4) << desc
-                    << " is a technique 1 FALSE ALARM for "
-                    << bga[i_bga].technique() << " "
-                    << unix_to_yyyymmdd_hhmmss(bga[i_bga].genesis_time())
-                    << " genesis at (" << bga[i_bga].lat() << ", "
-                    << bga[i_bga].lon() << ").\n";
+               mlog << Debug(4) << case_cs
+                    << " is a technique 1 FALSE ALARM with time offset "
+                    << dsec << " seconds not in ("
+                    << conf_info.VxOpt[i_vx].GenesisSecBeg << ", "
+                    << conf_info.VxOpt[i_vx].GenesisSecEnd << ") or distance "
+                    << dist << " > " << conf_info.VxOpt[i_vx].GenesisRadius
+                    << " km.\n";
 
                // Increment the FALSE ALARM count
-               info.cts_tech1.cts.inc_fy_on();
+               gci.cts_tech1.cts.inc_fy_on();
             }
             
             // Technique 2:
@@ -391,102 +476,41 @@ void do_genesis_ctc(int i_vx, const ConcatString &model,
             // the BEST genesis time.
             
             // Compute time offset
-            dsec = bga[i_bga].genesis_time() - fga[i].init();
+            dsec = bgi->genesis_time() - fgi->init();
             if(dsec <= conf_info.VxOpt[i_vx].GenesisInitDSec) {
-               mlog << Debug(4) << desc
-                    << " is a technique 2 HIT for "
-                    << bga[i_bga].technique() << " "
-                    << unix_to_yyyymmdd_hhmmss(bga[i_bga].genesis_time())
-                    << " genesis at (" << bga[i_bga].lat() << ", "
-                    << bga[i_bga].lon() << ").\n";
+
+               mlog << Debug(4) << case_cs
+                    << " is a technique 2 HIT.\n";
 
                // Increment the HIT count
-               info.cts_tech2.cts.inc_fy_oy();
+               gci.cts_tech2.cts.inc_fy_oy();
             }
             else {
-               mlog << Debug(4) << desc
-                    << " is a technique 2 FALSE ALARM for "
-                    << bga[i_bga].technique() << " "
-                    << unix_to_yyyymmdd_hhmmss(bga[i_bga].genesis_time())
-                    << " genesis at (" << bga[i_bga].lat() << ", "
-                    << bga[i_bga].lon() << ").\n";
+               mlog << Debug(4) << case_cs
+                    << " is a technique 2 FALSE ALARM with time offset "
+                    << dsec << " seconds > "
+                    << conf_info.VxOpt[i_vx].GenesisInitDSec << ".\n";
 
                // Increment the FALSE ALARM count
-               info.cts_tech2.cts.inc_fy_on();
+               gci.cts_tech2.cts.inc_fy_on();
             }
          }
       }
-      // No BEST track match is a FALSE ALARM
-      else {
-         mlog << Debug(4) << desc
-              << " is a technique 1 and 2 FALSE ALARM.\n";
+   } // end for i n_pair
 
-         // Increment the FALSE ALARM count for both techniques
-         info.cts_tech1.cts.inc_fy_on();
-         info.cts_tech2.cts.inc_fy_on();
-      }
-   } // end for i fga
-/* JHG do this too!
-   // Loop over the BEST track genesis events to find MISSES
-   for(i=0; i<bta.n(); i++) {
-
-      // Keep track of timing info
-      info.add_obs_valid(bta[i].valid_min(), bta[i].valid_max());
-
-      // Define opportunities to forecast this genesis event
-      init_beg = bta[i].genesis_time() - conf_info.LeadSecEnd;
-      init_end = bta[i].genesis_time() - conf_info.LeadSecBeg;
-
-      // Loop over the model opportunities
-      for(ut=init_beg; ut<=init_end; ut+=conf_info.InitFreqSec) {
-
-         // Search for forecast genesis events matching this BEST track
-         // genesis event for each possible combination of initialization
-         // and lead time.
-
-         for(j=0, match=false; j<fga.n(); j++) {
-             if(fga_bga_match[j] == &bta[i] && fga[j].init() == ut) {
-                mlog << Debug(4) << bga[i].technique() << " "
-                     << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
-                     << " genesis at (" << bga[i].lat() << ", "
-                     << bga[i].lon() << ") for "
-                     << unix_to_yyyymmdd_hhmmss(ut)
-                     << " initialization, "
-                     << (bta[i].genesis_time() - ut)/sec_per_hour
-                     << " lead matches " << fga[j].technique() << " "
-                     << unix_to_yyyymmdd_hhmmss(fga[j].genesis_time())
-                     << " genesis at (" << fga[j].lat() << ", "
-                     << fga[j].lon() << ").\n";
-                 match = true;
-                 break;
-             }
-         }
-
-         // Increment the MISS count
-         if(!match) {
-            mlog << Debug(4) << bta[i].technique() << " "
-                 << unix_to_yyyymmdd_hhmmss(bta[i].genesis_time())
-                 << " genesis at (" << bta[i].lat() << ", "
-                 << bta[i].lon() << ") for "
-                 << unix_to_yyyymmdd_hhmmss(ut) << " initialization, "
-                 << (bta[i].genesis_time() - ut)/sec_per_hour
-                 << " lead is a MISS.\n";
-            info.cts_tech1.cts.inc_fn_oy();
-         }
-      } // end for ut
-   } // end for i bga
-*/
-   mlog << Debug(3) << "For " << model
+   mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+        << pairs.desc() << ") " << pairs.model()
         << " model, technique 1 contingency table hits = "
-        << info.cts_tech1.cts.fy_oy() << ", false alarms = "
-        << info.cts_tech1.cts.fy_on() << ", and misses = "
-        << info.cts_tech1.cts.fn_oy() << ".\n";
+        << gci.cts_tech1.cts.fy_oy() << ", false alarms = "
+        << gci.cts_tech1.cts.fy_on() << ", and misses = "
+        << gci.cts_tech1.cts.fn_oy() << ".\n";
 
-   mlog << Debug(3) << "For " << model
+   mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+        << pairs.desc() << ") " << pairs.model()
         << " model, technique 2 contingency table hits = "
-        << info.cts_tech2.cts.fy_oy() << ", false alarms = "
-        << info.cts_tech2.cts.fy_on() << ", and misses = "
-        << info.cts_tech2.cts.fn_oy() << ".\n";
+        << gci.cts_tech2.cts.fy_oy() << ", false alarms = "
+        << gci.cts_tech2.cts.fy_on() << ", and misses = "
+        << gci.cts_tech2.cts.fn_oy() << ".\n";
 
    return;
 }
