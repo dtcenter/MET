@@ -55,8 +55,7 @@ class PairDataGenesis {
    
       bool has_gen(const vector<const GenesisInfo *>&,
                    const GenesisInfo *, int &) const;
-      bool has_case(const ConcatString &, const unixtime,
-                    const int) const;
+      bool has_case(const ConcatString &, const unixtime) const;
 
    public:
 

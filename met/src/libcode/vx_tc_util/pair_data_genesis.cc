@@ -158,14 +158,12 @@ bool PairDataGenesis::has_best_gen(const GenesisInfo *bgi, int &i) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataGenesis::has_case(const ConcatString &best_id,
-                               const unixtime init_ut,
-                               const int lead_sec) const {
+                               const unixtime init_ut) const {
    bool match = false;
 
    for(int i=0; i<NPair; i++) {
       if(BestStormId[i] == best_id.c_str() &&
-         InitTime[i]    == init_ut &&
-         LeadTime[i]    == lead_sec) match = true;
+         InitTime[i]    == init_ut) match = true;
    }
 
    return(match);
@@ -205,8 +203,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
    for(unixtime ut=init_beg; ut<=init_end; ut+=inc) {
 
       // Check if this case already exists
-      if(!has_case(bgi->storm_id(), ut,
-                   bgi->genesis_time() - ut)) {
+      if(!has_case(bgi->storm_id(), ut)) {
 
          // Add a new unmatched pair
          NPair++;
