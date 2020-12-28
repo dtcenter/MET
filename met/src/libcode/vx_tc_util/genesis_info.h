@@ -210,7 +210,7 @@ class GenesisInfoArray {
 
       bool add(const GenesisInfo &);
       bool has(const GenesisInfo &) const;
-      bool has_storm(const GenesisInfo &) const;
+      bool has_storm(const GenesisInfo &, int &) const;
       bool has_storm_id(const ConcatString &, int &) const;
 
          //

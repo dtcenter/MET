@@ -583,8 +583,9 @@ const GenesisInfo & GenesisInfoArray::operator[](int n) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool GenesisInfoArray::add(const GenesisInfo &gi) {
+   int i;
 
-   // Ignore true duplicates
+   // Skip true duplicates
    if(has(gi)) {
       mlog << Warning << "\nGenesisInfoArray::add() -> "
            << "Skipping duplicate genesis event:\n" << gi.serialize()
@@ -593,10 +594,12 @@ bool GenesisInfoArray::add(const GenesisInfo &gi) {
    }
 
    // Print warning for matches
-   if(has_storm(gi)) {
-      mlog << Warning << "\nGenesisInfoArray::add() -> "
-           << "Including multiple genesis events for the same storm:\n"
-           << gi.serialize() << "\n\n";
+   if(has_storm(gi, i)) {
+      mlog << Debug(3) << "GenesisInfoArray::add() -> "
+           << "Skipping multiple genesis events for the same storm:\n"
+           << "Existing: " << Genesis[i].serialize() << "\n"
+           << "Skipping: " << gi.serialize() << "\n";
+      return(false);
    }
 
    // Store the genesis object
@@ -618,12 +621,13 @@ bool GenesisInfoArray::has(const GenesisInfo &g) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::has_storm(const GenesisInfo &g) const {
+bool GenesisInfoArray::has_storm(const GenesisInfo &g, int &i) const {
 
-   for(int i=0; i<Genesis.size(); i++) {
+   for(i=0; i<Genesis.size(); i++) {
       if(g.is_storm(Genesis[i])) return(true);
    }
 
+   i = bad_data_int;
    return(false);
 }
 
