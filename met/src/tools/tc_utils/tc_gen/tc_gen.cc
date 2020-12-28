@@ -303,6 +303,17 @@ void get_genesis_pairs(int i_vx,
    gpd.set_mask (conf_info.VxOpt[i_vx].VxMaskName);
    gpd.set_model(model);
 
+   // Filter the BEST genesis events and define model opportunities
+   for(i=0; i<bga.n(); i++) {
+
+      // Check filters
+      if(!conf_info.VxOpt[i_vx].is_keeper(bga[i])) continue;
+
+      // Add pairs for the forecast opportunities
+      gpd.add_best_gen(&bga[i], conf_info.LeadSecBeg,
+                       conf_info.LeadSecEnd, conf_info.InitFreqSec);
+   }
+
    // Loop over the model genesis events looking for pairs.
    for(i=0; i<fga.n(); i++) {
 
@@ -310,7 +321,7 @@ void get_genesis_pairs(int i_vx,
       i_bta = find_genesis_match(fga[i], bta, ota,
                                  conf_info.VxOpt[i_vx].GenesisRadius);
 
-      // Add the matched pair
+      // Update the matched pairs
       if(!is_bad_data(i_bta)) {
 
          // Find the genesis event for this BEST track
@@ -328,17 +339,6 @@ void get_genesis_pairs(int i_vx,
          gpd.add_fcst_gen(&fga[i]);
       }
    } // end for i fga
-
-   // Filter the BEST genesis events and define model opportunities
-   for(i=0; i<bga.n(); i++) {
-
-      // Check filters
-      if(!conf_info.VxOpt[i_vx].is_keeper(bga[i])) continue;
-
-      // Add pairs for the forecast opportunities
-      gpd.add_best_gen(&bga[i], conf_info.LeadSecBeg,
-                       conf_info.LeadSecEnd, conf_info.InitFreqSec);
-   }
 
    return;
 }
@@ -398,7 +398,7 @@ void do_genesis_ctc(int i_vx,
 
          mlog << Debug(4) << case_cs << ", "
               << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
-              << " genesis forecast at ("
+              << " forecast genesis at ("
               << fgi->lat() << ", " << fgi->lon()
               << ") is a technique 1 and 2 FALSE ALARM.\n";
 
@@ -424,11 +424,13 @@ void do_genesis_ctc(int i_vx,
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
       else {
 
-         case_cs << ", " << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
-                 << " genesis forecast at (" << fgi->lat() << ", "
-                 << fgi->lon() << ") and BEST track " << bgi->storm_id()
-                 << " genesis at (" << bgi->lat() << ", " << bgi->lon() << ")";
-
+         case_cs << ", " << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
+                 << " BEST track " << bgi->storm_id() << " genesis at ("
+                 << bgi->lat() << ", " << bgi->lon() << ") and "
+                 << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
+                 << " forecast genesis at (" << fgi->lat() << ", "
+                 << fgi->lon() << ")";
+         
          // Discard if the forecast init >= BEST genesis
          if(fgi->init() >= bgi->genesis_time()) {
             mlog << Debug(4) << "DISCARD " << case_cs
@@ -525,6 +527,15 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
    int i_best = bad_data_int;
    int i_oper = bad_data_int;
 
+   ConcatString case_cs;
+   case_cs << fcst_gi.technique() << " "
+           << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
+           << " initialization, "
+           << fcst_gi.lead_time()/sec_per_hour << " lead, "
+           << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
+           << " forecast genesis at (" << fcst_gi.lat() << ", "
+           << fcst_gi.lon() << ")";
+
    // Search the BEST track points for a match
    for(i=0, i_best=bad_data_int;
        i<bta.n() && is_bad_data(i_best);
@@ -532,13 +543,9 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
       for(j=0; j<bta[i].n_points(); j++) {
          if(fcst_gi.is_match(bta[i][j], rad)) {
             i_best = i;
-            mlog << Debug(4) << fcst_gi.technique() << " "
-                 << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
-                 << " initialization, "
-                 << fcst_gi.lead_time()/sec_per_hour << " lead, "
-                 << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
-                 << " genesis at (" << fcst_gi.lat() << ", " << fcst_gi.lon()
-                 << ") matches BEST track " << bta[i].storm_id() << ".\n";
+            mlog << Debug(4) << case_cs
+                 << " MATCHES BEST track "
+                 << bta[i].storm_id() << ".\n";
             break;
          }
       }
@@ -553,13 +560,8 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
          for(j=0; j<ota[i].n_points(); j++) {
             if(fcst_gi.is_match(ota[i][j], rad)) {
                i_oper = i;
-               mlog << Debug(4) << fcst_gi.technique() << " "
-                    << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
-                    << " initialization, "
-                    << fcst_gi.lead_time()/sec_per_hour << " lead, "
-                    << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
-                    << " genesis at (" << fcst_gi.lat() << ", " << fcst_gi.lon()
-                    << ") matches operational " << ota[i].technique()
+               mlog << Debug(4) << case_cs
+                    << " MATCHES operational " << ota[i].technique()
                     << " track " << ota[i].storm_id() << ".\n";
                break;
             }
@@ -579,13 +581,8 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
 
    // Check for no match
    if(is_bad_data(i_best)) {
-      mlog << Debug(4) << fcst_gi.technique() << " "
-           << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
-           << " initialization, "
-           << fcst_gi.lead_time()/sec_per_hour << " lead, "
-           << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
-           << " genesis at (" << fcst_gi.lat() << ", " << fcst_gi.lon()
-           << ") has no match in the BEST or operational tracks.\n";
+      mlog << Debug(4) << case_cs
+           << " has NO MATCH in the BEST or operational tracks.\n";
    }
 
    return(i_best);

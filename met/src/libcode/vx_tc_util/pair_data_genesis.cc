@@ -130,17 +130,15 @@ bool PairDataGenesis::has_gen(const vector<const GenesisInfo *>& gi_list,
 
    if(!gi) return(false);
 
-   bool match = false;
-
    // Search for a match
    for(i=0; i<NPair; i++) {
-      if(*(gi_list[i]) == *gi) match = true;
+      if(*(gi_list[i]) == *gi) return(true);
    }
 
-   // Check for no match
-   if(!match) i = bad_data_int;
+   // No match
+   i = bad_data_int;
 
-   return(match);
+   return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -158,15 +156,17 @@ bool PairDataGenesis::has_best_gen(const GenesisInfo *bgi, int &i) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataGenesis::has_case(const ConcatString &best_id,
-                               const unixtime init_ut) const {
-   bool match = false;
+                               const unixtime init_ut, int &i) const {
 
-   for(int i=0; i<NPair; i++) {
+   for(i=0; i<NPair; i++) {
       if(BestStormId[i] == best_id.c_str() &&
-         InitTime[i]    == init_ut) match = true;
+         InitTime[i]    == init_ut) return(true);
    }
 
-   return(match);
+   // No match
+   i = bad_data_int;
+
+   return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -195,21 +195,23 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
 
    if(!bgi) return;
 
+   int i_case;
+
    // Define opportunities to forecast this event
    unixtime init_beg = bgi->genesis_time() - end;
    unixtime init_end = bgi->genesis_time() - beg;
 
    // Add unmatched pair for each forecast opportunity
-   for(unixtime ut=init_beg; ut<=init_end; ut+=inc) {
+   for(unixtime init_ut=init_beg; init_ut<=init_end; init_ut+=inc) {
 
       // Check if this case already exists
-      if(!has_case(bgi->storm_id(), ut)) {
+      if(!has_case(bgi->storm_id(), init_ut, i_case)) {
 
          // Add a new unmatched pair
          NPair++;
          BestStormId.add(bgi->storm_id());
-         InitTime.add(ut);
-         LeadTime.add(bgi->genesis_time() - ut);
+         InitTime.add(init_ut);
+         LeadTime.add(bgi->genesis_time() - init_ut);
          FcstGen.push_back((GenesisInfo *) 0);
          BestGen.push_back(bgi);
       }
@@ -225,13 +227,21 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
 
    if(!fgi || !bgi) return;
 
-   // Add the matched pair
-   NPair++;
-   BestStormId.add(bgi->storm_id());
-   InitTime.add(fgi->init());
-   LeadTime.add(fgi->lead_time());
-   FcstGen.push_back(fgi);
-   BestGen.push_back(bgi);
+   int i_case;
+
+   // Update an existing case
+   if(has_case(bgi->storm_id(), fgi->init(), i_case)) {
+      FcstGen[i_case] = fgi;
+   }
+   // Add a new case
+   else {
+      NPair++;
+      BestStormId.add(bgi->storm_id());
+      InitTime.add(fgi->init());
+      LeadTime.add(fgi->lead_time());
+      FcstGen.push_back(fgi);
+      BestGen.push_back(bgi);
+   }
    
    return;
 }
