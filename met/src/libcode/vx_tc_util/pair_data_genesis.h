@@ -44,7 +44,7 @@ class PairDataGenesis {
       int NPair;
 
       // Arrays of info for each pair
-      StringArray StormId;
+      StringArray BestStormId;
       TimeArray   InitTime;
       IntArray    LeadTime;
 
@@ -75,15 +75,15 @@ class PairDataGenesis {
       void set_model(const ConcatString &);
 
       // Get stuff
-      ConcatString       desc()         const;
-      ConcatString       mask()         const;
-      ConcatString       model()        const;
-      int                n_pair()       const;
-      const std::string  storm_id (int) const;
-      unixtime           init     (int) const;
-      int                lead_time(int) const;
-      const GenesisInfo *fcst_gen (int) const;
-      const GenesisInfo *best_gen (int) const;
+      ConcatString       desc()              const;
+      ConcatString       mask()              const;
+      ConcatString       model()             const;
+      int                n_pair()            const;
+      const std::string  best_storm_id (int) const;
+      unixtime           init          (int) const;
+      int                lead_time     (int) const;
+      const GenesisInfo *fcst_gen      (int) const;
+      const GenesisInfo *best_gen      (int) const;
 
       // Do stuff
       bool has_fcst_gen(const GenesisInfo *, int &) const;
@@ -101,13 +101,13 @@ inline void PairDataGenesis::set_desc (const ConcatString &s) { Desc  = s; }
 inline void PairDataGenesis::set_mask (const ConcatString &s) { Mask  = s; }
 inline void PairDataGenesis::set_model(const ConcatString &s) { Model = s; }
 
-inline ConcatString      PairDataGenesis::desc()           const { return(Desc);        }
-inline ConcatString      PairDataGenesis::mask()           const { return(Mask);        }
-inline ConcatString      PairDataGenesis::model()          const { return(Model);       }
-inline int               PairDataGenesis::n_pair()         const { return(NPair);       }
-inline const std::string PairDataGenesis::storm_id (int i) const { return(StormId[i]);  }
-inline unixtime          PairDataGenesis::init(int i)      const { return(InitTime[i]); }
-inline int               PairDataGenesis::lead_time(int i) const { return(LeadTime[i]); }
+inline ConcatString      PairDataGenesis::desc()               const { return(Desc);           }
+inline ConcatString      PairDataGenesis::mask()               const { return(Mask);           }
+inline ConcatString      PairDataGenesis::model()              const { return(Model);          }
+inline int               PairDataGenesis::n_pair()             const { return(NPair);          }
+inline const std::string PairDataGenesis::best_storm_id(int i) const { return(BestStormId[i]); }
+inline unixtime          PairDataGenesis::init(int i)          const { return(InitTime[i]);    }
+inline int               PairDataGenesis::lead_time(int i)     const { return(LeadTime[i]);    }
 
 ////////////////////////////////////////////////////////////////////////
 

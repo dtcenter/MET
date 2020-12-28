@@ -69,7 +69,7 @@ void PairDataGenesis::clear() {
 
    NPair = 0;
 
-   StormId.clear();
+   BestStormId.clear();
    InitTime.clear();
    LeadTime.clear();
 
@@ -85,15 +85,15 @@ void PairDataGenesis::assign(const PairDataGenesis &g) {
 
    clear();
 
-   Desc     = g.Desc;
-   Mask     = g.Mask;
-   Model    = g.Model;
+   Desc        = g.Desc;
+   Mask        = g.Mask;
+   Model       = g.Model;
 
-   NPair    = g.NPair;
+   NPair       = g.NPair;
 
-   StormId  = g.StormId;
-   InitTime = g.InitTime;
-   LeadTime = g.LeadTime;
+   BestStormId = g.BestStormId;
+   InitTime    = g.InitTime;
+   LeadTime    = g.LeadTime;
 
    return;
 }
@@ -157,15 +157,15 @@ bool PairDataGenesis::has_best_gen(const GenesisInfo *bgi, int &i) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataGenesis::has_case(const ConcatString &storm_id,
+bool PairDataGenesis::has_case(const ConcatString &best_id,
                                const unixtime init_ut,
                                const int lead_sec) const {
    bool match = false;
 
    for(int i=0; i<NPair; i++) {
-      if(StormId[i]  == storm_id.c_str() &&
-         InitTime[i] == init_ut &&
-         LeadTime[i] == lead_sec) match = true;
+      if(BestStormId[i] == best_id.c_str() &&
+         InitTime[i]    == init_ut &&
+         LeadTime[i]    == lead_sec) match = true;
    }
 
    return(match);
@@ -179,7 +179,7 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
 
    // Add the unmatched forecast
    NPair++;
-   StormId.add(fgi->storm_id());
+   BestStormId.add("");
    InitTime.add(fgi->init());
    LeadTime.add(fgi->lead_time());
    FcstGen.push_back(fgi);
@@ -210,7 +210,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
 
          // Add a new unmatched pair
          NPair++;
-         StormId.add(bgi->storm_id());
+         BestStormId.add(bgi->storm_id());
          InitTime.add(ut);
          LeadTime.add(bgi->genesis_time() - ut);
          FcstGen.push_back((GenesisInfo *) 0);
@@ -228,16 +228,9 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
 
    if(!fgi || !bgi) return;
 
-   if(fgi->storm_id() != bgi->storm_id()) {
-      mlog << Warning << "\nPairDataGenesis::add_gen_pair() -> "
-           << "the forecast storm id (" << fgi->storm_id()
-           << ") and BEST track storm id (" << bgi->storm_id()
-           << ") do not match!\n\n";
-   }
-
    // Add the matched pair
    NPair++;
-   StormId.add(fgi->storm_id());
+   BestStormId.add(bgi->storm_id());
    InitTime.add(fgi->init());
    LeadTime.add(fgi->lead_time());
    FcstGen.push_back(fgi);
