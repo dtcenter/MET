@@ -412,10 +412,10 @@ void do_genesis_ctc(int i_vx,
 
          mlog << Debug(4) << case_cs << ", "
               << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
-              << " BEST track genesis at ("
+              << " BEST track " << bgi->storm_id() << " genesis at ("
               << bgi->lat() << ", " << bgi->lon()
               << ") is a technique 1 and 2 MISS.\n";
-         
+
          // Increment the MISS count for both techniques
          gci.cts_tech1.cts.inc_fn_oy();
          gci.cts_tech2.cts.inc_fn_oy();
@@ -425,9 +425,9 @@ void do_genesis_ctc(int i_vx,
       else {
 
          case_cs << ", " << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
-                 << " genesis forecast at (" << fgi->lat()
-                 << ", " << fgi->lon() << ") and BEST track genesis at ("
-                 << bgi->lat() << ", " << bgi->lon() << ")";
+                 << " genesis forecast at (" << fgi->lat() << ", "
+                 << fgi->lon() << ") and BEST track " << bgi->storm_id()
+                 << " genesis at (" << bgi->lat() << ", " << bgi->lon() << ")";
 
          // Discard if the forecast init >= BEST genesis
          if(fgi->init() >= bgi->genesis_time()) {
@@ -538,8 +538,7 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
                  << fcst_gi.lead_time()/sec_per_hour << " lead, "
                  << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
                  << " genesis at (" << fcst_gi.lat() << ", " << fcst_gi.lon()
-                 << ") matches BEST track storm id "
-                 << bta[i].storm_id() << ".\n";
+                 << ") matches BEST track " << bta[i].storm_id() << ".\n";
             break;
          }
       }
@@ -561,7 +560,7 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
                     << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
                     << " genesis at (" << fcst_gi.lat() << ", " << fcst_gi.lon()
                     << ") matches operational " << ota[i].technique()
-                    << " track storm id " << ota[i].storm_id() << ".\n";
+                    << " track " << ota[i].storm_id() << ".\n";
                break;
             }
          }
