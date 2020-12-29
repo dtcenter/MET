@@ -432,17 +432,6 @@ if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 
 }
 
-/*
-if ( use_xarray )  {
-
-   mlog << Error << "\npickle_dataplane() -> "
-        << "pickling logic is not yet supported for Xarray\n\n";
-
-   exit ( 1 );
-
-} else {
-*/
-
 key_obj = PyUnicode_FromString (numpy_dict_name);
 
 PyObject * attrs_dict_obj = PyDict_GetItem (data_obj, key_obj);
@@ -456,8 +445,6 @@ Python3_Numpy np;
 np.set(numpy_array_obj);
 
 dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
-
-// }
 
    //
    //  cleanup
