@@ -287,6 +287,21 @@ void process_genesis() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Match the forecast and BEST track genesis events:
+// (1) Subset the BEST genesis events based on the current filters.
+// (2) For each BEST genesis event, add an unmatched PairDataGenesis
+//     entry for each model opportunity to forecast that genesis event.
+// (3) Loop over the forecast genesis events. For each, search for a
+//     BEST track point valid at that time and within the search radius.
+// (4) If found, store the matching BEST track storm id.
+// (5) If not found, search the CARQ points for a matching storm id.
+// (6) If a storm id was found, update the existing PairDataGenesis
+//     entry for that storm id with the forecast genesis event.
+// (7) If no match was found, add an unmatched PairDataGenesis
+//     entry for that forecast genesis event.
+//
+////////////////////////////////////////////////////////////////////////
 
 void get_genesis_pairs(int i_vx,
                        const ConcatString     &model,
@@ -344,27 +359,23 @@ void get_genesis_pairs(int i_vx,
 }
 
 ////////////////////////////////////////////////////////////////////////
-// JHG, really need to overhaul the comments here!
-// For each genesis forecast, find the matching BEST tracks genesis
-// event that is the closest in space and time, where:
-// (1) The difference between the BEST and forecast track genesis falls
-//     within the configurable genesis_window.
-// (2) The distance between the BEST and forecast genesis locations is
-//     less than the configurable genesis_radius.
-// (3) For multiple BEST track matches, choose the one closest in space.
 //
-// If there are no BEST track matches, apply to same logic with the
-// operational baseline genesis events.
-//
-// Any genesis forecast with a BEST or operational match is a HIT.
-//
-// Any genesis forecast with no BEST or operational match is a FALSE
-// ALARM.
-//
-// For each BEST track genesis event, define the timing information for
-// the model's opportunities to forecast that genesis event using the
-// configurable init_freq and lead_window options.  Any case for which
-// no match exists is a MISS.
+// Score the PairDataGenesis events:
+// (1) Loop over the PairDataGenesis entries.
+// (2) If the forecast is set but not the BEST track, increment the
+//     FALSE ALARM counts.
+// (2) If the BEST track is set but not the forecast, increment the
+//     MISS counts.
+// (3) If both are set, but the model initialization time is at or
+//     after the BEST track genesis time, discard that case.
+// (4) If both are set and the genesis time and location offsets
+//     fall within the configurable windows, increment the
+//     technique 1 HIT counts. Otherwise, increment the technique 1
+//     FALSE ALARM counts.
+// (5) If both are set and the forecast genesis time is within the
+//     configurable window of the BEST track genesis time, increment
+//     the technique 2 HIT counts. Otherwise, increment the technique 2
+//     FALSE ALARM counts.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -447,6 +458,10 @@ void do_genesis_ctc(int i_vx,
             dist = gc_dist(bgi->lat(), bgi->lon(),
                            fgi->lat(), fgi->lon());
 
+            ConcatString offset_cs;
+            offset_cs << "with a genesis time offset of " << dsec/sec_per_hour
+                      << " hours and location offset of " << dist << " km.\n";
+
             // Technique 1:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
@@ -455,19 +470,14 @@ void do_genesis_ctc(int i_vx,
                dist <= conf_info.VxOpt[i_vx].GenesisRadius) {
 
                mlog << Debug(4) << case_cs
-                    << " is a technique 1 HIT.\n";
+                    << " is a technique 1 HIT " << offset_cs;
 
                // Increment the HIT count
                gci.cts_tech1.cts.inc_fy_oy();
             }
             else {
                mlog << Debug(4) << case_cs
-                    << " is a technique 1 FALSE ALARM with time offset "
-                    << dsec << " seconds not in ("
-                    << conf_info.VxOpt[i_vx].GenesisSecBeg << ", "
-                    << conf_info.VxOpt[i_vx].GenesisSecEnd << ") or distance "
-                    << dist << " > " << conf_info.VxOpt[i_vx].GenesisRadius
-                    << " km.\n";
+                    << " is a technique 1 FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
                gci.cts_tech1.cts.inc_fy_on();
@@ -479,19 +489,22 @@ void do_genesis_ctc(int i_vx,
             
             // Compute time offset
             dsec = bgi->genesis_time() - fgi->init();
+
+            offset_cs << cs_erase
+                      << "with an init vs genesis time offset of "
+                      << dsec/sec_per_hour << " hours.\n";
+
             if(dsec <= conf_info.VxOpt[i_vx].GenesisInitDSec) {
 
                mlog << Debug(4) << case_cs
-                    << " is a technique 2 HIT.\n";
+                    << " is a technique 2 HIT " << offset_cs;
 
                // Increment the HIT count
                gci.cts_tech2.cts.inc_fy_oy();
             }
             else {
                mlog << Debug(4) << case_cs
-                    << " is a technique 2 FALSE ALARM with time offset "
-                    << dsec << " seconds > "
-                    << conf_info.VxOpt[i_vx].GenesisInitDSec << ".\n";
+                    << " is a technique 2 FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
                gci.cts_tech2.cts.inc_fy_on();
