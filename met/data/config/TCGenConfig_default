@@ -147,9 +147,8 @@ genesis_radius = 300;
 
 //
 // Genesis versus initialization time offset in hours
-// JHG, what is a good default value?
 //
-genesis_init_diff = 24;
+genesis_init_diff = 48;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
