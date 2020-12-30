@@ -212,6 +212,7 @@ class GenesisInfoArray {
       bool has(const GenesisInfo &) const;
       bool has_storm(const GenesisInfo &, int &) const;
       bool has_storm_id(const ConcatString &, int &) const;
+      bool erase_storm_id(const ConcatString &);
 
          //
          //  get stuff

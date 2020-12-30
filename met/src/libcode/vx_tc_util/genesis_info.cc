@@ -588,17 +588,8 @@ bool GenesisInfoArray::add(const GenesisInfo &gi) {
    // Skip true duplicates
    if(has(gi)) {
       mlog << Warning << "\nGenesisInfoArray::add() -> "
-           << "Skipping duplicate genesis event:\n" << gi.serialize()
-           << "\n\n";
-      return(false);
-   }
-
-   // Print warning for matches
-   if(has_storm(gi, i)) {
-      mlog << Debug(3) << "GenesisInfoArray::add() -> "
-           << "Skipping multiple genesis events for the same storm:\n"
-           << "Existing: " << Genesis[i].serialize() << "\n"
-           << "Skipping: " << gi.serialize() << "\n";
+           << "Skipping duplicate genesis event:\n"
+           << gi.serialize() << "\n\n";
       return(false);
    }
 
@@ -641,6 +632,19 @@ bool GenesisInfoArray::has_storm_id(const ConcatString &s, int &i) const {
 
    i = bad_data_int;
    return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfoArray::erase_storm_id(const ConcatString &s) {
+   int i;
+   bool status;
+
+   if((status = has_storm_id(s, i))) {
+      Genesis.erase(Genesis.begin()+i);
+   }
+
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
