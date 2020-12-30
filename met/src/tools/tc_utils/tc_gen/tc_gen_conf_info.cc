@@ -311,7 +311,8 @@ void TCGenConfInfo::init_from_scratch() {
 void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
-   InitFreqSec = bad_data_int;
+   InitFreqHr = bad_data_int;
+   ValidFreqHr = bad_data_int;
    LeadSecBeg = bad_data_int;
    LeadSecEnd = bad_data_int;
    MinDur = bad_data_int;
@@ -321,6 +322,9 @@ void TCGenConfInfo::clear() {
    DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
+   BasinFile.clear();
+   BasinGrid.clear();
+   BasinData.clear();
    Version.clear();
    CIAlpha = bad_data_double;
    OutputMap.clear();
@@ -357,11 +361,21 @@ void TCGenConfInfo::process_config() {
    int i, beg, end;
 
    // Conf: init_freq
-   InitFreqSec = Conf.lookup_int(conf_key_init_freq)*sec_per_hour;
+   InitFreqHr = Conf.lookup_int(conf_key_init_freq);
 
-   if(InitFreqSec <= 0) {
+   if(InitFreqHr <= 0) {
       mlog << Error << "\nTCGenConfInfo::process_config() -> "
            << "\"" << conf_key_init_freq << "\" must be greater than "
+           << "zero!\n\n";
+      exit(1);
+   }
+
+   // Conf: valid_freq
+   ValidFreqHr = Conf.lookup_int(conf_key_valid_freq);
+
+   if(ValidFreqHr <= 0) {
+      mlog << Error << "\nTCGenConfInfo::process_config() -> "
+           << "\"" << conf_key_valid_freq << "\" must be greater than "
            << "zero!\n\n";
       exit(1);
    }
@@ -388,6 +402,9 @@ void TCGenConfInfo::process_config() {
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);
+
+   // Conf: BasinFile
+   BasinFile = Conf.lookup_string(conf_key_basin_file);
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
@@ -490,7 +507,7 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
 
    // Load the distance to land data, if needed.
    if(DLandData.is_empty()) {
-      load_dland(DLandFile, DLandGrid, DLandData);
+      load_tc_dland(DLandFile, DLandGrid, DLandData);
    }
 
    // Convert lat,lon to x,y
@@ -506,6 +523,76 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
    else                               dist = DLandData.get(x, y);
 
    return(dist);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
+   double x_dbl, y_dbl, dist;
+   int x, y, id;
+   ConcatString abbr;
+
+   // Load the basin data, if needed.
+   if(BasinData.is_empty()) {
+      load_tc_basin(BasinFile, BasinGrid, BasinData);
+   }
+
+   // Convert lat,lon to x,y
+   BasinGrid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
+
+   // Round to nearest int
+   x = nint(x_dbl);
+   y = nint(y_dbl);
+
+   // Basin ID
+   id = ((x < 0 || x >= BasinGrid.nx() ||
+          y < 0 || y >= BasinGrid.ny()) ?
+         bad_data_int :
+         nint(BasinData.get(x, y)));
+
+   // Convert basin ID to string
+   switch(id) {
+      case 0:
+         abbr = "NONE";
+         break;
+      case 1:
+         // Atlantic
+         abbr = "AL";
+         break;
+      case 2:
+         // Eastern Pacific
+         abbr = "EP";
+         break;
+      case 3:
+         // Central Pacific
+         abbr = "CP";
+         break;
+      case 4:
+         // Western Pacific
+         abbr = "WP";
+         break;
+      case 5:
+         // Northern Indian Ocean
+         abbr = "NI";
+         break;
+      case 6:
+         // Southern Indian Ocean
+         abbr = "SI";
+         break;
+      case 7:
+         // Autstralia
+         abbr = "AU";
+         break;
+      case 8:
+         // Southern Pacific
+         abbr = "SP";
+         break;
+      default:
+         abbr = "UNKNOWN";
+         break;
+   }
+
+   return(abbr);
 }
 
 ////////////////////////////////////////////////////////////////////////

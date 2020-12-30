@@ -274,7 +274,7 @@ void process_genesis() {
          // Write the statistical output model
          ctc_info.model = it->first;
          write_cts(i, ctc_info);
-         // JHG also write MPR
+         // TODO: MET #1597 write a new TC-Gen MPR line type
 
       } // end for j
 
@@ -314,8 +314,8 @@ void get_genesis_pairs(int i_vx,
 
    // Initialize
    gpd.clear();
-   gpd.set_desc (conf_info.VxOpt[i_vx].Desc);
-   gpd.set_mask (conf_info.VxOpt[i_vx].VxMaskName);
+   gpd.set_desc(conf_info.VxOpt[i_vx].Desc);
+   gpd.set_mask(conf_info.VxOpt[i_vx].VxMaskName);
    gpd.set_model(model);
 
    // Filter the BEST genesis events and define model opportunities
@@ -325,8 +325,9 @@ void get_genesis_pairs(int i_vx,
       if(!conf_info.VxOpt[i_vx].is_keeper(bga[i])) continue;
 
       // Add pairs for the forecast opportunities
-      gpd.add_best_gen(&bga[i], conf_info.LeadSecBeg,
-                       conf_info.LeadSecEnd, conf_info.InitFreqSec);
+      gpd.add_best_gen(&bga[i],
+                       conf_info.LeadSecBeg, conf_info.LeadSecEnd,
+                       conf_info.InitFreqHr*sec_per_hour);
    }
 
    // Loop over the model genesis events looking for pairs.
@@ -661,6 +662,7 @@ void process_fcst_tracks(const StringArray &files,
       // Initialize
       tracks.clear();
       n_lines = 0;
+      int valid_freq = conf_info.ValidFreqHr;
 
       // Set metadata pointer
       suffix = model_suffix[i];
@@ -668,6 +670,10 @@ void process_fcst_tracks(const StringArray &files,
 
       // Process the input track lines
       while(f >> line) {
+
+         // Skip off-hour track points
+         if((line.valid_hour()%conf_info.ValidFreqHr) != 0) continue;
+   
          n_lines++;
          tracks.add(line);
       }
@@ -755,8 +761,8 @@ void process_best_tracks(const StringArray &files,
                          GenesisInfoArray  &best_ga,
                          TrackInfoArray    &best_ta,
                          TrackInfoArray    &oper_ta) {
-   int i, n_lines;
-   ConcatString suffix;
+   int i, i_bga, n_lines;
+   ConcatString suffix, gen_basin, case_cs, storm_id;
    StringArray best_tech, oper_tech;
    GenesisInfo best_gi;
    LineDataFile f;
@@ -791,6 +797,9 @@ void process_best_tracks(const StringArray &files,
       // Process the input track lines
       while(f >> line) {
 
+         // Skip off-hour track points
+         if((line.valid_hour()%conf_info.ValidFreqHr) != 0) continue;
+         
          // Increment the line counter
          n_lines++;
 
@@ -833,6 +842,50 @@ void process_best_tracks(const StringArray &files,
       // Attempt to define genesis
       if(!best_gi.set(best_ta[i], (&conf_info.BestEventInfo))) {
          continue;
+      }
+
+      // Check for duplicates
+      if(best_ga.has_storm(best_gi, i_bga)) {
+
+         // Determine the basin for this genesis event
+         gen_basin = conf_info.compute_basin(best_gi.lat(),
+                                             -1.0*best_gi.lon());
+
+         case_cs << cs_erase << "For duplicate "
+                 << unix_to_yyyymmdd_hhmmss(best_gi.genesis_time()) << " "
+                 << best_gi.technique() << " track genesis at ("
+                 << best_gi.lat() << ", " << best_gi.lon() << ") in the "
+                 << gen_basin << " basin, ";
+
+         // Keep existing storm id and discard the new one
+         if(gen_basin == best_ga[i_bga].basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_ga[i_bga].storm_id()
+                 << " and discard " << best_gi.storm_id()
+                 << ".\n";
+            best_ta.erase_storm_id(best_gi.storm_id());
+            oper_ta.erase_storm_id(best_gi.storm_id());
+            i--;
+            continue;
+         }
+         // Discard the existing storm id and add the new one
+         else if(gen_basin == best_gi.basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_gi.storm_id()
+                 << " and discard " << best_ga[i_bga].storm_id()
+                 << ".\n";
+            best_ga.erase_storm_id(best_ga[i_bga].storm_id());
+            best_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            oper_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            i--;
+         }
+         else {
+            mlog << Warning << "\nprocess_best_tracks() -> "
+                 << case_cs << "neither " << best_ga[i_bga].storm_id()
+                 << " nor " << best_gi.storm_id()
+                 << " matches the basin!\n\n";
+            continue;
+         }
       }
 
       // Compute the distance to land

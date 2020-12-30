@@ -129,7 +129,10 @@ class TCGenConfInfo {
       std::vector<TCGenVxOpt> VxOpt;
 
       // Forecast initialization frequency in hours
-      int InitFreqSec;
+      int InitFreqHr;
+
+      // Forecast lead time frequency in hours
+      int ValidFreqHr;
 
       // Begin and end forecast hours for genesis
       int LeadSecBeg, LeadSecEnd;
@@ -147,6 +150,11 @@ class TCGenConfInfo {
       Grid         DLandGrid;
       DataPlane    DLandData;
 
+      // Gridded data file containing TC basins
+      ConcatString BasinFile;
+      Grid         BasinGrid;
+      DataPlane    BasinData;
+
       // Config file version
       ConcatString Version;
 
@@ -163,6 +171,8 @@ class TCGenConfInfo {
       void process_config();
 
       double compute_dland(double lat, double lon);
+
+      ConcatString compute_basin(double lat, double lon);
 
       int n_vx() const;
 };
