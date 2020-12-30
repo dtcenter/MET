@@ -645,6 +645,8 @@ void process_fcst_tracks(const StringArray &files,
    GenesisInfo fcst_gi;
    bool keep;
 
+   int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
+
    // Initialize
    fcst_ga.clear();
    tot_lines = tot_tracks = n_genesis = 0;
@@ -662,7 +664,6 @@ void process_fcst_tracks(const StringArray &files,
       // Initialize
       tracks.clear();
       n_lines = 0;
-      int valid_freq = conf_info.ValidFreqHr;
 
       // Set metadata pointer
       suffix = model_suffix[i];
@@ -672,7 +673,7 @@ void process_fcst_tracks(const StringArray &files,
       while(f >> line) {
 
          // Skip off-hour track points
-         if((line.valid_hour()%conf_info.ValidFreqHr) != 0) continue;
+         if((line.valid_hour() % valid_freq_sec) != 0) continue;
    
          n_lines++;
          tracks.add(line);
@@ -768,6 +769,8 @@ void process_best_tracks(const StringArray &files,
    LineDataFile f;
    ATCFTrackLine line;
 
+   int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
+
    // Initialize
    best_ta.clear();
    oper_ta.clear();
@@ -798,7 +801,7 @@ void process_best_tracks(const StringArray &files,
       while(f >> line) {
 
          // Skip off-hour track points
-         if((line.valid_hour()%conf_info.ValidFreqHr) != 0) continue;
+         if((line.valid_hour() % valid_freq_sec) != 0) continue;
          
          // Increment the line counter
          n_lines++;
