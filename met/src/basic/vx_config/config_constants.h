@@ -1069,6 +1069,8 @@ static const char conf_key_mslp_thresh[]              = "mslp_thresh";
 static const char conf_key_genesis_window[]           = "genesis_window";
 static const char conf_key_genesis_radius[]           = "genesis_radius";
 static const char conf_key_genesis_init_diff[]        = "genesis_init_diff";
+static const char conf_key_dev_method_flag[]          = "dev_method_flag";
+static const char conf_key_ops_method_flag[]          = "ops_method_flag";
 
 //
 // TC-RMW specific parameter key names

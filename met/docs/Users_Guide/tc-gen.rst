@@ -11,7 +11,7 @@ The TC-Gen tool provides verification of tropical cyclone genesis forecasts in A
 Statistical aspects
 ___________________
 
-The TC-Gen tool populates a contingency table with hits, misses, and false alarms. As with other extreme events (where the event occurs much less frequently than the non-event), the correct negative category is not computed the non-events would dominate the contingency table. Therefore, only statistics that do not include correct negatives should be considered for this tool. The following CTS statistics are relevant: Base rate (BASER), Mean forecast (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS), Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS), Bias Adjusted Gilbert Skill Score (BAGSS).
+The TC-Gen tool populates a contingency tables with hits, misses, and false alarms. As with other extreme events (where the event occurs much less frequently than the non-event), the correct negative category is not computed the non-events would dominate the contingency table. Therefore, only statistics that do not include correct negatives should be considered for this tool. The following CTS statistics are relevant: Base rate (BASER), Mean forecast (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS), Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS), Bias Adjusted Gilbert Skill Score (BAGSS).
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
@@ -59,19 +59,33 @@ Optional arguments for tc_gen
 
 The TC-Gen tool implements the following logic:
 
-* Parse the genesis data and identify forecast genesis events separately for each model present.
+* Parse the forecast genesis data and identify forecast genesis events separately for each model present.
 
-* Parse the BEST and operational track data and identify observed genesis events.
+* Parse the BEST and operational track data, and identify BEST track genesis events.
 
 * Loop over the filters defined in the configuration file and apply the following logic for each.
 
- * For each forecast genesis event, search the BEST genesis events for a match that is close enough in time and space. If not found, search the operational genesis events for a match. If a match is found, classify the forecast genesis event as a **hit**. Otherwise, classify it as a **false alarm**.
+ * For each BEST track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
+ 
+ * For each forecast genesis event, search for a matching BEST track. A BEST track matches if the valid time of one of its track points matches the forecast genesis time and is within a configurable radius of the forecast genesis location. If a BEST track match is found, store the storm ID.
+ 
+ * In no BEST track match is found, apply the same logic to search the 0-hour operational track points. If an operational match is found, store the storm ID.
+ 
+ * If a matching storm ID is found, match the forecast genesis event to the BEST track genesis event for that storm ID.
+ 
+ * If no matching storm ID is found, store an unmatched pair for the genesis forecast.
 
- * For each BEST track genesis event, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. If the model opportunity is not classified in the previous step, then classify as a **miss**.
+ * Loop through the genesis pairs and populate contingency tables using two methods, the developement (dev) and operational (ops) methods. For each pair, if the forecast genesis event is unmatched, score it as a dev and ops FALSE ALARM. If the BEST track genesis event is unmatched, score it as a dev and ops MISS. Score each matched genesis pair as follows:
 
- * Do not count any correct negatives.
+  * If the forecast initialization time is at or after the BEST track genesis event, DISCARD this case and exclude it from the statistics.
+  
+  * Compute the difference between the forecast and BEST track genesis events in time and space. If they are both within the configurable tolerance, score it as a dev HIT. If not, score it as a dev FALSE ALARM.
+  
+  * Compute the difference between the BEST track genesis time and model initialization time. If it is within the configurable tolerance, score it as an ops HIT. If not, score it as an ops FALSE ALARM.
 
-* Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter.
+ * Do not count any CORRECT NEGATIVES.
+
+* Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter. The development (dev) scoring method is indicated in the output as *GENESIS_DEV* while the operational (ops) scoring method is indicated as *GENESIS_OPS*.
 
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,6 +101,14 @@ ______________________
   init_freq = 6;
 
 The **init_freq** variable is an integer specifying the model initialization frequency in hours, starting at 00Z. The default value of 6 indicates that the model is initialized every day at 00Z, 06Z, 12Z, and 18Z. The same frequency is applied to all models processed. Models initialized at different frequencies should be processed with separate calls to tc_gen. The initialization frequency is used when defining the model opportunities to forecast the BEST track genesis events.
+
+______________________
+
+.. code-block:: none
+
+  valid_freq = 6;
+
+The **valid_freq** variable is an integer specifying the valid time of the track points to be analyzed in hours, starting at 00Z. The default value of 6 indicates that only track points with valid times of 00Z, 06Z, 12Z, and 18Z will be checked for genesis events. Since BEST and operational tracks are typically only available at those times, a match to a forecast genesis event is only possible for those hours.
 
 ______________________
 
@@ -128,14 +150,16 @@ ______________________
      vmax_thresh = NA;
      mslp_thresh = NA;
   }
-  oper_genesis = {
-     technique   = "CARQ";
-     category    = [ "DB", "LO", "WV" ];
-     vmax_thresh = NA;
-     mslp_thresh = NA;
-  }
 
-The **best_genesis** and **oper_genesis** dictionaries define genesis criteria for the BEST and operational tracks, respectively. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST and operational tracks.
+The **best_genesis** dictionary define genesis criteria for the BEST tracks. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST track.
+
+______________________
+
+.. code-block:: none
+
+  oper_technique = "CARQ";
+
+The **oper_technique** entry is a string which defines the ATCF ID for the operational track data that should be used. For each forecast genesis event, the BEST tracks are searched for a track point valid at the time of forecast genesis and within the search radius. If no match is found, the 0-hour operational track is searched for a match.
 
 ______________________
 
@@ -232,6 +256,31 @@ ______________________
   genesis_radius = 300;
 
 The **genesis_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those BEST/operational genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in hits.
+
+______________________
+
+.. code-block:: none
+
+  genesis_init_diff = 48;
+
+The **gensis_init_diff** entry is an integer which defines a maximum allowable time difference in hours. This option applies only to the ops matching methodology. For each matching forecast and BEST track genesis event, if the difference between the BEST track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a HIT. Otherwise, it is counted as a FALSE ALARM.
+
+______________________
+
+.. code-block:: none
+
+  dev_method_flag = TRUE;
+  ops_method_flag = TRUE;
+
+The **dev_method_flag** and **ops_method_flag** entries are booleans which indicate whether the development and operational scoring methods should be applied and written to the output. At least one of these flags must be set to true.
+
+______________________
+
+.. code-block:: none
+
+  basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
+
+The **basin_file** entry defines the path to the NetCDF basin data file that is included with MET. When a BEST track storm moves from one basin to another, the BEST track dataset can include two tracks for the same storm, one for each basin. However, both tracks have the same genesis point. When this occurs, this basin data file is read and used to determine the basin in which genesis actually occurred. The corresponding BEST track is retained and the other is discarded.
 
 ______________________
 

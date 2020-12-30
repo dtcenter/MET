@@ -361,22 +361,22 @@ void get_genesis_pairs(int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Score the PairDataGenesis events:
+// Score the PairDataGenesis events, using two methods:
 // (1) Loop over the PairDataGenesis entries.
 // (2) If the forecast is set but not the BEST track, increment the
 //     FALSE ALARM counts.
 // (2) If the BEST track is set but not the forecast, increment the
 //     MISS counts.
 // (3) If both are set, but the model initialization time is at or
-//     after the BEST track genesis time, discard that case.
+//     after the BEST track genesis time, DISCARD that case.
 // (4) If both are set and the genesis time and location offsets
 //     fall within the configurable windows, increment the
-//     technique 1 HIT counts. Otherwise, increment the technique 1
+//     dev method HIT counts. Otherwise, increment the dev method
 //     FALSE ALARM counts.
-// (5) If both are set and the forecast genesis time is within the
-//     configurable window of the BEST track genesis time, increment
-//     the technique 2 HIT counts. Otherwise, increment the technique 2
-//     FALSE ALARM counts.
+// (5) If both are set and the difference between to BEST track genesis
+//     time and the forecast initialization time is small enough,
+//     increment the ops method HIT counts. Otherwise, increment the
+//     ops method FALSE ALARM counts.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -413,11 +413,11 @@ void do_genesis_ctc(int i_vx,
               << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
               << " forecast genesis at ("
               << fgi->lat() << ", " << fgi->lon()
-              << ") is a technique 1 and 2 FALSE ALARM.\n";
+              << ") is a dev and ops FALSE ALARM.\n";
 
-         // Increment the FALSE ALARM count for both techniques
-         gci.cts_tech1.cts.inc_fy_on();
-         gci.cts_tech2.cts.inc_fy_on();
+         // Increment the FALSE ALARM count for both methods 
+         gci.cts_dev.cts.inc_fy_on();
+         gci.cts_ops.cts.inc_fy_on();
       }
 
       // Unmatched BEST genesis (MISS)
@@ -427,11 +427,11 @@ void do_genesis_ctc(int i_vx,
               << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
               << " BEST track " << bgi->storm_id() << " genesis at ("
               << bgi->lat() << ", " << bgi->lon()
-              << ") is a technique 1 and 2 MISS.\n";
+              << ") is a dev and ops MISS.\n";
 
-         // Increment the MISS count for both techniques
-         gci.cts_tech1.cts.inc_fn_oy();
-         gci.cts_tech2.cts.inc_fn_oy();
+         // Increment the MISS count for both methods 
+         gci.cts_dev.cts.inc_fn_oy();
+         gci.cts_ops.cts.inc_fn_oy();
 
       }
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
@@ -464,7 +464,7 @@ void do_genesis_ctc(int i_vx,
             offset_cs << "with a genesis time offset of " << dsec/sec_per_hour
                       << " hours and location offset of " << dist << " km.\n";
 
-            // Technique 1:
+            // Dev Method:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
             if(dsec >= conf_info.VxOpt[i_vx].GenesisSecBeg &&
@@ -472,20 +472,20 @@ void do_genesis_ctc(int i_vx,
                dist <= conf_info.VxOpt[i_vx].GenesisRadius) {
 
                mlog << Debug(4) << case_cs
-                    << " is a technique 1 HIT " << offset_cs;
+                    << " is a dev method HIT " << offset_cs;
 
                // Increment the HIT count
-               gci.cts_tech1.cts.inc_fy_oy();
+               gci.cts_dev.cts.inc_fy_oy();
             }
             else {
                mlog << Debug(4) << case_cs
-                    << " is a technique 1 FALSE ALARM " << offset_cs;
+                    << " is a dev method FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
-               gci.cts_tech1.cts.inc_fy_on();
+               gci.cts_dev.cts.inc_fy_on();
             }
             
-            // Technique 2:
+            // Ops Method:
             // HIT if forecast init time is close enough to
             // the BEST genesis time.
             
@@ -499,35 +499,39 @@ void do_genesis_ctc(int i_vx,
             if(dsec <= conf_info.VxOpt[i_vx].GenesisInitDSec) {
 
                mlog << Debug(4) << case_cs
-                    << " is a technique 2 HIT " << offset_cs;
+                    << " is an ops method HIT " << offset_cs;
 
                // Increment the HIT count
-               gci.cts_tech2.cts.inc_fy_oy();
+               gci.cts_ops.cts.inc_fy_oy();
             }
             else {
                mlog << Debug(4) << case_cs
-                    << " is a technique 2 FALSE ALARM " << offset_cs;
+                    << " is an ops method FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
-               gci.cts_tech2.cts.inc_fy_on();
+               gci.cts_ops.cts.inc_fy_on();
             }
          }
       }
    } // end for i n_pair
 
-   mlog << Debug(3) << "For filter " << i_vx+1 << " ("
-        << pairs.desc() << ") " << pairs.model()
-        << " model, technique 1 contingency table hits = "
-        << gci.cts_tech1.cts.fy_oy() << ", false alarms = "
-        << gci.cts_tech1.cts.fy_on() << ", and misses = "
-        << gci.cts_tech1.cts.fn_oy() << ".\n";
+   if(conf_info.DevFlag) {
+      mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+           << pairs.desc() << ") " << pairs.model()
+           << " model, dev method contingency table hits = "
+           << gci.cts_dev.cts.fy_oy() << ", false alarms = "
+           << gci.cts_dev.cts.fy_on() << ", and misses = "
+           << gci.cts_dev.cts.fn_oy() << ".\n";
+   }
 
-   mlog << Debug(3) << "For filter " << i_vx+1 << " ("
-        << pairs.desc() << ") " << pairs.model()
-        << " model, technique 2 contingency table hits = "
-        << gci.cts_tech2.cts.fy_oy() << ", false alarms = "
-        << gci.cts_tech2.cts.fy_on() << ", and misses = "
-        << gci.cts_tech2.cts.fn_oy() << ".\n";
+   if(conf_info.OpsFlag) {
+      mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+           << pairs.desc() << ") " << pairs.model()
+           << " model, ops method contingency table hits = "
+           << gci.cts_ops.cts.fy_oy() << ", false alarms = "
+           << gci.cts_ops.cts.fy_on() << ", and misses = "
+           << gci.cts_ops.cts.fn_oy() << ".\n";
+   }
 
    return;
 }
@@ -915,7 +919,7 @@ void process_best_tracks(const StringArray &files,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(int n_model) {
-   int i, n_rows, n_cols;
+   int i, n_methods, n_rows, n_cols;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -926,8 +930,11 @@ void setup_txt_files(int n_model) {
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
 
+   if(conf_info.DevFlag && conf_info.OpsFlag) n_methods = 2;
+   else                                       n_methods = 1;
+
    // Setup the STAT AsciiTable
-   n_rows = 1 + 3 * n_model * conf_info.n_vx();
+   n_rows = 1 + 3 * n_methods * n_model * conf_info.n_vx();
    n_cols = 1 + n_header_columns + n_cts_columns;
    stat_at.set_size(n_rows, n_cols);
    setup_table(stat_at);
@@ -955,7 +962,7 @@ void setup_txt_files(int n_model) {
          open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Setup the text AsciiTable
-         n_rows = 1 + n_model * conf_info.n_vx();
+         n_rows = 1 + n_methods * n_model * conf_info.n_vx();
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
          setup_table(txt_at[i]);
@@ -997,7 +1004,8 @@ void setup_table(AsciiTable &at) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_cts(int i_vx, GenCTCInfo &info) {
-   ConcatString var_name("GENESIS");
+   ConcatString dev_name("GENESIS_DEV");
+   ConcatString ops_name("GENESIS_OPS");
 
    // Setup header columns
    shc.set_model(info.model.c_str());
@@ -1013,8 +1021,6 @@ void write_cts(int i_vx, GenCTCInfo &info) {
                          conf_info.VxOpt[i_vx].ValidBeg : info.obeg);
    shc.set_obs_valid_end(conf_info.VxOpt[i_vx].ValidEnd != 0 ?
                          conf_info.VxOpt[i_vx].ValidEnd : info.oend);
-   shc.set_fcst_var(var_name);
-   shc.set_obs_var(var_name);
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
    if(!conf_info.VxOpt[i_vx].VxMaskName.empty()) {
       shc.set_mask(conf_info.VxOpt[i_vx].VxMaskName.c_str());
@@ -1022,33 +1028,78 @@ void write_cts(int i_vx, GenCTCInfo &info) {
 
    // Write out FHO
    if(conf_info.OutputMap[stat_fho] != STATOutputType_None) {
-      write_fho_row(shc, info.cts_tech1,
-                    conf_info.OutputMap[stat_fho],
-                    stat_at, i_stat_row,
-                    txt_at[i_fho], i_txt_row[i_fho]);
+
+      if(conf_info.DevFlag) {
+         shc.set_fcst_var(dev_name);
+         shc.set_obs_var (dev_name);
+         write_fho_row(shc, info.cts_dev,
+                       conf_info.OutputMap[stat_fho],
+                       stat_at, i_stat_row,
+                       txt_at[i_fho], i_txt_row[i_fho]);
+      }
+
+      if(conf_info.OpsFlag) {
+         shc.set_fcst_var(ops_name);
+         shc.set_obs_var (ops_name);
+         write_fho_row(shc, info.cts_ops,
+                       conf_info.OutputMap[stat_fho],
+                       stat_at, i_stat_row,
+                       txt_at[i_fho], i_txt_row[i_fho]);
+      }
    }
 
    // Write out CTC
    if(conf_info.OutputMap[stat_ctc] != STATOutputType_None) {
-      write_ctc_row(shc, info.cts_tech1,
-                    conf_info.OutputMap[stat_ctc],
-                    stat_at, i_stat_row,
-                    txt_at[i_ctc], i_txt_row[i_ctc]);
+
+      if(conf_info.DevFlag) {   
+         shc.set_fcst_var(dev_name);
+         shc.set_obs_var (dev_name);
+         write_ctc_row(shc, info.cts_dev,
+                       conf_info.OutputMap[stat_ctc],
+                       stat_at, i_stat_row,
+                       txt_at[i_ctc], i_txt_row[i_ctc]);
+      }
+
+      if(conf_info.OpsFlag) {
+         shc.set_fcst_var(ops_name);
+         shc.set_obs_var (ops_name);
+         write_ctc_row(shc, info.cts_ops,
+                       conf_info.OutputMap[stat_ctc],
+                       stat_at, i_stat_row,
+                       txt_at[i_ctc], i_txt_row[i_ctc]);
+      } 
    }
 
    // Write out CTS
    if(conf_info.OutputMap[stat_cts] != STATOutputType_None) {
 
-      // Compute the statistics
-      info.cts_tech1.allocate_n_alpha(1);
-      info.cts_tech1.alpha[0] = conf_info.CIAlpha;
-      info.cts_tech1.compute_stats();
-      info.cts_tech1.compute_ci();
+      if(conf_info.DevFlag) {
+         info.cts_dev.allocate_n_alpha(1);
+         info.cts_dev.alpha[0] = conf_info.CIAlpha;
+         info.cts_dev.compute_stats();
+         info.cts_dev.compute_ci();
 
-      write_cts_row(shc, info.cts_tech1,
-                    conf_info.OutputMap[stat_cts],
-                    stat_at, i_stat_row,
-                    txt_at[i_cts], i_txt_row[i_cts]);
+         shc.set_fcst_var(dev_name);
+         shc.set_obs_var (dev_name);
+         write_cts_row(shc, info.cts_dev,
+                       conf_info.OutputMap[stat_cts],
+                       stat_at, i_stat_row,
+                       txt_at[i_cts], i_txt_row[i_cts]);
+      }
+
+      if(conf_info.OpsFlag) {
+         info.cts_ops.allocate_n_alpha(1);
+         info.cts_ops.alpha[0] = conf_info.CIAlpha;
+         info.cts_ops.compute_stats();
+         info.cts_ops.compute_ci();
+
+         shc.set_fcst_var(ops_name);
+         shc.set_obs_var (ops_name);
+         write_cts_row(shc, info.cts_ops,
+                       conf_info.OutputMap[stat_cts],
+                       stat_at, i_stat_row,
+                       txt_at[i_cts], i_txt_row[i_cts]);
+      } 
    }
 
    return;

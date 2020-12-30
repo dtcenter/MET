@@ -43,8 +43,8 @@ static const STATLineType txt_file_type[n_txt] = {
 
 struct GenCTCInfo {
    ConcatString model;
-   CTSInfo cts_tech1;
-   CTSInfo cts_tech2;
+   CTSInfo cts_dev;
+   CTSInfo cts_ops;
    unixtime fbeg, fend, obeg, oend;
 
    GenCTCInfo();
@@ -157,6 +157,10 @@ class TCGenConfInfo {
 
       // Config file version
       ConcatString Version;
+
+      // Scoring methods
+      bool DevFlag;
+      bool OpsFlag;
 
       // Output file options
       double CIAlpha;

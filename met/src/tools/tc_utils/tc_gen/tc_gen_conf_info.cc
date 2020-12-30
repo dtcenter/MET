@@ -38,8 +38,8 @@ GenCTCInfo::GenCTCInfo() {
 
 void GenCTCInfo::clear() {
    model.clear();
-   cts_tech1.clear();
-   cts_tech2.clear();
+   cts_dev.clear();
+   cts_ops.clear();
    fbeg = fend = obeg = oend = (unixtime) 0;
 }
 
@@ -48,8 +48,8 @@ void GenCTCInfo::clear() {
 GenCTCInfo & GenCTCInfo::operator+=(const GenCTCInfo &g) {
 
    // Increment counts
-   cts_tech1.cts += g.cts_tech1.cts;
-   cts_tech2.cts += g.cts_tech2.cts;
+   cts_dev.cts += g.cts_dev.cts;
+   cts_ops.cts += g.cts_ops.cts;
 
    // Keep track of the minimum and maximum times
    if(fbeg == 0 || g.fbeg < fbeg) fbeg = g.fbeg;
@@ -326,6 +326,8 @@ void TCGenConfInfo::clear() {
    BasinGrid.clear();
    BasinData.clear();
    Version.clear();
+   DevFlag = false;
+   OpsFlag = false;
    CIAlpha = bad_data_double;
    OutputMap.clear();
 
@@ -409,6 +411,18 @@ void TCGenConfInfo::process_config() {
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version.c_str());
+
+   // Conf: DevFlag and OpsFlag 
+   DevFlag = Conf.lookup_bool(conf_key_dev_method_flag);
+   OpsFlag = Conf.lookup_bool(conf_key_ops_method_flag);
+
+   if(!DevFlag && !OpsFlag) {
+      mlog << Error << "\nTCGenConfInfo::process_config() -> "
+           << "at least one of " << conf_key_dev_method_flag
+           << " or " << conf_key_ops_method_flag
+           << " must be set to true!\n\n";
+      exit(1);
+   }
 
    // Conf: CIAlpha
    CIAlpha = Conf.lookup_double(conf_key_ci_alpha);

@@ -191,6 +191,12 @@ genesis_init_diff = 48;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Scoring methods to be applied
+//
+dev_method_flag = TRUE;
+ops_method_flag = TRUE;
+
+//
 // Confidence interval alpha value
 //
 ci_alpha = 0.05;
@@ -199,9 +205,9 @@ ci_alpha = 0.05;
 // Statistical output types
 //
 output_flag = {
-   fho    = NONE;
-   ctc    = BOTH;
-   cts    = BOTH;
+   fho = NONE;
+   ctc = BOTH;
+   cts = BOTH;
 }
 
 //
