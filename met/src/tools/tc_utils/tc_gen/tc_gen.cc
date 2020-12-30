@@ -404,6 +404,7 @@ void do_genesis_ctc(int i_vx,
 
       // Track the range of valid times
       if(fgi) gci.add_fcst_valid(fgi->valid_min(), fgi->valid_max());
+      if(bgi) gci.add_obs_valid (bgi->valid_min(), bgi->valid_max());
 
       // Unmatched forecast genesis (FALSE ALARM)
       if(fgi && !bgi) {
