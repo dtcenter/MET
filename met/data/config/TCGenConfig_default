@@ -23,6 +23,11 @@
 init_freq = 6;
 
 //
+// Valid hour frequency to be analyzed in hours, starting at 0.
+//
+valid_freq = 6;
+
+//
 // Lead times in hours to be searched for genesis events.
 //
 lead_window = {
@@ -175,6 +180,12 @@ output_flag = {
 // representation of the minimum distance to land.
 //
 dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
+
+//
+// Specify the NetCDF file containing a gridded representation of the
+// global basins.
+//
+basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
 
 //
 // Indicate a version number for the contents of this configuration file.

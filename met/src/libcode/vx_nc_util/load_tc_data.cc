@@ -13,12 +13,12 @@ using namespace std;
 #include <iostream>
 
 #include "vx_data2d_nc_met.h"
-#include "load_dland.h"
+#include "load_tc_data.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-void load_dland(const ConcatString &dland_file, Grid &grid,
-                DataPlane &dp) {
+void load_tc_dland(const ConcatString &dland_file, Grid &grid,
+                   DataPlane &dp) {
    ConcatString file_name;
    LongArray dim;
    int i;
@@ -35,8 +35,7 @@ void load_dland(const ConcatString &dland_file, Grid &grid,
    // Open the NetCDF output of the tc_dland tool
    MetNcFile MetNc;
    if(!MetNc.open(file_name.c_str())) {
-      mlog << Error
-           << "\nload_dland() -> "
+      mlog << Error << "\nload_tc_dland() -> "
            << "problem reading file \"" << file_name << "\"\n\n";
       exit(1);
    }
@@ -50,8 +49,7 @@ void load_dland(const ConcatString &dland_file, Grid &grid,
 
    // Check range
    if(i == MetNc.Nvars) {
-      mlog << Error
-           << "\nload_dland() -> "
+      mlog << Error << "\nload_tc_dland() -> "
            << "can't find non-lat/lon variable in file \""
            << file_name << "\"\n\n";
       exit(1);
@@ -66,9 +64,57 @@ void load_dland(const ConcatString &dland_file, Grid &grid,
 
    // Read the data
    if(!MetNc.data(MetNc.Var[i].var, dim, dp)) {
-      mlog << Error
-           << "\nload_dland() -> "
+      mlog << Error << "\nload_tc_dland() -> "
            << "can't read data from file \""
+           << file_name << "\"\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static const char basin_var_name [] = "basin";
+
+////////////////////////////////////////////////////////////////////////
+
+void load_tc_basin(const ConcatString &basin_file, Grid &grid,
+                   DataPlane &dp) {
+   ConcatString file_name;
+   LongArray dim;
+   NcVarInfo *vi;
+   int i;
+
+   // Get the path for the distance to land file
+   file_name = replace_path(basin_file);
+
+   mlog << Debug(1)
+        << "Basin definition file: " << file_name << "\n";
+
+   // Check for no file provided
+   if(file_name.empty()) return;
+
+   // Open the NetCDF basin definition file
+   MetNcFile MetNc;
+   if(!MetNc.open(file_name.c_str())) {
+      mlog << Error << "\nload_tc_basin() -> "
+           << "problem reading file \"" << file_name << "\"\n\n";
+      exit(1);
+   }
+
+   // Store the grid
+   grid = MetNc.grid;
+
+   // Set the dimension to (*,*)
+   dim.add(vx_data2d_star);
+   dim.add(vx_data2d_star);
+
+   // Read the basin data
+   if(!MetNc.data(basin_var_name, dim, dp, vi)) {
+      mlog << Error << "\nload_tc_basin() -> "
+           << "can't read \"" << basin_var_name
+           << "\" data from file \""
            << file_name << "\"\n\n";
       exit(1);
    }

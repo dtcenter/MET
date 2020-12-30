@@ -1023,6 +1023,7 @@ static const char conf_key_oper_baseline[]            = "oper_baseline";
 static const char conf_key_anly_track[]               = "anly_track";
 static const char conf_key_match_points[]             = "match_points";
 static const char conf_key_dland_file[]               = "dland_file";
+static const char conf_key_basin_file[]               = "basin_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
 static const char conf_key_watch_warn[]               = "watch_warn";
 static const char conf_key_basin_map[]                = "basin_map";
@@ -1056,6 +1057,7 @@ static const char conf_key_dland_thresh[]             = "dland_thresh";
 
 // TC-Gen config options
 static const char conf_key_init_freq[]                = "init_freq";
+static const char conf_key_valid_freq[]               = "valid_freq";
 static const char conf_key_lead_window[]              = "lead_window";
 static const char conf_key_min_duration[]             = "min_duration";
 static const char conf_key_fcst_genesis[]             = "fcst_genesis";
