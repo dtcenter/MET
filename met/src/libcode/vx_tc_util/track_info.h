@@ -198,11 +198,8 @@ class TrackInfoArray {
 
       void init_from_scratch();
       void assign(const TrackInfoArray &);
-      void extend(int, bool exact = true);
 
-      TrackInfo     *Track;
-      int            NTracks;
-      int            NAlloc;
+      vector<TrackInfo> Track;
 
    public:
 
@@ -221,29 +218,24 @@ class TrackInfoArray {
          //  set stuff
          //
 
+      void add(const TrackInfo &);
+      void set(int, const TrackInfo &);
+      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
+      bool has(const ATCFTrackLine &) const;
+      bool erase_storm_id(const ConcatString &);
+
          //
          //  get stuff
          //
 
       const TrackInfo & operator[](int) const;
-      int n_tracks() const;
       int n() const;
-
-         //
-         //  do stuff
-         //
-
-      void add(const TrackInfo &);
-      void set(int, const TrackInfo &);
-      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
-      bool has(const ATCFTrackLine &) const;
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackInfoArray::n_tracks() const { return(NTracks); }
-inline int TrackInfoArray::n()        const { return(NTracks); }
+inline int TrackInfoArray::n() const { return(Track.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 
