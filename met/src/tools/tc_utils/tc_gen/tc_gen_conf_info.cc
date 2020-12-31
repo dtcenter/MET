@@ -26,6 +26,68 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for struct TCGenNcOutInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TCGenNcOutInfo::TCGenNcOutInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenNcOutInfo::clear() {
+
+   set_all_true();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenNcOutInfo::all_false() const {
+
+   bool status = do_latlon    || do_best_gen  || do_best_pts  ||
+                 do_fcst_gen  || do_fcst_pts  || do_gen_fy_oy ||
+                 do_gen_fy_on || do_gen_fn_oy;
+
+   return(!status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenNcOutInfo::set_all_false() {
+
+   do_latlon    = false;
+   do_best_gen  = false;
+   do_best_pts  = false;
+   do_fcst_gen  = false;
+   do_fcst_pts  = false;
+   do_gen_fy_oy = false;
+   do_gen_fy_on = false;
+   do_gen_fn_oy = false;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenNcOutInfo::set_all_true() {
+
+   do_latlon    = true;
+   do_best_gen  = true;
+   do_best_pts  = true;
+   do_fcst_gen  = true;
+   do_fcst_pts  = true;
+   do_gen_fy_oy = true;
+   do_gen_fy_on = true;
+   do_gen_fn_oy = true;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Code for struct GenCTCInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -129,6 +191,11 @@ void TCGenVxOpt::clear() {
    GenesisSecBeg = GenesisSecEnd = bad_data_int;
    GenesisRadius = bad_data_double;
    GenesisInitDSec = bad_data_int;
+   DevFlag = OpsFlag = false;
+   CIAlpha = bad_data_double;
+   OutputMap.clear();
+   NcInfo.clear();
+   NcTrackPtsBeg = NcTrackPtsEnd = bad_data_int;
 
    return;
 }
@@ -136,10 +203,11 @@ void TCGenVxOpt::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
-   int i;
+   int i, beg, end;
    Dictionary *dict2 = (Dictionary *) 0;
    ConcatString file_name;
    StringArray sa;
+   bool status;
 
    // Conf: desc
    Desc = parse_conf_string(&dict, conf_key_desc);
@@ -185,7 +253,6 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
    // Conf: genesis_window
-   int beg, end;
    dict2 = dict.lookup_dictionary(conf_key_genesis_window);
    parse_conf_range_int(dict2, beg, end);
    GenesisSecBeg = beg*sec_per_hour;
@@ -198,13 +265,102 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    GenesisInitDSec = nint(
       dict.lookup_double(conf_key_genesis_init_diff)
       *sec_per_hour);
+   
+   // Conf: dev_method_flag and ops_method_flag
+   DevFlag = dict.lookup_bool(conf_key_dev_method_flag);
+   OpsFlag = dict.lookup_bool(conf_key_ops_method_flag);
+
+   if(!DevFlag && !OpsFlag) {
+      mlog << Error << "\nTCGenVxOpt::process_config() -> "
+           << "at least one of " << conf_key_dev_method_flag
+           << " or " << conf_key_ops_method_flag
+           << " must be set to true!\n\n";
+      exit(1);
+   }
+
+   // Conf: ci_alpah
+   CIAlpha = dict.lookup_double(conf_key_ci_alpha);
+
+   // Conf: output_flag
+   OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
+
+   for(i=0, status=false; i<OutputMap.size(); i++) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+         status = true;
+         break;
+      }
+   }
+
+   // Check for at least one output line type
+   if(!status) {
+      mlog << Error << "\nTCGenVxOpt::process_config() -> "
+           << "at least one output line type must be requested in \""
+           << conf_key_output_flag << "\"!\n\n";
+      exit(1);
+   }
+
+   // Conf: nc_pairs_flag
+   parse_nc_info(dict);
+
+   // Conf: genesis_track_points_window
+   dict2 = dict.lookup_dictionary(conf_key_genesis_track_points_window);
+   parse_conf_range_int(dict2, beg, end);
+   NcTrackPtsBeg = beg*sec_per_hour;
+   NcTrackPtsEnd = end*sec_per_hour;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
+void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = odict.lookup(conf_key_nc_pairs_flag);
+
+   if(!e) {
+      mlog << Error << "\nTCGenVxOpt::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(!value) NcInfo.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error << "\nTCGenVxOpt::parse_nc_info() -> "
+           << "bad type for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   NcInfo.do_latlon    = d->lookup_bool(conf_key_latlon_flag);
+   NcInfo.do_best_gen  = d->lookup_bool(conf_key_best_gen_flag);
+   NcInfo.do_best_pts  = d->lookup_bool(conf_key_best_pts_flag);
+   NcInfo.do_fcst_gen  = d->lookup_bool(conf_key_fcst_gen_flag);
+   NcInfo.do_fcst_pts  = d->lookup_bool(conf_key_fcst_pts_flag);
+   NcInfo.do_gen_fy_oy = d->lookup_bool(conf_key_gen_fy_oy_flag);
+   NcInfo.do_gen_fy_on = d->lookup_bool(conf_key_gen_fy_on_flag);
+   NcInfo.do_gen_fn_oy = d->lookup_bool(conf_key_gen_fn_oy_flag);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
    bool keep = true;
 
    // ATCF ID processed elsewhere
@@ -280,6 +436,12 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+STATOutputType TCGenVxOpt::output_map(STATLineType t) const {
+   return(OutputMap.at(t));
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TCGenConfInfo
 //
@@ -325,11 +487,10 @@ void TCGenConfInfo::clear() {
    BasinFile.clear();
    BasinGrid.clear();
    BasinData.clear();
-   Version.clear();
-   DevFlag = false;
-   OpsFlag = false;
-   CIAlpha = bad_data_double;
+   NcOutGrid.clear();
    OutputMap.clear();
+   NcInfo.clear();
+   Version.clear();
 
    return;
 }
@@ -408,42 +569,13 @@ void TCGenConfInfo::process_config() {
    // Conf: BasinFile
    BasinFile = Conf.lookup_string(conf_key_basin_file);
 
+   // Conf: NcOutGrid
+   parse_grid_mask(Conf.lookup_string(conf_key_nc_pairs_grid),
+                   NcOutGrid);
+
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version.c_str());
-
-   // Conf: DevFlag and OpsFlag 
-   DevFlag = Conf.lookup_bool(conf_key_dev_method_flag);
-   OpsFlag = Conf.lookup_bool(conf_key_ops_method_flag);
-
-   if(!DevFlag && !OpsFlag) {
-      mlog << Error << "\nTCGenConfInfo::process_config() -> "
-           << "at least one of " << conf_key_dev_method_flag
-           << " or " << conf_key_ops_method_flag
-           << " must be set to true!\n\n";
-      exit(1);
-   }
-
-   // Conf: CIAlpha
-   CIAlpha = Conf.lookup_double(conf_key_ci_alpha);
-
-   // Conf: OutputMap
-   OutputMap = parse_conf_output_flag(dict, txt_file_type, n_txt);
-
-   for(i=0, status=false; i<OutputMap.size(); i++) {
-      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
-         status = true;
-         break;
-      }
-   }
-
-   // Check for at least one output line type
-   if(!status) {
-      mlog << Error << "\nTCGenConfInfo::process_config() -> "
-           << "at least one output line type must be requested in \""
-           << conf_key_output_flag << "\"!\n\n";
-      exit(1);
-   }
 
    // Conf: Filter
    dict = Conf.lookup_array(conf_key_filter, false);
@@ -479,10 +611,14 @@ void TCGenConfInfo::process_config() {
       } // end for i
    }
 
-   // If not already set, define the valid time window relative to the
-   // initialization time window.
+   // Loop through the filters
    for(size_t j=0; j<VxOpt.size(); j++) {
 
+      // Update the summary OutputMap and NcInfo
+      process_flags(VxOpt[j].OutputMap, VxOpt[j].NcInfo);
+
+      // If not already set, define the valid time window relative to the
+      // initialization time window.
       if(VxOpt[j].InitBeg != 0 && VxOpt[j].ValidBeg == 0) {
          VxOpt[j].ValidBeg = VxOpt[j].InitBeg + LeadSecBeg + VxOpt[j].GenesisSecBeg;
          mlog << Debug(3) << "For filter " << j+1 << " setting "
@@ -513,6 +649,39 @@ void TCGenConfInfo::process_config() {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void TCGenConfInfo::process_flags(
+        const map<STATLineType,STATOutputType> &m,
+        const TCGenNcOutInfo &n) {
+   int i;
+
+   // Initialize output map
+   if(OutputMap.empty()) OutputMap = m;
+
+   // Update output map
+   for(i=0; i<n_txt; i++) {
+      if(m.at(txt_file_type[i]) == STATOutputType_Both) {
+         OutputMap[txt_file_type[i]] = STATOutputType_Both;
+      }
+      else if(m.at(txt_file_type[i]) == STATOutputType_Stat &&
+              OutputMap[txt_file_type[i]] == STATOutputType_None) {
+         OutputMap[txt_file_type[i]] = STATOutputType_Stat;
+      }
+   }
+
+   // Update NcInfo flags
+   if(n.do_latlon)    NcInfo.do_latlon    = true;
+   if(n.do_best_gen)  NcInfo.do_best_gen  = true;
+   if(n.do_best_pts)  NcInfo.do_best_pts  = true;
+   if(n.do_fcst_gen)  NcInfo.do_fcst_gen  = true;
+   if(n.do_fcst_pts)  NcInfo.do_fcst_pts  = true;
+   if(n.do_gen_fy_oy) NcInfo.do_gen_fy_oy = true;
+   if(n.do_gen_fy_on) NcInfo.do_gen_fy_on = true;
+   if(n.do_gen_fn_oy) NcInfo.do_gen_fn_oy = true;
+
+   return;
+}
 ////////////////////////////////////////////////////////////////////////
 
 double TCGenConfInfo::compute_dland(double lat, double lon) {
@@ -607,6 +776,12 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
    }
 
    return(abbr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
+   return(OutputMap.at(t));
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -157,7 +157,7 @@ genesis_init_diff = 48;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Global settings.
+// Output options which may be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -182,6 +182,34 @@ output_flag = {
 }
 
 //
+// NetCDF genesis and track density contents
+//
+nc_pairs_flag = {
+   latlon    = TRUE;
+   best_gen  = TRUE;
+   best_pts  = TRUE;
+   fcst_gen  = TRUE;
+   fcst_pts  = TRUE;
+   gen_fy_oy = TRUE;
+   gen_fy_on = TRUE;
+   gen_fn_oy = TRUE;
+}
+
+//
+// Track points to count in the NetCDF output, relative to genesis time
+//
+genesis_track_points_window = {
+   beg = -120;
+   end =  120;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Global settings which may only be specified once.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
@@ -192,6 +220,11 @@ dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 // global basins.
 //
 basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
+
+//
+// NetCDF genesis and track density output grid
+//
+nc_pairs_grid = "G001";
 
 //
 // Indicate a version number for the contents of this configuration file.

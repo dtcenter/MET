@@ -17,6 +17,7 @@
 //   000    05/17/19  Halley Gotway   New
 //   001    10/21/20  Halley Gotway   Fix for MET #1465
 //   002    12/15/20  Halley Gotway   Matching logic for MET #1448
+//   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,14 +67,16 @@ static void   process_best_tracks  (const StringArray &,
                                     TrackInfoArray &,
                                     TrackInfoArray &);
 
-static void   get_genesis_pairs    (int, const ConcatString &,
+static void   get_genesis_pairs    (const TCGenVxOpt &,
+                                    const ConcatString &,
                                     const GenesisInfoArray &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     const TrackInfoArray &,
                                     PairDataGenesis &);
 
-static void   do_genesis_ctc       (int, const PairDataGenesis &,
+static void   do_genesis_ctc       (const TCGenVxOpt &,
+                                    const PairDataGenesis &,
                                     GenCTCInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
@@ -83,7 +86,7 @@ static int    find_genesis_match   (const GenesisInfo &,
 
 static void   setup_txt_files      (int);
 static void   setup_table          (AsciiTable &);
-static void   write_cts            (int, GenCTCInfo &);
+static void   write_cts            (const TCGenVxOpt &, GenCTCInfo &);
 static void   finish_txt_files     ();
 
 static void   usage                ();
@@ -264,16 +267,15 @@ void process_genesis() {
               << " tracks.\n";
 
          // Get the pairs
-         get_genesis_pairs(i, it->first, it->second,
-                           best_ga, best_ta, oper_ta,
-                           pairs);
+         get_genesis_pairs(conf_info.VxOpt[i], it->first, it->second,
+                           best_ga, best_ta, oper_ta, pairs);
 
          // Do the categorical verification
-         do_genesis_ctc(i, pairs, ctc_info);
+         do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
 
          // Write the statistical output model
          ctc_info.model = it->first;
-         write_cts(i, ctc_info);
+         write_cts(conf_info.VxOpt[i], ctc_info);
          // TODO: MET #1597 write a new TC-Gen MPR line type
 
       } // end for j
@@ -303,7 +305,7 @@ void process_genesis() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void get_genesis_pairs(int i_vx,
+void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        const ConcatString     &model,
                        const GenesisInfoArray &fga,
                        const GenesisInfoArray &bga,
@@ -314,15 +316,15 @@ void get_genesis_pairs(int i_vx,
 
    // Initialize
    gpd.clear();
-   gpd.set_desc(conf_info.VxOpt[i_vx].Desc);
-   gpd.set_mask(conf_info.VxOpt[i_vx].VxMaskName);
+   gpd.set_desc(vx_opt.Desc);
+   gpd.set_mask(vx_opt.VxMaskName);
    gpd.set_model(model);
 
    // Filter the BEST genesis events and define model opportunities
    for(i=0; i<bga.n(); i++) {
 
       // Check filters
-      if(!conf_info.VxOpt[i_vx].is_keeper(bga[i])) continue;
+      if(!vx_opt.is_keeper(bga[i])) continue;
 
       // Add pairs for the forecast opportunities
       gpd.add_best_gen(&bga[i],
@@ -335,7 +337,7 @@ void get_genesis_pairs(int i_vx,
 
       // Search for a BEST track match
       i_bta = find_genesis_match(fga[i], bta, ota,
-                                 conf_info.VxOpt[i_vx].GenesisRadius);
+                                 vx_opt.GenesisRadius);
 
       // Update the matched pairs
       if(!is_bad_data(i_bta)) {
@@ -380,9 +382,9 @@ void get_genesis_pairs(int i_vx,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_genesis_ctc(int i_vx,
+void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                     const PairDataGenesis &pairs,
-                    GenCTCInfo &gci) {
+                    GenCTCInfo            &gci) {
    int i, dsec;
    double dist;
    ConcatString case_cs;
@@ -467,9 +469,9 @@ void do_genesis_ctc(int i_vx,
             // Dev Method:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
-            if(dsec >= conf_info.VxOpt[i_vx].GenesisSecBeg &&
-               dsec <= conf_info.VxOpt[i_vx].GenesisSecEnd &&
-               dist <= conf_info.VxOpt[i_vx].GenesisRadius) {
+            if(dsec >= vx_opt.GenesisSecBeg &&
+               dsec <= vx_opt.GenesisSecEnd &&
+               dist <= vx_opt.GenesisRadius) {
 
                mlog << Debug(4) << case_cs
                     << " is a dev method HIT " << offset_cs;
@@ -496,7 +498,7 @@ void do_genesis_ctc(int i_vx,
                       << "with an init vs genesis time offset of "
                       << dsec/sec_per_hour << " hours.\n";
 
-            if(dsec <= conf_info.VxOpt[i_vx].GenesisInitDSec) {
+            if(dsec <= vx_opt.GenesisInitDSec) {
 
                mlog << Debug(4) << case_cs
                     << " is an ops method HIT " << offset_cs;
@@ -515,8 +517,8 @@ void do_genesis_ctc(int i_vx,
       }
    } // end for i n_pair
 
-   if(conf_info.DevFlag) {
-      mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+   if(vx_opt.DevFlag) {
+      mlog << Debug(3) << "For filter ("
            << pairs.desc() << ") " << pairs.model()
            << " model, dev method contingency table hits = "
            << gci.cts_dev.cts.fy_oy() << ", false alarms = "
@@ -524,8 +526,8 @@ void do_genesis_ctc(int i_vx,
            << gci.cts_dev.cts.fn_oy() << ".\n";
    }
 
-   if(conf_info.OpsFlag) {
-      mlog << Debug(3) << "For filter " << i_vx+1 << " ("
+   if(vx_opt.OpsFlag) {
+      mlog << Debug(3) << "For filter ("
            << pairs.desc() << ") " << pairs.model()
            << " model, ops method contingency table hits = "
            << gci.cts_ops.cts.fy_oy() << ", false alarms = "
@@ -919,7 +921,7 @@ void process_best_tracks(const StringArray &files,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(int n_model) {
-   int i, n_methods, n_rows, n_cols;
+   int i, n_rows, n_cols;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -930,11 +932,8 @@ void setup_txt_files(int n_model) {
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
 
-   if(conf_info.DevFlag && conf_info.OpsFlag) n_methods = 2;
-   else                                       n_methods = 1;
-
    // Setup the STAT AsciiTable
-   n_rows = 1 + 3 * n_methods * n_model * conf_info.n_vx();
+   n_rows = 1 + 6 * n_model * conf_info.n_vx();
    n_cols = 1 + n_header_columns + n_cts_columns;
    stat_at.set_size(n_rows, n_cols);
    setup_table(stat_at);
@@ -962,7 +961,7 @@ void setup_txt_files(int n_model) {
          open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Setup the text AsciiTable
-         n_rows = 1 + n_methods * n_model * conf_info.n_vx();
+         n_rows = 1 + 2 * n_model * conf_info.n_vx();
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
          setup_table(txt_at[i]);
@@ -1003,100 +1002,100 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_cts(int i_vx, GenCTCInfo &info) {
+void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
    ConcatString dev_name("GENESIS_DEV");
    ConcatString ops_name("GENESIS_OPS");
 
    // Setup header columns
    shc.set_model(info.model.c_str());
-   shc.set_desc(conf_info.VxOpt[i_vx].Desc.c_str());
-   if(conf_info.VxOpt[i_vx].Lead.n() == 1) {
-      shc.set_fcst_lead_sec(conf_info.VxOpt[i_vx].Lead[0]);
+   shc.set_desc(vx_opt.Desc.c_str());
+   if(vx_opt.Lead.n() == 1) {
+      shc.set_fcst_lead_sec(vx_opt.Lead[0]);
    }
-   shc.set_fcst_valid_beg(conf_info.VxOpt[i_vx].ValidBeg != 0 ?
-                          conf_info.VxOpt[i_vx].ValidBeg : info.fbeg);
-   shc.set_fcst_valid_end(conf_info.VxOpt[i_vx].ValidEnd != 0 ?
-                          conf_info.VxOpt[i_vx].ValidEnd : info.fend);
-   shc.set_obs_valid_beg(conf_info.VxOpt[i_vx].ValidBeg != 0 ?
-                         conf_info.VxOpt[i_vx].ValidBeg : info.obeg);
-   shc.set_obs_valid_end(conf_info.VxOpt[i_vx].ValidEnd != 0 ?
-                         conf_info.VxOpt[i_vx].ValidEnd : info.oend);
+   shc.set_fcst_valid_beg(vx_opt.ValidBeg != 0 ?
+                          vx_opt.ValidBeg : info.fbeg);
+   shc.set_fcst_valid_end(vx_opt.ValidEnd != 0 ?
+                          vx_opt.ValidEnd : info.fend);
+   shc.set_obs_valid_beg(vx_opt.ValidBeg != 0 ?
+                         vx_opt.ValidBeg : info.obeg);
+   shc.set_obs_valid_end(vx_opt.ValidEnd != 0 ?
+                         vx_opt.ValidEnd : info.oend);
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
-   if(!conf_info.VxOpt[i_vx].VxMaskName.empty()) {
-      shc.set_mask(conf_info.VxOpt[i_vx].VxMaskName.c_str());
+   if(!vx_opt.VxMaskName.empty()) {
+      shc.set_mask(vx_opt.VxMaskName.c_str());
    }
 
    // Write out FHO
-   if(conf_info.OutputMap[stat_fho] != STATOutputType_None) {
+   if(vx_opt.output_map(stat_fho) != STATOutputType_None) {
 
-      if(conf_info.DevFlag) {
+      if(vx_opt.DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_fho_row(shc, info.cts_dev,
-                       conf_info.OutputMap[stat_fho],
+                       vx_opt.OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
 
-      if(conf_info.OpsFlag) {
+      if(vx_opt.OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_fho_row(shc, info.cts_ops,
-                       conf_info.OutputMap[stat_fho],
+                       vx_opt.OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
    }
 
    // Write out CTC
-   if(conf_info.OutputMap[stat_ctc] != STATOutputType_None) {
+   if(vx_opt.output_map(stat_ctc) != STATOutputType_None) {
 
-      if(conf_info.DevFlag) {   
+      if(vx_opt.DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_ctc_row(shc, info.cts_dev,
-                       conf_info.OutputMap[stat_ctc],
+                       vx_opt.OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
 
-      if(conf_info.OpsFlag) {
+      if(vx_opt.OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_ctc_row(shc, info.cts_ops,
-                       conf_info.OutputMap[stat_ctc],
+                       vx_opt.OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       } 
    }
 
    // Write out CTS
-   if(conf_info.OutputMap[stat_cts] != STATOutputType_None) {
+   if(vx_opt.output_map(stat_cts) != STATOutputType_None) {
 
-      if(conf_info.DevFlag) {
+      if(vx_opt.DevFlag) {
          info.cts_dev.allocate_n_alpha(1);
-         info.cts_dev.alpha[0] = conf_info.CIAlpha;
+         info.cts_dev.alpha[0] = vx_opt.CIAlpha;
          info.cts_dev.compute_stats();
          info.cts_dev.compute_ci();
 
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_cts_row(shc, info.cts_dev,
-                       conf_info.OutputMap[stat_cts],
+                       vx_opt.OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
 
-      if(conf_info.OpsFlag) {
+      if(vx_opt.OpsFlag) {
          info.cts_ops.allocate_n_alpha(1);
-         info.cts_ops.alpha[0] = conf_info.CIAlpha;
+         info.cts_ops.alpha[0] = vx_opt.CIAlpha;
          info.cts_ops.compute_stats();
          info.cts_ops.compute_ci();
 
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_cts_row(shc, info.cts_ops,
-                       conf_info.OutputMap[stat_cts],
+                       vx_opt.OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       } 

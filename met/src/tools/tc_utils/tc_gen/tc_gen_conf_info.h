@@ -41,6 +41,31 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
+struct TCGenNcOutInfo {
+
+   bool do_latlon;
+   bool do_best_gen;
+   bool do_best_pts;
+   bool do_fcst_gen;
+   bool do_fcst_pts;
+   bool do_gen_fy_oy;
+   bool do_gen_fy_on;
+   bool do_gen_fn_oy;
+
+      //////////////////////////////////////////////////////////////////
+
+   TCGenNcOutInfo();
+
+   void clear();   //  sets everything to true
+
+   bool all_false() const;
+
+   void set_all_false();
+   void set_all_true();
+};
+
+////////////////////////////////////////////////////////////////////////
+
 struct GenCTCInfo {
    ConcatString model;
    CTSInfo cts_dev;
@@ -48,9 +73,9 @@ struct GenCTCInfo {
    unixtime fbeg, fend, obeg, oend;
 
    GenCTCInfo();
+   GenCTCInfo & operator+=(const GenCTCInfo &);
 
    void clear();
-   GenCTCInfo & operator+=(const GenCTCInfo &);
 
    void add_fcst_valid(const unixtime, const unixtime);
    void add_obs_valid (const unixtime, const unixtime);
@@ -98,13 +123,26 @@ class TCGenVxOpt {
       double GenesisRadius;
       int GenesisInitDSec;
 
+      // Scoring methods
+      bool DevFlag;
+      bool OpsFlag;
+
+      // Output file options
+      double CIAlpha;
+      map<STATLineType,STATOutputType> OutputMap;
+      TCGenNcOutInfo NcInfo;
+      int NcTrackPtsBeg, NcTrackPtsEnd;
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void process_config(Dictionary &);
+      void parse_nc_info(Dictionary &);
 
-      bool is_keeper(const GenesisInfo &);
+      bool is_keeper(const GenesisInfo &) const;
+
+      STATOutputType output_map(STATLineType) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,16 +193,15 @@ class TCGenConfInfo {
       Grid         BasinGrid;
       DataPlane    BasinData;
 
+      // Grid for NetCDF output file
+      Grid NcOutGrid;
+
+      // Summary of output file options across all filters
+      map<STATLineType,STATOutputType> OutputMap;
+      TCGenNcOutInfo NcInfo;
+   
       // Config file version
       ConcatString Version;
-
-      // Scoring methods
-      bool DevFlag;
-      bool OpsFlag;
-
-      // Output file options
-      double CIAlpha;
-      map<STATLineType,STATOutputType> OutputMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -173,12 +210,16 @@ class TCGenConfInfo {
       void read_config(const char *, const char *);
 
       void process_config();
+      void process_flags(const map<STATLineType,STATOutputType> &,
+                         const TCGenNcOutInfo &);
 
       double compute_dland(double lat, double lon);
 
       ConcatString compute_basin(double lat, double lon);
 
       int n_vx() const;
+
+      STATOutputType output_map(STATLineType) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

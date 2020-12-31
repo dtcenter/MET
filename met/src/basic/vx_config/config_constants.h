@@ -1056,21 +1056,30 @@ static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
 
 // TC-Gen config options
-static const char conf_key_init_freq[]                = "init_freq";
-static const char conf_key_valid_freq[]               = "valid_freq";
-static const char conf_key_lead_window[]              = "lead_window";
-static const char conf_key_min_duration[]             = "min_duration";
-static const char conf_key_fcst_genesis[]             = "fcst_genesis";
-static const char conf_key_best_genesis[]             = "best_genesis";
-static const char conf_key_technique[]                = "technique";
-static const char conf_key_category[]                 = "category";
-static const char conf_key_vmax_thresh[]              = "vmax_thresh";
-static const char conf_key_mslp_thresh[]              = "mslp_thresh";
-static const char conf_key_genesis_window[]           = "genesis_window";
-static const char conf_key_genesis_radius[]           = "genesis_radius";
-static const char conf_key_genesis_init_diff[]        = "genesis_init_diff";
-static const char conf_key_dev_method_flag[]          = "dev_method_flag";
-static const char conf_key_ops_method_flag[]          = "ops_method_flag";
+static const char conf_key_init_freq[]                   = "init_freq";
+static const char conf_key_valid_freq[]                  = "valid_freq";
+static const char conf_key_lead_window[]                 = "lead_window";
+static const char conf_key_min_duration[]                = "min_duration";
+static const char conf_key_fcst_genesis[]                = "fcst_genesis";
+static const char conf_key_best_genesis[]                = "best_genesis";
+static const char conf_key_technique[]                   = "technique";
+static const char conf_key_category[]                    = "category";
+static const char conf_key_vmax_thresh[]                 = "vmax_thresh";
+static const char conf_key_mslp_thresh[]                 = "mslp_thresh";
+static const char conf_key_genesis_window[]              = "genesis_window";
+static const char conf_key_genesis_radius[]              = "genesis_radius";
+static const char conf_key_genesis_init_diff[]           = "genesis_init_diff";
+static const char conf_key_dev_method_flag[]             = "dev_method_flag";
+static const char conf_key_ops_method_flag[]             = "ops_method_flag";
+static const char conf_key_nc_pairs_grid[]               = "nc_pairs_grid";
+static const char conf_key_genesis_track_points_window[] = "genesis_track_points_window";
+static const char conf_key_best_gen_flag[]               = "best_gen";
+static const char conf_key_best_pts_flag[]               = "best_pts";
+static const char conf_key_fcst_gen_flag[]               = "fcst_gen";
+static const char conf_key_fcst_pts_flag[]               = "fcst_pts";
+static const char conf_key_gen_fy_oy_flag[]              = "gen_fy_oy";
+static const char conf_key_gen_fy_on_flag[]              = "gen_fy_on";
+static const char conf_key_gen_fn_oy_flag[]              = "gen_fn_oy";
 
 //
 // TC-RMW specific parameter key names
