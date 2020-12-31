@@ -57,10 +57,6 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    // Otherwise, process regridding logic
    else {
 
-      // Parse info.name as a white-space separated string
-      StringArray sa;
-      sa.parse_wsss(info.name);
-
       // Verify on the forecast grid
       if(info.field == FieldType_Fcst) {
          mlog << Debug(3)
@@ -73,33 +69,10 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
               << "Use the observation grid.\n";
          vx_grid = *ogrid;
       }
-      // Search for a named grid
-      else if(sa.n() == 1 && find_grid_by_name(info.name.c_str(), vx_grid)) {
-         mlog << Debug(3)
-              << "Use the grid named \"" << info.name << "\".\n";
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, vx_grid)) {
-         mlog << Debug(3)
-              << "Use the grid defined by string \"" << info.name << "\".\n";
-      }
-      // Extract the grid from a gridded data file
+      // Parse a named grid, grid specification string,
+      // or gridded data file
       else {
-
-         mlog << Debug(3)
-              << "Use the grid defined by file \"" << info.name << "\".\n";
-
-         Met2dDataFileFactory mtddf_factory;
-         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-
-         // Attempt to open the data file
-         if(!(mtddf = mtddf_factory.new_met_2d_data_file(info.name.c_str()))) {
-            mlog << Error << "\nparse_vx_grid() -> "
-                 << "can't open file \"" << info.name << "\"\n\n";
-            exit(1);
-         }
-         vx_grid = mtddf->grid();
-         delete mtddf;
+         parse_grid_mask(info.name, vx_grid);
       }
    }
 
@@ -209,25 +182,40 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
    // Check for empty input string
    if(mask_grid_str.empty()) return;
 
-   Met2dDataFileFactory factory;
-   Met2dDataFile * datafile = (Met2dDataFile *) 0;
+   // Parse mask_grid_str as a white-space separated string
+   StringArray sa;
+   sa.parse_wsss(mask_grid_str);
+      
+   // Named grid
+   if(sa.n() == 1 && find_grid_by_name(mask_grid_str.c_str(), grid)) {
+      mlog << Debug(3)
+           << "Use the grid named \"" << mask_grid_str << "\".\n";
+   }
+   // Grid specification string
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3)
+           << "Use the grid defined by string \"" << mask_grid_str
+           << "\".\n";
+   }
+   // Extract the grid from a gridded data file
+   else {
+   
+      mlog << Debug(3)
+           << "Use the grid defined by file \""
+           << mask_grid_str << "\".\n";
 
-   // First, try to find the grid by name.
-   if(!find_grid_by_name(mask_grid_str.c_str(), grid)) {
+      Met2dDataFileFactory mtddf_factory;
+      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
-      // If that doesn't work, try to open a data file.
-      datafile = factory.new_met_2d_data_file(replace_path(mask_grid_str.c_str()).c_str());
-
-      if(!datafile) {
-        mlog << Error << "\nparse_grid_mask() -> "
-             << "can't open data file \"" << mask_grid_str << "\"\n\n";
-        exit(1);
+      // Attempt to open the data file
+      if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+                      replace_path(mask_grid_str.c_str()).c_str()))) {
+         mlog << Error << "\nparse_grid_mask() -> "
+              << "can't open file \"" << mask_grid_str << "\"\n\n";
+         exit(1);
       }
-
-      // Store the data file's grid
-      grid = datafile->grid();
-
-      delete datafile; datafile = (Met2dDataFile *) 0;
+      grid = mtddf->grid();
+      delete mtddf;
    }
 
    return;
