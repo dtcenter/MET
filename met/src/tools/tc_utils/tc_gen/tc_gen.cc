@@ -43,6 +43,7 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_statistics.h"
 #include "vx_tc_util.h"
+#include "vx_nc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_log.h"
@@ -86,6 +87,8 @@ static int    find_genesis_match   (const GenesisInfo &,
 
 static void   setup_txt_files      (int);
 static void   setup_table          (AsciiTable &);
+static void   setup_nc_file        ();
+
 static void   write_cts            (const TCGenVxOpt &, GenCTCInfo &);
 static void   finish_txt_files     ();
 
@@ -225,6 +228,9 @@ void process_genesis() {
    // Setup output files based on the number of techniques present
    setup_txt_files(fcst_ga.n_technique());
 
+   // If requested, setup the NetCDF output file
+   if(!conf_info.NcInfo.all_false()) setup_nc_file();
+
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
 
@@ -284,6 +290,17 @@ void process_genesis() {
 
    // Finish output files
    finish_txt_files();
+
+   // Close the NetCDF output file
+   if(nc_out) {
+
+      // List the NetCDF file after it is finished
+      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
+
+      delete nc_out;
+      nc_out = (NcFile *) 0;
+   }
+
 
    return;
 }
@@ -1002,6 +1019,42 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void setup_nc_file() {
+
+   // Build the output NetCDF file name
+   out_nc_file << cs_erase << out_base << "_pairs_.nc";
+
+   // Create a new NetCDF file and open it
+   nc_out = open_ncfile(out_nc_file.c_str(), true);
+
+   if(IS_INVALID_NC_P(nc_out)) {
+      mlog << Error << "\nsetup_nc_file() -> "
+           << "trouble opening output NetCDF file "
+           << out_nc_file << "\n\n";
+      exit(1);
+   }
+
+   // Add global attributes
+   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name);
+
+   // Add the projection information
+   Grid grid = conf_info.NcOutGrid;
+   write_netcdf_proj(nc_out, grid);
+
+   // Define Dimensions
+   lat_dim = add_dim(nc_out,"lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out,"lon", (long) grid.nx());
+
+   // Add the lat/lon variables
+   if(conf_info.NcInfo.do_latlon) {
+      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
    ConcatString dev_name("GENESIS_DEV");
    ConcatString ops_name("GENESIS_OPS");
@@ -1103,6 +1156,12 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
 
    return;
 }
+
+// JHG, for #1430, to do.
+// Update docs to indicate that dev_method_flag, ops_method_flag, and output_flag
+// can be defined separately for each filter.
+// Add docs for nc_pairs_flag and genesis_track_points_window.
+// Update tc_gen to actually create a NetCDF pairs (_pairs.nc) output file.
 
 ////////////////////////////////////////////////////////////////////////
 

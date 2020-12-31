@@ -29,6 +29,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "tc_gen_conf_info.h"
 
 #include "vx_tc_util.h"
@@ -90,6 +93,15 @@ static ConcatString out_base;
 // Variables for Output Files
 //
 ////////////////////////////////////////////////////////////////////////
+
+// Output NetCDF file
+static ConcatString out_nc_file;
+static NcFile      *nc_out = (NcFile *) 0;
+static NcDim        lat_dim;
+static NcDim        lon_dim;
+
+// List of output NetCDF variable names
+static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString stat_file;
