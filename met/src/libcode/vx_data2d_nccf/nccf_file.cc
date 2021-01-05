@@ -319,24 +319,21 @@ bool NcCfFile::open(const char * filepath)
     }
 
     if (units_att) delete units_att;
-
-    if( time_dim_count > 0 ) {
-      // Determine the number of times present.
-      int n_times = (int) get_data_size(valid_time_var);
-      double *time_values = new double[n_times + 1];
-      if( get_nc_data(valid_time_var, time_values) ) {
-        bool no_leap_year = get_att_no_leap_year(valid_time_var);
-        if( time_dim_count > 1 ) {
-          double latest_time = bad_data_double;
-          for(int i=0; i<n_times; i++) {
-            if( latest_time < time_values[i] ) latest_time = time_values[i];
-          }
-          ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
+    // Determine the number of times present.
+    int n_times = (int) get_data_size(valid_time_var);
+    double *time_values = new double[n_times];
+    if( get_nc_data(valid_time_var, time_values) ) {
+      bool no_leap_year = get_att_no_leap_year(valid_time_var);
+      if( time_dim_count > 1 ) {
+        double latest_time = bad_data_double;
+        for(int i=0; i<n_times; i++) {
+          if( latest_time < time_values[i] ) latest_time = time_values[i];
         }
-        else {
-          for(int i=0; i<n_times; i++) {
-            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
-          }
+        ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
+      }
+      else {
+        for(int i=0; i<n_times; i++) {
+          ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
         }
       }
     }
