@@ -28,7 +28,7 @@ if len(sys.argv) == 3:
     except NameError:
         print("Can't find the input file")
 else:
-    print("ERROR: read_ascii_numpy.py -> Must specify exactly one input file and a name for the data.")
+    print("ERROR: read_ascii_xarray.py -> Must specify exactly one input file and a name for the data.")
     sys.exit(1)
 
 
