@@ -1940,22 +1940,21 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime find_valid_time(NcVar time_var) {
+static unixtime find_valid_time(NcVar time_var) {
    unixtime valid_time = bad_data_int;
    static const char *method_name = "find_valid_time() ";
 
-   if (IS_VALID_NC(time_var)) {
+   if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
-      if( time_count > 0) {
-         double time_values [time_count + 1];
-         if (get_nc_data(&time_var, time_values)) {
-            valid_time = compute_unixtime(&time_var, time_values[0]);
-         }
-         else {
-            mlog << Error << "\n" << method_name << "-> "
-                 << "Can not read \"" << GET_NC_NAME(time_var)
-                 << "\" variable from \"" << InputFilename << "\"\n\n";
-         }
+      
+      double time_values [time_count + 1];
+      if (get_nc_data(&time_var, time_values)) {
+         valid_time = compute_unixtime(&time_var, time_values[0]);
+      }
+      else {
+         mlog << Error << "\n" << method_name << "-> "
+              << "Can not read \"" << GET_NC_NAME(time_var)
+              << "\" variable from \"" << InputFilename << "\"\n\n";
       }
    }
 
