@@ -139,8 +139,9 @@ static void set_adp(const StringArray &);
 static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
+static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
 static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon);
+                             NcVar var_lat, NcVar var_lon, bool *skip_times);
 static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
@@ -172,7 +173,7 @@ static IntArray qc_flags;
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
-static unixtime find_valid_time(NcFile *nc_in);
+static unixtime find_valid_time(NcVar time_var);
 static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid);
 static void get_grid_mapping(Grid fr_grid, Grid to_grid,
                              IntArray *cellMapping, ConcatString geostationary_file);
@@ -349,6 +350,7 @@ void process_data_file() {
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
    nc_in = open_ncfile(InputFilename.c_str());
    
+   //Get the obs type before opening NetCDF
    int obs_type = get_obs_type(nc_in);
    bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
 
@@ -517,7 +519,11 @@ int get_obs_type(NcFile *nc) {
    ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
    
-   if (get_global_att(nc, (string)"scene_id", att_val)) {
+   if (has_lat_lon_vars(nc)) {
+      obs_type = TYPE_NCCF;
+      input_type = "OBS_NCCF";
+   }
+   else if (get_global_att(nc, (string)"scene_id", att_val)) {
       obs_type = TYPE_GOES;
       input_type = "GOES";
       if (0 < AdpFilename.length()) {
@@ -528,10 +534,6 @@ int get_obs_type(NcFile *nc) {
             exit(1);
          }
       }
-   }
-   else if (has_lat_lon_vars(nc)) {
-      obs_type = TYPE_NCCF;
-      input_type = "OBS_NCCF";
    }
    else if (has_dim(nc, nc_dim_nhdr) && has_dim(nc, nc_dim_nobs)) {
       obs_type = TYPE_OBS;
@@ -803,7 +805,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
             for(idx=0; idx<hdr_valid_times.n(); idx++) {
                obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
-               if (valid_beg_ut <= obs_time and obs_time <= valid_end_ut) {
+               if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
                   valid_time_array.add(idx);
                   mlog << Debug(4) << method_name << "The obs time "
                        << hdr_valid_times[idx] << " was included\n";
@@ -1109,9 +1111,14 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
+   unixtime valid_beg_ut, valid_end_ut;
+   bool *skip_times = 0;
+   double *valid_times = 0;
+   int filtered_by_time = 0;
    clock_t start_clock =  clock();
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
+   int from_size = fr_grid.nx() * fr_grid.ny();
    static const char *method_name = "process_point_file_with_latlon() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
@@ -1134,10 +1141,46 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       usage();
    }
 
-   unixtime valid_time = find_valid_time(nc_in);
+   bool is_2d_time = false;
+   unixtime valid_time = bad_data_int;
+   valid_beg_ut = valid_end_ut = conf_info.valid_time;
+   
+   NcVar time_var = get_nc_var_time(nc_in);
+   if( IS_VALID_NC(time_var) ) {
+      if( 1 < get_dim_count(&time_var) ) {
+         is_2d_time = true;
+         double max_time = bad_data_double;
+         skip_times = new bool[from_size];
+         valid_times = new double[from_size];
+         if (get_nc_data(&time_var, valid_times)) {
+            int sec_per_unit;
+            bool no_leap_year;
+            unixtime ref_ut, tmp_time;
+            if( conf_info.valid_time > 0 ) {
+               if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+               if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+               ref_ut = get_reference_unixtime(&time_var, sec_per_unit, no_leap_year);
+            }
+            for (int i=0; i<from_size; i++) {
+               if( conf_info.valid_time > 0 ) {
+                  tmp_time = add_to_unixtime(ref_ut, sec_per_unit,
+                                             valid_times[i], no_leap_year);
+                  skip_times[i] = (valid_beg_ut > tmp_time || tmp_time > valid_end_ut);
+                  if( skip_times[i]) filtered_by_time++;
+               }
+               else skip_times[i] = false;
+               if (max_time < valid_times[i]) max_time = valid_times[i];
+            }
+            valid_time = compute_unixtime(&time_var, max_time);
+         }
+      }
+      else valid_time = find_valid_time(time_var);
+   }
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
-   get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon);
+   get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon, skip_times);
+   if( skip_times ) delete [] skip_times;
+   if( valid_times ) delete [] valid_times;
 
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n(); i++) {
@@ -1220,6 +1263,12 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
    delete [] cellMapping;
    cellMapping = (IntArray *)0;
+   if( 0 < filtered_by_time ) {
+      mlog << Debug(2) << method_name << "Filtered by time: " << filtered_by_time
+           << " out of " << from_size
+           << " [" << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << " to "
+           << unix_to_yyyymmdd_hhmmss(valid_end_ut) << "]\n";
+   }
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
@@ -1502,7 +1551,6 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
-   unixtime valid_time = 0;
    int global_attr_count;
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
@@ -1526,7 +1574,8 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
    }
 
-   valid_time = find_valid_time(nc_in);
+   NcVar time_var = get_nc_var_time(nc_in);
+   unixtime valid_time = find_valid_time(time_var);
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
    IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
@@ -1682,6 +1731,24 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
+   unixtime obs_time = bad_data_int;
+   static const char *method_name = "compute_unixtime() ";
+
+   if (IS_VALID_NC_P(time_var)) {
+      int sec_per_unit;
+      bool no_leap_year;
+      unixtime ref_ut = get_reference_unixtime(time_var, sec_per_unit, no_leap_year);
+      obs_time= add_to_unixtime(ref_ut, sec_per_unit, var_value, no_leap_year);
+      mlog << Debug(3) << method_name << "valid time: " << var_value
+           << " ==> " << unix_to_yyyymmdd_hhmmss(obs_time) << "\n";
+   }
+
+   return obs_time;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons) {
@@ -1739,8 +1806,9 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 ////////////////////////////////////////////////////////////////////////
 
 static void get_grid_mapping_latlon(
-      DataPlane from_dp, DataPlane to_dp, Grid to_grid, IntArray *cellMapping,
-      float *latitudes, float *longitudes, int from_lat_count, int from_lon_count) {
+      DataPlane from_dp, DataPlane to_dp, Grid to_grid,
+      IntArray *cellMapping, float *latitudes, float *longitudes,
+      int from_lat_count, int from_lon_count, bool *skip_times) {
    double x, y;
    float lat, lon;
    int idx_x, idx_y, to_offset;
@@ -1763,6 +1831,7 @@ static void get_grid_mapping_latlon(
    for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
          int coord_offset = from_dp.two_to_one(yIdx, xIdx);
+         if( skip_times != 0 && skip_times[coord_offset] ) continue;
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
          if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
@@ -1825,7 +1894,7 @@ static void get_grid_mapping_latlon(
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon) {
+                             NcVar var_lat, NcVar var_lon, bool *skip_times) {
    bool status = false;
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
@@ -1857,8 +1926,9 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       status = get_nc_data(&var_lat, latitudes);
       if( status ) status = get_nc_data(&var_lon, longitudes);
       if( status ) {
-         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count);
+         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
+                                 latitudes, longitudes, from_lat_count,
+                                 from_lon_count, skip_times);
       }
       if( latitudes )  delete [] latitudes;
       if( longitudes ) delete [] longitudes;
@@ -1870,33 +1940,26 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime find_valid_time(NcFile *nc_in) {
-   unixtime valid_time = -1;
+unixtime find_valid_time(NcVar time_var) {
+   unixtime valid_time = bad_data_int;
    static const char *method_name = "find_valid_time() ";
 
-   NcVar time_var = get_nc_var_time(nc_in);
    if (IS_VALID_NC(time_var)) {
-      int sec_per_unit;
-      bool no_leap_year;
-      int time_count = 0;
-      NcDim time_dim = get_nc_dim(&time_var, 0);
-      if (IS_VALID_NC(time_dim)) time_count = get_dim_size(&time_dim);
-
-      double time_values [time_count + 1];
-      if (get_nc_data(&time_var, time_values)) {
-         unixtime ref_ut = get_reference_unixtime(&time_var, sec_per_unit, no_leap_year);
-         valid_time = add_to_unixtime(ref_ut, sec_per_unit, time_values[0], no_leap_year);
-         mlog << Debug(2) << method_name << "valid time: " << time_values[0]
-              << " ==> " << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
-      }
-      else {
-         mlog << Error << "\n" << method_name << "-> "
-              << "Can not read \"" << GET_NC_NAME(time_var)
-              << "\" variable from \"" << InputFilename << "\"\n\n";
+      int time_count = get_dim_size(&time_var, 0);
+      if( time_count > 0) {
+         double time_values [time_count + 1];
+         if (get_nc_data(&time_var, time_values)) {
+            valid_time = compute_unixtime(&time_var, time_values[0]);
+         }
+         else {
+            mlog << Error << "\n" << method_name << "-> "
+                 << "Can not read \"" << GET_NC_NAME(time_var)
+                 << "\" variable from \"" << InputFilename << "\"\n\n";
+         }
       }
    }
 
-   if (valid_time < 0) {
+   if (valid_time == bad_data_int) {
       mlog << Error << "\n" << method_name << "-> "
            << "trouble finding time variable from \""
            << InputFilename << "\"\n\n";
@@ -2070,7 +2133,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count);
+                                 longitudes, from_lat_count, from_lon_count, 0);
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
