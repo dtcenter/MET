@@ -24,7 +24,7 @@
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
-      &OUTPUT_DIR;/python/letter.ps \
+      &OUTPUT_DIR;/python/letter_numpy.ps \
       'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled numpy plot_data_plane" \
@@ -39,7 +39,7 @@
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
-      &OUTPUT_DIR;/python/letter.ps \
+      &OUTPUT_DIR;/python/letter_xarray.ps \
       'name = "&MET_BASE;/python/read_ascii_xarray.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled xarray plot_data_plane" \
