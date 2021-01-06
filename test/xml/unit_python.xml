@@ -38,7 +38,7 @@
   <test name="python_xarray_plot_data_plane">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
-      PYTHON_NUMPY \
+      PYTHON_XARRAY \
       &OUTPUT_DIR;/python/letter_xarray.ps \
       'name = "&MET_BASE;/python/read_ascii_xarray.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
