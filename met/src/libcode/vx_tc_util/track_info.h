@@ -65,6 +65,8 @@ class TrackInfo {
       unixtime     InitTime;
       unixtime     MinValidTime;
       unixtime     MaxValidTime;
+      unixtime     MinWarmCore;
+      unixtime     MaxWarmCore;
 
       // TrackPoints
       TrackPoint  *Point;
@@ -131,6 +133,9 @@ class TrackInfo {
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
       int                  duration()         const;
+      unixtime             warm_core_min()    const;
+      unixtime             warm_core_max()    const;
+      int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
 
@@ -180,6 +185,8 @@ inline unixtime             TrackInfo::init()             const { return(InitTim
 inline int                  TrackInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
 inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);                 }
 inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);                 }
+inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
+inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
 inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
 
