@@ -31,8 +31,6 @@ else:
     print("ERROR: read_ascii_xarray.py -> Must specify exactly one input file and a name for the data.")
     sys.exit(1)
 
-
-
 ###########################################
 
    ##
@@ -84,7 +82,7 @@ da = xr.DataArray(met_data)
 ds = xr.Dataset({"fcst":da})
 
 # Add the attributes to the dataarray object
-da.attrs = attrs
+ds.attrs = attrs
 
 # Delete the local variable attrs to mimic the real world,
 # where a user will rely on da.attrs rather than construct it themselves
@@ -94,4 +92,4 @@ del attrs
 del met_data
 
 # Create met_data and specify attrs because XR doesn't persist them.
-met_data = xr.DataArray(ds.fcst,attrs=ds.attrs)
+met_data = xr.DataArray(ds.fcst, attrs=ds.attrs)
