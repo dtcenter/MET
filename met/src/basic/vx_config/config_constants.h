@@ -1073,13 +1073,12 @@ static const char conf_key_dev_method_flag[]             = "dev_method_flag";
 static const char conf_key_ops_method_flag[]             = "ops_method_flag";
 static const char conf_key_nc_pairs_grid[]               = "nc_pairs_grid";
 static const char conf_key_genesis_track_points_window[] = "genesis_track_points_window";
-static const char conf_key_best_gen_flag[]               = "best_gen";
-static const char conf_key_best_pts_flag[]               = "best_pts";
-static const char conf_key_fcst_gen_flag[]               = "fcst_gen";
-static const char conf_key_fcst_pts_flag[]               = "fcst_pts";
-static const char conf_key_gen_fy_oy_flag[]              = "gen_fy_oy";
-static const char conf_key_gen_fy_on_flag[]              = "gen_fy_on";
-static const char conf_key_gen_fn_oy_flag[]              = "gen_fn_oy";
+static const char conf_key_fcst_fy_oy[]                  = "fcst_fy_oy";
+static const char conf_key_fcst_fy_on[]                  = "fcst_fy_on";
+static const char conf_key_fcst_tracks[]                 = "fcst_tracks";
+static const char conf_key_best_fy_oy[]                  = "best_fy_oy";
+static const char conf_key_best_fn_oy[]                  = "best_fn_oy";
+static const char conf_key_best_tracks[]                 = "best_tracks";
 
 //
 // TC-RMW specific parameter key names

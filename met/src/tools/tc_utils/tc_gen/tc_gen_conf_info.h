@@ -44,17 +44,19 @@ static const STATLineType txt_file_type[n_txt] = {
 struct TCGenNcOutInfo {
 
    bool do_latlon;
-   bool do_best_gen;
-   bool do_best_pts;
-   bool do_fcst_gen;
-   bool do_fcst_pts;
-   bool do_gen_fy_oy;
-   bool do_gen_fy_on;
-   bool do_gen_fn_oy;
+   bool do_fcst_genesis;
+   bool do_fcst_fy_oy;
+   bool do_fcst_fy_on;
+   bool do_fcst_tracks;
+   bool do_best_genesis;
+   bool do_best_fy_oy;
+   bool do_best_fn_oy;
+   bool do_best_tracks;
 
       //////////////////////////////////////////////////////////////////
 
    TCGenNcOutInfo();
+   TCGenNcOutInfo & operator+=(const TCGenNcOutInfo &);
 
    void clear();   //  sets everything to true
 
@@ -62,23 +64,6 @@ struct TCGenNcOutInfo {
 
    void set_all_false();
    void set_all_true();
-};
-
-////////////////////////////////////////////////////////////////////////
-
-struct GenCTCInfo {
-   ConcatString model;
-   CTSInfo cts_dev;
-   CTSInfo cts_ops;
-   unixtime fbeg, fend, obeg, oend;
-
-   GenCTCInfo();
-   GenCTCInfo & operator+=(const GenCTCInfo &);
-
-   void clear();
-
-   void add_fcst_valid(const unixtime, const unixtime);
-   void add_obs_valid (const unixtime, const unixtime);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,13 +203,65 @@ class TCGenConfInfo {
       ConcatString compute_basin(double lat, double lon);
 
       int n_vx() const;
-
+      int compression_level();
+   
       STATOutputType output_map(STATLineType) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCGenConfInfo::n_vx() const { return(VxOpt.size()); }
+inline int TCGenConfInfo::n_vx()         const { return(VxOpt.size());          }
+inline int TCGenConfInfo::compression_level()  { return(Conf.nc_compression()); }
+
+////////////////////////////////////////////////////////////////////////
+
+class GenCTCInfo {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      GenCTCInfo();
+     ~GenCTCInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+   ConcatString Model;
+   unixtime FcstBeg, FcstEnd;
+   unixtime BestBeg, BestEnd;
+   CTSInfo CTSDev, CTSOps;
+
+   const TCGenVxOpt* VxOpt;
+   const Grid *NcOutGrid;
+
+   DataPlane FcstGenesisDp, FcstTrackDp;
+   DataPlane BestGenesisDp, BestTrackDp;
+
+   DataPlane FcstDevFYOYDp, FcstDevFYONDp;
+   DataPlane BestDevFYOYDp, BestDevFNOYDp;
+
+   DataPlane FcstOpsFYOYDp, FcstOpsFYONDp;
+   DataPlane BestOpsFYOYDp, BestOpsFNOYDp;
+
+      //////////////////////////////////////////////////////////////////
+
+   void clear();
+
+   void set_vx_opt(const TCGenVxOpt *, const Grid *);
+
+   void inc_dev(bool, bool,
+                const GenesisInfo *, const GenesisInfo *);
+   void inc_ops(bool, bool,
+                const GenesisInfo *, const GenesisInfo *);
+
+   void add_fcst_gen(const GenesisInfo &, int, int);
+   void add_best_gen(const GenesisInfo &, int, int);
+
+   void inc_pnt(double, double, DataPlane &);
+   void inc_trk(const GenesisInfo &, int, int, DataPlane &);
+};
 
 ////////////////////////////////////////////////////////////////////////
 

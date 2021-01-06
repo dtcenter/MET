@@ -185,14 +185,15 @@ output_flag = {
 // NetCDF genesis and track density contents
 //
 nc_pairs_flag = {
-   latlon    = TRUE;
-   best_gen  = TRUE;
-   best_pts  = TRUE;
-   fcst_gen  = TRUE;
-   fcst_pts  = TRUE;
-   gen_fy_oy = TRUE;
-   gen_fy_on = TRUE;
-   gen_fn_oy = TRUE;
+   latlon       = TRUE;
+   fcst_genesis = TRUE;
+   fcst_fy_oy   = TRUE;
+   fcst_fy_on   = TRUE;
+   fcst_tracks  = TRUE;
+   best_genesis = TRUE;
+   best_fy_oy   = TRUE;
+   best_fn_oy   = TRUE;
+   best_tracks  = TRUE;
 }
 
 //

@@ -36,6 +36,23 @@ TCGenNcOutInfo::TCGenNcOutInfo() {
 
 ////////////////////////////////////////////////////////////////////////
 
+TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
+
+   if(t.do_latlon)       do_latlon       = true;
+   if(t.do_fcst_genesis) do_fcst_genesis = true;
+   if(t.do_fcst_fy_oy)   do_fcst_fy_oy   = true;
+   if(t.do_fcst_fy_on)   do_fcst_fy_on   = true;
+   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
+   if(t.do_best_genesis) do_best_genesis = true;
+   if(t.do_best_fy_oy)   do_best_fy_oy   = true;
+   if(t.do_best_fn_oy)   do_best_fn_oy   = true;
+   if(t.do_best_tracks)  do_best_tracks  = true;
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TCGenNcOutInfo::clear() {
 
    set_all_true();
@@ -47,9 +64,11 @@ void TCGenNcOutInfo::clear() {
 
 bool TCGenNcOutInfo::all_false() const {
 
-   bool status = do_latlon    || do_best_gen  || do_best_pts  ||
-                 do_fcst_gen  || do_fcst_pts  || do_gen_fy_oy ||
-                 do_gen_fy_on || do_gen_fn_oy;
+   bool status = do_latlon       ||
+                 do_fcst_genesis || do_fcst_fy_oy  ||
+                 do_fcst_fy_on   || do_fcst_tracks ||
+                 do_best_genesis || do_best_fy_oy  ||
+                 do_best_fn_oy   || do_best_tracks;
 
    return(!status);
 }
@@ -58,14 +77,15 @@ bool TCGenNcOutInfo::all_false() const {
 
 void TCGenNcOutInfo::set_all_false() {
 
-   do_latlon    = false;
-   do_best_gen  = false;
-   do_best_pts  = false;
-   do_fcst_gen  = false;
-   do_fcst_pts  = false;
-   do_gen_fy_oy = false;
-   do_gen_fy_on = false;
-   do_gen_fn_oy = false;
+   do_latlon       = false;
+   do_fcst_genesis = false;
+   do_fcst_fy_oy   = false;
+   do_fcst_fy_on   = false;
+   do_fcst_tracks  = false;
+   do_best_genesis = false;
+   do_best_fy_oy   = false;
+   do_best_fn_oy   = false;
+   do_best_tracks  = false;
 
    return;
 }
@@ -74,72 +94,15 @@ void TCGenNcOutInfo::set_all_false() {
 
 void TCGenNcOutInfo::set_all_true() {
 
-   do_latlon    = true;
-   do_best_gen  = true;
-   do_best_pts  = true;
-   do_fcst_gen  = true;
-   do_fcst_pts  = true;
-   do_gen_fy_oy = true;
-   do_gen_fy_on = true;
-   do_gen_fn_oy = true;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Code for struct GenCTCInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-GenCTCInfo::GenCTCInfo() {
-   clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void GenCTCInfo::clear() {
-   model.clear();
-   cts_dev.clear();
-   cts_ops.clear();
-   fbeg = fend = obeg = oend = (unixtime) 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-GenCTCInfo & GenCTCInfo::operator+=(const GenCTCInfo &g) {
-
-   // Increment counts
-   cts_dev.cts += g.cts_dev.cts;
-   cts_ops.cts += g.cts_ops.cts;
-
-   // Keep track of the minimum and maximum times
-   if(fbeg == 0 || g.fbeg < fbeg) fbeg = g.fbeg;
-   if(fend == 0 || g.fend > fend) fend = g.fend;
-   if(obeg == 0 || g.obeg < obeg) obeg = g.obeg;
-   if(oend == 0 || g.oend > oend) oend = g.oend;
-
-   return(*this);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void GenCTCInfo::add_fcst_valid(const unixtime beg,
-                                const unixtime end) {
-
-   if(fbeg == 0 || fbeg > beg) fbeg = beg;
-   if(fend == 0 || fend < end) fend = end;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void GenCTCInfo::add_obs_valid(const unixtime beg,
-                               const unixtime end) {
-
-   if(obeg == 0 || obeg > beg) obeg = beg;
-   if(oend == 0 || oend < end) oend = end;
+   do_latlon       = true;
+   do_fcst_genesis = true;
+   do_fcst_fy_oy   = true;
+   do_fcst_fy_on   = true;
+   do_fcst_tracks  = true;
+   do_best_genesis = true;
+   do_best_fy_oy   = true;
+   do_best_fn_oy   = true;
+   do_best_tracks  = true;
 
    return;
 }
@@ -346,14 +309,15 @@ void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
    // Parse the various entries
    Dictionary * d = e->dict_value();
 
-   NcInfo.do_latlon    = d->lookup_bool(conf_key_latlon_flag);
-   NcInfo.do_best_gen  = d->lookup_bool(conf_key_best_gen_flag);
-   NcInfo.do_best_pts  = d->lookup_bool(conf_key_best_pts_flag);
-   NcInfo.do_fcst_gen  = d->lookup_bool(conf_key_fcst_gen_flag);
-   NcInfo.do_fcst_pts  = d->lookup_bool(conf_key_fcst_pts_flag);
-   NcInfo.do_gen_fy_oy = d->lookup_bool(conf_key_gen_fy_oy_flag);
-   NcInfo.do_gen_fy_on = d->lookup_bool(conf_key_gen_fy_on_flag);
-   NcInfo.do_gen_fn_oy = d->lookup_bool(conf_key_gen_fn_oy_flag);
+   NcInfo.do_latlon       = d->lookup_bool(conf_key_latlon_flag);
+   NcInfo.do_fcst_genesis = d->lookup_bool(conf_key_fcst_genesis);
+   NcInfo.do_fcst_fy_oy   = d->lookup_bool(conf_key_fcst_fy_oy);
+   NcInfo.do_fcst_fy_on   = d->lookup_bool(conf_key_fcst_fy_on);
+   NcInfo.do_fcst_tracks  = d->lookup_bool(conf_key_fcst_tracks);
+   NcInfo.do_best_genesis = d->lookup_bool(conf_key_best_genesis);
+   NcInfo.do_best_fy_oy   = d->lookup_bool(conf_key_best_fy_oy);
+   NcInfo.do_best_fn_oy   = d->lookup_bool(conf_key_best_fn_oy);
+   NcInfo.do_best_tracks  = d->lookup_bool(conf_key_best_tracks);
 
    return;
 }
@@ -368,7 +332,8 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
    // Only check basin, storm ID, cyclone number, and storm name for
    // BEST and operational tracks.
 
-   if(g.is_best_track() || g.is_oper_track()) {
+   if(g.track()->is_best_track() ||
+      g.track()->is_oper_track()) {
 
       // Check storm id
       if(StormId.n() > 0 &&
@@ -385,11 +350,12 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
    // Only check intialization and lead times for forecast and
    // operational tracks.
 
-   if(!g.is_best_track() || g.is_oper_track()) {
+   if(!g.track()->is_best_track() ||
+       g.track()->is_oper_track()) {
 
       // Initialization time window
-      if((InitBeg     > 0 &&  InitBeg > g.init()) ||
-         (InitEnd     > 0 &&  InitEnd < g.init()))
+      if((InitBeg > 0 &&  InitBeg > g.init()) ||
+         (InitEnd > 0 &&  InitEnd < g.init()))
          keep = false;
 
       // Initialization hours
@@ -671,15 +637,8 @@ void TCGenConfInfo::process_flags(
    }
 
    // Update NcInfo flags
-   if(n.do_latlon)    NcInfo.do_latlon    = true;
-   if(n.do_best_gen)  NcInfo.do_best_gen  = true;
-   if(n.do_best_pts)  NcInfo.do_best_pts  = true;
-   if(n.do_fcst_gen)  NcInfo.do_fcst_gen  = true;
-   if(n.do_fcst_pts)  NcInfo.do_fcst_pts  = true;
-   if(n.do_gen_fy_oy) NcInfo.do_gen_fy_oy = true;
-   if(n.do_gen_fy_on) NcInfo.do_gen_fy_on = true;
-   if(n.do_gen_fn_oy) NcInfo.do_gen_fn_oy = true;
-
+   NcInfo += n;
+   
    return;
 }
 ////////////////////////////////////////////////////////////////////////
@@ -782,6 +741,250 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
 
 STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
    return(OutputMap.at(t));
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class GenCTCInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo::GenCTCInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo::~GenCTCInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::clear() {
+
+   Model.clear();
+   FcstBeg = FcstEnd = (unixtime) 0;
+   BestBeg = BestEnd = (unixtime) 0;
+
+   CTSDev.clear();
+   CTSOps.clear();
+
+   VxOpt     = (const TCGenVxOpt *) 0;
+   NcOutGrid = (const Grid *) 0;
+
+   FcstGenesisDp.clear();
+   FcstTrackDp.clear();
+   FcstDevFYOYDp.clear();
+   FcstDevFYONDp.clear();
+   FcstOpsFYOYDp.clear();
+   FcstOpsFYONDp.clear();
+
+   BestGenesisDp.clear();
+   BestTrackDp.clear();
+   BestDevFYOYDp.clear();
+   BestDevFNOYDp.clear();
+   BestOpsFYOYDp.clear();
+   BestOpsFNOYDp.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::set_vx_opt(const TCGenVxOpt *vx_opt,
+                            const Grid *nc_out_grid) {
+
+   if(!vx_opt) return;
+
+   // Store pointer
+   VxOpt = vx_opt;
+
+   // Setup alpha value
+   if(VxOpt->DevFlag) {
+      CTSDev.allocate_n_alpha(1);
+      CTSDev.alpha[0] = VxOpt->CIAlpha;
+   }
+   if(VxOpt->OpsFlag) {
+      CTSOps.allocate_n_alpha(1);
+      CTSOps.alpha[0] = VxOpt->CIAlpha;
+   }
+
+   // Setup NetCDF pairs output fields
+   if(!VxOpt->NcInfo.all_false()) {
+
+      int nx, ny;
+      NcOutGrid = nc_out_grid;
+      nx = NcOutGrid->nx();
+      ny = NcOutGrid->ny();
+
+      // Initialize output fields
+      if(VxOpt->NcInfo.do_fcst_genesis) FcstGenesisDp.set_size(nx, ny, 0.0);
+      if(VxOpt->NcInfo.do_fcst_tracks)  FcstTrackDp.set_size  (nx, ny, 0.0);
+      if(VxOpt->NcInfo.do_best_genesis) BestGenesisDp.set_size(nx, ny, 0.0);
+      if(VxOpt->NcInfo.do_best_tracks)  BestTrackDp.set_size  (nx, ny, 0.0);
+      if(VxOpt->DevFlag) {
+         if(VxOpt->NcInfo.do_fcst_fy_oy) FcstDevFYOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_fcst_fy_on) FcstDevFYONDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_best_fy_oy) BestDevFYOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_best_fn_oy) BestDevFNOYDp.set_size(nx, ny, 0.0);
+      }
+      if(VxOpt->OpsFlag) {
+         if(VxOpt->NcInfo.do_fcst_fy_oy) FcstOpsFYOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_fcst_fy_on) FcstOpsFYONDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_best_fy_oy) BestOpsFYOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_best_fn_oy) BestOpsFNOYDp.set_size(nx, ny, 0.0);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_dev(bool f, bool o,
+        const GenesisInfo *fgi, const GenesisInfo *bgi) {
+
+   // Hits
+   if(f && o) {
+      CTSDev.cts.inc_fy_oy();
+      inc_pnt(fgi->lat(), fgi->lon(), FcstDevFYOYDp);
+      inc_pnt(bgi->lat(), bgi->lon(), BestDevFYOYDp);
+   }
+   // False Alarms
+   else if(f && !o) {
+      CTSDev.cts.inc_fy_on();
+      inc_pnt(fgi->lat(), fgi->lon(), FcstDevFYONDp);
+   }
+   // Misses
+   else if(!f && o) {
+      CTSDev.cts.inc_fn_oy();
+      inc_pnt(bgi->lat(), bgi->lon(), BestDevFNOYDp);
+   }
+   // Correct Negatives (should be none)
+   else {
+      CTSDev.cts.inc_fn_on();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_ops(bool f, bool o,
+        const GenesisInfo *fgi, const GenesisInfo *bgi) {
+
+   // Hits
+   if(f && o) {
+      CTSOps.cts.inc_fy_oy();
+      inc_pnt(fgi->lat(), fgi->lon(), FcstOpsFYOYDp);
+      inc_pnt(bgi->lat(), bgi->lon(), BestOpsFYOYDp);
+   }
+   // False Alarms
+   else if(f && !o) {
+      CTSOps.cts.inc_fy_on();
+      inc_pnt(fgi->lat(), fgi->lon(), FcstOpsFYONDp);
+   }
+   // Misses
+   else if(!f && o) {
+      CTSOps.cts.inc_fn_oy();
+      inc_pnt(bgi->lat(), bgi->lon(), BestOpsFNOYDp);
+   }
+   // Correct Negatives (should be none)
+   else {
+      CTSOps.cts.inc_fn_on();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi,
+                              int beg, int end) {
+
+   // Track the range of valid times
+   if(FcstBeg == 0 || FcstBeg > gi.valid_min()) FcstBeg = gi.valid_min();
+   if(FcstEnd == 0 || FcstEnd < gi.valid_max()) FcstEnd = gi.valid_max();
+   
+   // Count the genesis point
+   inc_pnt(gi.lat(), gi.lon(), FcstGenesisDp);
+
+   // Count the track points
+   if(!FcstTrackDp.is_empty()) inc_trk(gi, beg, end, FcstTrackDp);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_best_gen(const GenesisInfo &gi,
+                              int beg, int end) {
+
+   // Track the range of valid times
+   if(BestBeg == 0 || BestBeg > gi.valid_min()) BestBeg = gi.valid_min();
+   if(BestEnd == 0 || BestEnd < gi.valid_max()) BestEnd = gi.valid_max();
+
+   // Count the genesis point
+   inc_pnt(gi.lat(), gi.lon(), BestGenesisDp);
+
+   // Count the track points
+   if(!BestTrackDp.is_empty()) inc_trk(gi, beg, end, BestTrackDp);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
+
+   // Nothing to do if the DataPlane is empty
+   if(dp.is_empty()) return;
+
+   int x, y;
+   double x_dbl, y_dbl;
+
+   NcOutGrid->latlon_to_xy(lat, -1.0*lon, x_dbl, y_dbl);
+   x = nint(x_dbl);
+   y = nint(y_dbl);
+   dp.set(dp(x,y) + 1, x, y);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_trk(const GenesisInfo &gi, int beg, int end,
+                         DataPlane &dp) {
+
+   // Nothing to do if the DataPlane is empty
+   if(dp.is_empty()) return;
+
+   double lat, lon;
+   const TrackInfo *ti;
+   unixtime valid_beg = gi.genesis_time() + beg;
+   unixtime valid_end = gi.genesis_time() + end;
+
+   // Increment count for each track points falling in the time window
+   for(int i=0; i<ti->n_points(); i++) {
+      if((*ti)[i].valid() >= valid_beg &&
+         (*ti)[i].valid() <= valid_end) {
+         inc_pnt((*ti)[i].lat(), (*ti)[i].lon(), dp);
+      }
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
