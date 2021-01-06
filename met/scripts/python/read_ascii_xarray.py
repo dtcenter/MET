@@ -85,10 +85,9 @@ ds = xr.Dataset({"fcst":da})
 
 # Add the attributes to the dataarray object
 da.attrs = attrs
-ds.attrs = attrs
 
-# Delete the local variable attrs to mimic the real world, where a user will rely on da.attrs rather than
-# construct it themselves
+# Delete the local variable attrs to mimic the real world,
+# where a user will rely on da.attrs rather than construct it themselves
 del attrs
 
 # Delete the met_data variable, and reset it to be the Xarray object
@@ -96,4 +95,3 @@ del met_data
 
 # Create met_data and specify attrs because XR doesn't persist them.
 met_data = xr.DataArray(ds.fcst,attrs=ds.attrs)
-
