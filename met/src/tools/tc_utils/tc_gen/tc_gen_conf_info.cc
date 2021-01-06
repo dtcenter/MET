@@ -55,7 +55,7 @@ TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
 
 void TCGenNcOutInfo::clear() {
 
-   set_all_true();
+   set_all_false();
 
    return;
 }
@@ -958,7 +958,12 @@ void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
    NcOutGrid->latlon_to_xy(lat, -1.0*lon, x_dbl, y_dbl);
    x = nint(x_dbl);
    y = nint(y_dbl);
-   dp.set(dp(x,y) + 1, x, y);
+
+   // Only increment points on the grid
+   if(x >= 0 && x < NcOutGrid->nx() &&
+      y >= 0 && y < NcOutGrid->ny()) {
+      dp.set(dp(x,y) + 1, x, y);
+   }
 
    return;
 }

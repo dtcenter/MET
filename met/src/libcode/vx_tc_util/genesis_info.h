@@ -53,37 +53,22 @@ class GenesisInfo {
 
       void assign(const GenesisInfo &);
 
-      // Storm and model identification
+      bool IsSet;
 
-      bool         IsSet;
-      bool         IsBestTrack;
-      bool         IsOperTrack;
-      bool         IsAnlyTrack;
+      // Pointer to TrackInfo
+      const TrackInfo *Track; // not allocated
+      int   GenIndex;
 
-      ConcatString StormId;
-      ConcatString Basin;
-      ConcatString Cyclone;
-      ConcatString StormName;
-      int          TechniqueNumber;
+      // Genesis and model information
       ConcatString Technique;
-      ConcatString Initials;
-
-      // Genesis Timing
-      unixtime GenesisTime;
-      unixtime InitTime;
-      int      LeadTime;
+      unixtime     GenesisTime;
+      unixtime     InitTime;
+      int          LeadTime;
 
       // Genesis Location
       double   Lat;
       double   Lon;
       double   DLand;
-
-      // Track Summary
-      int      NPoints;
-      unixtime MinValidTime;
-      unixtime MaxValidTime;
-      unixtime MinWarmCoreTime;
-      unixtime MaxWarmCoreTime;
 
    public:
 
@@ -104,40 +89,31 @@ class GenesisInfo {
          //  set stuff
          //
 
-      void set_storm_id();
       void set_dland(double);
-      bool set(const TrackInfo &,
+      bool set(const TrackInfo *,
                const GenesisEventInfo *);
 
          //
          //  get stuff
          //
+   
+      const TrackInfo *track()        const;
+      double           lat()          const;
+      double           lon()          const;
+      double           dland()        const;
+      unixtime         genesis_time() const;
+      unixtime         init()         const;
+      int              init_hour()    const;
+      int              lead_time()    const;
 
-      bool is_best_track() const;
-      bool is_oper_track() const;
-      bool is_anly_track() const;
-
-      const ConcatString & storm_id()         const;
-      const ConcatString & basin()            const;
-      const ConcatString & cyclone()          const;
-      const ConcatString & storm_name()       const;
-      int                  technique_number() const;
-      const ConcatString & technique()        const;
-      const ConcatString & initials()         const;
-      double               lat()              const;
-      double               lon()              const;
-      double               dland()            const;
-      unixtime             genesis_time()     const;
-      unixtime             init()             const;
-      int                  init_hour()        const;
-      int                  lead_time()        const;
-      unixtime             valid_min()        const;
-      unixtime             valid_max()        const;
-      int                  duration()         const;
-      int                  n_points()         const;
-      unixtime             warm_core_min()    const;
-      unixtime             warm_core_max()    const;
-      int                  warm_core_dur()    const;
+      ConcatString     storm_id()     const;
+      ConcatString     basin()        const;
+      ConcatString     cyclone()      const;
+      ConcatString     storm_name()   const;
+      ConcatString     technique()    const;
+      unixtime         valid_min()    const;
+      unixtime         valid_max()    const;
+      int              duration()     const;
 
          //
          //  do stuff
@@ -149,32 +125,14 @@ class GenesisInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool                 GenesisInfo::is_best_track()    const { return(IsBestTrack);                  }
-inline bool                 GenesisInfo::is_oper_track()    const { return(IsOperTrack);                  }
-inline bool                 GenesisInfo::is_anly_track()    const { return(IsAnlyTrack);                  }
-inline const ConcatString & GenesisInfo::storm_id()         const { return(StormId);                      }
-inline const ConcatString & GenesisInfo::basin()            const { return(Basin);                        }
-inline const ConcatString & GenesisInfo::cyclone()          const { return(Cyclone);                      }
-inline const ConcatString & GenesisInfo::storm_name()       const { return(StormName);                    }
-inline int                  GenesisInfo::technique_number() const { return(TechniqueNumber);              }
-inline const ConcatString & GenesisInfo::technique()        const { return(Technique);                    }
-inline const ConcatString & GenesisInfo::initials()         const { return(Initials);                     }
-inline double               GenesisInfo::lat()              const { return(Lat);                          }
-inline double               GenesisInfo::lon()              const { return(Lon);                          }
-inline double               GenesisInfo::dland()            const { return(DLand);                        }
-inline unixtime             GenesisInfo::genesis_time()     const { return(GenesisTime);                  }
-inline unixtime             GenesisInfo::init()             const { return(InitTime);                     }
-inline int                  GenesisInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
-inline int                  GenesisInfo::lead_time()        const { return(LeadTime);                     }
-inline int                  GenesisInfo::n_points()         const { return(NPoints);                      }
-inline unixtime             GenesisInfo::valid_min()        const { return(MinValidTime);                 }
-inline unixtime             GenesisInfo::valid_max()        const { return(MaxValidTime);                 }
-inline int                  GenesisInfo::duration()         const { return((MinValidTime == 0 || MaxValidTime == 0 ?
-                                                                            bad_data_int : MaxValidTime - MinValidTime)); }
-inline unixtime             GenesisInfo::warm_core_min()    const { return(MinWarmCoreTime);              }
-inline unixtime             GenesisInfo::warm_core_max()    const { return(MaxWarmCoreTime);              }
-inline int                  GenesisInfo::warm_core_dur()    const { return((MinWarmCoreTime == 0 || MaxWarmCoreTime == 0 ?
-                                                                            bad_data_int : MaxWarmCoreTime - MinWarmCoreTime)); }
+inline const TrackInfo *GenesisInfo::track()            const { return(Track);                        }
+inline double           GenesisInfo::lat()              const { return(Lat);                          }
+inline double           GenesisInfo::lon()              const { return(Lon);                          }
+inline double           GenesisInfo::dland()            const { return(DLand);                        }
+inline unixtime         GenesisInfo::genesis_time()     const { return(GenesisTime);                  }
+inline unixtime         GenesisInfo::init()             const { return(InitTime);                     }
+inline int              GenesisInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
+inline int              GenesisInfo::lead_time()        const { return(LeadTime);                     }
 
 ////////////////////////////////////////////////////////////////////////
 //

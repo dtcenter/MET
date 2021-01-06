@@ -139,13 +139,15 @@ GenesisInfo & GenesisInfo::operator=(const GenesisInfo &g) {
 
 bool GenesisInfo::operator==(const GenesisInfo & g) const {
 
-   return(StormId         == g.StormId         &&
-          Technique       == g.Technique       &&
-          TechniqueNumber == g.TechniqueNumber &&
-          GenesisTime     == g.GenesisTime     &&
-          InitTime        == g.InitTime        &&
-          LeadTime        == g.LeadTime        &&
-          is_eq(Lat, g.Lat)                    &&
+   if(!Track || !g.Track) return(false);
+
+   return(Track->storm_id()         == g.Track->storm_id()         &&
+          Technique                 == g.Technique                 &&
+          Track->technique_number() == g.Track->technique_number() &&
+          GenesisTime               == g.GenesisTime               &&
+          InitTime                  == g.InitTime                  &&
+          LeadTime                  == g.LeadTime                  &&
+          is_eq(Lat, g.Lat)                                        &&
           is_eq(Lon, g.Lon));
 }
 
@@ -158,12 +160,14 @@ bool GenesisInfo::operator==(const GenesisInfo & g) const {
 
 bool GenesisInfo::is_storm(const GenesisInfo & g) const {
 
-   return(Technique       == g.Technique       &&
-          TechniqueNumber == g.TechniqueNumber &&
-          GenesisTime     == g.GenesisTime     &&
-          InitTime        == g.InitTime        &&
-          LeadTime        == g.LeadTime        &&
-          is_eq(Lat, g.Lat)                    &&
+   if(!Track || !g.Track) return(false);
+
+   return(Technique                 == g.Technique                 &&
+          Track->technique_number() == g.Track->technique_number() &&
+          GenesisTime               == g.GenesisTime               &&
+          InitTime                  == g.InitTime                  &&
+          LeadTime                  == g.LeadTime                  &&
+          is_eq(Lat, g.Lat)                                        &&
           is_eq(Lon, g.Lon));
 }
 
@@ -171,18 +175,12 @@ bool GenesisInfo::is_storm(const GenesisInfo & g) const {
 
 void GenesisInfo::clear() {
 
-   IsSet       = false;
-   IsBestTrack = false;
-   IsOperTrack = false;
-   IsAnlyTrack = false;
+   IsSet           = false;
 
-   StormId.clear();
-   Basin.clear();
-   Cyclone.clear();
-   StormName.clear();
-   TechniqueNumber = bad_data_int;
+   Track           = (TrackInfo *) 0;
+   GenIndex        = bad_data_int;
+
    Technique.clear();
-   Initials.clear();
 
    GenesisTime     = (unixtime) 0;
    InitTime        = (unixtime) 0;
@@ -191,12 +189,6 @@ void GenesisInfo::clear() {
    Lat             = bad_data_double;
    Lon             = bad_data_double;
    DLand           = bad_data_double;
-
-   NPoints         = 0;
-   MinValidTime    = (unixtime) 0;
-   MaxValidTime    = (unixtime) 0;
-   MinWarmCoreTime = (unixtime) 0;
-   MaxWarmCoreTime = (unixtime) 0;
 
    return;
 }
@@ -208,18 +200,11 @@ void GenesisInfo::assign(const GenesisInfo &g) {
    clear();
 
    IsSet           = true;
-   IsBestTrack     = g.IsBestTrack;
-   IsOperTrack     = g.IsOperTrack;
-   IsAnlyTrack     = g.IsAnlyTrack;
 
-   StormId         = g.StormId;
-   Basin           = g.Basin;
-   Cyclone         = g.Cyclone;
-   StormName       = g.StormName;
-   TechniqueNumber = g.TechniqueNumber;
+   Track           = g.Track;
+   GenIndex        = g.GenIndex;
+
    Technique       = g.Technique;
-   Initials        = g.Initials;
-
    GenesisTime     = g.GenesisTime;
    InitTime        = g.InitTime;
    LeadTime        = g.LeadTime;
@@ -227,12 +212,6 @@ void GenesisInfo::assign(const GenesisInfo &g) {
    Lat             = g.Lat;
    Lon             = g.Lon;
    DLand           = g.DLand;
-
-   NPoints         = g.NPoints;
-   MinValidTime    = g.MinValidTime;
-   MaxValidTime    = g.MaxValidTime;
-   MinWarmCoreTime = g.MinWarmCoreTime;
-   MaxWarmCoreTime = g.MaxWarmCoreTime;
 
    return;
 }
@@ -242,47 +221,22 @@ void GenesisInfo::assign(const GenesisInfo &g) {
 void GenesisInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
-   out << prefix << "IsSet           = " << bool_to_string(IsSet) << "\n";
-   out << prefix << "IsBest          = " << bool_to_string(IsBestTrack) << "\n";
-   out << prefix << "IsOper          = " << bool_to_string(IsOperTrack) << "\n";
-   out << prefix << "IsAnly          = " << bool_to_string(IsAnlyTrack) << "\n";
-   out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
-   out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
-   out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
-   out << prefix << "StormName       = \"" << StormName.contents() << "\"\n";
-   out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
-   out << prefix << "Technique       = \"" << Technique.contents() << "\"\n";
-   out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
-   out << prefix << "GenesisTime         = \""
+   out << prefix << "IsSet       = " << bool_to_string(IsSet) << "\n";
+   out << prefix << "StormId     = \""<< storm_id() << "\"\n";
+   out << prefix << "Technique   = \""<< Technique << "\"\n";
+   out << prefix << "GenesisTime = \""
                  << (GenesisTime > 0 ?
                      unix_to_yyyymmdd_hhmmss(GenesisTime).text() :
                      na_str) << "\"\n";
-   out << prefix << "InitTime        = \""
+   out << prefix << "InitTime    = \""
                  << (InitTime > 0 ?
                      unix_to_yyyymmdd_hhmmss(InitTime).text() :
                      na_str) << "\"\n";
-   out << prefix << "LeadTime        = \""
+   out << prefix << "LeadTime    = \""
                  << sec_to_hhmmss(LeadTime).text() << "\"\n";
-   out << prefix << "Lat             = " << Lat << "\n";
-   out << prefix << "Lon             = " << Lon << "\n";
-   out << prefix << "DLand           = " << DLand << "\n";
-   out << prefix << "NPoints         = " << NPoints << "\n";
-   out << prefix << "MinValidTime    = \""
-                 << (MinValidTime > 0 ?
-                     unix_to_yyyymmdd_hhmmss(MinValidTime).text() :
-                     na_str) << "\"\n";
-   out << prefix << "MaxValidTime    = \""
-                 << (MaxValidTime > 0 ?
-                     unix_to_yyyymmdd_hhmmss(MaxValidTime).text() :
-                     na_str) << "\"\n";
-   out << prefix << "MinWarmCoreTime = \""
-                 << (MinWarmCoreTime > 0 ?
-                     unix_to_yyyymmdd_hhmmss(MinWarmCoreTime).text() :
-                     na_str) << "\"\n";
-   out << prefix << "MaxWarmCoreTime = \""
-                 << (MaxWarmCoreTime > 0 ?
-                     unix_to_yyyymmdd_hhmmss(MaxWarmCoreTime).text() :
-                     na_str) << "\"\n";
+   out << prefix << "Lat         = " << Lat << "\n";
+   out << prefix << "Lon         = " << Lon << "\n";
+   out << prefix << "DLand       = " << DLand << "\n";
 
    out << flush;
 
@@ -297,16 +251,8 @@ ConcatString GenesisInfo::serialize() const {
 
    s << "GenesisInfo: "
      << "IsSet = " << bool_to_string(IsSet)
-     << ", IsBest = " << bool_to_string(IsBestTrack)
-     << ", IsOper = " << bool_to_string(IsOperTrack)
-     << ", IsAnly = " << bool_to_string(IsAnlyTrack)
-     << ", StormId = \"" << StormId.contents() << "\""
-     << ", Basin = \"" << Basin.contents() << "\""
-     << ", Cyclone = \"" << Cyclone.contents() << "\""
-     << ", StormName = \"" << StormName.contents() << "\""
-     << ", TechniqueNumber = " << TechniqueNumber
-     << ", Technique = \"" << Technique.contents() << "\""
-     << ", Initials = \"" << Initials.contents() << "\""
+     << ", StormId = \"" << storm_id() << "\""
+     << ", Technique = \"" << Technique << "\""
      << ", GenesisTime = \"" << (GenesisTime > 0 ?
            unix_to_yyyymmdd_hhmmss(GenesisTime).text() : na_str) << "\""
      << ", InitTime = \"" << (InitTime > 0 ?
@@ -314,16 +260,7 @@ ConcatString GenesisInfo::serialize() const {
      << ", LeadTime = \"" << sec_to_hhmmss(LeadTime).text() << "\""
      << ", Lat = " << Lat
      << ", Lon = " << Lon
-     << ", DLand = " << DLand
-     << ", NPoints = " << NPoints
-     << ", MinValidTime = \"" << (MinValidTime > 0 ?
-           unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str) << "\""
-     << ", MaxValidTime = \"" << (MaxValidTime > 0 ?
-           unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\""
-     << ", MinWarmCoreTime = \"" << (MinWarmCoreTime > 0 ?
-           unix_to_yyyymmdd_hhmmss(MinWarmCoreTime).text() : na_str) << "\""
-     << ", MaxWarmCoreTime = \"" << (MaxWarmCoreTime > 0 ?
-           unix_to_yyyymmdd_hhmmss(MaxWarmCoreTime).text() : na_str) << "\"";
+     << ", DLand = " << DLand;
 
    return(s);
 
@@ -343,16 +280,6 @@ ConcatString GenesisInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfo::set_storm_id() {
-
-   StormId = define_storm_id(InitTime, MinValidTime, MaxValidTime,
-                             Basin, Cyclone);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void GenesisInfo::set_dland(double d) {
    DLand = d;
    return;
@@ -360,81 +287,98 @@ void GenesisInfo::set_dland(double d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::set(const TrackInfo &t,
+bool GenesisInfo::set(const TrackInfo *t,
                       const GenesisEventInfo *event_info) {
    int i;
-   int i_point = bad_data_int;
 
    // Initialize
    clear();
 
    // Check for NULL pointer
-   if(event_info == 0) return(false);
+   if(!t || !event_info) return(false);
 
    // Find genesis point
-   for(i=0; i<t.n_points(); i++) {
-      if(event_info->is_genesis(t[i])) {
-         i_point = i;
+   for(i=0, GenIndex=bad_data_int; i<t->n_points(); i++) {
+      if(event_info->is_genesis((*t)[i])) {
+         GenIndex = i;
          break;
       }
    }
 
    // Return bad status if genesis was not found
-   if(is_bad_data(i_point)) return(false);
-
-   // Store track type information
-   IsBestTrack = t.is_best_track();
-   IsOperTrack = t.is_oper_track();
-   IsAnlyTrack = t.is_anly_track();
+   if(is_bad_data(GenIndex)) return(false);
 
    // Initialize
-   IsSet           = true;
-   Basin           = t.basin();
-   Cyclone         = t.cyclone();
-   StormName       = t.storm_name();
-   TechniqueNumber = t.technique_number();
-   Technique       = t.technique();
-   Initials        = t.initials();
+   IsSet = true;
+
+   // Store track pointer
+   Track = t;
 
    // Store genesis time and location.
-   GenesisTime = t[i_point].valid();
-   Lat         = t[i_point].lat();
-   Lon         = t[i_point].lon();
+   Technique   = t->technique();
+   GenesisTime = (*t)[GenIndex].valid();
+   Lat         = (*t)[GenIndex].lat();
+   Lon         = (*t)[GenIndex].lon();
 
    // For analysis tracks, keep InitTime = LeadTime = 0.
-   if(IsAnlyTrack) {
+   if(Track->is_anly_track()) {
       InitTime = (unixtime) 0;
       LeadTime = 0;
    }
    else {
-      InitTime = t.init();
-      LeadTime = t[i_point].lead();
+      InitTime = t->init();
+      LeadTime = (*t)[GenIndex].lead();
    }
-
-   // Compute the track time ranges
-   MinValidTime    = MaxValidTime    = t[0].valid();
-   MinWarmCoreTime = MaxWarmCoreTime = 0;
-   NPoints         = t.n_points();
-
-   for(i=0; i<NPoints; i++) {
-
-      if(t[i].valid() < MinValidTime) MinValidTime = t[i].valid();
-      if(t[i].valid() > MaxValidTime) MaxValidTime = t[i].valid();
-
-      if(t[i].warm_core()) {
-         if(MinWarmCoreTime == 0 || t[i].valid() < MinWarmCoreTime) {
-            MinWarmCoreTime = t[i].valid();
-         }
-         if(MaxWarmCoreTime == 0 || t[i].valid() > MaxWarmCoreTime) {
-            MaxWarmCoreTime = t[i].valid();
-         }
-      }
-   }
-
-   // Create the storm id
-   set_storm_id();
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString GenesisInfo::storm_id() const {
+   return(Track ? Track->storm_id() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString GenesisInfo::basin() const {
+   return(Track ? Track->basin() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString GenesisInfo::cyclone() const {
+   return(Track ? Track->cyclone() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString GenesisInfo::storm_name() const {
+   return(Track ? Track->storm_name() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString GenesisInfo::technique() const {
+   return(Technique);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+unixtime GenesisInfo::valid_min() const {
+   return(Track ? Track->valid_min() : (unixtime) 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+unixtime GenesisInfo::valid_max() const {
+   return(Track ? Track->valid_max() : (unixtime) 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GenesisInfo::duration() const {
+   return(Track ? Track->duration() : bad_data_int);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -627,7 +571,7 @@ bool GenesisInfoArray::has_storm(const GenesisInfo &g, int &i) const {
 bool GenesisInfoArray::has_storm_id(const ConcatString &s, int &i) const {
 
    for(i=0; i<Genesis.size(); i++) {
-      if(Genesis[i].storm_id() == s) return(true);
+      if(Genesis[i].track()->storm_id() == s) return(true);
    }
 
    i = bad_data_int;
@@ -651,16 +595,14 @@ bool GenesisInfoArray::erase_storm_id(const ConcatString &s) {
 
 int GenesisInfoArray::n_technique() const {
    StringArray sa;
-   int i, n;
 
-   for(i=0, n=0; i<Genesis.size(); i++) {
+   for(int i=0; i<Genesis.size(); i++) {
       if(!sa.has(Genesis[i].technique())) {
          sa.add(Genesis[i].technique());
-         n++;
       }
    }
 
-   return(n);
+   return(sa.n());
 }
 
 ////////////////////////////////////////////////////////////////////////

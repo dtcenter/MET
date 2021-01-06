@@ -74,7 +74,8 @@ static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     const TrackInfoArray &,
-                                    PairDataGenesis &);
+                                    PairDataGenesis &,
+                                    GenCTCInfo &);
 
 static void   do_genesis_ctc       (const TCGenVxOpt &,
                                     const PairDataGenesis &,
@@ -89,7 +90,9 @@ static void   setup_txt_files      (int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
-static void   write_cts            (const TCGenVxOpt &, GenCTCInfo &);
+static void   write_ctc_info       (const TCGenVxOpt &, GenCTCInfo &);
+static void   write_nc             (const TCGenVxOpt &, const DataPlane &dp,
+                                    const ConcatString &);
 static void   finish_txt_files     ();
 
 static void   usage                ();
@@ -263,6 +266,13 @@ void process_genesis() {
 
       // Process the genesis events for each model.
       for(j=0,it=model_ga_map.begin(); it!=model_ga_map.end(); it++,j++) {
+
+         // Initialize
+         ctc_info.clear();
+         ctc_info.Model = it->first;
+         ctc_info.set_vx_opt(&conf_info.VxOpt[i],
+                             &conf_info.NcOutGrid);
+
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
               << ") " << ": Model " << j+1 << "] " << "For " << it->first
@@ -274,16 +284,15 @@ void process_genesis() {
 
          // Get the pairs
          get_genesis_pairs(conf_info.VxOpt[i], it->first, it->second,
-                           best_ga, best_ta, oper_ta, pairs);
+                           best_ga, best_ta, oper_ta, pairs, ctc_info);
 
          // Do the categorical verification
          do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
 
-         // Write the statistical output model
-         ctc_info.model = it->first;
-         write_cts(conf_info.VxOpt[i], ctc_info);
+         // Write the output
+         write_ctc_info(conf_info.VxOpt[i], ctc_info);
          // TODO: MET #1597 write a new TC-Gen MPR line type
-
+   
       } // end for j
 
    } // end for i n_vx
@@ -328,7 +337,8 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        const GenesisInfoArray &bga,
                        const TrackInfoArray   &bta,
                        const TrackInfoArray   &ota,
-                       PairDataGenesis        &gpd) {
+                       PairDataGenesis        &gpd,
+                       GenCTCInfo             &gci) {
    int i, i_bta, i_bga;
 
    // Initialize
@@ -343,15 +353,24 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       // Check filters
       if(!vx_opt.is_keeper(bga[i])) continue;
 
+      // Store the BEST genesis and track points
+      gci.add_best_gen(bga[i], vx_opt.GenesisSecBeg,
+                               vx_opt.GenesisSecEnd);
+
       // Add pairs for the forecast opportunities
       gpd.add_best_gen(&bga[i],
                        conf_info.LeadSecBeg, conf_info.LeadSecEnd,
                        conf_info.InitFreqHr*sec_per_hour);
+
    }
 
    // Loop over the model genesis events looking for pairs.
    for(i=0; i<fga.n(); i++) {
 
+      // Store the forecast genesis and track points
+      gci.add_fcst_gen(fga[i], vx_opt.GenesisSecBeg,
+                               vx_opt.GenesisSecEnd);
+      
       // Search for a BEST track match
       i_bta = find_genesis_match(fga[i], bta, ota,
                                  vx_opt.GenesisRadius);
@@ -406,9 +425,6 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
    double dist;
    ConcatString case_cs;
 
-   // Initialize
-   gci.clear();
-
    // Loop over the pairs and score them
    for(i=0; i<pairs.n_pair(); i++) {
 
@@ -421,10 +437,6 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << " initialization, "
               << pairs.lead_time(i)/sec_per_hour << " lead";
 
-      // Track the range of valid times
-      if(fgi) gci.add_fcst_valid(fgi->valid_min(), fgi->valid_max());
-      if(bgi) gci.add_obs_valid (bgi->valid_min(), bgi->valid_max());
-
       // Unmatched forecast genesis (FALSE ALARM)
       if(fgi && !bgi) {
 
@@ -435,8 +447,8 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << ") is a dev and ops FALSE ALARM.\n";
 
          // Increment the FALSE ALARM count for both methods 
-         gci.cts_dev.cts.inc_fy_on();
-         gci.cts_ops.cts.inc_fy_on();
+         gci.inc_dev(true, false, fgi, bgi);
+         gci.inc_ops(true, false, fgi, bgi);
       }
 
       // Unmatched BEST genesis (MISS)
@@ -449,9 +461,8 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << ") is a dev and ops MISS.\n";
 
          // Increment the MISS count for both methods 
-         gci.cts_dev.cts.inc_fn_oy();
-         gci.cts_ops.cts.inc_fn_oy();
-
+         gci.inc_dev(false, true, fgi, bgi);
+         gci.inc_ops(false, true, fgi, bgi);
       }
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
       else {
@@ -494,14 +505,14 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                     << " is a dev method HIT " << offset_cs;
 
                // Increment the HIT count
-               gci.cts_dev.cts.inc_fy_oy();
+               gci.inc_dev(true, true, fgi, bgi);
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is a dev method FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
-               gci.cts_dev.cts.inc_fy_on();
+               gci.inc_dev(true, false, fgi, bgi);
             }
             
             // Ops Method:
@@ -521,14 +532,14 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                     << " is an ops method HIT " << offset_cs;
 
                // Increment the HIT count
-               gci.cts_ops.cts.inc_fy_oy();
+               gci.inc_ops(true, true, fgi, bgi);
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is an ops method FALSE ALARM " << offset_cs;
 
                // Increment the FALSE ALARM count
-               gci.cts_ops.cts.inc_fy_on();
+               gci.inc_ops(true, false, fgi, bgi);
             }
          }
       }
@@ -538,18 +549,18 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
       mlog << Debug(3) << "For filter ("
            << pairs.desc() << ") " << pairs.model()
            << " model, dev method contingency table hits = "
-           << gci.cts_dev.cts.fy_oy() << ", false alarms = "
-           << gci.cts_dev.cts.fy_on() << ", and misses = "
-           << gci.cts_dev.cts.fn_oy() << ".\n";
+           << gci.CTSDev.cts.fy_oy() << ", false alarms = "
+           << gci.CTSDev.cts.fy_on() << ", and misses = "
+           << gci.CTSDev.cts.fn_oy() << ".\n";
    }
 
    if(vx_opt.OpsFlag) {
       mlog << Debug(3) << "For filter ("
            << pairs.desc() << ") " << pairs.model()
            << " model, ops method contingency table hits = "
-           << gci.cts_ops.cts.fy_oy() << ", false alarms = "
-           << gci.cts_ops.cts.fy_on() << ", and misses = "
-           << gci.cts_ops.cts.fn_oy() << ".\n";
+           << gci.CTSOps.cts.fy_oy() << ", false alarms = "
+           << gci.CTSOps.cts.fy_on() << ", and misses = "
+           << gci.CTSOps.cts.fn_oy() << ".\n";
    }
 
    return;
@@ -714,7 +725,7 @@ void process_fcst_tracks(const StringArray &files,
       for(j=0; j<tracks.n(); j++) {
 
          // Attempt to define genesis
-         if(!fcst_gi.set(tracks[j], (&conf_info.FcstEventInfo))) {
+         if(!fcst_gi.set(&tracks[j], &conf_info.FcstEventInfo)) {
             continue;
          }
 
@@ -760,7 +771,7 @@ void process_fcst_tracks(const StringArray &files,
         << files.n() << " input files.\n";
 
    // Dump out the number of genesis events
-   mlog << Debug(2) << "Identified " << fcst_ga.n()
+   mlog << Debug(2) << "Found " << fcst_ga.n()
         << " forecast genesis events.\n";
 
    // Dump out very verbose output
@@ -867,7 +878,7 @@ void process_best_tracks(const StringArray &files,
    for(i=0; i<best_ta.n(); i++) {
 
       // Attempt to define genesis
-      if(!best_gi.set(best_ta[i], (&conf_info.BestEventInfo))) {
+      if(!best_gi.set(&best_ta[i], &conf_info.BestEventInfo)) {
          continue;
       }
 
@@ -925,7 +936,7 @@ void process_best_tracks(const StringArray &files,
    } // end for i
 
    // Dump out the number of genesis events
-   mlog << Debug(2) << "Identified " << best_ga.n()
+   mlog << Debug(2) << "Found " << best_ga.n()
         << " BEST genesis events.\n";
 
    return;
@@ -1022,7 +1033,7 @@ void setup_table(AsciiTable &at) {
 void setup_nc_file() {
 
    // Build the output NetCDF file name
-   out_nc_file << cs_erase << out_base << "_pairs_.nc";
+   out_nc_file << cs_erase << out_base << "_pairs.nc";
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
@@ -1055,24 +1066,24 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
+void write_ctc_info(const TCGenVxOpt &vx_opt, GenCTCInfo &gci) {
    ConcatString dev_name("GENESIS_DEV");
    ConcatString ops_name("GENESIS_OPS");
 
    // Setup header columns
-   shc.set_model(info.model.c_str());
+   shc.set_model(gci.Model.c_str());
    shc.set_desc(vx_opt.Desc.c_str());
    if(vx_opt.Lead.n() == 1) {
       shc.set_fcst_lead_sec(vx_opt.Lead[0]);
    }
    shc.set_fcst_valid_beg(vx_opt.ValidBeg != 0 ?
-                          vx_opt.ValidBeg : info.fbeg);
+                          vx_opt.ValidBeg : gci.FcstBeg);
    shc.set_fcst_valid_end(vx_opt.ValidEnd != 0 ?
-                          vx_opt.ValidEnd : info.fend);
+                          vx_opt.ValidEnd : gci.FcstEnd);
    shc.set_obs_valid_beg(vx_opt.ValidBeg != 0 ?
-                         vx_opt.ValidBeg : info.obeg);
+                         vx_opt.ValidBeg : gci.BestBeg);
    shc.set_obs_valid_end(vx_opt.ValidEnd != 0 ?
-                         vx_opt.ValidEnd : info.oend);
+                         vx_opt.ValidEnd : gci.BestEnd);
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
    if(!vx_opt.VxMaskName.empty()) {
       shc.set_mask(vx_opt.VxMaskName.c_str());
@@ -1084,7 +1095,7 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
       if(vx_opt.DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
-         write_fho_row(shc, info.cts_dev,
+         write_fho_row(shc, gci.CTSDev,
                        vx_opt.OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
@@ -1093,7 +1104,7 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
       if(vx_opt.OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
-         write_fho_row(shc, info.cts_ops,
+         write_fho_row(shc, gci.CTSOps,
                        vx_opt.OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
@@ -1106,7 +1117,7 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
       if(vx_opt.DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
-         write_ctc_row(shc, info.cts_dev,
+         write_ctc_row(shc, gci.CTSDev,
                        vx_opt.OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
@@ -1115,7 +1126,7 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
       if(vx_opt.OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
-         write_ctc_row(shc, info.cts_ops,
+         write_ctc_row(shc, gci.CTSOps,
                        vx_opt.OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
@@ -1126,33 +1137,107 @@ void write_cts(const TCGenVxOpt &vx_opt, GenCTCInfo &info) {
    if(vx_opt.output_map(stat_cts) != STATOutputType_None) {
 
       if(vx_opt.DevFlag) {
-         info.cts_dev.allocate_n_alpha(1);
-         info.cts_dev.alpha[0] = vx_opt.CIAlpha;
-         info.cts_dev.compute_stats();
-         info.cts_dev.compute_ci();
+         gci.CTSDev.compute_stats();
+         gci.CTSDev.compute_ci();
 
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
-         write_cts_row(shc, info.cts_dev,
+         write_cts_row(shc, gci.CTSDev,
                        vx_opt.OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
 
       if(vx_opt.OpsFlag) {
-         info.cts_ops.allocate_n_alpha(1);
-         info.cts_ops.alpha[0] = vx_opt.CIAlpha;
-         info.cts_ops.compute_stats();
-         info.cts_ops.compute_ci();
+         gci.CTSOps.compute_stats();
+         gci.CTSOps.compute_ci();
 
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
-         write_cts_row(shc, info.cts_ops,
+         write_cts_row(shc, gci.CTSOps,
                        vx_opt.OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       } 
    }
+   
+   // Write NetCDF output fields
+   if(!conf_info.NcInfo.all_false()) {
+      ConcatString cs;
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_GENESIS";
+      write_nc(vx_opt, gci.FcstGenesisDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_TRACKS";
+      write_nc(vx_opt, gci.FcstTrackDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_GENESIS";
+      write_nc(vx_opt, gci.BestGenesisDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_TRACKS";
+      write_nc(vx_opt, gci.BestTrackDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_DEV_FY_OY";
+      write_nc(vx_opt, gci.FcstDevFYOYDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_DEV_FY_ON";
+      write_nc(vx_opt, gci.FcstDevFYONDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_DEV_FY_OY";
+      write_nc(vx_opt, gci.BestDevFYOYDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_DEV_FN_OY";
+      write_nc(vx_opt, gci.BestDevFNOYDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_OPS_FY_OY";
+      write_nc(vx_opt, gci.FcstOpsFYOYDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_OPS_FY_ON";
+      write_nc(vx_opt, gci.FcstOpsFYONDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_OPS_FY_OY";
+      write_nc(vx_opt, gci.BestOpsFYOYDp, cs);
+      cs << cs_erase << vx_opt.Desc << "_BEST_OPS_FN_OY";
+      write_nc(vx_opt, gci.BestOpsFNOYDp, cs);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc(const TCGenVxOpt &vx_opt, const DataPlane &dp,
+              const ConcatString &var_name) {
+
+   // Nothing to do for an empty input or
+   // a field that has already been written
+   if(dp.is_empty() || nc_var_sa.has(var_name)) return;
+
+   int n, x, y;
+   ConcatString cs;
+   NcVar nc_var;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_var_sa.add(var_name);
+
+   // Define the variable
+   nc_var = add_var(nc_out, (string) var_name,
+                    ncFloat, lat_dim, lon_dim,
+                    conf_info.compression_level());
+
+   // Allocate memory
+   float *data = (float *) 0;
+   int nx = dp.nx();
+   int ny = dp.ny();
+   data = new float [nx*ny];
+             
+   // Store the data
+   for(x=0; x<nx; x++) {
+      for(y=0; y<ny; y++) {
+         n = DefaultTO.two_to_one(nx, ny, x, y);
+         data[n] = dp.get(x, y);
+      } // end for y
+   } // end for x
+
+   // Write out the data
+   if(!put_nc_data_with_dims(&nc_var, &data[0], ny, nx)) {
+      mlog << Error << "\nwrite_nc() -> "
+           << "error writing NetCDF variable name " << var_name
+           << "\n\n";
+      exit(1);
+   }
+
+   // Deallocate and clean up
+   if(data) { delete [] data; data = (float *) 0; }
 
    return;
 }
