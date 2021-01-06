@@ -94,12 +94,6 @@ del attrs
 # Delete the met_data variable, and reset it to be the Xarray object
 del met_data
 
-# Create a dataarray from a variable inside the dataset
-#met_data = ds.fcst
-#met_data.attrs = ds.attrs
-
-# Another way, one liner. Need to specify attrs because XR doesn't persist them.
+# Create met_data and specify attrs because XR doesn't persist them.
 met_data = xr.DataArray(ds.fcst,attrs=ds.attrs)
 
-# Reset the met_data to be the dataarray
-#met_data = da
