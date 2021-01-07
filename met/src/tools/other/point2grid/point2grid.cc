@@ -515,15 +515,14 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 
 int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
-   ConcatString att_val;
+   ConcatString att_val_scene_id;
+   ConcatString att_val_project;
    ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
    
-   if (has_lat_lon_vars(nc)) {
-      obs_type = TYPE_NCCF;
-      input_type = "OBS_NCCF";
-   }
-   else if (get_global_att(nc, (string)"scene_id", att_val)) {
+   bool has_project = get_global_att(nc, (string)"project", att_val_project);
+   bool has_scene_id = get_global_att(nc, (string)"scene_id", att_val_scene_id);
+   if( has_scene_id && has_project && att_val_project == "GOES" ) {
       obs_type = TYPE_GOES;
       input_type = "GOES";
       if (0 < AdpFilename.length()) {
@@ -534,6 +533,10 @@ int get_obs_type(NcFile *nc) {
             exit(1);
          }
       }
+   }
+   else if (has_lat_lon_vars(nc)) {
+      obs_type = TYPE_NCCF;
+      input_type = "OBS_NCCF";
    }
    else if (has_dim(nc, nc_dim_nhdr) && has_dim(nc, nc_dim_nobs)) {
       obs_type = TYPE_OBS;
@@ -2569,7 +2572,10 @@ bool has_lat_lon_vars(NcFile *nc) {
    bool has_time_var = IS_VALID_NC(get_nc_var_time(nc));
 
    //TODO: chech if this is a gridded data or a point data here!!!
-   
+   mlog << Debug(7) << "has_lat_lon_vars() "
+        << " has_lat_var: "  << has_lat_var
+        << ", has_lon_var: " << has_lon_var
+        << ", has_time_var: " << has_time_var << "\n";
    return (has_lat_var && has_lon_var && has_time_var);
 }
 
