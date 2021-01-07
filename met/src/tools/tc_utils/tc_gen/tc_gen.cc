@@ -354,12 +354,11 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       if(!vx_opt.is_keeper(bga[i])) continue;
 
       // Store the BEST genesis and track points
-      gci.add_best_gen(bga[i], vx_opt.GenesisSecBeg,
-                               vx_opt.GenesisSecEnd);
+      gci.add_best_gen(bga[i], vx_opt.ValidGenesisDHrThresh);
 
       // Add pairs for the forecast opportunities
       gpd.add_best_gen(&bga[i],
-                       conf_info.LeadSecBeg, conf_info.LeadSecEnd,
+                       conf_info.FcstSecBeg, conf_info.FcstSecEnd,
                        conf_info.InitFreqHr*sec_per_hour);
 
    }
@@ -368,12 +367,11 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
    for(i=0; i<fga.n(); i++) {
 
       // Store the forecast genesis and track points
-      gci.add_fcst_gen(fga[i], vx_opt.GenesisSecBeg,
-                               vx_opt.GenesisSecEnd);
+      gci.add_fcst_gen(fga[i], vx_opt.ValidGenesisDHrThresh);
       
       // Search for a BEST track match
       i_bta = find_genesis_match(fga[i], bta, ota,
-                                 vx_opt.GenesisRadius);
+                                 vx_opt.GenesisMatchRadius);
 
       // Update the matched pairs
       if(!is_bad_data(i_bta)) {
@@ -471,11 +469,12 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                  << " BEST track " << bgi->storm_id() << " genesis at ("
                  << bgi->lat() << ", " << bgi->lon() << ") and "
                  << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
-                 << " forecast genesis at (" << fgi->lat() << ", "
-                 << fgi->lon() << ")";
+                 << " forecast hour " << fgi->lead_time()/sec_per_hour
+                 << " genesis at (" << fgi->lat() << ", " << fgi->lon() << ")";
          
          // Discard if the forecast init >= BEST genesis
-         if(fgi->init() >= bgi->genesis_time()) {
+         if(vx_opt.DiscardFlag &&
+            fgi->init() >= bgi->genesis_time()) {
             mlog << Debug(4) << "DISCARD " << case_cs
                  << " since the model initialization time is at or "
                  << "after the matching BEST track "
@@ -486,7 +485,7 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
          else {
 
             // Compute time and space offsets
-            dsec = bgi->genesis_time() - fgi->genesis_time();
+            dsec = fgi->genesis_time() - bgi->genesis_time();
             dist = gc_dist(bgi->lat(), bgi->lon(),
                            fgi->lat(), fgi->lon());
 
@@ -497,9 +496,9 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
             // Dev Method:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
-            if(dsec >= vx_opt.GenesisSecBeg &&
-               dsec <= vx_opt.GenesisSecEnd &&
-               dist <= vx_opt.GenesisRadius) {
+            if(dsec >= vx_opt.GenesisHitBeg &&
+               dsec <= vx_opt.GenesisHitEnd &&
+               dist <= vx_opt.GenesisHitRadius) {
 
                mlog << Debug(4) << case_cs
                     << " is a dev method HIT " << offset_cs;
@@ -730,9 +729,9 @@ void process_fcst_tracks(const StringArray &files,
          }
 
          // Check the forecast lead time window
-         if(fcst_gi.lead_time() < conf_info.LeadSecBeg ||
-            fcst_gi.lead_time() > conf_info.LeadSecEnd) {
-            mlog << Debug(6) << "Skipping genesis event for lead time "
+         if(fcst_gi.lead_time() < conf_info.FcstSecBeg ||
+            fcst_gi.lead_time() > conf_info.FcstSecEnd) {
+            mlog << Debug(6) << "Skipping genesis event for forecast hour "
                  << fcst_gi.lead_time()/sec_per_hour << ".\n";
             continue;
          }

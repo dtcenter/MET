@@ -151,14 +151,16 @@ void TCGenVxOpt::clear() {
    VxGridMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
-   GenesisSecBeg = GenesisSecEnd = bad_data_int;
-   GenesisRadius = bad_data_double;
+   GenesisMatchRadius = bad_data_double;
+   GenesisHitRadius = bad_data_double;
+   GenesisHitBeg = GenesisHitEnd = bad_data_int;
    GenesisInitDSec = bad_data_int;
+   DiscardFlag = false;
    DevFlag = OpsFlag = false;
    CIAlpha = bad_data_double;
    OutputMap.clear();
    NcInfo.clear();
-   NcTrackPtsBeg = NcTrackPtsEnd = bad_data_int;
+   ValidGenesisDHrThresh.clear();
 
    return;
 }
@@ -215,20 +217,29 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: dland_thresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
-   // Conf: genesis_window
-   dict2 = dict.lookup_dictionary(conf_key_genesis_window);
+   // Conf: genesis_match_radius
+   GenesisMatchRadius =
+      dict.lookup_double(conf_key_genesis_match_radius);
+
+   // Conf: genesis_hit_radius
+   GenesisHitRadius =
+      dict.lookup_double(conf_key_genesis_hit_radius);
+
+   // Conf: genesis_hit_window
+   dict2 = dict.lookup_dictionary(conf_key_genesis_hit_window);
    parse_conf_range_int(dict2, beg, end);
-   GenesisSecBeg = beg*sec_per_hour;
-   GenesisSecEnd = end*sec_per_hour;
+   GenesisHitBeg = beg*sec_per_hour;
+   GenesisHitEnd = end*sec_per_hour;
 
-   // Conf: genesis_radius
-   GenesisRadius = dict.lookup_double(conf_key_genesis_radius);
-
-   // Conf: genesis_init_diff
+   // Conf: genesis_minus_init_diff
    GenesisInitDSec = nint(
-      dict.lookup_double(conf_key_genesis_init_diff)
-      *sec_per_hour);
-   
+      dict.lookup_double(conf_key_genesis_minus_init_diff) *
+      sec_per_hour);
+
+   // Conf: discard_init_post_genesis_flag
+   DiscardFlag =
+      dict.lookup_bool(conf_key_discard_init_post_genesis_flag);
+
    // Conf: dev_method_flag and ops_method_flag
    DevFlag = dict.lookup_bool(conf_key_dev_method_flag);
    OpsFlag = dict.lookup_bool(conf_key_ops_method_flag);
@@ -240,8 +251,8 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
            << " must be set to true!\n\n";
       exit(1);
    }
-
-   // Conf: ci_alpah
+   
+   // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
 
    // Conf: output_flag
@@ -265,11 +276,9 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: nc_pairs_flag
    parse_nc_info(dict);
 
-   // Conf: genesis_track_points_window
-   dict2 = dict.lookup_dictionary(conf_key_genesis_track_points_window);
-   parse_conf_range_int(dict2, beg, end);
-   NcTrackPtsBeg = beg*sec_per_hour;
-   NcTrackPtsEnd = end*sec_per_hour;
+   // Conf: valid_minus_genesis_diff_thresh
+   ValidGenesisDHrThresh =
+      dict.lookup_thresh(conf_key_valid_minus_genesis_diff_thresh);
 
    return;
 }
@@ -441,8 +450,8 @@ void TCGenConfInfo::clear() {
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
    InitFreqHr = bad_data_int;
    ValidFreqHr = bad_data_int;
-   LeadSecBeg = bad_data_int;
-   LeadSecEnd = bad_data_int;
+   FcstSecBeg = bad_data_int;
+   FcstSecEnd = bad_data_int;
    MinDur = bad_data_int;
    FcstEventInfo.clear();
    BestEventInfo.clear();
@@ -509,11 +518,11 @@ void TCGenConfInfo::process_config() {
       exit(1);
    }
 
-   // Conf: lead_window
-   dict = Conf.lookup_dictionary(conf_key_lead_window);
+   // Conf: fcst_hr_window
+   dict = Conf.lookup_dictionary(conf_key_fcst_hr_window);
    parse_conf_range_int(dict, beg, end);
-   LeadSecBeg = beg*sec_per_hour;
-   LeadSecEnd = end*sec_per_hour;
+   FcstSecBeg = beg*sec_per_hour;
+   FcstSecEnd = end*sec_per_hour;
 
    // Conf: min_duration
    MinDur = Conf.lookup_int(conf_key_min_duration);
@@ -586,29 +595,25 @@ void TCGenConfInfo::process_config() {
       // If not already set, define the valid time window relative to the
       // initialization time window.
       if(VxOpt[j].InitBeg != 0 && VxOpt[j].ValidBeg == 0) {
-         VxOpt[j].ValidBeg = VxOpt[j].InitBeg + LeadSecBeg + VxOpt[j].GenesisSecBeg;
+         VxOpt[j].ValidBeg = VxOpt[j].InitBeg + FcstSecBeg;
          mlog << Debug(3) << "For filter " << j+1 << " setting "
               << conf_key_valid_beg << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidBeg)
               <<  ") = " << conf_key_init_beg << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitBeg)
-              << ") + " << conf_key_lead_window << ".beg ("
-              << LeadSecBeg/sec_per_hour
-              << ") + " << conf_key_genesis_window << ".beg ("
-              << VxOpt[j].GenesisSecBeg/sec_per_hour << ").\n";
+              << ") + " << conf_key_fcst_hr_window << ".beg ("
+              << FcstSecBeg/sec_per_hour << ").\n";
       }
 
       if(VxOpt[j].InitEnd != 0 && VxOpt[j].ValidEnd == 0) {
-         VxOpt[j].ValidEnd = VxOpt[j].InitEnd + LeadSecEnd + VxOpt[j].GenesisSecEnd;
+         VxOpt[j].ValidEnd = VxOpt[j].InitEnd + FcstSecEnd;
          mlog << Debug(3) << "For filter " << j+1 << " setting "
               << conf_key_valid_end << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidEnd)
               <<  ") = " << conf_key_init_end << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitEnd)
-              << ") + " << conf_key_lead_window << ".end ("
-              << LeadSecEnd/sec_per_hour
-              << ") + " << conf_key_genesis_window << ".end ("
-              << VxOpt[j].GenesisSecEnd/sec_per_hour << ").\n";
+              << ") + " << conf_key_fcst_hr_window << ".end ("
+              << FcstSecEnd/sec_per_hour << ").\n";
       }
    }
 
@@ -912,7 +917,7 @@ void GenCTCInfo::inc_ops(bool f, bool o,
 ////////////////////////////////////////////////////////////////////////
 
 void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi,
-                              int beg, int end) {
+                              const SingleThresh &dhr_thresh) {
 
    // Track the range of valid times
    if(FcstBeg == 0 || FcstBeg > gi.valid_min()) FcstBeg = gi.valid_min();
@@ -922,15 +927,14 @@ void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi,
    inc_pnt(gi.lat(), gi.lon(), FcstGenesisDp);
 
    // Count the track points
-   if(!FcstTrackDp.is_empty()) inc_trk(gi, beg, end, FcstTrackDp);
-
+   if(!FcstTrackDp.is_empty()) inc_trk(gi, dhr_thresh, FcstTrackDp);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void GenCTCInfo::add_best_gen(const GenesisInfo &gi,
-                              int beg, int end) {
+                              const SingleThresh &dhr_thresh) {
 
    // Track the range of valid times
    if(BestBeg == 0 || BestBeg > gi.valid_min()) BestBeg = gi.valid_min();
@@ -940,7 +944,7 @@ void GenCTCInfo::add_best_gen(const GenesisInfo &gi,
    inc_pnt(gi.lat(), gi.lon(), BestGenesisDp);
 
    // Count the track points
-   if(!BestTrackDp.is_empty()) inc_trk(gi, beg, end, BestTrackDp);
+   if(!BestTrackDp.is_empty()) inc_trk(gi, dhr_thresh, BestTrackDp);
 
    return;
 }
@@ -970,21 +974,21 @@ void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_trk(const GenesisInfo &gi, int beg, int end,
+void GenCTCInfo::inc_trk(const GenesisInfo &gi,
+                         const SingleThresh &dhr_thresh,
                          DataPlane &dp) {
 
    // Nothing to do if the DataPlane is empty
-   if(dp.is_empty()) return;
+   if(dp.is_empty() || !gi.track()) return;
 
-   double lat, lon;
-   const TrackInfo *ti;
-   unixtime valid_beg = gi.genesis_time() + beg;
-   unixtime valid_end = gi.genesis_time() + end;
+   const TrackInfo *ti = gi.track();
 
-   // Increment count for each track points falling in the time window
+   // Loop through the track points
    for(int i=0; i<ti->n_points(); i++) {
-      if((*ti)[i].valid() >= valid_beg &&
-         (*ti)[i].valid() <= valid_end) {
+
+      // Count points whose valid time is close enough to genesis time
+      int dhr = ((*ti)[i].valid() - gi.genesis_time())/sec_per_hour;
+      if(dhr_thresh.check(dhr)) {
          inc_pnt((*ti)[i].lat(), (*ti)[i].lon(), dp);
       }
    }

@@ -104,11 +104,13 @@ class TCGenVxOpt {
       SingleThresh DLandThresh;
 
       // Temporal and spatial matching criteria
-      int GenesisSecBeg, GenesisSecEnd;
-      double GenesisRadius;
-      int GenesisInitDSec;
+      double GenesisMatchRadius;
+      double GenesisHitRadius;
+      int    GenesisHitBeg, GenesisHitEnd;
+      int    GenesisInitDSec;
 
       // Scoring methods
+      bool DiscardFlag;
       bool DevFlag;
       bool OpsFlag;
 
@@ -116,7 +118,7 @@ class TCGenVxOpt {
       double CIAlpha;
       map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
-      int NcTrackPtsBeg, NcTrackPtsEnd;
+      SingleThresh ValidGenesisDHrThresh;
 
       //////////////////////////////////////////////////////////////////
 
@@ -158,7 +160,7 @@ class TCGenConfInfo {
       int ValidFreqHr;
 
       // Begin and end forecast hours for genesis
-      int LeadSecBeg, LeadSecEnd;
+      int FcstSecBeg, FcstSecEnd;
 
       // Minimum track duration
       int MinDur;
@@ -256,11 +258,11 @@ class GenCTCInfo {
    void inc_ops(bool, bool,
                 const GenesisInfo *, const GenesisInfo *);
 
-   void add_fcst_gen(const GenesisInfo &, int, int);
-   void add_best_gen(const GenesisInfo &, int, int);
+   void add_fcst_gen(const GenesisInfo &, const SingleThresh &);
+   void add_best_gen(const GenesisInfo &, const SingleThresh &);
 
    void inc_pnt(double, double, DataPlane &);
-   void inc_trk(const GenesisInfo &, int, int, DataPlane &);
+   void inc_trk(const GenesisInfo &, const SingleThresh &, DataPlane &);
 };
 
 ////////////////////////////////////////////////////////////////////////

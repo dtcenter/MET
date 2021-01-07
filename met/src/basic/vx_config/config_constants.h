@@ -1056,29 +1056,31 @@ static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
 
 // TC-Gen config options
-static const char conf_key_init_freq[]                   = "init_freq";
-static const char conf_key_valid_freq[]                  = "valid_freq";
-static const char conf_key_lead_window[]                 = "lead_window";
-static const char conf_key_min_duration[]                = "min_duration";
-static const char conf_key_fcst_genesis[]                = "fcst_genesis";
-static const char conf_key_best_genesis[]                = "best_genesis";
-static const char conf_key_technique[]                   = "technique";
-static const char conf_key_category[]                    = "category";
-static const char conf_key_vmax_thresh[]                 = "vmax_thresh";
-static const char conf_key_mslp_thresh[]                 = "mslp_thresh";
-static const char conf_key_genesis_window[]              = "genesis_window";
-static const char conf_key_genesis_radius[]              = "genesis_radius";
-static const char conf_key_genesis_init_diff[]           = "genesis_init_diff";
-static const char conf_key_dev_method_flag[]             = "dev_method_flag";
-static const char conf_key_ops_method_flag[]             = "ops_method_flag";
-static const char conf_key_nc_pairs_grid[]               = "nc_pairs_grid";
-static const char conf_key_genesis_track_points_window[] = "genesis_track_points_window";
-static const char conf_key_fcst_fy_oy[]                  = "fcst_fy_oy";
-static const char conf_key_fcst_fy_on[]                  = "fcst_fy_on";
-static const char conf_key_fcst_tracks[]                 = "fcst_tracks";
-static const char conf_key_best_fy_oy[]                  = "best_fy_oy";
-static const char conf_key_best_fn_oy[]                  = "best_fn_oy";
-static const char conf_key_best_tracks[]                 = "best_tracks";
+static const char conf_key_init_freq[]                       = "init_freq";
+static const char conf_key_valid_freq[]                      = "valid_freq";
+static const char conf_key_fcst_hr_window[]                  = "fcst_hr_window";
+static const char conf_key_min_duration[]                    = "min_duration";
+static const char conf_key_fcst_genesis[]                    = "fcst_genesis";
+static const char conf_key_best_genesis[]                    = "best_genesis";
+static const char conf_key_technique[]                       = "technique";
+static const char conf_key_category[]                        = "category";
+static const char conf_key_vmax_thresh[]                     = "vmax_thresh";
+static const char conf_key_mslp_thresh[]                     = "mslp_thresh";
+static const char conf_key_genesis_match_radius[]            = "genesis_match_radius";
+static const char conf_key_genesis_hit_radius[]              = "genesis_hit_radius";
+static const char conf_key_genesis_hit_window[]              = "genesis_hit_window";
+static const char conf_key_genesis_minus_init_diff[]         = "genesis_minus_init_diff";
+static const char conf_key_discard_init_post_genesis_flag[]  = "discard_init_post_genesis_flag";
+static const char conf_key_dev_method_flag[]                 = "dev_method_flag";
+static const char conf_key_ops_method_flag[]                 = "ops_method_flag";
+static const char conf_key_fcst_fy_oy[]                      = "fcst_fy_oy";
+static const char conf_key_fcst_fy_on[]                      = "fcst_fy_on";
+static const char conf_key_fcst_tracks[]                     = "fcst_tracks";
+static const char conf_key_best_fy_oy[]                      = "best_fy_oy";
+static const char conf_key_best_fn_oy[]                      = "best_fn_oy";
+static const char conf_key_best_tracks[]                     = "best_tracks";
+static const char conf_key_valid_minus_genesis_diff_thresh[] = "valid_minus_genesis_diff_thresh";
+static const char conf_key_nc_pairs_grid[]                   = "nc_pairs_grid";
 
 //
 // TC-RMW specific parameter key names

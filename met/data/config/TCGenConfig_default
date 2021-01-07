@@ -28,10 +28,10 @@ init_freq = 6;
 valid_freq = 6;
 
 //
-// Lead times in hours to be searched for genesis events.
+// Forecast hours to be searched for genesis events.
 //
-lead_window = {
-   beg = 24;
+fcst_hr_window = {
+   beg = 6;
    end = 120;
 }
 
@@ -71,15 +71,14 @@ oper_technique = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Track filtering options which may be specified separately in each filter
-// array entry.
+// Track filtering options.
+// May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Filter is an array of dictionaries containing the track filtering options
-// listed below.  If empty, a single filter is defined using the top-level
-// settings.
+// Array of dictionaries containing the track filtering options.
+// If empty, a single filter is defined using the top-level settings.
 //
 filter = [];
 
@@ -137,35 +136,54 @@ vx_mask = "";
 //
 dland_thresh = NA;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Matching and scoring options.
+// May be specified separately in each filter array entry.
+//
+////////////////////////////////////////////////////////////////////////////////
+
 //
 // Genesis matching time window, in hours relative to the forecast genesis time
 //
-genesis_window = {
+genesis_match_window = {
    beg = -24;
    end =  24;
 }
 
 //
-// Genesis matching search radius in km
+// Radius in km to search for a matching genesis event.
 //
-genesis_radius = 300;
+genesis_match_radius = 500;
 
 //
-// Genesis versus initialization time offset in hours
+// Radius in km to classify a match as a hit.
 //
-genesis_init_diff = 48;
+genesis_hit_radius = 500;
 
-////////////////////////////////////////////////////////////////////////////////
 //
-// Output options which may be specified separately in each filter array entry.
+// Genesis minus initialization time offset in hours
 //
-////////////////////////////////////////////////////////////////////////////////
+genesis_minus_init_diff = 48;
+
+//
+// Discard genesis forecasts for initializations at or after the matching
+// BEST track genesis time
+//
+discard_init_post_genesis_flag = TRUE;
 
 //
 // Scoring methods to be applied
 //
 dev_method_flag = TRUE;
 ops_method_flag = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Output options.
+// May be specified separately in each filter array entry.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Confidence interval alpha value
@@ -197,16 +215,20 @@ nc_pairs_flag = {
 }
 
 //
-// Track points to count in the NetCDF output, relative to genesis time
+// Specify which track points should be counted by thresholding the track point
+// valid time minus genesis time difference.
 //
-genesis_track_points_window = {
-   beg = -120;
-   end =  120;
-};
+// e.g. NA  to count all track points
+//      <=0 to count genesis and all points prior
+//      >0  to count all points after genesis
+//      >=-12&&<=12 to count all points within 12 hours of genesis
+//
+valid_minus_genesis_diff_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Global settings which may only be specified once.
+// Global settings.
+// May only be specified once.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
