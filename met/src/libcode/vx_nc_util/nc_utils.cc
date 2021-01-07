@@ -1395,6 +1395,7 @@ void _apply_scale_factor(float *data, const T *packed_data,
    int unpacked_count = 0;
    float min_value =  10e10;
    float max_value = -10e10;
+   clock_t start_clock = clock();
    const char *method_name = "apply_scale_factor(float)";
 
    for (int idx=0; idx<cell_count; idx++) {
@@ -1412,16 +1413,19 @@ void _apply_scale_factor(float *data, const T *packed_data,
    }
    mlog << Debug(4) << method_name << " unpacked data: count="
         << unpacked_count << " out of " << cell_count
-        << ". FillValue(" << data_type << ")=" << fill_value
-        << " data range [" << min_value << " - " << max_value
+        << ". FillValue(" << data_type << ")=" << fill_value << "\n";
+   mlog << Debug(4) << method_name << "data range [" << min_value << " - " << max_value
         << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
         << positive_cnt << "\n";
+   mlog << Debug(7) << method_name << " took " 
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data) {
+   clock_t start_clock = clock();
    bool return_status = false;
    static const char *method_name = "get_nc_data(NcVar *, float *) ";
 
@@ -1627,6 +1631,10 @@ bool get_nc_data(NcVar *var, float *data) {
       }
       return_status = true;
    }
+
+   mlog << Debug(6) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC)
+        << " seconds for " << GET_NC_NAME_P(var) << "\n";
    return(return_status);
 }
 

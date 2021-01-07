@@ -432,36 +432,41 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    // Call data_plane_array() to retrieve all matching records
    n_planes = data_plane_array(*vinfo_grib, plane_array);
 
-   // Find an exact match
-   if(n_planes > 0) {
+   // Process multiple matches
+   if ( n_planes > 0 )  {
+
+      int n_match = 0;
 
       // Search for an exact pressure or vertical level match
       if ( vinfo_grib->level().type() == LevelType_Pres ||
-           vinfo_grib->level().type() == LevelType_Vert ) {
+           vinfo_grib->level().type() == LevelType_Vert )  {
 
-         for (j=0; j<n_planes; ++j )  {
+         for ( j=0; j<n_planes; ++j )  {
             if ( is_eq(plane_array.lower(j), vinfo_grib->level().lower()) &&
-                 is_eq(plane_array.upper(j), vinfo_grib->level().upper()) ) {
-               plane  = plane_array[j];
-               status = true;
-               break;
+                 is_eq(plane_array.upper(j), vinfo_grib->level().upper()) )  {
+               n_match++;
+               if ( n_match == 1 )  {
+                  plane  = plane_array[j];
+                  status = true;
+               }
             }
          }
       }
-      // Otherwise, use the first match found.
+      // Store the first match found
       else {
-         plane  = plane_array[0];
-         status = true;
-
-         // Check for more than one matching data_plane
-         if(n_planes > 1) {
-            mlog << Warning << "\nMetGrib1DataFile::data_plane() -> "
-                 << "Found " << n_planes << " matches for VarInfo \""
-                 << vinfo.magic_str() << "\" in GRIB file \"" << filename()
-                 << "\".  Using the first match found.\n\n";
-         }
+         n_match = n_planes;
+         plane   = plane_array[0];
+         status  = true;
       }
-   } // end if n_planes
+
+      // Print warning for more multiple matches
+      if(n_match > 1) {
+         mlog << Warning << "\nMetGrib1DataFile::data_plane() -> "
+              << "Found " << n_match << " matches for VarInfo \""
+              << vinfo.magic_str() << "\" in GRIB file \"" << filename()
+              << "\".  Using the first match found.\n\n";
+      }
+   } // end if n_planes > 0
 
    // Check for bad status
    if(!status) {

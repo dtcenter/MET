@@ -36,6 +36,8 @@ Required arguments for grid_diag
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used.
 
 When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
+In this case the first field in the config data field list is read from the files designated by the first **-data**, the second field in the field list is read from files designated by the second **-data**, and so forth.  All files within each set must be of the same file type, but the file types of each set may differ.
+A typical use case for this option is for the first **-data** to specify forecast data files and the second **-data** the observation data files.
 
 2. The **-out** argument is the NetCDF output file.
 
