@@ -13,22 +13,22 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Genesis event definition criteria.
+// Genesis event definition criteria
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Model initialization frequency in hours, starting at 0.
+// Model initialization frequency in hours, starting at 0
 //
 init_freq = 6;
 
 //
-// Valid hour frequency to be analyzed in hours, starting at 0.
+// Valid hour frequency to be analyzed in hours, starting at 0
 //
 valid_freq = 6;
 
 //
-// Forecast hours to be searched for genesis events.
+// Forecast hours to be searched for genesis events
 //
 fcst_hr_window = {
    beg = 6;
@@ -36,7 +36,7 @@ fcst_hr_window = {
 }
 
 //
-// Minimum track duration for genesis event in hours.
+// Minimum track duration for genesis event in hours
 //
 min_duration = 12;
 
@@ -65,19 +65,19 @@ best_genesis = {
 }
 
 //
-// Operational track technique name.
+// Operational track technique name
 //
 oper_technique = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Track filtering options.
+// Track filtering options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Array of dictionaries containing the track filtering options.
+// Array of dictionaries containing the track filtering options
 // If empty, a single filter is defined using the top-level settings.
 //
 filter = [];
@@ -138,28 +138,28 @@ dland_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Matching and scoring options.
+// Matching and scoring options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Genesis matching time window, in hours relative to the forecast genesis time
-//
-genesis_match_window = {
-   beg = -24;
-   end =  24;
-}
-
-//
-// Radius in km to search for a matching genesis event.
+// Radius in km to search for a matching genesis event
 //
 genesis_match_radius = 500;
 
 //
-// Radius in km to classify a match as a hit.
+// Radius in km to classify a match as a hit
 //
 genesis_hit_radius = 500;
+
+//
+// Time window in hours to classify a match as a hit
+//
+genesis_hit_window = {
+   beg = -24;
+   end =  24;
+}
 
 //
 // Genesis minus initialization time offset in hours
@@ -180,7 +180,7 @@ ops_method_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Output options.
+// Output options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ valid_minus_genesis_diff_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Global settings.
+// Global settings
 // May only be specified once.
 //
 ////////////////////////////////////////////////////////////////////////////////

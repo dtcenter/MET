@@ -13,30 +13,30 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Genesis event definition criteria.
+// Genesis event definition criteria
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Model initialization frequency in hours, starting at 0.
+// Model initialization frequency in hours, starting at 0
 //
 init_freq = 6;
 
 //
-// Valid hour frequency to be analyzed in hours, starting at 0.
+// Valid hour frequency to be analyzed in hours, starting at 0
 //
 valid_freq = 6;
 
 //
-// Lead times in hours to be searched for genesis events.
+// Forecast hours to be searched for genesis events
 //
-lead_window = {
-   beg = 24;
+fcst_hr_window = {
+   beg = 6;
    end = 120;
 }
 
 //
-// Minimum track duration for genesis event in hours.
+// Minimum track duration for genesis event in hours
 //
 min_duration = 12;
 
@@ -44,7 +44,7 @@ min_duration = 12;
 // Forecast genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
 // pressure threshold.  The forecast genesis time is the valid time of the first
-// point of tracks which meet this criteria.
+// track point where all of these criteria are met.
 //
 fcst_genesis = {
    vmax_thresh = NA;
@@ -54,8 +54,8 @@ fcst_genesis = {
 //
 // BEST track genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
-// pressure threshold.  The BEST track genesis time is the time of the first
-// track point where all of these criteria are met.
+// pressure threshold.  The BEST track genesis time is the valid time of the
+// first track point where all of these criteria are met.
 //
 best_genesis = {
    technique   = "BEST";
@@ -65,19 +65,19 @@ best_genesis = {
 }
 
 //
-// Operational track technique name.
+// Operational track technique name
 //
 oper_technique = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Track filtering options.
+// Track filtering options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Array of dictionaries containing the track filtering options.
+// Array of dictionaries containing the track filtering options
 // If empty, a single filter is defined using the top-level settings.
 //
 filter = [
@@ -160,28 +160,28 @@ dland_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Matching and scoring options.
+// Matching and scoring options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Genesis matching time window, in hours relative to the forecast genesis time
-//
-genesis_match_window = {
-   beg = -24;
-   end =  24;
-}
-
-//
-// Radius in km to search for a matching genesis event.
+// Radius in km to search for a matching genesis event
 //
 genesis_match_radius = 500;
 
 //
-// Radius in km to classify a match as a hit.
+// Radius in km to classify a match as a hit
 //
 genesis_hit_radius = 500;
+
+//
+// Time window in hours to classify a match as a hit
+//
+genesis_hit_window = {
+   beg = -24;
+   end =  24;
+}
 
 //
 // Genesis minus initialization time offset in hours
@@ -202,7 +202,7 @@ ops_method_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Output options.
+// Output options
 // May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,13 +227,13 @@ output_flag = {
 nc_pairs_flag = {
    latlon       = TRUE;
    fcst_genesis = TRUE;
-   fcst_fy_oy   = FALSE;
-   fcst_fy_on   = FALSE;
-   fcst_tracks  = FALSE;
+   fcst_fy_oy   = TRUE;
+   fcst_fy_on   = TRUE;
+   fcst_tracks  = TRUE;
    best_genesis = TRUE;
-   best_fy_oy   = FALSE;
-   best_fn_oy   = FALSE;
-   best_tracks  = FALSE;
+   best_fy_oy   = TRUE;
+   best_fn_oy   = TRUE;
+   best_tracks  = TRUE;
 }
 
 //
@@ -249,7 +249,7 @@ valid_minus_genesis_diff_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Global settings.
+// Global settings
 // May only be specified once.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
 //
 // NetCDF genesis and track density output grid
 //
-nc_pairs_grid = "G002";
+nc_pairs_grid = "G001";
 
 //
 // Indicate a version number for the contents of this configuration file.
