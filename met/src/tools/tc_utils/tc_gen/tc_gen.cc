@@ -65,7 +65,6 @@ static void   process_fcst_tracks  (const StringArray &,
 static void   process_best_tracks  (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &,
-                                    TrackInfoArray &,
                                     TrackInfoArray &);
 
 static void   get_genesis_pairs    (const TCGenVxOpt &,
@@ -73,17 +72,15 @@ static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const GenesisInfoArray &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
-                                    const TrackInfoArray &,
-                                    PairDataGenesis &,
-                                    GenCTCInfo &);
+                                    PairDataGenesis &);
 
 static void   do_genesis_ctc       (const TCGenVxOpt &,
                                     const PairDataGenesis &,
                                     GenCTCInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
+                                    const GenesisInfoArray &,
                                     const TrackInfoArray &,
-                                    const TrackInfoArray & ,
                                     double);
 
 static void   setup_txt_files      (int);
@@ -201,7 +198,7 @@ void process_genesis() {
    StringArray genesis_files, genesis_files_model_suffix;
    StringArray track_files, track_files_model_suffix;
    GenesisInfoArray fcst_ga, best_ga, empty_ga;
-   TrackInfoArray oper_ta, best_ta;
+   TrackInfoArray oper_ta;
    ConcatString model, cs;
    map<ConcatString,GenesisInfoArray> model_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
@@ -226,7 +223,7 @@ void process_genesis() {
         << "Processing " << track_files.n()
         << " verifying track files.\n";
    process_best_tracks(track_files, track_files_model_suffix,
-                       best_ga, best_ta, oper_ta);
+                       best_ga, oper_ta);
 
    // Setup output files based on the number of techniques present
    setup_txt_files(fcst_ga.n_technique());
@@ -277,14 +274,14 @@ void process_genesis() {
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
               << ") " << ": Model " << j+1 << "] " << "For " << it->first
               << " model, comparing " << it->second.n()
-              << " genesis forecasts to " << best_ta.n() << " "
+              << " genesis forecasts to " << best_ga.n() << " "
               << conf_info.BestEventInfo.Technique << " and "
               << oper_ta.n() << " " << conf_info.OperTechnique
               << " tracks.\n";
 
          // Get the pairs
          get_genesis_pairs(conf_info.VxOpt[i], it->first, it->second,
-                           best_ga, best_ta, oper_ta, pairs, ctc_info);
+                           best_ga, oper_ta, pairs);
 
          // Do the categorical verification
          do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
@@ -335,11 +332,9 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        const ConcatString     &model,
                        const GenesisInfoArray &fga,
                        const GenesisInfoArray &bga,
-                       const TrackInfoArray   &bta,
                        const TrackInfoArray   &ota,
-                       PairDataGenesis        &gpd,
-                       GenCTCInfo             &gci) {
-   int i, i_bta, i_bga;
+                       PairDataGenesis        &gpd) {
+   int i, i_bga;
 
    // Initialize
    gpd.clear();
@@ -353,38 +348,22 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       // Check filters
       if(!vx_opt.is_keeper(bga[i])) continue;
 
-      // Store the BEST genesis and track points
-      gci.add_best_gen(bga[i], vx_opt.ValidGenesisDHrThresh);
-
       // Add pairs for the forecast opportunities
       gpd.add_best_gen(&bga[i],
                        conf_info.FcstSecBeg, conf_info.FcstSecEnd,
                        conf_info.InitFreqHr*sec_per_hour);
-
    }
 
    // Loop over the model genesis events looking for pairs.
    for(i=0; i<fga.n(); i++) {
-
-      // Store the forecast genesis and track points
-      gci.add_fcst_gen(fga[i], vx_opt.ValidGenesisDHrThresh);
       
       // Search for a BEST track match
-      i_bta = find_genesis_match(fga[i], bta, ota,
+      i_bga = find_genesis_match(fga[i], bga, ota,
                                  vx_opt.GenesisMatchRadius);
 
-      // Update the matched pairs
-      if(!is_bad_data(i_bta)) {
-
-         // Find the genesis event for this BEST track
-         if(bga.has_storm_id(bta[i_bta].storm_id(), i_bga)) {
-            gpd.add_gen_pair(&fga[i], &bga[i_bga]);
-         }
-         else {
-            mlog << Warning << "\nget_genesis_pairs() -> "
-                 << "can't find the genesis event for the "
-                 << bta[i_bta].storm_id() << " BEST track!\n\n";
-         }
+      // Add the matched genesis pair
+      if(!is_bad_data(i_bga)) {
+         gpd.add_gen_pair(&fga[i], &bga[i_bga]);
       }
       // Add the unmatched forecast
       else {
@@ -435,6 +414,10 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << " initialization, "
               << pairs.lead_time(i)/sec_per_hour << " lead";
 
+      // Count the genesis and track points
+      if(fgi) gci.add_fcst_gen(*fgi);
+      if(bgi) gci.add_best_gen(*bgi);
+      
       // Unmatched forecast genesis (FALSE ALARM)
       if(fgi && !bgi) {
 
@@ -544,6 +527,9 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
       }
    } // end for i n_pair
 
+   // If requested, count the unique BEST track hit and miss counts
+   gci.inc_best_unique();
+
    if(vx_opt.DevFlag) {
       mlog << Debug(3) << "For filter ("
            << pairs.desc() << ") " << pairs.model()
@@ -567,9 +553,9 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-int find_genesis_match(const GenesisInfo    &fcst_gi,
-                       const TrackInfoArray &bta,
-                       const TrackInfoArray &ota,
+int find_genesis_match(const GenesisInfo      &fcst_gi,
+                       const GenesisInfoArray &bga,
+                       const TrackInfoArray   &ota,
                        const double rad) {
    int i, j;
    int i_best = bad_data_int;
@@ -586,14 +572,14 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
 
    // Search the BEST track points for a match
    for(i=0, i_best=bad_data_int;
-       i<bta.n() && is_bad_data(i_best);
+       i<bga.n() && is_bad_data(i_best);
        i++) {
-      for(j=0; j<bta[i].n_points(); j++) {
-         if(fcst_gi.is_match(bta[i][j], rad)) {
+      for(j=0; j<bga[i].n_points(); j++) {
+         if(fcst_gi.is_match(bga[i][j], rad)) {
             i_best = i;
             mlog << Debug(4) << case_cs
                  << " MATCHES BEST track "
-                 << bta[i].storm_id() << ".\n";
+                 << bga[i].storm_id() << ".\n";
             break;
          }
       }
@@ -618,8 +604,8 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
 
       // Find BEST track for this operational track
       if(!is_bad_data(i_oper)) {
-         for(i=0; i<bta.n(); i++) {
-            if(bta[i].storm_id() == ota[i_oper].storm_id()) {
+         for(i=0; i<bga.n(); i++) {
+            if(bga[i].storm_id() == ota[i_oper].storm_id()) {
                i_best = i;
                break;
             }
@@ -675,7 +661,7 @@ void process_fcst_tracks(const StringArray &files,
    ConcatString suffix;
    LineDataFile f;
    ATCFTrackLine line;
-   TrackInfoArray tracks;
+   TrackInfoArray fcst_ta;
    GenesisInfo fcst_gi;
    bool keep;
 
@@ -696,7 +682,7 @@ void process_fcst_tracks(const StringArray &files,
       }
 
       // Initialize
-      tracks.clear();
+      fcst_ta.clear();
       n_lines = 0;
 
       // Set metadata pointer
@@ -710,21 +696,21 @@ void process_fcst_tracks(const StringArray &files,
          if((line.valid_hour() % valid_freq_sec) != 0) continue;
    
          n_lines++;
-         tracks.add(line);
+         fcst_ta.add(line);
       }
 
       // Increment counts
       tot_lines  += n_lines;
-      tot_tracks += tracks.n();
+      tot_tracks += fcst_ta.n();
 
       // Close the current file
       f.close();
 
       // Search the tracks for genesis events
-      for(j=0; j<tracks.n(); j++) {
+      for(j=0; j<fcst_ta.n(); j++) {
 
          // Attempt to define genesis
-         if(!fcst_gi.set(tracks[j], conf_info.FcstEventInfo)) {
+         if(!fcst_gi.set(fcst_ta[j], conf_info.FcstEventInfo)) {
             continue;
          }
 
@@ -753,18 +739,17 @@ void process_fcst_tracks(const StringArray &files,
       } // end for j
 
       // Dump out the current number of lines
-      mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n() << "] Found "
-           << fcst_ga.n() - n_genesis << " forecast genesis events, from "
-           << tracks.n() << " tracks, from " << n_lines
-           << " input lines, from file \"" << files[i] << "\".\n";
+      mlog << Debug(4) << "[File " << i+1 << " of " << files.n()
+           << "] Found " << fcst_ga.n() - n_genesis
+           << " forecast genesis events, from " << fcst_ta.n()
+           << " tracks, from " << n_lines << " input lines, from file \""
+           << files[i] << "\".\n";
       n_genesis = fcst_ga.n();
 
    } // end for i
 
    // Dump out the total number of lines
-   mlog << Debug(3)
-        << "Found a total of " << fcst_ga.n()
+   mlog << Debug(3) << "Found a total of " << fcst_ga.n()
         << " forecast genesis events, from " << tot_tracks
         << " tracks, from " << tot_lines << " input lines, from "
         << files.n() << " input files.\n";
@@ -780,9 +765,9 @@ void process_fcst_tracks(const StringArray &files,
    // Dump out track info
    else {
       for(i=0; i<fcst_ga.n(); i++) {
-         mlog << Debug(6)
-              << "[Genesis " << i+1 << " of " << fcst_ga.n()
-              << "] " << fcst_ga[i].serialize() << "\n";
+         mlog << Debug(6) << "[Genesis " << i+1 << " of "
+              << fcst_ga.n() << "] " << fcst_ga[i].serialize()
+              << "\n";
       }
    }
 
@@ -790,17 +775,15 @@ void process_fcst_tracks(const StringArray &files,
 }
 
 ////////////////////////////////////////////////////////////////////////
-// JHG, by changing GenesisInfo to inherit from TrackInfo,
-// I should just be able to populate the GenesisInfo object directly!
-// Also, don't forget to avoid double-counting the BEST track genesis events
+
 void process_best_tracks(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray  &best_ga,
-                         TrackInfoArray    &best_ta,
                          TrackInfoArray    &oper_ta) {
    int i, i_bga, n_lines;
    ConcatString suffix, gen_basin, case_cs, storm_id;
    StringArray best_tech, oper_tech;
+   TrackInfoArray best_ta;
    GenesisInfo best_gi;
    LineDataFile f;
    ATCFTrackLine line;
@@ -808,7 +791,6 @@ void process_best_tracks(const StringArray &files,
    int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
 
    // Initialize
-   best_ta.clear();
    oper_ta.clear();
    n_lines = 0;
 
@@ -1244,6 +1226,7 @@ void write_nc(const TCGenVxOpt &vx_opt, const DataPlane &dp,
 }
 
 // JHG, for #1430, to do.
+// - Add NetCDF variable attributes
 // Update docs to indicate that dev_method_flag, ops_method_flag, and output_flag
 // can be defined separately for each filter.
 // Add docs for nc_pairs_flag and genesis_track_points_window.
