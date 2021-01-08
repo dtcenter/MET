@@ -119,6 +119,7 @@ class TCGenVxOpt {
       map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
       SingleThresh ValidGenesisDHrThresh;
+      bool BestUniqueFlag;
 
       //////////////////////////////////////////////////////////////////
 
@@ -238,13 +239,19 @@ class GenCTCInfo {
    const TCGenVxOpt* VxOpt;
    const Grid *NcOutGrid;
 
+   SingleThresh ValidGenesisDHrThresh;
+   bool BestUniqueFlag;
+
+   // Avoid double-counting BEST track genesis
+   map<const GenesisInfo *, int> BestDevHitMap;
+   map<const GenesisInfo *, int> BestOpsHitMap;
+
    DataPlane FcstGenesisDp, FcstTrackDp;
-   DataPlane BestGenesisDp, BestTrackDp;
-
    DataPlane FcstDevFYOYDp, FcstDevFYONDp;
-   DataPlane BestDevFYOYDp, BestDevFNOYDp;
-
    DataPlane FcstOpsFYOYDp, FcstOpsFYONDp;
+
+   DataPlane BestGenesisDp, BestTrackDp;
+   DataPlane BestDevFYOYDp, BestDevFNOYDp;
    DataPlane BestOpsFYOYDp, BestOpsFNOYDp;
 
       //////////////////////////////////////////////////////////////////
@@ -257,12 +264,13 @@ class GenCTCInfo {
                 const GenesisInfo *, const GenesisInfo *);
    void inc_ops(bool, bool,
                 const GenesisInfo *, const GenesisInfo *);
+   void inc_best_unique();
 
-   void add_fcst_gen(const GenesisInfo &, const SingleThresh &);
-   void add_best_gen(const GenesisInfo &, const SingleThresh &);
+   void add_fcst_gen(const GenesisInfo &);
+   void add_best_gen(const GenesisInfo &);
 
    void inc_pnt(double, double, DataPlane &);
-   void inc_trk(const GenesisInfo &, const SingleThresh &, DataPlane &);
+   void inc_trk(const GenesisInfo &, DataPlane &);
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -161,6 +161,7 @@ void TCGenVxOpt::clear() {
    OutputMap.clear();
    NcInfo.clear();
    ValidGenesisDHrThresh.clear();
+   BestUniqueFlag = false;
 
    return;
 }
@@ -279,6 +280,10 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: valid_minus_genesis_diff_thresh
    ValidGenesisDHrThresh =
       dict.lookup_thresh(conf_key_valid_minus_genesis_diff_thresh);
+
+   // Conf: bset_unique_flag
+   BestUniqueFlag =
+      dict.lookup_bool(conf_key_best_unique_flag);
 
    return;
 }
@@ -787,6 +792,12 @@ void GenCTCInfo::clear() {
    VxOpt     = (const TCGenVxOpt *) 0;
    NcOutGrid = (const Grid *) 0;
 
+   ValidGenesisDHrThresh.clear();
+   BestUniqueFlag = false;
+
+   BestDevHitMap.clear();
+   BestOpsHitMap.clear();
+
    FcstGenesisDp.clear();
    FcstTrackDp.clear();
    FcstDevFYOYDp.clear();
@@ -813,6 +824,10 @@ void GenCTCInfo::set_vx_opt(const TCGenVxOpt *vx_opt,
 
    // Store pointer
    VxOpt = vx_opt;
+
+   // Store config options
+   ValidGenesisDHrThresh = VxOpt->ValidGenesisDHrThresh;
+   BestUniqueFlag        = VxOpt->BestUniqueFlag;
 
    // Setup alpha value
    if(VxOpt->DevFlag) {
@@ -857,13 +872,19 @@ void GenCTCInfo::set_vx_opt(const TCGenVxOpt *vx_opt,
 ////////////////////////////////////////////////////////////////////////
 
 void GenCTCInfo::inc_dev(bool f, bool o,
-        const GenesisInfo *fgi, const GenesisInfo *bgi) {
+                         const GenesisInfo *fgi,
+                         const GenesisInfo *bgi) {
 
    // Hits
    if(f && o) {
       CTSDev.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), FcstDevFYOYDp);
-      inc_pnt(bgi->lat(), bgi->lon(), BestDevFYOYDp);
+      BestDevHitMap[bgi] += 1;
+      
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), BestDevFYOYDp);
+      }
    }
    // False Alarms
    else if(f && !o) {
@@ -873,7 +894,11 @@ void GenCTCInfo::inc_dev(bool f, bool o,
    // Misses
    else if(!f && o) {
       CTSDev.cts.inc_fn_oy();
-      inc_pnt(bgi->lat(), bgi->lon(), BestDevFNOYDp);
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), BestDevFNOYDp);
+      }
    }
    // Correct Negatives (should be none)
    else {
@@ -886,13 +911,19 @@ void GenCTCInfo::inc_dev(bool f, bool o,
 ////////////////////////////////////////////////////////////////////////
 
 void GenCTCInfo::inc_ops(bool f, bool o,
-        const GenesisInfo *fgi, const GenesisInfo *bgi) {
+                         const GenesisInfo *fgi,
+                         const GenesisInfo *bgi) {
 
    // Hits
    if(f && o) {
       CTSOps.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), FcstOpsFYOYDp);
-      inc_pnt(bgi->lat(), bgi->lon(), BestOpsFYOYDp);
+      BestOpsHitMap[bgi] += 1;
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), BestOpsFYOYDp);
+      }
    }
    // False Alarms
    else if(f && !o) {
@@ -902,7 +933,11 @@ void GenCTCInfo::inc_ops(bool f, bool o,
    // Misses
    else if(!f && o) {
       CTSOps.cts.inc_fn_oy();
-      inc_pnt(bgi->lat(), bgi->lon(), BestOpsFNOYDp);
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), BestOpsFNOYDp);
+      }
    }
    // Correct Negatives (should be none)
    else {
@@ -914,35 +949,76 @@ void GenCTCInfo::inc_ops(bool f, bool o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi,
-                              const SingleThresh &dhr_thresh) {
+void GenCTCInfo::inc_best_unique() {
 
-   // Track the range of valid times
-   if(FcstBeg == 0 || FcstBeg > gi.valid_min()) FcstBeg = gi.valid_min();
-   if(FcstEnd == 0 || FcstEnd < gi.valid_max()) FcstEnd = gi.valid_max();
-   
-   // Count the genesis point
-   inc_pnt(gi.lat(), gi.lon(), FcstGenesisDp);
+   // Only process when the flag is set
+   if(!BestUniqueFlag) return;
 
-   // Count the track points
-   if(!FcstTrackDp.is_empty()) inc_trk(gi, dhr_thresh, FcstTrackDp);
+   map<const GenesisInfo *,int>::iterator it;
+
+   // Count the dev BEST track hits and false alarms
+   for(it=BestDevHitMap.begin(); it!=BestDevHitMap.end(); it++) {
+
+      // Zero hits is a miss
+      if(it->second == 0) {
+         inc_pnt(it->first->lat(), it->first->lon(), BestDevFNOYDp);
+      }
+      // Otherwise, it's a hit
+      else {
+         inc_pnt(it->first->lat(), it->first->lon(), BestDevFYOYDp);
+      }
+   }
+
+   // Count the ops BEST track hits and false alarms
+   for(it=BestOpsHitMap.begin(); it!=BestOpsHitMap.end(); it++) {
+
+      // Zero hits is a miss
+      if(it->second == 0) {
+         inc_pnt(it->first->lat(), it->first->lon(), BestOpsFNOYDp);
+      }
+      // Otherwise, it's a hit
+      else {
+         inc_pnt(it->first->lat(), it->first->lon(), BestOpsFYOYDp);
+      }
+   }
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::add_best_gen(const GenesisInfo &gi,
-                              const SingleThresh &dhr_thresh) {
+void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi) {
+
+   // Track the range of valid times
+   if(FcstBeg == 0 || FcstBeg > gi.valid_min()) FcstBeg = gi.valid_min();
+   if(FcstEnd == 0 || FcstEnd < gi.valid_max()) FcstEnd = gi.valid_max();
+   
+   // Count the genesis and track points
+   inc_pnt(gi.lat(), gi.lon(), FcstGenesisDp);
+   inc_trk(gi, FcstTrackDp);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_best_gen(const GenesisInfo &gi) {
+
+   // Nothing to do if this genesis has already been counted
+   if(BestDevHitMap.count(&gi) > 0 ||
+      BestOpsHitMap.count(&gi) > 0) return;
+
+   // Add hit counter entries for this storm
+   BestDevHitMap[&gi] = 0;
+   BestOpsHitMap[&gi] = 0;
 
    // Track the range of valid times
    if(BestBeg == 0 || BestBeg > gi.valid_min()) BestBeg = gi.valid_min();
    if(BestEnd == 0 || BestEnd < gi.valid_max()) BestEnd = gi.valid_max();
 
-   // Count the genesis point
+   // Count the genesis and track points
    inc_pnt(gi.lat(), gi.lon(), BestGenesisDp);
-
-   // Count the track points
-   if(!BestTrackDp.is_empty()) inc_trk(gi, dhr_thresh, BestTrackDp);
+   inc_trk(gi, BestTrackDp);
 
    return;
 }
@@ -972,9 +1048,7 @@ void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_trk(const GenesisInfo &gi,
-                         const SingleThresh &dhr_thresh,
-                         DataPlane &dp) {
+void GenCTCInfo::inc_trk(const GenesisInfo &gi, DataPlane &dp) {
 
    // Nothing to do if the DataPlane is empty
    if(dp.is_empty()) return;
@@ -984,7 +1058,7 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi,
 
       // Count points whose valid time is close enough to genesis time
       int dhr = (gi[i].valid() - gi.genesis_time())/sec_per_hour;
-      if(dhr_thresh.check(dhr)) {
+      if(ValidGenesisDHrThresh.check(dhr)) {
          inc_pnt(gi[i].lat(), gi[i].lon(), dp);
       }
    }

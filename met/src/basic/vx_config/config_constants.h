@@ -1080,6 +1080,7 @@ static const char conf_key_best_fy_oy[]                      = "best_fy_oy";
 static const char conf_key_best_fn_oy[]                      = "best_fn_oy";
 static const char conf_key_best_tracks[]                     = "best_tracks";
 static const char conf_key_valid_minus_genesis_diff_thresh[] = "valid_minus_genesis_diff_thresh";
+static const char conf_key_best_unique_flag[]                = "best_unique_flag";
 static const char conf_key_nc_pairs_grid[]                   = "nc_pairs_grid";
 
 //

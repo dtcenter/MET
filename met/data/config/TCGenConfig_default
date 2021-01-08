@@ -85,7 +85,7 @@ filter = [];
 //
 // Description written to output DESC column
 //
-desc = "NA";
+desc = "ALL";
 
 //
 // Forecast ATCF ID's
@@ -224,6 +224,12 @@ nc_pairs_flag = {
 //      >=-12&&<=12 to count all points within 12 hours of genesis
 //
 valid_minus_genesis_diff_thresh = NA;
+
+//
+// Count unique BEST track genesis event locations (true) versus counting the
+// location for all pairs (false).
+//
+best_unique_flag = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

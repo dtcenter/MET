@@ -81,7 +81,6 @@ oper_technique = "CARQ";
 // If empty, a single filter is defined using the top-level settings.
 //
 filter = [
-  { desc           = "ALL"; }, 
   { desc           = "AL_BASIN";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
                      { name=\"basin\"; level=\"(*,*)\"; } ==1"; },
@@ -107,7 +106,7 @@ filter = [
 //
 // Description written to output DESC column
 //
-desc = "NA";
+desc = "ALL";
 
 //
 // Forecast ATCF ID's
@@ -246,6 +245,12 @@ nc_pairs_flag = {
 //      >=-12&&<=12 to count all points within 12 hours of genesis
 //
 valid_minus_genesis_diff_thresh = NA;
+
+//
+// Count unique BEST track genesis event locations (true) versus counting the
+// location for all pairs (false).
+//
+best_unique_flag = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
