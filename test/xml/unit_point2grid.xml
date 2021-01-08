@@ -247,7 +247,6 @@
       G231 \
       &OUTPUT_DIR;/point2grid/point2grid_2D_time_G231.nc \
       -field 'name="brightness_temperature_4micron"; level="(*,*)";' \
-      -qc 1,2,3 -method MAX \
       -v 1
     </param>
     <output>
