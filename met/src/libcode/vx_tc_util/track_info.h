@@ -37,7 +37,7 @@ static const int MaxBestTrackTimeInc    = 24 * sec_per_hour;
 
 class TrackInfo {
 
-   private:
+   protected:
 
       void init_from_scratch();
       void assign(const TrackInfo &);

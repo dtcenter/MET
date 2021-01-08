@@ -179,7 +179,7 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
    NPair++;
    BestStormId.add("");
    InitTime.add(fgi->init());
-   LeadTime.add(fgi->lead_time());
+   LeadTime.add(fgi->genesis_lead());
    FcstGen.push_back(fgi);
    BestGen.push_back((GenesisInfo *) 0);
 
@@ -238,7 +238,7 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       NPair++;
       BestStormId.add(bgi->storm_id());
       InitTime.add(fgi->init());
-      LeadTime.add(fgi->lead_time());
+      LeadTime.add(fgi->genesis_lead());
       FcstGen.push_back(fgi);
       BestGen.push_back(bgi);
    }

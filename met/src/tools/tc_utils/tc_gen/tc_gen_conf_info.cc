@@ -333,7 +333,7 @@ void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
+bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
    bool keep = true;
 
    // ATCF ID processed elsewhere
@@ -341,16 +341,15 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
    // Only check basin, storm ID, cyclone number, and storm name for
    // BEST and operational tracks.
 
-   if(g.track()->is_best_track() ||
-      g.track()->is_oper_track()) {
+   if(gi.is_best_track() || gi.is_oper_track()) {
 
       // Check storm id
       if(StormId.n() > 0 &&
-         !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
+         !has_storm_id(StormId, gi.basin(), gi.cyclone(), gi.init()))
          keep = false;
 
       // Check storm name
-      if(StormName.n() > 0 && !StormName.has(g.storm_name()))
+      if(StormName.n() > 0 && !StormName.has(gi.storm_name()))
          keep = false;
    }
 
@@ -359,39 +358,38 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
    // Only check intialization and lead times for forecast and
    // operational tracks.
 
-   if(!g.track()->is_best_track() ||
-       g.track()->is_oper_track()) {
+   if(!gi.is_best_track() || gi.is_oper_track()) {
 
       // Initialization time window
-      if((InitBeg > 0 &&  InitBeg > g.init()) ||
-         (InitEnd > 0 &&  InitEnd < g.init()))
+      if((InitBeg > 0 &&  InitBeg > gi.init()) ||
+         (InitEnd > 0 &&  InitEnd < gi.init()))
          keep = false;
 
       // Initialization hours
-      if(InitHour.n() > 0 && !InitHour.has(g.init_hour()))
+      if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
          keep = false;
 
       // Lead times
-      if(Lead.n() > 0 && !Lead.has(g.lead_time()))
+      if(Lead.n() > 0 && !Lead.has(gi.genesis_lead()))
          keep = false;
    }
 
    if(!keep) return(keep);
 
    // Valid time window
-   if((ValidBeg > 0 && ValidBeg > g.valid_min()) ||
-      (ValidEnd > 0 && ValidEnd < g.valid_max()))
+   if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
+      (ValidEnd > 0 && ValidEnd < gi.valid_max()))
       keep = false;
 
    // Poly masking
    if(VxPolyMask.n_points() > 0 &&
-     !VxPolyMask.latlon_is_inside(g.lat(), g.lon()))
+     !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
       keep = false;
 
    // Area masking
    if(!VxAreaMask.is_empty()) {
       double x, y;
-      VxGridMask.latlon_to_xy(g.lat(), -1.0*g.lon(), x, y);
+      VxGridMask.latlon_to_xy(gi.lat(), -1.0*gi.lon(), x, y);
       if(x < 0 || x >= VxGridMask.nx() ||
          y < 0 || y >= VxGridMask.ny()) {
          keep = false;
@@ -403,7 +401,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) const {
 
    // Distance to land
    if((DLandThresh.get_type() != no_thresh_type) &&
-      (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+      (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
       keep = false;
 
    // Return the keep status
@@ -979,17 +977,15 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi,
                          DataPlane &dp) {
 
    // Nothing to do if the DataPlane is empty
-   if(dp.is_empty() || !gi.track()) return;
-
-   const TrackInfo *ti = gi.track();
+   if(dp.is_empty()) return;
 
    // Loop through the track points
-   for(int i=0; i<ti->n_points(); i++) {
+   for(int i=0; i<gi.n_points(); i++) {
 
       // Count points whose valid time is close enough to genesis time
-      int dhr = ((*ti)[i].valid() - gi.genesis_time())/sec_per_hour;
+      int dhr = (gi[i].valid() - gi.genesis_time())/sec_per_hour;
       if(dhr_thresh.check(dhr)) {
-         inc_pnt((*ti)[i].lat(), (*ti)[i].lon(), dp);
+         inc_pnt(gi[i].lat(), gi[i].lon(), dp);
       }
    }
 

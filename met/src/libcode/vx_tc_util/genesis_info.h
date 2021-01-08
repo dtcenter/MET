@@ -47,7 +47,7 @@ extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
 //
 ////////////////////////////////////////////////////////////////////////
 
-class GenesisInfo {
+class GenesisInfo : public TrackInfo {
 
    private:
 
@@ -55,17 +55,13 @@ class GenesisInfo {
 
       bool IsSet;
 
-      // Pointer to TrackInfo
-      const TrackInfo *Track; // not allocated
-      int   GenIndex;
+      // TrackInfo for this Genesis event
+      TrackInfo Track;
+      int       GenesisIndex;
 
-      // Genesis and model information
-      ConcatString Technique;
-      unixtime     GenesisTime;
-      unixtime     InitTime;
-      int          LeadTime;
-
-      // Genesis Location
+      // Genesis Information
+      unixtime GenesisTime;
+      int      GenesisLead;
       double   Lat;
       double   Lon;
       double   DLand;
@@ -75,6 +71,7 @@ class GenesisInfo {
       GenesisInfo();
      ~GenesisInfo();
       GenesisInfo(const GenesisInfo &);
+
       GenesisInfo & operator=(const GenesisInfo &);
       bool          operator==(const GenesisInfo &) const;
       bool          is_storm(const GenesisInfo &) const;
@@ -90,30 +87,18 @@ class GenesisInfo {
          //
 
       void set_dland(double);
-      bool set(const TrackInfo *,
-               const GenesisEventInfo *);
+      bool set(const TrackInfo &, const GenesisEventInfo &);
 
          //
          //  get stuff
          //
    
-      const TrackInfo *track()        const;
-      double           lat()          const;
-      double           lon()          const;
-      double           dland()        const;
-      unixtime         genesis_time() const;
-      unixtime         init()         const;
-      int              init_hour()    const;
-      int              lead_time()    const;
-
-      ConcatString     storm_id()     const;
-      ConcatString     basin()        const;
-      ConcatString     cyclone()      const;
-      ConcatString     storm_name()   const;
-      ConcatString     technique()    const;
-      unixtime         valid_min()    const;
-      unixtime         valid_max()    const;
-      int              duration()     const;
+      double   lat()          const;
+      double   lon()          const;
+      double   dland()        const;
+      unixtime genesis_time() const;
+      int      genesis_lead() const;
+      double   genesis_fhr()  const;
 
          //
          //  do stuff
@@ -125,14 +110,11 @@ class GenesisInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const TrackInfo *GenesisInfo::track()            const { return(Track);                        }
-inline double           GenesisInfo::lat()              const { return(Lat);                          }
-inline double           GenesisInfo::lon()              const { return(Lon);                          }
-inline double           GenesisInfo::dland()            const { return(DLand);                        }
-inline unixtime         GenesisInfo::genesis_time()     const { return(GenesisTime);                  }
-inline unixtime         GenesisInfo::init()             const { return(InitTime);                     }
-inline int              GenesisInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
-inline int              GenesisInfo::lead_time()        const { return(LeadTime);                     }
+inline double   GenesisInfo::lat()          const { return(Lat);         }
+inline double   GenesisInfo::lon()          const { return(Lon);         }
+inline double   GenesisInfo::dland()        const { return(DLand);       }
+inline unixtime GenesisInfo::genesis_time() const { return(GenesisTime); }
+inline int      GenesisInfo::genesis_lead() const { return(GenesisLead); }
 
 ////////////////////////////////////////////////////////////////////////
 //

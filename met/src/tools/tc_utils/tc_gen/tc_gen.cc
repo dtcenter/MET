@@ -469,7 +469,7 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                  << " BEST track " << bgi->storm_id() << " genesis at ("
                  << bgi->lat() << ", " << bgi->lon() << ") and "
                  << unix_to_yyyymmdd_hhmmss(fgi->genesis_time())
-                 << " forecast hour " << fgi->lead_time()/sec_per_hour
+                 << " forecast hour " << fgi->genesis_fhr()
                  << " genesis at (" << fgi->lat() << ", " << fgi->lon() << ")";
          
          // Discard if the forecast init >= BEST genesis
@@ -579,7 +579,7 @@ int find_genesis_match(const GenesisInfo    &fcst_gi,
    case_cs << fcst_gi.technique() << " "
            << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
            << " initialization, "
-           << fcst_gi.lead_time()/sec_per_hour << " lead, "
+           << fcst_gi.genesis_fhr() << " lead, "
            << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
            << " forecast genesis at (" << fcst_gi.lat() << ", "
            << fcst_gi.lon() << ")";
@@ -724,15 +724,15 @@ void process_fcst_tracks(const StringArray &files,
       for(j=0; j<tracks.n(); j++) {
 
          // Attempt to define genesis
-         if(!fcst_gi.set(&tracks[j], &conf_info.FcstEventInfo)) {
+         if(!fcst_gi.set(tracks[j], conf_info.FcstEventInfo)) {
             continue;
          }
 
          // Check the forecast lead time window
-         if(fcst_gi.lead_time() < conf_info.FcstSecBeg ||
-            fcst_gi.lead_time() > conf_info.FcstSecEnd) {
+         if(fcst_gi.genesis_lead() < conf_info.FcstSecBeg ||
+            fcst_gi.genesis_lead() > conf_info.FcstSecEnd) {
             mlog << Debug(6) << "Skipping genesis event for forecast hour "
-                 << fcst_gi.lead_time()/sec_per_hour << ".\n";
+                 << fcst_gi.genesis_fhr() << ".\n";
             continue;
          }
 
@@ -790,7 +790,9 @@ void process_fcst_tracks(const StringArray &files,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+// JHG, by changing GenesisInfo to inherit from TrackInfo,
+// I should just be able to populate the GenesisInfo object directly!
+// Also, don't forget to avoid double-counting the BEST track genesis events
 void process_best_tracks(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray  &best_ga,
@@ -877,7 +879,7 @@ void process_best_tracks(const StringArray &files,
    for(i=0; i<best_ta.n(); i++) {
 
       // Attempt to define genesis
-      if(!best_gi.set(&best_ta[i], &conf_info.BestEventInfo)) {
+      if(!best_gi.set(best_ta[i], conf_info.BestEventInfo)) {
          continue;
       }
 
