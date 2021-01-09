@@ -291,7 +291,7 @@ void process_genesis() {
          // TODO: MET #1597 write a new TC-Gen MPR line type
    
          // Write NetCDF output fields
-         if(!conf_info.NcInfo.all_false()) {
+         if(!conf_info.VxOpt[i].NcInfo.all_false()) {
             write_nc(ctc_info);
          }
    
