@@ -60,13 +60,14 @@ struct TCGenNcOutInfo {
 
    bool do_latlon;
    bool do_fcst_genesis;
+   bool do_fcst_tracks;
    bool do_fcst_fy_oy;
    bool do_fcst_fy_on;
-   bool do_fcst_tracks;
    bool do_best_genesis;
+   bool do_best_tracks;
    bool do_best_fy_oy;
    bool do_best_fn_oy;
-   bool do_best_tracks;
+
 
       //////////////////////////////////////////////////////////////////
 

@@ -40,13 +40,14 @@ TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
 
    if(t.do_latlon)       do_latlon       = true;
    if(t.do_fcst_genesis) do_fcst_genesis = true;
+   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
    if(t.do_fcst_fy_oy)   do_fcst_fy_oy   = true;
    if(t.do_fcst_fy_on)   do_fcst_fy_on   = true;
-   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
    if(t.do_best_genesis) do_best_genesis = true;
+   if(t.do_best_tracks)  do_best_tracks  = true;
    if(t.do_best_fy_oy)   do_best_fy_oy   = true;
    if(t.do_best_fn_oy)   do_best_fn_oy   = true;
-   if(t.do_best_tracks)  do_best_tracks  = true;
+
 
    return(*this);
 }
@@ -65,10 +66,10 @@ void TCGenNcOutInfo::clear() {
 bool TCGenNcOutInfo::all_false() const {
 
    bool status = do_latlon       ||
-                 do_fcst_genesis || do_fcst_fy_oy  ||
-                 do_fcst_fy_on   || do_fcst_tracks ||
-                 do_best_genesis || do_best_fy_oy  ||
-                 do_best_fn_oy   || do_best_tracks;
+                 do_fcst_genesis || do_fcst_tracks ||
+                 do_fcst_fy_oy   || do_fcst_fy_on  ||
+                 do_best_genesis || do_best_tracks ||
+                 do_best_fy_oy   || do_best_fn_oy;
 
    return(!status);
 }
@@ -79,13 +80,13 @@ void TCGenNcOutInfo::set_all_false() {
 
    do_latlon       = false;
    do_fcst_genesis = false;
+   do_fcst_tracks  = false;
    do_fcst_fy_oy   = false;
    do_fcst_fy_on   = false;
-   do_fcst_tracks  = false;
    do_best_genesis = false;
+   do_best_tracks  = false;
    do_best_fy_oy   = false;
    do_best_fn_oy   = false;
-   do_best_tracks  = false;
 
    return;
 }
@@ -96,13 +97,13 @@ void TCGenNcOutInfo::set_all_true() {
 
    do_latlon       = true;
    do_fcst_genesis = true;
+   do_fcst_tracks  = true;
    do_fcst_fy_oy   = true;
    do_fcst_fy_on   = true;
-   do_fcst_tracks  = true;
    do_best_genesis = true;
+   do_best_tracks  = true;
    do_best_fy_oy   = true;
    do_best_fn_oy   = true;
-   do_best_tracks  = true;
 
    return;
 }
@@ -325,13 +326,13 @@ void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
 
    NcInfo.do_latlon       = d->lookup_bool(conf_key_latlon_flag);
    NcInfo.do_fcst_genesis = d->lookup_bool(conf_key_fcst_genesis);
+   NcInfo.do_fcst_tracks  = d->lookup_bool(conf_key_fcst_tracks);
    NcInfo.do_fcst_fy_oy   = d->lookup_bool(conf_key_fcst_fy_oy);
    NcInfo.do_fcst_fy_on   = d->lookup_bool(conf_key_fcst_fy_on);
-   NcInfo.do_fcst_tracks  = d->lookup_bool(conf_key_fcst_tracks);
    NcInfo.do_best_genesis = d->lookup_bool(conf_key_best_genesis);
+   NcInfo.do_best_tracks  = d->lookup_bool(conf_key_best_tracks);
    NcInfo.do_best_fy_oy   = d->lookup_bool(conf_key_best_fy_oy);
    NcInfo.do_best_fn_oy   = d->lookup_bool(conf_key_best_fn_oy);
-   NcInfo.do_best_tracks  = d->lookup_bool(conf_key_best_tracks);
 
    return;
 }

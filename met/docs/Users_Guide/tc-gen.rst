@@ -114,12 +114,12 @@ ______________________
 
 .. code-block:: none
 
-  lead_window = {
+  fcst_hr_window = {
      beg = 24;
      end = 120;
   }
 
-The **lead_window** option is a dictionary defining the beginning (**beg**) and ending (**end**) model forecast hours to be searched for genesis events. Model genesis events occurring outside of this window are ignored. This lead window is also used when defining the model opportunities to forecast the BEST track genesis events.
+The **fcst_hr_window** option is a dictionary defining the beginning (**beg**) and ending (**end**) model forecast hours to be searched for genesis events. Model genesis events occurring outside of this window are ignored. This forecast hour window is also used when defining the model opportunities to forecast the BEST track genesis events.
 
 ______________________
 
@@ -151,7 +151,7 @@ ______________________
      mslp_thresh = NA;
   }
 
-The **best_genesis** dictionary define genesis criteria for the BEST tracks. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST track.
+The **best_genesis** dictionary defines genesis criteria for the BEST tracks. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST track.
 
 ______________________
 
@@ -159,7 +159,7 @@ ______________________
 
   oper_technique = "CARQ";
 
-The **oper_technique** entry is a string which defines the ATCF ID for the operational track data that should be used. For each forecast genesis event, the BEST tracks are searched for a track point valid at the time of forecast genesis and within the search radius. If no match is found, the 0-hour operational track is searched for a match.
+The **oper_technique** entry is a string which defines the ATCF ID for the operational track data that should be used. For each forecast genesis event, the BEST tracks are searched for a track point valid at the time of forecast genesis and within the search radius. If no match is found, the 0-hour operational track points are searched for a match.
 
 ______________________
 
@@ -167,13 +167,13 @@ ______________________
 
   filter = [];
 
-The **filter** entry is an array of dictionaries defining genesis filtering criteria to be applied. Each of the entries listed below (from **desc** to **genesis_radius**) may be specified separately within each filter dictionary. If left empty, the default setting, a single filter is applied using the top-level filtering criteria. If multiple filtering dictionaries are defined, the **desc** entry must be specified for each to differentiate the output data. Output is written for each combination of filter dictionary and model ATCF ID encountered in the data.
+The **filter** entry is an array of dictionaries defining genesis filtering criteria to be applied. Each of the entries listed below (from **desc** to **best_unique_flag**) may be specified separately within each filter dictionary. If left empty, the default setting, a single filter is applied using the top-level filtering criteria. If multiple filtering dictionaries are defined, the **desc** entry must be specified for each to differentiate the output data. Output is written for each combination of filter dictionary and model ATCF ID encountered in the data.
 
 ______________________
 
 .. code-block:: none
 
-  desc = "NA";
+  desc = "ALL";
 
 The **desc** configuration option is common to many MET tools and is described in :numref:`config_options`.
 
@@ -219,7 +219,7 @@ ______________________
   init_hour = [];
   lead      = [];
 
-The **init_hour** and **lead** entries are arrays of strings in HH[MMSS] format defining which forecast and operational tracks should be included. If left empty, all tracks will be used. Otherwise, only those forecast and operational tracks whose initialization hour and lead times appear in the list will be used. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
+The **init_hour** and **lead** entries are arrays of strings in HH[MMSS] format defining which forecast tracks should be included. If left empty, all tracks will be used. Otherwise, only those forecast tracks whose initialization hour and lead times appear in the list will be used. Note that these settings only apply to the forecast tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
 ______________________
 
@@ -236,34 +236,50 @@ ______________________
 
   dland_thresh = NA;
 
-The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (**NA**) always evaluates to true.
+The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on its distance to land. The default threshold (**NA**) always evaluates to true.
 
 ______________________
 
 .. code-block:: none
 
-  genesis_window = {
+  genesis_match_radius = 500;
+
+The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those BEST genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+
+______________________
+
+.. code-block:: none
+
+  genesis_hit_radius = 500;
+
+The **genesis_hit_radius** entry defines the maximum distance, in km, that the forecast and BEST track genesis events may be separated in order for them to be scored as a HIT in the contingency table. Users should set the genesis hit radius less than or equal to the genesis match radius. Reducing this radius may cause HITS to become FALSE ALARMS.
+
+______________________
+
+.. code-block:: none
+
+  genesis_hit_window = {
      beg = -24;
      end =  24;
   }
 
-The **genesis_window** entry defines a matching time window, in hours, relative to the forecast genesis time. When searching for a match, only those BEST/operational genesis events which occur within this time window will be considered. Increasing this time window should lead to an increase in hits.
+The **genesis_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. When scoring a matched genesis pair, the BEST track genesis event must occur within this time window for the pair to be scored as a HIT in the contingency table. Tightening this window may cause HITS to become FALSE ALARMS.
 
 ______________________
 
 .. code-block:: none
 
-  genesis_radius = 300;
+  genesis_minus_init_diff = 48;
 
-The **genesis_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those BEST/operational genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in hits.
+The **gensis_minus_init_diff** entry is an integer which defines a maximum allowable time difference in hours. This option applies only to the ops matching methodology. For each matching forecast and BEST track genesis event, if the difference between the BEST track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a HIT. Otherwise, it is counted as a FALSE ALARM.
 
 ______________________
 
 .. code-block:: none
 
-  genesis_init_diff = 48;
+  discard_init_post_genesis_flag = TRUE;
 
-The **gensis_init_diff** entry is an integer which defines a maximum allowable time difference in hours. This option applies only to the ops matching methodology. For each matching forecast and BEST track genesis event, if the difference between the BEST track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a HIT. Otherwise, it is counted as a FALSE ALARM.
+The **discard_init_post_genesis_flag** entry is a boolean which indicates whether or not forecast genesis events from model intializations occurring at or after the matching BEST track genesis time should be discarded. If true, those cases are not scored in the contingency table. If false, they are included in the counts.
 
 ______________________
 
@@ -278,9 +294,53 @@ ______________________
 
 .. code-block:: none
 
+  nc_pairs_flag = {
+     latlon       = TRUE;
+     fcst_genesis = TRUE;
+     fcst_tracks  = TRUE;
+     fcst_fy_oy   = TRUE;
+     fcst_fy_on   = TRUE;
+     best_genesis = TRUE;
+     best_tracks  = TRUE;
+     best_fy_oy   = TRUE;
+     best_fn_oy   = TRUE;
+  }
+
+The **nc_pairs_flag** entry is a dictionary of booleans indicating which fields should be written to the NetCDF genesis pairs output file. Each type of output is enabled by setting it to TRUE and disabled by setting it to FALSE. The **latlon** option writes the latitude and longitude values of the output grid. The remaining options write a count of the number of points occuring within each grid cell. The **fcst_genesis** and **best_genesis** options write counts of the forecast and BEST track genesis locations. The **fcst_track** and **best_track** options write counts of the full set of track point locations, which can be refined by the **valid_minus_genesis_diff_thresh** option, described below. The **fcst_fy_oy** and **fcst_fy_on** options write counts for the locations of forecast genesis event HITS and FALSE ALARMS. The **best_fy_oy** and **best_fn_oy** options write counts for the locations of Best track genesis event HITS and MISSES. Note that since matching forecast and Best track genesis events may occur in different grid cells, their counts are reported separately.
+
+______________________
+
+
+.. code-block:: none
+
+  valid_minus_genesis_diff_thresh = NA;
+
+The **valid_minus_genesis_diff_thresh** is a threshold which affects the counts in the NetCDF pairs output file. The fcst_tracks and best_tracks options, described above, turn on counts for the forecast and BEST track points. This option defines which of those track points should be counted by thresholding the track point valid time minus genesis time difference. If set to NA, the default threshold which always evaluates to true, all track points will be counted. Setting <=0 would count the genesis point and all track points prior. Setting >0 would count all points after genesis. And setting >=-12**<=12 would could all points within 12 hours of the genesis time.
+
+______________________
+
+
+.. code-block:: none
+
+  best_unique_flag = TRUE;
+
+The **best_unique_flag** entry is a boolean which affects the counts in the NetCDF pairs output file. If true, the BEST track HIT and MISS locations are counted for each genesis pair. If false, each BEST track genesis event is counted only once. If it is a HIT in at least one genesis pair, it is counted as a HIT in the output. Otherwise, it is counted as a MISS.
+
+______________________
+
+.. code-block:: none
+
   basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
 
 The **basin_file** entry defines the path to the NetCDF basin data file that is included with MET. When a BEST track storm moves from one basin to another, the BEST track dataset can include two tracks for the same storm, one for each basin. However, both tracks have the same genesis point. When this occurs, this basin data file is read and used to determine the basin in which genesis actually occurred. The corresponding BEST track is retained and the other is discarded.
+
+______________________
+
+.. code-block:: none
+
+  nc_pairs_grid = "G001";
+
+The **nc_pairs_grid** entry is a string which defines the grid to be used for the NetCDF genesis pairs output file. It can be specified as a named grid, the path to a gridded data file, or a grid specification string.
 
 ______________________
 

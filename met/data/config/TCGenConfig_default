@@ -200,36 +200,31 @@ output_flag = {
 }
 
 //
-// NetCDF genesis and track density contents
+// NetCDF genesis pair counts
 //
 nc_pairs_flag = {
    latlon       = TRUE;
    fcst_genesis = TRUE;
+   fcst_tracks  = TRUE;
    fcst_fy_oy   = TRUE;
    fcst_fy_on   = TRUE;
-   fcst_tracks  = TRUE;
    best_genesis = TRUE;
+   best_tracks  = TRUE;
    best_fy_oy   = TRUE;
    best_fn_oy   = TRUE;
-   best_tracks  = TRUE;
 }
 
 //
 // Specify which track points should be counted by thresholding the track point
 // valid time minus genesis time difference.
 //
-// e.g. NA  to count all track points
-//      <=0 to count genesis and all points prior
-//      >0  to count all points after genesis
-//      >=-12&&<=12 to count all points within 12 hours of genesis
-//
 valid_minus_genesis_diff_thresh = NA;
 
 //
-// Count unique BEST track genesis event locations (true) versus counting the
-// location for all pairs (false).
+// Count unique BEST track genesis event locations (TRUE) versus counting the
+// location for all pairs (FALSE).
 //
-best_unique_flag = true;
+best_unique_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -251,7 +246,7 @@ dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
 
 //
-// NetCDF genesis and track density output grid
+// NetCDF genesis pairs grid
 //
 nc_pairs_grid = "G001";
 
