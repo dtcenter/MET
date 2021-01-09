@@ -363,5 +363,3 @@ tc_gen output
 TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, and **tc_gen_cts.txt**. The contents of these output files are described in section :numref:`point_stat-output`.
 
 Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in :numref:`stat-analysis`.
-
-Future development will include writing out a NetCDF file with total counts of events, hits, misses, false alarms, and pertinent information for plotting the density of genesis events.
