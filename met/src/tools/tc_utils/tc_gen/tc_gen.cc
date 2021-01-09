@@ -87,9 +87,8 @@ static void   setup_txt_files      (int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
-static void   write_ctc_info       (const TCGenVxOpt &, GenCTCInfo &);
-static void   write_nc             (const TCGenVxOpt &, const DataPlane &dp,
-                                    const ConcatString &);
+static void   write_ctc_info       (GenCTCInfo &);
+static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
 
 static void   usage                ();
@@ -286,9 +285,15 @@ void process_genesis() {
          // Do the categorical verification
          do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
 
-         // Write the output
-         write_ctc_info(conf_info.VxOpt[i], ctc_info);
+         // Write the statistics output
+         write_ctc_info(ctc_info);
+
          // TODO: MET #1597 write a new TC-Gen MPR line type
+   
+         // Write NetCDF output fields
+         if(!conf_info.NcInfo.all_false()) {
+            write_nc(ctc_info);
+         }
    
       } // end for j
 
@@ -1049,128 +1054,99 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ctc_info(const TCGenVxOpt &vx_opt, GenCTCInfo &gci) {
+void write_ctc_info(GenCTCInfo &gci) {
    ConcatString dev_name("GENESIS_DEV");
    ConcatString ops_name("GENESIS_OPS");
 
    // Setup header columns
    shc.set_model(gci.Model.c_str());
-   shc.set_desc(vx_opt.Desc.c_str());
-   if(vx_opt.Lead.n() == 1) {
-      shc.set_fcst_lead_sec(vx_opt.Lead[0]);
+   shc.set_desc(gci.VxOpt->Desc.c_str());
+   if(gci.VxOpt->Lead.n() == 1) {
+      shc.set_fcst_lead_sec(gci.VxOpt->Lead[0]);
    }
-   shc.set_fcst_valid_beg(vx_opt.ValidBeg != 0 ?
-                          vx_opt.ValidBeg : gci.FcstBeg);
-   shc.set_fcst_valid_end(vx_opt.ValidEnd != 0 ?
-                          vx_opt.ValidEnd : gci.FcstEnd);
-   shc.set_obs_valid_beg(vx_opt.ValidBeg != 0 ?
-                         vx_opt.ValidBeg : gci.BestBeg);
-   shc.set_obs_valid_end(vx_opt.ValidEnd != 0 ?
-                         vx_opt.ValidEnd : gci.BestEnd);
+   shc.set_fcst_valid_beg(gci.VxOpt->ValidBeg != 0 ?
+                          gci.VxOpt->ValidBeg : gci.FcstBeg);
+   shc.set_fcst_valid_end(gci.VxOpt->ValidEnd != 0 ?
+                          gci.VxOpt->ValidEnd : gci.FcstEnd);
+   shc.set_obs_valid_beg(gci.VxOpt->ValidBeg != 0 ?
+                         gci.VxOpt->ValidBeg : gci.BestBeg);
+   shc.set_obs_valid_end(gci.VxOpt->ValidEnd != 0 ?
+                         gci.VxOpt->ValidEnd : gci.BestEnd);
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
-   if(!vx_opt.VxMaskName.empty()) {
-      shc.set_mask(vx_opt.VxMaskName.c_str());
+   if(!gci.VxOpt->VxMaskName.empty()) {
+      shc.set_mask(gci.VxOpt->VxMaskName.c_str());
    }
 
    // Write out FHO
-   if(vx_opt.output_map(stat_fho) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_fho) != STATOutputType_None) {
 
-      if(vx_opt.DevFlag) {
+      if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_fho_row(shc, gci.CTSDev,
-                       vx_opt.OutputMap.at(stat_fho),
+                       gci.VxOpt->OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
 
-      if(vx_opt.OpsFlag) {
+      if(gci.VxOpt->OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_fho_row(shc, gci.CTSOps,
-                       vx_opt.OutputMap.at(stat_fho),
+                       gci.VxOpt->OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
    }
 
    // Write out CTC
-   if(vx_opt.output_map(stat_ctc) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_ctc) != STATOutputType_None) {
 
-      if(vx_opt.DevFlag) {
+      if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_ctc_row(shc, gci.CTSDev,
-                       vx_opt.OutputMap.at(stat_ctc),
+                       gci.VxOpt->OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
 
-      if(vx_opt.OpsFlag) {
+      if(gci.VxOpt->OpsFlag) {
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_ctc_row(shc, gci.CTSOps,
-                       vx_opt.OutputMap.at(stat_ctc),
+                       gci.VxOpt->OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       } 
    }
 
    // Write out CTS
-   if(vx_opt.output_map(stat_cts) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_cts) != STATOutputType_None) {
 
-      if(vx_opt.DevFlag) {
+      if(gci.VxOpt->DevFlag) {
          gci.CTSDev.compute_stats();
          gci.CTSDev.compute_ci();
 
          shc.set_fcst_var(dev_name);
          shc.set_obs_var (dev_name);
          write_cts_row(shc, gci.CTSDev,
-                       vx_opt.OutputMap.at(stat_cts),
+                       gci.VxOpt->OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
 
-      if(vx_opt.OpsFlag) {
+      if(gci.VxOpt->OpsFlag) {
          gci.CTSOps.compute_stats();
          gci.CTSOps.compute_ci();
 
          shc.set_fcst_var(ops_name);
          shc.set_obs_var (ops_name);
          write_cts_row(shc, gci.CTSOps,
-                       vx_opt.OutputMap.at(stat_cts),
+                       gci.VxOpt->OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       } 
-   }
-   
-   // Write NetCDF output fields
-   if(!conf_info.NcInfo.all_false()) {
-      ConcatString cs;
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_GENESIS";
-      write_nc(vx_opt, gci.FcstGenesisDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_TRACKS";
-      write_nc(vx_opt, gci.FcstTrackDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_GENESIS";
-      write_nc(vx_opt, gci.BestGenesisDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_TRACKS";
-      write_nc(vx_opt, gci.BestTrackDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_DEV_FY_OY";
-      write_nc(vx_opt, gci.FcstDevFYOYDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_DEV_FY_ON";
-      write_nc(vx_opt, gci.FcstDevFYONDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_DEV_FY_OY";
-      write_nc(vx_opt, gci.BestDevFYOYDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_DEV_FN_OY";
-      write_nc(vx_opt, gci.BestDevFNOYDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_OPS_FY_OY";
-      write_nc(vx_opt, gci.FcstOpsFYOYDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_" << gci.Model << "_OPS_FY_ON";
-      write_nc(vx_opt, gci.FcstOpsFYONDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_OPS_FY_OY";
-      write_nc(vx_opt, gci.BestOpsFYOYDp, cs);
-      cs << cs_erase << vx_opt.Desc << "_BEST_OPS_FN_OY";
-      write_nc(vx_opt, gci.BestOpsFNOYDp, cs);
    }
 
    return;
@@ -1178,45 +1154,148 @@ void write_ctc_info(const TCGenVxOpt &vx_opt, GenCTCInfo &gci) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const TCGenVxOpt &vx_opt, const DataPlane &dp,
-              const ConcatString &var_name) {
-
-   // Nothing to do for an empty input or
-   // a field that has already been written
-   if(dp.is_empty() || nc_var_sa.has(var_name)) return;
-
-   int n, x, y;
-   ConcatString cs;
-   NcVar nc_var;
-
-   // Otherwise, add to the list of previously defined variables
-   nc_var_sa.add(var_name);
-
-   // Define the variable
-   nc_var = add_var(nc_out, (string) var_name,
-                    ncFloat, lat_dim, lon_dim,
-                    conf_info.compression_level());
+void write_nc(GenCTCInfo &gci) {
+   int i;
+   ConcatString var_name, long_name;
+   unixtime valid_beg, valid_end;
 
    // Allocate memory
    float *data = (float *) 0;
-   int nx = dp.nx();
-   int ny = dp.ny();
+   int nx = gci.NcOutGrid->nx();
+   int ny = gci.NcOutGrid->ny();
    data = new float [nx*ny];
-             
-   // Store the data
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
-         n = DefaultTO.two_to_one(nx, ny, x, y);
-         data[n] = dp.get(x, y);
-      } // end for y
-   } // end for x
 
-   // Write out the data
-   if(!put_nc_data_with_dims(&nc_var, &data[0], ny, nx)) {
-      mlog << Error << "\nwrite_nc() -> "
-           << "error writing NetCDF variable name " << var_name
-           << "\n\n";
-      exit(1);
+   // Ordered list of output types
+   std::vector<string> nc_str {
+      fgen_str,      ftrk_str,      bgen_str,      btrk_str,
+      fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
+      fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
+   };
+   
+   // Loop over vector of output types
+   for(i=0; i<nc_str.size(); i++) {
+
+      // Continue if no map entry is present
+      if(gci.DpMap.count(nc_str[i]) == 0) continue;
+
+      // Setup strings for each output type
+      if(nc_str[i] == fgen_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_GENESIS";
+         long_name = "Forecast genesis events";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == ftrk_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_TRACKS";
+         long_name = "Forecast track points";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == bgen_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_BEST_GENESIS";
+         long_name = "Best track genesis events";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+      else if(nc_str[i] == btrk_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_BEST_TRACKS";
+         long_name = "Best track points";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+      else if(nc_str[i] == fdev_fyoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_DEV_FY_OY";
+         long_name = "Forecast genesis development method hits";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == fdev_fyon_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_DEV_FY_ON";
+         long_name = "Forecast genesis development method false alarms";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == bdev_fyoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_DEV_FY_OY";
+         long_name = "Best track genesis development method hits";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+      else if(nc_str[i] == bdev_fnoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_DEV_FN_OY";
+         long_name = "Best track genesis development method misses";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+      else if(nc_str[i] == fops_fyoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_OPS_FY_OY";
+         long_name = "Forecast genesis operational method hits";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == fops_fyon_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_OPS_FY_ON";
+         long_name = "Forecast genesis operational method false alarms";
+         valid_beg = gci.FcstBeg;
+         valid_end = gci.FcstEnd;
+      }
+      else if(nc_str[i] == bops_fyoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_OPS_FY_OY";
+         long_name = "Best track genesis operational method hits";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+      else if(nc_str[i] == bops_fnoy_str) {
+         var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_OPS_FN_OY";
+         long_name = "Best track genesis operational method misses";
+         valid_beg = gci.BestBeg;
+         valid_end = gci.BestEnd;
+      }
+
+      // Skip variable names that have already been written
+      if(nc_var_sa.has(var_name)) continue;
+
+      mlog << Debug(4) << "Writing output variable \""
+           << var_name << "\".\n";
+
+      int n, x, y;
+      ConcatString cs;
+      NcVar nc_var;
+
+      // Otherwise, add to the list of previously defined variables
+      nc_var_sa.add(var_name);
+
+      // Define the variable
+      nc_var = add_var(nc_out, (string) var_name,
+                       ncFloat, lat_dim, lon_dim,
+                       conf_info.compression_level());
+
+      // Add variable attributes
+      add_att(&nc_var, "name", nc_var.getName());
+      add_att(&nc_var, "long_name", long_name);
+      add_att(&nc_var, "model", gci.Model);
+      add_att(&nc_var, "desc", gci.VxOpt->Desc);
+      add_att(&nc_var, "valid_beg", unix_to_yyyymmdd_hhmmss(valid_beg));
+      add_att(&nc_var, "valid_end", unix_to_yyyymmdd_hhmmss(valid_end));
+
+      // Reset memory
+      memset(data, 0, nx*ny);
+             
+      // Store the data
+      for(x=0; x<nx; x++) {
+         for(y=0; y<ny; y++) {
+            n = DefaultTO.two_to_one(nx, ny, x, y);
+            data[n] = gci.DpMap[(nc_str[i])].get(x, y);
+         } // end for y
+      } // end for x
+
+      // Write out the data
+      if(!put_nc_data_with_dims(&nc_var, &data[0], ny, nx)) {
+         mlog << Error << "\nwrite_nc() -> "
+              << "error writing NetCDF variable name " << var_name
+              << "\n\n";
+         exit(1);
+      }
    }
 
    // Deallocate and clean up
@@ -1224,13 +1303,6 @@ void write_nc(const TCGenVxOpt &vx_opt, const DataPlane &dp,
 
    return;
 }
-
-// JHG, for #1430, to do.
-// - Add NetCDF variable attributes
-// Update docs to indicate that dev_method_flag, ops_method_flag, and output_flag
-// can be defined separately for each filter.
-// Add docs for nc_pairs_flag and genesis_track_points_window.
-// Update tc_gen to actually create a NetCDF pairs (_pairs.nc) output file.
 
 ////////////////////////////////////////////////////////////////////////
 

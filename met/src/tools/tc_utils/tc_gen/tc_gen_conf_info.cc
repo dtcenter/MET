@@ -798,19 +798,7 @@ void GenCTCInfo::clear() {
    BestDevHitMap.clear();
    BestOpsHitMap.clear();
 
-   FcstGenesisDp.clear();
-   FcstTrackDp.clear();
-   FcstDevFYOYDp.clear();
-   FcstDevFYONDp.clear();
-   FcstOpsFYOYDp.clear();
-   FcstOpsFYONDp.clear();
-
-   BestGenesisDp.clear();
-   BestTrackDp.clear();
-   BestDevFYOYDp.clear();
-   BestDevFNOYDp.clear();
-   BestOpsFYOYDp.clear();
-   BestOpsFNOYDp.clear();
+   DpMap.clear();
 
    return;
 }
@@ -841,28 +829,28 @@ void GenCTCInfo::set_vx_opt(const TCGenVxOpt *vx_opt,
 
    // Setup NetCDF pairs output fields
    if(!VxOpt->NcInfo.all_false()) {
-
-      int nx, ny;
       NcOutGrid = nc_out_grid;
-      nx = NcOutGrid->nx();
-      ny = NcOutGrid->ny();
 
-      // Initialize output fields
-      if(VxOpt->NcInfo.do_fcst_genesis) FcstGenesisDp.set_size(nx, ny, 0.0);
-      if(VxOpt->NcInfo.do_fcst_tracks)  FcstTrackDp.set_size  (nx, ny, 0.0);
-      if(VxOpt->NcInfo.do_best_genesis) BestGenesisDp.set_size(nx, ny, 0.0);
-      if(VxOpt->NcInfo.do_best_tracks)  BestTrackDp.set_size  (nx, ny, 0.0);
+      // Initialize data plane of all zeros
+      DataPlane dp;
+      dp.set_size(NcOutGrid->nx(), NcOutGrid->ny(), 0.0);
+
+      // Add map entries for requested outputs
+      if(VxOpt->NcInfo.do_fcst_genesis) DpMap[fgen_str] = dp;
+      if(VxOpt->NcInfo.do_fcst_tracks)  DpMap[ftrk_str] = dp;
+      if(VxOpt->NcInfo.do_best_genesis) DpMap[bgen_str] = dp;
+      if(VxOpt->NcInfo.do_best_tracks)  DpMap[btrk_str] = dp;
       if(VxOpt->DevFlag) {
-         if(VxOpt->NcInfo.do_fcst_fy_oy) FcstDevFYOYDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_fcst_fy_on) FcstDevFYONDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_best_fy_oy) BestDevFYOYDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_best_fn_oy) BestDevFNOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_fcst_fy_oy) DpMap[fdev_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_fcst_fy_on) DpMap[fdev_fyon_str] = dp;
+         if(VxOpt->NcInfo.do_best_fy_oy) DpMap[bdev_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_best_fn_oy) DpMap[bdev_fnoy_str] = dp;
       }
       if(VxOpt->OpsFlag) {
-         if(VxOpt->NcInfo.do_fcst_fy_oy) FcstOpsFYOYDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_fcst_fy_on) FcstOpsFYONDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_best_fy_oy) BestOpsFYOYDp.set_size(nx, ny, 0.0);
-         if(VxOpt->NcInfo.do_best_fn_oy) BestOpsFNOYDp.set_size(nx, ny, 0.0);
+         if(VxOpt->NcInfo.do_fcst_fy_oy) DpMap[fops_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_fcst_fy_on) DpMap[fops_fyon_str] = dp;
+         if(VxOpt->NcInfo.do_best_fy_oy) DpMap[bops_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_best_fn_oy) DpMap[bops_fnoy_str] = dp;
       }
    }
 
@@ -878,18 +866,18 @@ void GenCTCInfo::inc_dev(bool f, bool o,
    // Hits
    if(f && o) {
       CTSDev.cts.inc_fy_oy();
-      inc_pnt(fgi->lat(), fgi->lon(), FcstDevFYOYDp);
+      inc_pnt(fgi->lat(), fgi->lon(), fdev_fyoy_str);
       BestDevHitMap[bgi] += 1;
       
       // Count all BEST track genesis pairs
       if(!BestUniqueFlag) {
-         inc_pnt(bgi->lat(), bgi->lon(), BestDevFYOYDp);
+         inc_pnt(bgi->lat(), bgi->lon(), bdev_fyoy_str);
       }
    }
    // False Alarms
    else if(f && !o) {
       CTSDev.cts.inc_fy_on();
-      inc_pnt(fgi->lat(), fgi->lon(), FcstDevFYONDp);
+      inc_pnt(fgi->lat(), fgi->lon(), fdev_fyon_str);
    }
    // Misses
    else if(!f && o) {
@@ -897,7 +885,7 @@ void GenCTCInfo::inc_dev(bool f, bool o,
 
       // Count all BEST track genesis pairs
       if(!BestUniqueFlag) {
-         inc_pnt(bgi->lat(), bgi->lon(), BestDevFNOYDp);
+         inc_pnt(bgi->lat(), bgi->lon(), bdev_fnoy_str);
       }
    }
    // Correct Negatives (should be none)
@@ -917,18 +905,18 @@ void GenCTCInfo::inc_ops(bool f, bool o,
    // Hits
    if(f && o) {
       CTSOps.cts.inc_fy_oy();
-      inc_pnt(fgi->lat(), fgi->lon(), FcstOpsFYOYDp);
+      inc_pnt(fgi->lat(), fgi->lon(), fops_fyoy_str);
       BestOpsHitMap[bgi] += 1;
 
       // Count all BEST track genesis pairs
       if(!BestUniqueFlag) {
-         inc_pnt(bgi->lat(), bgi->lon(), BestOpsFYOYDp);
+         inc_pnt(bgi->lat(), bgi->lon(), bops_fyoy_str);
       }
    }
    // False Alarms
    else if(f && !o) {
       CTSOps.cts.inc_fy_on();
-      inc_pnt(fgi->lat(), fgi->lon(), FcstOpsFYONDp);
+      inc_pnt(fgi->lat(), fgi->lon(), fops_fyon_str);
    }
    // Misses
    else if(!f && o) {
@@ -936,7 +924,7 @@ void GenCTCInfo::inc_ops(bool f, bool o,
 
       // Count all BEST track genesis pairs
       if(!BestUniqueFlag) {
-         inc_pnt(bgi->lat(), bgi->lon(), BestOpsFNOYDp);
+         inc_pnt(bgi->lat(), bgi->lon(), bops_fnoy_str);
       }
    }
    // Correct Negatives (should be none)
@@ -961,11 +949,11 @@ void GenCTCInfo::inc_best_unique() {
 
       // Zero hits is a miss
       if(it->second == 0) {
-         inc_pnt(it->first->lat(), it->first->lon(), BestDevFNOYDp);
+         inc_pnt(it->first->lat(), it->first->lon(), bdev_fnoy_str);
       }
       // Otherwise, it's a hit
       else {
-         inc_pnt(it->first->lat(), it->first->lon(), BestDevFYOYDp);
+         inc_pnt(it->first->lat(), it->first->lon(), bdev_fyoy_str);
       }
    }
 
@@ -974,11 +962,11 @@ void GenCTCInfo::inc_best_unique() {
 
       // Zero hits is a miss
       if(it->second == 0) {
-         inc_pnt(it->first->lat(), it->first->lon(), BestOpsFNOYDp);
+         inc_pnt(it->first->lat(), it->first->lon(), bops_fnoy_str);
       }
       // Otherwise, it's a hit
       else {
-         inc_pnt(it->first->lat(), it->first->lon(), BestOpsFYOYDp);
+         inc_pnt(it->first->lat(), it->first->lon(), bops_fyoy_str);
       }
    }
 
@@ -994,8 +982,8 @@ void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi) {
    if(FcstEnd == 0 || FcstEnd < gi.valid_max()) FcstEnd = gi.valid_max();
    
    // Count the genesis and track points
-   inc_pnt(gi.lat(), gi.lon(), FcstGenesisDp);
-   inc_trk(gi, FcstTrackDp);
+   inc_pnt(gi.lat(), gi.lon(), fgen_str);
+   inc_trk(gi, ftrk_str);
 
    return;
 }
@@ -1017,18 +1005,18 @@ void GenCTCInfo::add_best_gen(const GenesisInfo &gi) {
    if(BestEnd == 0 || BestEnd < gi.valid_max()) BestEnd = gi.valid_max();
 
    // Count the genesis and track points
-   inc_pnt(gi.lat(), gi.lon(), BestGenesisDp);
-   inc_trk(gi, BestTrackDp);
+   inc_pnt(gi.lat(), gi.lon(), bgen_str);
+   inc_trk(gi, btrk_str);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
+void GenCTCInfo::inc_pnt(double lat, double lon, const string &s) {
 
-   // Nothing to do if the DataPlane is empty
-   if(dp.is_empty()) return;
+   // Nothing to do if there is no DataPlane map entry
+   if(DpMap.count(s) == 0) return;
 
    int x, y;
    double x_dbl, y_dbl;
@@ -1040,7 +1028,7 @@ void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
    // Only increment points on the grid
    if(x >= 0 && x < NcOutGrid->nx() &&
       y >= 0 && y < NcOutGrid->ny()) {
-      dp.set(dp(x,y) + 1, x, y);
+      DpMap[s].set((DpMap[s])(x, y) + 1, x, y);
    }
 
    return;
@@ -1048,10 +1036,10 @@ void GenCTCInfo::inc_pnt(double lat, double lon, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_trk(const GenesisInfo &gi, DataPlane &dp) {
+void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
 
-   // Nothing to do if the DataPlane is empty
-   if(dp.is_empty()) return;
+   // Nothing to do if there is no DataPlane map entry
+   if(DpMap.count(s) == 0) return;
 
    // Loop through the track points
    for(int i=0; i<gi.n_points(); i++) {
@@ -1059,7 +1047,7 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi, DataPlane &dp) {
       // Count points whose valid time is close enough to genesis time
       int dhr = (gi[i].valid() - gi.genesis_time())/sec_per_hour;
       if(ValidGenesisDHrThresh.check(dhr)) {
-         inc_pnt(gi[i].lat(), gi[i].lon(), dp);
+         inc_pnt(gi[i].lat(), gi[i].lon(), s);
       }
    }
 

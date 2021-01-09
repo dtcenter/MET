@@ -39,6 +39,21 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_cts         //  2
 };
 
+// Names for output data plane types
+
+static const string fgen_str       = "fcst_genesis";
+static const string ftrk_str       = "fcst_track";
+static const string fdev_fyoy_str  = "fcst_dev_fy_oy";
+static const string fdev_fyon_str  = "fcst_dev_fy_on";
+static const string fops_fyoy_str  = "fcst_ops_fy_oy";
+static const string fops_fyon_str  = "fcst_ops_fy_on";
+static const string bgen_str       = "best_genesis";
+static const string btrk_str       = "best_track";
+static const string bdev_fyoy_str  = "best_dev_fy_oy";
+static const string bdev_fnoy_str  = "best_dev_fy_on";
+static const string bops_fyoy_str  = "best_ops_fy_oy";
+static const string bops_fnoy_str  = "best_ops_fy_on";
+
 ////////////////////////////////////////////////////////////////////////
 
 struct TCGenNcOutInfo {
@@ -242,17 +257,12 @@ class GenCTCInfo {
    SingleThresh ValidGenesisDHrThresh;
    bool BestUniqueFlag;
 
-   // Avoid double-counting BEST track genesis
-   map<const GenesisInfo *, int> BestDevHitMap;
-   map<const GenesisInfo *, int> BestOpsHitMap;
+   // Number of hits per BEST track genesis event
+   map<const GenesisInfo *,int> BestDevHitMap;
+   map<const GenesisInfo *,int> BestOpsHitMap;
 
-   DataPlane FcstGenesisDp, FcstTrackDp;
-   DataPlane FcstDevFYOYDp, FcstDevFYONDp;
-   DataPlane FcstOpsFYOYDp, FcstOpsFYONDp;
-
-   DataPlane BestGenesisDp, BestTrackDp;
-   DataPlane BestDevFYOYDp, BestDevFNOYDp;
-   DataPlane BestOpsFYOYDp, BestOpsFNOYDp;
+   // Output DataPlane variables
+   map<const string,DataPlane> DpMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -269,8 +279,8 @@ class GenCTCInfo {
    void add_fcst_gen(const GenesisInfo &);
    void add_best_gen(const GenesisInfo &);
 
-   void inc_pnt(double, double, DataPlane &);
-   void inc_trk(const GenesisInfo &, DataPlane &);
+   void inc_pnt(double, double, const string &);
+   void inc_trk(const GenesisInfo &, const string &);
 };
 
 ////////////////////////////////////////////////////////////////////////

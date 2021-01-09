@@ -250,7 +250,7 @@ valid_minus_genesis_diff_thresh = NA;
 // Count unique BEST track genesis event locations (true) versus counting the
 // location for all pairs (false).
 //
-best_unique_flag = false;
+best_unique_flag = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
