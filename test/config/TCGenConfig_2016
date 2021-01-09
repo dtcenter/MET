@@ -224,7 +224,7 @@ output_flag = {
 //
 // NetCDF genesis pair counts
 //
-nc_pairs_flag = false;
+nc_pairs_flag = FALSE;
 
 //
 // Specify which track points should be counted by thresholding the track point

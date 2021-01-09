@@ -308,7 +308,8 @@ void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
    if(type == BooleanType) {
       bool value = e->b_value();
 
-      if(!value) NcInfo.set_all_false();
+      if(value) NcInfo.set_all_true();
+      else      NcInfo.set_all_false();
 
       return;
    }
