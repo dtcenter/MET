@@ -83,7 +83,8 @@ oper_technique = "CARQ";
 filter = [
   { desc           = "AL_BASIN";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                     { name=\"basin\"; level=\"(*,*)\"; } ==1"; },
+                     { name=\"basin\"; level=\"(*,*)\"; } ==1";
+    nc_pairs_flag  = TRUE; },
   { desc           = "AL_DLAND_300";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
                      { name=\"basin\"; level=\"(*,*)\"; } ==1";
@@ -223,17 +224,7 @@ output_flag = {
 //
 // NetCDF genesis pair counts
 //
-nc_pairs_flag = {
-   latlon       = TRUE;
-   fcst_genesis = TRUE;
-   fcst_tracks  = TRUE;
-   fcst_fy_oy   = TRUE;
-   fcst_fy_on   = TRUE;
-   best_genesis = TRUE;
-   best_tracks  = TRUE;
-   best_fy_oy   = TRUE;
-   best_fn_oy   = TRUE;
-}
+nc_pairs_flag = false;
 
 //
 // Specify which track points should be counted by thresholding the track point
