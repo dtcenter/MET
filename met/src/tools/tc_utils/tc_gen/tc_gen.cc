@@ -1166,7 +1166,7 @@ void write_nc(GenCTCInfo &gci) {
    data = new float [nx*ny];
 
    // Loop over vector of output types
-   for(i=0; i<ncout_str.size(); i++) {
+   for(i=0; i<n_ncout; i++) {
 
       // Continue if no map entry is present
       if(gci.DpMap.count(ncout_str[i]) == 0) continue;
