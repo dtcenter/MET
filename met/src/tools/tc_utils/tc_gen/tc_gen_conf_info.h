@@ -54,7 +54,7 @@ static const string bdev_fnoy_str  = "best_dev_fy_on";
 static const string bops_fyoy_str  = "best_ops_fy_oy";
 static const string bops_fnoy_str  = "best_ops_fy_on";
 
-static const array<string, 12> ncout_str = {
+static const std::array<string, 12> ncout_str = {
    fgen_str,      ftrk_str,      bgen_str,      btrk_str,
    fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
    fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
