@@ -1165,87 +1165,80 @@ void write_nc(GenCTCInfo &gci) {
    int ny = gci.NcOutGrid->ny();
    data = new float [nx*ny];
 
-   // Ordered list of output types
-   std::vector<string> nc_str {
-      fgen_str,      ftrk_str,      bgen_str,      btrk_str,
-      fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
-      fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
-   };
-   
    // Loop over vector of output types
-   for(i=0; i<nc_str.size(); i++) {
+   for(i=0; i<ncout_str.size(); i++) {
 
       // Continue if no map entry is present
-      if(gci.DpMap.count(nc_str[i]) == 0) continue;
+      if(gci.DpMap.count(ncout_str[i]) == 0) continue;
 
       // Setup strings for each output type
-      if(nc_str[i] == fgen_str) {
+      if(ncout_str[i] == fgen_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_GENESIS";
          long_name = "Forecast genesis events";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == ftrk_str) {
+      else if(ncout_str[i] == ftrk_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_TRACKS";
          long_name = "Forecast track points";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == bgen_str) {
+      else if(ncout_str[i] == bgen_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_BEST_GENESIS";
          long_name = "Best track genesis events";
          valid_beg = gci.BestBeg;
          valid_end = gci.BestEnd;
       }
-      else if(nc_str[i] == btrk_str) {
+      else if(ncout_str[i] == btrk_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_BEST_TRACKS";
          long_name = "Best track points";
          valid_beg = gci.BestBeg;
          valid_end = gci.BestEnd;
       }
-      else if(nc_str[i] == fdev_fyoy_str) {
+      else if(ncout_str[i] == fdev_fyoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_DEV_FY_OY";
          long_name = "Forecast genesis development method hits";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == fdev_fyon_str) {
+      else if(ncout_str[i] == fdev_fyon_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_DEV_FY_ON";
          long_name = "Forecast genesis development method false alarms";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == bdev_fyoy_str) {
+      else if(ncout_str[i] == bdev_fyoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_DEV_FY_OY";
          long_name = "Best track genesis development method hits";
          valid_beg = gci.BestBeg;
          valid_end = gci.BestEnd;
       }
-      else if(nc_str[i] == bdev_fnoy_str) {
+      else if(ncout_str[i] == bdev_fnoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_DEV_FN_OY";
          long_name = "Best track genesis development method misses";
          valid_beg = gci.BestBeg;
          valid_end = gci.BestEnd;
       }
-      else if(nc_str[i] == fops_fyoy_str) {
+      else if(ncout_str[i] == fops_fyoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_OPS_FY_OY";
          long_name = "Forecast genesis operational method hits";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == fops_fyon_str) {
+      else if(ncout_str[i] == fops_fyon_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_OPS_FY_ON";
          long_name = "Forecast genesis operational method false alarms";
          valid_beg = gci.FcstBeg;
          valid_end = gci.FcstEnd;
       }
-      else if(nc_str[i] == bops_fyoy_str) {
+      else if(ncout_str[i] == bops_fyoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_OPS_FY_OY";
          long_name = "Best track genesis operational method hits";
          valid_beg = gci.BestBeg;
          valid_end = gci.BestEnd;
       }
-      else if(nc_str[i] == bops_fnoy_str) {
+      else if(ncout_str[i] == bops_fnoy_str) {
          var_name  << cs_erase << gci.VxOpt->Desc << "_" << gci.Model << "_BEST_OPS_FN_OY";
          long_name = "Best track genesis operational method misses";
          valid_beg = gci.BestBeg;
@@ -1285,7 +1278,7 @@ void write_nc(GenCTCInfo &gci) {
       for(x=0; x<nx; x++) {
          for(y=0; y<ny; y++) {
             n = DefaultTO.two_to_one(nx, ny, x, y);
-            data[n] = gci.DpMap[(nc_str[i])].get(x, y);
+            data[n] = gci.DpMap[(ncout_str[i])].get(x, y);
          } // end for y
       } // end for x
 
