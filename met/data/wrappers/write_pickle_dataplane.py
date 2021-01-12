@@ -12,6 +12,7 @@ import os
 import sys
 import pickle
 import importlib.util
+import xarray as xr
 
 print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
@@ -31,7 +32,10 @@ spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
 met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
 
-met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
+if isinstance(met_in.met_data, xr.DataArray):
+    met_info = { 'attrs': met_in.met_data.attrs, 'met_data': met_in.met_data }
+else:
+    met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
 
 print(met_info)
 
