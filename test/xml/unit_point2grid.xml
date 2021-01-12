@@ -30,6 +30,20 @@
     </output>
   </test>
 
+  <test name="point2grid_ascii2nc_surfrad_DW_PSP_by_name">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/ascii2nc/surfrad.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/surfrad_to_G212_by_name.nc \
+      -field 'name="DW_PSP"; level="*";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/surfrad_to_G212_by_name.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
