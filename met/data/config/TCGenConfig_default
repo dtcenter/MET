@@ -194,9 +194,10 @@ ci_alpha = 0.05;
 // Statistical output types
 //
 output_flag = {
-   fho = NONE;
-   ctc = BOTH; 
-   cts = BOTH;
+   fho    = NONE;
+   ctc    = BOTH; 
+   cts    = BOTH;
+   genmpr = 
 }
 
 //

@@ -26,17 +26,19 @@
 
 // Indices for the output flag types in the configuration file
 
-static const int i_fho = 0;
-static const int i_ctc = 1;
-static const int i_cts = 2;
+static const int i_fho    = 0;
+static const int i_ctc    = 1;
+static const int i_cts    = 2;
+static const int i_genmpr = 3;
 
-static const int n_txt = 3;
+static const int n_txt = 4;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_fho,        //  0
-   stat_ctc,        //  1
-   stat_cts         //  2
+   stat_fho,   //  0
+   stat_ctc,   //  1
+   stat_cts,   //  2
+   stat_genmpr //  3
 };
 
 // Names for output data plane types

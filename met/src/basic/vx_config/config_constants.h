@@ -136,6 +136,7 @@ enum STATLineType {
    stat_eclv,
    stat_grad,
    stat_dmap,
+   stat_genmpr,
    stat_header,
 
    no_stat_line_type
@@ -179,6 +180,7 @@ static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";
 static const char stat_ssvar_str[]  = "SSVAR";
 static const char stat_relp_str[]   = "RELP";
+static const char stat_genmpr_str[] = "GENMPR";
 static const char stat_header_str[] = "LINE_TYPE";
 static const char stat_na_str[]     = "NA";
 
