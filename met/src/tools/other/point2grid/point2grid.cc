@@ -744,8 +744,15 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                var_idx_or_gc = atoi(vname.c_str());
                sprintf(grib_code, "%d", var_idx_or_gc);
                if (vname != grib_code) {
-                  exit_by_field_name_error = true;;
-                  error_msg << "Invalid GRIB code [" << vname << "]\n";
+                  ConcatString var_id = conf_info.get_var_id(vname);
+                  if( var_id.nonempty() ) {
+                     var_idx_or_gc = atoi(var_id.c_str());
+                     sprintf(grib_code, "%d", var_idx_or_gc);
+                  }
+                  else {
+                     exit_by_field_name_error = true;;
+                     error_msg << "Invalid GRIB code [" << vname << "]\n";
+                  }
                }
                else {
                   bool not_found_grib_code = true;
