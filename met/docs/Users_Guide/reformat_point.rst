@@ -952,4 +952,58 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 6. The probability field which is the probability of the event defined by the **-prob_cat_thresh** command line option. The output variable name includes the threshold used to define the probability. Ranges from 0 to 1.
 
 
-7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either “0” or “1” with “0” meaning the probability value does not exist and a value of “1” meaning that the probability value does exist. 
+7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either “0” or “1” with “0” meaning the probability value does not exist and a value of “1” meaning that the probability value does exist.
+
+For MET observation input and CF complaint NetCDF input with 2D time variable: The latest observation time within the target grid is saved as the observation time. If the "valid_time" is configured at the configuration file, the valid_time from the configuration file is saved into the output file.
+
+point2grid configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+The default configuration file for the point2grid tool named **Point2GridConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
+
+The point2grid configuration file is optional and only necessary when defining the variable name instead of GRIB code or filtering by time. The contents of the default MADIS2NC configuration file are described below.
+
+_______________
+
+
+.. code-block:: none
+
+		version = "VN.N";
+
+
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+
+__________________
+
+
+.. code-block:: none
+		
+   valid_time = "YYYYMMDD_HHMMSS";
+
+This entry is a string to override the obseration time into the output and to filter observation data by time.
+
+.. code-block:: none
+		
+   obs_window = {
+      beg = -5400;
+      end =  5400;
+   }
+
+The configuration option listed above is common to many MET tools and are described in :numref:`config_options`.
+
+.. code-block:: none
+
+   var_name_map = [
+      { key = "1";     val = "PRES"; },        // GRIB: Pressure
+      { key = "2";     val = "PRMSL"; },       // GRIB: Pressure reduced to MSL
+      { key = "7";     val = "HGT"; },         // GRIB: Geopotential height
+      { key = "11";    val = "TMP"; },         // GRIB: Temperature
+      { key = "15";    val = "TMAX"; },        // GRIB: Max Temperature
+      ... 
+   ]
+		
+This entry is an array of dictionaries, each containing a **GRIB code** string and mathcing **variable name** string which define a mapping of GRIB code to the output variable names.
+
+
+
