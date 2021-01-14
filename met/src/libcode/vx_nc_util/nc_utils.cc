@@ -1404,7 +1404,7 @@ void _apply_scale_factor(float *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((float)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
@@ -1667,7 +1667,7 @@ template <typename T>
 int _apply_scale_factor(double *data, const T *packed_data,
                         const int cell_count, const T fill_value,
                         T &raw_min_val, T &raw_max_val, const char *data_type,
-                        float add_offset, float scale_factor) {
+                        double add_offset, double scale_factor) {
    int positive_cnt = 0;
    int unpacked_count = 0;
    double min_value =  10e10;
@@ -1680,7 +1680,7 @@ int _apply_scale_factor(double *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((double)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
