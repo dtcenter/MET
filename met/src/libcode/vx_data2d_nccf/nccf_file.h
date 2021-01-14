@@ -136,6 +136,8 @@ class NcCfFile {
       NcDim *_yDim;
       NcDim *_tDim;
 
+      NcVar *_latVar;
+      NcVar *_lonVar;
       NcVar *_xCoordVar;
       NcVar *_yCoordVar;
       NcVarInfo *_time_var_info;
@@ -176,7 +178,8 @@ class NcCfFile {
       
       bool get_grid_from_coordinates(const NcVar *data_var);
       bool get_grid_from_dimensions();
-
+      void get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                      const long lat_counts, const long lon_counts);
 };
 
 

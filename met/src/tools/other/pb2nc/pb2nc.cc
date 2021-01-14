@@ -673,21 +673,21 @@ void get_variable_info(const char* tbl_filename) {
          if ('0' != line[BUFR_NUMBER_START]) continue;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = NULL;
+         var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = NULL;
+            var_name[idx] = '\0';
          }
          if (0 == strlen(var_name)) continue;
 
          var_count1++;
          strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
-         var_desc[BUFR_DESCRIPTION_LEN] = NULL;
+         var_desc[BUFR_DESCRIPTION_LEN] = '\0';
          for (int idx=(BUFR_DESCRIPTION_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_desc[idx] = NULL;
+            var_desc[idx] = '\0';
          }
          mlog << Debug(10) << method_name << " sec. 1 var: ["
               << var_name << "] \tdesc: [" << var_desc << "]\n";
@@ -701,20 +701,20 @@ void get_variable_info(const char* tbl_filename) {
          if (NULL == strstr(line,"EVENT")) continue;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = NULL;
+         var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = NULL;
+            var_name[idx] = '\0';
          }
          //if (NULL == strstr(var_name,"EVENT")) continue;
 
          strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN);
-         var_desc[BUFR_SEQUENCE_LEN] = NULL;
+         var_desc[BUFR_SEQUENCE_LEN] = '\0';
          for (int idx=(BUFR_SEQUENCE_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_desc[idx] = NULL;
+            var_desc[idx] = '\0';
          }
          mlog << Debug(10) << method_name << " event: ["
               << var_name << "] \tdesc: [" << var_desc << "]\n";
@@ -729,10 +729,10 @@ void get_variable_info(const char* tbl_filename) {
          if ('-' == line[BUFR_NAME_START]) break;
 
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
-         var_name[BUFR_NAME_LEN] = NULL;
+         var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
-            var_name[idx] = NULL;
+            var_name[idx] = '\0';
          }
 
          if (NULL != strstr(line,"CCITT IA5")) {
@@ -741,12 +741,12 @@ void get_variable_info(const char* tbl_filename) {
          }
          else {
             strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN);
-            var_unit_str[BUFR_UNIT_LEN] = NULL;
+            var_unit_str[BUFR_UNIT_LEN] = '\0';
             for (int idx=(BUFR_UNIT_LEN-1); idx>=0; idx--) {
                if (' ' != var_unit_str[idx] && '|' != var_unit_str[idx]) {
                   break;
                }
-               var_unit_str[idx] = NULL;
+               var_unit_str[idx] = '\0';
             }
             var_names.add(var_name);
             var_units.add(var_unit_str);
@@ -858,8 +858,8 @@ void process_pbfile(int i_pb) {
    // Initialize
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
-   min_time_str[0] = NULL;
-   max_time_str[0] = NULL;
+   min_time_str[0] = '\0';
+   max_time_str[0] = '\0';
 
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
@@ -1294,7 +1294,7 @@ void process_pbfile(int i_pb) {
          strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ));
       }
       if (max_buf >= max_str_len) max_buf--;
-      modified_hdr_typ[max_buf] = NULL;
+      modified_hdr_typ[max_buf] = '\0';
 
       // Search through the observation values and store them as:
       //    HDR_ID GC LVL HGT OB
