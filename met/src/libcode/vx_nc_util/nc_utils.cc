@@ -1667,7 +1667,7 @@ template <typename T>
 int _apply_scale_factor(double *data, const T *packed_data,
                         const int cell_count, const T fill_value,
                         T &raw_min_val, T &raw_max_val, const char *data_type,
-                        float add_offset, float scale_factor) {
+                        double add_offset, double scale_factor) {
    int positive_cnt = 0;
    int unpacked_count = 0;
    double min_value =  10e10;
