@@ -1404,7 +1404,7 @@ void _apply_scale_factor(float *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((float)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
@@ -1680,7 +1680,7 @@ int _apply_scale_factor(double *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((double)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
