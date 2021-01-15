@@ -322,6 +322,14 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
+static const char * genmpr_columns [] = {
+   "TOTAL",       "INDEX",       "STORM_ID",
+   "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",    "AGEN_TIME",
+   "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",    "BGEN_TIME",
+   "GEN_DIST",    "GEN_DSEC",    "INIT_DSEC",
+   "DEV_CAT",     "OPS_CAT"
+};
+
 static const char * relp_columns [] = {
    "TOTAL",       "N_ENS",       "RELP_"
 };
@@ -417,6 +425,8 @@ static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_co
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
 static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
+
+static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
 
 ////////////////////////////////////////////////////////////////////////
 

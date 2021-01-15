@@ -197,7 +197,7 @@ output_flag = {
    fho    = NONE;
    ctc    = BOTH; 
    cts    = BOTH;
-   genmpr = 
+   genmpr = NONE;
 }
 
 //
