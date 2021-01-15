@@ -60,18 +60,22 @@ static const char * default_config_filename =
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   fho_columns, ctc_columns, cts_columns
+   fho_columns, ctc_columns, cts_columns, genmpr_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_fho_columns, n_ctc_columns, n_cts_columns
+   n_fho_columns, n_ctc_columns, n_cts_columns, n_genmpr_columns
 };
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "fho", "ctc", "cts"
+   "fho", "ctc", "cts", "genmpr"
 };
+
+const ConcatString genesis_name    ("GENESIS");
+const ConcatString genesis_dev_name("GENESIS_DEV");
+const ConcatString genesis_ops_name("GENESIS_OPS");
 
 ////////////////////////////////////////////////////////////////////////
 //

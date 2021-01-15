@@ -174,7 +174,7 @@ class TCGenConfInfo {
 
       //////////////////////////////////////////////////////////////////
 
-      // TCPairs configuration object
+      // TCGen configuration object
       MetConfig Conf;
 
       // Vector of vx task filtering options [n_vx]
@@ -281,9 +281,9 @@ class GenCTCInfo {
 
    void set_vx_opt(const TCGenVxOpt *, const Grid *);
 
-   void inc_dev(bool, bool,
+   void inc_dev(GenesisPairCategory,
                 const GenesisInfo *, const GenesisInfo *);
-   void inc_ops(bool, bool,
+   void inc_ops(GenesisPairCategory,
                 const GenesisInfo *, const GenesisInfo *);
    void inc_best_unique();
 

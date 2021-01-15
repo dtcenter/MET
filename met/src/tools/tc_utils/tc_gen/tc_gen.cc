@@ -18,6 +18,7 @@
 //   001    10/21/20  Halley Gotway   Fix for MET #1465
 //   002    12/15/20  Halley Gotway   Matching logic for MET #1448
 //   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
+//   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +76,7 @@ static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     PairDataGenesis &);
 
 static void   do_genesis_ctc       (const TCGenVxOpt &,
-                                    const PairDataGenesis &,
+                                    PairDataGenesis &,
                                     GenCTCInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
@@ -83,11 +84,19 @@ static int    find_genesis_match   (const GenesisInfo &,
                                     const TrackInfoArray &,
                                     double);
 
-static void   setup_txt_files      (int);
+static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
-static void   write_ctc_info       (GenCTCInfo &);
+static void   write_stats          (const PairDataGenesis &,
+                                    GenCTCInfo &);
+static void   write_genmpr_row     (StatHdrColumns &,
+                                    const PairDataGenesis &,
+                                    STATOutputType,
+                                    AsciiTable &, int &,
+                                    AsciiTable &, int &);
+static void   write_genmpr_cols    (const PairDataGenesis &, int,
+                                    AsciiTable &, int, int);
 static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
 
@@ -225,7 +234,11 @@ void process_genesis() {
                        best_ga, oper_ta);
 
    // Setup output files based on the number of techniques present
-   setup_txt_files(fcst_ga.n_technique());
+   // and possible pairs.
+   int n_time = (conf_info.FcstSecEnd - conf_info.FcstSecBeg) /
+                (conf_info.InitFreqHr*sec_per_hour) + 1;
+   int n_pair = best_ga.n() * n_time + fcst_ga.n();
+   setup_txt_files(fcst_ga.n_technique(), n_pair);
 
    // If requested, setup the NetCDF output file
    if(!conf_info.NcInfo.all_false()) setup_nc_file();
@@ -286,10 +299,8 @@ void process_genesis() {
          do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
 
          // Write the statistics output
-         write_ctc_info(ctc_info);
+         write_stats(pairs, ctc_info);
 
-         // TODO: MET #1597 write a new TC-Gen MPR line type
-   
          // Write NetCDF output fields
          if(!conf_info.VxOpt[i].NcInfo.all_false()) {
             write_nc(ctc_info);
@@ -400,29 +411,33 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
-                    const PairDataGenesis &pairs,
-                    GenCTCInfo            &gci) {
-   int i, dsec;
-   double dist;
+void do_genesis_ctc(const TCGenVxOpt &vx_opt,
+                    PairDataGenesis  &gpd,
+                    GenCTCInfo       &gci) {
+   int i;
+   GenesisPairDiff diff;
    ConcatString case_cs;
 
    // Loop over the pairs and score them
-   for(i=0; i<pairs.n_pair(); i++) {
+   for(i=0; i<gpd.n_pair(); i++) {
 
-      const GenesisInfo *fgi = pairs.fcst_gen(i);
-      const GenesisInfo *bgi = pairs.best_gen(i);
+      // Pointers to the current pair
+      const GenesisInfo *fgi = gpd.fcst_gen(i);
+      const GenesisInfo *bgi = gpd.best_gen(i);
+
+      // Initialize
+      diff.clear();
 
       case_cs << cs_erase
-              << pairs.model() << " "
-              << unix_to_yyyymmdd_hhmmss(pairs.init(i))
+              << gpd.model() << " "
+              << unix_to_yyyymmdd_hhmmss(gpd.init(i))
               << " initialization, "
-              << pairs.lead_time(i)/sec_per_hour << " lead";
+              << gpd.lead_time(i)/sec_per_hour << " lead";
 
       // Count the genesis and track points
       if(fgi) gci.add_fcst_gen(*fgi);
       if(bgi) gci.add_best_gen(*bgi);
-      
+
       // Unmatched forecast genesis (FALSE ALARM)
       if(fgi && !bgi) {
 
@@ -432,9 +447,9 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << fgi->lat() << ", " << fgi->lon()
               << ") is a dev and ops FALSE ALARM.\n";
 
-         // Increment the FALSE ALARM count for both methods 
-         gci.inc_dev(true, false, fgi, bgi);
-         gci.inc_ops(true, false, fgi, bgi);
+         // FALSE ALARM for both methods
+         diff.DevCategory = FYONGenesis;
+         diff.OpsCategory = FYONGenesis;
       }
 
       // Unmatched BEST genesis (MISS)
@@ -446,9 +461,9 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
               << bgi->lat() << ", " << bgi->lon()
               << ") is a dev and ops MISS.\n";
 
-         // Increment the MISS count for both methods 
-         gci.inc_dev(false, true, fgi, bgi);
-         gci.inc_ops(false, true, fgi, bgi);
+         // MISS for both methods
+         diff.DevCategory = FNOYGenesis;
+         diff.OpsCategory = FNOYGenesis;
       }
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
       else {
@@ -468,76 +483,88 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
                  << "after the matching BEST track "
                  << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
                  << " genesis time.\n";
+
+            // DISCARD for both methods
+            diff.DevCategory = DiscardGenesis;
+            diff.OpsCategory = DiscardGenesis;
          }
          // Check for a HIT
          else {
 
             // Compute time and space offsets
-            dsec = fgi->genesis_time() - bgi->genesis_time();
-            dist = gc_dist(bgi->lat(), bgi->lon(),
-                           fgi->lat(), fgi->lon());
+            diff.DevDSec = fgi->genesis_time() - bgi->genesis_time();
+            diff.DevDist = gc_dist(bgi->lat(), bgi->lon(),
+                                   fgi->lat(), fgi->lon());
 
             ConcatString offset_cs;
-            offset_cs << "with a genesis time offset of " << dsec/sec_per_hour
-                      << " hours and location offset of " << dist << " km.\n";
+            offset_cs << "with a genesis time offset of " << diff.DevDSec/sec_per_hour
+                      << " hours and location offset of " << diff.DevDist << " km.\n";
 
             // Dev Method:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
-            if(dsec >= vx_opt.GenesisHitBeg &&
-               dsec <= vx_opt.GenesisHitEnd &&
-               dist <= vx_opt.GenesisHitRadius) {
+            if(diff.DevDSec >= vx_opt.GenesisHitBeg &&
+               diff.DevDSec <= vx_opt.GenesisHitEnd &&
+               diff.DevDist <= vx_opt.GenesisHitRadius) {
 
                mlog << Debug(4) << case_cs
                     << " is a dev method HIT " << offset_cs;
 
-               // Increment the HIT count
-               gci.inc_dev(true, true, fgi, bgi);
+               // HIT for the development method
+               diff.DevCategory = FYOYGenesis;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is a dev method FALSE ALARM " << offset_cs;
 
-               // Increment the FALSE ALARM count
-               gci.inc_dev(true, false, fgi, bgi);
+               // FALSE ALARM for the development method
+               diff.DevCategory = FYONGenesis;
             }
             
             // Ops Method:
             // HIT if forecast init time is close enough to
             // the BEST genesis time.
-            
+
             // Compute time offset
-            dsec = bgi->genesis_time() - fgi->init();
+            diff.OpsDSec = bgi->genesis_time() - fgi->init();
 
             offset_cs << cs_erase
                       << "with an init vs genesis time offset of "
-                      << dsec/sec_per_hour << " hours.\n";
+                      << diff.OpsDSec/sec_per_hour << " hours.\n";
 
-            if(dsec <= vx_opt.GenesisInitDSec) {
+            if(diff.OpsDSec <= vx_opt.GenesisInitDSec) {
 
                mlog << Debug(4) << case_cs
                     << " is an ops method HIT " << offset_cs;
 
-               // Increment the HIT count
-               gci.inc_ops(true, true, fgi, bgi);
+               // HIT for the operational method
+               diff.OpsCategory = FYOYGenesis;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is an ops method FALSE ALARM " << offset_cs;
 
-               // Increment the FALSE ALARM count
-               gci.inc_ops(true, false, fgi, bgi);
+               // FALSE ALARM for the operational method
+               diff.OpsCategory = FYONGenesis;
             }
          }
       }
-   } // end for i n_pair
+
+      // Increment contingency table counts
+      gci.inc_dev(diff.DevCategory, fgi, bgi);
+      gci.inc_ops(diff.OpsCategory, fgi, bgi);
+
+      // Store the genesis pair differences
+      gpd.set_gen_diff(i, diff);
+
+   } // end for i < n_pair
 
    // If requested, count the unique BEST track hit and miss counts
    gci.inc_best_unique();
 
    if(vx_opt.DevFlag) {
       mlog << Debug(3) << "For filter ("
-           << pairs.desc() << ") " << pairs.model()
+           << gpd.desc() << ") " << gpd.model()
            << " model, dev method contingency table hits = "
            << gci.CTSDev.cts.fy_oy() << ", false alarms = "
            << gci.CTSDev.cts.fy_on() << ", and misses = "
@@ -546,7 +573,7 @@ void do_genesis_ctc(const TCGenVxOpt      &vx_opt,
 
    if(vx_opt.OpsFlag) {
       mlog << Debug(3) << "For filter ("
-           << pairs.desc() << ") " << pairs.model()
+           << gpd.desc() << ") " << gpd.model()
            << " model, ops method contingency table hits = "
            << gci.CTSOps.cts.fy_oy() << ", false alarms = "
            << gci.CTSOps.cts.fy_on() << ", and misses = "
@@ -936,8 +963,11 @@ void process_best_tracks(const StringArray &files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(int n_model) {
+void setup_txt_files(int n_model, int n_pair) {
    int i, n_rows, n_cols;
+
+   // Check to see if the text files have already been set up
+   if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -950,6 +980,9 @@ void setup_txt_files(int n_model) {
 
    // Setup the STAT AsciiTable
    n_rows = 1 + 6 * n_model * conf_info.n_vx();
+   if(conf_info.OutputMap[stat_genmpr] != STATOutputType_None) {
+      n_rows += n_model * conf_info.n_vx() * n_pair;
+   }
    n_cols = 1 + n_header_columns + n_cts_columns;
    stat_at.set_size(n_rows, n_cols);
    setup_table(stat_at);
@@ -977,7 +1010,12 @@ void setup_txt_files(int n_model) {
          open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Setup the text AsciiTable
-         n_rows = 1 + 2 * n_model * conf_info.n_vx();
+         if(txt_file_type[i] == stat_genmpr) {
+            n_rows = 1 + n_model * conf_info.n_vx() * n_pair;
+         }
+         else {
+            n_rows = 1 + 2 * n_model * conf_info.n_vx();
+         }
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
          setup_table(txt_at[i]);
@@ -1041,8 +1079,8 @@ void setup_nc_file() {
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = add_dim(nc_out,"lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out,"lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
    if(conf_info.NcInfo.do_latlon) {
@@ -1054,9 +1092,8 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ctc_info(GenCTCInfo &gci) {
-   ConcatString dev_name("GENESIS_DEV");
-   ConcatString ops_name("GENESIS_OPS");
+void write_stats(const PairDataGenesis &gpd,
+                 GenCTCInfo &gci) {
 
    // Setup header columns
    shc.set_model(gci.Model.c_str());
@@ -1081,8 +1118,8 @@ void write_ctc_info(GenCTCInfo &gci) {
    if(gci.VxOpt->output_map(stat_fho) != STATOutputType_None) {
 
       if(gci.VxOpt->DevFlag) {
-         shc.set_fcst_var(dev_name);
-         shc.set_obs_var (dev_name);
+         shc.set_fcst_var(genesis_dev_name);
+         shc.set_obs_var (genesis_dev_name);
          write_fho_row(shc, gci.CTSDev,
                        gci.VxOpt->OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
@@ -1090,8 +1127,8 @@ void write_ctc_info(GenCTCInfo &gci) {
       }
 
       if(gci.VxOpt->OpsFlag) {
-         shc.set_fcst_var(ops_name);
-         shc.set_obs_var (ops_name);
+         shc.set_fcst_var(genesis_ops_name);
+         shc.set_obs_var (genesis_ops_name);
          write_fho_row(shc, gci.CTSOps,
                        gci.VxOpt->OutputMap.at(stat_fho),
                        stat_at, i_stat_row,
@@ -1103,8 +1140,8 @@ void write_ctc_info(GenCTCInfo &gci) {
    if(gci.VxOpt->output_map(stat_ctc) != STATOutputType_None) {
 
       if(gci.VxOpt->DevFlag) {
-         shc.set_fcst_var(dev_name);
-         shc.set_obs_var (dev_name);
+         shc.set_fcst_var(genesis_dev_name);
+         shc.set_obs_var (genesis_dev_name);
          write_ctc_row(shc, gci.CTSDev,
                        gci.VxOpt->OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
@@ -1112,13 +1149,13 @@ void write_ctc_info(GenCTCInfo &gci) {
       }
 
       if(gci.VxOpt->OpsFlag) {
-         shc.set_fcst_var(ops_name);
-         shc.set_obs_var (ops_name);
+         shc.set_fcst_var(genesis_ops_name);
+         shc.set_obs_var (genesis_ops_name);
          write_ctc_row(shc, gci.CTSOps,
                        gci.VxOpt->OutputMap.at(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
-      } 
+      }
    }
 
    // Write out CTS
@@ -1128,8 +1165,8 @@ void write_ctc_info(GenCTCInfo &gci) {
          gci.CTSDev.compute_stats();
          gci.CTSDev.compute_ci();
 
-         shc.set_fcst_var(dev_name);
-         shc.set_obs_var (dev_name);
+         shc.set_fcst_var(genesis_dev_name);
+         shc.set_obs_var (genesis_dev_name);
          write_cts_row(shc, gci.CTSDev,
                        gci.VxOpt->OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
@@ -1140,14 +1177,142 @@ void write_ctc_info(GenCTCInfo &gci) {
          gci.CTSOps.compute_stats();
          gci.CTSOps.compute_ci();
 
-         shc.set_fcst_var(ops_name);
-         shc.set_obs_var (ops_name);
+         shc.set_fcst_var(genesis_ops_name);
+         shc.set_obs_var (genesis_ops_name);
          write_cts_row(shc, gci.CTSOps,
                        gci.VxOpt->OutputMap.at(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
-      } 
+      }
    }
+
+   // Write out GENMPR
+   if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+      shc.set_fcst_var(genesis_name);
+      shc.set_obs_var (genesis_name);
+      write_genmpr_row(shc, gpd,
+                       gci.VxOpt->OutputMap.at(stat_genmpr),
+                       stat_at, i_stat_row,
+                       txt_at[i_genmpr], i_txt_row[i_genmpr]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_genmpr_row(StatHdrColumns &shc,
+                      const PairDataGenesis &gpd,
+                      STATOutputType out_type,
+                      AsciiTable &stat_at, int &stat_row,
+                      AsciiTable &txt_at, int &txt_row) {
+   int i;
+   unixtime ut;
+
+   // GENMPR line type
+   shc.set_line_type(stat_genmpr_str);
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each matched pair
+   for(i=0; i<gpd.n_pair(); i++) {
+
+      // Store timing info
+      ut = gpd.init(i) + gpd.lead_time(i);
+      shc.set_fcst_lead_sec(gpd.lead_time(i));
+      shc.set_fcst_valid_beg(ut);
+      shc.set_fcst_valid_end(ut);
+      shc.set_obs_lead_sec(0);
+      shc.set_obs_valid_beg(ut);
+      shc.set_obs_valid_end(ut);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_genmpr_cols(const PairDataGenesis &gpd, int i,
+                       AsciiTable &at, int r, int c) {
+
+   // Pointers for current case
+   const GenesisInfo* fgi = gpd.fcst_gen(i);
+   const GenesisInfo* bgi = gpd.best_gen(i);
+   
+   //
+   // Genesis Matched Pairs (GENMPR):
+   //    TOTAL,       INDEX,       STORM_ID,
+   //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,    AGEN_TIME,
+   //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,    BGEN_TIME,
+   //    GEN_DIST,    GEN_DSEC,    INIT_DSEC,
+   //    DEV_CAT,     OPS_CAT
+   //
+
+   at.set_entry(r, c+0,  // Total number of pairs
+      gpd.n_pair());
+
+   at.set_entry(r, c+1,  // Index of current pair
+      i+1);
+
+   at.set_entry(r, c+2,  // Best track Storm ID
+      gpd.best_storm_id(i));
+
+   at.set_entry(r, c+3,  // Fcst track latitude
+      fgi ? fgi->lat() : bad_data_double);
+
+   at.set_entry(r, c+4,  // Fcst track longitude
+      fgi ? fgi->lon() : bad_data_double);
+
+   at.set_entry(r, c+5,  // Fcst track distance to land
+      fgi ? fgi->dland() : bad_data_double);
+
+   at.set_entry(r, c+6,  // Fcst track genesis time
+      fgi ? unix_to_yyyymmdd_hhmmss(fgi->genesis_time()) : na_str);
+
+   at.set_entry(r, c+7,  // Best track latitude
+      bgi ? bgi->lat() : bad_data_double);
+
+   at.set_entry(r, c+8,  // Best track longitude
+      bgi ? bgi->lon() : bad_data_double);
+
+   at.set_entry(r, c+9,  // Best track distance to land
+      bgi ? bgi->dland() : bad_data_double);
+
+   at.set_entry(r, c+10, // Best track genesis time
+      bgi ? unix_to_yyyymmdd_hhmmss(bgi->genesis_time()) : na_str);
+
+   at.set_entry(r, c+11, // Genesis distance
+      gpd.gen_diff(i).DevDist);
+
+   at.set_entry(r, c+12, // Genesis time difference
+      sec_to_hhmmss(gpd.gen_diff(i).DevDSec));
+
+   at.set_entry(r, c+13, // Genesis - Init time
+      sec_to_hhmmss(gpd.gen_diff(i).OpsDSec));
+
+   at.set_entry(r, c+14, // Development category
+      genesispaircategory_to_string(gpd.gen_diff(i).DevCategory));
+
+   at.set_entry(r, c+15, // Operational category
+      genesispaircategory_to_string(gpd.gen_diff(i).OpsCategory));
 
    return;
 }

@@ -24,6 +24,39 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Genesis Pair Categories
+//
+////////////////////////////////////////////////////////////////////////
+
+enum GenesisPairCategory {
+   FYOYGenesis,    // Hit
+   FYONGenesis,    // False Alarm
+   FNOYGenesis,    // Miss
+   DiscardGenesis, // Discard
+   NoGenesisPairCategory
+};
+
+extern ConcatString genesispaircategory_to_string(const GenesisPairCategory);
+
+////////////////////////////////////////////////////////////////////////
+//
+// Structure for Genesis Pair Differences
+//
+////////////////////////////////////////////////////////////////////////
+
+struct GenesisPairDiff {
+   double              DevDist;     // Distance between genesis events
+   int                 DevDSec;     // Fcst - Best genesis time
+   int                 OpsDSec;     // Best genesis - fcst initalization
+   GenesisPairCategory DevCategory; // Contingency table category
+   GenesisPairCategory OpsCategory; // Concingency table category
+
+   GenesisPairDiff();
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Class to store matched genesis pairs.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -50,6 +83,7 @@ class PairDataGenesis {
 
       vector<const GenesisInfo *> FcstGen;
       vector<const GenesisInfo *> BestGen;
+      vector<GenesisPairDiff>     GenDiff;
 
       //////////////////////////////////////////////////////////////////
    
@@ -74,16 +108,18 @@ class PairDataGenesis {
       void set_mask (const ConcatString &);
       void set_model(const ConcatString &);
 
+
       // Get stuff
-      ConcatString       desc()              const;
-      ConcatString       mask()              const;
-      ConcatString       model()             const;
-      int                n_pair()            const;
-      const std::string  best_storm_id (int) const;
-      unixtime           init          (int) const;
-      int                lead_time     (int) const;
-      const GenesisInfo *fcst_gen      (int) const;
-      const GenesisInfo *best_gen      (int) const;
+      ConcatString           desc()             const;
+      ConcatString           mask()             const;
+      ConcatString           model()            const;
+      int                    n_pair()           const;
+      const std::string      best_storm_id(int) const;
+      unixtime               init         (int) const;
+      int                    lead_time    (int) const;
+      const GenesisInfo *    fcst_gen     (int) const;
+      const GenesisInfo *    best_gen     (int) const;
+      const GenesisPairDiff &gen_diff     (int) const;
 
       // Do stuff
       bool has_fcst_gen(const GenesisInfo *, int &) const;
@@ -93,6 +129,7 @@ class PairDataGenesis {
       void add_best_gen(const GenesisInfo *,
                         const int, const int, const int);
       void add_gen_pair(const GenesisInfo *, const GenesisInfo *);
+      void set_gen_diff(int, const GenesisPairDiff &);
 };
 
 ////////////////////////////////////////////////////////////////////////

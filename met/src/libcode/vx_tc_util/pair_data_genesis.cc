@@ -23,6 +23,50 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for enum GenesisPairCategory
+//
+////////////////////////////////////////////////////////////////////////
+
+ConcatString genesispaircategory_to_string(const GenesisPairCategory c) {
+   const char *s = (const char *) 0;
+
+   switch(c) {
+      case FYOYGenesis:    s = "FYOY";    break;
+      case FYONGenesis:    s = "FYON";    break;
+      case FNOYGenesis:    s = "FNOY";    break;
+      case DiscardGenesis: s = "DISCARD"; break;
+      default:             s = na_str;    break;
+   }
+
+   return(ConcatString(s));
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct Genesis Pair Differences
+//
+////////////////////////////////////////////////////////////////////////
+
+GenesisPairDiff::GenesisPairDiff() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenesisPairDiff::clear() {
+
+   DevDist     = bad_data_double;
+   DevDSec     = bad_data_int;
+   OpsDSec     = bad_data_int;
+   DevCategory = NoGenesisPairCategory;
+   OpsCategory = NoGenesisPairCategory;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for class PairDataGenesis
 //
 ////////////////////////////////////////////////////////////////////////
@@ -75,6 +119,7 @@ void PairDataGenesis::clear() {
 
    FcstGen.clear();
    BestGen.clear();
+   GenDiff.clear();
 
    return;
 }
@@ -95,12 +140,17 @@ void PairDataGenesis::assign(const PairDataGenesis &g) {
    InitTime    = g.InitTime;
    LeadTime    = g.LeadTime;
 
+   FcstGen     = g.FcstGen;
+   BestGen     = g.BestGen;
+   GenDiff     = g.GenDiff;
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const GenesisInfo * PairDataGenesis::fcst_gen(int i) const {
+
    if(i < 0 || i > NPair) {
       mlog << Error << "\nPairBase::fcst_gen() -> "
            << "range check error: " << i << " not in (0, "
@@ -114,6 +164,7 @@ const GenesisInfo * PairDataGenesis::fcst_gen(int i) const {
 ////////////////////////////////////////////////////////////////////////
 
 const GenesisInfo * PairDataGenesis::best_gen(int i) const {
+
    if(i < 0 || i > NPair) {
       mlog << Error << "\nPairBase::best_gen() -> "
            << "range check error: " << i << " not in (0, "
@@ -123,6 +174,21 @@ const GenesisInfo * PairDataGenesis::best_gen(int i) const {
 
    return(BestGen[i]);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+const GenesisPairDiff & PairDataGenesis::gen_diff(int i) const {
+
+   if(i < 0 || i > NPair) {
+      mlog << Error << "\nPairBase::gen_diff() -> "
+           << "range check error: " << i << " not in (0, "
+           << NPair << ").\n\n";
+      exit(1);
+   }
+
+   return(GenDiff[i]);
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataGenesis::has_gen(const vector<const GenesisInfo *>& gi_list,
@@ -175,13 +241,16 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
 
    if(!fgi) return;
 
+   GenesisPairDiff diff;
+
    // Add the unmatched forecast
    NPair++;
-   BestStormId.add("");
+   BestStormId.add(na_str);
    InitTime.add(fgi->init());
    LeadTime.add(fgi->genesis_lead());
    FcstGen.push_back(fgi);
    BestGen.push_back((GenesisInfo *) 0);
+   GenDiff.push_back(diff);
 
    return;
 }
@@ -196,6 +265,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
    if(!bgi) return;
 
    int i_case;
+   GenesisPairDiff diff;
 
    // Define opportunities to forecast this event
    unixtime init_beg = bgi->genesis_time() - end;
@@ -214,6 +284,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
          LeadTime.add(bgi->genesis_time() - init_ut);
          FcstGen.push_back((GenesisInfo *) 0);
          BestGen.push_back(bgi);
+         GenDiff.push_back(diff);
       }
    }
 
@@ -228,10 +299,12 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
    if(!fgi || !bgi) return;
 
    int i_case;
+   GenesisPairDiff diff;
 
    // Update an existing case
    if(has_case(bgi->storm_id(), fgi->init(), i_case)) {
       FcstGen[i_case] = fgi;
+      GenDiff[i_case].clear();
    }
    // Add a new case
    else {
@@ -241,8 +314,25 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       LeadTime.add(fgi->genesis_lead());
       FcstGen.push_back(fgi);
       BestGen.push_back(bgi);
+      GenDiff.push_back(diff);
    }
    
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataGenesis::set_gen_diff(int i, const GenesisPairDiff &diff) {
+
+   if(i < 0 || i > NPair) {
+      mlog << Error << "\nPairBase::set_gen_diff() -> "
+           << "range check error: " << i << " not in (0, "
+           << NPair << ").\n\n";
+      exit(1);
+   }
+
+   GenDiff[i] = diff;
+
    return;
 }
 
