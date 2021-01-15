@@ -1098,21 +1098,20 @@ void write_stats(const PairDataGenesis &gpd,
    // Setup header columns
    shc.set_model(gci.Model.c_str());
    shc.set_desc(gci.VxOpt->Desc.c_str());
-   if(gci.VxOpt->Lead.n() == 1) {
-      shc.set_fcst_lead_sec(gci.VxOpt->Lead[0]);
-   }
+   shc.set_fcst_lead_sec(gci.VxOpt->Lead.n() == 1 ?
+                         gci.VxOpt->Lead[0] : bad_data_int);
    shc.set_fcst_valid_beg(gci.VxOpt->ValidBeg != 0 ?
                           gci.VxOpt->ValidBeg : gci.FcstBeg);
    shc.set_fcst_valid_end(gci.VxOpt->ValidEnd != 0 ?
                           gci.VxOpt->ValidEnd : gci.FcstEnd);
+   shc.set_obs_lead_sec(bad_data_int);
    shc.set_obs_valid_beg(gci.VxOpt->ValidBeg != 0 ?
                          gci.VxOpt->ValidBeg : gci.BestBeg);
    shc.set_obs_valid_end(gci.VxOpt->ValidEnd != 0 ?
                          gci.VxOpt->ValidEnd : gci.BestEnd);
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
-   if(!gci.VxOpt->VxMaskName.empty()) {
-      shc.set_mask(gci.VxOpt->VxMaskName.c_str());
-   }
+   shc.set_mask(gci.VxOpt->VxMaskName.empty() ?
+                na_str : gci.VxOpt->VxMaskName.c_str());
 
    // Write out FHO
    if(gci.VxOpt->output_map(stat_fho) != STATOutputType_None) {
@@ -1223,7 +1222,7 @@ void write_genmpr_row(StatHdrColumns &shc,
       shc.set_fcst_lead_sec(gpd.lead_time(i));
       shc.set_fcst_valid_beg(ut);
       shc.set_fcst_valid_end(ut);
-      shc.set_obs_lead_sec(0);
+      shc.set_obs_lead_sec(bad_data_int);
       shc.set_obs_valid_beg(ut);
       shc.set_obs_valid_end(ut);
 
@@ -1262,7 +1261,7 @@ void write_genmpr_cols(const PairDataGenesis &gpd, int i,
    //    TOTAL,       INDEX,       STORM_ID,
    //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,    AGEN_TIME,
    //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,    BGEN_TIME,
-   //    GEN_DIST,    GEN_DSEC,    INIT_DSEC,
+   //    GEN_DIST,    GEN_TDIFF,   INIT_TDIFF,
    //    DEV_CAT,     OPS_CAT
    //
 

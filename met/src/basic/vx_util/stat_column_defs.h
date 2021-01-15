@@ -326,7 +326,7 @@ static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
    "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",    "AGEN_TIME",
    "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",    "BGEN_TIME",
-   "GEN_DIST",    "GEN_DSEC",    "INIT_DSEC",
+   "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
    "DEV_CAT",     "OPS_CAT"
 };
 
