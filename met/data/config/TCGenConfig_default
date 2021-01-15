@@ -249,7 +249,7 @@ basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
 //
 // NetCDF genesis pairs grid
 //
-nc_pairs_grid = "G001";
+nc_pairs_grid = "G003";
 
 //
 // Indicate a version number for the contents of this configuration file.
