@@ -288,7 +288,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - User provided text string designating model name
   * - 4
     - STORM_ID
-    - BBCCYYY designation of storm
+    - BBCCYYYY designation of storm
   * - 5
     - BASIN
     - Basin (BB in STORM_ID)

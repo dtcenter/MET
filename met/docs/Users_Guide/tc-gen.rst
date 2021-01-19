@@ -360,6 +360,192 @@ The configuration options listed above are common to many MET tools and are desc
 tc_gen output
 ~~~~~~~~~~~~~
 
-TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, and **tc_gen_cts.txt**. The contents of these output files are described in section :numref:`point_stat-output`.
+TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, **tc_gen_cts.txt**, **tc_gen_genmpr.txt**, and **tc_gen_pairs.nc**. The format of the STAT and ASCII output of the TC-Gen tool matches the output of other MET tools with the exception of the genesis matched pair line type. Please refer to the tables in :numref:`point_stat-output` for a description of the common output line types. The genesis matched pair line type and NetCDF output file are described below.
+
+.. _table_TG_header_info_tg_outputs:
+
+.. list-table:: Header information for each file tc-gen outputs
+  :widths: auto
+  :header-rows: 2
+
+  * - HEADER
+    -
+    -
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - Current ATCF Technique name
+  * - 3
+    - DESC
+    - User provided text string describing the "filter" options
+  * - 4
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 5
+    - FCST_VALID_BEG
+    - Minimum forecast valid time in YYYYMMDD_HHMMSS format
+  * - 6
+    - FCST_VALID_END
+    - Maximum forecast valid time in YYYYMMDD_HHMMSS format
+  * - 7
+    - OBS_LEAD
+    - Does not apply and is set to NA
+  * - 8
+    - OBS_VALID_BEG
+    - Minimum BEST track valid time in YYYYMMDD_HHMMSS format
+  * - 9
+    - OBS_VALID_END
+    - Maximum BEST track valid time in YYYYMMDD_HHMMSS format
+  * - 10
+    - FCST_VAR
+    - Genesis methodology
+  * - 11
+    - FCST_UNITS
+    - Does not apply and is set to NA
+  * - 12
+    - FCST_LEV
+    - Does not apply and is set to NA
+  * - 13
+    - OBS_VAR
+    - Genesis methodology
+  * - 14
+    - OBS_UNITS
+    - Does not apply and is set to NA
+  * - 15
+    - OBS_LEV
+    - Does not apply and is set to NA
+  * - 16
+    - OBTYPE
+    - Verifying BEST track technique name
+  * - 17
+    - VX_MASK
+    - Verifying masking region
+  * - 18
+    - INTERP_MTHD
+    - Does not apply and is set to NA
+  * - 19
+    - INTERP_PNTS
+    - Does not apply and is set to NA
+  * - 20
+    - FCST_THRESH
+    - Does not apply and is set to NA
+  * - 21
+    - OBS_THRESH
+    - Does not apply and is set to NA
+  * - 22
+    - COV_THRESH
+    - Does not apply and is set to NA
+  * - 23
+    - ALPHA
+    - Error percent value used in confidence intervals
+  * - 24
+    - LINE_TYPE
+    - Various line type options, refer to :numref:`point_stat-output` and the tables below.
+
+.. _table_TG_format_info_GENMPR:
+
+.. list-table:: Format information for GENMPR (Genesis Matched Pairs) output line type
+  :widths: auto
+  :header-rows: 2
+
+  * - GENMPR OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - GENMPR Column Name
+    - Description
+  * - 24
+    - GENMPR
+    - Genesis Matched Pairs line type
+  * - 25
+    - TOTAL
+    - Total number of genesis pairs
+  * - 26
+    - INDEX
+    - Index for the current matched pair
+  * - 27
+    - STORM_ID
+    - BBCCYYYY designation of storm (basin, cyclone number, and year)
+  * - 28
+    - AGEN_LAT
+    - Latitude position of the forecast genesis event
+  * - 29
+    - AGEN_LON
+    - Longitude position of the forecast genesis event
+  * - 30
+    - AGEN_DLAND
+    - Forecast genesis event distance to land (nm)
+  * - 31
+    - AGEN_TIME
+    - Forecast genesis time
+  * - 32
+    - BGEN_LAT
+    - Latitude position of the verifying Best track genesis event
+  * - 33
+    - BGEN_LON
+    - Longitude position of the verifying Best track genesis event
+  * - 34
+    - BGEN_DLAND
+    - Best track genesis event distance to land (nm)
+  * - 35
+    - BGEN_TIME
+    - Best track genesis time
+  * - 35
+    - GEN_DIST
+    - Distance between the forecast and Best track genesis events (km)
+  * - 35
+    - GEN_TDIFF
+    - Forecast minus Best track genesis time in HHMMSS format
+  * - 35
+    - INIT_TDIFF
+    - Best track genesis minus forecast initialization time in HHMMSS format
+  * - 35
+    - DEV_CAT
+    - Development methodology category (FYOY, FYON, FNOY, or DISCARD)
+  * - 35
+    - OPS_CAT
+    - Operational methodology category (FYOY, FYON, FNOY, or DISCARD)
+
+.. _table_TG_var_NetCDF_matched_pair_out:
+
+.. list-table:: A selection of variables that can appear in the NetCDF matched pair output which can be controlled by the nc_pairs_flag configuration option.
+  :widths: auto
+  :header-rows: 2
+
+  * - tc_gen NETCDF VARIABLES
+    -
+    -
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - DESC_MODEL_GENESIS
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events within each grid box.
+  * - DESC_MODEL_TRACKS
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of track points within each grid box.
+  * - DESC_BEST_GENESIS
+    - lat, lon
+    - For each filter entry (DESC), count the number of Best track genesis events within each grid box.
+  * - DESC_BEST_GENESIS
+    - lat, lon
+    - For each filter entry (DESC), count the number of Best track points within each grid box.
+  * - DESC_MODEL_[DEV|OPS]_FY_OY
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events classified as hits by the development (DEV) or operational (OPS) methodology.
+  * - DESC_MODEL_[DEV|OPS]_FY_ON
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events classified as false alarms by the development (DEV) or operational (OPS) methodology.
+  * - DESC_MODEL_BEST_[DEV|OPS]_FY_OY
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of Best track genesis events classified as hits by the development (DEV) or operational (OPS) methodology.
+  * - DESC_MODEL_BEST_[DEV|OPS]_FN_OY
+    - lat, lon
+    - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of Best track genesis events classified as misses by the development (DEV) or operational (OPS) methodology.
 
 Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in :numref:`stat-analysis`.
