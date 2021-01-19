@@ -94,11 +94,13 @@ for my $test (@tests){
   elsif ($callchk) {
     $cmd = "valgrind ".$VALGRIND_OPT_CALL." ".$cmd;
   }
-  
+
   # if writing a command file, print the environment and command, then loop
   if( $cmd_only ){
     print "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
-    print "$cmd\n\n";
+    print "$cmd\n";
+    print "unset $_\n" for sort keys %{ $test->{"env"} };
+    print "\n";
     next;
   }
   
@@ -137,23 +139,28 @@ for my $test (@tests){
     
   }
 
+  # unset the test environment variables
+  delete $ENV{$_} for keys %{ $test->{"env"} };
+   
   # print the test result
   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
 
-  # build a list of environment variable exports for reporting
-  my @envs;
-  push @envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
+  # build a list of environment variable exports and unsets for reporting
+  my @set_envs;
+  push @set_envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
+  my @unset_envs;
+  push @unset_envs, "unset $_\n" for sort keys %{ $test->{"env"} };
 
   # if the log file is activated, print the test information
   if( $file_log ){
     print $fh_log "\n\n";
-    print $fh_log "$_" for (@envs, @cmd_outs);
+    print $fh_log "$_" for (@set_envs, @cmd_outs, @unset_envs);
     print $fh_log "\n\n";
   }
 
   # on failure, print the problematic test and exit, if requested
   if( !($ret_ok && $out_ok) ){
-    print "$_" for (@envs, @cmd_outs);
+    print "$_" for (@set_envs, @cmd_outs, @unset_envs);
     $noexit or exit 1;
     print "\n\n";
   }
