@@ -472,42 +472,48 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - STORM_ID
     - BBCCYYYY designation of storm (basin, cyclone number, and year)
   * - 28
+    - AGEN_INIT
+    - Forecast initialization time
+  * - 29
+    - AGEN_FHR
+    - Forecast hour of genesis event (HH)
+  * - 30
+    - AGEN_TIME
+    - Forecast genesis valid time
+  * - 31
     - AGEN_LAT
     - Latitude position of the forecast genesis event
-  * - 29
+  * - 32
     - AGEN_LON
     - Longitude position of the forecast genesis event
-  * - 30
+  * - 33
     - AGEN_DLAND
     - Forecast genesis event distance to land (nm)
-  * - 31
-    - AGEN_TIME
-    - Forecast genesis time
-  * - 32
+  * - 34
+    - BGEN_TIME
+    - Best track genesis valid time
+  * - 35
     - BGEN_LAT
     - Latitude position of the verifying Best track genesis event
-  * - 33
+  * - 36
     - BGEN_LON
     - Longitude position of the verifying Best track genesis event
-  * - 34
+  * - 37
     - BGEN_DLAND
     - Best track genesis event distance to land (nm)
-  * - 35
-    - BGEN_TIME
-    - Best track genesis time
-  * - 35
+  * - 38
     - GEN_DIST
     - Distance between the forecast and Best track genesis events (km)
-  * - 35
+  * - 39
     - GEN_TDIFF
     - Forecast minus Best track genesis time in HHMMSS format
-  * - 35
+  * - 40
     - INIT_TDIFF
     - Best track genesis minus forecast initialization time in HHMMSS format
-  * - 35
+  * - 41
     - DEV_CAT
     - Development methodology category (FYOY, FYON, FNOY, or DISCARD)
-  * - 35
+  * - 42
     - OPS_CAT
     - Operational methodology category (FYOY, FYON, FNOY, or DISCARD)
 
