@@ -48,6 +48,9 @@
 
   <test name="plot_point_obs_CONFIG">
     <exec>&MET_BIN;/plot_point_obs</exec>
+    <env>
+      <pair><name>TO_GRID</name> <value>NONE</value></pair>
+    </env>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &OUTPUT_DIR;/plot_point_obs/nam_and_ndas.20120409.t12z.prepbufr_CONFIG.ps \
@@ -59,6 +62,25 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_point_obs/nam_and_ndas.20120409.t12z.prepbufr_CONFIG.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_point_obs_CONFIG_REGRID">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <env>
+      <pair><name>TO_GRID</name> <value>"latlon 80 100 25 -105 0.25 0.25"</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &OUTPUT_DIR;/plot_point_obs/nam_and_ndas.20120409.t12z.prepbufr_CONFIG_REGRID.ps \
+      -point_obs &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      -plot_grid &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      -config &CONFIG_DIR;/PlotPointObsConfig \
+      -title "NAM 2012040900 F12 vs NDAS 500mb RH and TRMM 3h > 0" \
+      -v 3
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_point_obs/nam_and_ndas.20120409.t12z.prepbufr_CONFIG_REGRID.ps</ps>
     </output>
   </test>
 
