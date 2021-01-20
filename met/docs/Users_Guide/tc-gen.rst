@@ -476,7 +476,7 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - Forecast initialization time
   * - 29
     - AGEN_FHR
-    - Forecast hour of genesis event (HH)
+    - Forecast hour of genesis event
   * - 30
     - AGEN_TIME
     - Forecast genesis valid time
