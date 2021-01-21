@@ -55,6 +55,7 @@ class PointToGridConfInfo {
       void process_config();
       void read_config(const char *, const char *);
       ConcatString get_var_name(const ConcatString);
+      ConcatString get_var_id(const ConcatString);
 };
 
 ////////////////////////////////////////////////////////////////////////

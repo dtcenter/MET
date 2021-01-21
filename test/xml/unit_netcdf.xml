@@ -81,8 +81,9 @@
   <test name="365_days">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name> <value>no_leap</value></pair>
-      <pair><name>APPLY_MASK</name>    <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>no_leap</value></pair>
+      <pair><name>APPLY_MASK</name>      <value>FALSE</value></pair>
+      <pair><name>MET_NC_COMPRESS</name> <value>3</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/easm/base_series_spei12_annual_mean.nc \

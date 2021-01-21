@@ -81,6 +81,14 @@ ______________________
 
      field = [];
 
+     regrid = {
+        to_grid    = NONE;
+        method     = NEAREST;
+        width      = 1;
+        vld_thresh = 0.5;
+        shape      = SQUARE;
+     }
+
      grid_plot_info = {
         color_table   = "MET_BASE/colortables/met_default.ctable";
         plot_min      = 0.0;
@@ -90,6 +98,8 @@ ______________________
   }
 
 The **grid_data** dictionary defines a gridded field of data to be plotted as a base image prior to plotting point locations on top of it. The data to be plotted is specified by the **field** array. If **field** is empty, no base image will be plotted. If **field** has length one, the requested data will be read from the input file specified by the **-plot_grid** command line argument.
+
+The **to_grid** entry in the **regrid** dictionary specifies if and how the requested gridded data should be regridded prior to plotting. Please see :numref:`config_options` for a description of the **regrid** dictionary options.
 
 The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
 
