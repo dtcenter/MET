@@ -39,24 +39,6 @@ static const char * ctc_columns [] = {
    "FN_OY",       "FN_ON"
 };
 
-static const char * ctp_columns [] = {
-   "TOTAL",       "FY_OY_TP",    "FY_ON_TP",
-   "FN_OY_TP",    "FN_ON_TP",    "FY_TP",
-   "FN_TP",       "OY_TP",       "ON_TP"
-};
-
-static const char * cfp_columns [] = {
-   "TOTAL",       "FY_OY_FP",    "FY_ON_FP",
-   "FN_OY_FP",    "FN_ON_FP",    "FY",
-   "FN"
-};
-
-static const char * cop_columns [] = {
-   "TOTAL",       "FY_OY_OP",    "FY_ON_OP",
-   "FN_OY_OP",    "FN_ON_OP",    "OY",
-   "ON"
-};
-
 static const char * cts_columns [] = {
    "TOTAL",
    "BASER",       "BASER_NCL",   "BASER_NCU",   "BASER_BCL",   "BASER_BCU",
