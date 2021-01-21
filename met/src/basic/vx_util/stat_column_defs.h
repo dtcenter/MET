@@ -325,8 +325,8 @@ static const char * ssvar_columns [] = {
 static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
    "AGEN_INIT",   "AGEN_FHR",
-   "AGEN_TIME",   "AGEN_LAT",    "AGEN_LON",     "AGEN_DLAND",
-   "BGEN_TIME",   "BGEN_LAT",    "BGEN_LON",     "BGEN_DLAND",
+   "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",
+   "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",
    "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
    "DEV_CAT",     "OPS_CAT"
 };

@@ -459,6 +459,12 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
   * - Column Number
     - GENMPR Column Name
     - Description
+  * - 5, 6
+    - FCST_VALID_BEG, FCST_VALID_END
+    - Forecast genesis time in YYYYMMDD_HHMMSS format
+  * - 8, 9
+    - OBS_VALID_BEG, OBS_VALID_END
+    - Best track genesis time in YYYYMMDD_HHMMSS format
   * - 24
     - GENMPR
     - Genesis Matched Pairs line type
@@ -478,42 +484,36 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - AGEN_FHR
     - Forecast hour of genesis event
   * - 30
-    - AGEN_TIME
-    - Forecast genesis valid time
-  * - 31
     - AGEN_LAT
     - Latitude position of the forecast genesis event
-  * - 32
+  * - 31
     - AGEN_LON
     - Longitude position of the forecast genesis event
-  * - 33
+  * - 32
     - AGEN_DLAND
     - Forecast genesis event distance to land (nm)
-  * - 34
-    - BGEN_TIME
-    - Best track genesis valid time
-  * - 35
+  * - 33
     - BGEN_LAT
     - Latitude position of the verifying Best track genesis event
-  * - 36
+  * - 34
     - BGEN_LON
     - Longitude position of the verifying Best track genesis event
-  * - 37
+  * - 35
     - BGEN_DLAND
     - Best track genesis event distance to land (nm)
-  * - 38
+  * - 36
     - GEN_DIST
     - Distance between the forecast and Best track genesis events (km)
-  * - 39
+  * - 37
     - GEN_TDIFF
     - Forecast minus Best track genesis time in HHMMSS format
-  * - 40
+  * - 38
     - INIT_TDIFF
     - Best track genesis minus forecast initialization time in HHMMSS format
-  * - 41
+  * - 39
     - DEV_CAT
     - Development methodology category (FYOY, FYON, FNOY, or DISCARD)
-  * - 42
+  * - 40
     - OPS_CAT
     - Operational methodology category (FYOY, FYON, FNOY, or DISCARD)
 

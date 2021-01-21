@@ -1197,7 +1197,6 @@ void write_stats(const PairDataGenesis &gpd,
 
    return;
 }
-
 ////////////////////////////////////////////////////////////////////////
 
 void write_genmpr_row(StatHdrColumns &shc,
@@ -1217,12 +1216,17 @@ void write_genmpr_row(StatHdrColumns &shc,
    // Write a line for each matched pair
    for(i=0; i<gpd.n_pair(); i++) {
 
+      // Pointers for current case
+      const GenesisInfo* fgi = gpd.fcst_gen(i);
+      const GenesisInfo* bgi = gpd.best_gen(i);
+ 
       // Store timing info
-      ut = gpd.init(i) + gpd.lead_time(i);
       shc.set_fcst_lead_sec(gpd.lead_time(i));
+      ut = (fgi ? fgi->genesis_time() : bgi->genesis_time());
       shc.set_fcst_valid_beg(ut);
       shc.set_fcst_valid_end(ut);
       shc.set_obs_lead_sec(bad_data_int);
+      ut = (bgi ? bgi->genesis_time() : fgi->genesis_time());
       shc.set_obs_valid_beg(ut);
       shc.set_obs_valid_end(ut);
 
@@ -1249,79 +1253,73 @@ void write_genmpr_row(StatHdrColumns &shc,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_genmpr_cols(const PairDataGenesis &gpd, int i,
-                       AsciiTable &at, int r, int c) {
+ void write_genmpr_cols(const PairDataGenesis &gpd, int i,
+                        AsciiTable &at, int r, int c) {
 
-   // Pointers for current case
-   const GenesisInfo* fgi = gpd.fcst_gen(i);
-   const GenesisInfo* bgi = gpd.best_gen(i);
-   
-   //
-   // Genesis Matched Pairs (GENMPR):
-   //    TOTAL,       INDEX,       STORM_ID,
-   //    AGEN_INIT,   AGEN_FHR,
-   //    AGEN_TIME,   AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
-   //    BGEN_TIME,   BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
-   //    GEN_DIST,    GEN_TDIFF,   INIT_TDIFF,
-   //    DEV_CAT,     OPS_CAT
-   //
+    // Pointers for current case
+    const GenesisInfo* fgi = gpd.fcst_gen(i);
+    const GenesisInfo* bgi = gpd.best_gen(i);
+    
+    //
+    // Genesis Matched Pairs (GENMPR):
+    //    TOTAL,       INDEX,       STORM_ID,
+    //    AGEN_INIT,   AGEN_FHR,
+    //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
+    //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
+    //    GEN_DIST,    GEN_TDIFF,   INIT_TDIFF,
+    //    DEV_CAT,     OPS_CAT
+    //
 
-   at.set_entry(r, c+0,  // Total number of pairs
-      gpd.n_pair());
+    at.set_entry(r, c+0,  // Total number of pairs
+       gpd.n_pair());
 
-   at.set_entry(r, c+1,  // Index of current pair
-      i+1);
+    at.set_entry(r, c+1,  // Index of current pair
+       i+1);
 
-   at.set_entry(r, c+2,  // Best track Storm ID
-      gpd.best_storm_id(i));
+    at.set_entry(r, c+2,  // Best track Storm ID
+       gpd.best_storm_id(i));
 
-   at.set_entry(r, c+3,  // Fcst genesis initialization time
-      fgi ? unix_to_yyyymmdd_hhmmss(fgi->init()) : na_str);
+    at.set_entry(r, c+3,  // Fcst genesis initialization time
+       fgi ? unix_to_yyyymmdd_hhmmss(fgi->init()) : na_str);
 
-   at.set_entry(r, c+4,  // Fcst genesis hour 
-      fgi ? nint(fgi->genesis_fhr()) : bad_data_int);
+    at.set_entry(r, c+4,  // Fcst genesis hour
+       fgi ? nint(fgi->genesis_fhr()) : bad_data_int);
 
-   at.set_entry(r, c+5,  // Fcst track genesis time
-      fgi ? unix_to_yyyymmdd_hhmmss(fgi->genesis_time()) : na_str);
+    at.set_entry(r, c+5,  // Fcst track latitude
+       fgi ? fgi->lat() : bad_data_double);
 
-   at.set_entry(r, c+6,  // Fcst track latitude
-      fgi ? fgi->lat() : bad_data_double);
+    at.set_entry(r, c+6,  // Fcst track longitude
+       fgi ? fgi->lon() : bad_data_double);
 
-   at.set_entry(r, c+7,  // Fcst track longitude
-      fgi ? fgi->lon() : bad_data_double);
+    at.set_entry(r, c+7,  // Fcst track distance to land
+       fgi ? fgi->dland() : bad_data_double);
 
-   at.set_entry(r, c+8,  // Fcst track distance to land
-      fgi ? fgi->dland() : bad_data_double);
+    at.set_entry(r, c+8,  // Best track latitude
+       bgi ? bgi->lat() : bad_data_double);
 
-   at.set_entry(r, c+9,  // Best track genesis time
-      bgi ? unix_to_yyyymmdd_hhmmss(bgi->genesis_time()) : na_str);
+    at.set_entry(r, c+9, // Best track longitude
+       bgi ? bgi->lon() : bad_data_double);
 
-   at.set_entry(r, c+10, // Best track latitude
-      bgi ? bgi->lat() : bad_data_double);
+    at.set_entry(r, c+10, // Best track distance to land
+       bgi ? bgi->dland() : bad_data_double);
 
-   at.set_entry(r, c+11, // Best track longitude
-      bgi ? bgi->lon() : bad_data_double);
+    at.set_entry(r, c+11, // Genesis distance
+       gpd.gen_diff(i).DevDist);
 
-   at.set_entry(r, c+12, // Best track distance to land
-      bgi ? bgi->dland() : bad_data_double);
+    at.set_entry(r, c+12, // Genesis time difference
+       sec_to_hhmmss(gpd.gen_diff(i).DevDSec));
 
-   at.set_entry(r, c+13, // Genesis distance
-      gpd.gen_diff(i).DevDist);
+    at.set_entry(r, c+13, // Genesis - Init time
+       sec_to_hhmmss(gpd.gen_diff(i).OpsDSec));
 
-   at.set_entry(r, c+14, // Genesis time difference
-      sec_to_hhmmss(gpd.gen_diff(i).DevDSec));
+    at.set_entry(r, c+14, // Development category
+       genesispaircategory_to_string(gpd.gen_diff(i).DevCategory));
 
-   at.set_entry(r, c+15, // Genesis - Init time
-      sec_to_hhmmss(gpd.gen_diff(i).OpsDSec));
+    at.set_entry(r, c+15, // Operational category
+       genesispaircategory_to_string(gpd.gen_diff(i).OpsCategory));
 
-   at.set_entry(r, c+16, // Development category
-      genesispaircategory_to_string(gpd.gen_diff(i).DevCategory));
-
-   at.set_entry(r, c+17, // Operational category
-      genesispaircategory_to_string(gpd.gen_diff(i).OpsCategory));
-
-   return;
-}
+    return;
+ }
 
 ////////////////////////////////////////////////////////////////////////
 
