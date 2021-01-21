@@ -146,10 +146,10 @@
     <param> \
       -lookin &OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
       -job aggregate_stat -line_type MPR -out_line_type CTC -fcst_lev P850 -interp_mthd NEAREST -by FCST_VAR -out_thresh '>CDP90' \
-      -out_stat &OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat
+      -out_stat &OUTPUT_DIR;/climatology/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat</stat>
     </output>
   </test>
 
@@ -161,10 +161,10 @@
     <param> \
       -lookin &OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
       -job filter -line_type MPR -column_thresh CLIMO_CDF 'lt0.1||gt0.9' \
-      -dump_row &OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
+      -dump_row &OUTPUT_DIR;/climatology/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat</stat>
     </output>
   </test>
 

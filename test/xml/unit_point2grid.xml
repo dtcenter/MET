@@ -17,9 +17,6 @@
 
   <test name="point2grid_ascii2nc_surfrad_DW_PSP">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/ascii2nc/surfrad.nc \
       G212 \
@@ -35,9 +32,6 @@
 
   <test name="point2grid_ascii2nc_surfrad_DW_PSP_by_name">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/ascii2nc/surfrad.nc \
       G212 \
@@ -52,9 +46,6 @@
 
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
@@ -70,9 +61,6 @@
 
   <test name="point2grid_pb2nc_TMP_prob">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
@@ -88,9 +76,6 @@
 
   <test name="point2grid_pb2nc_TMP_prob_gaussian">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
@@ -106,9 +91,6 @@
 
   <test name="point2grid_pb2nc_methods">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
@@ -124,9 +106,6 @@
 
   <test name="point2grid_pb2nc_big_input">
     <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
-    </env>
     <param> \
       &DATA_DIR_OBS;/point_obs/prepbufr.gdas.2017060300.nc \
       G212 \
@@ -213,11 +192,11 @@
   </test>
 
   <test name="point2grid_GOES_16_AOD_TO_G212_COORD">
-    <exec>rm -f &OUTPUT_DIR;/CONUS_2500_1500_*;
+    <exec>rm -f &OUTPUT_DIR;/point2grid/CONUS_2500_1500_*;
           &MET_BIN;/point2grid</exec>
     <env>
       <pair><name>MET_GEOSTATIONARY_DATA</name><value>&DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat</value></pair>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
