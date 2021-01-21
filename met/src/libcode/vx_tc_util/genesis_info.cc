@@ -290,10 +290,10 @@ bool GenesisInfo::set(const TrackInfo &ti,
 
 ////////////////////////////////////////////////////////////////////////
 
-double GenesisInfo::genesis_fhr() const {
+int GenesisInfo::genesis_fhr() const {
    return(is_bad_data(GenesisLead) ?
-          bad_data_double :
-          (double) GenesisLead/sec_per_hour);
+          bad_data_int :
+          nint((double) GenesisLead/sec_per_hour));
 }
 
 ////////////////////////////////////////////////////////////////////////

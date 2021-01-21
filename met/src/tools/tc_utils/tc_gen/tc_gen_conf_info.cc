@@ -153,9 +153,9 @@ void TCGenVxOpt::clear() {
    VxAreaMask.clear();
    DLandThresh.clear();
    GenesisMatchRadius = bad_data_double;
-   GenesisHitRadius = bad_data_double;
-   GenesisHitBeg = GenesisHitEnd = bad_data_int;
-   GenesisInitDSec = bad_data_int;
+   DevHitRadius = bad_data_double;
+   DevHitBeg = DevHitEnd = bad_data_int;
+   OpsHitDSec = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
    CIAlpha = bad_data_double;
@@ -223,19 +223,19 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    GenesisMatchRadius =
       dict.lookup_double(conf_key_genesis_match_radius);
 
-   // Conf: genesis_hit_radius
-   GenesisHitRadius =
-      dict.lookup_double(conf_key_genesis_hit_radius);
+   // Conf: dev_hit_radius
+   DevHitRadius =
+      dict.lookup_double(conf_key_dev_hit_radius);
 
    // Conf: genesis_hit_window
-   dict2 = dict.lookup_dictionary(conf_key_genesis_hit_window);
+   dict2 = dict.lookup_dictionary(conf_key_dev_hit_window);
    parse_conf_range_int(dict2, beg, end);
-   GenesisHitBeg = beg*sec_per_hour;
-   GenesisHitEnd = end*sec_per_hour;
+   DevHitBeg = beg*sec_per_hour;
+   DevHitEnd = end*sec_per_hour;
 
-   // Conf: genesis_minus_init_diff
-   GenesisInitDSec = nint(
-      dict.lookup_double(conf_key_genesis_minus_init_diff) *
+   // Conf: ops_hit_tdiff
+   OpsHitDSec = nint(
+      dict.lookup_double(conf_key_ops_hit_tdiff) *
       sec_per_hour);
 
    // Conf: discard_init_post_genesis_flag

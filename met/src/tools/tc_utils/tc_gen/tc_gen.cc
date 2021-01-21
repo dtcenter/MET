@@ -503,9 +503,9 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
             // Dev Method:
             // HIT if forecast genesis time and location
             // are within the temporal and spatial windows.
-            if(diff.DevDSec >= vx_opt.GenesisHitBeg &&
-               diff.DevDSec <= vx_opt.GenesisHitEnd &&
-               diff.DevDist <= vx_opt.GenesisHitRadius) {
+            if(diff.DevDSec >= vx_opt.DevHitBeg &&
+               diff.DevDSec <= vx_opt.DevHitEnd &&
+               diff.DevDist <= vx_opt.DevHitRadius) {
 
                mlog << Debug(4) << case_cs
                     << " is a dev method HIT " << offset_cs;
@@ -532,7 +532,7 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                       << "with an init vs genesis time offset of "
                       << diff.OpsDSec/sec_per_hour << " hours.\n";
 
-            if(diff.OpsDSec <= vx_opt.GenesisInitDSec) {
+            if(diff.OpsDSec <= vx_opt.OpsHitDSec) {
 
                mlog << Debug(4) << case_cs
                     << " is an ops method HIT " << offset_cs;
@@ -597,7 +597,7 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
    case_cs << fcst_gi.technique() << " "
            << unix_to_yyyymmdd_hhmmss(fcst_gi.init())
            << " initialization, "
-           << fcst_gi.genesis_fhr() << " lead, "
+           << fcst_gi.genesis_fhr() << " forecast hour, "
            << unix_to_yyyymmdd_hhmmss(fcst_gi.genesis_time())
            << " forecast genesis at (" << fcst_gi.lat() << ", "
            << fcst_gi.lon() << ")";
@@ -1283,7 +1283,7 @@ void write_genmpr_row(StatHdrColumns &shc,
        fgi ? unix_to_yyyymmdd_hhmmss(fgi->init()) : na_str);
 
     at.set_entry(r, c+4,  // Fcst genesis hour
-       fgi ? nint(fgi->genesis_fhr()) : bad_data_int);
+       fgi ? fgi->genesis_fhr() : bad_data_int);
 
     at.set_entry(r, c+5,  // Fcst track latitude
        fgi ? fgi->lat() : bad_data_double);

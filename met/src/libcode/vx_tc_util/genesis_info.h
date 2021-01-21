@@ -98,7 +98,7 @@ class GenesisInfo : public TrackInfo {
       double   dland()        const;
       unixtime genesis_time() const;
       int      genesis_lead() const;
-      double   genesis_fhr()  const;
+      int      genesis_fhr()  const;
 
          //
          //  do stuff

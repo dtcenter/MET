@@ -107,24 +107,24 @@ filter = [
    {
       desc                 = "ALL_MATCH_600KM";
       genesis_match_radius = 600;
-      genesis_hit_radius   = 600;
+      dev_hit_radius       = 600;
       dev_method_flag      = TRUE;
       ops_method_flag      = TRUE;
    },
    {
       desc                 = "ALL_MATCH_600KM_DEV60HR";
       genesis_match_radius = 600;
-      genesis_hit_radius   = 600;
-      genesis_hit_window   = { beg = -60; end = 60; };
+      dev_hit_radius       = 600;
+      dev_hit_window       = { beg = -60; end = 60; };
       dev_method_flag      = TRUE;
       ops_method_flag      = FALSE;
    },
    {
-      desc                    = "ALL_MATCH_600KM_OPS60HR";
-      genesis_match_radius    = 600;
-      genesis_minus_init_diff = 60;
-      dev_method_flag         = FALSE;
-      ops_method_flag         = TRUE;
+      desc                 = "ALL_MATCH_600KM_OPS60HR";
+      genesis_match_radius = 600;
+      ops_hit_tdiff        = 60;
+      dev_method_flag      = FALSE;
+      ops_method_flag      = TRUE;
    }
 ];
 
@@ -195,22 +195,23 @@ dland_thresh = NA;
 genesis_match_radius = 500;
 
 //
-// Radius in km to classify a match as a hit
+// Radius in km for a development scoring method hit
 //
-genesis_hit_radius = 500;
+dev_hit_radius = 500;
 
 //
-// Time window in hours to classify a match as a hit
+// Time window in hours for a development scoring method hit
 //
-genesis_hit_window = {
+dev_hit_window = {
    beg = -24;
    end =  24;
 }
 
 //
-// Genesis minus initialization time offset in hours
+// Maximum Best track genesis minus model initialization time difference for an
+// operational scoring method hit
 //
-genesis_minus_init_diff = 48;
+ops_hit_tdiff = 48;
 
 //
 // Discard genesis forecasts for initializations at or after the matching

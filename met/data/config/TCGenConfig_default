@@ -149,22 +149,23 @@ dland_thresh = NA;
 genesis_match_radius = 500;
 
 //
-// Radius in km to classify a match as a hit
+// Radius in km for a development scoring method hit
 //
-genesis_hit_radius = 500;
+dev_hit_radius = 500;
 
 //
-// Time window in hours to classify a match as a hit
+// Time window in hours for a development scoring method hit
 //
-genesis_hit_window = {
+dev_hit_window = {
    beg = -24;
    end =  24;
 }
 
 //
-// Genesis minus initialization time offset in hours
+// Maximum Best track genesis minus model initialization time difference for an
+// operational scoring method hit
 //
-genesis_minus_init_diff = 48;
+ops_hit_tdiff = 48;
 
 //
 // Discard genesis forecasts for initializations at or after the matching
