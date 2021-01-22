@@ -23,7 +23,8 @@
 
 extern void load_tc_dland(const ConcatString &, Grid &, DataPlane &);
 
-extern void load_tc_basin(const ConcatString &, Grid &, DataPlane &);
+extern void load_tc_basin(const ConcatString &, Grid &, DataPlane &,
+                          StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

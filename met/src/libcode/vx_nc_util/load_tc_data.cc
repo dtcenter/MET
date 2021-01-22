@@ -13,6 +13,7 @@ using namespace std;
 #include <iostream>
 
 #include "vx_data2d_nc_met.h"
+#include "vx_nc_util.h"
 #include "load_tc_data.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,12 +76,13 @@ void load_tc_dland(const ConcatString &dland_file, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char basin_var_name [] = "basin";
+static const char nc_var_basin      [] = "basin";
+static const char nc_var_basin_abbr [] = "basin_abbr";
 
 ////////////////////////////////////////////////////////////////////////
 
 void load_tc_basin(const ConcatString &basin_file, Grid &grid,
-                   DataPlane &dp) {
+                   DataPlane &dp, StringArray &abbr) {
    ConcatString file_name;
    LongArray dim;
    NcVarInfo *vi;
@@ -111,10 +113,19 @@ void load_tc_basin(const ConcatString &basin_file, Grid &grid,
    dim.add(vx_data2d_star);
 
    // Read the basin data
-   if(!MetNc.data(basin_var_name, dim, dp, vi)) {
+   if(!MetNc.data(nc_var_basin, dim, dp, vi)) {
       mlog << Error << "\nload_tc_basin() -> "
-           << "can't read \"" << basin_var_name
+           << "can't read \"" << nc_var_basin
            << "\" data from file \""
+           << file_name << "\"\n\n";
+      exit(1);
+   }
+
+   // Read the basin abbrevations
+   if(!get_nc_data_to_array(MetNc.Nc, nc_var_basin_abbr, &abbr)) {
+      mlog << Error << "\nload_tc_basin() -> "
+           << "can't read \"" << nc_var_basin_abbr
+           << "\" abbreviations from file \""
            << file_name << "\"\n\n";
       exit(1);
    }
@@ -123,4 +134,3 @@ void load_tc_basin(const ConcatString &basin_file, Grid &grid,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
