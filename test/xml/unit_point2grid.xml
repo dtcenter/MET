@@ -54,7 +54,6 @@
       -name TEMP \
       -v 1
     </param>
-    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP.nc</grid_nc>
     </output>
@@ -70,7 +69,6 @@
       -name TEMP -prob_cat_thresh ">=280.0" \
       -v 1
     </param>
-    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_prob.nc</grid_nc>
     </output>
@@ -86,7 +84,6 @@
       -name TEMP -prob_cat_thresh ">=280.0" -method GAUSSIAN \
       -v 1
     </param>
-    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_prob_gaussian.nc</grid_nc>
     </output>
@@ -102,7 +99,6 @@
       -field 'name="RH"; level="*"; valid_time="20120409_120000";' \
       -v 1
     </param>
-    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc</grid_nc>
     </output>
@@ -117,7 +113,6 @@
       -field 'name="TMP"; level="Z2";' \
       -v 1
     </param>
-    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc</grid_nc>
     </output>
@@ -126,7 +121,7 @@
   <test name="point2grid_GOES_16_AOD_TO_G212">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
@@ -144,7 +139,7 @@
   <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
@@ -162,7 +157,7 @@
   <test name="point2grid_GOES_16_ADP">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20192662141196_e20192662143569_c20192662145547.nc \
@@ -181,7 +176,7 @@
   <test name="point2grid_GOES_16_AOD_TO_G212_GRID_MAP">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
@@ -197,11 +192,11 @@
   </test>
 
   <test name="point2grid_GOES_16_AOD_TO_G212_COORD">
-    <exec>rm -f &OUTPUT_DIR;/CONUS_2500_1500_*;
+    <exec>rm -f &OUTPUT_DIR;/point2grid/CONUS_2500_1500_*;
           &MET_BIN;/point2grid</exec>
     <env>
       <pair><name>MET_GEOSTATIONARY_DATA</name><value>&DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat</value></pair>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
@@ -219,7 +214,7 @@
   <test name="point2grid_NCCF_UK">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/point_obs/UKMet_tripolar/prodm_op_am-hr.gridT_20200907_00.036_temp.nc \
@@ -236,7 +231,7 @@
   <test name="point2grid_GOES_16_AOD_TO_G212_unsigned">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20202581441152_e20202581443525_c20202581445493.nc \
@@ -254,7 +249,7 @@
   <test name="point2grid_2D_time">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/point_obs/VOLCAT_HIMAWARI-8_FLDK_s2020296_173000_v300250_VCB_w167_FLDK_b2020295_204000_g001.nc \

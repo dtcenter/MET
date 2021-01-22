@@ -140,10 +140,20 @@ Frequency Bias is the ratio of the total number of forecasts of an event to the 
 
 A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates the event was forecasted too frequently and a value less than 1 indicates the event was not forecasted frequently enough.
 
-Probability of Detection (POD)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+H_RATE
+~~~~~~
 
 Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
+
+H_RATE is defined as
+
+.. math:: \text{H_RATE } = \frac{n_{11}}{T}.
+
+
+H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
+
+Probability of Detection (POD)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "PODY" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -152,7 +162,7 @@ POD is defined as
 .. math:: \text{POD } = \frac{n_{11}}{n_{11} + n_{01}} = \frac{n_{11}}{n_1}.
 
 
-It is the fraction of events that were correctly forecasted to occur. POD is equivalent to the H value computed by the NCEP verification system and is also known as the hit rate. POD ranges from 0 to 1; a perfect forecast would have POD = 1.
+It is the fraction of events that were correctly forecasted to occur. POD is also known as the hit rate. POD ranges from 0 to 1; a perfect forecast would have POD = 1.
 
 Probability of False Detection (POFD)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

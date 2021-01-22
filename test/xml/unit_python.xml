@@ -142,6 +142,7 @@
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
