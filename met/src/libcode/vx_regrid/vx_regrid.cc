@@ -92,6 +92,24 @@ return ( out );
 ////////////////////////////////////////////////////////////////////////
 
 
+DataPlane met_regrid_nearest (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid)
+
+{
+
+RegridInfo ri;
+ri.enable = true;
+ri.method = InterpMthd_Nearest;
+ri.width  = 1;
+ri.shape  = GridTemplateFactory::GridTemplate_Square;
+
+return ( met_regrid_generic(from_data, from_grid, to_grid, ri) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 DataPlane met_regrid_generic (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
 
 {

@@ -269,18 +269,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
       // Regrid, if necessary, using nearest neighbor.
       if(!(mask_grid == grid)) {
 
-         RegridInfo ri;
-         ri.enable = true;
-         ri.method = InterpMthd_Nearest;
-         ri.width  = 1;
-         ri.shape  = GridTemplateFactory::GridTemplate_Square;
-
          mlog << Debug(2)
               << "Regridding mask grid to the verification grid using nearest "
               << "neighbor interpolation:\n"
               << mask_grid.serialize() << "!=\n" << grid.serialize() << "\n";
 
-         mask_dp = met_regrid(mask_dp, mask_grid, grid, ri);
+         mask_dp = met_regrid_nearest(mask_dp, mask_grid, grid);
       }
    }
 
@@ -334,7 +328,7 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Parse the poly mask information.  If it's a gridded data file,
+// Parse the poly mask information. If it's a gridded data file,
 // return the masking grid, mask plane, and the name of the mask.
 // If not, return the polyline object.
 //
