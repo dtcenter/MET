@@ -116,14 +116,16 @@ class TCGenVxOpt {
 
       // Timing information
       unixtime  InitBeg, InitEnd;
+      TimeArray InitInc, InitExc;
       unixtime  ValidBeg, ValidEnd;
       NumArray  InitHour;
       NumArray  Lead;
 
-      // Polyline masking region
+      // Spatial masking information
       ConcatString VxMaskName;
       MaskPoly     VxPolyMask;
       Grid         VxGridMask;
+      StringArray  VxBasinMask;
       MaskPlane    VxAreaMask;
 
       // Distance to land threshold
@@ -152,6 +154,8 @@ class TCGenVxOpt {
       void clear();
 
       void process_config(Dictionary &);
+      void process_basin_mask(const Grid &, const DataPlane &,
+                              const StringArray &);
       void parse_nc_info(Dictionary &);
 
       bool is_keeper(const GenesisInfo &) const;
@@ -206,6 +210,7 @@ class TCGenConfInfo {
       ConcatString BasinFile;
       Grid         BasinGrid;
       DataPlane    BasinData;
+      StringArray  BasinAbbr;
 
       // Grid for NetCDF output file
       Grid NcOutGrid;

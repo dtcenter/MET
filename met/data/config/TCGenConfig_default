@@ -105,10 +105,12 @@ storm_id = [];
 storm_name = [];
 
 //
-// Forecast and operational initialization time window
+// Forecast and operational initialization times to include or exclude
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
+init_exc = [];
 
 //
 // Forecast, BEST, and operational valid time window
@@ -130,6 +132,11 @@ lead = [];
 // Spatial masking region (path to gridded data file or polyline file)
 //
 vx_mask = "";
+
+//
+// Spatial masking of hurricane basin names from the basin_file
+//
+basin_mask = [];
 
 //
 // Distance to land threshold

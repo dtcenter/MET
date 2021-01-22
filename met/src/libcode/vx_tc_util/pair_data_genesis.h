@@ -127,7 +127,10 @@ class PairDataGenesis {
 
       void add_fcst_gen(const GenesisInfo *);
       void add_best_gen(const GenesisInfo *,
-                        const int, const int, const int);
+                        const int, const int, const int,
+                        const unixtime, const unixtime,
+                        const TimeArray &, const TimeArray &);
+      
       void add_gen_pair(const GenesisInfo *, const GenesisInfo *);
       void set_gen_diff(int, const GenesisPairDiff &);
 };

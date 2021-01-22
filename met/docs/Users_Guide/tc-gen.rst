@@ -200,8 +200,10 @@ ______________________
 
   init_beg = "";
   init_end = "";
+  init_inc = [];
+  init_exc = [];
 
-The **init_beg** and **init_end** entries are strings in YYYYMMDD[_HH[MMSS]] format which defines which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the Best tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
+The **init_beg**, **init_end**, **init_inc**, and **init_exc** entries define strings in YYYYMMDD[_HH[MMSS]] format which defines which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time meets all the criteria will be processed. The initialization time must fall between **init_beg**, and **init_end**, must appear in **init_inc** inclusion list, and must not appear in the **init_exc** exclusion list. Note that these settings only apply to the forecast and operational tracks, not the Best tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
 ______________________
 
@@ -225,10 +227,19 @@ ______________________
 
 .. code-block:: none
 
-  vx_mask = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-             { 'name=\”basin\”;level=\”(*,*)\”; } ==1";
+  vx_mask = "";
 
-The **vx_mask** entry is a string defining the path to a Lat/Lon polyline file or a gridded data file that MET can read to subset the results spatially. If specified, only those genesis events whose Lat/Lon location falls within the specified area will be included. The MET code includes the file **basin_global_tenth_degree.nc**, which contains a global definition of the Regional Specialized Meteorology Centers (RSMC) and hurricane basin regions. The above example uses this file to stratify genesis results for the Atlantic Basin, where the **basin** variable equals ones.
+The **vx_mask** entry is a string defining the path to a Lat/Lon polyline file or a gridded data file that MET can read to subset the results spatially. If specified, only those genesis events whose Lat/Lon location falls within the specified area will be included.
+
+______________________
+
+.. code-block:: none
+
+  basin_mask = [];
+
+The **basin_mask** entry is an array of strings listing tropical cycline basin abbreviations (e.g. AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
+
+The **vx_mask** and **basin_mask** names are concatenated and written to the **VX_MASK** output column.
 
 ______________________
 

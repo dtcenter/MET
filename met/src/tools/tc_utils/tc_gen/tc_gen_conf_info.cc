@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_nc_util.h"
 #include "apply_mask.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,12 +145,15 @@ void TCGenVxOpt::clear() {
    StormId.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitHour.clear();
    Lead.clear();
    VxMaskName.clear();
    VxPolyMask.clear();
    VxGridMask.clear();
+   VxBasinMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
    GenesisMatchRadius = bad_data_double;
@@ -192,19 +196,31 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    InitBeg = dict.lookup_unixtime(conf_key_init_beg);
    InitEnd = dict.lookup_unixtime(conf_key_init_end);
 
+   // Conf: InitInc
+   sa = dict.lookup_string_array(conf_key_init_inc);
+   for(i=0; i<sa.n(); i++) {
+      InitInc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: InitExc
+   sa = dict.lookup_string_array(conf_key_init_exc);
+   for(i=0; i<sa.n(); i++) {
+      InitExc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
    // Conf: valid_beg, valid_end
    ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = dict.lookup_unixtime(conf_key_valid_end);
 
    // Conf: init_hour
    sa = dict.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
       InitHour.add(timestring_to_sec(sa[i].c_str()));
    }
 
    // Conf: lead
    sa = dict.lookup_string_array(conf_key_lead);
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
       Lead.add(timestring_to_sec(sa[i].c_str()));
    }
 
@@ -214,6 +230,13 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
       mlog << Debug(2) << "Masking File: " << file_name << "\n";
       parse_poly_mask(file_name, VxPolyMask, VxGridMask, VxAreaMask,
                       VxMaskName);
+   }
+
+   // Conf: basin_mask
+   VxBasinMask = dict.lookup_string_array(conf_key_basin_mask);
+   if(VxBasinMask.n() > 0) {
+      mlog << Debug(2) << "Basin Mask: "
+           << write_css(VxBasinMask) << "\n";
    }
 
    // Conf: dland_thresh
@@ -285,6 +308,60 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: bset_unique_flag
    BestUniqueFlag =
       dict.lookup_bool(conf_key_best_unique_flag);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenVxOpt::process_basin_mask(const Grid &basin_grid,
+                                    const DataPlane &basin_data,
+                                    const StringArray &basin_abbr) {
+
+   // Nothing to do for an empty list
+   if(VxBasinMask.n() == 0) return;
+
+   int i, j;
+   DataPlane dp;
+   ConcatString cs;
+   SingleThresh st;
+   MaskPlane mp;
+
+   // If no grid has been defined, use the basin grid
+   if(VxGridMask.nxy() == 0) VxGridMask = basin_grid;
+
+   // Regrid the basin data, if necessary
+   dp = (VxGridMask == basin_grid ? basin_data :
+         met_regrid_nearest(basin_data, basin_grid, VxGridMask));
+
+   // Construct the threshold
+   for(i=0; i<VxBasinMask.n(); i++) {
+
+      // Convert string to integer
+      if(!basin_abbr.has(VxBasinMask[i], j)) {
+         mlog << Error << "\nTCGenConfInfo::process_basin_mask() -> "
+              << "\"" << VxBasinMask[i]
+              << "\" is not a valid basin name!\n\n";
+         exit(1);
+      }
+
+      // Build the threshold string
+      if(cs.nonempty()) cs << "||";
+      cs << "==" << j;
+   }
+   st.set(cs.c_str());
+
+   // Apply the threshold and create the mask
+   dp.threshold(st);
+   mp = dp.mask_plane();
+
+   // Set the area mask
+   if(VxAreaMask.is_empty()) VxAreaMask = mp;
+   else                      apply_mask(VxAreaMask, mp);
+
+   // Append to the mask name
+   if(VxMaskName.nonempty()) VxMaskName << ",";
+   VxMaskName << write_css(VxBasinMask);
 
    return;
 }
@@ -367,9 +444,11 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
 
    if(!gi.is_best_track() || gi.is_oper_track()) {
 
-      // Initialization time window
-      if((InitBeg > 0 &&  InitBeg > gi.init()) ||
-         (InitEnd > 0 &&  InitEnd < gi.init()))
+      // Initialization times
+      if((InitBeg     > 0 &&  InitBeg >   gi.init())  ||
+         (InitEnd     > 0 &&  InitEnd <   gi.init())  ||
+         (InitInc.n() > 0 && !InitInc.has(gi.init())) ||
+         (InitExc.n() > 0 &&  InitExc.has(gi.init())))
          keep = false;
 
       // Initialization hours
@@ -467,6 +546,7 @@ void TCGenConfInfo::clear() {
    BasinFile.clear();
    BasinGrid.clear();
    BasinData.clear();
+   BasinAbbr.clear();
    NcOutGrid.clear();
    OutputMap.clear();
    NcInfo.clear();
@@ -594,6 +674,18 @@ void TCGenConfInfo::process_config() {
    // Loop through the filters
    for(size_t j=0; j<VxOpt.size(); j++) {
 
+      // Process the basin mask
+      if(VxOpt[j].VxBasinMask.n() > 0) {
+
+         // Load the basin data, if needed.
+         if(BasinData.is_empty()) {
+            load_tc_basin(BasinFile, BasinGrid, BasinData, BasinAbbr);
+         }
+
+         // Apply the basin mask
+         VxOpt[j].process_basin_mask(BasinGrid, BasinData, BasinAbbr);
+      }
+
       // Update the summary OutputMap and NcInfo
       process_flags(VxOpt[j].OutputMap, VxOpt[j].NcInfo);
 
@@ -681,12 +773,11 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
 
 ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
    double x_dbl, y_dbl, dist;
-   int x, y, id;
-   ConcatString abbr;
+   int x, y, i;
 
    // Load the basin data, if needed.
    if(BasinData.is_empty()) {
-      load_tc_basin(BasinFile, BasinGrid, BasinData);
+      load_tc_basin(BasinFile, BasinGrid, BasinData, BasinAbbr);
    }
 
    // Convert lat,lon to x,y
@@ -697,54 +788,21 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
    y = nint(y_dbl);
 
    // Basin ID
-   id = ((x < 0 || x >= BasinGrid.nx() ||
-          y < 0 || y >= BasinGrid.ny()) ?
+   i = ((x < 0 || x >= BasinGrid.nx() ||
+         y < 0 || y >= BasinGrid.ny()) ?
          bad_data_int :
          nint(BasinData.get(x, y)));
 
-   // Convert basin ID to string
-   switch(id) {
-      case 0:
-         abbr = "NONE";
-         break;
-      case 1:
-         // Atlantic
-         abbr = "AL";
-         break;
-      case 2:
-         // Eastern Pacific
-         abbr = "EP";
-         break;
-      case 3:
-         // Central Pacific
-         abbr = "CP";
-         break;
-      case 4:
-         // Western Pacific
-         abbr = "WP";
-         break;
-      case 5:
-         // Northern Indian Ocean
-         abbr = "NI";
-         break;
-      case 6:
-         // Southern Indian Ocean
-         abbr = "SI";
-         break;
-      case 7:
-         // Autstralia
-         abbr = "AU";
-         break;
-      case 8:
-         // Southern Pacific
-         abbr = "SP";
-         break;
-      default:
-         abbr = "UNKNOWN";
-         break;
+   // Convert to string
+   if(i < 0 || i >= BasinAbbr.n()) {
+      mlog << Error << "\nTCGenConfInfo::compute_basin() -> "
+           << "unexpected basin id value (" << i
+           << ") found in basin file \"" << BasinFile
+           << "\"\n\n";
+      exit(1);
    }
 
-   return(abbr);
+   return(BasinAbbr[i]);
 }
 
 ////////////////////////////////////////////////////////////////////////

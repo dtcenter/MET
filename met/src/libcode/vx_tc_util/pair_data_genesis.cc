@@ -258,21 +258,29 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
-                                   const int beg,
-                                   const int end,
-                                   const int inc) {
+        const int fcst_beg, const int fcst_end, const int init_add,
+        const unixtime init_beg, const unixtime init_end,
+        const TimeArray &init_inc, const TimeArray &init_exc) {
 
    if(!bgi) return;
 
    int i_case;
    GenesisPairDiff diff;
+   unixtime init_ut;
 
    // Define opportunities to forecast this event
-   unixtime init_beg = bgi->genesis_time() - end;
-   unixtime init_end = bgi->genesis_time() - beg;
+   unixtime init_start = bgi->genesis_time() - fcst_end;
+   unixtime init_stop  = bgi->genesis_time() - fcst_beg;
 
    // Add unmatched pair for each forecast opportunity
-   for(unixtime init_ut=init_beg; init_ut<=init_end; init_ut+=inc) {
+   for(init_ut=init_start; init_ut<=init_stop; init_ut+=init_add) {
+
+      // Check if this initialization time should be used
+      if((init_beg     > 0 &&  init_beg >   init_ut)  ||
+         (init_end     > 0 &&  init_beg <   init_ut)  ||
+         (init_inc.n() > 0 && !init_inc.has(init_ut)) ||
+         (init_exc.n() > 0 &&  init_exc.has(init_ut)))
+         continue;
 
       // Check if this case already exists
       if(!has_case(bgi->storm_id(), init_ut, i_case)) {

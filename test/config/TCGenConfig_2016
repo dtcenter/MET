@@ -86,21 +86,18 @@ filter = [
    },
    {
       desc          = "AL_BASIN";
-      vx_mask       = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                      { name=\"basin\"; level=\"(*,*)\"; } ==1";
+      basin_mask    = "AL";
       nc_pairs_flag = TRUE;
       output_flag   = { genmpr = BOTH; }
    },
    {
       desc          = "AL_DLAND_300NM";
-      vx_mask       = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                      { name=\"basin\"; level=\"(*,*)\"; } ==1";
+      basin_mask    = "AL";
       dland_thresh  = >0&&<300;
    },
    {
       desc          = "EP_CP_BASIN";
-      vx_mask       = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                      { name=\"basin\"; level=\"(*,*)\"; } ==2||==3";
+      basin_mask    = [ "EP", "CP" ];
       nc_pairs_flag = TRUE;
       output_flag   = { genmpr = BOTH; }
    },
@@ -151,10 +148,12 @@ storm_id = [];
 storm_name = [];
 
 //
-// Forecast and operational initialization time window
+// Forecast and operational initialization times to include or exclude
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
+init_exc = [];
 
 //
 // Forecast, BEST, and operational valid time window
@@ -176,6 +175,11 @@ lead = [];
 // Spatial masking region (path to gridded data file or polyline file)
 //
 vx_mask = "";
+
+//
+// Spatial masking of hurricane basin names from the basin_file
+//
+basin_mask = [];
 
 //
 // Distance to land threshold

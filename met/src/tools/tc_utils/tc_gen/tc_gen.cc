@@ -367,7 +367,9 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       // Add pairs for the forecast opportunities
       gpd.add_best_gen(&bga[i],
                        conf_info.FcstSecBeg, conf_info.FcstSecEnd,
-                       conf_info.InitFreqHr*sec_per_hour);
+                       conf_info.InitFreqHr*sec_per_hour,
+                       vx_opt.InitBeg, vx_opt.InitEnd,
+                       vx_opt.InitInc, vx_opt.InitExc);
    }
 
    // Loop over the model genesis events looking for pairs.
