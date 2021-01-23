@@ -68,7 +68,7 @@ class DataPlane {
          // Set functions
          //
 
-      void set_size(int Nx, int Ny);
+      void set_size(int nx, int ny, double v = 0.0);
 
       void set(double, int, int);   //  x, y
       void set_block(double *, int, int);   //  nx, ny

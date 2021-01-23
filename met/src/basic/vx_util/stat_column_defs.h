@@ -39,24 +39,6 @@ static const char * ctc_columns [] = {
    "FN_OY",       "FN_ON"
 };
 
-static const char * ctp_columns [] = {
-   "TOTAL",       "FY_OY_TP",    "FY_ON_TP",
-   "FN_OY_TP",    "FN_ON_TP",    "FY_TP",
-   "FN_TP",       "OY_TP",       "ON_TP"
-};
-
-static const char * cfp_columns [] = {
-   "TOTAL",       "FY_OY_FP",    "FY_ON_FP",
-   "FN_OY_FP",    "FN_ON_FP",    "FY",
-   "FN"
-};
-
-static const char * cop_columns [] = {
-   "TOTAL",       "FY_OY_OP",    "FY_ON_OP",
-   "FN_OY_OP",    "FN_ON_OP",    "OY",
-   "ON"
-};
-
 static const char * cts_columns [] = {
    "TOTAL",
    "BASER",       "BASER_NCL",   "BASER_NCU",   "BASER_BCL",   "BASER_BCU",
@@ -322,6 +304,15 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
+static const char * genmpr_columns [] = {
+   "TOTAL",       "INDEX",       "STORM_ID",
+   "AGEN_INIT",   "AGEN_FHR",
+   "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",
+   "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",
+   "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
+   "DEV_CAT",     "OPS_CAT"
+};
+
 static const char * relp_columns [] = {
    "TOTAL",       "N_ENS",       "RELP_"
 };
@@ -371,19 +362,17 @@ static const char * job_ramp_mpr_columns [] = {
 static const int max_stat_col           = 100;
 
 static const int n_header_columns       = sizeof(hdr_columns)/sizeof(*hdr_columns);
+
 static const int n_fho_columns          = sizeof(fho_columns)/sizeof(*fho_columns);
 static const int n_ctc_columns          = sizeof(ctc_columns)/sizeof(*ctc_columns);
-static const int n_ctp_columns          = sizeof(ctp_columns)/sizeof(*ctp_columns);
-static const int n_cfp_columns          = sizeof(cfp_columns)/sizeof(*cfp_columns);
-
-static const int n_cop_columns          = sizeof(cop_columns)/sizeof(*cop_columns);
 static const int n_cts_columns          = sizeof(cts_columns)/sizeof(*cts_columns);
 static const int n_mctc_columns         = sizeof(mctc_columns)/sizeof(*mctc_columns);
 static const int n_mcts_columns         = sizeof(mcts_columns)/sizeof(*mcts_columns);
-static const int n_cnt_columns          = sizeof(cnt_columns)/sizeof(*cnt_columns);
 
+static const int n_cnt_columns          = sizeof(cnt_columns)/sizeof(*cnt_columns);
 static const int n_sl1l2_columns        = sizeof(sl1l2_columns)/sizeof(*sl1l2_columns);
 static const int n_sal1l2_columns       = sizeof(sal1l2_columns)/sizeof(*sal1l2_columns);
+
 static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_columns);
 static const int n_val1l2_columns       = sizeof(val1l2_columns)/sizeof(*val1l2_columns);
 static const int n_vcnt_columns         = sizeof(vcnt_columns)/sizeof(*vcnt_columns);
@@ -395,20 +384,22 @@ static const int n_prc_columns          = sizeof(prc_columns)/sizeof(*prc_column
 static const int n_eclv_columns         = sizeof(eclv_columns)/sizeof(*eclv_columns);
 
 static const int n_mpr_columns          = sizeof(mpr_columns)/sizeof(*mpr_columns);
+
 static const int n_nbrctc_columns       = sizeof(nbrctc_columns)/sizeof(*nbrctc_columns);
 static const int n_nbrcts_columns       = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
 static const int n_nbrcnt_columns       = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
-static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
 
+static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
 static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_columns);
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
+
 static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
 static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
 static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
-
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
+
 static const int n_ecnt_columns         = sizeof(ecnt_columns)/sizeof(*ecnt_columns);
 static const int n_rps_columns          = sizeof(rps_columns)/sizeof(*rps_columns);
 
@@ -417,6 +408,8 @@ static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_co
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
 static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
+
+static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
