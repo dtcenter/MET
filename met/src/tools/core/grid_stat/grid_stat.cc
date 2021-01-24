@@ -328,8 +328,8 @@ void setup_first_pass(const DataPlane &dp) {
       setup_txt_files(dp.valid(), dp.lead());
    }
 
-   // If requested, create a NetCDF file to store the matched pairs and
-   // difference fields for each GRIB code and masking region
+   // If requested, create a NetCDF file to store the gridded
+   // verification data
    if(conf_info.get_output_nc_flag()) {
       setup_nc_file(conf_info.nc_info, dp.valid(), dp.lead());
    }
