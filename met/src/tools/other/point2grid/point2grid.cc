@@ -910,8 +910,15 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             float from_min_value =  10e10;
             float from_max_value = -10e10;
 
-            // Initialize counter
+            // Initialize counter and output fields
             to_count = 0;
+            to_dp.set_constant(bad_data_double);
+            cnt_dp.set_constant(0);
+            mask_dp.set_constant(0);
+            if (has_prob_thresh || do_gaussian_filter) {
+               prob_dp.set_constant(0);
+               prob_mask_dp.set_constant(0);
+            }
 
             for (int x_idx = 0; x_idx<nx; x_idx++) {
                for (int y_idx = 0; y_idx<ny; y_idx++) {
