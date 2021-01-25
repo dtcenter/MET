@@ -35,8 +35,10 @@ using namespace std;
 static const char x_dim_name []          = "lon";
 static const char y_dim_name []          = "lat";
 
-static const string valid_time_att_name  = "valid_time_ut";
-static const string  init_time_att_name  = "init_time_ut";
+static const string valid_time_att_name  = "valid_time";
+static const string  init_time_att_name  = "init_time";
+static const string valid_time_ut_att_name  = "valid_time_ut";
+static const string  init_time_ut_att_name  = "init_time_ut";
 static const string accum_time_att_name  = "accum_time_sec";
 
 static const string name_att_name        = "name";
@@ -295,8 +297,12 @@ for (j=0; j<Ndims; ++j)  {
       get_att_str( Var[j], units_att_name,      Var[j].units_att     );
       get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
 
-      get_att_unixtime( Var[j], init_time_att_name,  ill);
-      get_att_unixtime( Var[j], valid_time_att_name, vll);
+      get_att_unixtime( Var[j], init_time_ut_att_name,  ill);
+      get_att_unixtime( Var[j], valid_time_ut_att_name, vll);
+
+      if ( is_bad_data(ill) ) get_att_unixtime( Var[j], init_time_att_name,  ill);
+      if ( is_bad_data(vll) ) get_att_unixtime( Var[j], valid_time_att_name, vll);
+
 
       if ( !is_bad_data(ill) )   InitTime = ill;
       if ( !is_bad_data(vll) )  ValidTime = vll;
