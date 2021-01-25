@@ -1327,7 +1327,8 @@ void write_genmpr_row(StatHdrColumns &shc,
 void write_nc(GenCTCInfo &gci) {
    int i;
    ConcatString var_name, long_name;
-   unixtime valid_beg, valid_end;
+   unixtime valid_beg = (unixtime) 0;
+   unixtime valid_end = (unixtime) 0;
 
    // Allocate memory
    float *data = (float *) 0;

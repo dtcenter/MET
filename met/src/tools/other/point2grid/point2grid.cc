@@ -1163,9 +1163,10 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          skip_times = new bool[from_size];
          valid_times = new double[from_size];
          if (get_nc_data(&time_var, valid_times)) {
-            int sec_per_unit;
-            bool no_leap_year;
-            unixtime ref_ut, tmp_time;
+            int sec_per_unit = 0;
+            bool no_leap_year = false;
+            unixtime ref_ut = (unixtime) 0;
+            unixtime tmp_time;
             if( conf_info.valid_time > 0 ) {
                if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
                if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
