@@ -442,7 +442,6 @@ const GenesisInfo & GenesisInfoArray::operator[](int n) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool GenesisInfoArray::add(const GenesisInfo &gi) {
-   int i;
 
    // Skip true duplicates
    if(has(gi)) {

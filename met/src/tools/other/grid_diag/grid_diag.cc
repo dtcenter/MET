@@ -402,9 +402,9 @@ void setup_histograms(void) {
       bin_max.clear();
       bin_mid.clear();
       for(int k=0; k<n_bins; k++) {
-         bin_min.push_back(min + delta * k);
-         bin_max.push_back(min + delta * (k + 1));
-         bin_mid.push_back(min + delta * (k + 0.5));
+	      bin_min.push_back(min + delta * k);
+	      bin_max.push_back(min + delta * (k + 1));
+	      bin_mid.push_back(min + delta * (k + 0.5));
       }
 
       bin_mins[data_info->magic_str()] = bin_min;
@@ -414,9 +414,9 @@ void setup_histograms(void) {
 
       // Initialize histograms
       mlog << Debug(2)
-           << "Initializing " << data_info->magic_str()
-           << " histogram with " << n_bins << " bins from "
-           << min << " to " << max << ".\n";
+	      << "Initializing " << data_info->magic_str()
+	      << " histogram with " << n_bins << " bins from "
+	      << min << " to " << max << ".\n";
       histograms[data_info->magic_str()] = vector<int>();
       init_pdf(n_bins, histograms[data_info->magic_str()]);
    } // for i_var
@@ -426,103 +426,102 @@ void setup_histograms(void) {
 
 void setup_joint_histograms(void) {
 
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+	for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      VarInfo *data_info = conf_info.data_info[i_var];
-      int n_bins = data_info->n_bins();
+		VarInfo *data_info = conf_info.data_info[i_var];
+		int n_bins = data_info->n_bins();
 
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+		for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-         VarInfo *joint_info = conf_info.data_info[j_var];
-         int n_joint_bins = joint_info->n_bins();
+			VarInfo *joint_info = conf_info.data_info[j_var];
+			int n_joint_bins = joint_info->n_bins();
 
-         ConcatString joint_str = data_info->magic_str();
-         joint_str.add("_");
-         joint_str.add(joint_info->magic_str());
-         mlog << Debug(2)
-              << "Initializing " << joint_str << " joint histogram with "
-              << n_bins << " x " << n_joint_bins << " bins.\n";
-         joint_histograms[joint_str] = vector<int>();
+			ConcatString joint_str = data_info->magic_str();
+			joint_str.add("_");
+			joint_str.add(joint_info->magic_str());
+			mlog << Debug(2)
+				<< "Initializing " << joint_str << " joint histogram with "
+				<< n_bins << " x " << n_joint_bins << " bins.\n";
+			joint_histograms[joint_str] = vector<int>();
 
-         init_joint_pdf(n_bins, n_joint_bins,
-                        joint_histograms[joint_str]);
-      } // end  for j_var
-   } // end for i_var
+			init_joint_pdf(n_bins, n_joint_bins,
+					joint_histograms[joint_str]);
+		} // end  for j_var
+	} // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(void) {
-   int n;
-   ConcatString cs;
+	ConcatString cs;
 
-   // Create NetCDF file
-   nc_out = open_ncfile(out_file.c_str(), true);
+	// Create NetCDF file
+	nc_out = open_ncfile(out_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
-      mlog << Error << "\nsetup_nc_file() -> "
-           << "trouble opening output NetCDF file "
-           << out_file << "\n\n";
-      exit(1);
-   }
+	if(IS_INVALID_NC_P(nc_out)) {
+		mlog << Error << "\nsetup_nc_file() -> "
+			<< "trouble opening output NetCDF file "
+			<< out_file << "\n\n";
+		exit(1);
+	}
 
-   // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name,
-                       NULL, NULL, conf_info.desc.c_str());
-   add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
-                                (string)conf_info.mask_grid_name :
-                                na_str));
-   add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
-                                (string)conf_info.mask_poly_name :
-                                na_str));
+	// Add global attributes
+	write_netcdf_global(nc_out, out_file.c_str(), program_name,
+			NULL, NULL, conf_info.desc.c_str());
+	add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
+				(string)conf_info.mask_grid_name :
+				na_str));
+	add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
+				(string)conf_info.mask_poly_name :
+				na_str));
 
-   // Add time range information to the global attributes
-   add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
-   add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
-   add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
-   add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
-   add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
-   add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
+	// Add time range information to the global attributes
+	add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
+	add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
+	add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
+	add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
+	add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
+	add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
 
-   // Write the grid size, mask size, and series length
-   write_nc_var_int("grid_size", "number of grid points", grid.nxy());
-   write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
-   write_nc_var_int("n_series", "length of series", n_series);
+	// Write the grid size, mask size, and series length
+	write_nc_var_int("grid_size", "number of grid points", grid.nxy());
+	write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
+	write_nc_var_int("n_series", "length of series", n_series);
 
-   // Compression level
-   int deflate_level = compress_level;
-   if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+	// Compression level
+	int deflate_level = compress_level;
+	if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+	for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *data_info = conf_info.data_info[i_var];
+		VarInfo *data_info = conf_info.data_info[i_var];
 
-      // Set variable NetCDF name
-      ConcatString var_name = data_info->name_attr();
-      var_name.add("_");
-      var_name.add(data_info->level_attr());
+		// Set variable NetCDF name
+		ConcatString var_name = data_info->name_attr();
+		var_name.add("_");
+		var_name.add(data_info->level_attr());
 
-      // Define histogram dimensions
-      NcDim var_dim = add_dim(nc_out, var_name,
-                              (long) data_info->n_bins());
-      data_var_dims.push_back(var_dim);
+		// Define histogram dimensions
+		NcDim var_dim = add_dim(nc_out, var_name,
+				(long) data_info->n_bins());
+		data_var_dims.push_back(var_dim);
 
-      // Define histogram bins
-      ConcatString var_min_name = var_name;
-      ConcatString var_max_name = var_name;
-      ConcatString var_mid_name = var_name;
-      var_min_name.add("_min");
-      var_max_name.add("_max");
-      var_mid_name.add("_mid");
-      NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
-                              deflate_level);
-      NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
-                              deflate_level);
-      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
-                              deflate_level);
+		// Define histogram bins
+		ConcatString var_min_name = var_name;
+		ConcatString var_max_name = var_name;
+		ConcatString var_mid_name = var_name;
+		var_min_name.add("_min");
+		var_max_name.add("_max");
+		var_mid_name.add("_mid");
+		NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
+				deflate_level);
+		NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
+				deflate_level);
+		NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
+				deflate_level);
 
-      // Add variable attributes
-      cs << cs_erase << "Minimum value of " << var_name << " bin";
+		// Add variable attributes
+		cs << cs_erase << "Minimum value of " << var_name << " bin";
       add_var_att_local(&var_min, "long_name", cs);
       add_var_att_local(&var_min, "units", data_info->units_attr());
 

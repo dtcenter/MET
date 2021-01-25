@@ -86,7 +86,6 @@ void load_tc_basin(const ConcatString &basin_file, Grid &grid,
    ConcatString file_name;
    LongArray dim;
    NcVarInfo *vi;
-   int i;
 
    // Get the path for the distance to land file
    file_name = replace_path(basin_file);

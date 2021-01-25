@@ -580,7 +580,6 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 void TCGenConfInfo::process_config() {
    Dictionary *dict = (Dictionary *) 0;
    TCGenVxOpt vx_opt;
-   bool status;
    int i, beg, end;
 
    // Conf: init_freq
@@ -772,7 +771,7 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
-   double x_dbl, y_dbl, dist;
+   double x_dbl, y_dbl;
    int x, y, i;
 
    // Load the basin data, if needed.

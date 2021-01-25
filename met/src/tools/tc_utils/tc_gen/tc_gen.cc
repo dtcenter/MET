@@ -690,14 +690,13 @@ void get_atcf_files(const StringArray &source,
 void process_fcst_tracks(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray  &fcst_ga) {
-   int i, j, k;
+   int i, j;
    int n_lines, tot_lines, tot_tracks, n_genesis;
    ConcatString suffix;
    LineDataFile f;
    ATCFTrackLine line;
    TrackInfoArray fcst_ta;
    GenesisInfo fcst_gi;
-   bool keep;
 
    int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
 

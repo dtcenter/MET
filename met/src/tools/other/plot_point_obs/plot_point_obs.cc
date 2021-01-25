@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_obs(const char *point_obs_filename) {
-   int i, h, v;
+   int h, v;
    int   obs_hid_block[DEF_NC_BUFFER_SIZE];
    int   obs_vid_block[DEF_NC_BUFFER_SIZE];
    int   obs_qty_block[DEF_NC_BUFFER_SIZE];
@@ -381,7 +381,6 @@ void process_point_obs(const char *point_obs_filename) {
 
       int typ_idx, sid_idx, vld_idx;
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
-         int str_length;
 
          if(use_obs_arr) {
              for(int j=0; j < obs_arr_len; j++) {
