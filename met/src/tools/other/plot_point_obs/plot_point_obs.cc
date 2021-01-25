@@ -230,10 +230,6 @@ void process_point_obs(const char *point_obs_filename) {
    // Get the corresponding header:
    //   message type, staton_id, valid_time, and lat/lon/elv
    NcHeaderData header_data = get_nc_hdr_data(obsVars);
-   int strl_len = header_data.strl_len;
-   int typ_len  = header_data.typ_len;
-   int sid_len  = header_data.sid_len;
-   int vld_len  = header_data.vld_len;
 
    bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
    bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);

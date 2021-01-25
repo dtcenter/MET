@@ -1836,7 +1836,6 @@ static void get_grid_mapping_latlon(
    for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
    for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
 
-   clock_t start_loop =  clock();
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
