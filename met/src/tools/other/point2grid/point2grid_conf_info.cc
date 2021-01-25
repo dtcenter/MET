@@ -124,6 +124,29 @@ void PointToGridConfInfo::process_config() {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
+   ConcatString var_id;
+   
+   map<ConcatString,ConcatString>::iterator ptr;
+   for (ptr=var_name_map.begin(); ptr != var_name_map.end(); ptr++) {
+      if( ptr->second == var_name ) {
+         var_id = ptr->first;
+         break;
+      }
+   }
+   if( var_id.empty() ) {
+      for (ptr=def_var_name_map.begin(); ptr != var_name_map.end(); ptr++) {
+         if( ptr->second == var_name ) {
+            var_id = ptr->first;
+            break;
+         }
+      }
+   }
+   return var_id;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString PointToGridConfInfo::get_var_name(const ConcatString var_name) {
    ConcatString out_var;
    ConcatString t_name;

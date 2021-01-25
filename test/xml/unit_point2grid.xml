@@ -30,6 +30,20 @@
     </output>
   </test>
 
+  <test name="point2grid_ascii2nc_surfrad_DW_PSP_by_name">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/ascii2nc/surfrad.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/surfrad_to_G212_by_name.nc \
+      -field 'name="DW_PSP"; level="*";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/surfrad_to_G212_by_name.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
@@ -157,7 +171,7 @@
       -field 'name="AOD_Smoke";  level="(*,*)";' \
       -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20192662141196_e20192662143569_c20192662144526.nc \
       -qc 1,2 -method MAX \
-      -v 5:warning
+      -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP.nc</grid_nc>
@@ -202,20 +216,20 @@
     </output>
   </test>
 
-  <test name="point2grid_NCCF_TO_G231">
+  <test name="point2grid_NCCF_UK">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
       <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/point_obs/UKMet_tripolar/prodm_op_am-hr.gridT_20200907_00.036_temp.nc \
-      G231 \
-      &OUTPUT_DIR;/point2grid/point2grid_NCCF_TO_G231.nc \
+      "latlon 500 300 40 -30 0.1 0.1" \
+      &OUTPUT_DIR;/point2grid/point2grid_NCCF_UKMet.nc \
       -field 'name="votemper";  level="(0,0,*,*)";' \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_NCCF_TO_G231.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_NCCF_UKMet.nc</grid_nc>
     </output>
   </test>
 
@@ -234,6 +248,23 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_unsigned.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_2D_time">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/VOLCAT_HIMAWARI-8_FLDK_s2020296_173000_v300250_VCB_w167_FLDK_b2020295_204000_g001.nc \
+      "latlon 150 150 45 155 0.1 0.1" \
+      &OUTPUT_DIR;/point2grid/point2grid_2D_time_west_bering_sea.nc \
+      -field 'name="brightness_temperature_4micron"; level="(*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_2D_time_west_bering_sea.nc</grid_nc>
     </output>
   </test>
 </met_test>

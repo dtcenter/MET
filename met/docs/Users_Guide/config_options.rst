@@ -1117,7 +1117,7 @@ of several entires defining the climatology file names and fields to be used.
   
      time_interp_method = DW_MEAN;
      day_interval       = 31;
-     hour_interal       = 6;
+     hour_interval      = 6;
   }
 
 **climo_stdev**
