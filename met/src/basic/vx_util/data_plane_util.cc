@@ -606,7 +606,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
 
 DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
                      const DataPlane &sd) {
-   DataPlane cdf = dp;
+   DataPlane cdf = mn;
    double v;
 
    // Check grid dimensions
