@@ -1070,7 +1070,7 @@ void process_scores() {
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-            write_nc((string)"CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
+            write_nc((string)"CLIMO_CDF", normal_cdf(obs_dp, cmn_dp, csd_dp),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
 
