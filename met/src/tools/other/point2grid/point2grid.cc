@@ -18,6 +18,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    12-11-19  Howard Soh     Support GOES-16
+//   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 
-//#include "GridTemplate.h"
 #include "point2grid_conf_info.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,8 @@ static const int        LEVEL_FOR_PERFORMANCE = 6;
 
 static const char * default_config_filename = "MET_BASE/config/Point2GridConfig_default";
 
-static const string lat_dim_name_list = "x";    // "lat,latitude";
-static const string lon_dim_name_list = "y";    // "lon,longitude";
+static const string lat_dim_name_list = "x"; // "lat,latitude";
+static const string lon_dim_name_list = "y"; // "lon,longitude";
 
 static const char * GOES_global_attr_names[] = {
       "naming_authority",
@@ -150,12 +150,9 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
                                Grid to_grid, IntArray *cellMapping);
 
-//static bool keep_message_type(const char *mt_str);
 static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(NcFile *nc_in);
-//static int  get_lat_dim_offset(NcVar *);
-//static int  get_lon_dim_offset(NcVar *);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -295,7 +292,8 @@ void process_command_line(int argc, char **argv) {
          vname = vinfo->name();
          if (var_names.has(vname)) {
             mlog << Error << "\n" << method_name
-                 << "Please add -name argument to avoid the output name conflicts on handling the variable \""
+                 << "Please add -name argument to avoid the output name "
+                 << "conflicts on handling the variable \""
                  << vname << "\" multiple times.\n\n";
             usage();
          }
@@ -333,7 +331,7 @@ void process_data_file() {
    GrdFileType ftype;
    ConcatString run_cs;
    NcFile *nc_in = (NcFile *)0;
-   static const char *method_name = "process_data_file() ";
+   static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
    MetConfig config;
@@ -350,7 +348,7 @@ void process_data_file() {
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
    nc_in = open_ncfile(InputFilename.c_str());
    
-   //Get the obs type before opening NetCDF
+   // Get the obs type before opening NetCDF
    int obs_type = get_obs_type(nc_in);
    bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
 
@@ -362,7 +360,7 @@ void process_data_file() {
    fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!fr_mtddf) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "\"" << InputFilename << "\" not a valid data file\n\n";
       exit(1);
    }
@@ -376,7 +374,7 @@ void process_data_file() {
    vinfo = v_factory.new_var_info(ftype);
 
    if(!vinfo) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "unable to determine file type of \"" << InputFilename
            << "\"\n\n";
       exit(1);
@@ -417,7 +415,8 @@ void process_data_file() {
    }
    else {
       mlog << Error << "\n" << method_name
-           << "Please check the input file. Only supports GOES, MET point obs. and CF complaint NetCDF with time/lat/lon variables.\n\n";
+           << "Please check the input file. Only supports GOES, MET point obs, "
+           << "and CF complaint NetCDF with time/lat/lon variables.\n\n";
       exit(1);
    }
 
@@ -529,7 +528,8 @@ int get_obs_type(NcFile *nc) {
          obs_type = TYPE_GOES_ADP;
          input_type = "GOES_ADP";
          if (!file_exists(AdpFilename.c_str())) {
-            mlog << Error << method_name << "ADP input \"" << AdpFilename << "\" does not exist!\n";
+            mlog << Error << "\n" << method_name
+                 << "ADP input \"" << AdpFilename << "\" does not exist!\n\n";
             exit(1);
          }
       }
@@ -569,8 +569,9 @@ void prepare_message_types(const StringArray hdr_types) {
          msg_list_str << message_type_str;
       }
       if (0 == message_type_list.n()) {
-         mlog << Error << method_name << " No matching message types ["
-              << msg_list_str << "].\n";
+         mlog << Error << "\n" << method_name
+              << "No matching message types ["
+              << msg_list_str << "].\n\n";
          exit(1);
       }
    }
@@ -637,7 +638,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    int *obs_hids = new int[nobs];
    float *hdr_lats = new float[nhdr];
    float *hdr_lons = new float[nhdr];
-   //float *hdr_elvs[nhdr] = new float[nhdr];
    float *obs_lvls = new float[nobs];
    float *obs_hgts = new float[nobs];
    float *obs_vals = new float[nobs];
@@ -683,7 +683,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
    if (success_to_read)
       success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
-   //if (!get_nc_data_float_array(nc_in, nc_var_hdr_elv, hdr_elvs)) exit(1);
    if (success_to_read)
       success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
    if (success_to_read)
@@ -700,18 +699,22 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
 
-      // Initialize configuration object
-
+      // Initialize size and values of output fields
       nx = to_grid.nx();
       ny = to_grid.ny();
       to_dp.set_size(nx, ny);
+      to_dp.set_constant(bad_data_double);
       cnt_dp.set_size(nx, ny);
+      cnt_dp.set_constant(0);
       mask_dp.set_size(nx, ny);
+      mask_dp.set_constant(0);
       if (has_prob_thresh || do_gaussian_filter) {
          prob_dp.set_size(nx, ny);
+         prob_dp.set_constant(0);
          prob_mask_dp.set_size(nx, ny);
+         prob_mask_dp.set_constant(0);
       }
-
+      
       // Loop through the requested fields
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
@@ -797,7 +800,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             mlog << Error << "\n" << method_name
                  << error_msg
                  << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
-                 << "\t" << log_msg <<"\n\n";
+                 << "\t" << log_msg << "\n\n";
             exit(1);
          }
 
@@ -832,7 +835,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                if (obs_time > valid_time) valid_time = obs_time;
             }
          }
-         mlog << Debug(3) << method_name << " valid_time from "
+         mlog << Debug(3) << method_name << "valid_time from "
               << (valid_time_from_config ? "config" : "input data") << ": "
               << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
 
@@ -855,7 +858,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                  ? conf_info.get_var_name(vinfo->name())
                  : conf_info.get_var_name(VarNameSA[i]);
          mlog << Debug(4) << method_name
-              << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
+              << "var: " << vname << ", index: " << var_idx_or_gc << ".\n";
 
          var_count = var_count2 = to_count = 0;
          filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
@@ -907,6 +910,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             float from_min_value =  10e10;
             float from_max_value = -10e10;
 
+            // Initialize counter and output fields
             to_count = 0;
             to_dp.set_constant(bad_data_double);
             cnt_dp.set_constant(0);
@@ -984,7 +988,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                                 << ", mean: " << dataArray.sum()/data_count
                                 << " from " << data_count << " data values.\n";
                         }
-                        mlog << Debug(8) << method_name << " data at " << x_idx << "," << y_idx
+                        mlog << Debug(8) << method_name << "data at " << x_idx << "," << y_idx
                              << ", value: " << to_value << "\n";
                      }
                   }
@@ -1042,7 +1046,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
          vinfo->set_long_name(var_long_name.c_str());
 
-         mlog << Debug(7) << method_name << " obs_count_zero_to: " << obs_count_zero_to
+         mlog << Debug(7) << method_name << "obs_count_zero_to: " << obs_count_zero_to
               << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
 
          ConcatString log_msg;
@@ -1072,22 +1076,20 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
          if (0 == var_count) {
             if (0 == filtered_count) {
-               mlog << Error << method_name << " No valid data for the variable ["
-                    << vinfo->name() << "]\n";
+               mlog << Warning << "\n" << method_name
+                    << "No valid data for the variable ["
+                    << vinfo->name() << "]\n\n";
             }
             else {
-               mlog << Error << method_name << " No valid data after filtering.\n\t"
-                    << log_msg << ".\n";
+               mlog << Warning << "\n" << method_name
+                    << "No valid data after filtering.\n\t"
+                    << log_msg << ".\n\n";
             }
-            exit(1);
          }
          else {
-            mlog << Debug(2) << method_name << " var_count=" << var_count
+            mlog << Debug(2) << method_name << "var_count=" << var_count
                  << ", grid: " << to_count << " out of " << (nx * ny) << "  "
-                 << (0 < filtered_count ? log_msg.c_str() : " ")
-                 //<< ",    Obs_value] zero: " << obs_count_zero_from
-                 //<< ", non_zero: " <<obs_count_non_zero_from
-                 << "\n";
+                 << (0 < filtered_count ? log_msg.c_str() : " ") << "\n";
          }
       } // end for i
 
@@ -1295,7 +1297,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    int to_cell_cnt = 0;
    clock_t start_clock =  clock();
    Grid fr_grid = fr_mtddf->grid();
-   static const char *method_name = "regrid_nc_variable() --> ";
+   static const char *method_name = "regrid_nc_variable() -> ";
 
    NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
    if (IS_INVALID_NC(var_data)) {
@@ -1309,8 +1311,10 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    int from_lon_cnt = fr_grid.nx();
    int from_data_size = from_lat_cnt * from_lon_cnt;
    if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
-      mlog << Error << "\n" << method_name << "Trouble reading data \"" 
-           << vinfo->name() << "\" from file \"" << InputFilename << "\"\n\n";
+      mlog << Error << "\n" << method_name
+           << "Trouble reading data \""
+           << vinfo->name() << "\" from file \""
+           << InputFilename << "\"\n\n";
       exit(1);
    }
    else {
@@ -1397,7 +1401,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       
       delete [] from_data;
       
-      mlog << Debug(4) << method_name << " Count] data cells: " << to_cell_cnt
+      mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
            << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
            << ", non mapped cells: " << no_map_cnt
            << " out of " << (to_lat_cnt*to_lon_cnt)
@@ -1566,7 +1570,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
    NcFile *nc_adp = (NcFile *)0;
-   static const char *method_name = "process_goes_file() ";
+   static const char *method_name = "process_goes_file() -> ";
 
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
@@ -1577,7 +1581,8 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    if (0 < AdpFilename.length() && file_exists(AdpFilename.c_str())) {
       nc_adp = open_ncfile(AdpFilename.c_str());
       if (IS_INVALID_NC_P(nc_adp)) {
-         mlog << Error << method_name << "Can't open the ADP input \"" << AdpFilename << "\"\n";
+         mlog << Error << "\n" << method_name
+              << "Can't open the ADP input \"" << AdpFilename << "\"\n\n";
          exit(1);
       }
       else if (is_time_mismatch(nc_in, nc_adp)) {
@@ -1712,11 +1717,11 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    float max_lat=-90.0;
    float min_lon=360.0;
    float max_lon=-360.0;
-   static const char *method_name = "check_lat_lon() ";
+   static const char *method_name = "check_lat_lon() -> ";
    for (int idx=0; idx<data_size; idx++) {
       if (cnt_printed < 10 && latitudes[idx] > MISSING_LATLON
           && longitudes[idx] > MISSING_LATLON) {
-         mlog << Debug(7) << method_name << " index: " << idx <<  " lat: "
+         mlog << Debug(7) << method_name << "index: " << idx <<  " lat: "
               << latitudes[idx] << ", lon: " << longitudes[idx] << "\n";
          cnt_printed++;
       }
@@ -1736,15 +1741,15 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    mlog << Debug(7) << method_name << "Count: missing -> lat: " << cnt_missing_lat
         << ", lon: " << cnt_missing_lon << "   invalid -> lat: "
         << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
-        << method_name << "  LAT: " << min_lat << " to " << max_lat << "\n"
-        << method_name << " LONG: " << min_lon << " to " << max_lon << "\n";
+        << method_name << "LAT: " << min_lat << " to " << max_lat << "\n"
+        << method_name << "LONG: " << min_lon << " to " << max_lon << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
    unixtime obs_time = bad_data_int;
-   static const char *method_name = "compute_unixtime() ";
+   static const char *method_name = "compute_unixtime() -> ";
 
    if (IS_VALID_NC_P(time_var)) {
       int sec_per_unit;
@@ -1765,11 +1770,12 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
                              const float *hdr_lats, const float *hdr_lons) {
    bool status = false;
    clock_t start_clock =  clock();
-   static const char *method_name = "get_grid_mapping(MET_obs) ";
+   static const char *method_name = "get_grid_mapping(MET_obs) -> ";
 
    int obs_count = obs_index_array.n();
    if (0 == obs_count) {
-      mlog << Warning << method_name << " no valid point observation data\n";
+      mlog << Warning << "\n" << method_name
+           << "no valid point observation data!\n\n";
       return status;
    }
 
@@ -1801,10 +1807,11 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
    }
 
    if (0 == count_in_grid)
-      mlog << Warning << method_name << " no valid point observation data within to grid\n";
+      mlog << Warning << "\n" << method_name
+           << "no valid point observation data within to grid\n\n";
    else {
       status = true;
-      mlog << Debug(3) << method_name << " count in grid: " << count_in_grid
+      mlog << Debug(3) << method_name << "count in grid: " << count_in_grid
            << " out of " << obs_count << " ("
            << ((obs_count > 0) ? 1.0*count_in_grid/obs_count*100 : 0) << "%)\n";
    }
@@ -1829,7 +1836,7 @@ static void get_grid_mapping_latlon(
    int to_lon_count = to_grid.nx();
    int to_size  = to_lat_count * to_lon_count;
    int data_size  = from_lat_count * from_lon_count;
-   static const char *method_name = "get_grid_mapping(lats, lons) ";
+   static const char *method_name = "get_grid_mapping(lats, lons) -> ";
 
    int *to_cell_counts = new int[to_size];
    int *mapping_indices = new int[data_size];
@@ -1873,9 +1880,10 @@ static void get_grid_mapping_latlon(
          if( max_count < cell_count ) max_count = cell_count;
       }
       else if( cell_count < 0 ) {
-         mlog << Error << method_name
+         mlog << Error << "\n" << method_name
               << "the mapping cell count can not be negative "
-              << cell_count << " at " << xIdx << "\n";
+              << cell_count << " at " << xIdx << "\n\n";
+         exit(1);
       }
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE+1) << method_name << "took "
@@ -1887,15 +1895,17 @@ static void get_grid_mapping_latlon(
       to_offset = mapping_indices[xIdx];
       if( to_offset == bad_data_int ) continue;
       if( to_offset < 0 || to_offset >= to_size ) {
-         mlog << Error << method_name << "the mapped cell is out of range: "
-              << to_offset << " at " << xIdx << "\n";
+         mlog << Error << "\n" << method_name
+              << "the mapped cell is out of range: "
+              << to_offset << " at " << xIdx << "\n\n";
+         exit(1);
       }
       else cellMapping[to_offset].add(xIdx);
    }
    delete [] to_cell_counts;
    delete [] mapping_indices;
 
-   mlog << Debug(3) << method_name << " within grid: " << count_in_grid
+   mlog << Debug(3) << method_name << "within grid: " << count_in_grid
         << " out of " << data_size << " (" << 1.0*count_in_grid/data_size*100 << "%)\n";
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1909,7 +1919,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
    clock_t start_clock =  clock();
-   static const char *method_name = "get_grid_mapping(var_lat, var_lon) ";
+   static const char *method_name = "get_grid_mapping(var_lat, var_lon) -> ";
 
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
@@ -1918,7 +1928,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
    // Override the from nx & ny from NetCDF if exists
    int data_size  = from_lat_count * from_lon_count;
-   mlog << Debug(4) << method_name << " data_size (ny*nx): " << data_size
+   mlog << Debug(4) << method_name << "data_size (ny*nx): " << data_size
         << " = " << from_lat_count << " * " << from_lon_count << "\n"
         << "                    target grid (nx,ny): " << to_lon_count * to_lat_count
         << " = " << to_lon_count << " * " << to_lat_count << "\n";
@@ -1926,10 +1936,16 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    from_dp.set_size(from_lon_count, from_lat_count);
    to_dp.set_size(to_lon_count, to_lat_count);
 
-   if (IS_INVALID_NC(var_lat))
-      mlog << Error << method_name << " Fail to get latitudes\n";
-   else if (IS_INVALID_NC(var_lon))
-      mlog << Error << method_name << " Fail to get longitudes\n";
+   if (IS_INVALID_NC(var_lat)) {
+      mlog << Error << "\n" << method_name
+           << "Fail to get latitudes!\n\n";
+      exit(1);
+   }
+   else if (IS_INVALID_NC(var_lon)) {
+      mlog << Error << "\n" << method_name
+           << "Fail to get longitudes!\n\n";
+      exit(1);
+   }
    else if (data_size > 0) {
       float *latitudes  = new float[data_size];
       float *longitudes = new float[data_size];
@@ -1952,7 +1968,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
 static unixtime find_valid_time(NcVar time_var) {
    unixtime valid_time = bad_data_int;
-   static const char *method_name = "find_valid_time() ";
+   static const char *method_name = "find_valid_time() -> ";
 
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
@@ -1962,14 +1978,14 @@ static unixtime find_valid_time(NcVar time_var) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
       }
       else {
-         mlog << Error << "\n" << method_name << "-> "
+         mlog << Error << "\n" << method_name
               << "Can not read \"" << GET_NC_NAME(time_var)
               << "\" variable from \"" << InputFilename << "\"\n\n";
       }
    }
 
    if (valid_time == bad_data_int) {
-      mlog << Error << "\n" << method_name << "-> "
+      mlog << Error << "\n" << method_name
            << "trouble finding time variable from \""
            << InputFilename << "\"\n\n";
       exit(1);
@@ -2003,7 +2019,7 @@ ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
 
 void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                       ConcatString geostationary_file) {
-   static const char *method_name = "get_grid_mapping() ";
+   static const char *method_name = "get_grid_mapping() -> ";
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
 
@@ -2032,7 +2048,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    // Override the from nx & ny from NetCDF if exists
    NcFile *coord_nc_in = (NcFile *)0;
    if (has_coord_input) {
-      mlog << Debug(2)  << method_name << " Reading coord file: " << cur_coord_name << "\n";
+      mlog << Debug(2)  << method_name << "Reading coord file: " << cur_coord_name << "\n";
       coord_nc_in = open_ncfile(cur_coord_name.c_str());
       if (IS_VALID_NC_P(coord_nc_in)) {
          from_lat_count = get_lat_count(coord_nc_in);
@@ -2040,7 +2056,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       }
    }
    int data_size  = from_lat_count * from_lon_count;
-   mlog << Debug(4) << method_name << " data_size (ny*nx): " << data_size
+   mlog << Debug(4) << method_name << "data_size (ny*nx): " << data_size
         << " = " << from_lat_count << " * " << from_lon_count << "\n"
         << "                    target grid (nx,ny): " << to_lon_count * to_lat_count
         << " = " << to_lon_count << " * " << to_lat_count << "\n";
@@ -2097,9 +2113,10 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                    if ((latitudes[idx] > MISSING_LATLON) && (tmp_lats[idx] > MISSING_LATLON)) {
                       if (!is_eq(latitudes[idx], tmp_lats[idx], loose_tol)) {
                          lat_mis_matching_count++;
-                         mlog << Warning << method_name << "diff lat at " << idx
-                              << "  binary-computing: " << latitudes[idx] << " - "
-                              << tmp_lats[idx] << " = " << (latitudes[idx]-tmp_lats[idx]) << "\n";
+                         mlog << Warning << "\n" << method_name
+                              << "diff lat at " << idx << "  binary-computing: "
+                              << latitudes[idx] << " - " << tmp_lats[idx] << " = "
+                              << (latitudes[idx]-tmp_lats[idx]) << "\n\n";
                       }
                       else lat_matching_count++;
                    }
@@ -2107,18 +2124,20 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                    if ((longitudes[idx] > MISSING_LATLON) && (tmp_lons[idx] > MISSING_LATLON)) {
                       if (!is_eq(longitudes[idx], tmp_lons[idx], loose_tol)) {
                          lon_mis_matching_count++;
-                         mlog << Warning << method_name << "diff lon at " << idx
-                              << "  binary-computing: " << longitudes[idx] << " - "
-                              << tmp_lons[idx] << " = " << (longitudes[idx]-tmp_lons[idx]) << "\n";
+                         mlog << Warning << "\n" << method_name
+                              << "diff lon at " << idx << "  binary-computing: "
+                              << longitudes[idx] << " - " << tmp_lons[idx] << " = "
+                              << (longitudes[idx]-tmp_lons[idx]) << "\n\n";
                       }
                       else lon_matching_count++;
                    }
                    else lon_matching_count++;
                }
                if ((lon_mis_matching_count > 0) || (lat_mis_matching_count > 0)) {
-                  mlog << Warning << method_name << "mis-matching: lon = " << lon_mis_matching_count
+                  mlog << Warning << "\n" << method_name
+                       << "mis-matching: lon = " << lon_mis_matching_count
                        << "  lat =  " << lat_mis_matching_count << "   matched:  lon = "
-                       << lon_matching_count << "  lat =  " << lat_matching_count << "\n";
+                       << lon_matching_count << "  lat =  " << lat_matching_count << "\n\n";
                }
             }
          }
@@ -2135,10 +2154,14 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
             }
          }
       }
-      if (0 == latitudes)
-         mlog << Error << method_name << " Fail to get latitude\n";
-      else if (0 == longitudes)
-         mlog << Error << method_name << " Fail to get longitudes\n";
+      if (0 == latitudes) {
+         mlog << Error << "\n" << method_name
+              << "Fail to get latitudes!\n\n";
+      }
+      else if (0 == longitudes) {
+         mlog << Error << "\n" << method_name
+              << "Fail to get longitudes!\n\n";
+      }
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
@@ -2185,7 +2208,8 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
        var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
    }
    if (IS_INVALID_NC(var_data)) {
-      mlog << Error << "The variable \"" << var_name << "\" does not exist\n";
+      mlog << Error << "\nget_goes_nc_var() -> "
+           << "The variable \"" << var_name << "\" does not exist\n\n";
       if (exit_if_error) exit(1);
    }
    return var_data;
@@ -2245,7 +2269,10 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
                   << aod_end_time << " != " << adp_end_time << "\n";
    }
    if (time_mismatch) {
-      mlog << Error << "The ADP input does not match with AOD input\n" << log_message;
+      mlog << Error << "\nis_time_mismatch() -> "
+           << "The ADP input does not match with AOD input: "
+           << log_message << "\n\n";
+      exit(1);
    }
    return time_mismatch;
 }
@@ -2272,7 +2299,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    uchar *adp_data = new uchar[from_data_size];
    float *from_data = new float[from_data_size];
    unsigned short *adp_qc_data = new unsigned short[from_data_size];
-   static const char *method_name = "regrid_goes_variable() ";
+   static const char *method_name = "regrid_goes_variable() -> ";
 
    // -99 is arbitrary number as invalid QC value
    memset(qc_data, -99, from_data_size*sizeof(uchar));
@@ -2281,10 +2308,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    NcVar var_adp;
    NcVar var_adp_qc;
    NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
-   //if (IS_INVALID_NC(var_data)) {
-   //   mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
-   //   exit(1);
-   //}
    bool is_dust_only = false;
    bool is_smoke_only = false;
    string actual_var_name = GET_NC_NAME(var_data);
@@ -2315,11 +2338,15 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                     << " for " << GET_NC_NAME(var_adp) << ".\n";
             }
          }
-         else mlog << Warning << method_name << "found QC var name (" << qc_var_name
-                   << " for " << GET_NC_NAME(var_adp) << ") but does not exist.\n";
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "QC var name (" << qc_var_name
+                 << " for " << GET_NC_NAME(var_adp)
+                 << ") does not exist.\n\n";
+         }
       }
    }
-   mlog << Debug(5) << method_name << " is_dust: " << is_dust_only
+   mlog << Debug(5) << method_name << "is_dust: " << is_dust_only
         << ", is_smoke: " << is_smoke_only << "\n";
 
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
@@ -2330,8 +2357,11 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
          has_qc_var = true;
          mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
       }
-      else mlog << Warning << method_name << "found QC var name ("
-                << qc_var_name << ") but does not exist.\n";
+      else {
+         mlog << Warning << "\n" << method_name
+              << "QC var name (" << qc_var_name
+              << ") does not exist.\n";
+      }
    }
 
    get_nc_data(&var_data, (float *)from_data);
@@ -2352,7 +2382,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
-   // int global_attr_count;
    float data_value;
    float from_min_value =  10e10;
    float from_max_value = -10e10;
@@ -2388,7 +2417,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   if (from_max_value < data_value) from_max_value = data_value;
                }
 
-               //Filter by QC flag
+               // Filter by QC flag
                qc_value = qc_data[from_index];
                if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
                   for(int i=0; i<vinfo->censor_thresh().n(); i++) {
@@ -2438,7 +2467,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   if (0 == data_count % 2)
                      to_value = (to_value + dataArray[(data_count/2)+1])/2;
                }
-               else to_value = dataArray.sum() / data_count;    // UW_Mean
+               else to_value = dataArray.sum() / data_count; // UW_Mean
 
                to_dp.set(to_value, xIdx, yIdx);
                to_cell_count++;
@@ -2459,7 +2488,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
-   mlog << Debug(4) << method_name << " Count: actual: " << to_cell_count
+   mlog << Debug(4) << method_name << "Count: actual: " << to_cell_count
         << ", missing: " << missing_count << ", non_missing: " << non_missing_count
         << "\n\tFiltered: by QC: " << qc_filtered_count
         << ", by adp QC: " << adp_qc_filtered_count
@@ -2468,8 +2497,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
         << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
 
-   if (to_cell_count == 0)
-      mlog << Warning << method_name << " No valid data\n";
+   if (to_cell_count == 0) {
+      mlog << Warning << "\n" << method_name
+           << "No valid data!\n\n";
+   }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -2483,7 +2514,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    bool has_error = false;
    int deflate_level = 0;
    clock_t start_clock =  clock();
-   static const char *method_name = "save_geostationary_data() ";
+   static const char *method_name = "save_geostationary_data() -> ";
 
    NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
    NcDim xdim = add_dim(nc_file, dim_name_lon, grid_data.nx);
@@ -2504,7 +2535,8 @@ static void save_geostationary_data(const ConcatString geostationary_file,
       add_att(&lat_var, "dy_rad", grid_data.dy_rad);
       if(!put_nc_data((NcVar *)&lat_var, latitudes)) {
          has_error = true;
-         mlog << Error << "Can not save latitudes\n";
+         mlog << Warning << "\nsave_geostationary_data() -> "
+              << "Cannot save latitudes!\n\n";
       }
    }
    if (IS_VALID_NC(lon_var)) {
@@ -2519,7 +2551,8 @@ static void save_geostationary_data(const ConcatString geostationary_file,
       add_att(&lon_var, "dx_rad", grid_data.dx_rad);
       if(!put_nc_data((NcVar *)&lon_var, longitudes)) {
          has_error = true;
-         mlog << Error << "Can not save longitudes\n";
+         mlog << Warning << "\nsave_geostationary_data() -> "
+              << "Cannot save longitudes!\n\n";
       }
    }
 
@@ -2527,7 +2560,8 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 
    if (has_error) {
       remove(geostationary_file.c_str());
-      mlog << Warning << "The geostationary data file ("
+      mlog << Warning << "\nsave_geostationary_data() -> "
+           << "The geostationary data file ("
            << geostationary_file << ") was not saved!\n";
    }
    else {
@@ -2578,7 +2612,7 @@ bool has_lat_lon_vars(NcFile *nc) {
    bool has_lon_var = IS_VALID_NC(get_nc_var_lon(nc));
    bool has_time_var = IS_VALID_NC(get_nc_var_time(nc));
 
-   //TODO: chech if this is a gridded data or a point data here!!!
+   //TODO: check if this is a gridded data or a point data here!!!
    mlog << Debug(7) << "has_lat_lon_vars() "
         << " has_lat_var: "  << has_lat_var
         << ", has_lon_var: " << has_lon_var
