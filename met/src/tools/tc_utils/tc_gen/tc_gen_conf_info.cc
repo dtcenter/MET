@@ -772,6 +772,7 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
 
 ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
    double x_dbl, y_dbl;
+
    int x, y, i;
 
    // Load the basin data, if needed.
