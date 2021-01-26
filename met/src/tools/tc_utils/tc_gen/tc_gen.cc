@@ -451,7 +451,7 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 
          // FALSE ALARM for both methods
          diff.DevCategory = FYONGenesis;
-         diff.OpsCategory = FYONGenesis;<<< develop
+         diff.OpsCategory = FYONGenesis;
       }
 
       // Unmatched BEST genesis (MISS)
