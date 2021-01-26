@@ -17,7 +17,7 @@ Version `10.0.0-beta3 <https://github.com/dtcenter/MET/projects/25>`_ release no
 
 * Repository and build:
 
-   * Update the MET unit test logic by unsetting environment variables after each test to provide a clean environment for the next test (`#1624 <http://github.com/dtcenter/MET/issues/1624>`_).
+   * Update the MET unit test logic by unsetting environment variables after each test to provide a clean environment for the next (`#1624 <http://github.com/dtcenter/MET/issues/1624>`_).
 
 * Documentation:
   
@@ -34,17 +34,17 @@ Version `10.0.0-beta3 <https://github.com/dtcenter/MET/projects/25>`_ release no
   
 * Application code:
 
-   * Enhance plot_point_obs to support regridding in the config file (`#1627 <http://github.com/dtcenter/MET/issues/1627>`_).
-   * Update ASCII2NC and Point2Grid to print a warning message for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
+   * Enhance Plot-Point-Obs to support regridding in the config file (`#1627 <http://github.com/dtcenter/MET/issues/1627>`_).
+   * Update ASCII2NC and Point2Grid to create empty output files for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
    * Point2Grid Tool:
       * Improve the Point2Grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
       * Process point observations by variable name instead of GRIB code (`#1408 <http://github.com/dtcenter/MET/issues/1408>`_).
-      * Support the 2-dimensional time variable from Himawari data files (`#1580 <http://github.com/dtcenter/MET/issues/1580>`_).
+      * Support the 2-dimensional time variable in Himawari data files (`#1580 <http://github.com/dtcenter/MET/issues/1580>`_).
    * TC-Gen Tool:
       * Overhaul the Tropical Cyclone genesis matching logic, add the development and operational scoring algorithms, and add many config file options (`#1448 <http://github.com/dtcenter/MET/issues/1448>`_).
       * Add config file options to filter data by initialization time (init_inc and init_exc) and hurricane basin (basin_mask) (`#1626 <http://github.com/dtcenter/MET/issues/1626>`_).
       * Add the genesis matched pair (GENMPR) output line type (`#1597 <http://github.com/dtcenter/MET/issues/1597>`_).
-      * Add a gridded NetCDF output file with genesis event and track point counts (`#1430 <http://github.com/dtcenter/MET/issues/1430>`_).
+      * Add a gridded NetCDF output file with counts for genesis events and track points (`#1430 <http://github.com/dtcenter/MET/issues/1430>`_).
 
 Version `10.0.0-beta2 <https://github.com/dtcenter/MET/projects/24>`_ release notes (20201207)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
