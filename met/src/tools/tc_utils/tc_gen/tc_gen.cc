@@ -467,6 +467,7 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
          diff.DevCategory = FNOYGenesis;
          diff.OpsCategory = FNOYGenesis;
       }
+
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
       else {
 
@@ -690,14 +691,13 @@ void get_atcf_files(const StringArray &source,
 void process_fcst_tracks(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray  &fcst_ga) {
-   int i, j, k;
+   int i, j;
    int n_lines, tot_lines, tot_tracks, n_genesis;
    ConcatString suffix;
    LineDataFile f;
    ATCFTrackLine line;
    TrackInfoArray fcst_ta;
    GenesisInfo fcst_gi;
-   bool keep;
 
    int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
 
@@ -803,7 +803,117 @@ void process_fcst_tracks(const StringArray &files,
               << fcst_ga.n() << "] " << fcst_ga[i].serialize()
               << "\n";
       }
+
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
+      // Process the input track lines
+      while(f >> line) {
+
+         // Skip off-hour track points
+         if((line.valid_hour() % valid_freq_sec) != 0) continue;
+         
+         // Increment the line counter
+         n_lines++;
+
+         // Store all BEST track lines
+         if(line.is_best_track()) {
+            best_ta.add(line, false, true);
+         }
+         // Store only 0-hour operational track lines
+         else if(line.is_oper_track() && line.lead() == 0) {
+            oper_ta.add(line);
+         }
+      }
+
+      // Close the current file
+      f.close();
+
+   } // end for i
+
+   // Dump out the total number of lines
+   mlog << Debug(3)
+        << "Found a total of " << best_ta.n() << " "
+        << conf_info.BestEventInfo.Technique
+        << " tracks and " << oper_ta.n() << " "
+        << conf_info.OperTechnique
+        << " operational tracks, from " << n_lines
+        << " track lines, from " << files.n()
+        << " input files.\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 6) {
+      mlog << Debug(6) << "BEST tracks:\n"
+           << best_ta.serialize_r() << "\n"
+           << "Operational tracks:\n"
+           << oper_ta.serialize_r() << "\n";
    }
+
+   // Search the BEST tracks for genesis events
+   for(i=0; i<best_ta.n(); i++) {
+
+      // Attempt to define genesis
+      if(!best_gi.set(best_ta[i], conf_info.BestEventInfo)) {
+         continue;
+      }
+
+      // Check for duplicates
+      if(best_ga.has_storm(best_gi, i_bga)) {
+
+         // Determine the basin for this genesis event
+         gen_basin = conf_info.compute_basin(best_gi.lat(),
+                                             -1.0*best_gi.lon());
+
+         case_cs << cs_erase << "For duplicate "
+                 << unix_to_yyyymmdd_hhmmss(best_gi.genesis_time()) << " "
+                 << best_gi.technique() << " track genesis at ("
+                 << best_gi.lat() << ", " << best_gi.lon() << ") in the "
+                 << gen_basin << " basin, ";
+
+         // Keep existing storm id and discard the new one
+         if(gen_basin == best_ga[i_bga].basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_ga[i_bga].storm_id()
+                 << " and discard " << best_gi.storm_id()
+                 << ".\n";
+            best_ta.erase_storm_id(best_gi.storm_id());
+            oper_ta.erase_storm_id(best_gi.storm_id());
+            i--;
+            continue;
+         }
+         // Discard the existing storm id and add the new one
+         else if(gen_basin == best_gi.basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_gi.storm_id()
+                 << " and discard " << best_ga[i_bga].storm_id()
+                 << ".\n";
+            best_ga.erase_storm_id(best_ga[i_bga].storm_id());
+            best_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            oper_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            i--;
+         }
+         else {
+            mlog << Warning << "\nprocess_best_tracks() -> "
+                 << case_cs << "neither " << best_ga[i_bga].storm_id()
+                 << " nor " << best_gi.storm_id()
+                 << " matches the basin!\n\n";
+            continue;
+         }
+      }
+
+      // Compute the distance to land
+      best_gi.set_dland(conf_info.compute_dland(
+                        best_gi.lat(), -1.0*best_gi.lon()));
+
+      // Store the genesis event
+      best_ga.add(best_gi);
+
+   } // end for i
+
+   // Dump out the number of genesis events
+   mlog << Debug(2) << "Found " << best_ga.n()
+        << " BEST genesis events.\n";
 
    return;
 }
@@ -1328,7 +1438,8 @@ void write_genmpr_row(StatHdrColumns &shc,
 void write_nc(GenCTCInfo &gci) {
    int i;
    ConcatString var_name, long_name;
-   unixtime valid_beg, valid_end;
+   unixtime valid_beg = (unixtime) 0;
+   unixtime valid_end = (unixtime) 0;
 
    // Allocate memory
    float *data = (float *) 0;
