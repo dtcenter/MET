@@ -1070,7 +1070,7 @@ void process_scores() {
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-            write_nc((string)"CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
+            write_nc((string)"CLIMO_CDF", normal_cdf(obs_dp, cmn_dp, csd_dp),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
 
@@ -1803,11 +1803,11 @@ void get_mask_points(const MaskPlane &mask_mp,
     apply_mask(*obs_ptr,  mask_mp, pd.o_na);
     pd.n_obs = pd.o_na.n();
 
-    if(cmn_ptr) apply_mask(*cmn_ptr,  mask_mp, pd.cmn_na);
+    if(cmn_ptr) apply_mask(*cmn_ptr, mask_mp, pd.cmn_na);
     else        pd.cmn_na.add_const(bad_data_double, pd.n_obs);
-    if(csd_ptr) apply_mask(*csd_ptr,  mask_mp, pd.csd_na);
+    if(csd_ptr) apply_mask(*csd_ptr, mask_mp, pd.csd_na);
     else        pd.csd_na.add_const(bad_data_double, pd.n_obs);
-    if(wgt_ptr) apply_mask(*wgt_ptr,  mask_mp, pd.wgt_na);
+    if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
     else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
     if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
