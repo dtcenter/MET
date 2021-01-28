@@ -7,7 +7,7 @@ describes the bugfix, enhancement, or new feature: `MET Git-Hub issues. <https:/
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
-Version `10.0.0-beta3 <https://github.com/dtcenter/MET/projects/25>`_ release notes (20210126)
+Version `10.0.0-beta3 <https://github.com/dtcenter/MET/projects/25>`_ release notes (20210127)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Bugfixes:
