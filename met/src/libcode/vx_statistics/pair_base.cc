@@ -1026,9 +1026,40 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
    n_mn = mn_na.n_valid();
    n_sd = sd_na.n_valid();
 
-   // For CDP threshold types, the climo_prob is constant.
+   // For CDP threshold types, the climo probability is constant
    if(othresh.get_ptype() == perc_thresh_climo_dist) {
-      climo_prob.add_const(othresh.get_pvalue()/100.0, n_mn);
+
+      // Climo probability varies based on the threshold type
+      switch(othresh.get_type()) {
+
+         case thresh_lt:
+         case thresh_le:
+            prob = othresh.get_pvalue()/100.0;
+            break;
+
+         case thresh_eq:
+            prob = 0.0;
+            break;
+
+         case thresh_ne:
+            prob = 1.0;
+            break;
+
+         case thresh_gt:
+         case thresh_ge:
+            prob = 1.0 - othresh.get_pvalue()/100.0;
+            break;
+
+         default:
+            mlog << Error << "\n\nderive_climo_prob() -> "
+                 << "climatological threshold \"" << othresh.get_str()
+                 << "\" cannot be converted to a probability!\n\n";
+            exit(1);
+            break;
+      }
+
+      // Add constant climo probability value
+      climo_prob.add_const(prob, n_mn);
    }
    // If both mean and standard deviation were provided, use them to
    // derive normal climatological probabilities for the current event

@@ -312,6 +312,7 @@ static NcFile *f_out      = (NcFile *) 0;
 
 extern "C" {
    void numpbmsg_(int *, int *);
+   void numpbmsg_new_(const char *, int *, int *);
    void openpb_(const char *, int *);
    void closepb_(int *);
    void readpb_(int *, int *, int *, double[mxr8pm],
@@ -2059,13 +2060,13 @@ void process_pbfile_metadata(int i_pb) {
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
 
-   // Open the blocked temp PrepBufr file for reading
-   openpb_(blk_file.c_str(), &unit);
-
    // Compute the number of PrepBufr records in the current file.
-   numpbmsg_(&unit, &npbmsg);
+   numpbmsg_new_(blk_file.c_str(), &unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
+
+   // Open the blocked temp PrepBufr file for reading
+   openpb_(blk_file.c_str(), &unit);
 
    // Use the number of records requested by the user if there
    // are enough present.
