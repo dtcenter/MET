@@ -405,10 +405,12 @@ void process_data_file() {
    // Open the output file
    open_nc(to_grid, run_cs);
 
-   if (goes_data)
+   if (goes_data) {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
-   else if (TYPE_OBS == obs_type)
+   }
+   else if (TYPE_OBS == obs_type) {
       process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
+   }
    else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
       unsetenv(nc_att_met_point_nccf);
@@ -723,7 +725,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
       for(int i=0; i<FieldSA.n(); i++) {
+
          var_idx_or_gc = -1;
+   
          // Initialize
          vinfo->clear();
 
@@ -743,7 +747,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          else {
             if (use_var_id) {
                if (!var_names.has(vname, var_idx_or_gc)) {
-                  exit_by_field_name_error = true;;
+                  exit_by_field_name_error = true;
                   error_msg << "The variable \"" << vname << "\" is not available.\n";
                }
             }
@@ -758,7 +762,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      sprintf(grib_code, "%d", var_idx_or_gc);
                   }
                   else {
-                     exit_by_field_name_error = true;;
+                     exit_by_field_name_error = true;
                      error_msg << "Invalid GRIB code [" << vname << "]\n";
                   }
                }
@@ -771,7 +775,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      }
                   }
                   if (not_found_grib_code) {
-                     exit_by_field_name_error = true;;
+                     exit_by_field_name_error = true;
                      error_msg << "No data for the GRIB code [" << vname << "]\n";
                   }
                }
@@ -877,7 +881,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   continue;
                }
 
-               //Filter by QC flag
+               // Filter by QC flag
                if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
                   filtered_by_qc++;
                   continue;
@@ -1923,7 +1927,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   int from_lat_count = fr_grid.ny();;
+   int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
 
    // Override the from nx & ny from NetCDF if exists
@@ -2026,7 +2030,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   int from_lat_count = fr_grid.ny();;
+   int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
 
    bool has_coord_input = false;
