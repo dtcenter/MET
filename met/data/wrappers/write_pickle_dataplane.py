@@ -59,4 +59,6 @@ dp[:] = met_in.met_data
 for attr in met_in.attrs:
     attr_val = met_in.attrs[attr]
     print(attr, attr_val, type(attr_val))
+    if type(attr_val) == str:
+        a = ds.createVariable(attr, 'str')
 ds.close()
