@@ -205,7 +205,7 @@ while(<$fh_mode_in>){
   }
 
   # write a single object attribute line
-  elsif( $vals[20] !~ /_/ ){
+  elsif( $vals[22] !~ /_/ ){
     next if( $type eq "p");
     push @outs, (" MODE_SOA ", @vals[2,3,22 .. 43]);
     $fmt_val = $fmt_sing;
