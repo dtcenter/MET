@@ -53,6 +53,7 @@ nx, ny = met_in.met_data.shape
 print(nx, ny)
 ds.createDimension('x', nx)
 ds.createDimension('y', ny)
+ds.createDimension('str_dim', 1)
 dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
 dp[:] = met_in.met_data
 
@@ -60,5 +61,5 @@ for attr in met_in.attrs:
     attr_val = met_in.attrs[attr]
     print(attr, attr_val, type(attr_val))
     if type(attr_val) == str:
-        a = ds.createVariable(attr, 'str')
+        setattr(ds, attr, attr_val)
 ds.close()
