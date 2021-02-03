@@ -622,7 +622,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Difference in object direction of movement
   * - 30
     - VOLUME_RATIO
-    - Ratio of object volumes
+    - Forecast object volume divided by observation object volume
   * - 31
     - START_TIME_DELTA
     - Difference in object starting time steps

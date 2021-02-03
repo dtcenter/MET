@@ -818,7 +818,8 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - Absolute value of the difference between the aspect ratios of two objects (unitless)
   * - 50
     - AREA_RATIO
-    - Ratio of the areas of two objects defined as the lesser of the two divided by the greater of the two (unitless)
+    - The forecast object area divided by the observation object area (unitless) :raw-html:`<br />`
+      **NOTE:** Prior to met-10.0.0, defined as the lesser of the two object areas divided by the greater of the two
   * - 51
     - INTERSECTION :raw-html:`<br />` \_AREA
     - Intersection area of two objects (in grid squares)
