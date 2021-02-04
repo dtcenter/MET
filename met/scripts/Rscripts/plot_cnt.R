@@ -73,18 +73,18 @@ args = commandArgs(TRUE)
 
 # Check the number of arguments
 if(length(args) < 1) {
-   cat("Usage: plot_cnt.R\n")
-   cat("         cnt_file_list\n")
-   cat("         [-column name]\n")
-   cat("         [-out name]\n")
-   cat("         [-met_base path]\n")
-   cat("         [-save]\n")
-   cat("         where \"file_list\"      is one or more files containing CNT lines.\n")
-   cat("               \"-column name\"   specifies a CNT statistic to be plotted (multiple).\n")
-   cat("               \"-out name\"      specifies an output PDF file name.\n")
-   cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
-   cat("               \"-save\"          calls save.image() before exiting R.\n\n")
-   quit()
+  cat("Usage: plot_cnt.R\n")
+  cat("         cnt_file_list\n")
+  cat("         [-column name]\n")
+  cat("         [-out name]\n")
+  cat("         [-met_base path]\n")
+  cat("         [-save]\n")
+  cat("         where \"file_list\"      is one or more files containing CNT lines.\n")
+  cat("               \"-column name\"   specifies a CNT statistic to be plotted (multiple).\n")
+  cat("               \"-out name\"      specifies an output PDF file name.\n")
+  cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
+  cat("               \"-save\"          calls save.image() before exiting R.\n\n")
+  quit()
 }
 
 # Initialize
@@ -168,31 +168,32 @@ vXY = paste(version[1], version[2], sep='.')
 
 # Check met_base
 if(nchar(met_base) == 0) {
-   met_base = Sys.getenv("MET_BASE")
+  met_base = Sys.getenv("MET_BASE")
 }
 if(nchar(met_base) == 0) {
-   cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
-       "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
-   quit()
+  cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
+      "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
+  quit()
 }
-   
+
 # Get the header columns
 header_file = paste(met_base, "/table_files/met_header_columns_", vXY, ".txt", sep='')
 print(paste("Reading Header File:", header_file))
-line = grep(': CNT ', readLines(header_file), value=TRUE)
-headers = trimws(unlist(strsplit(line, ':'))[4])
-cnt_header = unlist(strsplit(headers, ' '))
+lty_str  = paste(" : CNT ", sep='')
+hdr_line = grep(lty_str, readLines(header_file), value=TRUE)
+hdr_cols = trimws(unlist(strsplit(hdr_line, ':'))[4])
+hdr_lty  = unlist(strsplit(hdr_cols, ' '))
 
-# Check the header and data columns match
-if(length(cnt_header) != dim(data)[2]) {
-   cat("ERROR: The number of data (", dim(data)[2],
-       ") and header (", length(cnt_header),
-       ") columns do not match!\n", sep='')
-   quit()
+# Check that header and data columns match
+if(length(hdr_lty) != dim(data)[2]) {
+  cat("ERROR: The number of data (", dim(data)[2],
+      ") and header (", length(hdr_lty),
+      ") columns do not match!\n", sep='')
+  quit()
 }
 
 # After constructing the input data, attach column names
-colnames(data) <- cnt_header
+colnames(data) <- hdr_lty
 
 # Convert date/time columns to date/time objects
 data$FCST_VALID_BEG <- as.POSIXct(strptime(data$FCST_VALID_BEG,

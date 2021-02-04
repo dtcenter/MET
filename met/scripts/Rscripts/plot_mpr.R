@@ -82,18 +82,18 @@ args = commandArgs(TRUE)
 
 # Check the number of arguments
 if(length(args) < 1) {
-   cat("Usage: plot_mpr.R\n")
-   cat("         mpr_file_list\n")
-   cat("         [-wind_rose]\n")
-   cat("         [-out name]\n")
-   cat("         [-met_base path]\n")
-   cat("         [-save]\n")
-   cat("         where \"file_list\"      is one or more files containing MPR lines.\n")
-   cat("               \"-wind_rose\"     enables plotting of vector winds.\n")
-   cat("               \"-out name\"      specifies an output PDF file name.\n")
-   cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
-   cat("               \"-save\"          calls save.image() before exiting R.\n\n")
-   quit()
+  cat("Usage: plot_mpr.R\n")
+  cat("         mpr_file_list\n")
+  cat("         [-wind_rose]\n")
+  cat("         [-out name]\n")
+  cat("         [-met_base path]\n")
+  cat("         [-save]\n")
+  cat("         where \"file_list\"      is one or more files containing MPR lines.\n")
+  cat("               \"-wind_rose\"     enables plotting of vector winds.\n")
+  cat("               \"-out name\"      specifies an output PDF file name.\n")
+  cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
+  cat("               \"-save\"          calls save.image() before exiting R.\n\n")
+  quit()
 }
 
 # Initialize
@@ -119,9 +119,9 @@ while(i <= length(args)) {
 
   } else if(args[i] == "-met_base") {
 
-      # Set MET_BASE variable
-      met_base = args[i+1]
-      i = i+1
+    # Set MET_BASE variable
+    met_base = args[i+1]
+    i = i+1
 
   } else {
 
@@ -170,31 +170,32 @@ vXY = paste(version[1], version[2], sep='.')
 
 # Check met_base
 if(nchar(met_base) == 0) {
-   met_base = Sys.getenv("MET_BASE")
+  met_base = Sys.getenv("MET_BASE")
 }
 if(nchar(met_base) == 0) {
-   cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
-       "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
-   quit()
+  cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
+      "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
+  quit()
 }
-   
+
 # Get the header columns
 header_file = paste(met_base, "/table_files/met_header_columns_", vXY, ".txt", sep='')
 print(paste("Reading Header File:", header_file))
-line = grep(': MPR ', readLines(header_file), value=TRUE)
-headers = trimws(unlist(strsplit(line, ':'))[4])
-mpr_header = unlist(strsplit(headers, ' '))
+lty_str  = paste(" : MPR ", sep='')
+hdr_line = grep(lty_str, readLines(header_file), value=TRUE)
+hdr_cols = trimws(unlist(strsplit(hdr_line, ':'))[4])
+hdr_lty  = unlist(strsplit(hdr_cols, ' '))
 
-# Check the header and data columns match
-if(length(mpr_header) != dim(data)[2]) {
-   cat("ERROR: The number of data (", dim(data)[2],
-       ") and header (", length(mpr_header),
-       ") columns do not match!\n", sep='')
-   quit()
+# Check that header and data columns match
+if(length(hdr_lty) != dim(data)[2]) {
+  cat("ERROR: The number of data (", dim(data)[2],
+      ") and header (", length(hdr_lty),
+      ") columns do not match!\n", sep='')
+  quit()
 }
 
 # After constructing the input data, attach column names
-colnames(data) <- mpr_header
+colnames(data) <- hdr_lty
 
 ########################################################################
 #
@@ -202,10 +203,10 @@ colnames(data) <- mpr_header
 #
 ########################################################################
 
-# Construct an idex
+# Construct an index
 data$index <- paste(data$MODEL,
                     data$FCST_VAR, data$FCST_LEV,
-                    data$OBS_VAR,  data$OBS_LEV,
+                    data$OBS_VAR, data$OBS_LEV,
                     data$OBTYPE, data$VX_MASK,
                     data$INTERP_MTHD, data$INTERP_PNTS,
                     sep='_')
