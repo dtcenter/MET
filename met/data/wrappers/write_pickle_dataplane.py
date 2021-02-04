@@ -19,8 +19,9 @@ print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
 print('Write Pickle:\t',  sys.argv[1])
 
-pickle_filename = sys.argv[1]
-netcdf_filename = sys.argv[1] + '.nc4'
+# pickle_filename = sys.argv[1]
+# netcdf_filename = sys.argv[1] + '.nc4'
+netcdf_filename = sys.argv[1]
 
 print('Write NetCDF:\t',  netcdf_filename)
 
@@ -44,13 +45,13 @@ else:
 print('write_pickle_dataplane')
 print(met_info)
 
-pickle.dump( met_info, open( pickle_filename, "wb" ) )
+# pickle.dump( met_info, open( pickle_filename, "wb" ) )
 
 # write NetCDF file
 ds = nc.Dataset(netcdf_filename, 'w')
 
 nx, ny = met_in.met_data.shape
-print(nx, ny)
+# print(nx, ny)
 ds.createDimension('x', nx)
 ds.createDimension('y', ny)
 dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
@@ -59,6 +60,8 @@ dp[:] = met_in.met_data
 for attr in met_in.attrs:
     attr_val = met_in.attrs[attr]
     print(attr, attr_val, type(attr_val))
+    if attr == 'name':
+        setattr(ds, '_name', attr_val)
     if type(attr_val) == str:
         setattr(ds, attr, attr_val)
     if type(attr_val) == dict:
