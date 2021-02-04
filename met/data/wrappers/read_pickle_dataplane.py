@@ -21,4 +21,11 @@ print('Read NetCDF:\t',  netcdf_filename)
 # read NetCDF file
 ds = nc.Dataset(netcdf_filename, 'r')
 met_data = ds['met_data'][:]
+grid = {}
+for attr, attr_val in ds.__dict__.items():
+    print(attr, attr_val)
+    if 'grid' in attr:
+        grid_attr = attr.split('.')[1]
+        grid[grid_attr] = attr_val
+print(grid)
 met_info['met_data'] = met_data
