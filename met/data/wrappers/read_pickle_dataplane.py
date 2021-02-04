@@ -32,6 +32,8 @@ for attr, attr_val in ds.__dict__.items():
         met_attrs[attr] = attr_val
 grid['nx'], grid['ny'] = int(grid['nx']), int(grid['ny'])
 met_attrs['grid'] = grid
+met_attrs['name'] = met_attrs['_name']
+del met_attrs['_name']
 met_info['met_data'] = met_data
 met_info['attrs'] = met_attrs
 print(met_info)
