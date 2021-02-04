@@ -162,6 +162,12 @@ for(i in 1:length(file_list)) {
   system(cmd)
 }
 
+# Check for no data
+if(is.null(data)) {
+  cat("ERROR: No CNT data found!\n")
+  quit()
+}
+
 # Store version from the data
 version = unlist(strsplit(data[1,1], '\\.'))
 vXY = paste(version[1], version[2], sep='.')
@@ -211,7 +217,7 @@ data$OBS_VALID_END  <- as.POSIXct(strptime(data$OBS_VALID_END,
 #
 ########################################################################
 
-# Construct an idex
+# Construct an index
 data$index <- paste(data$MODEL,
                     data$FCST_VAR, data$FCST_LEV,
                     data$OBS_VAR,  data$OBS_LEV,

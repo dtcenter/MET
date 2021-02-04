@@ -164,6 +164,12 @@ for(i in 1:length(file_list)) {
   system(cmd)
 }
 
+# Check for no data
+if(is.null(data)) {
+  cat("ERROR: No MPR data found!\n")
+  quit()
+}
+
 # Store version from the data
 version = unlist(strsplit(data[1,1], '\\.'))
 vXY = paste(version[1], version[2], sep='.')

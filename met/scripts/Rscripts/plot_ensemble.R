@@ -166,8 +166,8 @@ read_line_type = function(line_type) {
   }
 
   # Check for no data
-  if(length(d) == 0) {
-    return(d);
+  if(is.null(d)) {
+    return(d)
   }
 
   # Store version from the data
