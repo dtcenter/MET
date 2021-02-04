@@ -74,7 +74,7 @@ args = commandArgs(TRUE)
 # Check the number of arguments
 if(length(args) < 1) {
   cat("Usage: plot_cnt.R\n")
-  cat("         cnt_file_list\n")
+  cat("         file_list\n")
   cat("         [-column name]\n")
   cat("         [-out name]\n")
   cat("         [-met_base path]\n")
@@ -136,6 +136,12 @@ if(length(stat_list) <= 0) stat_list <- default_stat_list
 # Read the input files.
 #
 ########################################################################
+
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
 
 # Initialize
 data <- c()

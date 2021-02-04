@@ -136,6 +136,12 @@ if(length(line_types) <= 0) line_types <- default_line_types
 #
 ########################################################################
 
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
+
 read_line_type = function(line_type) {
 
   # Initialize

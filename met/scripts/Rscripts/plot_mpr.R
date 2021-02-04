@@ -83,7 +83,7 @@ args = commandArgs(TRUE)
 # Check the number of arguments
 if(length(args) < 1) {
   cat("Usage: plot_mpr.R\n")
-  cat("         mpr_file_list\n")
+  cat("         file_list\n")
   cat("         [-wind_rose]\n")
   cat("         [-out name]\n")
   cat("         [-met_base path]\n")
@@ -138,6 +138,12 @@ while(i <= length(args)) {
 # Read the input files.
 #
 ########################################################################
+
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
 
 # Initialize
 data <- c()
