@@ -177,7 +177,7 @@ read_line_type = function(line_type) {
   }
 
   # Store version from the data
-  version = unlist(strsplit(d[1,1], '\\.'))
+  version = unlist(strsplit(as.character(d[1,1]), '\\.'))
   vXY = paste(version[1], version[2], sep='.')
 
   # Check met_base

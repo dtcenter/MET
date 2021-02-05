@@ -177,7 +177,7 @@ if(is.null(data)) {
 }
 
 # Store version from the data
-version = unlist(strsplit(data[1,1], '\\.'))
+version = unlist(strsplit(as.character(data[1,1]), '\\.'))
 vXY = paste(version[1], version[2], sep='.')
 
 # Check met_base
