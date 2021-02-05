@@ -57,8 +57,8 @@ ds.createDimension('y', ny)
 dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
 dp[:] = met_in.met_data
 
-for attr in met_in.attrs:
-    attr_val = met_in.attrs[attr]
+for attr in met_info['attrs']:
+    attr_val = met_info['attrs'][attr]
     print(attr, attr_val, type(attr_val))
     if attr == 'name':
         setattr(ds, '_name', attr_val)
