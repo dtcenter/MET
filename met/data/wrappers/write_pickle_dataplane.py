@@ -17,10 +17,7 @@ import netCDF4 as nc
 
 print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
-print('Write Pickle:\t',  sys.argv[1])
 
-# pickle_filename = sys.argv[1]
-# netcdf_filename = sys.argv[1] + '.nc4'
 netcdf_filename = sys.argv[1]
 
 print('Write NetCDF:\t',  netcdf_filename)
@@ -57,8 +54,7 @@ ds.createDimension('y', ny)
 dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
 dp[:] = met_in.met_data
 
-for attr in met_info['attrs']:
-    attr_val = met_info['attrs'][attr]
+for attr, attr_val in met_info['attrs'].items():
     print(attr, attr_val, type(attr_val))
     if attr == 'name':
         setattr(ds, '_name', attr_val)
