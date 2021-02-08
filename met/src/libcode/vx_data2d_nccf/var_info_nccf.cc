@@ -143,11 +143,8 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
    char *save_ptr = 0;
    const char *method_name = "VarInfoNcCF::set_magic() -> ";
 
-   // Validate the magic string
-   VarInfo::set_magic(nstr, lstr);
-
    // Store the magic string
-   MagicStr << cs_erase << nstr << lstr;
+   VarInfo::set_magic(nstr, lstr);
 
    // Set the requested name and default output name
    set_req_name(nstr.c_str());

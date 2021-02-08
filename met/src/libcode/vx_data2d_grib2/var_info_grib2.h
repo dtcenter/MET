@@ -97,7 +97,6 @@ class VarInfoGrib2 : public VarInfo
          // set stuff
          //
 
-      void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &);
 
       void set_record(int);
