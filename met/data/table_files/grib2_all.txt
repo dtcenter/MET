@@ -460,7 +460,7 @@ GRIB2
 0 1 0 255 0 0 19 28  "MWTURB"  "Mountain Wave Turbulence (Eddy Dissipation Rate)"  "m2/3s-1"
 0 0 0 255 7 1 19 192  "MXSALB"  "Maximum Snow Albedo"  "%"
 0 1 0 255 0 0 19 17  "MXSALB"  "Maximum Snow Albedosee Note 1"  "%"
-0 0 0 255 7 1 7 199  "MXUPHL"  "Hourly Maximum of Updraft Helicity over Layer 2km to 5 km AGL"  "m^2/s^2"
+0 0 0 255 7 1 7 199  "MXUPHL"  "Hourly Maximum of Updraft Helicity"  "m^2/s^2"
 10 1 0 255 0 0 0 30  "MZPTSW"  "Mean Zero-Crossing Period of The Total Swell"  "s"
 10 1 0 255 0 0 0 29  "MZPWW"  "Mean Zero-Crossing Period of The Wind Waves"  "s"
 10 1 0 255 0 0 0 28  "MZWPER"  "Mean Zero-Crossing Wave Period"  "s"
