@@ -659,6 +659,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
+   bool empty_input = (nhdr == 0 && nobs == 0);
    NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
    if (IS_VALID_NC(obs_vid_var)) {
       if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids);
@@ -673,30 +674,32 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
    }
 
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
-   if (success_to_read)
-      success_to_read = get_nc_data_string_array(
-            nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
-   if (success_to_read)
-      success_to_read = get_nc_data_string_array(
-            nc_in, nc_var_obs_qty_tbl, &qc_tables);
+   if (!empty_input) {
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
+      if (success_to_read)
+         success_to_read = get_nc_data_string_array(
+               nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
+      if (success_to_read)
+         success_to_read = get_nc_data_string_array(
+               nc_in, nc_var_obs_qty_tbl, &qc_tables);
+   }
    if (success_to_read) {
       bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
@@ -801,11 +804,17 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   }
                }
             }
-            mlog << Error << "\n" << method_name
-                 << error_msg
-                 << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
-                 << "\t" << log_msg << "\n\n";
-            exit(1);
+            if (empty_input) {
+               mlog << Warning << "\n" << method_name
+                    << error_msg << "\tBut ignored because of empty input\n\n";
+            }
+            else {
+               mlog << Error << "\n" << method_name
+                    << error_msg
+                    << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
+                    << "\t" << log_msg << "\n\n";
+               exit(1);
+            }
          }
 
          // Check the time range. Apply the time window
