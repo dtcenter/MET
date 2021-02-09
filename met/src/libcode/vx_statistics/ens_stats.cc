@@ -176,11 +176,15 @@ void ECNTInfo::init_from_scratch() {
 void ECNTInfo::clear() {
 
    othresh.clear();
-   n_ens   = n_pair    = 0;
-   crps    = crpss     = ign         = bad_data_double;
-   me      = rmse      = spread      = bad_data_double;
-   me_oerr = rmse_oerr = spread_oerr = bad_data_double;
-   spread_plus_oerr    = bad_data_double;
+   n_ens      = n_pair     = 0;
+   ign        = bad_data_double;
+   crps       = crpscl     = crpss       = bad_data_double;
+   crps_emp   = crpscl_emp = crpss_emp   = bad_data_double;
+   crps_rel   = crps_pot   = bad_data_double;
+   crps_alpha = crps_beta  = bad_data_double;
+   me         = rmse       = spread      = bad_data_double;
+   me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
+   spread_plus_oerr        = bad_data_double;
    
    return;
 }
@@ -194,9 +198,21 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    n_ens            = c.n_ens;
    n_pair           = c.n_pair;
 
-   crps             = c.crps;
-   crpss            = c.crpss;
    ign              = c.ign;
+
+   crps             = c.crps;
+   crpscl           = c.crpscl;
+   crpss            = c.crpss;
+
+   crps_emp         = c.crps_emp;
+   crpscl_emp       = c.crpscl_emp;
+   crpss_emp        = c.crpss_emp;
+
+   crps_rel         = c.crps_rel;
+   crps_pot         = c.crps_pot;
+
+   crps_alpha       = c.crps_alpha;
+   crps_beta        = c.crps_beta;
 
    me               = c.me;
    rmse             = c.rmse;
@@ -215,13 +231,16 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 void ECNTInfo::set(const PairDataEnsemble &pd) {
    int i;
    double w, w_sum;
-   double crps_climo;
    double fbar, obar, ffbar, oobar, fobar;
    NumArray cur;
 
    // Store the number of ensemble members
    n_ens = pd.n_ens;
-   
+
+   // TODO: Compute Hersbach CRPS values here
+   // crps_emp, crpscl_emp, crpss_emp,
+   // crps_rel, crps_pot, crps_alpha, crps_beta
+
    // Get the average CRPS value
    crps = pd.crps_na.wmean(pd.wgt_na);
 
@@ -254,11 +273,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
          oobar += w * pd.o_na[i]   * pd.o_na[i];
          fobar += w * pd.cmn_na[i] * pd.o_na[i];
       }
-      crps_climo = ffbar + oobar - 2.0*fobar;
+      crpscl = ffbar + oobar - 2.0*fobar;
 
       // Compute skill score
-      crpss = (is_eq(crps_climo, 0.0) ?
-               bad_data_double : (crps_climo - crps)/crps_climo);
+      crpss = (is_eq(crpscl, 0.0) ?
+               bad_data_double : (crpscl - crps)/crpscl);
    }
 
    // Compute the average IGN value

@@ -2517,6 +2517,8 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    double crps_fcst, crps_climo, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
+   // TODO: aggregate ECNTData objects here
+
    //
    // Process the STAT lines
    //
