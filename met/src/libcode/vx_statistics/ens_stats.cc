@@ -241,8 +241,9 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // crps_emp, crpscl_emp, crpss_emp,
    // crps_rel, crps_pot, crps_alpha, crps_beta
 
-   // Get the average CRPS value
-   crps = pd.crps_na.wmean(pd.wgt_na);
+   // Get the average CRPS and CRPS_EMP values
+   crps     = pd.crps_na.wmean(pd.wgt_na);
+   crps_emp = pd.crps_emp_na.wmean(pd.wgt_na);
 
    // Get the sum of the weights
    for(i=0, n_pair=0, w_sum=0.0; i<pd.wgt_na.n(); i++) {

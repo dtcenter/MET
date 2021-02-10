@@ -98,6 +98,7 @@ void PairDataEnsemble::clear() {
 
    v_na.clear();
    r_na.clear();
+   crps_emp_na.clear();
    crps_na.clear();
    ign_na.clear();
    pit_na.clear();
@@ -151,6 +152,7 @@ void PairDataEnsemble::extend(int n, bool exact) {
 
    v_na.extend               (n, exact);
    r_na.extend               (n, exact);
+   crps_emp_na.extend        (n, exact);
    crps_na.extend            (n, exact);
    ign_na.extend             (n, exact);
    pit_na.extend             (n, exact);
@@ -203,6 +205,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na           = pd.v_na;
    r_na           = pd.r_na;
+   crps_emp_na    = pd.crps_emp_na;
    crps_na        = pd.crps_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
@@ -369,6 +372,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_oerr_na.add(bad_data_double);
          var_plus_oerr_na.add(bad_data_double);
          r_na.add(bad_data_int);
+         crps_emp_na.add(bad_data_double);
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
@@ -422,6 +426,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Store ensemble stats for the current point
+         crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
          compute_crps_ign_pit(o_na[i], cur_ens, crps, ign, pit);
          crps_na.add(crps);
          ign_na.add(ign);
@@ -746,9 +751,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na, crps_na,
-      //   ign_na, pit_na, var_na, var_oerr_na,
-      //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
+      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
+      //   crps_emp_na, crps_na, ign_na, pit_na, var_na,
+      //   var_oerr_na, var_plus_oerr_na, mn_na, mn_oerr_na,
+      //   e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -761,6 +767,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.cdf_na.add(cdf_na[i]);
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
+      pd.crps_emp_na.add(crps_emp_na[i]);
       pd.crps_na.add(crps_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
@@ -1763,9 +1770,59 @@ void compute_crps_ign_pit(double obs, const NumArray &ens_na,
 
       // Compute PIT
       pit = normal_cdf(obs, m, s);
+
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the empirical continuous ranked probability score.
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_crps_emp(double obs, const NumArray &ens_na) {
+   int i;
+   double fcst;
+   NumArray evals;
+
+   // Sore valid ensemble member values
+   evals.extend(ens_na.n());
+   for(i=0; i<ens_na.n(); i++) {
+      if(!is_bad_data(ens_na[i])) evals.add(ens_na[i]);
+   }
+   evals.sort_array();
+
+   // Check for bad or no data
+   if(is_bad_data(obs) || evals.n() == 0) return(bad_data_double);
+
+   // Initialize
+   double obs_cdf  = 0.0;
+   double fcst_cdf = 0.0;
+   double prv_fcst = 0.0;
+   double integral = 0.0;
+   double wgt      = 1.0/evals.n();
+
+   // Compute empirical CRPS
+   for(i=0; i<evals.n(); i++) {
+      fcst = evals[i];
+      if(is_eq(obs_cdf, 0.0) && obs < fcst) {
+         integral += (obs - prv_fcst) * pow(fcst_cdf, 2);
+         integral += (fcst - obs) * pow(fcst_cdf - 1.0, 2);
+         obs_cdf   = 1.0;
+      }
+      else {
+         integral += (fcst - prv_fcst) * pow(fcst_cdf - obs_cdf, 2);
+      }
+      fcst_cdf += wgt;
+      prv_fcst  = fcst;
+   }
+
+   // Handle obs being >= all ensemble members
+   if(is_eq(obs_cdf, 0.0)) integral += (obs - fcst);
+
+   return(integral);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1805,9 +1862,10 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          // required for ensemble output line types.
          //
          // Include in subset:
-         //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na, crps_na,
-         //   ign_na, pit_na, var_na, var_oerr_na,
-         //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
+         //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na,
+         //   crps_emp_na, crps_na, ign_na, pit_na, var_na,
+         //   var_oerr_na, var_plus_oerr_na, mn_na, mn_oerr_na,
+         //   e_na
          //
          // Exclude from subset:
          //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -1820,6 +1878,7 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          out_pd.cdf_na.add(pd.cdf_na[i]);
          out_pd.v_na.add(pd.v_na[i]);
          out_pd.r_na.add(pd.r_na[i]);
+         out_pd.crps_emp_na.add(pd.crps_emp_na[i]);
          out_pd.crps_na.add(pd.crps_na[i]);
          out_pd.ign_na.add(pd.ign_na[i]);
          out_pd.pit_na.add(pd.pit_na[i]);

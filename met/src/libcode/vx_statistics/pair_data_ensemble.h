@@ -78,6 +78,7 @@ class PairDataEnsemble : public PairBase {
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
+      NumArray   crps_emp_na;     // Empirical Continuous Ranked Probability Score [n_obs]
       NumArray   crps_na;         // Continuous Ranked Probability Score [n_obs]
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
@@ -292,6 +293,8 @@ class VxPairDataEnsemble {
 
 extern void compute_crps_ign_pit(double, const NumArray &, double &,
                            double &, double &);
+
+extern double compute_crps_emp(double, const NumArray &);
 
 // Subset pairs for a specific climatology CDF bin
 extern PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &,
