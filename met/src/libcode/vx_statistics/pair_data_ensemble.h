@@ -78,12 +78,14 @@ class PairDataEnsemble : public PairBase {
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
+
       NumArray   crps_emp_na;     // Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   crps_na;         // Continuous Ranked Probability Score [n_obs]
+      NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
+
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
-      int        n_ens;           // Number of ensemble members
 
+      int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
       bool       skip_const;      // Skip cases where the observation and
                                   // all ensemble members are constant
@@ -108,7 +110,9 @@ class PairDataEnsemble : public PairBase {
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
 
-      double     crpss;           // Continuous ranked probability skill score
+      double     crps_climo;      // Climatological CRPS score
+      double     crpss_emp;       // Empirical CRPS skill score
+      double     crpss_gaus;      // Guassian CRPS skill score
       double     me;              // ME for ensemble mean
       double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members
@@ -291,10 +295,10 @@ class VxPairDataEnsemble {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void compute_crps_ign_pit(double, const NumArray &, double &,
-                           double &, double &);
-
 extern double compute_crps_emp(double, const NumArray &);
+
+extern void compute_crps_gaus_ign_pit(double, const NumArray &,
+               double &, double &, double &);
 
 // Subset pairs for a specific climatology CDF bin
 extern PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &,

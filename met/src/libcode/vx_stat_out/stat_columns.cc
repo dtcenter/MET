@@ -3659,13 +3659,11 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //
    // Ensemble Continuous Statistics
    // Dump out the ECNT line:
-   //    TOTAL,            N_ENS,
-   //    CRPS,             CRPSS,        IGN,
-   //    ME,               RMSE,         SPREAD,
-   //    ME_OERR,          RMSE_OERR,    SPREAD_OERR,
-   //    SPREAD_PLUS_OERR, CRPSCL,       CRPS_EMP,
-   //    CRPSCL_EMP,       CRPSS_EMP,    CRPS_REL,
-   //    CRPS_POT,         CRPS_ALPHA,   CRPS_BETA
+   //    TOTAL,            N_ENS,        CRPS,
+   //    CRPSS,            IGN,          ME,
+   //    RMSE,             SPREAD,       ME_OERR,
+   //    RMSE_OERR,        SPREAD_OERR,  SPREAD_PLUS_OERR,
+   //    CRPS_CLIMO,       CRPS_EMP,     CRPSS_EMP
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -3674,10 +3672,10 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
       ecnt_info.n_ens);
 
    at.set_entry(r, c+2,  // Continuous Ranked Probability Score
-      ecnt_info.crps);
+      ecnt_info.crps_gaus);
 
    at.set_entry(r, c+3,  // Continuous Ranked Probability Skill Score
-      ecnt_info.crpss);
+      ecnt_info.crpss_gaus);
 
    at.set_entry(r, c+4,  // Ignorance Score
       ecnt_info.ign);
@@ -3704,28 +3702,13 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
       ecnt_info.spread_plus_oerr);
 
    at.set_entry(r, c+12,  // Climatological CRPS
-      ecnt_info.crpscl);
+      ecnt_info.crps_climo);
 
    at.set_entry(r, c+13,  // Empirical ensemble CRPS
       ecnt_info.crps_emp);
 
-   at.set_entry(r, c+14,  // Empirical climatological CRPS
-      ecnt_info.crpscl_emp);
-
-   at.set_entry(r, c+15,  // Empirical CRPSS
+   at.set_entry(r, c+14,  // Empirical CRPSS
       ecnt_info.crpss_emp);
-
-   at.set_entry(r, c+16,  // Empirical CRPS reliability
-      ecnt_info.crps_rel);
-
-   at.set_entry(r, c+17,  // Empirical CRPS potential
-      ecnt_info.crps_pot);
-
-   at.set_entry(r, c+18,  // Empirical CRPS alpha
-      ecnt_info.crps_alpha);
-
-   at.set_entry(r, c+19,  // Empirical CRPS beta
-      ecnt_info.crps_beta);
 
    return;
 }
