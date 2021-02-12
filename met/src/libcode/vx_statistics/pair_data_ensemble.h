@@ -110,9 +110,11 @@ class PairDataEnsemble : public PairBase {
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
 
-      double     crps_climo;      // Climatological CRPS score
+      double     crpscl_emp;      // Empirical climatological CRPS score
       double     crpss_emp;       // Empirical CRPS skill score
+      double     crpscl_gaus;     // Guassian climatological CRPS score
       double     crpss_gaus;      // Guassian CRPS skill score
+
       double     me;              // ME for ensemble mean
       double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members

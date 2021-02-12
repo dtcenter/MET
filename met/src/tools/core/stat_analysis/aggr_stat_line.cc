@@ -2514,7 +2514,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   double crps_emp_fcst, crps_gaus_fcst, crps_climo, v;
+   double crps_emp, crpscl_emp, crps_gaus, crpscl_gaus, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2553,7 +2553,8 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.ens_pd.clear();
-            aggr.crps_climo_na.clear();
+            aggr.crpscl_emp_na.clear();
+            aggr.crpscl_gaus_na.clear();
             aggr.hdr.clear();
             m[key] = aggr;
          }
@@ -2572,13 +2573,14 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store the current statistics and weight (TOTAL column)
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
+         m[key].crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
+         m[key].crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.var_na.add(square(cur.spread));
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
          m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
          m[key].ens_pd.wgt_na.add(cur.total);
-         m[key].crps_climo_na.add(cur.crps_climo);
 
          //
          // Store the summary statistics
@@ -2617,20 +2619,20 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       v                           = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      crps_emp_fcst  = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_gaus_fcst = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      crps_climo     = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_emp  = it->second.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_gaus = it->second.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
-      // Compute aggregated empirical and Gaussian CRPSS
-      if(!is_bad_data(crps_emp_fcst) && !is_bad_data(crps_gaus_fcst) &&
-         !is_bad_data(crps_climo)    && !is_eq(crps_climo, 0.0)) {
-         it->second.ens_pd.crpss_emp  = (crps_climo - crps_emp_fcst)/crps_climo;
-         it->second.ens_pd.crpss_gaus = (crps_climo - crps_gaus_fcst)/crps_climo;
-      }
-      else {
-         it->second.ens_pd.crpss_emp  = bad_data_double;
-         it->second.ens_pd.crpss_gaus = bad_data_double;
-      }
+      // Compute aggregated empirical CRPSS
+      it->second.ens_pd.crpss_emp =
+         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) && is_eq(crpscl_emp, 0.0) ?
+         bad_data_double : (crpscl_emp - crps_emp)/crpscl_emp);
+
+      // Compute aggregated Gaussian CRPSS
+      it->second.ens_pd.crpss_emp =
+         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) && is_eq(crpscl_gaus, 0.0) ?
+         bad_data_double : (crpscl_gaus - crps_gaus)/crpscl_gaus);
 
    } // end for it
 

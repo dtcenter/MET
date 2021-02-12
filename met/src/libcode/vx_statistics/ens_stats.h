@@ -76,8 +76,8 @@ class ECNTInfo {
       // Number of ensemble members and pairs
       int n_ens, n_pair;
 
-      double crps_emp, crps_gaus, crps_climo;
-      double crpss_emp, crpss_gaus;
+      double crps_emp, crpscl_emp, crpss_emp;
+      double crps_gaus, crpscl_gaus, crpss_gaus;
       double ign, me, rmse, spread;
       double me_oerr, rmse_oerr, spread_oerr;
       double spread_plus_oerr;

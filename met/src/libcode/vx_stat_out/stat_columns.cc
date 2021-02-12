@@ -3663,7 +3663,8 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    CRPSS,            IGN,          ME,
    //    RMSE,             SPREAD,       ME_OERR,
    //    RMSE_OERR,        SPREAD_OERR,  SPREAD_PLUS_OERR,
-   //    CRPS_CLIMO,       CRPS_EMP,     CRPSS_EMP
+   //    CRPSCL,           CRPS_EMP,     CRPSCL_EMP,
+   //    CRPSS_EMP
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -3701,13 +3702,16 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    at.set_entry(r, c+11,  // Mean of unperturbed spread plus observation error
       ecnt_info.spread_plus_oerr);
 
-   at.set_entry(r, c+12,  // Climatological CRPS
-      ecnt_info.crps_climo);
+   at.set_entry(r, c+12,  // Gaussian climatological CRPS
+      ecnt_info.crpscl_gaus);
 
    at.set_entry(r, c+13,  // Empirical ensemble CRPS
       ecnt_info.crps_emp);
 
-   at.set_entry(r, c+14,  // Empirical CRPSS
+   at.set_entry(r, c+14,  // Empirical climatological CRPS
+      ecnt_info.crpscl_emp);
+
+   at.set_entry(r, c+15,  // Empirical CRPSS
       ecnt_info.crpss_emp);
 
    return;

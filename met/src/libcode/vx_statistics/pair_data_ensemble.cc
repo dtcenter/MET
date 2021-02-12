@@ -128,9 +128,11 @@ void PairDataEnsemble::clear() {
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
 
-   crps_climo     = bad_data_double;
+   crpscl_emp     = bad_data_double;
    crpss_emp      = bad_data_double;
+   crpscl_gaus    = bad_data_double;
    crpss_gaus     = bad_data_double;
+
    me             = bad_data_double;
    rmse           = bad_data_double;
    me_oerr        = bad_data_double;
@@ -241,9 +243,11 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
 
-   crps_climo     = pd.crps_climo;
+   crpscl_emp     = pd.crpscl_emp;
    crpss_emp      = pd.crpss_emp;
+   crpscl_gaus    = pd.crpscl_gaus;
    crpss_gaus     = pd.crpss_gaus;
+
    me             = pd.me;
    rmse           = pd.rmse;
    me_oerr        = pd.me_oerr;
