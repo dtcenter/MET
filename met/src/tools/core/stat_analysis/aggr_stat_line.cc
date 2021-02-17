@@ -2630,7 +2630,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          bad_data_double : (crpscl_emp - crps_emp)/crpscl_emp);
 
       // Compute aggregated Gaussian CRPSS
-      it->second.ens_pd.crpss_emp =
+      it->second.ens_pd.crpss_gaus =
          (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) && is_eq(crpscl_gaus, 0.0) ?
          bad_data_double : (crpscl_gaus - crps_gaus)/crpscl_gaus);
 
