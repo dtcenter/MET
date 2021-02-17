@@ -11,7 +11,6 @@
 import os
 import sys
 import importlib.util
-import xarray as xr
 import netCDF4 as nc
 
 print('Python Script:\t', sys.argv[0])
@@ -33,10 +32,12 @@ spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
 met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
 
-if isinstance(met_in.met_data, xr.DataArray):
-    met_info = { 'attrs': met_in.met_data.attrs, 'met_data': met_in.met_data }
+met_info = {'met_data': met_in.met_data}
+if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
+    attrs = met_in.met_data.attrs
 else:
-    met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
+    attrs = met_in.attrs
+met_info['attrs'] = attrs
 
 print('write_tmp_dataplane')
 print(met_info)
