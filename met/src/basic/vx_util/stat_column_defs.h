@@ -260,7 +260,9 @@ static const char * ecnt_columns [] = {
    "TOTAL",       "N_ENS",       "CRPS",
    "CRPSS",       "IGN",         "ME",
    "RMSE",        "SPREAD",      "ME_OERR",
-   "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR"
+   "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR",
+   "CRPSCL",      "CRPS_EMP",    "CRPSCL_EMP",
+   "CRPSS_EMP"
 };
 
 static const char * rps_columns [] = {

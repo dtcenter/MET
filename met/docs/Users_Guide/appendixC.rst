@@ -887,9 +887,9 @@ ________________________________________________
 CRPS
 ~~~~
 
-Called "CRPS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+Called "CRPS", "CRPSCL", "CRPS_EMP", and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). In some cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -906,11 +906,13 @@ The score can be interpreted as a continuous version of the mean absolute error 
 CRPS Skill Score
 ~~~~~~~~~~~~~~~~
 
-Called "CRPSS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+Called "CRPSS" and "CRPSS_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The continuous ranked probability skill score (CRPSS) is similar to the MSESS and the BSS, in that it compares its namesake score to that of a reference forecast to produce a positively oriented score between 0 and 1.
 
 .. math:: \text{CRPSS} = 1 - \frac{\text{CRPS}_{fcst}}{ \text{CRPS}_{ref}}
+
+For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
 
 IGN
 ~~~

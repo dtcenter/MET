@@ -151,7 +151,7 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
-   NumArray crps_climo_na;
+   NumArray crpscl_emp_na, crpscl_gaus_na;
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
 };
 

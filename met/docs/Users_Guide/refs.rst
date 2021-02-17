@@ -132,6 +132,12 @@ References
 |   forecasts. *Monthly Weather Review*, 129, 550-560.
 | 
 
+.. _Hersbach-2000:
+
+| Hersbach, H., 2000: Decomposition of the Continuous Ranked Probability Score
+| for Ensemble Prediction Systems. *Weather and Forecasting*, 15, 559-570.
+| 
+
 .. _Jolliffe-2012:
 
 | Jolliffe, I.T., and D.B. Stephenson, 2012: *Forecast verification. A*
