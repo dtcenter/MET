@@ -3,14 +3,13 @@
 #    Adapted from a script provided by George McCabe
 #    Adapted by Randy Bullock
 #
-#    usage:  /path/to/python write_pickle_dataplane.py \
-#            pickle_output_filename <user_python_script>.py <args>
+#    usage:  /path/to/python write_tmp_dataplane.py \
+#            tmp_output_filename <user_python_script>.py <args>
 #
 ########################################################################
 
 import os
 import sys
-import pickle
 import importlib.util
 import xarray as xr
 import netCDF4 as nc
@@ -39,16 +38,13 @@ if isinstance(met_in.met_data, xr.DataArray):
 else:
     met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
 
-print('write_pickle_dataplane')
+print('write_tmp_dataplane')
 print(met_info)
-
-# pickle.dump( met_info, open( pickle_filename, "wb" ) )
 
 # write NetCDF file
 ds = nc.Dataset(netcdf_filename, 'w')
 
 nx, ny = met_in.met_data.shape
-# print(nx, ny)
 ds.createDimension('x', nx)
 ds.createDimension('y', ny)
 dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
