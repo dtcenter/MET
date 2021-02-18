@@ -234,6 +234,18 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void Python3_Script::read_tmp_point(const char * tmp_filename) const
+
+{
+
+mlog << Debug(3) << "Reading temporary point ascii file: "
+     << tmp_filename << "\n";
+
+ConcatString command;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
