@@ -1832,7 +1832,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
          write_ecnt_row(shc, ecnt_info,
             conf_info.vx_opt[i_vx].output_flag[i_ecnt],
-            0, 1, stat_at, i_stat_row,
+            stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       } // end if ECNT
 
