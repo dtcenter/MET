@@ -26,6 +26,7 @@ wrappers_DATA = \
      read_tmp_dataplane.py \
      write_tmp_dataplane.py \
      write_pickle_mpr.py \
+     read_tmp_point.py \
      write_pickle_point.py
 
 EXTRA_DIST = ${wrappers_DATA}
