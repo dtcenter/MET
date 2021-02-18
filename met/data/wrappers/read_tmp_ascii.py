@@ -1,8 +1,10 @@
 """
-Module Name: read_tmp_point.py
+Module Name: read_tmp_ascii.py
 
-Read MET Point Observations from a text file created by write_tmp_point.py script.
+Read MET Point Observations from a text file created by write_tmp_point.py script
+  or MET Matched Pairs from a text file created by write_tmp_mpr.py script
 
+Point observation format:
     Message_Type, Station_ID, Valid_Time, Lat, Lon, Elevation,
     GRIB_Code or Variable_Name, Level, Height, QC_String, Observation_Value
 
@@ -16,7 +18,7 @@ __email__ = 'met_help@ucar.edu'
 
 import argparse
 
-def read_tmp_point(filename):
+def read_tmp_ascii(filename):
     """
     Arguments:
         filename (string): temporary file created by write_tmp_point.py
@@ -28,9 +30,9 @@ def read_tmp_point(filename):
     lines = f.readlines()
     f.close()
 
-    point_data = [eval(line.strip('\n')) for line in lines]
+    data = [eval(line.strip('\n')) for line in lines]
 
-    return point_data
+    return data
 
 if __name__ == '__main__':
     """
@@ -40,4 +42,4 @@ if __name__ == '__main__':
     parser.add_argument('--filename', type=str)
     args = parser.parse_args()
 
-    point_data = read_tmp_point(args.filename)
+    data = read_tmp_ascii(args.filename)
