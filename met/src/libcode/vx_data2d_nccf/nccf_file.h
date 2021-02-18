@@ -82,6 +82,7 @@ class NcCfFile {
       TimeArray ValidTime;
 
       unixtime  InitTime;
+      unixtime  AccumTime;
 
       int       lead_time () const;   //  seconds
 
