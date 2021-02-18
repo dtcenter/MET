@@ -176,11 +176,13 @@ void ECNTInfo::init_from_scratch() {
 void ECNTInfo::clear() {
 
    othresh.clear();
-   n_ens   = n_pair    = 0;
-   crps    = crpss     = ign         = bad_data_double;
-   me      = rmse      = spread      = bad_data_double;
-   me_oerr = rmse_oerr = spread_oerr = bad_data_double;
-   spread_plus_oerr    = bad_data_double;
+   n_ens      = n_pair      = 0;
+   crps_emp   = crpscl_emp  = crpss_emp   = bad_data_double;
+   crps_gaus  = crpscl_gaus = crpss_gaus  = bad_data_double;
+   ign        = bad_data_double;
+   me         = rmse       = spread      = bad_data_double;
+   me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
+   spread_plus_oerr        = bad_data_double;
    
    return;
 }
@@ -193,11 +195,16 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 
    n_ens            = c.n_ens;
    n_pair           = c.n_pair;
+   
+   crps_emp         = c.crps_emp;
+   crpscl_emp       = c.crpscl_emp;
+   crpss_emp        = c.crpss_emp;
 
-   crps             = c.crps;
-   crpss            = c.crpss;
+   crps_gaus        = c.crps_gaus;
+   crpscl_gaus      = c.crpscl_gaus;
+   crpss_gaus       = c.crpss_gaus;
+
    ign              = c.ign;
-
    me               = c.me;
    rmse             = c.rmse;
    spread           = c.spread;
@@ -215,15 +222,16 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 void ECNTInfo::set(const PairDataEnsemble &pd) {
    int i;
    double w, w_sum;
-   double crps_climo;
    double fbar, obar, ffbar, oobar, fobar;
    NumArray cur;
 
    // Store the number of ensemble members
    n_ens = pd.n_ens;
-   
-   // Get the average CRPS value
-   crps = pd.crps_na.wmean(pd.wgt_na);
+
+   // Get the average empirical and Gaussian CRPS and
+   // components values
+   crps_emp  = pd.crps_emp_na.wmean(pd.wgt_na);
+   crps_gaus = pd.crps_gaus_na.wmean(pd.wgt_na);
 
    // Get the sum of the weights
    for(i=0, n_pair=0, w_sum=0.0; i<pd.wgt_na.n(); i++) {
@@ -234,11 +242,12 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    }
 
    // Check for bad data
-   if(is_bad_data(crps)            ||
+   if(is_bad_data(crps_emp)        ||
+      is_bad_data(crps_gaus)       ||
       pd.cmn_na.n() != pd.o_na.n() ||
       pd.cmn_na.n() == 0           ||
       pd.cmn_na.has(bad_data_double)) {
-      crpss = bad_data_double;
+      crpss_emp = crpss_gaus = bad_data_double;
    }
    else {
 
@@ -254,11 +263,16 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
          oobar += w * pd.o_na[i]   * pd.o_na[i];
          fobar += w * pd.cmn_na[i] * pd.o_na[i];
       }
-      crps_climo = ffbar + oobar - 2.0*fobar;
 
-      // Compute skill score
-      crpss = (is_eq(crps_climo, 0.0) ?
-               bad_data_double : (crps_climo - crps)/crps_climo);
+      // TODO: MET #1451 correct this computation
+      crpscl_emp  = ffbar + oobar - 2.0*fobar;
+      crpscl_gaus = ffbar + oobar - 2.0*fobar;
+
+      // Compute CRPS skill scores
+      crpss_emp  = (is_eq(crpscl_emp, 0.0) ? bad_data_double :
+                    (crpscl_emp - crps_emp) /crpscl_emp);
+      crpss_gaus = (is_eq(crpscl_gaus, 0.0) ? bad_data_double :
+                    (crpscl_gaus - crps_gaus) /crpscl_gaus);
    }
 
    // Compute the average IGN value

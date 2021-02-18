@@ -540,7 +540,7 @@ void NumArray::sort_array()
 
 {
 
-sort(e, Nelements);
+if(!Sorted) sort(e, Nelements);
 
 Sorted = true;
 
@@ -784,7 +784,7 @@ double var;
 
 compute_mean_variance(mn, var);
 
-stdev = square_root(var);
+stdev = (is_bad_data(var) ? bad_data_double : square_root(var));
 
 return;
 

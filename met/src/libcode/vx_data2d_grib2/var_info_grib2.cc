@@ -257,19 +257,6 @@ void VarInfoGrib2::set_ipdtmpl_val(const IntArray &v) {
    return;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfoGrib2::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-   MagicStr << cs_erase << nstr << "/" << lstr;
-
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoGrib2::set_dict(Dictionary & dict) {

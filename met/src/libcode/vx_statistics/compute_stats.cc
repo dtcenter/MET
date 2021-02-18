@@ -1306,12 +1306,23 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
    ecnt_mean.n_pair = na.sum();
 
    // Compute unweighted mean for each statistic
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps_emp);
+   ecnt_mean.crps_emp = na.mean();
 
-   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps);
-   ecnt_mean.crps = na.mean();
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpscl_emp);
+   ecnt_mean.crpscl_emp = na.mean();
 
-   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss);
-   ecnt_mean.crpss = na.mean();
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss_emp);
+   ecnt_mean.crpss_emp = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps_gaus);
+   ecnt_mean.crps_gaus = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpscl_gaus);
+   ecnt_mean.crpscl_gaus = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss_gaus);
+   ecnt_mean.crpss_gaus = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].ign);
    ecnt_mean.ign = na.mean();

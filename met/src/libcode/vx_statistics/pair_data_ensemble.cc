@@ -94,14 +94,17 @@ void PairDataEnsemble::clear() {
 
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
-   n_ens = 0;
 
    v_na.clear();
    r_na.clear();
-   crps_na.clear();
+
+   crps_emp_na.clear();
+   crps_gaus_na.clear();
+
    ign_na.clear();
    pit_na.clear();
 
+   n_ens = 0;
    n_pair = 0;
    skip_const = false;
    skip_ba.clear();
@@ -125,7 +128,11 @@ void PairDataEnsemble::clear() {
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
 
-   crpss          = bad_data_double;
+   crpscl_emp     = bad_data_double;
+   crpss_emp      = bad_data_double;
+   crpscl_gaus    = bad_data_double;
+   crpss_gaus     = bad_data_double;
+
    me             = bad_data_double;
    rmse           = bad_data_double;
    me_oerr        = bad_data_double;
@@ -151,7 +158,8 @@ void PairDataEnsemble::extend(int n, bool exact) {
 
    v_na.extend               (n, exact);
    r_na.extend               (n, exact);
-   crps_na.extend            (n, exact);
+   crps_emp_na.extend        (n, exact);
+   crps_gaus_na.extend       (n, exact);
    ign_na.extend             (n, exact);
    pit_na.extend             (n, exact);
    skip_ba.extend            (n, exact);
@@ -203,7 +211,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na           = pd.v_na;
    r_na           = pd.r_na;
-   crps_na        = pd.crps_na;
+   crps_emp_na    = pd.crps_emp_na;
+   crps_gaus_na   = pd.crps_gaus_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
    n_pair         = pd.n_pair;
@@ -234,7 +243,11 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
 
-   crpss          = pd.crpss;
+   crpscl_emp     = pd.crpscl_emp;
+   crpss_emp      = pd.crpss_emp;
+   crpscl_gaus    = pd.crpscl_gaus;
+   crpss_gaus     = pd.crpss_gaus;
+
    me             = pd.me;
    rmse           = pd.rmse;
    me_oerr        = pd.me_oerr;
@@ -313,7 +326,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
    double mean, var_unperturbed, var_perturbed;
-   double crps, ign, pit;
+   double crps_gaus, ign, pit;
 
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
@@ -369,7 +382,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_oerr_na.add(bad_data_double);
          var_plus_oerr_na.add(bad_data_double);
          r_na.add(bad_data_int);
-         crps_na.add(bad_data_double);
+         crps_emp_na.add(bad_data_double);
+         crps_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
       }
@@ -422,8 +436,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Store ensemble stats for the current point
-         compute_crps_ign_pit(o_na[i], cur_ens, crps, ign, pit);
-         crps_na.add(crps);
+         crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
+         compute_crps_gaus_ign_pit(o_na[i], cur_ens, crps_gaus, ign, pit);
+         crps_gaus_na.add(crps_gaus);
          ign_na.add(ign);
          pit_na.add(pit);
       }
@@ -746,9 +761,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na, crps_na,
-      //   ign_na, pit_na, var_na, var_oerr_na,
-      //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
+      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
+      //   crps_emp_na, crps_gaus_na, ign_na, pit_na,
+      //   var_na, var_oerr_na, var_plus_oerr_na,
+      //   mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -761,7 +777,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.cdf_na.add(cdf_na[i]);
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
-      pd.crps_na.add(crps_na[i]);
+      pd.crps_emp_na.add(crps_emp_na[i]);
+      pd.crps_gaus_na.add(crps_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
       pd.skip_ba.add(false);
@@ -1732,14 +1749,62 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Utility function for computing the continuous ranked probability
-// score (CRPS), the ignorance score (IGN), and the probability
-// itegral transform (PIT)
+// Compute the empirical continuous ranked probability score
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_crps_ign_pit(double obs, const NumArray &ens_na,
-                          double &crps, double &ign, double &pit) {
+double compute_crps_emp(double obs, const NumArray &ens_na) {
+   int i;
+   double fcst;
+   NumArray evals;
+
+   // Store valid ensemble member values
+   evals.extend(ens_na.n());
+   for(i=0; i<ens_na.n(); i++) {
+      if(!is_bad_data(ens_na[i])) evals.add(ens_na[i]);
+   }
+   evals.sort_array();
+
+   // Check for bad or no data
+   if(is_bad_data(obs) || evals.n() == 0) return(bad_data_double);
+
+   // Initialize
+   double obs_cdf  = 0.0;
+   double fcst_cdf = 0.0;
+   double prv_fcst = 0.0;
+   double integral = 0.0;
+   double wgt      = 1.0/evals.n();
+
+   // Compute empirical CRPS
+   for(i=0; i<evals.n(); i++) {
+      fcst = evals[i];
+      if(is_eq(obs_cdf, 0.0) && obs < fcst) {
+         integral += (obs - prv_fcst) * pow(fcst_cdf, 2);
+         integral += (fcst - obs) * pow(fcst_cdf - 1.0, 2);
+         obs_cdf   = 1.0;
+      }
+      else {
+         integral += (fcst - prv_fcst) * pow(fcst_cdf - obs_cdf, 2);
+      }
+      fcst_cdf += wgt;
+      prv_fcst  = fcst;
+   }
+
+   // Handle obs being >= all ensemble members
+   if(is_eq(obs_cdf, 0.0)) integral += (obs - fcst);
+
+   return(integral);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the Gaussian continuous ranked probability score (CRPS),
+// the ignorance score (IGN), and probability integral transform (PIT)
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_crps_gaus_ign_pit(double obs, const NumArray &ens_na,
+                               double &crps, double &ign, double &pit) {
    double m, s, z;
 
    // Mean and standard deviation of the ensemble values
@@ -1755,7 +1820,7 @@ void compute_crps_ign_pit(double obs, const NumArray &ens_na,
 
       z = (obs - m)/s;
 
-      // Compute CRPS
+      // Compute Gaussian CRPS
       crps = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
 
       // Compute IGN
@@ -1763,6 +1828,7 @@ void compute_crps_ign_pit(double obs, const NumArray &ens_na,
 
       // Compute PIT
       pit = normal_cdf(obs, m, s);
+
    }
 
    return;
@@ -1805,9 +1871,10 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          // required for ensemble output line types.
          //
          // Include in subset:
-         //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na, crps_na,
-         //   ign_na, pit_na, var_na, var_oerr_na,
-         //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
+         //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na,
+         //   crps_emp_na, crps_gaus_na, ign_na, pit_na,
+         //   var_na, var_oerr_na, var_plus_oerr_na,
+         //   mn_na, mn_oerr_na, e_na
          //
          // Exclude from subset:
          //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -1820,7 +1887,8 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          out_pd.cdf_na.add(pd.cdf_na[i]);
          out_pd.v_na.add(pd.v_na[i]);
          out_pd.r_na.add(pd.r_na[i]);
-         out_pd.crps_na.add(pd.crps_na[i]);
+         out_pd.crps_emp_na.add(pd.crps_emp_na[i]);
+         out_pd.crps_gaus_na.add(pd.crps_gaus_na[i]);
          out_pd.ign_na.add(pd.ign_na[i]);
          out_pd.pit_na.add(pd.pit_na[i]);
          out_pd.skip_ba.add(false);

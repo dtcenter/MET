@@ -22,20 +22,22 @@
 ##      file_list
 ##      [-column name]
 ##      [-out name]
+##      [-met_base path]
 ##      [-save]
 ##
 ##  Arguments:
-##    "file_list"    is one or more files containing CNT lines.
-##    "-column name" specifies a CNT statistic to be plotted (multiple).
-##    "-out name"    specifies an output PDF file name.
-##    "-save"        calls save.image() before exiting R.
+##    "file_list"      is one or more files containing CNT lines.
+##    "-column name"   specifies a CNT statistic to be plotted (multiple).
+##    "-out name"      specifies an output PDF file name.
+##    "-met_base path" is MET_INSTALL_DIR/share/met for the headers.
+##    "-save"          calls save.image() before exiting R.
 ##
 ##  Details:
-##    Updated for MET version 6.0.
+##    Updated on 02/03/2021 to parse version-specific headers.
 ##
 ##  Examples:
 ##    Rscript plot_cnt.R \
-##      met-6.0/out/point_stat/*_cnt.txt
+##      out/point_stat/*_cnt.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -51,40 +53,8 @@ library(stats)
 #
 ########################################################################
 
-# Header for the CNT line type (MET version 6.0)
-cnt_header <- c("VERSION", "MODEL", "DESC",
-                "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
-                "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
-                "FCST_VAR", "FCST_LEV",
-                "OBS_VAR", "OBS_LEV",
-                "OBTYPE", "VX_MASK",
-                "INTERP_MTHD", "INTERP_PNTS",
-                "FCST_THRESH", "OBS_THRESH", "COV_THRESH",
-                "ALPHA", "LINE_TYPE", "TOTAL",
-                "FBAR", "FBAR_NCL", "FBAR_NCU", "FBAR_BCL", "FBAR_BCU",
-                "FSTDEV", "FSTDEV_NCL", "FSTDEV_NCU", "FSTDEV_BCL", "FSTDEV_BCU",
-                "OBAR", "OBAR_NCL", "OBAR_NCU", "OBAR_BCL", "OBAR_BCU",
-                "OSTDEV", "OSTDEV_NCL", "OSTDEV_NCU", "OSTDEV_BCL", "OSTDEV_BCU",
-                "PR_CORR", "PR_CORR_NCL", "PR_CORR_NCU", "PR_CORR_BCL", "PR_CORR_BCU",
-                "SP_CORR",
-                "KT_CORR", "RANKS", "FRANK_TIES", "ORANK_TIES",
-                "ME", "ME_NCL", "ME_NCU", "ME_BCL", "ME_BCU",
-                "ESTDEV", "ESTDEV_NCL", "ESTDEV_NCU", "ESTDEV_BCL", "ESTDEV_BCU",
-                "MBIAS", "MBIAS_BCL", "MBIAS_BCU",
-                "MAE", "MAE_BCL", "MAE_BCU",
-                "MSE", "MSE_BCL", "MSE_BCU",
-                "BCMSE", "BCMSE_BCL", "BCMSE_BCU",
-                "RMSE", "RMSE_BCL", "RMSE_BCU",
-                "E10", "E10_BCL", "E10_BCU",
-                "E25", "E25_BCL", "E25_BCU",
-                "E50", "E50_BCL", "E50_BCU",
-                "E75", "E75_BCL", "E75_BCU",
-                "E90", "E90_BCL", "E90_BCU",
-                "EIQR", "EIQR_BCL", "EIQR_BCU",
-                "MAD", "MAD_BCL", "MAD_BCU")
-
 # Temporary input file name
-tmp_file <- "cnt_input.tmp"
+tmp_file = "cnt_input.tmp"
 
 # Default output file name
 out_file = "cnt_plots.pdf"
@@ -103,21 +73,24 @@ args = commandArgs(TRUE)
 
 # Check the number of arguments
 if(length(args) < 1) {
-   cat("Usage: plot_cnt.R\n")
-   cat("         cnt_file_list\n")
-   cat("         [-column name]\n")
-   cat("         [-out name]\n")
-   cat("         [-save]\n")
-   cat("         where \"file_list\"    is one or more files containing CNT lines.\n")
-   cat("               \"-column name\" specifies a CNT statistic to be plotted (multiple).\n")
-   cat("               \"-out name\"    specifies an output PDF file name.\n")
-   cat("               \"-save\"        calls save.image() before exiting R.\n\n")
-   quit()
+  cat("Usage: plot_cnt.R\n")
+  cat("         file_list\n")
+  cat("         [-column name]\n")
+  cat("         [-out name]\n")
+  cat("         [-met_base path]\n")
+  cat("         [-save]\n")
+  cat("         where \"file_list\"      is one or more files containing CNT lines.\n")
+  cat("               \"-column name\"   specifies a CNT statistic to be plotted (multiple).\n")
+  cat("               \"-out name\"      specifies an output PDF file name.\n")
+  cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
+  cat("               \"-save\"          calls save.image() before exiting R.\n\n")
+  quit()
 }
 
 # Initialize
 file_list = c()
 stat_list = c()
+met_base  = ''
 save      = FALSE
 
 # Parse the arguments
@@ -131,6 +104,12 @@ while(i <= length(args)) {
 
     # Set the output file name
     out_file = args[i+1]
+    i = i+1
+
+  } else if(args[i] == "-met_base") {
+
+    # Set MET_BASE variable
+    met_base = args[i+1]
     i = i+1
 
   } else if(args[i] == "-column") {
@@ -158,6 +137,12 @@ if(length(stat_list) <= 0) stat_list <- default_stat_list
 #
 ########################################################################
 
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
+
 # Initialize
 data <- c()
 
@@ -183,8 +168,44 @@ for(i in 1:length(file_list)) {
   system(cmd)
 }
 
+# Check for no data
+if(is.null(data)) {
+  cat("ERROR: No CNT data found!\n")
+  quit()
+}
+
+# Store version from the data
+version = unlist(strsplit(as.character(data[1,1]), '\\.'))
+vXY = paste(version[1], version[2], sep='.')
+
+# Check met_base
+if(nchar(met_base) == 0) {
+  met_base = Sys.getenv("MET_BASE")
+}
+if(nchar(met_base) == 0) {
+  cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
+      "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
+  quit()
+}
+
+# Get the header columns
+header_file = paste(met_base, "/table_files/met_header_columns_", vXY, ".txt", sep='')
+print(paste("Reading Header File:", header_file))
+lty_str  = paste(" : CNT ", sep='')
+hdr_line = grep(lty_str, readLines(header_file), value=TRUE)
+hdr_cols = trimws(unlist(strsplit(hdr_line, ':'))[4])
+hdr_lty  = unlist(strsplit(hdr_cols, ' '))
+
+# Check that header and data columns match
+if(length(hdr_lty) != dim(data)[2]) {
+  cat("ERROR: The number of data (", dim(data)[2],
+      ") and header (", length(hdr_lty),
+      ") columns do not match!\n", sep='')
+  quit()
+}
+
 # After constructing the input data, attach column names
-colnames(data) <- cnt_header
+colnames(data) <- hdr_lty
 
 # Convert date/time columns to date/time objects
 data$FCST_VALID_BEG <- as.POSIXct(strptime(data$FCST_VALID_BEG,
@@ -202,7 +223,7 @@ data$OBS_VALID_END  <- as.POSIXct(strptime(data$OBS_VALID_END,
 #
 ########################################################################
 
-# Construct an idex
+# Construct an index
 data$index <- paste(data$MODEL,
                     data$FCST_VAR, data$FCST_LEV,
                     data$OBS_VAR,  data$OBS_LEV,

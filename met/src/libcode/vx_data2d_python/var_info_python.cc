@@ -147,21 +147,6 @@ void VarInfoPython::set_file_type(const GrdFileType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-   MagicStr << cs_erase << nstr << "/" << lstr;
-
-   return;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 void VarInfoPython::set_dict(Dictionary & dict) {
 
    VarInfo::set_dict(dict);

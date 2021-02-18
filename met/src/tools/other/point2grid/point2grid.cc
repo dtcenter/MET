@@ -405,10 +405,12 @@ void process_data_file() {
    // Open the output file
    open_nc(to_grid, run_cs);
 
-   if (goes_data)
+   if (goes_data) {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
-   else if (TYPE_OBS == obs_type)
+   }
+   else if (TYPE_OBS == obs_type) {
       process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
+   }
    else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
       unsetenv(nc_att_met_point_nccf);
@@ -657,6 +659,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
+   bool empty_input = (nhdr == 0 && nobs == 0);
    NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
    if (IS_VALID_NC(obs_vid_var)) {
       if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids);
@@ -671,30 +674,32 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
    }
 
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
-   if (success_to_read)
-      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
-   if (success_to_read)
-      success_to_read = get_nc_data_string_array(
-            nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
-   if (success_to_read)
-      success_to_read = get_nc_data_string_array(
-            nc_in, nc_var_obs_qty_tbl, &qc_tables);
+   if (!empty_input) {
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
+      if (success_to_read)
+         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
+      if (success_to_read)
+         success_to_read = get_nc_data_string_array(
+               nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
+      if (success_to_read)
+         success_to_read = get_nc_data_string_array(
+               nc_in, nc_var_obs_qty_tbl, &qc_tables);
+   }
    if (success_to_read) {
       bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
@@ -723,7 +728,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
       for(int i=0; i<FieldSA.n(); i++) {
+
          var_idx_or_gc = -1;
+   
          // Initialize
          vinfo->clear();
 
@@ -743,7 +750,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          else {
             if (use_var_id) {
                if (!var_names.has(vname, var_idx_or_gc)) {
-                  exit_by_field_name_error = true;;
+                  exit_by_field_name_error = true;
                   error_msg << "The variable \"" << vname << "\" is not available.\n";
                }
             }
@@ -758,7 +765,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      sprintf(grib_code, "%d", var_idx_or_gc);
                   }
                   else {
-                     exit_by_field_name_error = true;;
+                     exit_by_field_name_error = true;
                      error_msg << "Invalid GRIB code [" << vname << "]\n";
                   }
                }
@@ -771,7 +778,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      }
                   }
                   if (not_found_grib_code) {
-                     exit_by_field_name_error = true;;
+                     exit_by_field_name_error = true;
                      error_msg << "No data for the GRIB code [" << vname << "]\n";
                   }
                }
@@ -797,11 +804,17 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   }
                }
             }
-            mlog << Error << "\n" << method_name
-                 << error_msg
-                 << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
-                 << "\t" << log_msg << "\n\n";
-            exit(1);
+            if (empty_input) {
+               mlog << Warning << "\n" << method_name
+                    << error_msg << "\tBut ignored because of empty input\n\n";
+            }
+            else {
+               mlog << Error << "\n" << method_name
+                    << error_msg
+                    << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
+                    << "\t" << log_msg << "\n\n";
+               exit(1);
+            }
          }
 
          // Check the time range. Apply the time window
@@ -877,7 +890,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   continue;
                }
 
-               //Filter by QC flag
+               // Filter by QC flag
                if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
                   filtered_by_qc++;
                   continue;
@@ -1923,7 +1936,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   int from_lat_count = fr_grid.ny();;
+   int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
 
    // Override the from nx & ny from NetCDF if exists
@@ -2026,7 +2039,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   int from_lat_count = fr_grid.ny();;
+   int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
 
    bool has_coord_input = false;

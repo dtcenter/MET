@@ -198,18 +198,6 @@ void VarInfoGrib::set_tri(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-   MagicStr << cs_erase << nstr << "/" << lstr;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoGrib::add_grib_code (Dictionary &dict)
 {
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);

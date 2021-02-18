@@ -141,11 +141,8 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    ConcatString tmp_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
 
-   // Validate the magic string
-   VarInfo::set_magic(nstr, lstr);
-
    // Store the magic string
-   MagicStr << cs_erase << nstr << lstr;
+   VarInfo::set_magic(nstr, lstr);
 
    // Set the requested name and default output name
    set_req_name(nstr.c_str());

@@ -21,19 +21,22 @@
 ##      file_list
 ##      [-wind_rose]
 ##      [-out name]
+##      [-met_base path]
 ##      [-save]
 ##
 ##  Arguments:
-##    "file_list" is one or more files containing MPR lines.
-##    "-out name" specifies an output PDF file name.
-##    "-save"     calls save.image() before exiting R.
+##    "file_list"      is one or more files containing MPR lines.
+##    "-wind_rose"     enables plotting of wind vectors.
+##    "-out name"      specifies an output PDF file name.
+##    "-met_base path" is MET_INSTALL_DIR/share/met for the headers.
+##    "-save"          calls save.image() before exiting R.
 ##
 ##  Details:
-##    Updated for MET version 6.0.
+##    Updated on 02/03/2021 to parse version-specific headers.
 ##
 ##  Examples:
 ##    Rscript plot_mpr.R \
-##      met-6.0/out/point_stat/*_mpr.txt
+##      out/point_stat/*_mpr.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -62,19 +65,6 @@ plot_wind_rose <- function(u, v, title) {
 #
 ########################################################################
 
-# Header for the MPR line type (MET version 6.0)
-mpr_header <- c("VERSION", "MODEL", "DESC",
-                "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
-                "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
-                "FCST_VAR", "FCST_LEV",
-                "OBS_VAR", "OBS_LEV",
-                "OBTYPE", "VX_MASK",
-                "INTERP_MTHD", "INTERP_PNTS",
-                "FCST_THRESH", "OBS_THRESH", "COV_THRESH",
-                "ALPHA", "LINE_TYPE",
-                "TOTAL", "INDEX", "OBS_SID", "OBS_LAT", "OBS_LON",
-                "OBS_LVL", "OBS_ELV", "FCST", "OBS", "CLIMO")
-
 # Temporary input file name
 tmp_file <- "mpr_input.tmp"
 
@@ -92,22 +82,25 @@ args = commandArgs(TRUE)
 
 # Check the number of arguments
 if(length(args) < 1) {
-   cat("Usage: plot_mpr.R\n")
-   cat("         mpr_file_list\n")
-   cat("         [-wind_rose]\n")
-   cat("         [-out name]\n")
-   cat("         [-save]\n")
-   cat("         where \"file_list\"  is one or more files containing MPR lines.\n")
-   cat("               \"-wind_rose\" enables plotting of vector winds.\n")
-   cat("               \"-out name\"  specifies an output PDF file name.\n")
-   cat("               \"-save\"      calls save.image() before exiting R.\n\n")
-   quit()
+  cat("Usage: plot_mpr.R\n")
+  cat("         file_list\n")
+  cat("         [-wind_rose]\n")
+  cat("         [-out name]\n")
+  cat("         [-met_base path]\n")
+  cat("         [-save]\n")
+  cat("         where \"file_list\"      is one or more files containing MPR lines.\n")
+  cat("               \"-wind_rose\"     enables plotting of vector winds.\n")
+  cat("               \"-out name\"      specifies an output PDF file name.\n")
+  cat("               \"-met_base path\" is MET_INSTALL_DIR/share/met for the headers.\n")
+  cat("               \"-save\"          calls save.image() before exiting R.\n\n")
+  quit()
 }
 
 # Initialize
-save = FALSE
-wind_rose = FALSE
 file_list = c()
+wind_rose = FALSE
+met_base  = ''
+save      = FALSE
 
 # Parse the arguments
 i=1
@@ -122,6 +115,12 @@ while(i <= length(args)) {
 
     # Set the output file name
     out_file = args[i+1]
+    i = i+1
+
+  } else if(args[i] == "-met_base") {
+
+    # Set MET_BASE variable
+    met_base = args[i+1]
     i = i+1
 
   } else {
@@ -139,6 +138,12 @@ while(i <= length(args)) {
 # Read the input files.
 #
 ########################################################################
+
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
 
 # Initialize
 data <- c()
@@ -165,8 +170,44 @@ for(i in 1:length(file_list)) {
   system(cmd)
 }
 
+# Check for no data
+if(is.null(data)) {
+  cat("ERROR: No MPR data found!\n")
+  quit()
+}
+
+# Store version from the data
+version = unlist(strsplit(as.character(data[1,1]), '\\.'))
+vXY = paste(version[1], version[2], sep='.')
+
+# Check met_base
+if(nchar(met_base) == 0) {
+  met_base = Sys.getenv("MET_BASE")
+}
+if(nchar(met_base) == 0) {
+  cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
+      "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
+  quit()
+}
+
+# Get the header columns
+header_file = paste(met_base, "/table_files/met_header_columns_", vXY, ".txt", sep='')
+print(paste("Reading Header File:", header_file))
+lty_str  = paste(" : MPR ", sep='')
+hdr_line = grep(lty_str, readLines(header_file), value=TRUE)
+hdr_cols = trimws(unlist(strsplit(hdr_line, ':'))[4])
+hdr_lty  = unlist(strsplit(hdr_cols, ' '))
+
+# Check that header and data columns match
+if(length(hdr_lty) != dim(data)[2]) {
+  cat("ERROR: The number of data (", dim(data)[2],
+      ") and header (", length(hdr_lty),
+      ") columns do not match!\n", sep='')
+  quit()
+}
+
 # After constructing the input data, attach column names
-colnames(data) <- mpr_header
+colnames(data) <- hdr_lty
 
 ########################################################################
 #
@@ -174,10 +215,10 @@ colnames(data) <- mpr_header
 #
 ########################################################################
 
-# Construct an idex
+# Construct an index
 data$index <- paste(data$MODEL,
                     data$FCST_VAR, data$FCST_LEV,
-                    data$OBS_VAR,  data$OBS_LEV,
+                    data$OBS_VAR, data$OBS_LEV,
                     data$OBTYPE, data$VX_MASK,
                     data$INTERP_MTHD, data$INTERP_PNTS,
                     sep='_')
