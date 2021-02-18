@@ -93,11 +93,11 @@ void increase_one_month(int &year, int &month) {
 unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
-  unixtime time_value_ut = (int)time_value;
+  unixtime time_value_ut = (unixtime)time_value;
   double time_fraction = time_value - time_value_ut;
   if (!no_leap || sec_per_unit != 86400) {
     bool use_ut = true;
-    if (abs(1.0 - time_fraction) < TIME_EPSILON) time_value_ut += 1;
+    if ((1.0 - time_fraction) < TIME_EPSILON) time_value_ut += 1;
     else if (time_fraction > TIME_EPSILON) use_ut = false;
     if (use_ut) ut = (unixtime)(base_unixtime + sec_per_unit * time_value_ut);
     else ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
