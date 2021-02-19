@@ -800,28 +800,30 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
   * - 37
     - ENS_i
     - Value of the ith ensemble member (repeated)
-  * - Last-6
+  * - Last-7
     - OBS_QC
     - Quality control string for the observation
-  * - Last-5
+  * - Last-6
     - ENS_MEAN
     - The unperturbed ensemble mean value
+  * - Last-5
+    - CLIMO_MEAN
+    - Climatological mean value (named CLIMO prior to met-10.0.0)
   * - Last-4
-    - CLIMO
-    - The value of the included climatology
-  * - Last-3
     - SPREAD
     - The spread (standard deviation) of the unperturbed ensemble member values
-  * - Last-2
+  * - Last-3
     - ENS_MEAN _OERR
     - The PERTURBED ensemble mean (e.g. with Observation Error).
-  * - Last-1
+  * - Last-2
     - SPREAD_OERR
     - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error).
-  * - Last
+  * - Last-1
     - SPREAD_PLUS_OERR
     - The square root of the sum of the unperturbed ensemble variance and the observation error variance.
-
+  * - Last
+    - CLIMO_STDEV
+    - Climatological standard deviation value
       
 .. role:: raw-html(raw)
     :format: html

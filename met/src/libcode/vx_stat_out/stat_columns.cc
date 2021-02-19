@@ -3822,14 +3822,14 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    // Ensemble Observation Rank Matched Pairs
    // Dump out the ORANK line:
-   //    TOTAL,       INDEX,         OBS_SID,
-   //    OBS_LAT,     OBS_LON,       OBS_LVL,
-   //    OBS_ELV,     OBS,           PIT,
-   //    RANK,        N_ENS_VLD,     N_ENS,
+   //    TOTAL,            INDEX,         OBS_SID,
+   //    OBS_LAT,          OBS_LON,       OBS_LVL,
+   //    OBS_ELV,          OBS,           PIT,
+   //    RANK,             N_ENS_VLD,     N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN,      CLIMO,
-   //    SPREAD,      ENS_MEAN_OERR, SPREAD_OERR,
-   //    SPREAD_PLUS_OERR
+   //    OBS_QC,           ENS_MEAN,      CLIMO_MEAN,
+   //    SPREAD,           ENS_MEAN_OERR, SPREAD_OERR,
+   //    SPREAD_PLUS_OERR, CLIMO_STDEV
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);    // Use n_obs instead of n_pair to include missing data
@@ -3885,7 +3885,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
-   // Climatology values
+   // Climatology mean values
    at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
 
@@ -3904,6 +3904,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Unperturbed ensemble spread values plus observation error
    at.set_entry(r, c+18+pd_ptr->n_ens,
       square_root(pd_ptr->var_plus_oerr_na[i]));
+
+   // Climatology standard deviation values
+   at.set_entry(r, c+19+pd_ptr->n_ens,
+      pd_ptr->csd_na[i]);
 
    return;
 }
