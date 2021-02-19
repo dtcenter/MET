@@ -77,6 +77,8 @@ class Python3_Script {
 
       void read_pickle  (const char * variable_name, const char * pickle_filename) const;
 
+      void import_read_tmp_ascii_py (void) const;
+
       void read_tmp_ascii (const char * tmp_filename) const;
 };
 

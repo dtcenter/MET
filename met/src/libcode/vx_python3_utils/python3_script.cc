@@ -27,6 +27,8 @@ using namespace std;
 
 static const char sq = '\'';   //  single quote
 
+static const char read_tmp_ascii_py [] = "MET_BASE/wrappers/read_tmp_ascii.py";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -231,6 +233,14 @@ if ( PyErr_Occurred() )  {
 }
 
 return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void Python3_Script::import_read_tmp_ascii_py(void) const
+
+{
 
 }
 
