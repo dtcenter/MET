@@ -74,13 +74,19 @@ class PairDataEnsemble : public PairBase {
       ObsErrorEntryPtrArray obs_error_entry;
       bool                  obs_error_flag;
 
+      // ClimoCDFInfo pointer
+      const ClimoCDFInfo *cdf_info;
+
       // Ensemble, valid count, and rank values
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
 
       NumArray   crps_emp_na;     // Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   crpscl_emp_na;   // Empirical climatological CRPS [n_obs]
+
       NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
+      NumArray   crpscl_gaus_na;  // Gaussian climatological CRPS [n_obs]
 
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
@@ -110,9 +116,7 @@ class PairDataEnsemble : public PairBase {
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
 
-      double     crpscl_emp;      // Empirical climatological CRPS score
       double     crpss_emp;       // Empirical CRPS skill score
-      double     crpscl_gaus;     // Guassian climatological CRPS score
       double     crpss_gaus;      // Guassian CRPS skill score
 
       double     me;              // ME for ensemble mean
@@ -131,6 +135,7 @@ class PairDataEnsemble : public PairBase {
       void add_ens(int, double);
       void add_ens_var_sums(int, double);
       void set_ens_size(int);
+      void set_climo_cdf(const ClimoCDFInfo *);
 
       void add_obs_error_entry(ObsErrorEntry *);
 
@@ -267,6 +272,8 @@ class VxPairDataEnsemble {
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
 
+      void set_climo_cdf(const ClimoCDFInfo *);
+
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
 
@@ -298,13 +305,11 @@ class VxPairDataEnsemble {
 ////////////////////////////////////////////////////////////////////////
 
 extern double compute_crps_emp(double, const NumArray &);
+extern double compute_crps_gaus(double, double, double);
+extern double compute_ens_ign(double, double, double);
+extern double compute_ens_pit(double, double, double);
 
-extern void compute_crps_gaus_ign_pit(double, const NumArray &,
-               double &, double &, double &);
-
-// Subset pairs for a specific climatology CDF bin
-extern PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &,
-                           const ThreshArray &, int i_bin);
+extern NumArray derive_normal_cdf_inv(const ClimoCDFInfo *, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
