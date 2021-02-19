@@ -242,6 +242,13 @@ void Python3_Script::import_read_tmp_ascii_py(void) const
 
 {
 
+ConcatString module;
+
+module << cs_erase
+       << replace_path(read_tmp_ascii_py);
+
+mlog << Debug(3) << "Importing " << module << "\n";
+
 }
 
 ////////////////////////////////////////////////////////////////////////
