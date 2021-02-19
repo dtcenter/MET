@@ -284,11 +284,11 @@ struct RegridInfo {
    ThreshArray   censor_thresh; // Censoring thesholds
    NumArray      censor_val;    // and replacement values
 
-   void *       hook;           // not allocated
+   void * hook;            // not allocated
 
-   void         clear();
-   void         validate();        // ensure that width and method are accordant
-   void         validate_point();  // ensure that width and method are accordant
+   void clear();
+   void validate();        // ensure that width and method are accordant
+   void validate_point();  // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -305,6 +305,7 @@ struct ClimoCDFInfo {
 
    ClimoCDFInfo();
    void clear();
+   void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
 };
 
 ////////////////////////////////////////////////////////////////////////
