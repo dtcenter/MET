@@ -2553,8 +2553,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.ens_pd.clear();
-            aggr.crpscl_emp_na.clear();
-            aggr.crpscl_gaus_na.clear();
             aggr.hdr.clear();
             m[key] = aggr;
          }
@@ -2573,9 +2571,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store the current statistics and weight (TOTAL column)
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
-         m[key].crpscl_emp_na.add(cur.crpscl_emp);
+         m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
-         m[key].crpscl_gaus_na.add(cur.crpscl_gaus);
+         m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.var_na.add(square(cur.spread));
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
@@ -2620,9 +2618,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
       crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_emp  = it->second.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
       crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_gaus = it->second.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
@@ -3002,8 +3000,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ORANKData cur;
    ConcatString key;
+   NumArray cur_clm;
    int i, n_valid, n_bin;
-   double esum, esumsq, crps_gaus, ign, pit;
+   double esum, esumsq;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -3054,6 +3053,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
+            bool center = false;
+            aggr.ens_pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
             aggr.hdr.clear();
             m[key] = aggr;
          }
@@ -3073,8 +3074,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo,
-                                    bad_data_double, default_grid_weight);
+         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo_mean,
+                                    cur.climo_stdev, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
@@ -3097,12 +3098,19 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.esumsq_na.add(esumsq);
          m[key].ens_pd.v_na.add(n_valid);
 
-         // Compute Empirical and Gaussian CRPS, IGN, and PIT for the current point
+         // Derive ensemble from climo mean and standard deviation
+         cur_clm = derive_climo_cdf_inv(m[key].ens_pd.cdf_info,
+                                        cur.climo_mean, cur.climo_stdev);
+
+         // Store empirical CRPS stats
          m[key].ens_pd.crps_emp_na.add(compute_crps_emp(cur.obs, cur.ens_na));
-         compute_crps_gaus_ign_pit(cur.obs, cur.ens_na, crps_gaus, ign, pit);
-         m[key].ens_pd.crps_gaus_na.add(crps_gaus);
-         m[key].ens_pd.ign_na.add(ign);
-         m[key].ens_pd.pit_na.add(pit);
+         m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, cur_clm));
+
+         // Store Gaussian CRPS stats
+         m[key].ens_pd.crps_gaus_na.add(compute_crps_gaus(cur.obs, cur.ens_mean, cur.spread));
+         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
+         m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
+         m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
          //
          // Increment the RHIST counts

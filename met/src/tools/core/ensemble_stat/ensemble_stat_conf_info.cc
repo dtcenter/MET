@@ -601,7 +601,7 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       vx_opt[i].vx_pd.set_ens_size(ens_size[i]);
 
       // Store the ClimoCDFInfo
-      vx_opt[i].vx_pd.set_climo_cdf(&vx_opt[i].cdf_info);
+      vx_opt[i].vx_pd.set_climo_cdf(vx_opt[i].cdf_info);
 
    }
 

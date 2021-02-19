@@ -93,7 +93,7 @@ struct ORANKData {
    int total, index;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double obs, pit, climo;
+   double obs, pit, climo_mean, climo_stdev;
    double ens_mean, spread, ens_mean_oerr, spread_oerr;
    double spread_plus_oerr;
    int rank, n_ens_vld, n_ens;
