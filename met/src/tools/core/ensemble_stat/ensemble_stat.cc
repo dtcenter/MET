@@ -1220,6 +1220,7 @@ int process_point_ens(int i_ens, int &n_miss) {
 void process_point_scores() {
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
    PairDataEnsemble pd;
+   ConcatString cs;
    int i, j, k, l, m, n;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1254,7 +1255,9 @@ void process_point_scores() {
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
+      cs = conf_info.vx_opt[i].vx_pd.obs_info->units_attr();
+      if(cs.empty()) cs = na_string;
+      shc.set_obs_units(cs);
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
