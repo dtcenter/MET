@@ -247,6 +247,19 @@ ConcatString module;
 module << cs_erase
        << replace_path(read_tmp_ascii_py);
 
+ConcatString command;
+
+run_python_string("import sys");
+
+command << cs_erase
+        << "sys.path.append(\""
+        << module.dirname().c_str()
+        << "\")";
+
+mlog << Debug(3) << command << "\n";
+
+// run_python_string(command.text());
+
 mlog << Debug(3) << "Importing " << module << "\n";
 
 }
