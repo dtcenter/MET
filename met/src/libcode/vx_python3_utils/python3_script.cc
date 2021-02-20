@@ -258,9 +258,15 @@ command << cs_erase
 
 mlog << Debug(3) << command << "\n";
 
-// run_python_string(command.text());
+run_python_string(command.text());
 
-mlog << Debug(3) << "Importing " << module << "\n";
+mlog << Debug(2) << "Importing " << module << "\n";
+
+command << cs_erase << "import read_tmp_ascii";
+
+mlog << Debug(3) << command << "\n";
+
+run_python_string(command.text());
 
 }
 
