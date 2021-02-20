@@ -600,9 +600,6 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       // Set up the ensemble size
       vx_opt[i].vx_pd.set_ens_size(ens_size[i]);
 
-      // Store the ClimoCDFInfo
-      vx_opt[i].vx_pd.set_climo_cdf(vx_opt[i].cdf_info);
-
    }
 
    return;
@@ -879,6 +876,9 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+
+   // Store climo CDF
+   vx_pd.set_climo_cdf(cdf_info);
 
    // Store the list of surface message types
    vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
