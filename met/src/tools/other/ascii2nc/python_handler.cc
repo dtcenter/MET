@@ -332,6 +332,7 @@ const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
 ConcatString pickle_path;
+ConcatString tmp_ascii_path;
 const char * tmp_dir = 0;
 int status;
 
@@ -348,6 +349,8 @@ path << cs_erase
      << pickle_base_name;
 
 pickle_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path << ".txt";
 
 command << cs_erase
         << user_path_to_python                << ' '    //  user's path to python
@@ -382,6 +385,8 @@ Python3_Script script(wrapper.text());
 script.import_read_tmp_ascii_py();
 
 script.read_pickle(list_name, pickle_path.text());
+
+script.read_tmp_ascii(tmp_ascii_path.text());
 
 PyObject * obj = script.lookup(list_name);
 

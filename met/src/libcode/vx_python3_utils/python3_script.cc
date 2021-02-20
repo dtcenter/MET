@@ -276,10 +276,18 @@ void Python3_Script::read_tmp_ascii(const char * tmp_filename) const
 
 {
 
-mlog << Debug(3) << "Reading temporary ascii file: "
+mlog << Debug(2) << "Reading temporary ascii file: "
      << tmp_filename << "\n";
 
 ConcatString command;
+
+command << "read_tmp_ascii.read_tmp_ascii(\""
+        << tmp_filename
+        << "\")";
+
+mlog << Debug(3) << command << "\n";
+
+run_python_string(command.text());
 
 }
 
