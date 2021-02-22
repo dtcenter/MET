@@ -293,7 +293,10 @@ mlog << Debug(3) << command << "\n";
 
 PyErr_Clear();
 
-run(command.text());
+PyObject * pobj;
+
+// pobj = run(command.text());
+run_python_string(command.text());
 
 if ( PyErr_Occurred() )  {
 
