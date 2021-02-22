@@ -171,6 +171,7 @@ static const int Friday    = 5;
 static const int Saturday  = 6;
 static const int Sunday    = 7;
 
+static const double TIME_EPSILON = 0.001;
 
 ////////////////////////////////////////////////////////////////////////
 

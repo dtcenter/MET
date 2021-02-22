@@ -150,6 +150,7 @@ void NcCfFile::close()
 
   ValidTime.clear();
   InitTime = (unixtime)0;
+  AccumTime = (unixtime)0;
 
   //  done
 
@@ -318,11 +319,31 @@ bool NcCfFile::open(const char * filepath)
       ut = sec_per_unit = 0;
     }
 
+    NcVar bounds_time_var;
+    NcVar *nc_time_var = (NcVar *)0;
+    nc_time_var = valid_time_var;
+    bool use_bounds_var = false;
+    ConcatString bounds_var_name;
+    nc_time_var = valid_time_var;
+    NcVarAtt *bounds_att = get_nc_att(valid_time_var, (string)"bounds", false);
+    if (get_att_value_chars(bounds_att, bounds_var_name)) {
+      bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
+      use_bounds_var = IS_VALID_NC(bounds_time_var);
+      if (use_bounds_var) {
+        nc_time_var = &bounds_time_var;
+        mlog << Debug(3) << method_name
+             << "read time from the bounds variable \"" << bounds_var_name << "\"\n";
+      }
+    }
+    if (bounds_att) delete bounds_att;
+
     if (units_att) delete units_att;
     // Determine the number of times present.
     int n_times = (int) get_data_size(valid_time_var);
-    double *time_values = new double[n_times];
-    if( get_nc_data(valid_time_var, time_values) ) {
+    int tim_buf_size = n_times;
+    if (use_bounds_var) tim_buf_size *= 2;
+    double *time_values = new double[tim_buf_size];
+    if( get_nc_data(nc_time_var, time_values) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
       if( time_dim_count > 1 ) {
         double latest_time = bad_data_double;
@@ -332,8 +353,24 @@ bool NcCfFile::open(const char * filepath)
         ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
       }
       else {
-        for(int i=0; i<n_times; i++) {
-          ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
+        if (use_bounds_var) {
+          double bounds_diff;
+          double time_fraction;
+          for(int i=0; i<n_times; i++) {
+            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
+            bounds_diff = time_values[i*2+1] - time_values[i*2];
+            if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
+              AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
+            }
+            else {
+              AccumTime = (unixtime)(sec_per_unit * bounds_diff);
+            }
+          }
+        }
+        else {
+          for(int i=0; i<n_times; i++) {
+            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
+          }
         }
       }
     }
@@ -385,11 +422,6 @@ bool NcCfFile::open(const char * filepath)
 
     double time_value = get_nc_time(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
-
-    //bool no_leap_year = get_att_no_leap_year(&init_time_var);
-    //if (sec_per_unit == 86400 && no_leap_year) {
-    //  InitTime = add_days_to_unix((unixtime)ut, (int)time_value);
-    //}
   }
 
   // Pull out the grid.  This must be done after pulling out the dimension
@@ -700,6 +732,17 @@ void NcCfFile::dump(ostream & out, int depth) const
           short_month_name[month], day, year, hour, minute, second);
 
   out << junk << "\n";
+
+  out << prefix << "\n";
+
+  if (AccumTime > 0) {
+    unix_to_mdyhms(AccumTime, month, day, year, hour, minute, second);
+    snprintf(junk, sizeof(junk), "%2d:%02d:%02d (%d seconds)",
+             hour, minute, second, AccumTime);
+    out << prefix << "Accum Time = ";
+    out << junk << "\n";
+    out << prefix << "\n";
+  }
 
   out << prefix << "\n";
 
@@ -1158,10 +1201,13 @@ bool NcCfFile::getData(const char *var_name,
      init_ut = valid_ut;
   }
 
+  unixtime accum_time = info->AccumTime;
+  if ((0 == accum_time) && (AccumTime>0)) accum_time = AccumTime;
+
   plane.set_init(init_ut);
   plane.set_valid(valid_ut);
   plane.set_lead(valid_ut - init_ut);
-  plane.set_accum(info->AccumTime);
+  plane.set_accum(accum_time);
 
   //  done
 
