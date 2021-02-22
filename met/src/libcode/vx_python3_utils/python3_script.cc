@@ -287,7 +287,17 @@ command << "read_tmp_ascii.read_tmp_ascii(\""
 
 mlog << Debug(3) << command << "\n";
 
-run_python_string(command.text());
+PyErr_Clear();
+
+run(command.text());
+
+if ( PyErr_Occurred() )  {
+
+   mlog << Error << "\nPython3_Script::read_tmp_ascii() -> "
+        << "command \"" << command << "\" failed!\n\n";
+
+   exit ( 1 );
+}
 
 }
 
