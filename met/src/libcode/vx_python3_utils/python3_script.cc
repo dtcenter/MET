@@ -165,9 +165,11 @@ return ( var );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Python3_Script::run(const char * command) const
+PyObject * Python3_Script::run(const char * command) const
 
 {
+
+PyObject * pobj;
 
 if ( empty(command) )  {
 
@@ -178,7 +180,9 @@ if ( empty(command) )  {
 
 }
 
-if ( ! PyRun_String(command, Py_file_input, Dict, Dict) )  {
+pobj = PyRun_String(command, Py_file_input, Dict, Dict);
+
+if ( ! pobj )  {
 
    mlog << Error << "\nPython3_Script::run(const char *) -> "
         << "command \"" << command << "\" failed!\n\n";
@@ -190,7 +194,7 @@ if ( ! PyRun_String(command, Py_file_input, Dict, Dict) )  {
 fflush(stdout);
 fflush(stderr);
 
-return;
+return pobj;
 
 }
 

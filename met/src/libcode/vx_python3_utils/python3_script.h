@@ -73,7 +73,7 @@ class Python3_Script {
 
       PyObject * lookup(const char * name) const;
 
-      void run(const char * command) const;   //  runs a command in the namespace of the script
+      PyObject * run(const char * command) const;   //  runs a command in the namespace of the script
 
       void read_pickle  (const char * variable_name, const char * pickle_filename) const;
 
