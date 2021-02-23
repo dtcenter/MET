@@ -2170,6 +2170,22 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void check_mask_names(const StringArray &sa) {
+   StringArray sa_uniq = sa.uniq();
+
+   // Check for unique mask names
+   if(sa_uniq.n() < sa.n()) {
+      mlog << Error << "\ncheck_mask_names() -> "
+           << "found non-unique strings in the list of masking region names ("
+           << write_css(sa) << ")!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void check_climo_n_vx(Dictionary *dict, const int n_vx) {
    int n;
 

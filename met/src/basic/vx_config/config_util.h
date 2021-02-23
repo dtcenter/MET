@@ -73,6 +73,8 @@ extern map<ConcatString,ThreshArray>
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 
+extern void         check_mask_names(const StringArray &);
+
 extern void         check_climo_n_vx(Dictionary *dict, const int);
 
 extern InterpMthd   int_to_interpmthd(int);

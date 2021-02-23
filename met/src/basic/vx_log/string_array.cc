@@ -615,7 +615,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray StringArray::uniq()
+StringArray StringArray::uniq() const
 
 {
 

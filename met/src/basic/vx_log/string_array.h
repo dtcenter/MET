@@ -115,7 +115,7 @@ class StringArray {
          //  return a unique subset of strings
          //
 
-      StringArray uniq();
+      StringArray uniq() const;
 
 };
 
