@@ -363,6 +363,9 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
+      // Check for unique mask names
+      check_mask_names(vx_opt[i].mask_name);
+
    } // end for i
 
    return;
