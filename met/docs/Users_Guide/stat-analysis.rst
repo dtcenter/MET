@@ -335,7 +335,7 @@ ___________________
   obs_init_exc   = [];
   obs_init_hour  = [];
 
-These time filtering options are the same as described above but applied to initialization times rather than valid times. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-fcst_init_inc", "-fcst_init_exc", "-fcst_init_hour"," "-obs_init_beg", "-obs_init_end", fcst_init_hour"** and **"-obs_init_hour"** options within the job command line.
+These time filtering options are the same as described above but applied to initialization times rather than valid times. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-fcst_init_inc", "-fcst_init_exc", "-fcst_init_hour"," "-obs_init_beg", "-obs_init_end", "-obs_init_inc", "-obs_init_exc"** and **"-obs_init_hour"** options within the job command line.
 
 ___________________
 
