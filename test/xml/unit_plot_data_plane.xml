@@ -402,7 +402,7 @@
     <param> \
       &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
       &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101_12_time.ps \
-      'name="pr"; level="(20060101_120000,*,*)";' \
+      'name="pr"; level="(20060102_000000,*,*)";' \
       -v 4
     </param>
     <output>
