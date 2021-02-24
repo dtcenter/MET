@@ -281,13 +281,13 @@ static const char * phist_columns [] = {
 };
 
 static const char * orank_columns [] = {
-   "TOTAL",       "INDEX",       "OBS_SID",
-   "OBS_LAT",     "OBS_LON",     "OBS_LVL",
-   "OBS_ELV",     "OBS",         "PIT",
-   "RANK",        "N_ENS_VLD",   "N_ENS",
-   "ENS_",        "OBS_QC",      "ENS_MEAN",
-   "CLIMO",       "SPREAD",      "ENS_MEAN_OERR",
-   "SPREAD_OERR", "SPREAD_PLUS_OERR"
+   "TOTAL",       "INDEX",            "OBS_SID",
+   "OBS_LAT",     "OBS_LON",          "OBS_LVL",
+   "OBS_ELV",     "OBS",              "PIT",
+   "RANK",        "N_ENS_VLD",        "N_ENS",
+   "ENS_",        "OBS_QC",           "ENS_MEAN",
+   "CLIMO_MEAN",  "SPREAD",           "ENS_MEAN_OERR",
+   "SPREAD_OERR", "SPREAD_PLUS_OERR", "CLIMO_STDEV"
 };
 
 static const char * ssvar_columns [] = {
@@ -424,7 +424,7 @@ inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = 
 inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
 inline int get_n_relp_columns  (int n) { return(2  + n);               } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(19 + n);               } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(20 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 

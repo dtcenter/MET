@@ -315,11 +315,14 @@
     <param> \
       &OUTPUT_DIR;/climatology/ensemble_stat_input_file_list \
       &CONFIG_DIR;/EnsembleStatConfig_climo \
+      -point_obs &OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc \
       -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
       -outdir &OUTPUT_DIR;/climatology
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology/ensemble_stat_NCEP_1.0DEG_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/ensemble_stat_NCEP_1.0DEG_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/ensemble_stat_NCEP_1.0DEG_20120410_120000V_orank.txt</stat>
       <grid_nc>&OUTPUT_DIR;/climatology/ensemble_stat_NCEP_1.0DEG_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/climatology/ensemble_stat_NCEP_1.0DEG_20120410_120000V_orank.nc</grid_nc>
     </output>

@@ -1483,6 +1483,61 @@ ClimoCDFInfo::ClimoCDFInfo() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
+
+   // Must be greater than 0
+   if(n_bin <= 0) {
+      mlog << Error << "\nClimoCDFInfo::set_cdf_ta() -> "
+           << "The \"" << conf_key_cdf_bins << "\" entry (" << n_bin
+           << ") must be greater than zero.\n\n";
+      exit(1);
+   }
+
+   // Even number of bins cannot be centered
+   if(n_bin%2 == 0 && center) {
+      mlog << Warning <<  "\nClimoCDFInfo::set_cdf_ta() -> "
+           << "Resetting \"" << conf_key_center_bins
+           << "\" to false since the \"" << conf_key_cdf_bins
+           << "\" entry (" << n_bin << ") is even.\n\n";
+      center = false;
+   }
+
+   // For a single bin, set center to false
+   if(n_bin == 1) center = false;
+
+   // Add the first threshold for 0.0
+   cdf_ta.add(0.0, thresh_ge);
+
+   double cdf_inc = (center ? 1.0/(n_bin - 1.0) : 1.0/n_bin);
+   double cdf_val = (center ? cdf_inc/2         : cdf_inc  );
+
+   // Add thresholds between 0.0 and 1.0
+   while(cdf_val < 1.0 && !is_eq(cdf_val, 1.0)) {
+      cdf_ta.add(cdf_val, thresh_ge);
+      cdf_val += cdf_inc;
+   }
+
+   // Add the last threshold for 1.0
+   cdf_ta.add(1.0, thresh_ge);
+
+   if(n_bin == 1) {
+      mlog << Debug(4) << "ClimoCDFInfo::set_cdf_ta() -> "
+           << "Since \"" << conf_key_cdf_bins << "\" = 1, "
+           << "no climatology CDF bins will be applied.\n";
+   }
+   else {
+      mlog << Debug(4) << "ClimoCDFInfo::set_cdf_ta() -> "
+           << "For \"" << conf_key_cdf_bins << "\" (" << n_bin << ") and \""
+           << conf_key_center_bins << "\" (" << bool_to_string(center)
+           << "), defined climatology CDF thresholds: "
+           << write_css(cdf_ta) << "\n";
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    Dictionary *cdf_dict = (Dictionary *) 0;
    ClimoCDFInfo info;
@@ -1506,7 +1561,8 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    center = cdf_dict->lookup_bool(conf_key_center_bins);
 
    // Conf: write_bins
-   info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins);
+   // Used by Grid-Stat and Point-Stat but not by Ensemble-Stat
+   info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins, false, false);
 
    // Check that at least one value is provided
    if(bins.n() == 0) {
@@ -1522,57 +1578,7 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    }
    // Interpret a single value as the number of bins
    else {
-
-      // Store the number of bins
-      int n_bins = nint(bins[0]);
-
-      // Must be greater than 0
-      if(n_bins <= 0) {
-         mlog << Error << "\nparse_conf_climo_cdf() -> "
-              << "The \"" << conf_key_cdf_bins << "\" entry (" << n_bins 
-              << ") must be greater than zero.\n\n";
-         exit(1);
-      }
-
-      // Even number of bins cannot be centered
-      if(n_bins%2 == 0 && center) {
-         mlog << Warning << "\nparse_conf_climo_cdf() -> "
-              << "Resetting \"" << conf_key_center_bins
-              << "\" to false since the \"" << conf_key_cdf_bins
-              << "\" entry (" << n_bins << ") is even.\n\n";
-         center = false;
-      }
-
-      // For a single bin, set center to false
-      if(n_bins == 1) center = false;
-
-      // Add the first threshold for 0.0
-      info.cdf_ta.add(0.0, thresh_ge);
-
-      double cdf_inc = (center ? 1.0/(bins[0] - 1.0) : 1.0/bins[0]);
-      double cdf_val = (center ? cdf_inc/2           : cdf_inc    );
-
-      // Add thresholds between 0.0 and 1.0
-      while(cdf_val < 1.0 && !is_eq(cdf_val, 1.0)) {
-         info.cdf_ta.add(cdf_val, thresh_ge);
-         cdf_val += cdf_inc;
-      }
-
-      // Add the last threshold for 1.0
-      info.cdf_ta.add(1.0, thresh_ge);
-
-      if(n_bins == 1) {
-         mlog << Debug(4) << "parse_conf_climo_cdf() -> "
-              << "Since \"" << conf_key_cdf_bins << "\" = 1, "
-              << "no climatology CDF bins will be applied.\n";
-      }
-      else {
-         mlog << Debug(4) << "parse_conf_climo_cdf() -> "
-              << "For \"" << conf_key_cdf_bins << "\" (" << n_bins << ") and \""
-              << conf_key_center_bins << "\" (" << bool_to_string(center)
-              << "), defined climatology CDF thresholds: "
-              << write_css(info.cdf_ta) << "\n";
-      }
+      info.set_cdf_ta(bins[0], center);
    }
 
    // Sanity check the end points
@@ -2162,6 +2168,22 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
       mlog << Error << "\nparse_conf_range_double() -> "
            << "the ending value (" << end
            << ") must be >= the beginning value (" << beg << ").\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void check_mask_names(const StringArray &sa) {
+   StringArray sa_uniq = sa.uniq();
+
+   // Check for unique mask names
+   if(sa_uniq.n() < sa.n()) {
+      mlog << Error << "\ncheck_mask_names() -> "
+           << "found non-unique strings in the list of masking region names ("
+           << write_css(sa) << ")!\n\n";
       exit(1);
    }
 
