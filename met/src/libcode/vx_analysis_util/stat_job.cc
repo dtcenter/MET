@@ -2439,7 +2439,8 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // Jobs which use out_bin_size
    if(line_type.n_elements() > 0) {
       if(string_to_statlinetype(line_type[0].c_str()) == stat_orank &&
-         out_line_type.has(stat_phist_str)) {
+         (out_line_type.has(stat_phist_str) ||
+          out_line_type.has(stat_ecnt_str))) {
 
          // out_bin_size
         js << "-out_bin_size " << out_bin_size << " ";

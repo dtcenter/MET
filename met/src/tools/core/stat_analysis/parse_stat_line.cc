@@ -488,11 +488,20 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    o_data.obs_qc           =      l.get_item("OBS_QC", false);
    o_data.ens_mean         = atof(l.get_item("ENS_MEAN"));
-   o_data.climo            = atof(l.get_item("CLIMO"));
    o_data.spread           = atof(l.get_item("SPREAD"));
    o_data.ens_mean_oerr    = atof(l.get_item("ENS_MEAN_OERR"));
    o_data.spread_oerr      = atof(l.get_item("SPREAD_OERR"));
    o_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
+
+   // In met-10.0.0 and later, CLIMO column was replaced by CLIMO_MEAN
+   if(l.has("CLIMO")) {
+      o_data.climo_mean  = atof(l.get_item("CLIMO"));
+      o_data.climo_stdev = bad_data_double;
+   }
+   else {
+      o_data.climo_mean  = atof(l.get_item("CLIMO_MEAN"));
+      o_data.climo_stdev = atof(l.get_item("CLIMO_STDEV"));
+   }
 
    return;
 }

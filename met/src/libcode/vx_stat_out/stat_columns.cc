@@ -480,6 +480,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+16+n_ens, (string)orank_columns[17]);
    at.set_entry(r, c+17+n_ens, (string)orank_columns[18]);
    at.set_entry(r, c+18+n_ens, (string)orank_columns[19]);
+   at.set_entry(r, c+19+n_ens, (string)orank_columns[20]);
 
    return;
 }
@@ -1600,10 +1601,9 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
-                    STATOutputType out_type, int i_bin, int n_bin,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
-   ConcatString mask_name = shc.get_mask();
 
    // ECNT line type
    shc.set_line_type(stat_ecnt_str);
@@ -1616,10 +1616,6 @@ void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
-
-   // Update the mask name, if needed.
-   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
-   shc.set_mask(cs.c_str());
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
@@ -1637,9 +1633,6 @@ void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
 
    // Increment the STAT row counter
    stat_row++;
-
-   // Reset the mask name
-   shc.set_mask(mask_name.c_str());
 
    return;
 }
@@ -1680,9 +1673,6 @@ void write_rps_row(StatHdrColumns &shc, const RPSInfo &rps_info,
 
    // Increment the STAT row counter
    stat_row++;
-
-   // Reset the mask name
-   shc.set_mask(mask_name.c_str());
 
    return;
 }
@@ -3833,14 +3823,14 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    // Ensemble Observation Rank Matched Pairs
    // Dump out the ORANK line:
-   //    TOTAL,       INDEX,         OBS_SID,
-   //    OBS_LAT,     OBS_LON,       OBS_LVL,
-   //    OBS_ELV,     OBS,           PIT,
-   //    RANK,        N_ENS_VLD,     N_ENS,
+   //    TOTAL,            INDEX,         OBS_SID,
+   //    OBS_LAT,          OBS_LON,       OBS_LVL,
+   //    OBS_ELV,          OBS,           PIT,
+   //    RANK,             N_ENS_VLD,     N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN,      CLIMO,
-   //    SPREAD,      ENS_MEAN_OERR, SPREAD_OERR,
-   //    SPREAD_PLUS_OERR
+   //    OBS_QC,           ENS_MEAN,      CLIMO_MEAN,
+   //    SPREAD,           ENS_MEAN_OERR, SPREAD_OERR,
+   //    SPREAD_PLUS_OERR, CLIMO_STDEV
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);    // Use n_obs instead of n_pair to include missing data
@@ -3896,7 +3886,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
-   // Climatology values
+   // Climatology mean values
    at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
 
@@ -3915,6 +3905,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Unperturbed ensemble spread values plus observation error
    at.set_entry(r, c+18+pd_ptr->n_ens,
       square_root(pd_ptr->var_plus_oerr_na[i]));
+
+   // Climatology standard deviation values
+   at.set_entry(r, c+19+pd_ptr->n_ens,
+      pd_ptr->csd_na[i]);
 
    return;
 }
