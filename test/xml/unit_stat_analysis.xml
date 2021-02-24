@@ -307,11 +307,11 @@
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_filter_times \
-      -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES_sl1l2.out \
+      -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES.out \
       -v 1
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES_sl1l2.out</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES.out</exist>
     </output>
   </test>
 
