@@ -254,6 +254,13 @@ extern void subset_wind_pairs(const PairDataPoint &,
 extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
                         const ThreshArray &, int i_bin);
 
+// Write the point observation in the MET point format for logging
+extern ConcatString point_obs_to_string(
+                       float *hdr_arr, const char *hdr_typ_str,
+                       const char *hdr_sid_str, unixtime hdr_ut,
+                       const char *obs_qty, float *obs_arr,
+                       const char *var_name);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   // __PAIR_DATA_POINT_H__
