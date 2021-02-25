@@ -92,6 +92,8 @@ void PairDataEnsemble::clear() {
    obs_error_entry.clear();
    obs_error_flag = false;
 
+   cdf_info.clear();
+
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
 
@@ -99,7 +101,9 @@ void PairDataEnsemble::clear() {
    r_na.clear();
 
    crps_emp_na.clear();
+   crpscl_emp_na.clear();
    crps_gaus_na.clear();
+   crpscl_gaus_na.clear();
 
    ign_na.clear();
    pit_na.clear();
@@ -128,9 +132,7 @@ void PairDataEnsemble::clear() {
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
 
-   crpscl_emp     = bad_data_double;
    crpss_emp      = bad_data_double;
-   crpscl_gaus    = bad_data_double;
    crpss_gaus     = bad_data_double;
 
    me             = bad_data_double;
@@ -159,7 +161,9 @@ void PairDataEnsemble::extend(int n, bool exact) {
    v_na.extend               (n, exact);
    r_na.extend               (n, exact);
    crps_emp_na.extend        (n, exact);
+   crpscl_emp_na.extend      (n, exact);
    crps_gaus_na.extend       (n, exact);
+   crpscl_gaus_na.extend     (n, exact);
    ign_na.extend             (n, exact);
    pit_na.extend             (n, exact);
    skip_ba.extend            (n, exact);
@@ -212,7 +216,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    v_na           = pd.v_na;
    r_na           = pd.r_na;
    crps_emp_na    = pd.crps_emp_na;
+   crpscl_emp_na  = pd.crpscl_emp_na;
    crps_gaus_na   = pd.crps_gaus_na;
+   crpscl_gaus_na = pd.crpscl_gaus_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
    n_pair         = pd.n_pair;
@@ -243,9 +249,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
 
-   crpscl_emp     = pd.crpscl_emp;
    crpss_emp      = pd.crpss_emp;
-   crpscl_gaus    = pd.crpscl_gaus;
    crpss_gaus     = pd.crpss_gaus;
 
    me             = pd.me;
@@ -259,6 +263,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    obs_error_entry = pd.obs_error_entry;
    obs_error_flag  = pd.obs_error_flag;
+
+   cdf_info = pd.cdf_info;
 
    return;
 }
@@ -310,6 +316,15 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
+
+   cdf_info = info;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
@@ -324,9 +339,8 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
-   NumArray src_na, dest_na, cur_ens;
-   double mean, var_unperturbed, var_perturbed;
-   double crps_gaus, ign, pit;
+   NumArray src_na, dest_na, cur_ens, cur_clm;
+   double mean, stdev, var_unperturbed, var_perturbed;
 
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
@@ -383,7 +397,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_plus_oerr_na.add(bad_data_double);
          r_na.add(bad_data_int);
          crps_emp_na.add(bad_data_double);
+         crpscl_emp_na.add(bad_data_double);
          crps_gaus_na.add(bad_data_double);
+         crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
       }
@@ -435,12 +451,19 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             r_na.add(nint(dest_na[0]));
          }
 
-         // Store ensemble stats for the current point
+         // Derive ensemble from climo mean and standard deviation
+         cur_clm = derive_climo_cdf_inv(cdf_info, cmn_na[i], csd_na[i]);
+
+         // Store empirical CRPS stats
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
-         compute_crps_gaus_ign_pit(o_na[i], cur_ens, crps_gaus, ign, pit);
-         crps_gaus_na.add(crps_gaus);
-         ign_na.add(ign);
-         pit_na.add(pit);
+         crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
+
+         // Store Gaussian CRPS stats
+         cur_ens.compute_mean_stdev(mean, stdev);
+         crps_gaus_na.add(compute_crps_gaus(o_na[i], mean, stdev));
+         crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
+         ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
+         pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
       }
    } // end for i
 
@@ -762,8 +785,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
-      //   crps_emp_na, crps_gaus_na, ign_na, pit_na,
-      //   var_na, var_oerr_na, var_plus_oerr_na,
+      //   crps_emp_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
+      //   ign_na, pit_na, var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
@@ -778,7 +801,9 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
       pd.crps_emp_na.add(crps_emp_na[i]);
+      pd.crpscl_emp_na.add(crpscl_emp_na[i]);
       pd.crps_gaus_na.add(crps_gaus_na[i]);
+      pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
       pd.skip_ba.add(false);
@@ -1107,7 +1132,6 @@ void VxPairDataEnsemble::set_obs_qty_filt(const StringArray q) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_pd_size(int types, int masks, int interps) {
-   int i, j;
 
    // Store the dimensions for the PairData array
    n_msg_typ = types;
@@ -1117,10 +1141,10 @@ void VxPairDataEnsemble::set_pd_size(int types, int masks, int interps) {
    // Allocate space for the PairData array
    pd = new PairDataEnsemble ** [n_msg_typ];
 
-   for(i=0; i<n_msg_typ; i++) {
+   for(int i=0; i<n_msg_typ; i++) {
       pd[i] = new PairDataEnsemble * [n_mask];
 
-      for(j=0; j<n_mask; j++) {
+      for(int j=0; j<n_mask; j++) {
          pd[i][j] = new PairDataEnsemble [n_interp];
       }
    }
@@ -1131,10 +1155,9 @@ void VxPairDataEnsemble::set_pd_size(int types, int masks, int interps) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_msg_typ(int i_msg_typ, const char *name) {
-   int i, j;
 
-   for(i=0; i<n_mask; i++) {
-      for(j=0; j<n_interp; j++) {
+   for(int i=0; i<n_mask; i++) {
+      for(int j=0; j<n_interp; j++) {
          pd[i_msg_typ][i][j].set_msg_typ(name);
       }
    }
@@ -1145,10 +1168,9 @@ void VxPairDataEnsemble::set_msg_typ(int i_msg_typ, const char *name) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) {
-   int i, j;
 
-   for(i=0; i<n_mask; i++) {
-      for(j=0; j<n_interp; j++) {
+   for(int i=0; i<n_mask; i++) {
+      for(int j=0; j<n_interp; j++) {
          pd[i_msg_typ][i][j].set_msg_typ_vals(sa);
       }
    }
@@ -1160,10 +1182,9 @@ void VxPairDataEnsemble::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) 
 
 void VxPairDataEnsemble::set_mask_area(int i_mask, const char *name,
                                        MaskPlane *mp_ptr) {
-   int i, j;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_interp; j++) {
          pd[i][i_mask][j].set_mask_name(name);
          pd[i][i_mask][j].set_mask_area_ptr(mp_ptr);
       }
@@ -1176,10 +1197,9 @@ void VxPairDataEnsemble::set_mask_area(int i_mask, const char *name,
 
 void VxPairDataEnsemble::set_mask_sid(int i_mask, const char *name,
                                       StringArray *sid_ptr) {
-   int i, j;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_interp; j++) {
          pd[i][i_mask][j].set_mask_name(name);
          pd[i][i_mask][j].set_mask_sid_ptr(sid_ptr);
       }
@@ -1192,10 +1212,9 @@ void VxPairDataEnsemble::set_mask_sid(int i_mask, const char *name,
 
 void VxPairDataEnsemble::set_mask_llpnt(int i_mask, const char *name,
                                         MaskLatLon *llpnt_ptr) {
-   int i, j;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_interp; j++) {
          pd[i][i_mask][j].set_mask_name(name);
          pd[i][i_mask][j].set_mask_llpnt_ptr(llpnt_ptr);
       }
@@ -1210,10 +1229,9 @@ void VxPairDataEnsemble::set_mask_llpnt(int i_mask, const char *name,
 void VxPairDataEnsemble::set_interp(int i_interp,
                                     const char *interp_mthd_str,
                                     int width, GridTemplateFactory::GridTemplates shape) {
-   int i, j;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
          pd[i][j][i_interp].set_interp_wdth(width);
          pd[i][j][i_interp].set_interp_shape(shape);
@@ -1227,10 +1245,9 @@ void VxPairDataEnsemble::set_interp(int i_interp,
 
 void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
                                      int width, GridTemplateFactory::GridTemplates shape) {
-   int i, j;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(mthd);
          pd[i][j][i_interp].set_interp_wdth(width);
          pd[i][j][i_interp].set_interp_shape(shape);
@@ -1243,11 +1260,10 @@ void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_ens_size(int n) {
-   int i, j, k;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
             pd[i][j][k].set_ens_size(n);
          }
       }
@@ -1256,15 +1272,28 @@ void VxPairDataEnsemble::set_ens_size(int n) {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
+
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
+            pd[i][j][k].set_climo_cdf(info);
+         }
+      }
+   }
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
-   int i, j, k;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
             pd[i][j][k].ssvar_bin_size = ssvar_bin_size;
          }
       }
@@ -1276,11 +1305,10 @@ void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
-   int i, j, k;
 
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
             pd[i][j][k].phist_bin_size = phist_bin_size;
          }
       }
@@ -1798,119 +1826,76 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Compute the Gaussian continuous ranked probability score (CRPS),
-// the ignorance score (IGN), and probability integral transform (PIT)
+// Compute the Gaussian CRPS
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_crps_gaus_ign_pit(double obs, const NumArray &ens_na,
-                               double &crps, double &ign, double &pit) {
-   double m, s, z;
+double compute_crps_gaus(double obs, double m, double s) {
+   double v, z;
 
-   // Mean and standard deviation of the ensemble values
-   ens_na.compute_mean_stdev(m, s);
-
-   // Check for divide by zero
    if(is_bad_data(m) || is_bad_data(s) || is_eq(s, 0.0)) {
-      crps = bad_data_double;
-      ign  = bad_data_double;
-      pit  = bad_data_double;
+      v = bad_data_double;
    }
    else {
-
       z = (obs - m)/s;
-
-      // Compute Gaussian CRPS
-      crps = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
-
-      // Compute IGN
-      ign = 0.5*log(2.0*pi*s*s) + (obs - m)*(obs - m)/(2.0*s*s);
-
-      // Compute PIT
-      pit = normal_cdf(obs, m, s);
-
+      v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
    }
 
-   return;
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute the ensemble ignorance score
+//
+////////////////////////////////////////////////////////////////////////
 
-PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
-                                      const ThreshArray &ta, int i_bin) {
+double compute_ens_ign(double obs, double m, double s) {
+   double v;
 
-   // Check for no work to be done
-   if(ta.n() == 0) return(pd);
+   if(is_bad_data(m) || is_bad_data(s) || is_eq(s, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = 0.5*log(2.0*pi*s*s) + (obs - m)*(obs - m)/(2.0*s*s);
+   }
 
-   int i, j;
-   PairDataEnsemble out_pd;
+   return(v);
+}
 
-   // Set the ensemble size and allocate memory
-   out_pd.set_ens_size(pd.n_ens);
-   out_pd.extend(pd.n_obs);
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the ensemble probability integral transform
+//
+////////////////////////////////////////////////////////////////////////
 
-   bool cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
-   bool csd_flag = set_climo_flag(pd.o_na, pd.csd_na);
-   bool wgt_flag = set_climo_flag(pd.o_na, pd.wgt_na);
+double compute_ens_pit(double obs, double m, double s) {
+   double v;
+   
+   if(is_bad_data(m) || is_bad_data(s) || is_eq(s, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = normal_cdf(obs, m, s);
+   }
 
-   // Loop over the pairs
-   for(i=0; i<pd.n_obs; i++) {
+   return(v);
+}
+            
+////////////////////////////////////////////////////////////////////////
 
-      // Check for bad data
-      if(is_bad_data(pd.o_na[i])                 ||
-         pd.skip_ba[i]                           ||
-         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
-         (csd_flag && is_bad_data(pd.csd_na[i])) ||
-         (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
+NumArray derive_climo_cdf_inv(const ClimoCDFInfo &cdf_info, double m, double s) {
+   NumArray cdf_inv_na;
 
-      // Keep pairs for the current bin.
-      // check_bins() returns a 1-based bin value.
-      if(ta.check_bins(pd.cdf_na[i]) == (i_bin + 1)) {
+   // Check for bad data
+   if(is_bad_data(m) || is_bad_data(s)) return(cdf_inv_na);
 
-         // Add data for the current observation but only include data
-         // required for ensemble output line types.
-         //
-         // Include in subset:
-         //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na,
-         //   crps_emp_na, crps_gaus_na, ign_na, pit_na,
-         //   var_na, var_oerr_na, var_plus_oerr_na,
-         //   mn_na, mn_oerr_na, e_na
-         //
-         // Exclude from subset:
-         //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
-         //   o_qc_sa, esum_na, esumsq_na
+   // Skip the first (>=0.0) and last (>=1.0) climo CDF thresholds
+   for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
+      cdf_inv_na.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+   }
 
-         out_pd.wgt_na.add(pd.wgt_na[i]);
-         out_pd.o_na.add(pd.o_na[i]);
-         out_pd.cmn_na.add(pd.cmn_na[i]);
-         out_pd.csd_na.add(pd.csd_na[i]);
-         out_pd.cdf_na.add(pd.cdf_na[i]);
-         out_pd.v_na.add(pd.v_na[i]);
-         out_pd.r_na.add(pd.r_na[i]);
-         out_pd.crps_emp_na.add(pd.crps_emp_na[i]);
-         out_pd.crps_gaus_na.add(pd.crps_gaus_na[i]);
-         out_pd.ign_na.add(pd.ign_na[i]);
-         out_pd.pit_na.add(pd.pit_na[i]);
-         out_pd.skip_ba.add(false);
-         out_pd.var_na.add(pd.var_na[i]);
-         out_pd.var_oerr_na.add(pd.var_oerr_na[i]);
-         out_pd.var_plus_oerr_na.add(pd.var_plus_oerr_na[i]);
-         out_pd.mn_na.add(pd.mn_na[i]);
-         out_pd.mn_oerr_na.add(pd.mn_oerr_na[i]);
-
-         for(j=0; j<pd.n_ens; j++) out_pd.e_na[j].add(pd.e_na[j][i]);
-
-         // Increment counters
-         out_pd.n_obs++;
-         out_pd.n_pair++;
-      }
-   } // end for
-
-   mlog << Debug(3)
-        << "Using " << out_pd.n_obs << " of " << pd.n_obs
-        << " pairs for climatology bin number " << i_bin+1 << ".\n";
-
-   return(out_pd);
+   return(cdf_inv_na);
 }
 
 ////////////////////////////////////////////////////////////////////////

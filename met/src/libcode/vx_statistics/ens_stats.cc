@@ -228,10 +228,26 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Store the number of ensemble members
    n_ens = pd.n_ens;
 
-   // Get the average empirical and Gaussian CRPS and
-   // components values
-   crps_emp  = pd.crps_emp_na.wmean(pd.wgt_na);
-   crps_gaus = pd.crps_gaus_na.wmean(pd.wgt_na);
+   // Compute empirical CRPS scores
+   crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
+   crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
+   crpss_emp  = (is_bad_data(crps_emp)   ||
+                 is_bad_data(crpscl_emp) ||
+                 is_eq(crpscl_emp, 0.0) ?
+                 bad_data_double :
+                 (crpscl_emp - crps_emp) / crpscl_emp);
+
+   // Compute Gaussian CRPS scores
+   crps_gaus   = pd.crps_gaus_na.wmean(pd.wgt_na);
+   crpscl_gaus = pd.crpscl_gaus_na.wmean(pd.wgt_na);
+   crpss_gaus  = (is_bad_data(crps_gaus)   ||
+                  is_bad_data(crpscl_gaus) ||
+                  is_eq(crpscl_gaus, 0.0) ?
+                  bad_data_double :
+                  (crpscl_gaus - crps_gaus) / crpscl_gaus);
+
+   // Compute the average IGN value
+   ign = pd.ign_na.wmean(pd.wgt_na);
 
    // Get the sum of the weights
    for(i=0, n_pair=0, w_sum=0.0; i<pd.wgt_na.n(); i++) {
@@ -240,43 +256,6 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
          w_sum += pd.wgt_na[i];
       }
    }
-
-   // Check for bad data
-   if(is_bad_data(crps_emp)        ||
-      is_bad_data(crps_gaus)       ||
-      pd.cmn_na.n() != pd.o_na.n() ||
-      pd.cmn_na.n() == 0           ||
-      pd.cmn_na.has(bad_data_double)) {
-      crpss_emp = crpss_gaus = bad_data_double;
-   }
-   else {
-
-      // Compute the climatological CRPS
-      ffbar = oobar = fobar = 0.0;
-      for(i=0; i<pd.n_obs; i++) {
-
-         if(pd.skip_ba[i]) continue;
-
-         // Track running sums
-         w      = pd.wgt_na[i]/w_sum;
-         ffbar += w * pd.cmn_na[i] * pd.cmn_na[i];
-         oobar += w * pd.o_na[i]   * pd.o_na[i];
-         fobar += w * pd.cmn_na[i] * pd.o_na[i];
-      }
-
-      // TODO: MET #1451 correct this computation
-      crpscl_emp  = ffbar + oobar - 2.0*fobar;
-      crpscl_gaus = ffbar + oobar - 2.0*fobar;
-
-      // Compute CRPS skill scores
-      crpss_emp  = (is_eq(crpscl_emp, 0.0) ? bad_data_double :
-                    (crpscl_emp - crps_emp) /crpscl_emp);
-      crpss_gaus = (is_eq(crpscl_gaus, 0.0) ? bad_data_double :
-                    (crpscl_gaus - crps_gaus) /crpscl_gaus);
-   }
-
-   // Compute the average IGN value
-   ign = pd.ign_na.wmean(pd.wgt_na);
 
    // Compute ME and RMSE values
    fbar = obar = ffbar = oobar = fobar = 0.0;

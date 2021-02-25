@@ -28,18 +28,26 @@ obs_lead  = [];
 
 fcst_valid_beg  = "";
 fcst_valid_end  = "";
+fcst_valid_inc  = [];
+fcst_valid_exc  = [];
 fcst_valid_hour = [];
 
 obs_valid_beg   = "";
 obs_valid_end   = "";
+obs_valid_inc   = [];
+obs_valid_exc   = [];
 obs_valid_hour  = [];
 
 fcst_init_beg   = "";
 fcst_init_end   = "";
+fcst_init_inc   = [];
+fcst_init_exc   = [];
 fcst_init_hour  = [];
 
 obs_init_beg    = "";
 obs_init_end    = "";
+obs_init_inc    = [];
+obs_init_exc    = [];
 obs_init_hour   = [];
 
 fcst_var = [ "WIND",  "WIND",  "WIND",  "WIND",
