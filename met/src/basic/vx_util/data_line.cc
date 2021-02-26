@@ -253,7 +253,12 @@ const char * DataLine::get_item(int k) const
 
 if ( (k < 0) || (k >= N_items) )  {
 
-   mlog << Error << "\nDataLine::get_item(int) -> range check error\n\n";
+   ConcatString cs = (File ? File->filename() : "");
+
+   mlog << Error << "\nDataLine::get_item(int) -> "
+        << "range check error reading line number " << LineNumber
+        << ", item number " << k+1 << " of " << N_items
+        << " from file \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -640,7 +645,8 @@ LineDataFile::LineDataFile(const LineDataFile &)
 
 {
 
-mlog << Error << "\nLineDataFile::LineDataFile(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nLineDataFile::LineDataFile(const LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -654,7 +660,8 @@ LineDataFile & LineDataFile::operator=(const LineDataFile &)
 
 {
 
-mlog << Error << "\nLineDataFile::operator=(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nLineDataFile::operator=(const LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -698,7 +705,8 @@ in = new ifstream;
 
 if ( !in )  {
 
-   mlog << Error << "\nLineDataFile::open(const char *) -> can't allocate input stream\n\n";
+   mlog << Error << "\nLineDataFile::open(const char *) -> "
+        << "can't allocate input stream\n\n";
 
    exit ( 1 );
 
