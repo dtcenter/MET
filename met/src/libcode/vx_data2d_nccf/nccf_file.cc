@@ -2892,7 +2892,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   bool lat_first = false;
   double dlat = fabs(lat_values[1] - lat_values[0]);
-  double dlon = rescale_lon(fabs(lon_values[1] - lon_values[0]));
+  double dlon = fabs(rescale_lon(lon_values[1] - lon_values[0]));
   if( two_dim_corrd ) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
     if( lat_first ) dlat = fabs(lat_values[lon_counts] - lat_values[0]);
