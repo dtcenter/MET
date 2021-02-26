@@ -253,11 +253,12 @@ const char * DataLine::get_item(int k) const
 
 if ( (k < 0) || (k >= N_items) )  {
 
-   ConcatString filename = (get_file() ? get_file()->filename() : "");
+   ConcatString cs = (File ? File->filename() : "");
 
    mlog << Error << "\nDataLine::get_item(int) -> "
-        << "range check error while reading item number " << k+1
-        << " from file \"" << filename << "\"\n\n";
+        << "range check error reading line number " << LineNumber
+        << ", item number " << k+1 << " of " << N_items
+        << " from file \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
