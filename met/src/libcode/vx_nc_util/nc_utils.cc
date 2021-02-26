@@ -25,11 +25,6 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const string  level_att_name         = "level";
-static const string  units_att_name         = "units";
-static const string  missing_value_att_name = "missing_value";
-static const string  fill_value_att_name    = "_FillValue";
-
 ////////////////////////////////////////////////////////////////////////
 
 void patch_nc_name(string *var_name) {
