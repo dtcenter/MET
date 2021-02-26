@@ -74,6 +74,8 @@ void PairBase::clear() {
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
+   cdf_info.clear();
+
    o_na.clear();
    x_na.clear();
    y_na.clear();
@@ -120,6 +122,8 @@ void PairBase::erase() {
 
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
+
+   cdf_info.clear();
 
    o_na.erase();
    x_na.erase();
@@ -261,6 +265,15 @@ void PairBase::set_interp_wdth(int n) {
 void PairBase::set_interp_shape(GridTemplateFactory::GridTemplates shape) {
 
    interp_shape = shape;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_climo_cdf_info(const ClimoCDFInfo &info) {
+
+   cdf_info = info;
 
    return;
 }
@@ -1016,11 +1029,32 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
+void derive_climo_vals(const ClimoCDFInfo &cdf_info,
+                       double m, double s,
+                       NumArray &climo_vals) {
+
+   // Initialize
+   climo_vals.erase();
+
+   // Check for bad data
+   if(is_bad_data(m) || is_bad_data(s)) return;
+
+   // Skip the first (>=0.0) and last (>=1.0) climo CDF thresholds
+   for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
+      climo_vals.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
+                           const NumArray &mn_na, const NumArray &sd_na,
                            const SingleThresh &othresh) {
    int i, n_mn, n_sd;
    double prob;
-   NumArray climo_prob;
+   NumArray climo_prob, climo_vals;
 
    // Number of valid climo mean and standard deviation
    n_mn = mn_na.n_valid();
@@ -1051,7 +1085,7 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
             break;
 
          default:
-            mlog << Error << "\n\nderive_climo_prob() -> "
+            mlog << Error << "\nderive_climo_prob() -> "
                  << "climatological threshold \"" << othresh.get_str()
                  << "\" cannot be converted to a probability!\n\n";
             exit(1);
@@ -1067,22 +1101,15 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
    else if(n_mn > 0 && n_sd > 0) {
 
       mlog << Debug(2)
-           << "Deriving normal approximation of climatological "
-           << "probabilities for threshold " << othresh.get_str()
-           << ".\n";
+           << "Deriving climatological probabilities for threshold "
+           << othresh.get_str() << " by sampling " << cdf_info.cdf_ta.n()
+           << " values from the normal climatological distribution.\n";
 
-      // Compute probability value for each point
+      // Compute the probability by sampling from the climo distribution
+      // and deriving the event frequency
       for(i=0; i<mn_na.n(); i++) {
-
-         prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
-
-         // Handle greater-than probabilities
-         if(!is_bad_data(prob) &&
-            (othresh.get_type() == thresh_gt ||
-             othresh.get_type() == thresh_ge)) {
-            prob = 1.0 - prob;
-         }
-         climo_prob.add(prob);
+         derive_climo_vals(cdf_info, mn_na[i], sd_na[i], climo_vals);
+         climo_prob.add(derive_prob(climo_vals, othresh));
       }
    }
    // If only climatological mean was provided, it should already
@@ -1110,6 +1137,25 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
    }
 
    return(climo_prob);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double derive_prob(const NumArray &na, const SingleThresh &st) {
+   int i, n_vld, n_event;
+   double prob;
+
+   // Count up the number of events
+   for(i=0,n_vld=0,n_event=0; i<na.n(); i++) {
+      if(is_bad_data(na[i])) continue;
+      n_vld++;
+      if(st.check(na[i])) n_event++;
+   }
+
+   if(n_vld == 0) prob = bad_data_double;
+   else           prob = (double) n_event / n_vld;
+
+   return(prob);
 }
 
 ////////////////////////////////////////////////////////////////////////
