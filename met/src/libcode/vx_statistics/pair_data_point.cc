@@ -834,7 +834,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
       mlog << Debug(4)
-           << "Skipping observation with bad data value:\n"
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation with bad data value:\n"
            << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                   hdr_ut, obs_qty, obs_arr, var_name)
            << "\n";
@@ -851,8 +853,11 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    if(x < 0 || x >= gr.nx() ||
       y < 0 || y >= gr.ny()) {
       mlog << Debug(4)
-           << "Skipping observation off the grid where (x, y) = ("
-           << x << ", " << y << "):\n"
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation off the grid where (x, y) = ("
+           << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
+           << ", " << gr.ny() << "):\n"
            << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                   hdr_ut, obs_qty, obs_arr, var_name)
            << "\n";
@@ -872,7 +877,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
          mlog << Debug(4)
-              << "Skipping observation due to missing topography values "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to bad topography values "
               << "where observation elevation = " << hdr_elv
               << " and model topography = " << topo << ":\n"
               << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
@@ -885,7 +892,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Check the topography difference threshold
       if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
          mlog << Debug(4)
-              << "Skipping observation due to topography difference "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to topography difference "
               << "where observation elevation (" << hdr_elv
               << ") minus model topography (" << topo << ") = "
               << topo - hdr_elv << " is not "
@@ -1111,7 +1120,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             if(is_bad_data(fcst_v)) {
                mlog << Debug(4)
-                    << "Skipping observation due to bad data in the interpolated "
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation due to bad data in the interpolated "
                     << "forecast value:\n"
                     << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
@@ -1131,7 +1142,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                   obs_hgt, fcst_v, obs_v, obs_qty, cmn_v, csd_v,
                   wgt_v)) {
                mlog << Debug(4)
-                    << "Skipping observation since it is a duplicate:\n"
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation since it is a duplicate:\n"
                     << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
                     << "\n";
@@ -1535,7 +1548,8 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
    //   Var_Name(or GRIB_Code) Level Height(msl or agl)
    //   QC_String Observation_Value
    //
-   obs_cs << hdr_typ_str << " " << hdr_sid_str << " "
+   obs_cs << "   "
+          << hdr_typ_str << " " << hdr_sid_str << " "
           << unix_to_yyyymmdd_hhmmss(hdr_ut) << " "
           << hdr_arr[0] << " " << -1.0*hdr_arr[1] << " "
           << hdr_arr[2] << " " << name << " "
