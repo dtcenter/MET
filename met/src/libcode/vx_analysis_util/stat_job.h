@@ -172,18 +172,26 @@ class STATAnalysisJob {
 
       unixtime    fcst_valid_beg;
       unixtime    fcst_valid_end;
+      TimeArray   fcst_valid_inc;
+      TimeArray   fcst_valid_exc;
       IntArray    fcst_valid_hour; // stored in seconds
 
       unixtime    obs_valid_beg;
       unixtime    obs_valid_end;
+      TimeArray   obs_valid_inc;
+      TimeArray   obs_valid_exc;
       IntArray    obs_valid_hour; // stored in seconds
 
       unixtime    fcst_init_beg;
       unixtime    fcst_init_end;
+      TimeArray   fcst_init_inc;
+      TimeArray   fcst_init_exc;
       IntArray    fcst_init_hour; // stored in seconds
 
       unixtime    obs_init_beg;
       unixtime    obs_init_end;
+      TimeArray   obs_init_inc;
+      TimeArray   obs_init_exc;
       IntArray    obs_init_hour;  // stored in seconds
 
       StringArray fcst_var;
