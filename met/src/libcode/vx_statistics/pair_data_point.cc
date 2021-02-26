@@ -730,6 +730,21 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_climo_cdf_info(const ClimoCDFInfo &info) {
+
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
+            pd[i][j][k].set_climo_cdf_info(info);
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_msg_typ_sfc(const StringArray &sa) {
 
    msg_typ_sfc = sa;

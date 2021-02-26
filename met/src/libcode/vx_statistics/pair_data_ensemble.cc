@@ -92,8 +92,6 @@ void PairDataEnsemble::clear() {
    obs_error_entry.clear();
    obs_error_flag = false;
 
-   cdf_info.clear();
-
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
 
@@ -264,8 +262,6 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    obs_error_entry = pd.obs_error_entry;
    obs_error_flag  = pd.obs_error_flag;
 
-   cdf_info = pd.cdf_info;
-
    return;
 }
 
@@ -310,15 +306,6 @@ void PairDataEnsemble::set_ens_size(int n) {
    // Allocate a NumArray to store ensemble values for each member
    n_ens = n;
    e_na  = new NumArray [n_ens];
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
-
-   cdf_info = info;
 
    return;
 }
@@ -452,7 +439,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Derive ensemble from climo mean and standard deviation
-         cur_clm = derive_climo_cdf_inv(cdf_info, cmn_na[i], csd_na[i]);
+         derive_climo_vals(cdf_info, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
@@ -1274,12 +1261,12 @@ void VxPairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
+void VxPairDataEnsemble::set_climo_cdf_info(const ClimoCDFInfo &info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf(info);
+            pd[i][j][k].set_climo_cdf_info(info);
          }
       }
    }
@@ -1882,20 +1869,4 @@ double compute_ens_pit(double obs, double m, double s) {
    return(v);
 }
             
-////////////////////////////////////////////////////////////////////////
-
-NumArray derive_climo_cdf_inv(const ClimoCDFInfo &cdf_info, double m, double s) {
-   NumArray cdf_inv_na;
-
-   // Check for bad data
-   if(is_bad_data(m) || is_bad_data(s)) return(cdf_inv_na);
-
-   // Skip the first (>=0.0) and last (>=1.0) climo CDF thresholds
-   for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
-      cdf_inv_na.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
-   }
-
-   return(cdf_inv_na);
-}
-
 ////////////////////////////////////////////////////////////////////////
