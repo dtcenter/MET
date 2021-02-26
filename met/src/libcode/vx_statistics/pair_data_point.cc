@@ -603,12 +603,12 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
          rej_dup[i][j]  = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
-            rej_typ[i][j][k]   = 0;
-            rej_mask[i][j][k]  = 0;
-            rej_fcst[i][j][k]  = 0;
-            rej_cmn[i][j][k] = 0;
-            rej_csd[i][j][k] = 0;
-            rej_dup[i][j][k]   = 0;
+            rej_typ[i][j][k]  = 0;
+            rej_mask[i][j][k] = 0;
+            rej_fcst[i][j][k] = 0;
+            rej_cmn[i][j][k]  = 0;
+            rej_csd[i][j][k]  = 0;
+            rej_dup[i][j][k]  = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -792,7 +792,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the GRIB code for the observation matches
    // the specified code
    if((var_name != 0) && (0 < strlen(var_name))) {
-      if ( var_name != obs_info->name() ) {
+      if(var_name != obs_info->name()) {
          rej_var++;
          return;
       }
@@ -805,10 +805,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check if the observation quality flag is included in the list
    if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_filt[i] ) qty_match = true;
-
-      if( !qty_match ){
+      for(i=0; i<obs_qty_filt.n() && !qty_match; i++) {
+         if(obs_qty == obs_qty_filt[i]) qty_match = true;
+      }
+      if(!qty_match) {
          rej_qty++;
          return;
       }
@@ -833,6 +833,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
+      mlog << Debug(4)
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation with bad data value:\n"
+           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                  hdr_ut, obs_qty, obs_arr, var_name)
+           << "\n";
       rej_obs++;
       return;
    }
@@ -845,6 +852,15 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check if the observation's lat/lon is on the grid
    if(x < 0 || x >= gr.nx() ||
       y < 0 || y >= gr.ny()) {
+      mlog << Debug(4)
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation off the grid where (x, y) = ("
+           << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
+           << ", " << gr.ny() << "):\n"
+           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                  hdr_ut, obs_qty, obs_arr, var_name)
+           << "\n";
       rej_grd++;
       return;
    }
@@ -861,12 +877,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
          mlog << Debug(4)
-              << "Skipping observation due to missing topography values for "
-              << "[msg_typ:sid:lat:lon:elevation] = ["
-              << hdr_typ_str << ":" << hdr_sid_str << ":"
-              << hdr_lat << ":" << -1.0*hdr_lon << ":"
-              << hdr_elv << "] and model topography = "
-              << topo << ".\n";
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to bad topography values "
+              << "where observation elevation = " << hdr_elv
+              << " and model topography = " << topo << ":\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
          rej_topo++;
          return;
       }
@@ -874,14 +892,16 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Check the topography difference threshold
       if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
          mlog << Debug(4)
-              << "Skipping observation for topography difference since "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to topography difference "
+              << "where observation elevation (" << hdr_elv
+              << ") minus model topography (" << topo << ") = "
               << topo - hdr_elv << " is not "
-              << sfc_info.topo_use_obs_thresh.get_str() << " for "
-              << "[msg_typ:sid:lat:lon:elevation] = ["
-              << hdr_typ_str << ":" << hdr_sid_str << ":"
-              << hdr_lat << ":" << -1.0*hdr_lon << ":"
-              << hdr_elv << "] and model topography = "
-              << topo << ".\n";
+              << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
          rej_topo++;
          return;
       }
@@ -1099,6 +1119,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             if(is_bad_data(fcst_v)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation due to bad data in the interpolated "
+                    << "forecast value:\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
                inc_count(rej_fcst, i, j, k);
                continue;
             }
@@ -1113,6 +1141,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
                   obs_hgt, fcst_v, obs_v, obs_qty, cmn_v, csd_v,
                   wgt_v)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation since it is a duplicate:\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
                inc_count(rej_dup, i, j, k);
             }
 
@@ -1492,6 +1527,36 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
         << " pairs for climatology bin number " << i_bin+1 << ".\n";
 
    return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Write the point observation in the MET point format for logging
+ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
+                                 const char *hdr_sid_str, unixtime hdr_ut,
+                                 const char *obs_qty, float *obs_arr,
+                                 const char *var_name) {
+   ConcatString obs_cs, name;
+
+   if((var_name != 0) && (0 < strlen(var_name))) name = var_name;
+   else                                          name = obs_arr[1];
+
+   //
+   // Write the 11-column MET point format:
+   //   Message_Type Station_ID Valid_Time(YYYYMMDD_HHMMSS)
+   //   Lat(Deg North) Lon(Deg East) Elevation(msl)
+   //   Var_Name(or GRIB_Code) Level Height(msl or agl)
+   //   QC_String Observation_Value
+   //
+   obs_cs << "   "
+          << hdr_typ_str << " " << hdr_sid_str << " "
+          << unix_to_yyyymmdd_hhmmss(hdr_ut) << " "
+          << hdr_arr[0] << " " << -1.0*hdr_arr[1] << " "
+          << hdr_arr[2] << " " << name << " "
+          << obs_arr[2] << " " << obs_arr[3] << " "
+          << obs_qty    << " " << obs_arr[4];
+
+   return(obs_cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
