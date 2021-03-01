@@ -343,21 +343,6 @@
     </output>
   </test>
 
-  <!--
-  <test name="plot_data_plane_EaSM_CMIP5_histroical">
-    <exec>&MET_BIN;/plot_data_plane</exec>
-    <param> \
-      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.nc \
-      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps \
-      'name="pr"; level="(0,*,*)";' \
-      -v 4
-    </param>
-    <output>
-      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps</ps>
-    </output>
-  </test>
-  -->
-
   <test name="plot_data_plane_EaSM_CMIP5_rcp85">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
