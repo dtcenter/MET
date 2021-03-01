@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  max_met_args           = 30;
+static const int  max_met_args              = 30;
 static const double DELTA_TOLERANCE_PERCENT = 0.05;
 
 const double NcCfFile::DELTA_TOLERANCE = 15.0;
@@ -2871,11 +2871,10 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   // Figure out the dlat/dlon values from the dimension variables
 
-  bool two_dim_corrd = false;
   long x_size = get_data_size(lon_var);
   long y_size = get_data_size(lat_var);
   long latlon_counts = lon_counts*lat_counts;
-  two_dim_corrd = (x_size == latlon_counts) && (y_size == latlon_counts );
+  bool two_dim_corrd = (x_size == latlon_counts) && (y_size == latlon_counts );
   if( !two_dim_corrd && (x_size != lon_counts || y_size != lat_counts))
   {
     mlog << Error << "\n" << method_name << " -> "
@@ -2883,21 +2882,34 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     exit(1);
   }
 
-  double lat_values[y_size];
-  double lon_values[x_size];
-  get_nc_data(lat_var,lat_values);
-  get_nc_data(lon_var,lon_values);
+  double lat_values[lat_counts];
+  double lon_values[lon_counts];
+  bool lat_first = false;
+  if (two_dim_corrd) {
+    lat_first = (lat_counts == get_dim_size(lat_var, 0));
+    long cur[2], length[2];
+    cur[0] = cur[1] = 0;
+    length[0] = length[1] = 1;
+    if (lat_first) length[0] = lat_counts;
+    else length[1] = lat_counts;
+    get_nc_data(lat_var,lat_values, length, cur);
+    
+    length[0] = length[1] = 1;
+    if (lat_first) length[1] = lon_counts;
+    else length[0] = lon_counts;
+    get_nc_data(lon_var,lon_values, length, cur);
+  }
+  else {
+    get_nc_data(lat_var,lat_values);
+    get_nc_data(lon_var,lon_values);
+  }
 
   // Calculate dlat and dlon assuming they are constant.
 
-  bool lat_first = false;
-  double dlat = fabs(lat_values[1] - lat_values[0]);
-  double dlon = fabs(rescale_lon(lon_values[1] - lon_values[0]));
-  if( two_dim_corrd ) {
-    lat_first = (lat_counts == get_dim_size(lat_var, 0));
-    if( lat_first ) dlat = fabs(lat_values[lon_counts] - lat_values[0]);
-    else dlon = fabs(rescale_lon(lon_values[lat_counts] - lon_values[0]));
-  }
+  double dlat_raw = lat_values[1] - lat_values[0];
+  double dlon_raw = rescale_lon(lon_values[1] - lon_values[0]);
+  double dlat = fabs(dlat_raw);
+  double dlon = fabs(dlon_raw);
 
   ConcatString point_nccf;
   bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
@@ -2920,20 +2932,14 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     degree_tolerance = dlat * DELTA_TOLERANCE_PERCENT;
     for (int i = 1; i < (int)lat_counts; ++i)
     {
-      int idx_cur = i;
-      int idx_pre = i - 1;
-      if( two_dim_corrd && lat_first ) {
-        idx_cur *= lon_counts;
-        idx_pre *= lon_counts;
-      }
-      if ((fabs(lat_missing_value - lat_values[idx_cur]) < degree_tolerance) ||
-          (fabs(lat_missing_value - lat_values[idx_pre]) < degree_tolerance)) continue;
-      double curr_delta = fabs(lat_values[idx_cur] - lat_values[idx_pre]);
+      if ((fabs(lat_missing_value - lat_values[i]) < degree_tolerance) ||
+          (fabs(lat_missing_value - lat_values[i-1]) < degree_tolerance)) continue;
+      double curr_delta = fabs(lat_values[i] - lat_values[i-1]);
       if (fabs(curr_delta - dlat) > degree_tolerance)
       {
         mlog << Debug(4) << method_name << " -> lat["
-             << idx_pre << "]=" << lat_values[idx_pre] << " lat["
-             << idx_cur << "]=" << lat_values[idx_cur] << "  "
+             << i-1 << "]=" << lat_values[i-1] << " lat["
+             << i << "]=" << lat_values[i] << "  "
              << fabs(curr_delta - dlat) << " > " << degree_tolerance << "\n";
         mlog << Error << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the latitudes are evenly spaced (dlat="
@@ -2946,20 +2952,14 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     degree_tolerance = dlon * DELTA_TOLERANCE_PERCENT;
     for (int i = 1; i < (int)lon_counts; ++i)
     {
-      int idx_cur = i;
-      int idx_pre = i - 1;
-      if( two_dim_corrd && !lat_first ) {
-        idx_cur *= lat_counts;
-        idx_pre *= lat_counts;
-      }
-      if ((fabs(lon_missing_value - lon_values[idx_cur]) < degree_tolerance) ||
-          (fabs(lon_missing_value - lon_values[idx_pre]) < degree_tolerance)) continue;
-      double curr_delta = fabs(rescale_lon(lon_values[idx_cur] - lon_values[idx_pre]));
+      if ((fabs(lon_missing_value - lon_values[i]) < degree_tolerance) ||
+          (fabs(lon_missing_value - lon_values[i-1]) < degree_tolerance)) continue;
+      double curr_delta = fabs(rescale_lon(lon_values[i] - lon_values[i-1]));
       if (fabs(curr_delta - dlon) > degree_tolerance)
       {
         mlog << Debug(4) << method_name << " -> lon["
-             << idx_pre << "]=" << lon_values[idx_pre] << " lon["
-             << idx_cur << "]=" << lon_values[idx_cur] << "  "
+             << i-1 << "]=" << lon_values[i-1] << " lon["
+             << i << "]=" << lon_values[i] << "  "
              << fabs(curr_delta - dlon) << " > " << degree_tolerance << "\n";
         mlog << Error << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the longitudes are evenly spaced (dlon="
@@ -2991,17 +2991,14 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   data.lat_ll = lat_values[0];
   data.lon_ll = -lon_values[0];
   data.delta_lat = dlat;
-  data.delta_lon = dlon;
+  data.delta_lon = dlon_raw;
   data.Nlat = lat_counts;
   data.Nlon = lon_counts;
-  if (dlat < 0) {
-    data.delta_lat = -dlat;
-    data.lat_ll = lat_values[lat_counts-1];
-  }
+  if (dlat_raw < 0) data.lat_ll = lat_values[lat_counts-1];
 
-  grid.set(data);
-  if (dlat < 0) grid.set_swap_to_north(true);
- 
+  grid.set(data);   // resets swap_to_north to false
+  if (dlat_raw < 0) grid.set_swap_to_north(true);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
