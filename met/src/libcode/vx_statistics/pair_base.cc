@@ -1043,7 +1043,7 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
    for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
       climo_vals.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
    }
-
+   
    return;
 }
 
@@ -1100,9 +1100,10 @@ NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
    // threshold
    else if(n_mn > 0 && n_sd > 0) {
 
-      mlog << Debug(2)
+      // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
+      mlog << Debug(4)
            << "Deriving climatological probabilities for threshold "
-           << othresh.get_str() << " by sampling " << cdf_info.cdf_ta.n()
+           << othresh.get_str() << " by sampling " << cdf_info.cdf_ta.n()-2
            << " values from the normal climatological distribution.\n";
 
       // Compute the probability by sampling from the climo distribution

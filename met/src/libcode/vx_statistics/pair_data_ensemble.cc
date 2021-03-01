@@ -206,6 +206,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
+   cdf_info       = pd.cdf_info;
+
    cmn_na         = pd.cmn_na;
    csd_na         = pd.csd_na;
    cdf_na         = pd.cdf_na;
@@ -751,6 +753,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
    pd.ssvar_bin_size  = ssvar_bin_size;
    pd.obs_error_entry = obs_error_entry;
    pd.obs_error_flag  = obs_error_flag;
+   pd.cdf_info        = cdf_info;
 
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
