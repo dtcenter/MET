@@ -437,13 +437,7 @@ bool PairBase::add_point_obs(const char *sid,
      if(check_unique) {
         vector<ob_val_t>::iterator o_it = (*it).second.obs.begin();
         for(;o_it != (*it).second.obs.end(); o_it++) {
-           if( (*o_it).ut == ut) {
-              mlog << Debug(4)
-                   << "Skipping duplicate observation for [lat:lon:level:elevation] = ["
-                   << obs_key << "] valid at " << unix_to_yyyymmdd_hhmmss(ut)
-                   << " with value = " << o << "\n";
-              return false;
-           }
+           if((*o_it).ut == ut) return false;
         }
      }
 
