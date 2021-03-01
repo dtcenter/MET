@@ -3063,6 +3063,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
+            aggr.ens_pd.extend(cur.total);
             for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = job.out_bin_size;
             n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
