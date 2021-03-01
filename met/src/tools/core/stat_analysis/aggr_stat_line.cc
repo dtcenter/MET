@@ -2205,6 +2205,9 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
 
+            bool center = false;
+            aggr.pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
             aggr.pd.cmn_na.clear();
@@ -2223,6 +2226,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
+
             m[key] = aggr;
          }
          //
