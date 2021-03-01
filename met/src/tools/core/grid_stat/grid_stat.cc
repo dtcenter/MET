@@ -2189,10 +2189,6 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = *pd_ptr;
 
-         mlog << Warning << "JHG: grid_stat pd.cdf_info.cdf_ta:\n";
-         pd.cdf_info.cdf_ta.dump(cout);
-         pd_ptr->cdf_info.cdf_ta.dump(cout);
-
          // Store thresholds
          pct_info[j].fthresh = vx_opt.fcat_ta;
          pct_info[j].othresh = vx_opt.ocat_ta[i];
