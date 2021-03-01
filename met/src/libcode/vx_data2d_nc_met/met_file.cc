@@ -41,11 +41,6 @@ static const string valid_time_ut_att_name  = "valid_time_ut";
 static const string  init_time_ut_att_name  = "init_time_ut";
 static const string accum_time_att_name  = "accum_time_sec";
 
-static const string name_att_name        = "name";
-static const string long_name_att_name   = "long_name";
-static const string level_att_name       = "level";
-static const string units_att_name       = "units";
-
 static const int  max_met_args           = 30;
 
 ////////////////////////////////////////////////////////////////////////

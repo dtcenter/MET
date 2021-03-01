@@ -58,9 +58,6 @@ static const char hpa_units_str        [] = "hPa";
 
 static const string init_time_att_name   = "START_DATE";
 
-static const string description_att_name  = "description";
-static const string units_att_name        = "units";
-
 static const int max_pinterp_args         = 30;
 
 static const double pinterp_missing       = 1.0e35;
