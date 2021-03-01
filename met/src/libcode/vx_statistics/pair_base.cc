@@ -1036,14 +1036,31 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
    // Initialize
    climo_vals.erase();
 
-   // Check for bad data
-   if(is_bad_data(m) || is_bad_data(s)) return;
+   // cdf_info.cdf_ta starts with >=0.0 and ends with >=1.0.
+   // The number of bins is the number of thresholds minus 1.
 
-   // Skip the first (>=0.0) and last (>=1.0) climo CDF thresholds
-   for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
-      climo_vals.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+   // Check for bad mean value
+   if(is_bad_data(m) || cdf_info.cdf_ta.n() < 2) {
+      return;
    }
-   
+   // Single climo bin
+   else if(cdf_info.cdf_ta.n() == 2) {
+      climo_vals.add(m);
+   }
+   // Check for bad standard deviation value
+   else if(is_bad_data(s)) {
+      return;
+   }
+   // Extract climo distribution values
+   else {
+
+      // Skip the first and last thresholds
+      for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
+         climo_vals.add(
+            normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+      }
+   }
+
    return;
 }
 
