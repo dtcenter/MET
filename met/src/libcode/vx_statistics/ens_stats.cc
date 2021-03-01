@@ -484,10 +484,10 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    // Check that thresholds are actually defined
    if(fthresh.n() == 0) {
       mlog << Error << "\nRPSInfo::set(const PairDataEnsemble &) -> "
-           << "no thresholds provided to compute the RPS line type! "
-           << "Specify thresholds using the \""
-           << conf_key_prob_cat_thresh
-           << "\" configuration file option.\n\n";
+           << "no thresholds provided to compute the RPS line type!\n"
+           << "Specify thresholds using the \"" << conf_key_prob_cat_thresh
+           << "\" configuration file option or by providing climatological "
+           << "mean and standard deviation data.\n\n";
       exit(1);
    }
 
