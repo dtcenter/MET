@@ -2893,7 +2893,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     if (lat_first) length[0] = lat_counts;
     else length[1] = lat_counts;
     get_nc_data(lat_var,lat_values, length, cur);
-    
+
     length[0] = length[1] = 1;
     if (lat_first) length[1] = lon_counts;
     else length[0] = lon_counts;
@@ -2906,10 +2906,8 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   // Calculate dlat and dlon assuming they are constant.
 
-  double dlat_raw = lat_values[1] - lat_values[0];
-  double dlon_raw = rescale_lon(lon_values[1] - lon_values[0]);
-  double dlat = fabs(dlat_raw);
-  double dlon = fabs(dlon_raw);
+  double dlat = lat_values[1] - lat_values[0];
+  double dlon = rescale_lon(lon_values[1] - lon_values[0]);
 
   ConcatString point_nccf;
   bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
@@ -2929,12 +2927,12 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     get_var_att_float(lat_var, fill_value_att_name, lat_missing_value);
     get_var_att_float(lon_var, fill_value_att_name, lon_missing_value);
 
-    degree_tolerance = dlat * DELTA_TOLERANCE_PERCENT;
+    degree_tolerance = fabs(dlat * DELTA_TOLERANCE_PERCENT);
     for (int i = 1; i < (int)lat_counts; ++i)
     {
       if ((fabs(lat_missing_value - lat_values[i]) < degree_tolerance) ||
           (fabs(lat_missing_value - lat_values[i-1]) < degree_tolerance)) continue;
-      double curr_delta = fabs(lat_values[i] - lat_values[i-1]);
+      double curr_delta = lat_values[i] - lat_values[i-1];
       if (fabs(curr_delta - dlat) > degree_tolerance)
       {
         mlog << Debug(4) << method_name << " -> lat["
@@ -2949,12 +2947,12 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
       }
     }
 
-    degree_tolerance = dlon * DELTA_TOLERANCE_PERCENT;
+    degree_tolerance = fabs(dlon * DELTA_TOLERANCE_PERCENT);
     for (int i = 1; i < (int)lon_counts; ++i)
     {
       if ((fabs(lon_missing_value - lon_values[i]) < degree_tolerance) ||
           (fabs(lon_missing_value - lon_values[i-1]) < degree_tolerance)) continue;
-      double curr_delta = fabs(rescale_lon(lon_values[i] - lon_values[i-1]));
+      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
       if (fabs(curr_delta - dlon) > degree_tolerance)
       {
         mlog << Debug(4) << method_name << " -> lon["
@@ -2991,13 +2989,16 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   data.lat_ll = lat_values[0];
   data.lon_ll = -lon_values[0];
   data.delta_lat = dlat;
-  data.delta_lon = dlon_raw;
+  data.delta_lon = dlon;
   data.Nlat = lat_counts;
   data.Nlon = lon_counts;
-  if (dlat_raw < 0) data.lat_ll = lat_values[lat_counts-1];
+  if (dlat < 0) {
+    data.delta_lat = -dlat;
+    data.lat_ll = lat_values[lat_counts-1];
+  }
 
   grid.set(data);   // resets swap_to_north to false
-  if (dlat_raw < 0) grid.set_swap_to_north(true);
+  if (dlat < 0) grid.set_swap_to_north(true);
 
 }
 
