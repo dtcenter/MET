@@ -145,7 +145,8 @@ static void build_outfile_name(unixtime, int, const char *,
 
 static void process_scores();
 
-static void get_mask_points(const MaskPlane &, const DataPlane *,
+static void get_mask_points(const GridStatVxOpt &,
+                            const MaskPlane &, const DataPlane *,
                             const DataPlane *, const DataPlane *,
                             const DataPlane *, const DataPlane *,
                             PairDataPoint &);
@@ -797,7 +798,8 @@ void process_scores() {
             }
 
             // Apply the current mask to the current fields
-            get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+            get_mask_points(conf_info.vx_opt[i], mask_mp,
+                            &fcst_dp_smooth, &obs_dp_smooth,
                             &cmn_dp, &csd_dp, &wgt_dp, pd);
 
             // Set the mask name
@@ -981,7 +983,8 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               get_mask_points(mask_mp, &fu_dp_smooth, &ou_dp_smooth,
+               get_mask_points(conf_info.vx_opt[i], mask_mp,
+                               &fu_dp_smooth, &ou_dp_smooth,
                                &cmnu_dp, &csdu_dp, &wgt_dp, pd_u);
 
                // Compute VL1L2
@@ -1136,9 +1139,11 @@ void process_scores() {
                   mask_bad_data(mask_mp, ogy_dp);
 
                   // Apply the current mask to the current fields
-                  get_mask_points(mask_mp, &fgx_dp, &ogx_dp,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fgx_dp, &ogx_dp,
                                   0, 0, &wgt_dp, pd_gx);
-                  get_mask_points(mask_mp, &fgy_dp, &ogy_dp,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fgy_dp, &ogy_dp,
                                   0, 0, &wgt_dp, pd_gy);
 
                   // Set the mask name
@@ -1217,7 +1222,8 @@ void process_scores() {
                      conf_info.vx_opt[i].ocat_ta.need_perc()) {
 
                      // Apply the current mask
-                     get_mask_points(mask_mp, &fcst_dp, &obs_dp,
+                     get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                     &fcst_dp, &obs_dp,
                                      &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
@@ -1271,9 +1277,11 @@ void process_scores() {
 
                   // Apply the current mask to the distance map and
                   // thresholded fields
-                  get_mask_points(mask_mp, &fcst_dp_dmap, &obs_dp_dmap,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fcst_dp_dmap, &obs_dp_dmap,
                                   0, 0, 0, pd);
-                  get_mask_points(mask_mp, &fcst_dp_thresh, &obs_dp_thresh,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fcst_dp_thresh, &obs_dp_thresh,
                                   0, 0, 0, pd_thr);
 
                   dmap_info.set_options(
@@ -1346,7 +1354,8 @@ void process_scores() {
                      conf_info.vx_opt[i].ocat_ta.need_perc()) {
 
                      // Apply the current mask
-                     get_mask_points(mask_mp, &fcst_dp, &obs_dp,
+                     get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                     &fcst_dp, &obs_dp,
                                      &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
@@ -1445,9 +1454,11 @@ void process_scores() {
 
                   // Apply the current mask to the fractional coverage
                   // and thresholded fields
-                  get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fcst_dp_smooth, &obs_dp_smooth,
                                   0, 0, &wgt_dp, pd);
-                  get_mask_points(mask_mp, &fcst_dp_thresh, &obs_dp_thresh,
+                  get_mask_points(conf_info.vx_opt[i], mask_mp,
+                                  &fcst_dp_thresh, &obs_dp_thresh,
                                   0, 0, 0, pd_thr);
 
                   // Store climatology values as bad data
@@ -1618,7 +1629,8 @@ void process_scores() {
             }
 
             // Apply the current mask to the current fields
-            get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+            get_mask_points(conf_info.vx_opt[i], mask_mp,
+                            &fcst_dp_smooth, &obs_dp_smooth,
                             &cmn_dp_smooth, &csd_dp, &wgt_dp, pd);
 
             // Set the mask name
@@ -1706,7 +1718,8 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               get_mask_points(mask_mp, &fu_dp_smooth, &ou_dp_smooth,
+               get_mask_points(conf_info.vx_opt[i], mask_mp,
+                               &fu_dp_smooth, &ou_dp_smooth,
                                &cmnu_dp_smooth, 0, &wgt_dp, pd_u);
 
                // Compute VL1L2
@@ -1790,29 +1803,33 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_mask_points(const MaskPlane &mask_mp,
+void get_mask_points(const GridStatVxOpt &vx_opt,
+                     const MaskPlane &mask_mp,
                      const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
                      const DataPlane *cmn_ptr,  const DataPlane *csd_ptr,
                      const DataPlane *wgt_ptr,  PairDataPoint &pd) {
 
-    // Initialize
-    pd.erase();
+   // Initialize
+   pd.erase();
 
-    // Apply the mask the data fields or fill with default values
-    apply_mask(*fcst_ptr, mask_mp, pd.f_na);
-    apply_mask(*obs_ptr,  mask_mp, pd.o_na);
-    pd.n_obs = pd.o_na.n();
+   // Store the climo CDF info
+   pd.set_climo_cdf_info(vx_opt.cdf_info);
+   
+   // Apply the mask the data fields or fill with default values
+   apply_mask(*fcst_ptr, mask_mp, pd.f_na);
+   apply_mask(*obs_ptr,  mask_mp, pd.o_na);
+   pd.n_obs = pd.o_na.n();
 
-    if(cmn_ptr) apply_mask(*cmn_ptr, mask_mp, pd.cmn_na);
-    else        pd.cmn_na.add_const(bad_data_double, pd.n_obs);
-    if(csd_ptr) apply_mask(*csd_ptr, mask_mp, pd.csd_na);
-    else        pd.csd_na.add_const(bad_data_double, pd.n_obs);
-    if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
-    else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
+   if(cmn_ptr) apply_mask(*cmn_ptr, mask_mp, pd.cmn_na);
+   else        pd.cmn_na.add_const(bad_data_double, pd.n_obs);
+   if(csd_ptr) apply_mask(*csd_ptr, mask_mp, pd.csd_na);
+   else        pd.csd_na.add_const(bad_data_double, pd.n_obs);
+   if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
+   else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
-    if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
+   if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2171,6 +2188,10 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = *pd_ptr;
+
+         mlog << Warning << "JHG: grid_stat pd.cdf_info.cdf_ta:\n";
+         pd.cdf_info.cdf_ta.dump(cout);
+         pd_ptr->cdf_info.cdf_ta.dump(cout);
 
          // Store thresholds
          pct_info[j].fthresh = vx_opt.fcat_ta;
