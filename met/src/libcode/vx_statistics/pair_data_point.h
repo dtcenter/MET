@@ -205,6 +205,8 @@ class VxPairDataPoint {
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
 
+      void set_climo_cdf_info(const ClimoCDFInfo &);
+
       void set_msg_typ_sfc(const StringArray &);
       void set_msg_typ_lnd(const StringArray &);
       void set_msg_typ_wtr(const StringArray &);
