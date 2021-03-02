@@ -32,7 +32,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  max_met_args           = 30;
+static const int  max_met_args              = 30;
+static const double DELTA_TOLERANCE_PERCENT = 0.05;
 
 const double NcCfFile::DELTA_TOLERANCE = 15.0;
 
@@ -2870,31 +2871,32 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   // Figure out the dlat/dlon values from the dimension variables
 
-  double lat_values[lat_counts];
-  double lon_values[lon_counts];
-
-  bool two_dim_corrd = false;
   long x_size = get_data_size(lon_var);
   long y_size = get_data_size(lat_var);
   long latlon_counts = lon_counts*lat_counts;
-  if( x_size == latlon_counts || y_size == latlon_counts ) two_dim_corrd = true;
-  else if( x_size != lon_counts || y_size != lat_counts)
+  bool two_dim_corrd = (x_size == latlon_counts) && (y_size == latlon_counts );
+  if( !two_dim_corrd && (x_size != lon_counts || y_size != lat_counts))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
     exit(1);
   }
 
+  double lat_values[lat_counts];
+  double lon_values[lon_counts];
+  bool lat_first = false;
   if (two_dim_corrd) {
+    lat_first = (lat_counts == get_dim_size(lat_var, 0));
     long cur[2], length[2];
-    for (int i=0; i<2; i++) {
-       cur[i] = 0;
-       length[i] = 1;
-    }
-    length[0] = lat_counts;
+    cur[0] = cur[1] = 0;
+    length[0] = length[1] = 1;
+    if (lat_first) length[0] = lat_counts;
+    else length[1] = lat_counts;
     get_nc_data(lat_var,lat_values, length, cur);
-    length[1] = lon_counts;
-    length[0] = 1;
+
+    length[0] = length[1] = 1;
+    if (lat_first) length[1] = lon_counts;
+    else length[0] = lon_counts;
     get_nc_data(lon_var,lon_values, length, cur);
   }
   else {
@@ -2902,8 +2904,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     get_nc_data(lon_var,lon_values);
   }
 
-  // Calculate dlat and dlon assuming they are constant.  MET requires that
-  // dlat be equal to dlon
+  // Calculate dlat and dlon assuming they are constant.
 
   double dlat = lat_values[1] - lat_values[0];
   double dlon = rescale_lon(lon_values[1] - lon_values[0]);
@@ -2919,52 +2920,57 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   // entire grid.  CF compliancy doesn't require this, but MET does.
 
   if (!skip_sanity_check) {
+    double degree_tolerance;
     float lat_missing_value = bad_data_double;
     float lon_missing_value = bad_data_double;
-    NcVarAtt *missing_value_att = (NcVarAtt*) 0;
-    missing_value_att = get_nc_att(lat_var, (string)"_FillValue");
-    if (IS_VALID_NC_P(missing_value_att)) {
-      lat_missing_value = get_att_value_double(missing_value_att);
-    }
-    if( missing_value_att ) delete missing_value_att;
-    missing_value_att = get_nc_att(lon_var, (string)"_FillValue");
-    if (IS_VALID_NC_P(missing_value_att)) {
-      lon_missing_value = get_att_value_double(missing_value_att);
-    }
-    if( missing_value_att ) delete missing_value_att;
+    bool sanity_check_failed = false;
+    get_var_att_float(lat_var, fill_value_att_name, lat_missing_value);
+    get_var_att_float(lon_var, fill_value_att_name, lon_missing_value);
 
-    if (fabs(dlat - dlon) > DELTA_TOLERANCE)
-    {
-      mlog << Error << "\n" << method_name << " -> "
-           << "MET can only process Latitude/Longitude files where the delta lat and delta lon are the same\n\n";
-      exit(1);
-    }
-    
+    degree_tolerance = fabs(dlat * DELTA_TOLERANCE_PERCENT);
     for (int i = 1; i < (int)lat_counts; ++i)
     {
-      if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
+      if ((fabs(lat_missing_value - lat_values[i]) < degree_tolerance) ||
+          (fabs(lat_missing_value - lat_values[i-1]) < degree_tolerance)) continue;
       double curr_delta = lat_values[i] - lat_values[i-1];
-      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+      if (fabs(curr_delta - dlat) > degree_tolerance)
       {
+        mlog << Debug(4) << method_name << " -> lat["
+             << i-1 << "]=" << lat_values[i-1] << " lat["
+             << i << "]=" << lat_values[i] << "  "
+             << fabs(curr_delta - dlat) << " > " << degree_tolerance << "\n";
         mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lat delta is constant (dlat="
-             << dlat <<", dlon=" << dlon << ")\n\n";
-        exit(1);
+             << "MET can only process Latitude/Longitude files where the latitudes are evenly spaced (dlat="
+             << dlat <<", delta[" << i << "]=" << curr_delta << ")\n\n";
+        sanity_check_failed = true;
+        break;
       }
     }
-    
+
+    degree_tolerance = fabs(dlon * DELTA_TOLERANCE_PERCENT);
     for (int i = 1; i < (int)lon_counts; ++i)
     {
-      if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
-          (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
+      if ((fabs(lon_missing_value - lon_values[i]) < degree_tolerance) ||
+          (fabs(lon_missing_value - lon_values[i-1]) < degree_tolerance)) continue;
       double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
-      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+      if (fabs(curr_delta - dlon) > degree_tolerance)
       {
+        mlog << Debug(4) << method_name << " -> lon["
+             << i-1 << "]=" << lon_values[i-1] << " lon["
+             << i << "]=" << lon_values[i] << "  "
+             << fabs(curr_delta - dlon) << " > " << degree_tolerance << "\n";
         mlog << Error << "\n" << method_name << " -> "
-             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
-        exit(1);
+             << "MET can only process Latitude/Longitude files where the longitudes are evenly spaced (dlon="
+             << dlon <<", delta[" << i << "]=" << curr_delta << ")\n\n";
+        sanity_check_failed = true;
+        break;
       }
+    }
+
+    if (sanity_check_failed) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Please check the input data is the lat/lon projection\n\n";
+      exit(1);
     }
   }
 
@@ -2991,9 +2997,9 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     data.lat_ll = lat_values[lat_counts-1];
   }
 
-  grid.set(data);
+  grid.set(data);   // resets swap_to_north to false
   if (dlat < 0) grid.set_swap_to_north(true);
- 
+
 }
 
 ////////////////////////////////////////////////////////////////////////

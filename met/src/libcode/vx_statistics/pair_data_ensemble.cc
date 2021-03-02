@@ -92,8 +92,6 @@ void PairDataEnsemble::clear() {
    obs_error_entry.clear();
    obs_error_flag = false;
 
-   cdf_info.clear();
-
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
 
@@ -208,6 +206,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
+   cdf_info       = pd.cdf_info;
+
    cmn_na         = pd.cmn_na;
    csd_na         = pd.csd_na;
    cdf_na         = pd.cdf_na;
@@ -264,8 +264,6 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    obs_error_entry = pd.obs_error_entry;
    obs_error_flag  = pd.obs_error_flag;
 
-   cdf_info = pd.cdf_info;
-
    return;
 }
 
@@ -316,15 +314,6 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
-
-   cdf_info = info;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
@@ -344,6 +333,26 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
+
+   // Print the climo data being used
+   bool cmn_flag = set_climo_flag(o_na, cmn_na);
+   bool csd_flag = set_climo_flag(o_na, csd_na);
+
+   if(cmn_flag && cdf_info.cdf_ta.n() == 2) {
+      mlog << Debug(3)
+           << "Computing ensemble statistics relative to the "
+           << "climatological mean.\n";
+   }
+   else if(cmn_flag && csd_flag && cdf_info.cdf_ta.n() > 2) {
+      mlog << Debug(3)
+           << "Computing ensemble statistics relative to a "
+           << cdf_info.cdf_ta.n() - 2
+           << "-member climatological ensemble.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "No reference climatology data provided.\n";
+   }
 
    // Compute the rank for each observation
    for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n(); i++) {
@@ -452,7 +461,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Derive ensemble from climo mean and standard deviation
-         cur_clm = derive_climo_cdf_inv(cdf_info, cmn_na[i], csd_na[i]);
+         derive_climo_vals(cdf_info, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
@@ -764,6 +773,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
    pd.ssvar_bin_size  = ssvar_bin_size;
    pd.obs_error_entry = obs_error_entry;
    pd.obs_error_flag  = obs_error_flag;
+   pd.cdf_info        = cdf_info;
 
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
@@ -1274,12 +1284,12 @@ void VxPairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_climo_cdf(const ClimoCDFInfo &info) {
+void VxPairDataEnsemble::set_climo_cdf_info(const ClimoCDFInfo &info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf(info);
+            pd[i][j][k].set_climo_cdf_info(info);
          }
       }
    }
@@ -1882,20 +1892,4 @@ double compute_ens_pit(double obs, double m, double s) {
    return(v);
 }
             
-////////////////////////////////////////////////////////////////////////
-
-NumArray derive_climo_cdf_inv(const ClimoCDFInfo &cdf_info, double m, double s) {
-   NumArray cdf_inv_na;
-
-   // Check for bad data
-   if(is_bad_data(m) || is_bad_data(s)) return(cdf_inv_na);
-
-   // Skip the first (>=0.0) and last (>=1.0) climo CDF thresholds
-   for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
-      cdf_inv_na.add(normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
-   }
-
-   return(cdf_inv_na);
-}
-
 ////////////////////////////////////////////////////////////////////////

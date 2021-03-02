@@ -686,7 +686,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
    }
 
    if(!is_bad_data(interp_v)) {
-      mlog << Debug(4)
+      mlog << Debug(5)
            << "For observation value " << obs_v << " at grid (x, y) = ("
            << obs_x << ", " << obs_y << ") found forecast value "
            << interp_v << " at nearest matching geography point ("

@@ -79,6 +79,9 @@ class PairBase {
       int        interp_wdth;
       GridTemplateFactory::GridTemplates interp_shape;
 
+      // Climo distribution info
+      ClimoCDFInfo cdf_info;
+   
       // Point and Grid Observation Information
       NumArray    o_na;    // Observation value [n_obs]
       NumArray    x_na;    // X [n_obs]
@@ -131,6 +134,8 @@ class PairBase {
       void set_interp_wdth(int);
       void set_interp_shape(GridTemplateFactory::GridTemplates);
 
+      void set_climo_cdf_info(const ClimoCDFInfo &);
+
       void set_fcst_ut(unixtime ut);
       void set_check_unique(bool check);
       void set_obs_summary(ObsSummary s);
@@ -159,8 +164,7 @@ class PairBase {
       
       void add_grid_obs(double, double, double,
                         double, double, double);
-
-
+   
       void add_climo(double, double, double);
       void set_climo(int, double, double, double);
       void add_climo_cdf();
@@ -187,28 +191,34 @@ extern void find_vert_lvl(const DataPlaneArray &, const double,
                           int &, int &);
 
 extern double compute_interp(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y,
-                      const double obs_v, const double cmn, const double csd,
-                      const InterpMthd method, const int width,
-                      const GridTemplateFactory::GridTemplates shape,
-                      const double thresh,
-                      const bool spfh_flag, const LevelType lvl_typ,
-                      const double to_lvl, const int i_blw, const int i_abv,
-                      const SingleThresh *cat_thresh = 0);
+                             const double obs_x, const double obs_y,
+                             const double obs_v, const double cmn, const double csd,
+                             const InterpMthd method, const int width,
+                             const GridTemplateFactory::GridTemplates shape,
+                             const double thresh,
+                             const bool spfh_flag, const LevelType lvl_typ,
+                             const double to_lvl, const int i_blw, const int i_abv,
+                             const SingleThresh *cat_thresh = 0);
 
 extern void get_interp_points(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y,
-                      const InterpMthd method, const int width,
-                      const GridTemplateFactory::GridTemplates shape,
-                      const double thresh,
-                      const bool spfh_flag, const LevelType lvl_typ,
-                      const double to_lvl, const int i_blw, const int i_abv,
-                      NumArray &interp_points);
+                              const double obs_x, const double obs_y,
+                              const InterpMthd method, const int width,
+                              const GridTemplateFactory::GridTemplates shape,
+                              const double thresh,
+                              const bool spfh_flag, const LevelType lvl_typ,
+                              const double to_lvl, const int i_blw, const int i_abv,
+                              NumArray &interp_points);
 
-extern bool     set_climo_flag(const NumArray &, const NumArray &);
+extern bool set_climo_flag(const NumArray &, const NumArray &);
 
-extern NumArray derive_climo_prob(const NumArray &, const NumArray &,
+extern void derive_climo_vals(const ClimoCDFInfo &,
+                              double, double, NumArray &);
+
+extern NumArray derive_climo_prob(const ClimoCDFInfo &,
+                                  const NumArray &, const NumArray &,
                                   const SingleThresh &);
+
+extern double derive_prob(const NumArray &, const SingleThresh &);
 
 ////////////////////////////////////////////////////////////////////////
 

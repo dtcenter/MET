@@ -74,9 +74,6 @@ class PairDataEnsemble : public PairBase {
       ObsErrorEntryPtrArray obs_error_entry;
       bool                  obs_error_flag;
 
-      // Climatology info
-      ClimoCDFInfo cdf_info;
-
       // Ensemble, valid count, and rank values
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
@@ -135,7 +132,6 @@ class PairDataEnsemble : public PairBase {
       void add_ens(int, double);
       void add_ens_var_sums(int, double);
       void set_ens_size(int);
-      void set_climo_cdf(const ClimoCDFInfo &);
 
       void add_obs_error_entry(ObsErrorEntry *);
 
@@ -272,7 +268,7 @@ class VxPairDataEnsemble {
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
 
-      void set_climo_cdf(const ClimoCDFInfo &);
+      void set_climo_cdf_info(const ClimoCDFInfo &);
 
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
@@ -308,8 +304,6 @@ extern double compute_crps_emp(double, const NumArray &);
 extern double compute_crps_gaus(double, double, double);
 extern double compute_ens_ign(double, double, double);
 extern double compute_ens_pit(double, double, double);
-
-extern NumArray derive_climo_cdf_inv(const ClimoCDFInfo &, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 

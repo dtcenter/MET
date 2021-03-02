@@ -461,8 +461,7 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_orank_line(STATLine &l, ORANKData &o_data) {
-   int i;
-   char col_str[max_str_len];
+   int i, ens1;
 
    o_data.total     = atoi(l.get_item("TOTAL"));
    o_data.index     = atoi(l.get_item("INDEX"));
@@ -480,10 +479,10 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.n_ens     = atoi(l.get_item("N_ENS"));
 
    // Parse out ENS_i
-   o_data.ens_na.clear();
+   o_data.ens_na.erase();
+   ens1 = l.get_offset("ENS_1");
    for(i=0; i<o_data.n_ens; i++) {
-      snprintf(col_str, sizeof(col_str), "ENS_%i", i+1);
-      o_data.ens_na.add(atof(l.get_item(col_str)));
+      o_data.ens_na.add(atof(l.get_item(ens1+i)));
    }
 
    o_data.obs_qc           =      l.get_item("OBS_QC", false);

@@ -743,7 +743,8 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+      else         climo_prob = derive_climo_prob(pd.cdf_info,
+                                                  pd.cmn_na, pd.csd_na,
                                                   pct_info.othresh);
    }
 

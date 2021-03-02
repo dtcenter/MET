@@ -635,8 +635,8 @@ void process_job(const char * jobstring, int n_job) {
    ConcatString full_jobstring;
    MetConfig go_conf;
 
-   mlog << Debug(4) << "process_job(jobstring):"
-        << jobstring << "\"\n";
+   mlog << Debug(4) << "process_job(jobstring): "
+        << jobstring << "\n";
 
    //
    // Initialize to the default job
