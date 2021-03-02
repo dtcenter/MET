@@ -334,6 +334,26 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
 
+   // Print the climo data being used
+   bool cmn_flag = set_climo_flag(o_na, cmn_na);
+   bool csd_flag = set_climo_flag(o_na, csd_na);
+
+   if(cmn_flag && cdf_info.cdf_ta.n() == 2) {
+      mlog << Debug(3)
+           << "Computing ensemble statistics relative to the "
+           << "climatological mean.\n";
+   }
+   else if(cmn_flag && csd_flag && cdf_info.cdf_ta.n() > 2) {
+      mlog << Debug(3)
+           << "Computing ensemble statistics relative to a "
+           << cdf_info.cdf_ta.n() - 2
+           << "-member climatological ensemble.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "No reference climatology data provided.\n";
+   }
+
    // Compute the rank for each observation
    for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n(); i++) {
 
