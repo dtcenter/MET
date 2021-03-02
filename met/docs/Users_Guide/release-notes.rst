@@ -2,10 +2,63 @@ MET release notes
 _________________
 
 When applicable, release notes are followed by the GitHub issue number which
-describes the bugfix, enhancement, or new feature: `MET Git-Hub issues. <https://github.com/dtcenter/MET/issues>`_
+describes the bugfix, enhancement, or new feature: `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
 Version |version| release notes (|release_date|)
 ------------------------------------------------
+
+Version `10.0.0-beta4 <https://github.com/dtcenter/MET/projects/26>`_ release notes (20210302)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Bugfixes:
+
+   * Fix the set_attr_accum option to set the accumulation time instead of the lead time (`#1646 <http://github.com/dtcenter/MET/issues/1646>`_).
+   * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
+
+* Repository and build:
+
+   * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
+
+* Library code:
+
+   * Miscellaneous:
+
+      * Update GRIB1/2 table entries for the MXUPHL, MAXREF, MAXUVV, and MAXDVV variables (`#1658 <http://github.com/dtcenter/MET/issues/1658>`_).
+      * Update the Air Force GRIB tables to reflect current AF usage (`#1519 <http://github.com/dtcenter/MET/issues/1519>`_).
+      * Enhance the DataLine::get_item() error message to include the file name, line number, and column (`#1429 <http://github.com/dtcenter/MET/issues/1429>`_).
+
+   * NetCDF library:
+
+      * Add support for the NetCDF-CF conventions time bounds option (`#1657 <http://github.com/dtcenter/MET/issues/1657>`_).
+      * Error out when reading CF-compliant NetCDF data with incomplete grid definition (`#1454 <http://github.com/dtcenter/MET/issues/1454>`_).
+      * Reformat and simplify the magic_str() printed for NetCDF data files (`#1655 <http://github.com/dtcenter/MET/issues/1655>`_).
+
+   * Statistics computations:
+
+      * Add support for the Hersbach CRPS algorithm by add new columns to the ECNT line type (`#1450 <http://github.com/dtcenter/MET/issues/1450>`_).
+      * Enhance MET to derive the Hersbach CRPSCL_EMP and CRPSS_EMP statistics from a single deterministic reference model (`#1685 <http://github.com/dtcenter/MET/issues/1685>`_).
+      * Correct the climatological CRPS computation to match the NOAA/EMC VSDB method (`#1451 <http://github.com/dtcenter/MET/issues/1451>`_).
+      * Modify the climatological Brier Score computation to match the NOAA/EMC VSDB method (`#1684 <http://github.com/dtcenter/MET/issues/1684>`_).
+
+* Application code:
+
+   * ASCII2NC and Point2Grid:
+
+      * Enhance ascii2nc and point2grid to gracefully process zero input observations rather than erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
+
+   * Point-Stat Tool:
+
+      * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
+      * Print the Point-Stat rejection code reason count log messages at verbosity level 2 for zero matched pairs (`#1644 <http://github.com/dtcenter/MET/issues/1644>`_).
+      * Add detailed log messages to Point-Stat when discarding observations (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).
+
+   * Stat-Analysis Tool:
+
+      * Add -fcst_init_inc/_exc and -fcst_valid_inc/_exc job command filtering options to Stat-Analysis (`#1135 <http://github.com/dtcenter/MET/issues/1135>`_).
+
+   * MODE Tool:
+
+      * Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).
 
 Version `10.0.0-beta3 <https://github.com/dtcenter/MET/projects/25>`_ release notes (20210127)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
