@@ -318,7 +318,7 @@ void process_series(void) {
         if(is_bad_data(var_maxs[i_var]) || max > var_maxs[i_var]) {
            var_maxs[i_var] = max;
         }
-         
+
         // Update partial sums
         update_pdf(bin_mins[i_var_str][0],
                    bin_deltas[i_var_str],
@@ -510,34 +510,34 @@ void setup_nc_file(void) {
 
       i_var_str << cs_erase << "VAR" << i_var;
 
-		VarInfo *data_info = conf_info.data_info[i_var];
+      VarInfo *data_info = conf_info.data_info[i_var];
 
-		// Set variable NetCDF name
-		ConcatString var_name = data_info->name_attr();
-		var_name.add("_");
-		var_name.add(data_info->level_attr());
+      // Set variable NetCDF name
+      ConcatString var_name = data_info->name_attr();
+      var_name.add("_");
+      var_name.add(data_info->level_attr());
 
-		// Define histogram dimensions
-		NcDim var_dim = add_dim(nc_out, var_name,
-				(long) data_info->n_bins());
-		data_var_dims.push_back(var_dim);
+      // Define histogram dimensions
+      NcDim var_dim = add_dim(nc_out, var_name,
+                              (long) data_info->n_bins());
+      data_var_dims.push_back(var_dim);
 
-		// Define histogram bins
-		ConcatString var_min_name = var_name;
-		ConcatString var_max_name = var_name;
-		ConcatString var_mid_name = var_name;
-		var_min_name.add("_min");
-		var_max_name.add("_max");
-		var_mid_name.add("_mid");
-		NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
-				deflate_level);
-		NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
-				deflate_level);
-		NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
-				deflate_level);
+      // Define histogram bins
+      ConcatString var_min_name = var_name;
+      ConcatString var_max_name = var_name;
+      ConcatString var_mid_name = var_name;
+      var_min_name.add("_min");
+      var_max_name.add("_max");
+      var_mid_name.add("_mid");
+      NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
+                              deflate_level);
+      NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
+                              deflate_level);
+      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
+                              deflate_level);
 
-		// Add variable attributes
-		cs << cs_erase << "Minimum value of " << var_name << " bin";
+      // Add variable attributes
+      cs << cs_erase << "Minimum value of " << var_name << " bin";
       add_var_att_local(&var_min, "long_name", cs);
       add_var_att_local(&var_min, "units", data_info->units_attr());
 
@@ -661,7 +661,7 @@ void write_histograms(void) {
 void write_joint_histograms(void) {
    vector<size_t> offsets;
    vector<size_t> counts;
-   ConcatString var_cs;
+   ConcatString ij_var_str;
 
    int i_hist=0;
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
@@ -672,11 +672,11 @@ void write_joint_histograms(void) {
 
          VarInfo *joint_info = conf_info.data_info[j_var];
 
-         var_cs << cs_erase
-                << "VAR" << i_var << "_"
-                << "VAR" << j_var;
+         ij_var_str << cs_erase
+                    << "VAR" << i_var << "_"
+                    << "VAR" << j_var;
 
-         int *hist = joint_histograms[var_cs].data();
+         int *hist = joint_histograms[ij_var_str].data();
 
          offsets.clear();
          counts.clear();
