@@ -77,7 +77,11 @@ void Python3_Script::clear()
 
 Module = 0;
 
+ModuleAscii = 0;
+
 Dict = 0;
+
+DictAscii = 0;
 
 Script_Filename.clear();
 
@@ -242,7 +246,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-void Python3_Script::import_read_tmp_ascii_py(void) const
+void Python3_Script::import_read_tmp_ascii_py(void)
 
 {
 
@@ -266,11 +270,30 @@ run_python_string(command.text());
 
 mlog << Debug(2) << "Importing " << module << "\n";
 
-command << cs_erase << "import read_tmp_ascii";
+ConcatString path = "read_tmp_ascii";
 
-mlog << Debug(3) << command << "\n";
+ModuleAscii = PyImport_ImportModule(path.text());
 
-run_python_string(command.text());
+if ( ! ModuleAscii )  {
+
+   PyErr_Print();
+   mlog << Error << "\nPython3_Script::Python3_Script(const char *) -> "
+        << "unable to import module \"" << path << "\"\n\n";
+
+   Py_Finalize();
+
+   exit ( 1 );
+
+}
+
+DictAscii = PyModule_GetDict (ModuleAscii);
+
+   //
+   //  done
+   //
+
+fflush(stdout);
+fflush(stderr);
 
 }
 
@@ -293,8 +316,7 @@ mlog << Debug(3) << command << "\n";
 
 PyErr_Clear();
 
-PyObject * pobj;
-
+// PyObject * pobj;
 // pobj = run(command.text());
 run_python_string(command.text());
 

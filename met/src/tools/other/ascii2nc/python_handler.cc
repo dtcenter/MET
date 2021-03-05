@@ -386,7 +386,7 @@ script.import_read_tmp_ascii_py();
 
 script.read_pickle(list_name, pickle_path.text());
 
-script.read_tmp_ascii(tmp_ascii_path.text());
+// script.read_tmp_ascii(tmp_ascii_path.text());
 
 PyObject * obj = script.lookup(list_name);
 

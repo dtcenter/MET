@@ -41,6 +41,10 @@ class Python3_Script {
 
       PyObject * Dict;     //  script dictionary, not allocated
 
+      PyObject * ModuleAscii;
+
+      PyObject * DictAscii;
+
       ConcatString Script_Filename;
 
 
@@ -62,6 +66,8 @@ class Python3_Script {
 
       PyObject * module();
       PyObject * dict();
+      PyObject * module_ascii();
+      PyObject * dict_ascii();
 
          //
          //  do stuff
@@ -77,7 +83,7 @@ class Python3_Script {
 
       void read_pickle  (const char * variable_name, const char * pickle_filename) const;
 
-      void import_read_tmp_ascii_py (void) const;
+      void import_read_tmp_ascii_py (void);
 
       void read_tmp_ascii (const char * tmp_filename) const;
 };
@@ -89,6 +95,10 @@ class Python3_Script {
 inline PyObject * Python3_Script::module() { return ( Module ); }
 
 inline PyObject * Python3_Script::dict() { return ( Dict ); }
+
+inline PyObject * Python3_Script::module_ascii() { return ( ModuleAscii ); }
+
+inline PyObject * Python3_Script::dict_ascii() { return ( DictAscii ); }
 
 inline ConcatString Python3_Script::filename() const { return ( Script_Filename ); }
 
