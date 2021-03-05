@@ -13,7 +13,7 @@ formats: all
 python:
    version: 3.7
    install:
-   - requirements: docs/requirements.txt
+   - requirements: met/docs/requirements.txt
 
 # Configuration for Sphinx documentation (this is the default documentation
 # type)
