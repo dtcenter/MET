@@ -79,6 +79,8 @@ class Python3_Script {
 
       PyObject * lookup(const char * name) const;
 
+      PyObject * lookup_ascii(const char * name) const;
+
       PyObject * run(const char * command) const;   //  runs a command in the namespace of the script
 
       void read_pickle  (const char * variable_name, const char * pickle_filename) const;

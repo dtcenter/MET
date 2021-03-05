@@ -165,6 +165,19 @@ return ( var );
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+PyObject * Python3_Script::lookup_ascii(const char * name) const
+
+{
+
+PyObject * var = 0;
+
+var = PyDict_GetItemString (DictAscii, name);
+
+return ( var );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
