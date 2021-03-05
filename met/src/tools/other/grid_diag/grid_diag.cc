@@ -440,27 +440,27 @@ void setup_joint_histograms(void) {
 
       i_var_str << cs_erase << "VAR" << i_var;
 
-		VarInfo *data_info = conf_info.data_info[i_var];
-		int n_bins = data_info->n_bins();
+      VarInfo *data_info = conf_info.data_info[i_var];
+      int n_bins = data_info->n_bins();
 
-		for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
          j_var_str << cs_erase << "VAR" << j_var;
    
-			VarInfo *joint_info = conf_info.data_info[j_var];
-			int n_joint_bins = joint_info->n_bins();
+         VarInfo *joint_info = conf_info.data_info[j_var];
+         int n_joint_bins = joint_info->n_bins();
 
          ij_var_str << cs_erase << i_var_str << "_" << j_var_str;
 
-			mlog << Debug(2)
-				  << "Initializing " << data_info->magic_str_attr() << "_"
+         mlog << Debug(2)
+              << "Initializing " << data_info->magic_str_attr() << "_"
               << joint_info->magic_str_attr() << " joint histogram with "
-				  << n_bins << " x " << n_joint_bins << " bins.\n";
-			joint_histograms[ij_var_str] = vector<int>();
+              << n_bins << " x " << n_joint_bins << " bins.\n";
+         joint_histograms[ij_var_str] = vector<int>();
 
-			init_joint_pdf(n_bins, n_joint_bins,
-					joint_histograms[ij_var_str]);
-		} // end  for j_var
+         init_joint_pdf(n_bins, n_joint_bins,
+                        joint_histograms[ij_var_str]);
+      } // end  for j_var
 	} // end for i_var
 }
 
