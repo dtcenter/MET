@@ -286,7 +286,7 @@ if ( ! ModuleAscii )  {
 
 }
 
-DictAscii = PyModule_GetDict (ModuleAscii);
+DictAscii = PyModule_GetDict(ModuleAscii);
 
    //
    //  done
@@ -308,7 +308,7 @@ mlog << Debug(2) << "Reading temporary ascii file: "
 
 ConcatString command;
 
-command << "read_tmp_ascii.read_tmp_ascii(\""
+command << "read_tmp_ascii(\""
         << tmp_filename
         << "\")";
 
@@ -316,9 +316,9 @@ mlog << Debug(3) << command << "\n";
 
 PyErr_Clear();
 
-// PyObject * pobj;
-// pobj = run(command.text());
-run_python_string(command.text());
+PyObject * pobj;
+
+pobj = PyRun_String(command.text(), Py_file_input, DictAscii, DictAscii);
 
 if ( PyErr_Occurred() )  {
 
