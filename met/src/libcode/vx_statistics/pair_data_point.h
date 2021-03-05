@@ -205,6 +205,8 @@ class VxPairDataPoint {
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
 
+      void set_climo_cdf_info(const ClimoCDFInfo &);
+
       void set_msg_typ_sfc(const StringArray &);
       void set_msg_typ_lnd(const StringArray &);
       void set_msg_typ_wtr(const StringArray &);
@@ -253,6 +255,13 @@ extern void subset_wind_pairs(const PairDataPoint &,
 // Subset pairs for a specific climatology CDF bin
 extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
                         const ThreshArray &, int i_bin);
+
+// Write the point observation in the MET point format for logging
+extern ConcatString point_obs_to_string(
+                       float *hdr_arr, const char *hdr_typ_str,
+                       const char *hdr_sid_str, unixtime hdr_ut,
+                       const char *obs_qty, float *obs_arr,
+                       const char *var_name);
 
 ////////////////////////////////////////////////////////////////////////
 

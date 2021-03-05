@@ -999,27 +999,34 @@ void process_scores() {
                     << shc.get_interp_pnts_str()
                     << "), using " << pd_ptr->n_obs << " matched pairs.\n";
 
-               // Dump out detailed information about why observations were rejected
-               mlog << Debug(3)
-                    << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
-                    << "Observations processed    = " << conf_info.vx_opt[i].vx_pd.n_try << "\n"
-                    << "Rejected: station id      = " << conf_info.vx_opt[i].vx_pd.rej_sid << "\n"
-                    << "Rejected: obs var name    = " << conf_info.vx_opt[i].vx_pd.rej_var << "\n"
-                    << "Rejected: valid time      = " << conf_info.vx_opt[i].vx_pd.rej_vld << "\n"
-                    << "Rejected: bad obs value   = " << conf_info.vx_opt[i].vx_pd.rej_obs << "\n"
-                    << "Rejected: off the grid    = " << conf_info.vx_opt[i].vx_pd.rej_grd << "\n"
-                    << "Rejected: topography      = " << conf_info.vx_opt[i].vx_pd.rej_topo << "\n"
-                    << "Rejected: level mismatch  = " << conf_info.vx_opt[i].vx_pd.rej_lvl << "\n"
-                    << "Rejected: quality marker  = " << conf_info.vx_opt[i].vx_pd.rej_qty << "\n"
-                    << "Rejected: message type    = " << conf_info.vx_opt[i].vx_pd.rej_typ[j][k][l] << "\n"
-                    << "Rejected: masking region  = " << conf_info.vx_opt[i].vx_pd.rej_mask[j][k][l] << "\n"
-                    << "Rejected: bad fcst value  = " << conf_info.vx_opt[i].vx_pd.rej_fcst[j][k][l] << "\n"
-                    << "Rejected: bad climo mean  = " << conf_info.vx_opt[i].vx_pd.rej_cmn[j][k][l] << "\n"
-                    << "Rejected: bad climo stdev = " << conf_info.vx_opt[i].vx_pd.rej_csd[j][k][l] << "\n"
-                    << "Rejected: duplicates      = " << conf_info.vx_opt[i].vx_pd.rej_dup[j][k][l] << "\n";
+               // List counts for reasons why observations were rejected
+               cs << cs_erase
+                  << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
+                  << "Observations processed    = " << conf_info.vx_opt[i].vx_pd.n_try << "\n"
+                  << "Rejected: station id      = " << conf_info.vx_opt[i].vx_pd.rej_sid << "\n"
+                  << "Rejected: obs var name    = " << conf_info.vx_opt[i].vx_pd.rej_var << "\n"
+                  << "Rejected: valid time      = " << conf_info.vx_opt[i].vx_pd.rej_vld << "\n"
+                  << "Rejected: bad obs value   = " << conf_info.vx_opt[i].vx_pd.rej_obs << "\n"
+                  << "Rejected: off the grid    = " << conf_info.vx_opt[i].vx_pd.rej_grd << "\n"
+                  << "Rejected: topography      = " << conf_info.vx_opt[i].vx_pd.rej_topo << "\n"
+                  << "Rejected: level mismatch  = " << conf_info.vx_opt[i].vx_pd.rej_lvl << "\n"
+                  << "Rejected: quality marker  = " << conf_info.vx_opt[i].vx_pd.rej_qty << "\n"
+                  << "Rejected: message type    = " << conf_info.vx_opt[i].vx_pd.rej_typ[j][k][l] << "\n"
+                  << "Rejected: masking region  = " << conf_info.vx_opt[i].vx_pd.rej_mask[j][k][l] << "\n"
+                  << "Rejected: bad fcst value  = " << conf_info.vx_opt[i].vx_pd.rej_fcst[j][k][l] << "\n"
+                  << "Rejected: bad climo mean  = " << conf_info.vx_opt[i].vx_pd.rej_cmn[j][k][l] << "\n"
+                  << "Rejected: bad climo stdev = " << conf_info.vx_opt[i].vx_pd.rej_csd[j][k][l] << "\n"
+                  << "Rejected: duplicates      = " << conf_info.vx_opt[i].vx_pd.rej_dup[j][k][l] << "\n";
 
-               // Continue for no matched pairs
-               if(pd_ptr->n_obs == 0) continue;
+               // Print report based on the number of matched pairs
+               if(pd_ptr->n_obs > 0) {
+                  mlog << Debug(3) << cs;
+               }
+               // Continue for zero matched pairs
+               else {
+                  mlog << Debug(2) << cs;
+                  continue;
+               }
 
                // Process percentile thresholds
                conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
@@ -1755,6 +1762,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       hira_pd.clear();
       hira_pd.extend(pd_ptr->n_obs);
       hira_pd.set_ens_size(gt->size());
+      hira_pd.set_climo_cdf_info(conf_info.vx_opt[i_vx].cdf_info);
       f_ens.extend(gt->size());
 
       // Process each observation point
@@ -1825,7 +1833,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
          write_ecnt_row(shc, ecnt_info,
             conf_info.vx_opt[i_vx].output_flag[i_ecnt],
-            0, 1, stat_at, i_stat_row,
+            stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       } // end if ECNT
 

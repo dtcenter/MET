@@ -363,6 +363,9 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
+      // Check for unique mask names
+      check_mask_names(vx_opt[i].mask_name);
+
    } // end for i
 
    return;
@@ -928,6 +931,9 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+
+   // Store the climo CDF info
+   vx_pd.set_climo_cdf_info(cdf_info);
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;

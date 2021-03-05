@@ -12,6 +12,14 @@ grid_data = {
 
    field = [ { name = "RH"; level = "P500"; } ];
 
+   regrid = {
+      to_grid    = ${TO_GRID};
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
    grid_plot_info = {
       color_table   = "MET_BASE/colortables/NCL_colortables/BlueGreen14.ctable";
       plot_min      = 0.0;

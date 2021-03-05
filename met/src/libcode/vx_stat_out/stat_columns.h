@@ -107,7 +107,7 @@ extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, STATOutput
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
-                             int, int, AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rps_row   (StatHdrColumns &, const RPSInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,

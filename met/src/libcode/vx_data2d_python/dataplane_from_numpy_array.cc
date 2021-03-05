@@ -98,8 +98,8 @@ int nrows, ncols, Nx, Ny;
 
 if ( np.n_dims() != 2 )  {
 
-   mlog << Error << "\ndataplane_from_numpy_array() -> "
-        << "numpy array is not 2-dimensional! ... "
+   mlog << Error << "\ndataplane_from_data_array() -> "
+        << "data array is not 2-dimensional! ... "
         << "(dim = " << (np.n_dims()) << ")\n\n";
 
    exit ( 1 );
@@ -170,8 +170,8 @@ else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bi
 
 else  {
 
-   mlog << Error << "\ndataplane_from_numpy_array() -> "
-        << "unsupported numpy data type \""  << dtype << "\"\n\n";
+   mlog << Error << "\ndataplane_from_data_array() -> "
+        << "unsupported data type \""  << dtype << "\"\n\n";
 
    exit ( 1 );
 

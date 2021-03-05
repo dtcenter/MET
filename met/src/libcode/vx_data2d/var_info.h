@@ -135,6 +135,7 @@ class VarInfo
 
       RegridInfo   regrid()         const;
 
+      ConcatString magic_str_attr() const;
       ConcatString name_attr()      const;
       ConcatString units_attr()     const;
       ConcatString level_attr()     const;

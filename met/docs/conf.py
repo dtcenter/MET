@@ -23,8 +23,8 @@ author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K.
 version = 'develop'
 verinfo = version
 release = f'{version}'
-release_year = '2020'
-release_date = f'{release_year}1207'
+release_year = '2021'
+release_date = f'{release_year}0302'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------

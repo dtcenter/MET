@@ -31,7 +31,7 @@ extern DataPlane met_regrid (const DataPlane & in, const Grid & from_grid, const
 
 ////////////////////////////////////////////////////////////////////////
 
-
+extern DataPlane met_regrid_nearest       (const DataPlane & in, const Grid & from_grid, const Grid & to_grid);
 extern DataPlane met_regrid_generic       (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 extern DataPlane met_regrid_budget        (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 extern DataPlane met_regrid_area_weighted (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);

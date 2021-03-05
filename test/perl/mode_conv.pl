@@ -34,8 +34,8 @@ my @fld_sings = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y C
                    INTENSITY_90 INTENSITY_50 INTENSITY_SUM);
 
 my @fld_pairs = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF
-                   AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA
-                   COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST);
+                   ASPECT_DIFF AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA
+                   CURVATURE_RATIO COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST);
 
 my @fld_ctss  = qw(N_VALID GRID_RES FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR
                    CSI GSS HK HSS ODDS);
@@ -101,11 +101,13 @@ my $fmt_pair =
       "%14s"  . # BOUNDARY_DIST
       "%17s"  . # CONVEX_HULL_DIST
       "%11s"  . # ANGLE_DIFF
+      "%11s"  . # ASPECT_DIFF
       "%11s"  . # AREA_RATIO
       "%18s"  . # INTERSECTION_AREA
       "%11s"  . # UNION_AREA
       "%15s"  . # SYMMETRIC_DIFF
       "%23s"  . # INTERSECTION_OVER_AREA
+      "%17s"  . # CURVATURE_RATIO
       "%17s"  . # COMPLEXITY_RATIO
       "%27s"  . # PERCENTILE_INTENSITY_RATIO
       "%12s";   # INTEREST
@@ -205,7 +207,7 @@ while(<$fh_mode_in>){
   }
 
   # write a single object attribute line
-  elsif( $vals[20] !~ /_/ ){
+  elsif( $vals[22] !~ /_/ ){
     next if( $type eq "p");
     push @outs, (" MODE_SOA ", @vals[2,3,22 .. 43]);
     $fmt_val = $fmt_sing;
