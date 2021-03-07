@@ -56,7 +56,7 @@ PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_n
 
 {
 
-use_pickle = false;
+use_tmp_ascii = false;
 
 }
 
@@ -81,13 +81,13 @@ for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
 
 }
 
-use_pickle = false;
+use_tmp_ascii = false;
 
 const char * c = getenv(user_python_path_env);
 
 if ( c )  {
 
-   use_pickle = true;
+   use_tmp_ascii = true;
 
    user_path_to_python = c;
 
@@ -230,7 +230,7 @@ bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_
 
 bool status = false;
 
-if ( use_pickle )  status = do_pickle   ();
+if ( use_tmp_ascii )  status = do_tmp_ascii   ();
 else               status = do_straight ();
 
 return ( status );
@@ -319,10 +319,10 @@ return ( true );
 
 
    //
-   //  wrapper usage:  /path/to/python wrapper.py pickle_output_filename user_script_name [ user_script args ... ]
+   //  wrapper usage:  /path/to/python wrapper.py tmp_output_filename user_script_name [ user_script args ... ]
    //
 
-bool PythonHandler::do_pickle()
+bool PythonHandler::do_tmp_ascii()
 
 {
 
@@ -330,7 +330,6 @@ int j;
 const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
-ConcatString pickle_path;
 ConcatString tmp_ascii_path;
 const char * tmp_dir = 0;
 int status;
@@ -347,14 +346,13 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-// pickle_path = make_temp_file_name(path.text(), 0);
 tmp_ascii_path = make_temp_file_name(path.text(), 0);
 tmp_ascii_path << ".txt";
 
 command << cs_erase
         << user_path_to_python                   << ' '    //  user's path to python
         << replace_path(write_tmp_ascii_wrapper) << ' '    //  write_tmp_point.py
-        << tmp_ascii_path                        << ' '    //  pickle output filename
+        << tmp_ascii_path                        << ' '    //  temporary ascii output filename
         << user_script_filename;                           //  user's script name
 
 for (j=0; j<N; ++j)  {
@@ -367,7 +365,7 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error << "\nPythonHandler::do_pickle() -> "
+   mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
         << "command \"" << command.text() << "\" failed ... status = "
         << status << "\n\n";
 
@@ -389,8 +387,8 @@ PyObject * obj = script.lookup_ascii(list_name);
 
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error << "\nPythonHandler::do_pickle() -> "
-        << "pickle object is not a list!\n\n";
+   mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
+        << "tmp ascii object is not a list!\n\n";
 
    exit ( 1 );
 
