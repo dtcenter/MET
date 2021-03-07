@@ -18,6 +18,8 @@ __email__ = 'met_help@ucar.edu'
 
 import argparse
 
+point_data = None
+
 def read_tmp_ascii(filename):
     """
     Arguments:
@@ -26,13 +28,15 @@ def read_tmp_ascii(filename):
     Returns:
         (list of lists): point data
     """
+    print('read_tmp_ascii:' + filename)
     f = open(filename, 'r')
     lines = f.readlines()
     f.close()
 
-    data = [eval(line.strip('\n')) for line in lines]
+    global point_data
+    point_data = [eval(line.strip('\n')) for line in lines]
 
-    return data
+    return point_data
 
 if __name__ == '__main__':
     """
