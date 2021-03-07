@@ -312,7 +312,7 @@ fflush(stderr);
 
 ////////////////////////////////////////////////////////////////////////
 
-void Python3_Script::read_tmp_ascii(const char * tmp_filename) const
+PyObject* Python3_Script::read_tmp_ascii(const char * tmp_filename) const
 
 {
 
@@ -341,6 +341,13 @@ if ( PyErr_Occurred() )  {
    exit ( 1 );
 }
 
+PyTypeObject* type = pobj->ob_type;
+
+const char* p = type->tp_name;
+
+mlog << Debug(2) << "read_tmp_ascii return type: " << p << "\n";
+
+return pobj;
 }
 
 ////////////////////////////////////////////////////////////////////////

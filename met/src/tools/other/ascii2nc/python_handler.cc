@@ -153,7 +153,7 @@ if ( ! PyList_Check(obj) )  {
    mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
         << "given object not a list!\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
 
 }
 
@@ -386,9 +386,9 @@ script.import_read_tmp_ascii_py();
 
 script.read_pickle(list_name, pickle_path.text());
 
-script.read_tmp_ascii(tmp_ascii_path.text());
+PyObject * obj = script.read_tmp_ascii(tmp_ascii_path.text());
 
-PyObject * obj = script.lookup(list_name);
+// PyObject * obj = script.lookup(list_name);
 
 // PyObject * obj = script.lookup_ascii(list_name);
 
@@ -397,7 +397,7 @@ if ( ! PyList_Check(obj) )  {
    mlog << Error << "\nPythonHandler::do_pickle() -> "
         << "pickle object is not a list!\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
 
 }
 

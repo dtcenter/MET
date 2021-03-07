@@ -87,7 +87,7 @@ class Python3_Script {
 
       void import_read_tmp_ascii_py (void);
 
-      void read_tmp_ascii (const char * tmp_filename) const;
+      PyObject * read_tmp_ascii (const char * tmp_filename) const;
 };
 
 
