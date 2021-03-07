@@ -27,9 +27,8 @@ using namespace std;
 
 
 static const char generic_python_wrapper [] = "generic_python";
-static const char generic_pickle_wrapper [] = "generic_pickle";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_pickle_point.py";
+static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_tmp_point.py";
 
 static const char list_name              [] = "point_data";
 
@@ -378,13 +377,13 @@ if ( status )  {
 
 ConcatString wrapper;
 
-wrapper = generic_pickle_wrapper;
+wrapper = generic_python_wrapper;
 
 Python3_Script script(wrapper.text());
 
 script.import_read_tmp_ascii_py();
 
-script.read_pickle(list_name, pickle_path.text());
+// script.read_pickle(list_name, pickle_path.text());
 
 PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
 
@@ -407,7 +406,7 @@ load_python_obs(obj);
    //  cleanup
    //
 
-remove_temp_file(pickle_path);
+remove_temp_file(tmp_ascii_path);
 
    //
    //  done
