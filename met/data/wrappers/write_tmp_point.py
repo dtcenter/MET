@@ -16,7 +16,7 @@ print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
 print('Write Temporary Ascii:\t',  sys.argv[1])
 
-tmp_filename = sys.argv[1] + '.txt'
+tmp_filename = sys.argv[1]
 
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]

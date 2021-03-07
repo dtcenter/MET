@@ -28,11 +28,11 @@ using namespace std;
 
 static const char generic_python_wrapper [] = "generic_python";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_tmp_point.py";
+static const char write_tmp_ascii_wrapper[] = "MET_BASE/wrappers/write_tmp_point.py";
 
 static const char list_name              [] = "point_data";
 
-static const char pickle_base_name       [] = "tmp_ascii2nc_pickle";
+static const char tmp_base_name          [] = "tmp_ascii2nc";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -345,17 +345,17 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << pickle_base_name;
+     << tmp_base_name;
 
-pickle_path = make_temp_file_name(path.text(), 0);
+// pickle_path = make_temp_file_name(path.text(), 0);
 tmp_ascii_path = make_temp_file_name(path.text(), 0);
 tmp_ascii_path << ".txt";
 
 command << cs_erase
-        << user_path_to_python                << ' '    //  user's path to python
-        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
-        << pickle_path                        << ' '    //  pickle output filename
-        << user_script_filename;                        //  user's script name
+        << user_path_to_python                   << ' '    //  user's path to python
+        << replace_path(write_tmp_ascii_wrapper) << ' '    //  write_tmp_point.py
+        << tmp_ascii_path                        << ' '    //  pickle output filename
+        << user_script_filename;                           //  user's script name
 
 for (j=0; j<N; ++j)  {
 
@@ -383,11 +383,7 @@ Python3_Script script(wrapper.text());
 
 script.import_read_tmp_ascii_py();
 
-// script.read_pickle(list_name, pickle_path.text());
-
 PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
-
-// PyObject * obj = script.lookup(list_name);
 
 PyObject * obj = script.lookup_ascii(list_name);
 
