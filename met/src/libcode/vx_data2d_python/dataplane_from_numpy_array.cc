@@ -224,7 +224,7 @@ dp_out.set_accum(t);
    // attempt to parse "grid" as a string
    //
 
-s = attrs.lookup_string("grid");
+s = attrs.lookup_string("grid", false);
 
 if ( s.nonempty() ) {
 
