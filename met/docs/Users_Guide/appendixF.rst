@@ -66,7 +66,7 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
      'level':     'Surface',
      'units':     'None',
  
-     # Define 'grid' as a string or dictionary
+     # Define 'grid' as a string or a dictionary
  
      'grid': {
         'type': 'Lambert Conformal',
@@ -85,7 +85,7 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
         'ny': 129,
       }
   
-     }
+  }
 
 
 In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
@@ -96,19 +96,19 @@ If specified as a string, **grid** can be defined as follows:
 
 .. code-block:: none
 
-     'grid': 'G212'
+  'grid': 'G212'
 
 • As a grid specification string, as described in :ref:`appendixB`:
 
 .. code-block:: none
 
-     'grid': 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'
+  'grid': 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'
 
 • As the path to an existing gridded data file:
 
 .. code-block:: none
 
-     'grid': '/path/to/sample_data.grib'
+  'grid': '/path/to/sample_data.grib'
 
 When specified as a dictionary, the contents of the **grid** dictionary vary based on the grid **type** string. The entries for the supported grid types are described below:
 
