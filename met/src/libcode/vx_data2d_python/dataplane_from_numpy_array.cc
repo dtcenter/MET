@@ -243,6 +243,21 @@ else {
 
 }
 
+   //
+   // make sure the grid and data dimensions match
+   //
+
+if ( grid_out.nx() != Nx || grid_out.ny() != Ny ) {
+
+   mlog << Error << "\ndataplane_from_numpy_array() -> "
+        << "the grid dimensions (" << grid_out.nx() << ", "
+        << grid_out.ny() << ") and data dimensions (" << Nx
+        << ", " << Ny << ") do not match!\n\n";
+
+   exit ( 1 );
+
+}
+
      ////////////////////
 
 vinfo.set_name       (attrs.lookup_string("name"));
