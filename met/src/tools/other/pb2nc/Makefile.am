@@ -42,6 +42,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
 	$(PYTHON_LIBS) \
+	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_nc_util \
