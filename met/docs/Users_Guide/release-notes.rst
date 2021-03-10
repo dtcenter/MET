@@ -9,6 +9,7 @@ Version 9.1.2 release notes (20210310)
 ------------------------------------------------
 
 - See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/70?closed=1>`_.
+- Enable the MET documentation to be published via `Read the Docs <https://met.readthedocs.io/en/latest/>`_.
 - Fix sporadic PB2NC segfaults for the -index command line option (`#1618 <http://github.com/dtcenter/MET/issues/1618>`_).
 - Correct the climatological CDF value reported by Grid-Stat (`#1638 <http://github.com/dtcenter/MET/issues/1638>`_).
 - The set_attr_accum option sets the lead time instead of the accumulation time (`#1646 <http://github.com/dtcenter/MET/issues/1646>`_).
