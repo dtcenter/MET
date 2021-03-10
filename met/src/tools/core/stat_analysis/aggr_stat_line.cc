@@ -2577,6 +2577,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
          m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
          m[key].ens_pd.wgt_na.add(cur.total);
+         m[key].ens_pd.skip_ba.add(false);
 
          //
          // Store the summary statistics
