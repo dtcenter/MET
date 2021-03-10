@@ -19,6 +19,68 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
+  <!-- Define a named grid -->
+  <test name="python_numpy_grid_name">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair><name>PYTHON_GRID</name> <value>G212</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_name.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Grid Name: 'G212'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_name.ps</ps>
+    </output>
+  </test>
+
+  <!-- Define a grid specification string -->
+  <test name="python_numpy_grid_string">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair>
+        <name>PYTHON_GRID</name>
+        <value>lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N</value>
+      </pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_string.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Grid String: '${PYTHON_GRID}'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_string.ps</ps>
+    </output>
+  </test>
+
+  <!-- Define the grid using a gridded data file -->
+  <test name="python_numpy_grid_data_file">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair>
+        <name>PYTHON_GRID</name>
+        <value>&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_data_file.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Gridded Data File: 'wrfprs_ruc13_12.tm00_G212'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_data_file.ps</ps>
+    </output>
+  </test>
+  
   <!-- Invokes Python script that reads in NUMPY text data -->
   <test name="python_numpy_plot_data_plane">
     <exec>&MET_BIN;/plot_data_plane</exec>

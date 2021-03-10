@@ -39,6 +39,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
