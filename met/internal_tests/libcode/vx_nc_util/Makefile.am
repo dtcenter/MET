@@ -19,27 +19,32 @@ noinst_PROGRAMS = test_pressure_levels
 test_pressure_levels_SOURCES = test_pressure_levels.cc
 test_pressure_levels_CPPFLAGS = ${MET_CPPFLAGS}
 test_pressure_levels_LDFLAGS = -L. ${MET_LDFLAGS}
-test_pressure_levels_LDADD = -lvx_tc_util \
-	-lvx_stat_out \
+test_pressure_levels_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
 	-lvx_gsl_prob \
 	-lvx_analysis_util \
+	-lvx_tc_util \
+	-lvx_shapedata \
+	-lvx_util \
+	$(PYTHON_LIBS) \
+	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_statistics \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+

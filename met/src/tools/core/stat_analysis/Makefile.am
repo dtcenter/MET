@@ -8,19 +8,13 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-OPT_PYTHON_SOURCES =
-
-if ENABLE_PYTHON
-LDFLAGS += -lvx_python3_utils
-endif
-
 # The program
 
 bin_PROGRAMS    = stat_analysis
 stat_analysis_SOURCES = stat_analysis.cc \
 	aggr_stat_line.cc \
 	parse_stat_line.cc \
-	stat_analysis_job.cc $(OPT_PYTHON_SOURCES)
+	stat_analysis_job.cc
 stat_analysis_CPPFLAGS = ${MET_CPPFLAGS}
 stat_analysis_LDFLAGS = ${MET_LDFLAGS}
 stat_analysis_LDADD = -lvx_stat_out \
