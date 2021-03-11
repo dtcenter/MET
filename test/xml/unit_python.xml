@@ -52,7 +52,7 @@
       &OUTPUT_DIR;/python/letter_numpy_grid_string.ps \
       'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
-      -title "Grid String: '${PYTHON_GRID}'" \
+      -title "Grid String: 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'" \
       -v 1
     </param>
     <output>
