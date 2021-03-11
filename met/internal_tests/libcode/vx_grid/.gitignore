@@ -4,3 +4,4 @@ test_grid_area
 .deps
 Makefile
 Makefile.in
+*.dSYM

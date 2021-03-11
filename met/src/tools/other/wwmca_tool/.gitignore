@@ -7,3 +7,4 @@ wwmca_plot
 .deps
 Makefile
 Makefile.in
+*.dSYM

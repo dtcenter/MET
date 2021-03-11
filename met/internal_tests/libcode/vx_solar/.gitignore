@@ -4,3 +4,4 @@ test_ra_dec
 .deps
 Makefile
 Makefile.in
+*.dSYM

@@ -4,3 +4,4 @@ test_series_data
 .deps
 Makefile
 Makefile.in
+*.dSYM

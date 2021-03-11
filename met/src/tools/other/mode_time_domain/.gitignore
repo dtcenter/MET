@@ -6,3 +6,4 @@ mtd
 .deps
 Makefile
 Makefile.in
+*.dSYM
