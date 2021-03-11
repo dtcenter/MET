@@ -4,3 +4,4 @@ tc_rmw
 .deps
 Makefile
 Makefile.in
+*.dSYM

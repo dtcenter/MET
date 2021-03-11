@@ -4,3 +4,4 @@ test_thermo
 .deps
 Makefile
 Makefile.in
+*.dSYM

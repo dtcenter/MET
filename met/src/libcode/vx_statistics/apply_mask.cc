@@ -84,6 +84,51 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
 
 ////////////////////////////////////////////////////////////////////////
 
+Grid parse_grid_string(const char *grid_str) {
+   Grid grid;
+   StringArray sa;
+
+   // Parse as a white-space separated string
+   sa.parse_wsss(grid_str);
+
+   // Search for a named grid
+   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+      mlog << Debug(3) << "Use the grid named \""
+           << grid_str << "\".\n";
+   }
+   // Parse grid definition
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3) << "Use the grid defined by string \""
+           << grid_str << "\".\n";
+   }
+   // Extract the grid from a gridded data file
+   else {
+      mlog << Debug(3) << "Use the grid defined by file \""
+           << grid_str << "\".\n";
+
+      Met2dDataFileFactory m_factory;
+      Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
+
+      // Open the data file
+      if(!(met_ptr = m_factory.new_met_2d_data_file(grid_str))) {
+         mlog << Error << "\nparse_grid_string() -> "
+              << "can't open file \"" << grid_str
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Store the grid
+      grid = met_ptr->grid();
+
+      // Cleanup
+      if(met_ptr) { delete met_ptr; met_ptr = 0; }
+   }
+
+   return(grid);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
                        DataPlane &wgt_dp) {
    int x, y;

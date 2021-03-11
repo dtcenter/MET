@@ -8,3 +8,4 @@ test_add_rows
 .deps
 Makefile
 Makefile.in
+*.dSYM

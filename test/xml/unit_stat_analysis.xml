@@ -74,6 +74,22 @@
     </output>
   </test>
 
+  <test name="stat_analysis_AGG_ECNT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate -line_type ECNT -by FCST_VAR -obs_thresh NA -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_ECNT_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_ECNT_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ECNT_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ECNT_out.stat</stat>
+    </output>
+  </test>
+
   <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \

@@ -40,6 +40,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_cal \
 	-lvx_util \
 	$(PYTHON_LIBS) \
+	-lvx_statistics \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
