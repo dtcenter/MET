@@ -426,6 +426,19 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConcatString VarInfo::magic_str_attr() const {
+   ConcatString mstr(name_attr());
+   ConcatString lstr(level_attr());
+
+   // Format as {name}/{level} or {name}{level}
+   if(lstr.nonempty() && lstr[0] != '(') mstr << "/";
+   mstr << lstr;
+
+   return(mstr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_dict(Dictionary &dict) {
    ThreshArray ta;
    NumArray na;
