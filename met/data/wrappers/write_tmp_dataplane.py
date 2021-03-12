@@ -54,7 +54,7 @@ dp[:] = met_in.met_data
 for attr, attr_val in met_info['attrs'].items():
     print(attr, attr_val, type(attr_val))
     if attr == 'name':
-        setattr(ds, '_name', attr_val)
+        setattr(ds, 'name_str', attr_val)
     if type(attr_val) == str:
         setattr(ds, attr, attr_val)
     if type(attr_val) == dict:
