@@ -12,6 +12,7 @@
 #include "string.h"
 
 #include "vx_python3_utils.h"
+#include "vx_statistics.h"
 #include "check_endian.h"
 
 #include "data_plane.h"
@@ -219,9 +220,43 @@ dp_out.set_accum(t);
 
      ////////////////////
 
-PyObject * py_grid = attrs.lookup_dict("grid");
+   //
+   // attempt to parse "grid" as a string
+   //
 
-grid_from_python_dict(Python3_Dict(py_grid), grid_out);
+s = attrs.lookup_string("grid", false);
+
+if ( s.nonempty() ) {
+
+   grid_out = parse_grid_string(s.c_str());
+
+}
+else {
+
+   //
+   // otherwise, parse "grid" as a dictionary
+   //
+
+   PyObject * py_grid = attrs.lookup_dict("grid");
+
+   grid_from_python_dict(Python3_Dict(py_grid), grid_out);
+
+}
+
+   //
+   // make sure the grid and data dimensions match
+   //
+
+if ( grid_out.nx() != Nx || grid_out.ny() != Ny ) {
+
+   mlog << Error << "\ndataplane_from_numpy_array() -> "
+        << "the grid dimensions (" << grid_out.nx() << ", "
+        << grid_out.ny() << ") and data dimensions (" << Nx
+        << ", " << Ny << ") do not match!\n\n";
+
+   exit ( 1 );
+
+}
 
      ////////////////////
 

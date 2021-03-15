@@ -50,9 +50,9 @@ class PythonHandler : public FileHandler
       static string getFormatString() { return "python"; }
 
 
-      bool use_pickle;
+      bool use_tmp_ascii;
 
-      ConcatString user_path_to_python;   //  if we're using pickle
+      ConcatString user_path_to_python;   //  if we're using temporary ascii
 
       ConcatString user_script_filename;
 
@@ -68,15 +68,13 @@ class PythonHandler : public FileHandler
 
       virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
 
-      bool do_pickle   ();
-      bool do_straight ();   //  straight-up python, no pickle
+      bool do_tmp_ascii();
+      bool do_straight ();   //  straight-up python, no temporary ascii
 
       void load_python_obs(PyObject *);   //  python object is list of lists
 
 
       bool read_obs_from_script (const char * script_name, const char * variable_name);
-
-      bool read_obs_from_pickle (const char * pickle_name, const char * variable_name);
   
 };
 

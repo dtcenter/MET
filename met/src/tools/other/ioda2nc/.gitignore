@@ -5,3 +5,4 @@ ioda2nc
 .dirstamp
 Makefile
 Makefile.in
+*.dSYM

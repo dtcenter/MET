@@ -4,3 +4,4 @@ plot_point_obs
 .deps
 Makefile
 Makefile.in
+*.dSYM

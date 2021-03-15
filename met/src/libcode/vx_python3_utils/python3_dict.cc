@@ -220,7 +220,7 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Python3_Dict::lookup_string(const char * key) const
+ConcatString Python3_Dict::lookup_string(const char * key, bool error_out) const
 
 {
 
@@ -240,14 +240,23 @@ if ( ! a )  {
 
 if ( ! PyUnicode_Check(a) )  {
 
-   mlog << Error << "\nPython3_Dict::lookup_string(const char * key) -> "
-        << "value for key \"" << key << "\" not a character string\n\n";
+   if ( error_out )  {
 
-   exit ( 1 );
+      mlog << Error << "\nPython3_Dict::lookup_string(const char * key) -> "
+           << "value for key \"" << key << "\" not a character string\n\n";
+
+      exit ( 1 );
+
+   }
+
+   s.clear();
 
 }
+else {
 
-s = PyUnicode_AsUTF8(a);
+   s = PyUnicode_AsUTF8(a);
+
+}
 
 return ( s );
 

@@ -4,3 +4,4 @@ lidar2nc
 .deps
 Makefile
 Makefile.in
+*.dSYM
