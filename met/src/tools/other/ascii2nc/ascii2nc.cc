@@ -43,7 +43,6 @@
 //   015    03-20-19  Fillmore       Add aeronetv2 and aeronetv3 options.
 //   016    01-30-20  Bullock        Add python option.
 //   017    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
-//   018    03-01-21  Fillmore       Replace pickle files for temporary ascii.
 //
 ////////////////////////////////////////////////////////////////////////
 
