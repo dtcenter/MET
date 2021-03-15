@@ -91,6 +91,11 @@ filter = [
       output_flag   = { genmpr = BOTH; }
    },
    {
+      desc                 = "AL_MATCH24HR";
+      basin_mask           = "AL";
+      genesis_match_window = { beg = 0; end = 24; };
+   },
+   {
       desc          = "AL_DLAND_300NM";
       basin_mask    = "AL";
       dland_thresh  = >0&&<300;
@@ -213,7 +218,8 @@ genesis_match_window = {
 dev_hit_radius = 500;
 
 //
-// Time window in hours for a development scoring method hit
+// Time window in hours, relative to the model genesis time, for a development 
+// scoring method hit
 //
 dev_hit_window = {
    beg = -24;
