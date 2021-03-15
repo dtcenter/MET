@@ -18,6 +18,7 @@ print('User Command:\t',  sys.argv[2:])
 print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1]
+tmp_filename = pickle_filename + '.txt'
 
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
@@ -27,5 +28,9 @@ user_base = os.path.basename(pyembed_module_name).replace('.py','')
 spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
 met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
+
+f = open(tmp_filename, 'w')
+for line in met_in.point_data:
+    f.write(str(line) + '\n')
 
 pickle.dump( met_in.point_data, open( pickle_filename, "wb" ) )
