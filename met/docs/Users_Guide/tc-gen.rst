@@ -255,7 +255,18 @@ ______________________
 
   genesis_match_radius = 500;
 
-The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those Best genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only Best or operational tracks with a track point within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+
+______________________
+
+.. code-block:: none
+
+  genesis_match_window = {
+     beg = 0;
+     end = 0;
+  }
+
+The **genesis_match_window** entry defines a time window, in hours, relative to the forecast genesis time. When searching for a match, only Best or operational tracks with a track point falling within this time window will be considered. The default time window of 0 requires a Best or operational track to exist at the forecast genesis time for a match to be found. Increasing this time window should lead to an increase in the number matched genesis pairs. For example, setting *beg = -12;* would allow the forecast genesis events to be up to 12 hours early.
 
 ______________________
 

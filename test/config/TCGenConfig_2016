@@ -199,6 +199,15 @@ dland_thresh = NA;
 genesis_match_radius = 500;
 
 //
+// Time window in hours, relative to the model genesis time, to search for a
+// matching Best track point
+//
+genesis_match_window = {
+   beg = 0;
+   end = 0;
+}
+
+//
 // Radius in km for a development scoring method hit
 //
 dev_hit_radius = 500;

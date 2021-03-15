@@ -157,6 +157,7 @@ void TCGenVxOpt::clear() {
    VxAreaMask.clear();
    DLandThresh.clear();
    GenesisMatchRadius = bad_data_double;
+   GenesisMatchBeg = GenesisMatchEnd = bad_data_int;
    DevHitRadius = bad_data_double;
    DevHitBeg = DevHitEnd = bad_data_int;
    OpsHitDSec = bad_data_int;
@@ -246,9 +247,14 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    GenesisMatchRadius =
       dict.lookup_double(conf_key_genesis_match_radius);
 
+   // Conf: genesis_match_window
+   dict2 = dict.lookup_dictionary(conf_key_genesis_match_window);
+   parse_conf_range_int(dict2, beg, end);
+   GenesisMatchBeg = beg*sec_per_hour;
+   GenesisMatchEnd = end*sec_per_hour;
+
    // Conf: dev_hit_radius
-   DevHitRadius =
-      dict.lookup_double(conf_key_dev_hit_radius);
+   DevHitRadius = dict.lookup_double(conf_key_dev_hit_radius);
 
    // Conf: genesis_hit_window
    dict2 = dict.lookup_dictionary(conf_key_dev_hit_window);

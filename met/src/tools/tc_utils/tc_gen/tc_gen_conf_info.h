@@ -133,14 +133,13 @@ class TCGenVxOpt {
 
       // Temporal and spatial matching criteria
       double GenesisMatchRadius;
+      int    GenesisMatchBeg, GenesisMatchEnd;
+
+      // Temporal and spatial scoring options
       double DevHitRadius;
       int    DevHitBeg, DevHitEnd;
       int    OpsHitDSec;
-
-      // Scoring methods
-      bool DiscardFlag;
-      bool DevFlag;
-      bool OpsFlag;
+      bool   DiscardFlag, DevFlag, OpsFlag;
 
       // Output file options
       double CIAlpha;

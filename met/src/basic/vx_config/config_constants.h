@@ -1071,6 +1071,7 @@ static const char conf_key_vmax_thresh[]                     = "vmax_thresh";
 static const char conf_key_mslp_thresh[]                     = "mslp_thresh";
 static const char conf_key_basin_mask[]                      = "basin_mask";
 static const char conf_key_genesis_match_radius[]            = "genesis_match_radius";
+static const char conf_key_genesis_match_window[]            = "genesis_match_window";
 static const char conf_key_dev_hit_radius[]                  = "dev_hit_radius";
 static const char conf_key_dev_hit_window[]                  = "dev_hit_window";
 static const char conf_key_ops_hit_tdiff[]                   = "ops_hit_tdiff";

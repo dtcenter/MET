@@ -104,8 +104,8 @@ class GenesisInfo : public TrackInfo {
          //  do stuff
          //
 
-      bool is_match(const TrackPoint &,
-                    const double) const;
+      bool is_match(const TrackPoint &, const double,
+                    const int, const int) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

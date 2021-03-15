@@ -82,7 +82,7 @@ static void   do_genesis_ctc       (const TCGenVxOpt &,
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
-                                    double);
+                                    double, int, int);
 
 static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
@@ -377,7 +377,9 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       
       // Search for a BEST track match
       i_bga = find_genesis_match(fga[i], bga, ota,
-                                 vx_opt.GenesisMatchRadius);
+                                 vx_opt.GenesisMatchRadius,
+                                 vx_opt.GenesisMatchBeg,
+                                 vx_opt.GenesisMatchEnd);
 
       // Add the matched genesis pair
       if(!is_bad_data(i_bga)) {
@@ -591,7 +593,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 int find_genesis_match(const GenesisInfo      &fcst_gi,
                        const GenesisInfoArray &bga,
                        const TrackInfoArray   &ota,
-                       const double rad) {
+                       const double rad,
+                       const int beg, const int end) {
    int i, j;
    int i_best = bad_data_int;
    int i_oper = bad_data_int;
@@ -610,7 +613,7 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
        i<bga.n() && is_bad_data(i_best);
        i++) {
       for(j=0; j<bga[i].n_points(); j++) {
-         if(fcst_gi.is_match(bga[i][j], rad)) {
+         if(fcst_gi.is_match(bga[i][j], rad, beg, end)) {
             i_best = i;
             mlog << Debug(4) << case_cs
                  << " MATCHES BEST track "
@@ -627,7 +630,7 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
           i<ota.n() && is_bad_data(i_oper);
           i++) {
          for(j=0; j<ota[i].n_points(); j++) {
-            if(fcst_gi.is_match(ota[i][j], rad)) {
+            if(fcst_gi.is_match(ota[i][j], rad, beg, end)) {
                i_oper = i;
                mlog << Debug(4) << case_cs
                     << " MATCHES operational " << ota[i].technique()
