@@ -31,15 +31,15 @@ GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = 0;
 
-static const char write_tmp_nc         [] = "MET_BASE/wrappers/write_tmp_dataplane.py";
+static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle_dataplane.py";
 
-static const char read_tmp_nc          [] = "read_tmp_dataplane";   //  NO ".py" suffix
+static const char read_pickle          [] = "read_pickle_dataplane";   //  NO ".py" suffix
 
-static const char tmp_nc_base_name     [] = "tmp_met_nc";
+static const char pickle_base_name     [] = "tmp_met_pickle";
 
-static const char tmp_nc_var_name      [] = "met_info";
+static const char pickle_var_name      [] = "met_info";
 
-static const char tmp_nc_file_var_name [] = "tmp_nc_filename";
+static const char pickle_file_var_name [] = "pickle_filename";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ static bool straight_python_dataplane(const char * script_name,
                                       Grid & met_grid_out, VarInfoPython &vinfo);
 
 
-static bool tmp_nc_dataplane(const char * script_name,
+static bool pickle_dataplane(const char * script_name,
                              int script_argc, char ** script_argv,
                              const bool use_xarray, DataPlane & met_dp_out,
                              Grid & met_grid_out, VarInfoPython &vinfo);
@@ -69,9 +69,9 @@ bool python_dataplane(const char * user_script_name,
 
 bool status = false;
 
-if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_tmp_nc = true;
+if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_pickle = true;
 
-   status = tmp_nc_dataplane(user_script_name,
+   status = pickle_dataplane(user_script_name,
                              user_script_argc, user_script_argv,
                              use_xarray, met_dp_out,
                              met_grid_out, vinfo);
@@ -276,7 +276,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool tmp_nc_dataplane(const char * user_script_name,
+bool pickle_dataplane(const char * user_script_name,
                       int user_script_argc, char ** user_script_argv,
                       const bool use_xarray, DataPlane & met_dp_out,
                       Grid & met_grid_out, VarInfoPython &vinfo)
@@ -287,7 +287,7 @@ int j;
 int status;
 ConcatString command;
 ConcatString path;
-ConcatString tmp_nc_path;
+ConcatString pickle_path;
 const char * tmp_dir = 0;
 Wchar_Argv wa;
 
@@ -301,14 +301,14 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << tmp_nc_base_name;
+     << pickle_base_name;
 
-tmp_nc_path = make_temp_file_name(path.text(), 0);
+pickle_path = make_temp_file_name(path.text(), 0);
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_nc)    << ' '    //  write_tmp_nc.py
-        << tmp_nc_path                   << ' '    //  tmp_nc output filename
+        << replace_path(write_pickle)    << ' '    //  write_pickle.py
+        << pickle_path                   << ' '    //  pickle output filename
         << user_script_name;                       //  user's script name
 
 for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
@@ -321,7 +321,7 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error << "\ntmp_nc_dataplane() -> "
+   mlog << Error << "\npickle_dataplane() -> "
         << "command \"" << command.text() << "\" failed ... status = "
         << status << "\n\n";
 
@@ -346,15 +346,15 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
    return ( false );
 
 }
 
-mlog << Debug(3) << "Reading temporary tmp_nc file: "
-     << tmp_nc_path << "\n";
+mlog << Debug(3) << "Reading temporary pickle file: "
+     << pickle_path << "\n";
 
    //
    //  set the arguments
@@ -362,9 +362,9 @@ mlog << Debug(3) << "Reading temporary tmp_nc file: "
 
 StringArray a;
 
-a.add(read_tmp_nc);
+a.add(read_pickle);
 
-a.add(tmp_nc_path);
+a.add(pickle_path);
 
 wa.set(a);
 
@@ -374,7 +374,7 @@ PySys_SetArgv (wa.wargc(), wa.wargv());
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(read_tmp_nc);
+path = get_short_name(read_pickle);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
@@ -392,7 +392,7 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
 
@@ -402,7 +402,7 @@ if ( PyErr_Occurred() )  {
 
 if ( ! module_obj )  {
 
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
+   mlog << Warning << "\npickle_dataplane() -> "
         << "error running python script\n\n";
 
    return ( false );
@@ -410,7 +410,7 @@ if ( ! module_obj )  {
 }
 
    //
-   //  read the tmp_nc file
+   //  read the pickle file
    //
 
    //
@@ -419,13 +419,13 @@ if ( ! module_obj )  {
 
 PyObject * module_dict_obj = PyModule_GetDict (module_obj);
 
-PyObject * key_obj = PyUnicode_FromString (tmp_nc_var_name);
+PyObject * key_obj = PyUnicode_FromString (pickle_var_name);
 
 PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
 if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 
-   mlog << Error << "\ntmp_nc_dataplane() -> "
+   mlog << Error << "\npickle_dataplane() -> "
         << "bad dict object\n\n";
 
    exit ( 1 );
@@ -450,7 +450,7 @@ dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
    //  cleanup
    //
 
-remove_temp_file(tmp_nc_path);
+remove_temp_file(pickle_path);
 
    //
    //  done
