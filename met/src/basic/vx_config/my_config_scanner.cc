@@ -169,6 +169,8 @@ static bool replace_env(ConcatString &);
 
 static bool is_fort_thresh_no_spaces();
 
+static bool is_simple_perc_thresh();
+
 static int  do_simple_perc_thresh();
 
 
@@ -369,6 +371,8 @@ if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
 if ( is_float_v2() )  { if ( do_float() )  return ( token(FLOAT) ); }
 
 if ( is_fort_thresh_no_spaces() )  { return ( do_fort_thresh() ); }
+
+if ( is_simple_perc_thresh() )  { return ( do_simple_perc_thresh() ); }
 
 int t;
 
@@ -1436,6 +1440,37 @@ int j;
 for (j=0; j<n_fort_thresh_strings; ++j)  {
 
    if ( (strncmp(configtext, fort_thresh_string[j], 2) == 0) && (is_number(configtext + 2, max_id_length - 2)) )    return ( true );
+
+}
+
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_simple_perc_thresh()
+
+
+{
+
+int j, k;
+
+
+   //
+   //  simple percentile threshold?  (example: "SOP50.0")
+   //
+
+for (j=0; j<n_perc_thresh_infos; ++j)  {
+
+   k = perc_thresh_info[j].short_name_length;
+
+   if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
+        && (is_number(configtext + k, max_id_length - k))  )
+           { return ( do_simple_perc_thresh() ); }
 
 }
 
