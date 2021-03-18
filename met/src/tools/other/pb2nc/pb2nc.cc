@@ -2428,7 +2428,7 @@ void write_netcdf_hdr_data() {
 
    // Check for no messages retained
    if(dim_count <= 0) {
-      mlog << Error << method_name << " -> "
+      mlog << Error << "\n" << method_name << " -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
@@ -2950,14 +2950,13 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
 
       bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
       mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
-           << " to " << tq_pres_min << "   UV pressures: " << uv_pres_max
+           << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
            << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
       if( no_overlap ) {
-         mlog << Warning << method_name
-              << "Can not combine TQ and UV records because of no overlapping.\n";
-         mlog << Warning << "             TQZ record count: " << tq_count
-              << ", UV record count: " << uv_count
-              << "  common_levels: " << common_levels.n() << "\n";
+         mlog << Warning << "\n" << method_name
+              << "Can not combine TQ and UV records because of no overlapping."
+              << "  TQZ count: " << tq_count << ", UV count: " << uv_count
+              << "  common_levels: " << common_levels.n() << "\n\n";
          return pqtzuv_map_merged.size();
       }
 
@@ -3061,7 +3060,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
       hgt_cnt = spfh_cnt = 0;
       for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
          if (index < 0) {
-            mlog << Error << method_name  << "negative index: " << index << "\n";
+            mlog << Error << "\n" <<  method_name  << "negative index: " << index << "\n\n";
             break;
          }
 
@@ -3081,7 +3080,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          index--;
       }
       if (index != -1) {
-         mlog << Error << method_name  << "Missing some levels (" << index << ")\n";
+         mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n";
       }
 
       if (pbl_level > MAX_PBL_LEVEL) {
@@ -3166,10 +3165,10 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
    if (is_eq(pbl_value, bad_data_float)) {
-      mlog << Warning << "Failed to compute PBL " << hdr_info << "\n\n";
+      mlog << Warning << "\nFailed to compute PBL " << hdr_info << "\n\n";
    }
    else if (pbl_value < hdr_elv) {
-      mlog << Warning << "Not saved because the computed PBL (" << pbl_value
+      mlog << Warning << "\nNot saved because the computed PBL (" << pbl_value
            << ") is less than the station elevation (" << hdr_elv
            << "). " << hdr_info << "\n\n";
       obs_arr[4] = 0;
@@ -3183,7 +3182,7 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
            << "   lat: " << hdr_lat << ", lon: " << hdr_lon
            << ", elv: " << hdr_elv << " " << hdr_info << "\n\n";
       if (obs_arr[4] > MAX_PBL) {
-         mlog << Warning << " Computed PBL (" << obs_arr[4] << " from "
+         mlog << Warning << "\nComputed PBL (" << obs_arr[4] << " from "
               << pbl_value << ") is too high, Reset to " << MAX_PBL
               << "  " << hdr_info<< "\n\n";
          obs_arr[4] = MAX_PBL;
@@ -3254,10 +3253,10 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
-      mlog << Error << method_name 
+      mlog << Error << "\n" << method_name 
            << "  Can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
-           << ", next: " <<  prev_pqtzuv[0] << "\n";
+           << ", next: " <<  prev_pqtzuv[0] << "\n\n";
    }
    else {
       float p_ratio = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
