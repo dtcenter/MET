@@ -26,7 +26,7 @@ sys.argv = sys.argv[2:]
 # append user script dir to system path
 pyembed_dir, pyembed_file = os.path.split(pyembed_module_name)
 if pyembed_dir:
-    os.path.append(pyembed_dir)
+    os.path.insert(0, pyembed_dir)
 
 if not pyembed_module_name.endswith('.py'):
     pyembed_module_name += '.py'
