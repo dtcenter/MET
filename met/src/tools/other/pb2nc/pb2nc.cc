@@ -2934,21 +2934,21 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       std::map<float,float*>::iterator it, it_tq, it_uv;
 
       // Gets pressure levels for TQZ records
-      it=pqtzuv_map_tq.begin();
+      it = pqtzuv_map_tq.begin();
       tq_pres_min = tq_pres_max = it->first;
       for (; it!=pqtzuv_map_tq.end(); ++it) {
          float pres_v = it->first;
          if (tq_pres_min > pres_v) tq_pres_min = pres_v;
-         if (tq_pres_max > pres_v) tq_pres_min = pres_v;
+         if (tq_pres_max < pres_v) tq_pres_max = pres_v;
          tq_levels.add(nint(pres_v));
       }
       // Gets pressure levels for common records
-      it=pqtzuv_map_uv.begin();
+      it = pqtzuv_map_uv.begin();
       uv_pres_min = uv_pres_max = it->first;
       for (; it!=pqtzuv_map_uv.end(); ++it) {
          float pres_v = it->first;
          if (uv_pres_min > pres_v) uv_pres_min = pres_v;
-         if (uv_pres_max > pres_v) uv_pres_min = pres_v;
+         if (uv_pres_max < pres_v) uv_pres_max = pres_v;
          if (tq_levels.has(nint(pres_v))) {
             common_levels.add(nint(pres_v));
          }
@@ -2961,7 +2961,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
       mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
            << " to " << tq_pres_min << "   UV pressures: " << uv_pres_max
-           << " to " << uv_pres_min << (no_overlap ? "no overlap" : "overlapping") << "\n";
+           << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
       if( no_overlap ) {
          mlog << Warning << method_name
               << "Can not combine TQ and UV records because of no overlapping.\n";
@@ -2970,23 +2970,25 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
               << "  common_levels: " << common_levels.n() << "\n";
          return pqtzuv_map_merged.size();
       }
-      
+
       // Select first record by 1) merging two records with the same pressure
       // level or 2) interpolate
+      int tq_pres, uv_pres;
       next_pqtzuv = (float *)0;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
       pqtzuv_uv = (float *)it_uv->second;;
       pqtzuv_merged = new float[mxr8vt];
-      if (common_levels.has(nint(it_tq->first)) 
-            || common_levels.has(nint(it_uv->first))) {
+      tq_pres = nint(it_tq->first);
+      uv_pres = nint(it_uv->first);
+      if (common_levels.has(tq_pres) || common_levels.has(uv_pres)) {
          // Found the records with the same precsure level
-         if (it_tq->first != it_uv->first) {
-            if (common_levels.has(nint(it_uv->first))) {
+         if (tq_pres != uv_pres) {
+            if (common_levels.has(uv_pres)) {
                pqtzuv_uv = pqtzuv_map_uv[it_uv->first];
             }
-            else if (common_levels.has(nint(it_tq->first))) {
+            else if (common_levels.has(tq_pres)) {
                pqtzuv_tq = pqtzuv_map_tq[it_tq->first];
             }
          }
@@ -3228,9 +3230,14 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
                     << var_data[idx_start] << " and " << var_data[idx_end] << "\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
                for (idx2 = idx_start+1; idx2<idx_end; idx2++) {
-                  float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
-                        / (pres_data[idx_end] - pres_data[idx_start]);
-                  var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
+                  if (is_eq(pres_data[idx_end], pres_data[idx_start])) {
+                     float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
+                           / (pres_data[idx_end] - pres_data[idx_start]);
+                     var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
+                  }
+                  else {
+                     var_data[idx2] = var_data[idx_start];
+                  }
                   mlog << Debug(7) << method_name << " interpolated value["
                        << idx2 << "] = " << var_data[idx2] << "\n";
                   count_interpolated++;
@@ -3254,6 +3261,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
 
 void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzuv) {
    static const char *method_name = "interpolate_pqtzuv() ";
+
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
