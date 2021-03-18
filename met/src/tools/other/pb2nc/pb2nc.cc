@@ -3230,7 +3230,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
                     << var_data[idx_start] << " and " << var_data[idx_end] << "\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
                for (idx2 = idx_start+1; idx2<idx_end; idx2++) {
-                  if (is_eq(pres_data[idx_end], pres_data[idx_start])) {
+                  if (!is_eq(pres_data[idx_end], pres_data[idx_start])) {
                      float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
                            / (pres_data[idx_end] - pres_data[idx_start]);
                      var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
@@ -3266,9 +3266,9 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
       mlog << Error << method_name 
-              << "  Can't interpolate because of same pressure levels. prev: "
-              << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
-              << ", next: " <<  prev_pqtzuv[0] << "\n";
+           << "  Can't interpolate because of same pressure levels. prev: "
+           << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
+           << ", next: " <<  prev_pqtzuv[0] << "\n";
    }
    else {
       float p_ratio = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
