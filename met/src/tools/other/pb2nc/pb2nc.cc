@@ -2437,7 +2437,7 @@ void write_netcdf_hdr_data() {
 
    // Check for no messages retained
    if(dim_count <= 0) {
-      mlog << Error << method_name << " -> "
+      mlog << Error << "\n" << method_name << " -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
@@ -3071,7 +3071,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
       hgt_cnt = spfh_cnt = 0;
       for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
          if (index < 0) {
-            mlog << Error << method_name  << "negative index: " << index << "\n";
+            mlog << Error << "\n" << method_name  << "negative index: " << index << "\n\n";
             break;
          }
 
@@ -3091,7 +3091,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          index--;
       }
       if (index != -1) {
-         mlog << Error << method_name  << "Missing some levels (" << index << ")\n";
+         mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n\n";
       }
 
       if (pbl_level > MAX_PBL_LEVEL) {
@@ -3264,7 +3264,7 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
-      mlog << Error << method_name 
+      mlog << Error << "\n" << method_name 
            << "  Can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
            << ", next: " <<  prev_pqtzuv[0] << "\n";
