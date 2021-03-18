@@ -81,7 +81,7 @@ The configuration file language supports the following data types:
   * The following percentile threshold types are supported:
     
     * "SFP" for a percentile of the sample forecast values.
-      e.g. ">SFP50" means greater than the 50-th forecast percentile.
+      e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
       
     * "SOP" for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
