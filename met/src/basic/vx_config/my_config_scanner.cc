@@ -169,6 +169,8 @@ static bool replace_env(ConcatString &);
 
 static bool is_fort_thresh_no_spaces();
 
+static bool is_simple_perc_thresh();
+
 static int  do_simple_perc_thresh();
 
 
@@ -370,6 +372,8 @@ if ( is_float_v2() )  { if ( do_float() )  return ( token(FLOAT) ); }
 
 if ( is_fort_thresh_no_spaces() )  { return ( do_fort_thresh() ); }
 
+if ( is_simple_perc_thresh() )  { return ( do_simple_perc_thresh() ); }
+
 int t;
 
 if ( is_id() )  { t = do_id();  return ( token(t) ); }
@@ -533,7 +537,6 @@ if ( is_lhs )  { strncpy(configlval.text, configtext, max_id_length);  return ( 
 
 if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
 
-
    //
    //  boolean?
    //
@@ -554,17 +557,13 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
 }
 
-
-
-
-
    //
    //  builtin ?
    //
 
 int index;
 
- if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
    //  local variable ?   //  ie, in argument list
@@ -579,11 +578,6 @@ if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index
 const DictionaryEntry * e = dict_stack->lookup(configtext);
 
 if ( e && (e->is_number()) && (! is_lhs) )  {
-
-   // cout << "=================== id = \"" << configtext << "\"    is_lhs = " << (is_lhs ? "true" : "false") << "\n";
-
-   // cout << "do_id() -> \n";
-   // e->dump(cout);
 
    if ( e->type() == IntegerType )  {
 
@@ -613,27 +607,19 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
 
 }
 
-
     ///////////////////////////////////////////////////////////////////////
-
-
-
-
 
    //
    //  fortran threshold without spaces?  (example: "le150")
    //
 
-if ( (strncmp(configtext, "lt", 2) == 0) && is_number(configtext + 2, max_id_length - 2) )  { return ( do_fort_thresh() ); }
-
 for (j=0; j<n_fort_thresh_strings; ++j)  {
 
    if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
-        && (is_number(configtext + 2, max_id_length - 2))
-        )  { configlval.cval = thresh_lt;  return ( do_fort_thresh() ); }
+        && (is_number(configtext + 2, max_id_length - 2))  )
+           { configlval.cval = thresh_lt;  return ( do_fort_thresh() ); }
 
 }
-
 
    //
    //  simple percentile threshold?  (example: "SOP50")
@@ -649,10 +635,7 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
 
 }
 
-
-
     ///////////////////////////////////////////////////////////////////////
-
 
    //
    //  nope
@@ -863,7 +846,6 @@ while ( 1 )  {
 
    c1 = c2;
 
-   // c2 = nextchar();
    c2 = fgetc(configin);
 
 }
@@ -891,7 +873,6 @@ while ( 1 )  {
 
    if ( feof (configin) )  break;
 
-   // c = nextchar();
    c = fgetc(configin);
 
    if ( (c == eof) || (c == '\n') )  break;
@@ -1435,7 +1416,38 @@ int j;
 
 for (j=0; j<n_fort_thresh_strings; ++j)  {
 
-   if ( (strncmp(configtext, fort_thresh_string[j], 2) == 0) && (is_number(configtext + 2, max_id_length - 2)) )    return ( true );
+   if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
+        && (is_number(configtext + 2, max_id_length - 2))  )
+           { return ( true ); }
+
+}
+
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_simple_perc_thresh()
+
+{
+
+int j, k;
+
+   //
+   //  simple percentile threshold?  (example: "SOP50.0")
+   //
+
+for (j=0; j<n_perc_thresh_infos; ++j)  {
+
+   k = perc_thresh_info[j].short_name_length;
+
+   if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
+        && (is_number(configtext + k, max_id_length - k))  )
+           { return ( do_simple_perc_thresh() ); }
 
 }
 
@@ -1472,7 +1484,6 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
 
 }
 
-
 if ( index < 0 )   {
 
    mlog << Error << "\ndo_simple_perc_thresh() -> "
@@ -1482,11 +1493,8 @@ if ( index < 0 )   {
 
 }
 
-
 configlval.pc_info.perc_index = index;
-// configlval.pc_info.is_simple  = true;
-configlval.pc_info.value     = value;
-// configlval.pc_info.value2     = bad_data_double;;
+configlval.pc_info.value      = value;
 
 
 return ( SIMPLE_PERC_THRESH );
@@ -1495,9 +1503,3 @@ return ( SIMPLE_PERC_THRESH );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
