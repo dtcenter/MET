@@ -5,8 +5,15 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 https://github.com/dtcenter/MET/issues
 
+Version 9.1.3 release notes (20210319)
+--------------------------------------
+
+- See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/71?closed=1>`_.
+- Fix PB2NC segfault when deriving PBL (`#1715 <http://github.com/dtcenter/MET/issues/1715>`_).
+- Fix parsing error for floating point percentile thresholds, like >SFP33.3 (`#1716 <http://github.com/dtcenter/MET/issues/1716>`_).
+
 Version 9.1.2 release notes (20210310)
-------------------------------------------------
+--------------------------------------
 
 - See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/70?closed=1>`_.
 - Enable the MET documentation to be published via `Read the Docs <https://met.readthedocs.io/en/latest/>`_.
@@ -17,7 +24,7 @@ Version 9.1.2 release notes (20210310)
 - The 1D histograms reported by Grid-Diag are incorrect when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
 
 Version 9.1.1 release notes (20201118)
-------------------------------------------------
+--------------------------------------
 
 - See complete list of `GitHub Issues <https://github.com/NCAR/MET/milestone/68?closed=1>`_.
 - Fix Grid-Diag to correctly ignore missing data values (`#1562 <http://github.com/dtcenter/MET/issues/1562>`_).
