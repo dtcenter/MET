@@ -531,23 +531,23 @@ For example:
   column_str_name = [];
   column_str_val  = [];
 
-**column_exc_name, column_exc_val**
+**column_str_exc_name, column_str_exc_val**
   
 Stratify by performing string matching on non-numeric data columns.
 Specify a comma-separated list of columns names and values
 to be excluded from the analysis.
-May add using the "-column_exc name string" job command options.
+May add using the "-column_str_exc name string" job command options.
 
 For example:
 
-| column_exc_name = [ "LEVEL" ];
-| column_exc_val  = [ "TD"    ];
+| column_str_exc_name = [ "LEVEL" ];
+| column_str_exc_val  = [ "TD"    ];
 |
 
 .. code-block:: none
 		
-  column_exc_name = [];
-  column_exc_val  = [];
+  column_str_exc_name = [];
+  column_str_exc_val  = [];
 
 **init_thresh_name, init_thresh_val**
   
@@ -584,22 +584,22 @@ For example:
   init_str_name = [];
   init_str_val  = [];
 
-**init_exc_name, init_exc_val**
+**init_str_exc_name, init_str_exc_val**
   
-Just like the column_exc options above, but apply the string matching only
+Just like the column_str_exc options above, but apply the string matching only
 when lead = 0.  If lead = 0 string does match, discard the entire track.
-May add using the "-init_exc name thresh" job command options.
+May add using the "-init_str_exc name thresh" job command options.
 
 For example:
 
-| init_exc_name = [ "LEVEL" ];
-| init_exc_val  = [ "HU"    ];
+| init_str_exc_name = [ "LEVEL" ];
+| init_str_exc_val  = [ "HU"    ];
 |
 
 .. code-block:: none
 
-  init_exc_name = [];
-  init_exc_val  = [];
+  init_str_exc_name = [];
+  init_str_exc_val  = [];
 
 **water_only**
 
@@ -781,10 +781,10 @@ Where "job_name" is set to one of the following:
     "-track_watch_warn   name"
     "-column_thresh      name thresh"
     "-column_str         name string"
-    "-column_exc         name string"
+    "-column_str_exc     name string"
     "-init_thresh        name thresh"
     "-init_str           name string"
-    "-init_exc           name string"
+    "-init_str_exc       name string"
 
   Additional filtering options that may be used only when -line_type
   has been listed only once. These options take two arguments: the name
@@ -794,13 +794,13 @@ Where "job_name" is set to one of the following:
 
   .. code-block:: none
 		  
-    "-column_min col_name value" For example: -column_min TK_ERR 100.00
-    "-column_max col_name value"
-    "-column_eq  col_name value"
-    "-column_str col_name string" separate multiple filtering strings
-                                  with commas
-    "-column_exc col_name string" separate multiple filtering strings
-                                  with commas
+    "-column_min     col_name value" For example: -column_min TK_ERR 100.00
+    "-column_max     col_name value"
+    "-column_eq      col_name value"
+    "-column_str     col_name string" separate multiple filtering strings
+                                      with commas
+    "-column_str_exc col_name string" separate multiple filtering strings
+                                      with commas
 
   Required Args: -dump_row
   

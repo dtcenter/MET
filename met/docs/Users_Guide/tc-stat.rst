@@ -257,10 +257,10 @@ _________________________
 
 .. code-block:: none
 
-  column_exc_name = [];
-  column_exc_val  = [];
+  column_str_exc_name = [];
+  column_str_exc_val  = [];
 
-The **column_exc_name** and **column_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_exc_val** should match that of the **column_exc_name**. Using the **-column_exc name val** option within the job command lines may further refine these selections.
+The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name val** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -284,10 +284,10 @@ _________________________
 
 .. code-block:: none
 
-  init_exc_name = [];
-  init_exc_val  = [];
+  init_str_exc_name = [];
+  init_str_exc_val  = [];
 
-The **init_exc_name** and **init_exc_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, and the string **does** match, discard the entire track. The length of the **init_exc_val** should match that of the **init_exc_name**. Using the **-init_exc name val** option within the job command lines may further refine these selections.
+The **init_str_exc_name** and **init_str_exc_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, and the string **does** match, discard the entire track. The length of the **init_str_exc_val** should match that of the **init_str_exc_name**. Using the **-init_str_exc name val** option within the job command lines may further refine these selections.
 
 _________________________
 

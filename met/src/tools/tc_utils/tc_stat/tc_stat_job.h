@@ -286,15 +286,15 @@ class TCStatJob {
       map<ConcatString,ThreshArray> ColumnThreshMap;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> ColumnStrMap;
-      map<ConcatString,StringArray> ColumnExcMap;
+      map<ConcatString,StringArray> ColumnStrIncMap;
+      map<ConcatString,StringArray> ColumnStrExcMap;
 
       // Numeric column thresholds
       map<ConcatString,ThreshArray> InitThreshMap;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> InitStrMap;
-      map<ConcatString,StringArray> InitExcMap;
+      map<ConcatString,StringArray> InitStrIncMap;
+      map<ConcatString,StringArray> InitStrExcMap;
 
       // Variables to the store the analysis job specification
       ConcatString DumpFile;        // Dump TrackPairInfo used to a file

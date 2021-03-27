@@ -220,11 +220,11 @@ void TCStatJob::clear() {
    LineType.clear();
    TrackWatchWarn.clear();
    ColumnThreshMap.clear();
-   ColumnStrMap.clear();
-   ColumnExcMap.clear();
+   ColumnStrIncMap.clear();
+   ColumnStrExcMap.clear();
    InitThreshMap.clear();
-   InitStrMap.clear();
-   InitExcMap.clear();
+   InitStrIncMap.clear();
+   InitStrExcMap.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -303,11 +303,11 @@ void TCStatJob::assign(const TCStatJob & j) {
    LineType = j.LineType;
    TrackWatchWarn = j.TrackWatchWarn;
    ColumnThreshMap = j.ColumnThreshMap;
-   ColumnStrMap = j.ColumnStrMap;
-   ColumnExcMap = j.ColumnExcMap;
+   ColumnStrIncMap = j.ColumnStrIncMap;
+   ColumnStrExcMap = j.ColumnStrExcMap;
    InitThreshMap = j.InitThreshMap;
-   InitStrMap = j.InitStrMap;
-   InitExcMap = j.InitExcMap;
+   InitStrIncMap = j.InitStrIncMap;
+   InitStrExcMap = j.InitStrExcMap;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -427,14 +427,14 @@ void TCStatJob::dump(ostream & out, int depth) const {
       thr_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "ColumnStrMap ...\n";
-   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+   out << prefix << "ColumnStrIncMap ...\n";
+   for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "ColumnExcMap ...\n";
-   for(str_it=ColumnExcMap.begin(); str_it!= ColumnExcMap.end(); str_it++) {
+   out << prefix << "ColumnStrExcMap ...\n";
+   for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -445,14 +445,14 @@ void TCStatJob::dump(ostream & out, int depth) const {
       thr_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "InitStrMap ...\n";
-   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
+   out << prefix << "InitStrIncMap ...\n";
+   for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "InitExcMap ...\n";
-   for(str_it=InitExcMap.begin(); str_it!= InitExcMap.end(); str_it++) {
+   out << prefix << "InitStrExcMap ...\n";
+   for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -555,11 +555,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          keep = false;
          n.RejInitThresh += pair.n_points();
       }
-      else if(InitStrMap.size() > 0) {
+      else if(InitStrIncMap.size() > 0) {
          keep = false;
          n.RejInitStr += pair.n_points();
       }
-      else if(InitExcMap.size() > 0) {
+      else if(InitStrExcMap.size() > 0) {
          keep = false;
          n.RejInitStr += pair.n_points();
       }
@@ -587,10 +587,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       }
    }
 
-   // Check InitStr
+   // Check InitStrInc
    if(keep == true) {
 
-      for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
+      for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = pair.line(i_init)->get_item(str_it->first.c_str());
@@ -604,10 +604,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       }
    }
 
-   // Check InitExc
+   // Check InitStrExc
    if(keep == true) {
 
-      for(str_it=InitExcMap.begin(); str_it!= InitExcMap.end(); str_it++) {
+      for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = pair.line(i_init)->get_item(str_it->first.c_str());
@@ -745,11 +745,11 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       }
    }
 
-   // Check ColumnStrMap
+   // Check ColumnStrIncMap
    if(keep == true) {
 
       // Loop through the column string matching
-      for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+      for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = line.get_item(str_it->first.c_str());
@@ -763,11 +763,11 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       }
    }
 
-   // Check ColumnExcMap
+   // Check ColumnStrExcMap
    if(keep == true) {
 
       // Loop through the column string matching
-      for(str_it=ColumnExcMap.begin(); str_it!= ColumnExcMap.end(); str_it++) {
+      for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = line.get_item(str_it->first.c_str());
@@ -931,15 +931,15 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1].c_str());            a.shift_down(i, 1); }
       else if(c.compare("-column_thresh"     ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), ColumnThreshMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrMap);
+      else if(c.compare("-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrIncMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-column_exc"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnExcMap);
+      else if(c.compare("-column_str_exc"    ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrExcMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-init_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitThreshMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrMap);
+      else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrIncMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-init_exc"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitExcMap);
+      else if(c.compare("-init_str_exc"      ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrExcMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
       else if(c.compare("-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
@@ -1224,15 +1224,15 @@ ConcatString TCStatJob::serialize() const {
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+   for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
       for(i=0; i<str_it->second.n(); i++) {
          s << "-column_str " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
-   for(str_it=ColumnExcMap.begin(); str_it!= ColumnExcMap.end(); str_it++) {
+   for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
       for(i=0; i<str_it->second.n(); i++) {
-         s << "-column_exc " << str_it->first << " "
+         s << "-column_str_exc " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
@@ -1242,15 +1242,15 @@ ConcatString TCStatJob::serialize() const {
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
+   for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
       for(i=0; i<str_it->second.n(); i++) {
          s << "-init_str " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
-   for(str_it=InitExcMap.begin(); str_it!= InitExcMap.end(); str_it++) {
+   for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
       for(i=0; i<str_it->second.n(); i++) {
-         s << "-init_exc " << str_it->first << " "
+         s << "-init_str_exc " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }

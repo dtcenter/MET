@@ -172,8 +172,8 @@ void STATAnalysisJob::clear() {
    wmo_fisher_stats.clear();
 
    column_thresh_map.clear();
-   column_str_map.clear();
-   column_exc_map.clear();
+   column_str_inc_map.clear();
+   column_str_exc_map.clear();
 
    by_column.clear();
 
@@ -307,8 +307,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    wmo_fisher_stats     = aj.wmo_fisher_stats;
 
    column_thresh_map    = aj.column_thresh_map;
-   column_str_map       = aj.column_str_map;
-   column_exc_map       = aj.column_exc_map;
+   column_str_inc_map       = aj.column_str_inc_map;
+   column_str_exc_map       = aj.column_str_exc_map;
 
    by_column            = aj.by_column;
 
@@ -509,16 +509,16 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
       thr_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "column_str_map ...\n";
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
-       str_it != column_str_map.end(); str_it++) {
+   out << prefix << "column_str_inc_map ...\n";
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_inc_map.begin();
+       str_it != column_str_inc_map.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "column_exc_map ...\n";
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_exc_map.begin();
-       str_it != column_exc_map.end(); str_it++) {
+   out << prefix << "column_str_exc_map ...\n";
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_exc_map.begin();
+       str_it != column_str_exc_map.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -957,8 +957,8 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    // column_str
    //
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
-       str_it != column_str_map.end(); str_it++) {
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_inc_map.begin();
+       str_it != column_str_inc_map.end(); str_it++) {
 
       //
       // Check if the current value is in the list for the column
@@ -967,10 +967,10 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    }
 
    //
-   // column_exc
+   // column_str_exc
    //
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_exc_map.begin();
-       str_it != column_exc_map.end(); str_it++) {
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_exc_map.begin();
+       str_it != column_str_exc_map.end(); str_it++) {
 
       //
       // Check if the current value is not in the list for the column
@@ -1146,10 +1146,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column_thresh_map.clear();
       }
       else if(jc_array[i] == "-column_str"     ) {
-         column_str_map.clear();
+         column_str_inc_map.clear();
       }
-      else if(jc_array[i] == "-column_exc"     ) {
-         column_exc_map.clear();
+      else if(jc_array[i] == "-column_str_exc" ) {
+         column_str_exc_map.clear();
       }
       else if(jc_array[i] == "-set_hdr"        ) {
          hdr_name.clear();
@@ -1400,16 +1400,16 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          col_value.add_css(jc_array[i+2]);
 
          // If the column name is already present in the map, add to it
-         if(column_str_map.count(col_name) > 0) {
-            column_str_map[col_name].add(col_value);
+         if(column_str_inc_map.count(col_name) > 0) {
+            column_str_inc_map[col_name].add(col_value);
          }
          // Otherwise, add a new map entry
          else {
-            column_str_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
+            column_str_inc_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
          }
          i+=2;
       }
-      else if(jc_array[i] == "-column_exc") {
+      else if(jc_array[i] == "-column_str_exc") {
 
          // Parse the column name and value
          col_name = to_upper((string)jc_array[i+1]);
@@ -1418,12 +1418,12 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          col_value.add_css(jc_array[i+2]);
 
          // If the column name is already present in the map, add to it
-         if(column_exc_map.count(col_name) > 0) {
-            column_exc_map[col_name].add(col_value);
+         if(column_str_exc_map.count(col_name) > 0) {
+            column_str_exc_map[col_name].add(col_value);
          }
          // Otherwise, add a new map entry
          else {
-            column_exc_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
+            column_str_exc_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
          }
          i+=2;
       }
@@ -2503,20 +2503,20 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // column_str
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
-       str_it != column_str_map.end(); str_it++) {
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_inc_map.begin();
+       str_it != column_str_inc_map.end(); str_it++) {
 
       for(i=0; i<str_it->second.n(); i++) {
          js << "-column_str " << str_it->first << " " << str_it->second[i] << " ";
       }
    }
 
-   // column_exc
-   for(map<ConcatString,StringArray>::const_iterator str_it = column_exc_map.begin();
-       str_it != column_exc_map.end(); str_it++) {
+   // column_str_exc
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_exc_map.begin();
+       str_it != column_str_exc_map.end(); str_it++) {
 
       for(i=0; i<str_it->second.n(); i++) {
-         js << "-column_exc " << str_it->first << " " << str_it->second[i] << " ";
+         js << "-column_str_exc " << str_it->first << " " << str_it->second[i] << " ";
       }
    }
 

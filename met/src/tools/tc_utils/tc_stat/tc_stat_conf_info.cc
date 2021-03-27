@@ -187,30 +187,30 @@ void TCStatConfInfo::process_config() {
                          conf_key_column_thresh_name, conf_key_column_thresh_val,
                          Filter.ColumnThreshMap);
 
-   // Conf: TCStatJob::ColumnStrName, TCStatJob::ColumnStrVal
+   // Conf: TCStatJob::ColumnStrIncName, TCStatJob::ColumnStrIncVal
    parse_conf_string_map(Conf,
                          conf_key_column_str_name, conf_key_column_str_val,
-                         Filter.ColumnStrMap);
+                         Filter.ColumnStrIncMap);
 
-   // Conf: TCStatJob::ColumnExcName, TCStatJob::ColumnExcVal
+   // Conf: TCStatJob::ColumnStrExcName, TCStatJob::ColumnStrExcVal
    parse_conf_string_map(Conf,
-                         conf_key_column_exc_name, conf_key_column_exc_val,
-                         Filter.ColumnExcMap);
+                         conf_key_column_str_exc_name, conf_key_column_str_exc_val,
+                         Filter.ColumnStrExcMap);
 
    // Conf: TCStatJob::InitThreshName, TCStatJob::InitThreshVal
    parse_conf_thresh_map(Conf,
                          conf_key_init_thresh_name, conf_key_init_thresh_val,
                          Filter.InitThreshMap);
 
-   // Conf: TCStatJob::InitStrName, TCStatJob::InitStrVal
+   // Conf: TCStatJob::InitStrIncName, TCStatJob::InitStrIncVal
    parse_conf_string_map(Conf,
                          conf_key_init_str_name, conf_key_init_str_val,
-                         Filter.InitStrMap);
+                         Filter.InitStrIncMap);
 
-   // Conf: TCStatJob::InitExcName, TCStatJob::InitExcVal
+   // Conf: TCStatJob::InitStrExcName, TCStatJob::InitStrExcVal
    parse_conf_string_map(Conf,
-                         conf_key_init_exc_name, conf_key_init_exc_val,
-                         Filter.InitExcMap);
+                         conf_key_init_str_exc_name, conf_key_init_str_exc_val,
+                         Filter.InitStrExcMap);
 
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);

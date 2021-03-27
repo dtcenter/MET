@@ -3753,14 +3753,14 @@ Where "job_name" is set to one of the following:
 
   .. code-block:: none
 		  
-    "-column_min    col_name value"     e.g. -column_min BASER 0.02
-    "-column_max    col_name value"
-    "-column_eq     col_name value"
-    "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
-    "-column_str    col_name string" separate multiple filtering strings
-                                     with commas
-    "-column_exc    col_name string" separate multiple filtering strings
-                                     with commas
+    "-column_min     col_name value"     e.g. -column_min BASER 0.02
+    "-column_max     col_name value"
+    "-column_eq      col_name value"
+    "-column_thresh  col_name threshold" e.g. -column_thresh FCST '>273'
+    "-column_str     col_name string" separate multiple filtering strings
+                                      with commas
+    "-column_str_exc col_name string" separate multiple filtering strings
+                                      with commas
 
 
   Job command options to DEFINE the analysis job. Unless otherwise noted,
