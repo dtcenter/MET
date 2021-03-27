@@ -527,8 +527,9 @@ This job command option is extremely useful. It can be used multiple times to sp
   -column_eq     col_name value
   -column_thresh col_name thresh
   -column_str    col_name string
+  -column_exc    col_name string
 
-The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
+The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the string defined by the **-column_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
 		

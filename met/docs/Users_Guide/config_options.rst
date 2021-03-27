@@ -3748,7 +3748,7 @@ Where "job_name" is set to one of the following:
   Job command FILTERING options that may be used only when -line_type
   has been listed once. These options take two arguments: the name of the
   data column to be used and the min, max, or exact value for that column.
-  If multiple column eq/min/max/str options are listed, the job will be
+  If multiple column eq/min/max/str/exc options are listed, the job will be
   performed on their intersection:
 
   .. code-block:: none
@@ -3758,6 +3758,8 @@ Where "job_name" is set to one of the following:
     "-column_eq     col_name value"
     "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
     "-column_str    col_name string" separate multiple filtering strings
+                                     with commas
+    "-column_exc    col_name string" separate multiple filtering strings
                                      with commas
 
 
