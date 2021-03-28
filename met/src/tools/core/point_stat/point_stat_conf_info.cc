@@ -774,10 +774,17 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       int_to_setlogic(fdict.lookup_int(conf_key_wind_logic)),
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
 
+   // Conf: mpr_column and mpr_thresh
+   StringArray mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
+   ThreshArray mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+   vx_pd.set_mpr_filt(mpr_sa, mpr_ta);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
+           << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
+           << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
