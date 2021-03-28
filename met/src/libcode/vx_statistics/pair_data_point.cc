@@ -29,6 +29,10 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+static double get_mpr_column_value(const char *, double, double, double, double);
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
 //
@@ -174,8 +178,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
            << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
+           << n_obs << ").\n\n";
       exit(1);
    }
 
@@ -233,6 +236,72 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool PairDataPoint::check_mpr_filt(double f, double o,
+                                   double cmn, double csd,
+                                   ConcatString &reason_cs) {
+
+   // Check pointers
+   if(!col_name_ptr || !col_thresh_ptr) return(true);
+
+   bool keep = true;
+   bool absv = false;
+   StringArray sa;
+   ConcatString cs;
+   double v, v_cur;
+   int i, j;
+
+   // Loop over all the column filter names
+   for(i=0; i<col_name_ptr->n(); i++) {
+
+      // Check for absolute value
+      if(strncasecmp((*col_name_ptr)[i].c_str(), "ABS", 3) == 0) {
+         absv = true;
+         cs   = (*col_name_ptr)[i];
+         sa   = cs.split("()");
+         cs   = sa[1];
+      }
+      else {
+         cs = (*col_name_ptr)[i];
+      }
+
+      // Split the input column name on hyphens for differences
+      sa = cs.split("-");
+
+      // Get the first value
+      v = get_mpr_column_value(sa[0].c_str(), f, o, cmn, csd);
+
+      // If multiple columns, compute the requested difference
+      if(sa.n() > 1) {
+
+         // Loop through the columns
+         for(j=1; j<sa.n(); j++) {
+
+            // Get the current column value
+            v_cur = get_mpr_column_value(sa[j].c_str(), f, o, cmn, csd);
+
+            // Compute the difference, checking for bad data
+            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+            else                                     v -= v_cur;
+         } // end for j
+      }
+
+      // Apply absolute value, if requested
+      if(absv && !is_bad_data(v)) v = fabs(v);
+
+      // Check the threshold
+      if(!(*col_thresh_ptr)[i].check(v)) {
+         reason_cs << cs_erase << (*col_name_ptr)[i] << " = " << v
+                   << " is not " << (*col_thresh_ptr)[i].get_str();
+         keep = false;
+         break;
+      }
+   } // end for i
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class VxPairDataPoint
 //
@@ -282,6 +351,7 @@ void VxPairDataPoint::init_from_scratch() {
    rej_fcst     = (int ***) 0;
    rej_cmn      = (int ***) 0;
    rej_csd      = (int ***) 0;
+   rej_mpr      = (int ***) 0;
    rej_dup      = (int ***) 0;
 
    n_msg_typ    = 0;
@@ -312,6 +382,8 @@ void VxPairDataPoint::clear() {
    sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_filt.clear();
+   mpr_column.clear();
+   mpr_thresh.clear();
 
    fcst_ut     = (unixtime) 0;
    beg_ut      = (unixtime) 0;
@@ -336,6 +408,7 @@ void VxPairDataPoint::clear() {
             rej_fcst[i][j][k] = 0;
             rej_cmn[i][j][k]  = 0;
             rej_csd[i][j][k]  = 0;
+            rej_mpr[i][j][k]  = 0;
             rej_dup[i][j][k]  = 0;
          }
       }
@@ -371,6 +444,9 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
+   mpr_column = vx_pd.mpr_column;
+   mpr_thresh = vx_pd.mpr_thresh;
+
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;
    end_ut   = vx_pd.end_ut;
@@ -381,6 +457,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    rej_fcst = vx_pd.rej_fcst;
    rej_cmn  = vx_pd.rej_cmn;
    rej_csd  = vx_pd.rej_csd;
+   rej_mpr  = vx_pd.rej_mpr;
    rej_dup  = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
@@ -401,6 +478,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
             rej_fcst[i][j][k] = vx_pd.rej_fcst[i][j][k];
             rej_cmn[i][j][k]  = vx_pd.rej_cmn[i][j][k];
             rej_csd[i][j][k]  = vx_pd.rej_csd[i][j][k];
+            rej_mpr[i][j][k]  = vx_pd.rej_mpr[i][j][k];
             rej_dup[i][j][k]  = vx_pd.rej_dup[i][j][k];
          }
       }
@@ -542,7 +620,7 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
+void VxPairDataPoint::set_sid_inc_filt(const StringArray &sa) {
 
    sid_inc_filt = sa;
 
@@ -551,7 +629,7 @@ void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
+void VxPairDataPoint::set_sid_exc_filt(const StringArray &sa) {
 
    sid_exc_filt = sa;
 
@@ -560,9 +638,9 @@ void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_obs_qty_filt(const StringArray q) {
+void VxPairDataPoint::set_obs_qty_filt(const StringArray &sa) {
 
-   obs_qty_filt = q;
+   obs_qty_filt = sa;
 
    return;
 }
@@ -584,6 +662,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
    rej_fcst = new int **           [n_msg_typ];
    rej_cmn  = new int **           [n_msg_typ];
    rej_csd  = new int **           [n_msg_typ];
+   rej_mpr  = new int **           [n_msg_typ];
    rej_dup  = new int **           [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
@@ -593,6 +672,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
       rej_fcst[i] = new int *           [n_mask];
       rej_cmn[i]  = new int *           [n_mask];
       rej_csd[i]  = new int *           [n_mask];
+      rej_mpr[i]  = new int *           [n_mask];
       rej_dup[i]  = new int *           [n_mask];
 
       for(j=0; j<n_mask; j++) {
@@ -602,6 +682,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
          rej_fcst[i][j] = new int           [n_interp];
          rej_cmn[i][j]  = new int           [n_interp];
          rej_csd[i][j]  = new int           [n_interp];
+         rej_mpr[i][j]  = new int           [n_interp];
          rej_dup[i][j]  = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
@@ -610,6 +691,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
             rej_fcst[i][j][k] = 0;
             rej_cmn[i][j][k]  = 0;
             rej_csd[i][j][k]  = 0;
+            rej_mpr[i][j][k]  = 0;
             rej_dup[i][j][k]  = 0;
          } // end for k
       } // end for j
@@ -732,6 +814,34 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_mpr_filt(const StringArray &sa, const ThreshArray &ta) {
+
+   // Check for constant length
+   if(sa.n() != ta.n()) {
+      mlog << Error << "\nVxPairDataPoint::set_mpr_filt() -> "
+           << "the \"" << conf_key_mpr_column << "\" matched pair column array ("
+           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" threshold array (" << write_css(ta)
+           << ") must have the same length!\n\n";
+      exit(1);
+   }
+
+   mpr_column = sa;
+   mpr_thresh = ta;
+
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
+            pd[i][j][k].set_col_name_thresh(&sa, &ta);
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_climo_cdf_info(const ClimoCDFInfo &info) {
 
    for(int i=0; i<n_msg_typ; i++) {
@@ -795,6 +905,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    int f_lvl_blw, f_lvl_abv;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
+   ConcatString reason_cs;
 
    // Increment the number of tries count
    n_try++;
@@ -1145,6 +1256,20 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
                     << "\n";
                inc_count(rej_fcst, i, j, k);
+               continue;
+            }
+
+            // Check matched pair filtering options
+            if(!pd[i][j][k].check_mpr_filt(fcst_v, obs_v, cmn_v, csd_v, reason_cs)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation due to matched pair filter since "
+                    << reason_cs << ":\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
+               inc_count(rej_mpr, i, j, k);
                continue;
             }
 
@@ -1578,6 +1703,34 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
           << obs_qty    << " " << obs_arr[4];
 
    return(obs_cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Parse string to determine which value to use
+//
+////////////////////////////////////////////////////////////////////////
+
+double get_mpr_column_value(const char *s, double f, double o,
+                            double cmn, double csd) {
+   double v;
+
+        if(strcasecmp(s, "FCST")        == 0) v = f;
+   else if(strcasecmp(s, "OBS")         == 0) v = o;
+   else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
+   else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
+   else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
+      v = (is_bad_data(cmn) || is_bad_data(csd) ?
+           bad_data_double : normal_cdf(o, cmn, csd));
+   }
+   else {
+      mlog << Error << "\nget_mpr_column_value() -> "
+           << "unsupported matched pair column name requested in \""
+           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
+      exit(1);
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////

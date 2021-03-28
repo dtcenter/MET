@@ -64,6 +64,8 @@ class PairDataPoint : public PairBase {
       bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
                          const NumArray &cmn_in, const NumArray &csd_in,
                          const NumArray &w_in);
+
+      bool check_mpr_filt(double, double, double, double, ConcatString &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,6 +130,11 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray mpr_column;    // Names of MPR columns or diffs of columns
+      ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
+
+      //////////////////////////////////////////////////////////////////
+
       StringArray msg_typ_sfc;   // List of surface message types
       StringArray msg_typ_lnd;   // List of surface land message types
       StringArray msg_typ_wtr;   // List of surface water message types
@@ -165,6 +172,7 @@ class VxPairDataPoint {
       int ***rej_fcst;           // Reject forecast bad data
       int ***rej_cmn;            // Reject climo mean bad data
       int ***rej_csd;            // Reject climo stdev bad data
+      int ***rej_mpr;            // Reject based on MPR filtering logic
       int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
@@ -187,9 +195,9 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
-      void set_sid_inc_filt(const StringArray);
-      void set_sid_exc_filt(const StringArray);
-      void set_obs_qty_filt(const StringArray);
+      void set_sid_inc_filt(const StringArray &);
+      void set_sid_exc_filt(const StringArray &);
+      void set_obs_qty_filt(const StringArray &);
 
       // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
@@ -204,6 +212,8 @@ class VxPairDataPoint {
                       GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
+
+      void set_mpr_filt(const StringArray &, const ThreshArray &);
 
       void set_climo_cdf_info(const ClimoCDFInfo &);
 
