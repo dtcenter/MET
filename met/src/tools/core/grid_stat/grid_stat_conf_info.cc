@@ -275,7 +275,7 @@ void GridStatConfInfo::process_flags() {
 
    // Check for at least one output data type
    if(!output_ascii_flag && !output_nc_flag) {
-      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+      mlog << Error << "\nGridStatConfInfo::process_flags() -> "
            << "At least one output STAT or NetCDF type must be "
            << " requested in \"" << conf_key_output_flag << "\" or \""
            << conf_key_nc_pairs_flag << "\".\n\n";
@@ -506,6 +506,9 @@ void GridStatVxOpt::clear() {
    owind_ta.clear();
    wind_logic = SetLogic_None;
 
+   mpr_sa.clear();
+   mpr_ta.clear();
+
    mask_grid.clear();
    mask_poly.clear();
    mask_name.clear();
@@ -640,10 +643,16 @@ void GridStatVxOpt::process_config(
       int_to_setlogic(fdict.lookup_int(conf_key_wind_logic)),
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
 
+   // Conf: mpr_column and mpr_thresh
+   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
+   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
+           << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
+           << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -878,6 +887,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
+   //    mpr_sa, mpr_ta,
    //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,

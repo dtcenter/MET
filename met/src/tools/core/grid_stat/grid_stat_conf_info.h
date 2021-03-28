@@ -156,6 +156,9 @@ class GridStatVxOpt {
       ThreshArray      owind_ta;         // obs wind speed thresholds
       SetLogic         wind_logic;       // wind speed field logic
 
+      StringArray      mpr_sa;           // MPR filtering columns
+      ThreshArray      mpr_ta;           // MPR filtering thresholds
+
       StringArray      mask_grid;        // Masking grid strings
       StringArray      mask_poly;        // Masking polyline strings
 
