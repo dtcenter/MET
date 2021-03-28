@@ -32,6 +32,8 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+mpr_column  = [];
+mpr_thresh  = [];
 cat_thresh  = [ NA ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
