@@ -876,6 +876,9 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
       exit(1);
    }
 
+   mpr_column = sa;
+   mpr_thresh = ta;
+
    return;
 }
 
