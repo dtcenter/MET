@@ -73,13 +73,6 @@ class PairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      const StringArray *col_name_ptr;   // Names of data columns or diffs of columns
-                                         // which is not allocated
-      const ThreshArray *col_thresh_ptr; // Filtering thresholds for the data columns
-                                         // which is not allocated
-
-      //////////////////////////////////////////////////////////////////
-
       ConcatString msg_typ;          // Name of the verifying message type
       StringArray  msg_typ_vals;     // Message type values to be included
 
@@ -134,8 +127,6 @@ class PairBase {
       void set_mask_area_ptr(MaskPlane *);
       void set_mask_sid_ptr(StringArray *);
       void set_mask_llpnt_ptr(MaskLatLon *);
-
-      void set_col_name_thresh(const StringArray *, const ThreshArray *);
 
       void set_msg_typ(const char *);
       void set_msg_typ_vals(const StringArray &);
