@@ -302,6 +302,16 @@ PairDataPoint PairDataPoint::subset_pairs_mpr_thresh(
       return(*this);
    }
 
+   // Check for constant length
+   if(sa.n() != ta.n()) {
+      mlog << Error << "\nPairDataPoint::subset_pairs_mpr_thresh() -> "
+           << "the \"" << conf_key_mpr_column << "\" ("
+           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" (" << write_css(ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
    int i;
    PairDataPoint out_pd;
 
@@ -869,10 +879,10 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
    // Check for constant length
    if(sa.n() != ta.n()) {
       mlog << Error << "\nVxPairDataPoint::set_mpr_thresh() -> "
-           << "the \"" << conf_key_mpr_column << "\" matched pair column array ("
+           << "the \"" << conf_key_mpr_column << "\" ("
            << write_css(sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" threshold array (" << write_css(ta)
-           << ") must have the same length!\n\n";
+           << "\" (" << write_css(ta)
+           << ") config file entries must have the same length!\n\n";
       exit(1);
    }
 
