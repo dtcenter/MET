@@ -941,8 +941,8 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
-   // Store the MPR filters
-   vx_pd.set_mpr_filt(mpr_sa, mpr_ta);
+   // Store the MPR filter threshold
+   vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info(cdf_info);

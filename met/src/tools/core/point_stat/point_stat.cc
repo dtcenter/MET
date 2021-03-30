@@ -1424,8 +1424,9 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
-      pd_thr = subset_pairs(*pd_ptr, vx_opt.fcnt_ta[i],
-                            vx_opt.ocnt_ta[i], vx_opt.cnt_logic);
+      pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
+                                               vx_opt.ocnt_ta[i],
+                                               vx_opt.cnt_logic);
 
       // Check for no matched pairs to process
       if(pd_thr.n_obs == 0) continue;
