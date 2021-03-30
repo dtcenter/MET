@@ -495,6 +495,9 @@ void GridStatVxOpt::clear() {
    var_name.clear();
    var_suffix.clear();
 
+   mpr_sa.clear();
+   mpr_ta.clear();
+
    fcat_ta.clear();
    ocat_ta.clear();
 
@@ -505,9 +508,6 @@ void GridStatVxOpt::clear() {
    fwind_ta.clear();
    owind_ta.clear();
    wind_logic = SetLogic_None;
-
-   mpr_sa.clear();
-   mpr_ta.clear();
 
    mask_grid.clear();
    mask_poly.clear();
@@ -617,6 +617,10 @@ void GridStatVxOpt::process_config(
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
+   // Conf: mpr_column and mpr_thresh
+   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
+   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+
    // Conf: cat_thresh
    fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
@@ -642,10 +646,6 @@ void GridStatVxOpt::process_config(
    wind_logic = check_setlogic(
       int_to_setlogic(fdict.lookup_int(conf_key_wind_logic)),
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
-
-   // Conf: mpr_column and mpr_thresh
-   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
-   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
 
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
@@ -884,10 +884,10 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
+   //    mpr_sa, mpr_ta,
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
-   //    mpr_sa, mpr_ta,
    //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,

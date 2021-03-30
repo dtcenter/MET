@@ -145,6 +145,9 @@ class GridStatVxOpt {
       ConcatString     var_suffix;       // nc_pairs_var_suffix string
                                          // nc_pairs_var_str is deprecated
 
+      StringArray      mpr_sa;           // MPR filtering columns
+      ThreshArray      mpr_ta;           // MPR filtering thresholds
+
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds
 
@@ -155,9 +158,6 @@ class GridStatVxOpt {
       ThreshArray      fwind_ta;         // fcst wind speed thresholds
       ThreshArray      owind_ta;         // obs wind speed thresholds
       SetLogic         wind_logic;       // wind speed field logic
-
-      StringArray      mpr_sa;           // MPR filtering columns
-      ThreshArray      mpr_ta;           // MPR filtering thresholds
 
       StringArray      mask_grid;        // Masking grid strings
       StringArray      mask_poly;        // Masking polyline strings
