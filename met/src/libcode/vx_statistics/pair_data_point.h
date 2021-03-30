@@ -65,7 +65,12 @@ class PairDataPoint : public PairBase {
                          const NumArray &cmn_in, const NumArray &csd_in,
                          const NumArray &w_in);
 
-      bool check_mpr_filt(double, double, double, double, ConcatString &);
+      PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
+                                            const SingleThresh &ot,
+                                            const SetLogic type) const;
+
+      PairDataPoint subset_pairs_mpr_thresh(const StringArray &sa,
+                                            const ThreshArray &ta) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -213,7 +218,7 @@ class VxPairDataPoint {
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
 
-      void set_mpr_filt(const StringArray &, const ThreshArray &);
+      void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
       void set_climo_cdf_info(const ClimoCDFInfo &);
 
@@ -251,10 +256,16 @@ class VxPairDataPoint {
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Apply conditional thresholds to subset the pairs
-extern PairDataPoint subset_pairs(const PairDataPoint &,
+extern bool check_fo_thresh(double, double, double, double,
                         const SingleThresh &, const SingleThresh &,
                         const SetLogic);
+
+extern bool check_mpr_thresh(double, double, double, double,
+                        const StringArray &, const ThreshArray &,
+                        ConcatString * = 0);
+
+extern double get_mpr_column_value(double, double, double, double,
+                        const char *);
 
 // Apply conditional thresholds to subset the wind pairs
 extern void subset_wind_pairs(const PairDataPoint &,

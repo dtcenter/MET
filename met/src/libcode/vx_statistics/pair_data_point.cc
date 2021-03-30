@@ -29,10 +29,6 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-static double get_mpr_column_value(const char *, double, double, double, double);
-
-////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
 //
@@ -237,68 +233,122 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::check_mpr_filt(double f, double o,
-                                   double cmn, double csd,
-                                   ConcatString &reason_cs) {
+PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
+                 const SingleThresh &ft, const SingleThresh &ot,
+                 const SetLogic type) const {
 
-   // Check pointers
-   if(!col_name_ptr || !col_thresh_ptr) return(true);
+   // Check for no work to be done
+   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
+      return(*this);
+   }
 
-   bool keep = true;
-   bool absv = false;
-   StringArray sa;
-   ConcatString cs;
-   double v, v_cur;
-   int i, j;
+   int i;
+   PairDataPoint out_pd;
 
-   // Loop over all the column filter names
-   for(i=0; i<col_name_ptr->n(); i++) {
+   // Allocate memory for output pairs
+   out_pd.extend(n_obs);
+   out_pd.set_climo_cdf_info(cdf_info);
 
-      // Check for absolute value
-      if(strncasecmp((*col_name_ptr)[i].c_str(), "ABS", 3) == 0) {
-         absv = true;
-         cs   = (*col_name_ptr)[i];
-         sa   = cs.split("()");
-         cs   = sa[1];
+   bool cmn_flag = set_climo_flag(f_na, cmn_na);
+   bool csd_flag = set_climo_flag(f_na, csd_na);
+   bool wgt_flag = set_climo_flag(f_na, wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<n_obs; i++) {
+
+      // Check for bad data
+      if(is_bad_data(f_na[i])                 ||
+         is_bad_data(o_na[i])                 ||
+         (cmn_flag && is_bad_data(cmn_na[i])) ||
+         (csd_flag && is_bad_data(csd_na[i])) ||
+         (wgt_flag && is_bad_data(wgt_na[i]))) continue;
+
+      // Keep pairs which meet the threshold criteria
+      if(check_fo_thresh(f_na[i], o_na[i], cmn_na[i], csd_na[i],
+                         ft, ot, type)) {
+
+         // Handle point data
+         if(is_point_vx()) {
+            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
+                      lon_na[i], x_na[i], y_na[i],
+                      vld_ta[i], lvl_na[i], elv_na[i],
+                      f_na[i], o_na[i], o_qc_sa[i].c_str(),
+                      cmn_na[i], csd_na[i], wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd.add_grid_pair(f_na[i], o_na[i], cmn_na[i],
+                      csd_na[i], wgt_na[i]);
+         }
       }
-      else {
-         cs = (*col_name_ptr)[i];
+   } // end for
+
+   mlog << Debug(3)
+        << "Using " << out_pd.n_obs << " of " << n_obs
+        << " pairs for forecast filtering threshold " << ft.get_str()
+        << ", observation filtering threshold " << ot.get_str()
+        << ", and field logic " << setlogic_to_string(type) << ".\n";
+
+   return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+PairDataPoint PairDataPoint::subset_pairs_mpr_thresh(
+                 const StringArray &sa, const ThreshArray &ta) const {
+
+   // Check for no work to be done
+   if(sa.n() == 0 && ta.n() == 0) {
+      return(*this);
+   }
+
+   int i;
+   PairDataPoint out_pd;
+
+   // Allocate memory for output pairs
+   out_pd.extend(n_obs);
+   out_pd.set_climo_cdf_info(cdf_info);
+
+   bool cmn_flag = set_climo_flag(f_na, cmn_na);
+   bool csd_flag = set_climo_flag(f_na, csd_na);
+   bool wgt_flag = set_climo_flag(f_na, wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<n_obs; i++) {
+
+      // Check for bad data
+      if(is_bad_data(f_na[i])                 ||
+         is_bad_data(o_na[i])                 ||
+         (cmn_flag && is_bad_data(cmn_na[i])) ||
+         (csd_flag && is_bad_data(csd_na[i])) ||
+         (wgt_flag && is_bad_data(wgt_na[i]))) continue;
+
+      // Keep pairs which meet the threshold criteria
+      if(check_mpr_thresh(f_na[i], o_na[i], cmn_na[i], csd_na[i],
+                          sa, ta)) {
+
+         // Handle point data
+         if(is_point_vx()) {
+            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
+                      lon_na[i], x_na[i], y_na[i],
+                      vld_ta[i], lvl_na[i], elv_na[i],
+                      f_na[i], o_na[i], o_qc_sa[i].c_str(),
+                      cmn_na[i], csd_na[i], wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd.add_grid_pair(f_na[i], o_na[i], cmn_na[i],
+                      csd_na[i], wgt_na[i]);
+         }
       }
+   } // end for
 
-      // Split the input column name on hyphens for differences
-      sa = cs.split("-");
+   mlog << Debug(3)
+        << "Using " << out_pd.n_obs << " of " << n_obs
+        << " pairs for matched pair filtering columns (" << write_css(sa)
+        << ") and thresholds (" << ta.get_str() << ").\n";
 
-      // Get the first value
-      v = get_mpr_column_value(sa[0].c_str(), f, o, cmn, csd);
-
-      // If multiple columns, compute the requested difference
-      if(sa.n() > 1) {
-
-         // Loop through the columns
-         for(j=1; j<sa.n(); j++) {
-
-            // Get the current column value
-            v_cur = get_mpr_column_value(sa[j].c_str(), f, o, cmn, csd);
-
-            // Compute the difference, checking for bad data
-            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
-            else                                     v -= v_cur;
-         } // end for j
-      }
-
-      // Apply absolute value, if requested
-      if(absv && !is_bad_data(v)) v = fabs(v);
-
-      // Check the threshold
-      if(!(*col_thresh_ptr)[i].check(v)) {
-         reason_cs << cs_erase << (*col_name_ptr)[i] << " = " << v
-                   << " is not " << (*col_thresh_ptr)[i].get_str();
-         keep = false;
-         break;
-      }
-   } // end for i
-
-   return(keep);
+   return(out_pd);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -814,27 +864,16 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_mpr_filt(const StringArray &sa, const ThreshArray &ta) {
+void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &ta) {
 
    // Check for constant length
    if(sa.n() != ta.n()) {
-      mlog << Error << "\nVxPairDataPoint::set_mpr_filt() -> "
+      mlog << Error << "\nVxPairDataPoint::set_mpr_thresh() -> "
            << "the \"" << conf_key_mpr_column << "\" matched pair column array ("
            << write_css(sa) << ") and \"" << conf_key_mpr_thresh
            << "\" threshold array (" << write_css(ta)
            << ") must have the same length!\n\n";
       exit(1);
-   }
-
-   mpr_column = sa;
-   mpr_thresh = ta;
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_col_name_thresh(&sa, &ta);
-         }
-      }
    }
 
    return;
@@ -1260,7 +1299,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Check matched pair filtering options
-            if(!pd[i][j][k].check_mpr_filt(fcst_v, obs_v, cmn_v, csd_v, reason_cs)) {
+            if(!check_mpr_thresh(fcst_v, obs_v, cmn_v, csd_v,
+                                 mpr_column, mpr_thresh, &reason_cs)) {
                mlog << Debug(4)
                     << "For " << fcst_info->magic_str() << " versus "
                     << obs_info->magic_str()
@@ -1461,64 +1501,139 @@ void VxPairDataPoint::inc_count(int ***&rej, int i, int j, int k) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-PairDataPoint subset_pairs(const PairDataPoint &pd,
-                           const SingleThresh &ft, const SingleThresh &ot,
-                           const SetLogic type) {
+bool check_fo_thresh(double f, double o, double cmn, double csd,
+                     const SingleThresh &ft, const SingleThresh &ot,
+                     const SetLogic type) {
+   bool status = true;
+   bool fcheck = ft.check(f, cmn, csd);
+   bool ocheck = ot.check(o, cmn, csd);
+   SetLogic t  = type;
 
-   // Check for no work to be done
-   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
-      return(pd);
+   // If either of the thresholds is NA, reset the logic to intersection
+   // because an NA threshold is always true.
+   if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
+      t = SetLogic_Intersection;
    }
 
-   int i;
-   PairDataPoint out_pd;
+   switch(t) {
+      case(SetLogic_Union):
+         if(!fcheck && !ocheck) status = false;
+         break;
 
-   // Allocate memory for output pairs
-   out_pd.extend(pd.n_obs);
-   out_pd.set_climo_cdf_info(pd.cdf_info);
+      case(SetLogic_Intersection):
+         if(!fcheck || !ocheck) status = false;
+         break;
 
-   bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
-   bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
-   bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
+      case(SetLogic_SymDiff):
+         if(fcheck == ocheck) status = false;
+         break;
 
-   // Loop over the pairs
-   for(i=0; i<pd.n_obs; i++) {
+      default:
+         mlog << Error << "\ncheck_fo_thresh() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
 
-      // Check for bad data
-      if(is_bad_data(pd.f_na[i])                 ||
-         is_bad_data(pd.o_na[i])                 ||
-         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
-         (csd_flag && is_bad_data(pd.csd_na[i])) ||
-         (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
+   return(status);
+}
 
-      // Keep pairs which meet the threshold criteria
-      if(check_fo_thresh(pd.f_na[i],   pd.o_na[i],
-                         pd.cmn_na[i], pd.csd_na[i],
-                         ft, ot, type)) {
+////////////////////////////////////////////////////////////////////////
 
-         // Handle point data
-         if(pd.is_point_vx()) {
-            out_pd.add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i],
-                      pd.lon_na[i], pd.x_na[i], pd.y_na[i],
-                      pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
-                      pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                      pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
-         }
-         // Handle gridded data
-         else {
-            out_pd.add_grid_pair(pd.f_na[i], pd.o_na[i], pd.cmn_na[i],
-                      pd.csd_na[i], pd.wgt_na[i]);
-         }
+bool check_mpr_thresh(double f, double o, double cmn, double csd,
+                      const StringArray &col_sa, const ThreshArray &col_ta,
+                      ConcatString *reason_ptr) {
+   // Initialize
+   if(reason_ptr) reason_ptr->erase();
+
+   // Check arrays
+   if(col_sa.n() == 0 || col_ta.n() == 0) return(true);
+
+   bool keep = true;
+   bool absv = false;
+   StringArray sa;
+   ConcatString cs;
+   double v, v_cur;
+   int i, j;
+
+   // Loop over all the column filter names
+   for(i=0; i<col_sa.n(); i++) {
+
+      // Check for absolute value
+      if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
+         absv = true;
+         cs   = col_sa[i];
+         sa   = cs.split("()");
+         cs   = sa[1];
       }
-   } // end for
+      else {
+         cs = col_sa[i];
+      }
 
-   mlog << Debug(3)
-        << "Using " << out_pd.n_obs << " of " << pd.n_obs
-        << " pairs for forecast filtering threshold " << ft.get_str()
-        << ", observation filtering threshold " << ot.get_str()
-        << ", and field logic " << setlogic_to_string(type) << ".\n";
+      // Split the input column name on hyphens for differences
+      sa = cs.split("-");
 
-   return(out_pd);
+      // Get the first value
+      v = get_mpr_column_value(f, o, cmn, csd, sa[0].c_str());
+
+      // If multiple columns, compute the requested difference
+      if(sa.n() > 1) {
+
+         // Loop through the columns
+         for(j=1; j<sa.n(); j++) {
+
+            // Get the current column value
+            v_cur = get_mpr_column_value(f, o, cmn, csd, sa[j].c_str());
+
+            // Compute the difference, checking for bad data
+            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+            else                                     v -= v_cur;
+         } // end for j
+      }
+
+      // Apply absolute value, if requested
+      if(absv && !is_bad_data(v)) v = fabs(v);
+
+      // Check the threshold
+      if(!col_ta[i].check(v)) {
+         if(reason_ptr) {
+            (*reason_ptr) << cs_erase << col_sa[i] << " = " << v
+                          << " is not " << col_ta[i].get_str();
+         }
+         keep = false;
+         break;
+      }
+   } // end for i
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Parse string to determine which value to use
+//
+////////////////////////////////////////////////////////////////////////
+
+double get_mpr_column_value(double f, double o, double cmn, double csd,
+                            const char *s) {
+   double v;
+
+        if(strcasecmp(s, "FCST")        == 0) v = f;
+   else if(strcasecmp(s, "OBS")         == 0) v = o;
+   else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
+   else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
+   else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
+      v = (is_bad_data(cmn) || is_bad_data(csd) ?
+           bad_data_double : normal_cdf(o, cmn, csd));
+   }
+   else {
+      mlog << Error << "\nget_mpr_column_value() -> "
+           << "unsupported matched pair column name requested in \""
+           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
+      exit(1);
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1703,34 +1818,6 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
           << obs_qty    << " " << obs_arr[4];
 
    return(obs_cs);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Parse string to determine which value to use
-//
-////////////////////////////////////////////////////////////////////////
-
-double get_mpr_column_value(const char *s, double f, double o,
-                            double cmn, double csd) {
-   double v;
-
-        if(strcasecmp(s, "FCST")        == 0) v = f;
-   else if(strcasecmp(s, "OBS")         == 0) v = o;
-   else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
-   else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
-   else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
-      v = (is_bad_data(cmn) || is_bad_data(csd) ?
-           bad_data_double : normal_cdf(o, cmn, csd));
-   }
-   else {
-      mlog << Error << "\nget_mpr_column_value() -> "
-           << "unsupported matched pair column name requested in \""
-           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
-      exit(1);
-   }
-
-   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
