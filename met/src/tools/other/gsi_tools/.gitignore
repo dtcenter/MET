@@ -5,3 +5,4 @@ gsid2mpr
 .deps
 Makefile
 Makefile.in
+*.dSYM

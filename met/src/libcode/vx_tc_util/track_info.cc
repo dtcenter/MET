@@ -801,6 +801,7 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
       TrackInfo t;
       t.add(l, check_dup, check_anly);
       Track.push_back(t);
+      status = true;
    }
 
    return(status);

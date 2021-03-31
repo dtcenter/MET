@@ -4,3 +4,4 @@ mode
 .deps
 Makefile
 Makefile.in
+*.dSYM

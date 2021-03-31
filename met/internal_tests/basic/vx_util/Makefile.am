@@ -82,18 +82,30 @@ endif
 test_ascii_header_SOURCES = test_ascii_header.cc
 test_ascii_header_CPPFLAGS = ${MET_CPPFLAGS}
 test_ascii_header_LDFLAGS = -L. ${MET_LDFLAGS}
-test_ascii_header_LDADD = -lvx_util \
+test_ascii_header_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
+	-lvx_analysis_util \
+	-lvx_shapedata \
+	-lvx_util \
+	$(PYTHON_LIBS) \
+	-lvx_statistics \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	$(PYTHON_LIBS) \
+	-lvx_data2d_nccf \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_regrid \
+	-lvx_grid \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
+	-lvx_color \
 	-lvx_log \
-	-lgsl -lgslcblas
- 
-if ENABLE_PYTHON
-test_ascii_header_LDADD += $(MET_PYTHON_LD) -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils -lvx_math 
-test_ascii_header_LDADD += -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils
-test_ascii_header_LDADD += -lvx_math -lvx_grid -lvx_util -lvx_data2d -lvx_config -lvx_gsl_prob -lvx_cal -lvx_math -lvx_util
-endif
-
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util

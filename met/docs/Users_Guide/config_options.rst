@@ -81,7 +81,7 @@ The configuration file language supports the following data types:
   * The following percentile threshold types are supported:
     
     * "SFP" for a percentile of the sample forecast values.
-      e.g. ">SFP50" means greater than the 50-th forecast percentile.
+      e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
       
     * "SOP" for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
@@ -3748,17 +3748,19 @@ Where "job_name" is set to one of the following:
   Job command FILTERING options that may be used only when -line_type
   has been listed once. These options take two arguments: the name of the
   data column to be used and the min, max, or exact value for that column.
-  If multiple column eq/min/max/str options are listed, the job will be
+  If multiple column eq/min/max/str/exc options are listed, the job will be
   performed on their intersection:
 
   .. code-block:: none
 		  
-    "-column_min    col_name value"     e.g. -column_min BASER 0.02
-    "-column_max    col_name value"
-    "-column_eq     col_name value"
-    "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
-    "-column_str    col_name string" separate multiple filtering strings
-                                     with commas
+    "-column_min     col_name value"     e.g. -column_min BASER 0.02
+    "-column_max     col_name value"
+    "-column_eq      col_name value"
+    "-column_thresh  col_name threshold" e.g. -column_thresh FCST '>273'
+    "-column_str     col_name string" separate multiple filtering strings
+                                      with commas
+    "-column_str_exc col_name string" separate multiple filtering strings
+                                      with commas
 
 
   Job command options to DEFINE the analysis job. Unless otherwise noted,

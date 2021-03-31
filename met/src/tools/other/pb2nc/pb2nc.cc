@@ -2428,7 +2428,7 @@ void write_netcdf_hdr_data() {
 
    // Check for no messages retained
    if(dim_count <= 0) {
-      mlog << Error << method_name << " -> "
+      mlog << Error << "\n" << method_name << " -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
@@ -2920,16 +2920,27 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       float *pqtzuv_tq, *pqtzuv_uv;
       float *pqtzuv_merged = (float *) 0;
       float *next_pqtzuv, *prev_pqtzuv;
+      float tq_pres_max, tq_pres_min, uv_pres_max, uv_pres_min;
       std::map<float,float*>::iterator it, it_tq, it_uv;
 
       // Gets pressure levels for TQZ records
-      for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
-         tq_levels.add(int(it->first));
+      it = pqtzuv_map_tq.begin();
+      tq_pres_min = tq_pres_max = it->first;
+      for (; it!=pqtzuv_map_tq.end(); ++it) {
+         float pres_v = it->first;
+         if (tq_pres_min > pres_v) tq_pres_min = pres_v;
+         if (tq_pres_max < pres_v) tq_pres_max = pres_v;
+         tq_levels.add(nint(pres_v));
       }
       // Gets pressure levels for common records
-      for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
-         if (tq_levels.has(int(it->first))) {
-            common_levels.add(int(it->first));
+      it = pqtzuv_map_uv.begin();
+      uv_pres_min = uv_pres_max = it->first;
+      for (; it!=pqtzuv_map_uv.end(); ++it) {
+         float pres_v = it->first;
+         if (uv_pres_min > pres_v) uv_pres_min = pres_v;
+         if (uv_pres_max < pres_v) uv_pres_max = pres_v;
+         if (tq_levels.has(nint(pres_v))) {
+            common_levels.add(nint(pres_v));
          }
       }
 
@@ -2937,22 +2948,36 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          log_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv, method_name);
       }
 
+      bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
+      mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
+           << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
+           << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
+      if( no_overlap ) {
+         mlog << Warning << "\n" << method_name
+              << "Can not combine TQ and UV records because of no overlapping."
+              << "  TQZ count: " << tq_count << ", UV count: " << uv_count
+              << "  common_levels: " << common_levels.n() << "\n\n";
+         return pqtzuv_map_merged.size();
+      }
+
       // Select first record by 1) merging two records with the same pressure
       // level or 2) interpolate
+      int tq_pres, uv_pres;
       next_pqtzuv = (float *)0;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
       pqtzuv_uv = (float *)it_uv->second;;
       pqtzuv_merged = new float[mxr8vt];
-      if (common_levels.has(int(it_tq->first)) 
-            || common_levels.has(int(it_uv->first))) {
+      tq_pres = nint(it_tq->first);
+      uv_pres = nint(it_uv->first);
+      if (common_levels.has(tq_pres) || common_levels.has(uv_pres)) {
          // Found the records with the same precsure level
-         if (it_tq->first != it_uv->first) {
-            if (common_levels.has(int(it_uv->first))) {
+         if (tq_pres != uv_pres) {
+            if (common_levels.has(uv_pres)) {
                pqtzuv_uv = pqtzuv_map_uv[it_uv->first];
             }
-            else if (common_levels.has(int(it_tq->first))) {
+            else if (common_levels.has(tq_pres)) {
                pqtzuv_tq = pqtzuv_map_tq[it_tq->first];
             }
          }
@@ -2968,7 +2993,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
                prev_pqtzuv = (float *)it_uv->second;
                ++it_uv;
             }
-            next_pqtzuv = it_uv->second;
+            next_pqtzuv = (float *)it_uv->second;
          }
          else {
             //Interpolate TQZ into UV
@@ -2978,7 +3003,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
                prev_pqtzuv = (float *)it_tq->second;
                ++it_tq;
             }
-            next_pqtzuv = it_tq->second;
+            next_pqtzuv = (float *)it_tq->second;
          }
          interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
       }
@@ -2996,6 +3021,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
          log_merged_tqz_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged, method_name);
       }
+      delete [] pqtzuv_merged;
    }
 
    return pqtzuv_map_merged.size();
@@ -3034,7 +3060,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
       hgt_cnt = spfh_cnt = 0;
       for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
          if (index < 0) {
-            mlog << Error << method_name  << "negative index: " << index << "\n";
+            mlog << Error << "\n" <<  method_name  << "negative index: " << index << "\n\n";
             break;
          }
 
@@ -3048,13 +3074,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             pbl_data_vgrd[index] = pqtzuv[5];
             if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
             if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
-            selected_levels.add(int(it->first));
+            selected_levels.add(nint(it->first));
          }
 
          index--;
       }
       if (index != -1) {
-         mlog << Error << method_name  << "Missing some levels (" << index << ")\n";
+         mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n";
       }
 
       if (pbl_level > MAX_PBL_LEVEL) {
@@ -3070,7 +3096,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          if (!is_eq(highest_pressure, bad_data_float)) {
             index = MAX_PBL_LEVEL - 1;
             for (; it!=pqtzuv_map_tq.end(); ++it) {
-               int pres_level = int(it->first);
+               int pres_level = nint(it->first);
                if (selected_levels.has(pres_level)) break;
                
                float *pqtzuv = pqtzuv_map_merged[it->first];
@@ -3139,10 +3165,10 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
    if (is_eq(pbl_value, bad_data_float)) {
-      mlog << Warning << "Failed to compute PBL " << hdr_info << "\n\n";
+      mlog << Warning << "\nFailed to compute PBL " << hdr_info << "\n\n";
    }
    else if (pbl_value < hdr_elv) {
-      mlog << Warning << "Not saved because the computed PBL (" << pbl_value
+      mlog << Warning << "\nNot saved because the computed PBL (" << pbl_value
            << ") is less than the station elevation (" << hdr_elv
            << "). " << hdr_info << "\n\n";
       obs_arr[4] = 0;
@@ -3156,7 +3182,7 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
            << "   lat: " << hdr_lat << ", lon: " << hdr_lon
            << ", elv: " << hdr_elv << " " << hdr_info << "\n\n";
       if (obs_arr[4] > MAX_PBL) {
-         mlog << Warning << " Computed PBL (" << obs_arr[4] << " from "
+         mlog << Warning << "\nComputed PBL (" << obs_arr[4] << " from "
               << pbl_value << ") is too high, Reset to " << MAX_PBL
               << "  " << hdr_info<< "\n\n";
          obs_arr[4] = MAX_PBL;
@@ -3192,9 +3218,14 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
                     << var_data[idx_start] << " and " << var_data[idx_end] << "\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
                for (idx2 = idx_start+1; idx2<idx_end; idx2++) {
-                  float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
-                        / (pres_data[idx_end] - pres_data[idx_start]);
-                  var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
+                  if (!is_eq(pres_data[idx_end], pres_data[idx_start])) {
+                     float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
+                           / (pres_data[idx_end] - pres_data[idx_start]);
+                     var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
+                  }
+                  else {
+                     var_data[idx2] = var_data[idx_start];
+                  }
                   mlog << Debug(7) << method_name << " interpolated value["
                        << idx2 << "] = " << var_data[idx2] << "\n";
                   count_interpolated++;
@@ -3219,11 +3250,13 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
 void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzuv) {
    static const char *method_name = "interpolate_pqtzuv() ";
 
-   if ((prev_pqtzuv[0] == cur_pqtzuv[0]) || (next_pqtzuv[0] == cur_pqtzuv[0])) {
-      mlog << Error << method_name 
+   if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
+       || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
+       || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
+      mlog << Error << "\n" << method_name 
            << "  Can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
-           << ", next: " <<  prev_pqtzuv[0] << "\n";
+           << ", next: " <<  prev_pqtzuv[0] << "\n\n";
    }
    else {
       float p_ratio = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
@@ -3272,8 +3305,8 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
       if (first_pres < it_pivot->first) break;
    }
    mlog << Debug(8) << method_name << "pivot->first: " << it_pivot->first
-        << "  aux->first " << it_aux->first << "  first_pres: " << first_pres
-        << "  prev_pqtzuv[0]" << prev_pqtzuv[0] << "\n";
+        << "  aux->first: " << it_aux->first << "  first_pres: " << first_pres
+        << "  prev_pqtzuv[0]: " << prev_pqtzuv[0] << "\n";
    // Find next UV level
    for (; it_aux!=pqtzuv_map_aux.end(); ++it_aux) {
       // Skip the records below the first mathcing/interpolated level

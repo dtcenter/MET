@@ -251,7 +251,16 @@ _________________________
   column_str_name = [];
   column_str_val  = [];
 
-The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be checked. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name val** option within the job command lines may further refine these selections.
+The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **included** in the analysis. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name val** option within the job command lines may further refine these selections.
+
+_________________________
+
+.. code-block:: none
+
+  column_str_exc_name = [];
+  column_str_exc_val  = [];
+
+The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name val** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -260,7 +269,7 @@ _________________________
   init_thresh_name = [];
   init_thresh_val  = [];
 
-The **init_thresh_name** and **init_thresh_val** fields stratify by applying thresholds to numeric data columns only when lead = 0. If lead =0, but the value does not meet the threshold, discard the entire track. The length of the **init_thresh_val** should match that of the **init_thresh_name**. Using the **-init_thresh name val** option within the job command lines may further refine these selections.
+The **init_thresh_name** and **init_thresh_val** fields stratify by applying thresholds to numeric data columns only when lead = 0. If lead = 0, but the value does not meet the threshold, discard the entire track. The length of the **init_thresh_val** should match that of the **init_thresh_name**. Using the **-init_thresh name val** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -269,7 +278,16 @@ _________________________
   init_str_name = [];
   init_str_val  = [];
 
-The **init_str_name** and **init_str_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead =0, but the string does not match, discard the entire track. The length of the **init_str_val** should match that of the **init_str_name**. Using the **-init_str name val** option within the job command lines may further refine these selections.
+The **init_str_name** and **init_str_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, but the string **does not** match, discard the entire track. The length of the **init_str_val** should match that of the **init_str_name**. Using the **-init_str name val** option within the job command lines may further refine these selections.
+
+_________________________
+
+.. code-block:: none
+
+  init_str_exc_name = [];
+  init_str_exc_val  = [];
+
+The **init_str_exc_name** and **init_str_exc_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, and the string **does** match, discard the entire track. The length of the **init_str_exc_val** should match that of the **init_str_exc_name**. Using the **-init_str_exc name val** option within the job command lines may further refine these selections.
 
 _________________________
 

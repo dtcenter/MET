@@ -227,7 +227,8 @@ class STATAnalysisJob {
       map<ConcatString,ThreshArray> column_thresh_map;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> column_str_map;
+      map<ConcatString,StringArray> column_str_inc_map;
+      map<ConcatString,StringArray> column_str_exc_map;
 
       StringArray hdr_name;
       StringArray hdr_value;
