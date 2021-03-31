@@ -68,9 +68,6 @@ class PairDataPoint : public PairBase {
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
                                             const SingleThresh &ot,
                                             const SetLogic type) const;
-
-      PairDataPoint subset_pairs_mpr_thresh(const StringArray &sa,
-                                            const ThreshArray &ta) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -266,6 +263,10 @@ extern bool check_mpr_thresh(double, double, double, double,
 
 extern double get_mpr_column_value(double, double, double, double,
                         const char *);
+
+extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
+                        DataPlane &, DataPlane &,
+                        const StringArray &, const ThreshArray &);
 
 // Apply conditional thresholds to subset the wind pairs
 extern void subset_wind_pairs(const PairDataPoint &,

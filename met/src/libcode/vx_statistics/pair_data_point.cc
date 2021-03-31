@@ -293,75 +293,6 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-PairDataPoint PairDataPoint::subset_pairs_mpr_thresh(
-                 const StringArray &sa, const ThreshArray &ta) const {
-
-   // Check for no work to be done
-   if(sa.n() == 0 && ta.n() == 0) {
-      return(*this);
-   }
-
-   // Check for constant length
-   if(sa.n() != ta.n()) {
-      mlog << Error << "\nPairDataPoint::subset_pairs_mpr_thresh() -> "
-           << "the \"" << conf_key_mpr_column << "\" ("
-           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" (" << write_css(ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
-
-   int i;
-   PairDataPoint out_pd;
-
-   // Allocate memory for output pairs
-   out_pd.extend(n_obs);
-   out_pd.set_climo_cdf_info(cdf_info);
-
-   bool cmn_flag = set_climo_flag(f_na, cmn_na);
-   bool csd_flag = set_climo_flag(f_na, csd_na);
-   bool wgt_flag = set_climo_flag(f_na, wgt_na);
-
-   // Loop over the pairs
-   for(i=0; i<n_obs; i++) {
-
-      // Check for bad data
-      if(is_bad_data(f_na[i])                 ||
-         is_bad_data(o_na[i])                 ||
-         (cmn_flag && is_bad_data(cmn_na[i])) ||
-         (csd_flag && is_bad_data(csd_na[i])) ||
-         (wgt_flag && is_bad_data(wgt_na[i]))) continue;
-
-      // Keep pairs which meet the threshold criteria
-      if(check_mpr_thresh(f_na[i], o_na[i], cmn_na[i], csd_na[i],
-                          sa, ta)) {
-
-         // Handle point data
-         if(is_point_vx()) {
-            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
-                      lon_na[i], x_na[i], y_na[i],
-                      vld_ta[i], lvl_na[i], elv_na[i],
-                      f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                      cmn_na[i], csd_na[i], wgt_na[i]);
-         }
-         // Handle gridded data
-         else {
-            out_pd.add_grid_pair(f_na[i], o_na[i], cmn_na[i],
-                      csd_na[i], wgt_na[i]);
-         }
-      }
-   } // end for
-
-   mlog << Debug(3)
-        << "Using " << out_pd.n_obs << " of " << n_obs
-        << " pairs for matched pair filtering columns (" << write_css(sa)
-        << ") and thresholds (" << ta.get_str() << ").\n";
-
-   return(out_pd);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 // Code for class VxPairDataPoint
 //
@@ -1647,6 +1578,66 @@ double get_mpr_column_value(double f, double o, double cmn, double csd,
    }
 
    return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
+                           DataPlane &cmn_dp, DataPlane &csd_dp,
+                           const StringArray &col_sa, const ThreshArray &col_ta) {
+
+   // Check for no work to be done
+   if(col_sa.n() == 0 && col_ta.n() == 0) return;
+
+   // Check for constant length
+   if(col_sa.n() != col_ta.n()) {
+      mlog << Error << "\napply_mpr_thresh_mask() -> "
+           << "the \"" << conf_key_mpr_column << "\" ("
+           << write_css(col_sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" (" << write_css(col_ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
+   int  nxy = fcst_dp.nx() * fcst_dp.ny();
+   int  n_skip = 0;
+   bool cmn_flag = !(cmn_dp.is_empty());
+   bool csd_flag = !(csd_dp.is_empty());
+
+   // Loop over the pairs
+   for(int i=0; i<nxy; i++) {
+
+      double cmn = (cmn_flag ? cmn_dp.buf()[i] : bad_data_double);
+      double csd = (csd_flag ? csd_dp.buf()[i] : bad_data_double);
+
+      // Check for bad data
+      if(is_bad_data(fcst_dp.buf()[i])  ||
+         is_bad_data(obs_dp.buf()[i])   ||
+         (cmn_flag && is_bad_data(cmn)) ||
+         (csd_flag && is_bad_data(csd))) continue;
+
+      // Discard pairs which do not meet the threshold criteria
+      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cmn, csd,
+                           col_sa, col_ta)) {
+
+         // Increment skip counter
+         n_skip++;
+
+         // Set point to bad data
+         fcst_dp.buf()[i] = bad_data_double;
+         obs_dp.buf()[i]  = bad_data_double;
+         if(cmn_flag) cmn_dp.buf()[i] = bad_data_double;
+         if(csd_flag) csd_dp.buf()[i] = bad_data_double;
+      }
+   } // end for i
+
+   mlog << Debug(3)
+        << "Discarded " << n_skip << " of " << nxy
+        << " pairs for matched pair filtering columns ("
+        << write_css(col_sa) << ") and thresholds ("
+        << col_ta.get_str() << ").\n";
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

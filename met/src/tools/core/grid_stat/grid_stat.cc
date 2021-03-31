@@ -713,6 +713,13 @@ void process_scores() {
            << " climatology standard deviation field(s) for forecast "
            << conf_info.vx_opt[i].fcst_info->magic_str() << ".\n";
 
+      // Apply MPR threshold filters
+      if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
+         apply_mpr_thresh_mask(fcst_dp, obs_dp, cmn_dp, csd_dp,
+                               conf_info.vx_opt[i].mpr_sa,
+                               conf_info.vx_opt[i].mpr_ta);
+      }
+
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
 
@@ -1830,11 +1837,6 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
    if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
-
-   // Apply any MPR filters
-   if(vx_opt.mpr_sa.n() > 0) {
-      pd = pd.subset_pairs_mpr_thresh(vx_opt.mpr_sa, vx_opt.mpr_ta);
-   }
 
    return;
 }
