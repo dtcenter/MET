@@ -113,6 +113,12 @@ column_str_name = [];
 column_str_val  = [];
 
 //
+// Stratify by excluding strings in non-numeric data columns.
+//
+column_str_exc_name = [];
+column_str_exc_val  = [];
+
+//
 // Similar to the column_thresh options above
 //
 init_thresh_name = [];
@@ -123,6 +129,12 @@ init_thresh_val  = [];
 //
 init_str_name = [];
 init_str_val  = [];
+
+//
+// Similar to the column_str_exc options above
+//
+init_str_exc_name = [];
+init_str_exc_val  = [];
 
 //
 // Stratify by the ADECK and BDECK distances to land.
