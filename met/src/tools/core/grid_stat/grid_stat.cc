@@ -106,6 +106,8 @@
 //                    continuous and probabilistic statistics.
 //   050    03/02/20  Halley Gotway  Add nc_pairs_var_name and rename
 //                    nc_pairs_var_str to nc_pairs_var_suffix.
+//   051    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
+//                    filtering options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -710,6 +712,13 @@ void process_scores() {
            << " climatology mean and " << (csd_dp.nx() == 0 ? 0 : 1)
            << " climatology standard deviation field(s) for forecast "
            << conf_info.vx_opt[i].fcst_info->magic_str() << ".\n";
+
+      // Apply MPR threshold filters
+      if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
+         apply_mpr_thresh_mask(fcst_dp, obs_dp, cmn_dp, csd_dp,
+                               conf_info.vx_opt[i].mpr_sa,
+                               conf_info.vx_opt[i].mpr_ta);
+      }
 
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
@@ -1961,8 +1970,9 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
-      pd_thr = subset_pairs(*pd_ptr, vx_opt.fcnt_ta[i],
-                            vx_opt.ocnt_ta[i], vx_opt.cnt_logic);
+      pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
+                                               vx_opt.ocnt_ta[i],
+                                               vx_opt.cnt_logic);
 
       // Check for no matched pairs to process
       if(pd_thr.n_obs == 0) continue;

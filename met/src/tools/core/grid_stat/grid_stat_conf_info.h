@@ -145,6 +145,9 @@ class GridStatVxOpt {
       ConcatString     var_suffix;       // nc_pairs_var_suffix string
                                          // nc_pairs_var_str is deprecated
 
+      StringArray      mpr_sa;           // MPR filtering columns
+      ThreshArray      mpr_ta;           // MPR filtering thresholds
+
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds
 

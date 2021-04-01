@@ -142,7 +142,7 @@ class PairDataEnsemble : public PairBase {
       void compute_phist();
       void compute_ssvar();
 
-      PairDataEnsemble subset_pairs(const SingleThresh &ot) const;
+      PairDataEnsemble subset_pairs_obs_thresh(const SingleThresh &ot) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
