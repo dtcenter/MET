@@ -76,9 +76,9 @@ void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
       }
       else {
          if (nc_out_data.processed_hdr_cnt > 0) {
-            bool hdr_cnt = get_nc_hdr_cur_index();
+            bool hdr_cnt = obs_vars.get_hdr_index();
             bool reset_array = true;
-            reset_header_buffer(hdr_cnt, reset_array);
+            obs_vars.reset_header_buffer(hdr_cnt, reset_array);
             mlog << Debug(5) << method_name << "reset headers (" << hdr_cnt << ") raw data.\n";
          }
          obs_count = summary_count;
@@ -88,10 +88,10 @@ void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
    mlog << Debug(7) << method_name << "obs_count: "
         << obs_count << " header count: " << hdr_count << "\n";
    obs_vars.obs_cnt = obs_count;
+   obs_vars.deflate_level = nc_out_data.deflate_level;
    
-   create_nc_hdr_vars(obs_vars, nc_file, hdr_count, nc_out_data.deflate_level);
-   create_nc_obs_vars(obs_vars, nc_file, nc_out_data.deflate_level,
-         obs_vars.use_var_id);
+   obs_vars.create_hdr_vars(nc_file, hdr_count);
+   obs_vars.create_obs_vars(nc_file);
 
    //
    // Add global attributes
@@ -107,7 +107,6 @@ void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
 bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
       NcObsOutputData &nc_out_data)
 {
-  bool use_var_id = obs_vars.use_var_id;
   string method_name = "write_observations() ";
   bool do_summary = nc_out_data.summary_info.flag;
   bool do_save_raw_data = nc_out_data.summary_info.raw_data;
@@ -121,26 +120,24 @@ bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
   if (!do_summary || (do_summary && do_save_raw_data)) {
     mlog << Debug(5) << method_name << "writing " 
          << (int)nc_out_data.observations.size() << " raw data...\n";
-    write_nc_observations(obs_vars, nc_out_data.observations, use_var_id, do_header);
+    obs_vars.write_observations(nc_out_data.observations, do_header);
   }
   if (do_summary) {
     mlog << Debug(5) << method_name << "writing summary"
          << (do_save_raw_data ? " " : " (summary only)") << "...\n";
     bool tmp_do_header = true;
-    write_nc_observations(obs_vars, nc_out_data.summary_obs->getSummaries(),
-                          use_var_id, tmp_do_header);
+    obs_vars.write_observations(nc_out_data.summary_obs->getSummaries(),
+                                tmp_do_header);
   }
   
-  int obs_buf_index = get_nc_obs_buf_index();
+  int obs_buf_index = obs_vars.get_obs_index();
   if (obs_buf_index > 0) {
-    write_nc_obs_buffer(obs_buf_index);
+    obs_vars.write_obs_buffer(obs_buf_index);
   }
   
-  create_nc_table_vars (obs_vars, nc_file, nc_out_data.deflate_level);
-  
-  write_nc_arr_headers(obs_vars);
-  
-  //write_nc_table_vars(obs_vars);
+  obs_vars.create_table_vars (nc_file);
+  obs_vars.write_arr_headers();
+  //obs_vars.write_table_vars();
 
   return true;
 }
