@@ -10,7 +10,7 @@ BUILDDIR      = _build
 
 # Put it first so that "make" without argument is like "make help".
 help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O) -w "${BUILDDIR}/warnings.log"
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 # Sphinx doesn't know to clean out the debris from sphinx-gallery
 clean:
