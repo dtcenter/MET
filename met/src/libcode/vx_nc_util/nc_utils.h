@@ -77,6 +77,7 @@ static const string C_unknown_str = string("unknown");
 #define NC_BUFFER_SIZE_16K              (16*1024)
 
 #define HDR_ARRAY_LEN    3   // Observation header length
+#define HDR_TYPE_ARR_LEN 3   // Observation header type length (prpt/irpt/inst)
 #define OBS_ARRAY_LEN    5   // Observation values length
 #define HEADER_STR_LEN   16  // Maximum length for header string
 #define HEADER_STR_LEN2  40  // Maximum length for header string 2
