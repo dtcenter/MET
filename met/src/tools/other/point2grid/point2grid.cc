@@ -38,6 +38,8 @@ using namespace std;
 #include "vx_regrid.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "nc_obs_util.h"
+#include "met_nc_point_obs.h"
 
 #include "point2grid_conf_info.h"
 
@@ -612,22 +614,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   bool use_var_id = true;
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_file() -> ";
-
-   if (!get_dim(nc_in, ConcatString(nc_dim_nhdr), nhdr, true)) {
-      mlog << Error << "\n" << method_name
-           << "can not find the header dimension\"" << nc_dim_nhdr << "\".\n\n";
-      exit(1);
-   }
-   if (!get_dim(nc_in, ConcatString(nc_dim_nobs), nobs, true)) {
-      mlog << Error << "\n" << method_name
-           << "can not find the obs dimension\"" << nc_dim_nobs << "\".\n\n";
-      exit(1);
-   }
+   static const char *method_name_s = "process_point_file()";
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -636,70 +627,39 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       usage();
    }
 
-   int *obs_ids = new int[nobs];       // grib_code or var_id
-   int *obs_hids = new int[nobs];
+   MetNcPointObs nc_point_obs;
+   nc_point_obs.set_netcdf(nc_in, true);
+   // Read the dimensions and variables
+   nc_point_obs.read_dim_headers();
+   nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
+   // Read all obs data to compute the cell mapping
+   nc_point_obs.read_obs_data();
+   NcHeaderData header_data = nc_point_obs.get_header_data();
+   NcPointObsData obs_data = nc_point_obs.get_point_obs_data();
+
+   nhdr = nc_point_obs.get_hdr_cnt();
+   nobs = nc_point_obs.get_obs_cnt();
+   bool empty_input = (nhdr == 0 && nobs == 0);
+   bool use_var_id = nc_point_obs.is_using_var_id();
+
    float *hdr_lats = new float[nhdr];
    float *hdr_lons = new float[nhdr];
-   float *obs_lvls = new float[nobs];
-   float *obs_hgts = new float[nobs];
-   float *obs_vals = new float[nobs];
-   int *hdr_typ_ids = new int[nhdr];
-   int *hdr_vld_ids = new int[nhdr];
-   int *obs_qty_ids = new int[nobs];
    IntArray var_index_array;
    IntArray valid_time_array;
-   StringArray qc_tables;
-   StringArray var_names;
-   StringArray hdr_types;
-   StringArray hdr_valid_times;
+   StringArray qc_tables = nc_point_obs.get_qty_data();
+   StringArray var_names = nc_point_obs.get_var_names();
+   StringArray hdr_valid_times = header_data.vld_array;
+   hdr_valid_times.sort();
 
-   if (!get_nc_data_string_array(nc_in, nc_var_hdr_typ_tbl, &hdr_types)) exit(1);
+   nc_point_obs.get_lats(hdr_lats);
+   nc_point_obs.get_lons(hdr_lons);
+
    // Check the message types
-   prepare_message_types(hdr_types);
+   prepare_message_types(header_data.typ_array);
 
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
-   bool empty_input = (nhdr == 0 && nobs == 0);
-   NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
-   if (IS_VALID_NC(obs_vid_var)) {
-      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids);
-      if (success_to_read) success_to_read = get_nc_data_string_array(nc_in, nc_var_obs_var, &var_names);
-   }
-   else {
-      use_var_id = false;
-      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_gc, obs_ids, false);
-      if (!success_to_read) {
-         mlog << Error << "\n" << method_name
-              << "\"" << InputFilename << "\" is very old format. Not supported\n\n";
-      }
-   }
 
-   if (!empty_input) {
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
-      if (success_to_read)
-         success_to_read = get_nc_data_string_array(
-               nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
-      if (success_to_read)
-         success_to_read = get_nc_data_string_array(
-               nc_in, nc_var_obs_qty_tbl, &qc_tables);
-   }
    if (success_to_read) {
       bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
@@ -772,7 +732,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                else {
                   bool not_found_grib_code = true;
                   for (idx=0; idx<nobs; idx++) {
-                     if (var_idx_or_gc == obs_ids[idx]) {
+                     if (var_idx_or_gc == obs_data.obs_ids[idx]) {
                         not_found_grib_code = false;
                         break;
                      }
@@ -797,10 +757,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                log_msg << "GRIB codes: ";
                IntArray grib_codes;
                for (idx=0; idx<nobs; idx++) {
-                  if (!grib_codes.has(obs_ids[idx])) {
-                     grib_codes.add(obs_ids[idx]);
+                  if (!grib_codes.has(obs_data.obs_ids[idx])) {
+                     grib_codes.add(obs_data.obs_ids[idx]);
                      if (0 < idx) log_msg << ", ";
-                     log_msg << obs_ids[idx];
+                     log_msg << obs_data.obs_ids[idx];
                   }
                }
             }
@@ -876,29 +836,29 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          var_count = var_count2 = to_count = 0;
          filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
          for (idx=0; idx < nobs; idx++) {
-            if (var_idx_or_gc == obs_ids[idx]) {
+            if (var_idx_or_gc == obs_data.obs_ids[idx]) {
                var_count2++;
-               hdr_idx = obs_hids[idx];
+               hdr_idx = obs_data.obs_hids[idx];
                if (0 < valid_time_array.n() &&
-                     !valid_time_array.has(hdr_vld_ids[hdr_idx])) {
+                     !valid_time_array.has(header_data.vld_idx_array[hdr_idx])) {
                   filtered_by_time++;
                   continue;
                }
 
-               if(!keep_message_type(hdr_typ_ids[hdr_idx])) {
+               if(!keep_message_type(header_data.typ_idx_array[hdr_idx])) {
                   filtered_by_msg_type++;
                   continue;
                }
 
                // Filter by QC flag
-               if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
+               if (has_qc_flags && !qc_idx_array.has(obs_data.obs_qids[idx])) {
                   filtered_by_qc++;
                   continue;
                }
 
                var_index_array.add(idx);
                var_count++;
-               if (is_eq(obs_vals[idx], 0.)) obs_count_zero_from++;
+               if (is_eq(obs_data.obs_vals[idx], 0.)) obs_count_zero_from++;
                else obs_count_non_zero_from++;
             }
          }
@@ -909,7 +869,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
          cellMapping = new IntArray[nx * ny];
          if( get_grid_mapping(to_grid, cellMapping, var_index_array,
-                              obs_hids, hdr_lats, hdr_lons) ) {
+                              obs_data.obs_hids, hdr_lats, hdr_lons) ) {
             int from_index;
             IntArray cellArray;
             NumArray dataArray;
@@ -945,7 +905,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      dataArray.extend(cellArray.n());
                      for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
-                        data_value = obs_vals[from_index];
+                        data_value = obs_data.get_obs_val(from_index);
                         if (is_eq(data_value, bad_data_float)) continue;
 
                         if(mlog.verbosity_level() >= 4) {
@@ -1111,16 +1071,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
    }
 
-   delete [] obs_ids;
-   delete [] obs_hids;
    delete [] hdr_lats;
    delete [] hdr_lons;
-   delete [] obs_lvls;
-   delete [] obs_hgts;
-   delete [] obs_vals;
-   delete [] hdr_typ_ids;
-   delete [] hdr_vld_ids;
-   delete [] obs_qty_ids;
+   nc_point_obs.close();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
