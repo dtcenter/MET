@@ -86,15 +86,6 @@ static const int n_txt_columns[n_txt] = {
 // Maximum number of GRIB records
 static const int max_n_rec = 300;
 
-// Point observation header length
-static const int hdr_arr_len = 3;
-
-// Point observation header types lengths
-static const int hdr_typ_arr_len = 3;
-
-// Point observation values length
-static const int obs_arr_len = 5;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
