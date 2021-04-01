@@ -559,9 +559,10 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Write the ASCII Table and the job command line
+   // If -out_stat was specified, do not write output
    //
    write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
+   if(!job.stat_out) write_table(out_at, sa_out);
 
    return;
 }
@@ -911,9 +912,10 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Write the ASCII Table and the job command line
+   // If -out_stat was specified, do not write output
    //
    write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
+   if(!job.stat_out) write_table(out_at, sa_out);
 
    return;
 }
