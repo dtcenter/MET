@@ -76,9 +76,6 @@ static const char *DEFAULT_CONFIG_FILENAME =
   "MET_BASE/config/Madis2NcConfig_default";
 
 static const float fill_value   = -9999.f;
-static const int   strl_len     = 16; // Length of "YYYYMMDD_HHMMSS"
-static const int   hdr_arr_len  = 3;  // Observation header length
-static const int   obs_arr_len  = 5;  // Observation values length
 
 ////////////////////////////////////////////////////////////////////////
 //
