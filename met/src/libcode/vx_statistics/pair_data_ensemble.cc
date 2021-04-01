@@ -758,7 +758,7 @@ void PairDataEnsemble::compute_ssvar() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
+PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &ot) const {
 
    // Check for no work to be done
    if(ot.get_type() == thresh_na) return(*this);

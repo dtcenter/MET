@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "NAM";
+model = "GFS";
 
 //
 // Output description to be written
@@ -20,7 +20,7 @@ desc = "NA";
 //
 // Output observation type to be written
 //
-obtype = "ANALYS";
+obtype = "GFSANL";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -28,11 +28,10 @@ obtype = "ANALYS";
 // Verification grid
 //
 regrid = {
-   to_grid    = FCST;
+   to_grid    = NONE;
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
-   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,13 +57,76 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   field = [ { name = "${FCST_COMMAND}"; },
-             { name = "${OBS_COMMAND}";  } ];
+
+   name  = "TMP";
+   level = "Z2";
+
+   field = [
+      {
+        desc                = "NO_MPR_THRESH";
+        nc_pairs_var_suffix = desc;
+      },
+      {
+        mpr_column          = [ "OBS-FCST" ];
+        mpr_thresh          = [ >=-5&&<=5  ];
+        desc                = "OBS_FCST_DIFF";
+        nc_pairs_var_suffix = desc;
+      },
+      {
+        mpr_column          = [ "ABS(OBS-FCST)" ];
+        mpr_thresh          = [ <=5             ];
+        desc                = "ABS_OBS_FCST_DIFF";
+        nc_pairs_var_suffix = desc;
+      },
+      { 
+        mpr_column          = [ "ABS(OBS-CLIMO_MEAN)" ];
+        mpr_thresh          = [ <=5                   ];
+        desc                = "ABS_OBS_CLIMO_MEAN_DIFF";
+        nc_pairs_var_suffix = desc;
+      },
+      { 
+        mpr_column          = [ "CLIMO_CDF" ];
+        mpr_thresh          = [ >=0.25&&<=0.75 ];
+        desc                = "CLIMO_CDF_IQR";
+        nc_pairs_var_suffix = desc;
+      }
+   ];
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
+//
+climo_mean = fcst;
+climo_mean = {
+
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
+
+   regrid = {
+      method     = BILIN;
+      width      = 2;
+      vld_thresh = 0.5;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
-obs = {
-   field = [ { name = "${OBS_COMMAND}";  },
-             { name = "${FCST_COMMAND}"; } ];
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +137,6 @@ obs = {
 mask = {
    grid = [ "FULL" ];
    poly = [];
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +252,7 @@ output_flag = {
 //
 nc_pairs_flag = {
    latlon       = FALSE;
-   raw          = TRUE;
+   raw          = FALSE;
    diff         = TRUE;
    climo        = FALSE;
    climo_cdp    = FALSE;
@@ -205,9 +266,9 @@ nc_pairs_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-grid_weight_flag = NONE;
+grid_weight_flag = COS_LAT;
 tmp_dir          = "/tmp";
-output_prefix    = "python";
+output_prefix    = "${OUTPUT_PREFIX}";
 version          = "V10.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
