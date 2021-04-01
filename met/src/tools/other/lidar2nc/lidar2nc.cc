@@ -63,8 +63,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-struct NcHeaderData *header_data = get_hdr_data_buffer();
-
 static ConcatString program_name;
 
 static CommandLine cline;
@@ -332,10 +330,11 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    //
 
    bool use_var_id = false;
-   init_nc_dims_vars_config(obs_vars, use_var_id);
+   obs_vars.reset(use_var_id);
    obs_vars.attr_agl = true;
-   create_nc_hdr_vars(obs_vars, out, n_data, deflate_level);
-   create_nc_obs_vars(obs_vars, out, deflate_level, use_var_id);
+   obs_vars.deflate_level = deflate_level;
+   obs_vars.create_hdr_vars(out, n_data);
+   obs_vars.create_obs_vars(out);
 
    if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
       NcDim str_dim;
@@ -385,7 +384,6 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-header_data->typ_array.add(hdr_typ_string);
 obs_vars.hdr_typ_var.putVar(ibuf);
 
    //
@@ -394,8 +392,8 @@ obs_vars.hdr_typ_var.putVar(ibuf);
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-header_data->sid_array.add(na_str);
 obs_vars.hdr_sid_var.putVar(ibuf);
+obs_vars.add_header_strings(hdr_typ_string, na_str);
 
    //
    //  populate the obs_qty variable
@@ -473,7 +471,8 @@ for (j=0; j<n_data; ++j)  {
 
       v_idx = valid_times.n_elements();
       valid_times.add(t);
-      header_data->vld_array.add(junk);
+      //header_data.vld_array.add(junk);
+      obs_vars.add_header_vld(junk);
    }
    ibuf[j] = v_idx;
 
@@ -553,11 +552,11 @@ for (j=0; j<n_data; ++j)  {
 
 }   //  for j
 
-   write_nc_observation(obs_vars);
+   obs_vars.write_observation();
 
-   create_nc_table_vars(obs_vars, out);
+   obs_vars.create_table_vars(out);
 
-   write_nc_table_vars(obs_vars);
+   obs_vars.write_table_vars();
 
    //
    //  close hdf file
@@ -597,11 +596,11 @@ void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value)
    //
 
 if ( qc_value < 0 )  {
-   write_nc_observation(obs_vars, f, na_str);
+   obs_vars.write_observation(f, na_str);
 } else {
    char junk[HEADER_STR_LEN];
    snprintf(junk, sizeof(junk), "%d", qc_value);
-   write_nc_observation(obs_vars, f, junk);
+   obs_vars.write_observation(f, junk);
 }
 
 return;

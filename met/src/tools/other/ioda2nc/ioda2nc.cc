@@ -205,7 +205,7 @@ void initialize() {
 
    n_total_obs = 0;
 
-   nc_obs_initialize();
+   obs_vars.init_data_buffer();
 
    core_dims.clear();
    core_dims.add("nvars");
@@ -323,7 +323,7 @@ void open_netcdf() {
    }
 
    // Define netCDF variables
-   init_nc_dims_vars_config(obs_vars);
+   obs_vars.reset();
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -768,7 +768,7 @@ void process_ioda_file(int i_pb) {
       }
 
       // Store the index to the header data
-      obs_arr[0] = (float) get_nc_hdr_cur_index();
+      obs_arr[0] = (float) obs_vars.get_hdr_index();
 
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
@@ -792,8 +792,8 @@ void process_ioda_file(int i_pb) {
       // store the header data and increment the IODA record
       // counter
       if(n_hdr_obs > 0) {
-         add_nc_header_to_array(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
-                                hdr_lat, hdr_lon, hdr_elv);
+         obs_vars.add_header(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
+                             hdr_lat, hdr_lon, hdr_elv);
          i_msg++;
       }
       else {
@@ -810,8 +810,8 @@ void process_ioda_file(int i_pb) {
       cout << log_message << "\n";
    }
 
-   int obs_buf_index = get_nc_obs_buf_index();
-   if(obs_buf_index > 0) write_nc_obs_buffer(obs_buf_index);
+   int obs_buf_index = obs_vars.get_obs_index();
+   if(obs_buf_index > 0) obs_vars.write_obs_buffer(obs_buf_index);
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
@@ -900,7 +900,7 @@ void process_ioda_file(int i_pb) {
 void write_netcdf_hdr_data() {
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   const long hdr_count = (long) get_nc_hdr_cur_index();
+   const long hdr_count = (long) obs_vars.get_hdr_index();
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
@@ -940,10 +940,11 @@ void write_netcdf_hdr_data() {
       nc_var_desc_arr.add(obs_var_descs[i]);
    }
 
-   create_nc_obs_name_vars(obs_vars, f_out, var_count, units_count, deflate_level);
-   write_obs_var_names(obs_vars,  nc_var_name_arr);
-   write_obs_var_units(obs_vars, nc_var_unit_arr);
-   write_obs_var_descriptions(obs_vars, nc_var_desc_arr);
+   obs_vars.deflate_level = deflate_level;
+   obs_vars.create_obs_name_vars(f_out, var_count, units_count);
+   obs_vars.write_obs_var_names(nc_var_name_arr);
+   obs_vars.write_obs_var_units(nc_var_unit_arr);
+   obs_vars.write_obs_var_descriptions(nc_var_desc_arr);
 
    return;
 }

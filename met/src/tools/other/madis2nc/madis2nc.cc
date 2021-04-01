@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
    //
    process_command_line(argc, argv);
 
-   nc_obs_initialize();
+   obs_vars.init_data_buffer();
 
    //
    // Process the MADIS file
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 
    bool use_var_id = true;
    bool do_header = false;
-   int nhdr = get_nc_hdr_cur_index();
+   int nhdr = obs_vars.get_obs_index();
 
    if (conf_info.getSummaryInfo().flag) {
       int summmary_hdr_cnt = 0;
@@ -387,7 +387,7 @@ void setup_netcdf_out(int nhdr) {
    }
 
    bool use_var_id = false;
-   init_nc_dims_vars_config(obs_vars, use_var_id);
+   obs_vars.reset(use_var_id);
    obs_vars.obs_cnt = obs_vector.size();
    mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
         << "\tobs_cnt:\t" << obs_vars.obs_cnt << "\n";
@@ -744,7 +744,7 @@ void process_madis_metar(NcFile *&f_in) {
    double tmp_dbl;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -1172,7 +1172,7 @@ void process_madis_raob(NcFile *&f_in) {
    char qty;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -1594,7 +1594,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = get_nc_hdr_cur_index();
+         hdr_idx = obs_vars.get_obs_index();
 
          //
          // Process the station name.
@@ -1985,7 +1985,7 @@ void process_madis_profiler(NcFile *&f_in) {
    double tmp_dbl;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -2170,7 +2170,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = get_nc_hdr_cur_index();
+         hdr_idx = obs_vars.get_obs_index();
 
          //
          // Initialize the observation array: hdr_id
@@ -2243,7 +2243,7 @@ void process_madis_maritime(NcFile *&f_in) {
    double tmp_dbl;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -2504,7 +2504,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = get_nc_hdr_cur_index();
+         hdr_idx = obs_vars.get_obs_index();
 
 
          //
@@ -2625,7 +2625,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    double tmp_dbl;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -2981,7 +2981,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          if(is_bad_data(tmp_dbl)) continue;
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = get_nc_hdr_cur_index();
+         hdr_idx = obs_vars.get_obs_index();
 
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -3204,7 +3204,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    char qty;
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure, wdir, wind, ugrd, vgrd;
    int count;
    StringArray missing_vars, missing_qty_vars;
@@ -3428,7 +3428,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            hdr_idx = get_nc_hdr_cur_index();
+            hdr_idx = obs_vars.get_obs_index();
 
             //
             // Use cur to index into the NetCDF variables.

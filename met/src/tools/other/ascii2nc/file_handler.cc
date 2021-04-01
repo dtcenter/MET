@@ -76,7 +76,7 @@ FileHandler::~FileHandler()
 
 bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
 {
-  nc_obs_initialize();
+  obs_vars.init_data_buffer();
 
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
@@ -157,7 +157,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     return false;
 
   // Add variable names
-  if (use_var_id) write_obs_var_names(obs_vars, obs_names);
+  if (use_var_id) obs_vars.write_obs_var_names(obs_names);
 
   // Close the netCDF file.
 
@@ -249,8 +249,9 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   init_nc_dims_vars_config(obs_vars, use_var_id);
+   obs_vars.reset(use_var_id);
    obs_vars.attr_agl   = true;
+   obs_vars.deflate_level = deflate_level;
 
    nc_out_data.processed_hdr_cnt = 0;
    nc_out_data.deflate_level = deflate_level;
@@ -388,8 +389,8 @@ bool FileHandler::_writeObservations()
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
   if (var_count > 0) {
     int unit_count = 0;
-    create_nc_obs_name_vars (obs_vars, _ncFile, var_count, unit_count, deflate_level);
-    write_obs_var_names(obs_vars, obs_names);
+    obs_vars.create_obs_name_vars (_ncFile, var_count, unit_count);
+    obs_vars.write_obs_var_names(obs_names);
   }
 
   return true;
