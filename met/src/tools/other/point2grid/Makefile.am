@@ -24,6 +24,7 @@ point2grid_LDADD = -lvx_statistics \
 	-lvx_data2d_nccf \
 	-lvx_statistics \
 	-lvx_nc_util \
+	-lvx_nc_obs \
 	-lvx_data2d \
 	-lvx_gnomon \
 	-lvx_regrid \
