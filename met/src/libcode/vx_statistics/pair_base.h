@@ -71,6 +71,8 @@ class PairBase {
       MaskLatLon    *mask_llpnt_ptr; // Pointer to Lat/Lon thresholds
                                      // which is not allocated
 
+      //////////////////////////////////////////////////////////////////
+
       ConcatString msg_typ;          // Name of the verifying message type
       StringArray  msg_typ_vals;     // Message type values to be included
 

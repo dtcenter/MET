@@ -42,6 +42,8 @@ regrid = {
 //
 censor_thresh       = [];
 censor_val          = [];
+mpr_column          = [];
+mpr_thresh          = [];
 cat_thresh          = [];
 cnt_thresh          = [ NA ];
 cnt_logic           = UNION;
@@ -51,6 +53,7 @@ eclv_points         = 0.05;
 nc_pairs_var_name   = "";
 nc_pairs_var_suffix = "";
 rank_corr_flag      = FALSE;
+
 //
 // Forecast and observation fields to be verified
 //

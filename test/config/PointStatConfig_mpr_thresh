@@ -9,13 +9,13 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "GFS";
 
 //
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "${DESCRIPTION}";
+desc = "NA";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,42 +23,97 @@ desc = "${DESCRIPTION}";
 // Verification grid
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 mpr_column  = [];
 mpr_thresh  = [];
+cat_thresh  = [ NA ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
 wind_logic  = UNION;
-duplicate_flag = NONE;
-obs_summary    = ${OBS_SUMMARY};
-obs_perc_value = 75;
 eclv_points = 0.05;
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
+   sid_inc    = [];
+   sid_exc    = [];
+   cat_thresh = [];
    message_type = [ "ADPSFC" ];
-   sid_inc      = [];
-   sid_exc      = [];
+
+   name  = "TMP";
+   level = "Z2";
 
    field = [
       {
-        name       = "TMP";
-        level      = [ "Z2" ];
-        cat_thresh = [ <=273, >273 ];
+        desc = "NO_MPR_THRESH";
+      },
+      {
+        mpr_column = [ "OBS-FCST" ];
+        mpr_thresh = [ >=-5&&<=5  ];
+        desc       = "OBS_FCST_DIFF";
+      },
+      {
+        mpr_column = [ "ABS(OBS-FCST)" ];
+        mpr_thresh = [ <=5             ];
+        desc       = "ABS_OBS_FCST_DIFF";
+      },
+      { 
+        mpr_column = [ "ABS(OBS-CLIMO_MEAN)" ];
+        mpr_thresh = [ <=5                   ];
+        desc       = "ABS_OBS_CLIMO_MEAN_DIFF";
+      },
+      { 
+        mpr_column = [ "CLIMO_CDF" ];
+        mpr_thresh = [ >=0.25&&<=0.75 ];
+        desc       = "CLIMO_CDF_IQR";
       }
    ];
-
 }
 obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
+//
+climo_mean = fcst;
+climo_mean = {
+
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
+
+   regrid = {
+      method     = BILIN;
+      width      = 2;
+      vld_thresh = 0.5;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +147,7 @@ ci_alpha  = [ 0.05 ];
 boot = {
    interval = PCTILE;
    rep_prop = 1.0;
-   n_rep    = 0;
+   n_rep    = 1000;
    rng      = "mt19937";
    seed     = "1";
 }
@@ -116,16 +171,30 @@ interp = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// HiRA verification method
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
-   fho    = STAT;
-   ctc    = STAT;
-   cts    = STAT;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = STAT;
-   sl1l2  = NONE;
+   cnt    = NONE;
+   sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
@@ -136,13 +205,15 @@ output_flag = {
    prc    = NONE;
    ecnt   = NONE;
    rps    = NONE;
-   eclv   = STAT;
-   mpr    = BOTH;
+   eclv   = NONE;
+   mpr    = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = FALSE;
+obs_quality    = [];
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
 version        = "V10.0.0";

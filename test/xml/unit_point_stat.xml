@@ -8,6 +8,7 @@
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
 <met_test>
@@ -451,6 +452,32 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_MPR_THRESH">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>MPR_THRESH</value></pair>
+      <pair><name>DAY_INTERVAL</name>  <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590409"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590409"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_mpr_thresh \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_MPR_THRESH_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
