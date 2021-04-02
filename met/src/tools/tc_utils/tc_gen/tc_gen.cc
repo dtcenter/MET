@@ -752,18 +752,32 @@ void process_fcst_tracks(const StringArray &files,
             continue;
          }
 
+         // Skip invest tracks with a large cyclone number
+         if(atof(fcst_ta[j].cyclone().c_str()) > max_cyclone_number) {
+            mlog << Debug(6)
+                 << "Skipping forecast genesis event for cyclone number "
+                 << fcst_ta[j].cyclone() << " > " << max_cyclone_number
+                 << ".\n";
+            continue;
+         }
+
          // Check the forecast lead time window
          if(fcst_gi.genesis_lead() < conf_info.FcstSecBeg ||
             fcst_gi.genesis_lead() > conf_info.FcstSecEnd) {
-            mlog << Debug(6) << "Skipping genesis event for forecast hour "
-                 << fcst_gi.genesis_fhr() << ".\n";
+            mlog << Debug(6)
+                 << "Skipping forecast genesis event for forecast hour "
+                 << fcst_gi.genesis_fhr() << " not between "
+                 << conf_info.FcstSecBeg/sec_per_hour << " and "
+                 << conf_info.FcstSecEnd/sec_per_hour << ".\n";
             continue;
          }
 
          // Check the forecast track minimum duration
          if(fcst_gi.duration() < conf_info.MinDur*sec_per_hour) {
-            mlog << Debug(6) << "Skipping genesis event for track duration of "
-                 << fcst_gi.duration()/sec_per_hour << ".\n";
+            mlog << Debug(6)
+                 << "Skipping forecast genesis event for track duration of "
+                 << fcst_gi.duration()/sec_per_hour << " < "
+                 << conf_info.MinDur << ".\n";
             continue;
          }
 
@@ -900,6 +914,15 @@ void process_best_tracks(const StringArray &files,
 
       // Attempt to define genesis
       if(!best_gi.set(best_ta[i], conf_info.BestEventInfo)) {
+         continue;
+      }
+
+      // Skip invest tracks with a large cyclone number
+      if(atof(best_ta[i].cyclone().c_str()) > max_cyclone_number) {
+         mlog << Debug(6)
+              << "Skipping Best track genesis event for cyclone number "
+              << best_ta[i].cyclone() << " > " << max_cyclone_number
+              << ".\n";
          continue;
       }
 

@@ -77,6 +77,8 @@ const ConcatString genesis_name    ("GENESIS");
 const ConcatString genesis_dev_name("GENESIS_DEV");
 const ConcatString genesis_ops_name("GENESIS_OPS");
 
+static const int max_cyclone_number = 50;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
