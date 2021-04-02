@@ -285,15 +285,18 @@ ______________________
      end =  24;
   }
 
-The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
+The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as a contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
 
 ______________________
 
 .. code-block:: none
 
-  ops_hit_tdiff = 48;
+  ops_hit_window = {
+     beg =  0;
+     end = 48;
+  }
 
-The **ops_hit_tdiff** entry is an integer which defines a maximum allowable time difference in hours. For each matching forecast and Best track genesis event, if the difference between the Best track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a contingency table HIT for the operational scoring method. Otherwise, it is counted as a FALSE ALARM.
+The **ops_hit_window** entry defines a time window, in hours, relative to the Best track genesis time. The model initialization time for the forecast genesis event must occur within this time window for the pairs to be counted as a contingency table HIT for the operationl scoring method. Otherwise, the pair is counted as a FALSE ALARM.
 
 ______________________
 

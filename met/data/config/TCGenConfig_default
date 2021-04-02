@@ -179,10 +179,13 @@ dev_hit_window = {
 }
 
 //
-// Maximum Best track genesis minus model initialization time difference for an
-// operational scoring method hit
+// Time window in hours for the Best track genesis minus model initialization
+// time difference for an operational scoring method hit
 //
-ops_hit_tdiff = 48;
+ops_hit_window = {
+   beg =  0;
+   end = 48;
+}
 
 //
 // Discard genesis forecasts for initializations at or after the matching

@@ -124,7 +124,7 @@ filter = [
    {
       desc                 = "ALL_MATCH_600KM_OPS60HR";
       genesis_match_radius = 600;
-      ops_hit_tdiff        = 60;
+      ops_hit_window       = { beg = -60; end = 60; };
       dev_method_flag      = FALSE;
       ops_method_flag      = TRUE;
    }
@@ -227,10 +227,13 @@ dev_hit_window = {
 }
 
 //
-// Maximum Best track genesis minus model initialization time difference for an
-// operational scoring method hit
+// Time window in hours for the Best track genesis minus model initialization
+// time difference for an operational scoring method hit
 //
-ops_hit_tdiff = 48;
+ops_hit_window = {
+   beg =  0;
+   end = 48;
+}
 
 //
 // Discard genesis forecasts for initializations at or after the matching

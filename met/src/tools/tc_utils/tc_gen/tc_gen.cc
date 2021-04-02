@@ -19,6 +19,7 @@
 //   002    12/15/20  Halley Gotway   Matching logic for MET #1448
 //   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
 //   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
+//   005    04/02/21  Halley Gotway   Refinements for MET #1714
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -525,19 +526,19 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                // FALSE ALARM for the development method
                diff.DevCategory = FYONGenesis;
             }
-            
-            // Ops Method:
-            // HIT if forecast init time is close enough to
-            // the BEST genesis time.
 
-            // Compute time offset
+            // Compute init/genesis time offset
             diff.OpsDSec = bgi->genesis_time() - fgi->init();
 
             offset_cs << cs_erase
                       << "with an init vs genesis time offset of "
                       << diff.OpsDSec/sec_per_hour << " hours.\n";
 
-            if(diff.OpsDSec <= vx_opt.OpsHitDSec) {
+            // Ops Method:
+            // HIT if forecast init time is close enough to
+            // the BEST genesis time.
+            if(diff.OpsDSec >= vx_opt.OpsHitBeg &&
+               diff.OpsDSec <= vx_opt.OpsHitEnd) {
 
                mlog << Debug(4) << case_cs
                     << " is an ops method HIT " << offset_cs;

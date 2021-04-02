@@ -138,7 +138,7 @@ class TCGenVxOpt {
       // Temporal and spatial scoring options
       double DevHitRadius;
       int    DevHitBeg, DevHitEnd;
-      int    OpsHitDSec;
+      int    OpsHitBeg, OpsHitEnd;
       bool   DiscardFlag, DevFlag, OpsFlag;
 
       // Output file options
