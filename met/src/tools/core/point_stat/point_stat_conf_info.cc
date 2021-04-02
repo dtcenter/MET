@@ -606,6 +606,9 @@ void PointStatVxOpt::clear() {
    mask_sid.clear();
    mask_llpnt.clear();
 
+   mpr_sa.clear();
+   mpr_ta.clear();
+
    mask_name.clear();
 
    eclv_points.clear();
@@ -774,10 +777,16 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       int_to_setlogic(fdict.lookup_int(conf_key_wind_logic)),
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
 
+   // Conf: mpr_column and mpr_thresh
+   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
+   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
+           << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
+           << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -931,6 +940,9 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+
+   // Store the MPR filter threshold
+   vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info(cdf_info);

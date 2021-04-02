@@ -123,6 +123,9 @@ class PointStatVxOpt {
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
 
+      StringArray     mpr_sa;             // MPR column names
+      ThreshArray     mpr_ta;             // MPR column thresholds
+
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;
 
