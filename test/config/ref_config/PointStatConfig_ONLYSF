@@ -30,6 +30,8 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+mpr_column  = [];
+mpr_thresh  = [];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_logic  = INTERSECTION;

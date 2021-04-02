@@ -26,7 +26,7 @@ sys.argv = sys.argv[2:]
 # append user script dir to system path
 pyembed_dir, pyembed_file = os.path.split(pyembed_module_name)
 if pyembed_dir:
-    os.path.append(pyembed_dir)
+    sys.path.insert(0, pyembed_dir)
 
 if not pyembed_module_name.endswith('.py'):
     pyembed_module_name += '.py'
@@ -60,9 +60,9 @@ for attr, attr_val in met_info['attrs'].items():
     print(attr, attr_val, type(attr_val))
     if attr == 'name':
         setattr(ds, 'name_str', attr_val)
-    if type(attr_val) == str:
+    elif type(attr_val) == str:
         setattr(ds, attr, attr_val)
-    if type(attr_val) == dict:
+    elif type(attr_val) == dict:
         for key in attr_val:
             setattr(ds, attr + '.' + key, attr_val[key])
 ds.close()

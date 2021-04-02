@@ -234,4 +234,31 @@
     </output>
   </test>
 
+  <test name="grid_stat_MPR_THRESH">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>MPR_THRESH</value></pair>
+      <pair><name>DAY_INTERVAL</name>  <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590409"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590409"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_mpr_thresh \
+      -outdir &OUTPUT_DIR;/grid_stat -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_MPR_THRESH_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MPR_THRESH_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

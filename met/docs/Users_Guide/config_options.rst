@@ -81,7 +81,7 @@ The configuration file language supports the following data types:
   * The following percentile threshold types are supported:
     
     * "SFP" for a percentile of the sample forecast values.
-      e.g. ">SFP50" means greater than the 50-th forecast percentile.
+      e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
       
     * "SOP" for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
@@ -640,12 +640,12 @@ to be verified. This dictionary may include the following entries:
     metadata of any output files, but the user can set the "desc" entry
     accordingly.
 
-    Examples of user-defined conversion functions include:
+    Examples of user-defined data censoring operations include:
 
     .. code-block:: none
 		    
       censor_thresh = [ >12000 ];
-      censor_val    = [ 12000 ];
+      censor_val    = [  12000 ];
 
   * Several configuration options are provided to override and correct the
     metadata read from the input file. The supported options are listed
@@ -677,6 +677,25 @@ to be verified. This dictionary may include the following entries:
       is_wind_speed        = boolean;
       is_wind_direction    = boolean;
       is_prob              = boolean;
+
+  * The "mpr_column" and "mpr_thresh" entries are arrays of strings and
+    thresholds to specify which matched pairs should be included in the
+    statistics. These options apply to the Point-Stat and Grid-Stat tools.
+    They are parsed seperately for each "obs.field" array entry.
+    The "mpr_column" strings specify MPR column names ("FCST", "OBS",
+    "CLIMO_MEAN", "CLIMO_STDEV", or "CLIMO_CDF"), differences of columns
+    ("FCST-OBS"), or the absolute value of those differences ("ABS(FCST-OBS)").
+    The number of "mpr_thresh" thresholds must match the number of "mpr_column"
+    entries, and the n-th threshold is applied to the n-th column. Any matched
+    pairs which do not meet any of the specified thresholds are excluded from
+    the analysis. For example, the following settings exclude matched pairs
+    where the observation value differs from the forecast or climatological
+    mean values by more than 10:
+    
+    .. code-block:: none
+
+      mpr_column = [ "ABS(OBS-FCST)", "ABS(OBS-CLIMO_MEAN)" ];
+      mpr_thresh = [ <=10, <=10 ];
 
   * The "cat_thresh" entry is an array of thresholds to be used when
     computing categorical statistics.
@@ -981,6 +1000,8 @@ or
    obs = {
      censor_thresh = [];
      censor_val    = [];
+     mpr_column    = [];
+     mpr_thresh    = [];
      cnt_thresh    = [ NA ];
      cnt_logic     = UNION;
      wind_thresh   = [ NA ];
@@ -3748,17 +3769,19 @@ Where "job_name" is set to one of the following:
   Job command FILTERING options that may be used only when -line_type
   has been listed once. These options take two arguments: the name of the
   data column to be used and the min, max, or exact value for that column.
-  If multiple column eq/min/max/str options are listed, the job will be
+  If multiple column eq/min/max/str/exc options are listed, the job will be
   performed on their intersection:
 
   .. code-block:: none
 		  
-    "-column_min    col_name value"     e.g. -column_min BASER 0.02
-    "-column_max    col_name value"
-    "-column_eq     col_name value"
-    "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
-    "-column_str    col_name string" separate multiple filtering strings
-                                     with commas
+    "-column_min     col_name value"     e.g. -column_min BASER 0.02
+    "-column_max     col_name value"
+    "-column_eq      col_name value"
+    "-column_thresh  col_name threshold" e.g. -column_thresh FCST '>273'
+    "-column_str     col_name string" separate multiple filtering strings
+                                      with commas
+    "-column_str_exc col_name string" separate multiple filtering strings
+                                      with commas
 
 
   Job command options to DEFINE the analysis job. Unless otherwise noted,

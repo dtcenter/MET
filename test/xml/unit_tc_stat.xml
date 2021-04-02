@@ -15,7 +15,6 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-
   <test name="tc_stat_ALAL2010">
     <exec>&MET_BIN;/tc_stat</exec>
     <param> \
@@ -30,6 +29,20 @@
       <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst</stat>
       <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_ri.tcst</stat>
       <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_rw.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_stat_FILTER_STRINGS">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
+      -job filter -dump_row &OUTPUT_DIR;/tc_stat/ALAL2010_FILTER_STRINGS.tcst \
+      -init_str LEVEL TS,HU -init_str_exc WATCH_WARN HUWARN \
+      -column_str LEVEL HU -column_str_exc WATCH_WARN TSWATCH \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/ALAL2010_FILTER_STRINGS.tcst</exist>
     </output>
   </test>
 

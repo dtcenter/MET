@@ -33,6 +33,8 @@ obs_window = {
 
 censor_thresh = [];
 censor_val    = [];
+mpr_column    = [];
+mpr_thresh    = [];
 cnt_thresh    = [ NA ];
 cnt_logic     = UNION;
 wind_thresh   = [ NA ];

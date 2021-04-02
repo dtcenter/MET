@@ -24,7 +24,7 @@ version = 'develop'
 verinfo = version
 release = f'{version}'
 release_year = '2021'
-release_date = f'{release_year}0302'
+release_date = f'{release_year}-03-31'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -53,8 +53,6 @@ suppress_warnings = ['ref.citation']
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 html_js_files = ['pop_ver.js']
-html_theme_options = {'canonical_url': 'https://dtcenter.github.io/MET/latest/'}
-html_theme_options['versions'] = {'latest': '../latest', 'develop': '../develop'}
 html_css_files = ['theme_override.css']
 
 # Add any paths that contain custom static files (such as style sheets) here,
