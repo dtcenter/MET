@@ -61,7 +61,7 @@ The TC-Gen tool implements the following logic:
 
 * Parse the forecast genesis data and identify forecast genesis events separately for each model present.
 
-* Parse the Best and operational track data, and identify Best track genesis events.
+* Parse the Best and operational track data, and identify Best track genesis events. Note that Best tracks with a cyclone number greater than 50 are automatically discarded from the analysis. Large cyclone numbers are used for pre-season testing or to track invests prior to a storm actually forming. Running this tool at verbosity level 6 (-v 6) prints details about which tracks are discarded.
 
 * Loop over the filters defined in the configuration file and apply the following logic for each.
 
