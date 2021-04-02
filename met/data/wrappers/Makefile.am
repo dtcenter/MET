@@ -23,10 +23,11 @@ wrappersdir = $(pkgdatadir)/wrappers
 wrappers_DATA = \
      generic_python.py \
      generic_pickle.py \
-     read_pickle_dataplane.py \
-     write_pickle_dataplane.py \
+     read_tmp_dataplane.py \
+     write_tmp_dataplane.py \
      write_pickle_mpr.py \
-     write_pickle_point.py
+     read_tmp_ascii.py \
+     write_tmp_point.py
 
 EXTRA_DIST = ${wrappers_DATA}
 
