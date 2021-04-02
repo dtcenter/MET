@@ -38,6 +38,8 @@
 //   017    03/01/18  Halley Gotway   Update summary job type.
 //   018    04/04/19  Fillmore        Added FCST and OBS units.
 //   019    01/24/20  Halley Gotway   Add aggregate RPS lines.
+//   020    04/02/21  Halley Gotway   MET #1736, write output to -out or
+//                    -out_stat, but not both.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1186,19 +1188,29 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       // FHO output line
       //
       if(lt == stat_fho) {
-         at.set_entry(r, c++, (string)"FHO:");
-         write_case_cols(it->first, at, r, c);
-         write_fho_cols(it->second.cts_info, at, r, c);
-         if(job.stat_out) write_fho_cols(it->second.cts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_fho_cols(it->second.cts_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"FHO:");
+            write_case_cols(it->first, at, r, c);
+            write_fho_cols(it->second.cts_info, at, r, c);
+         }
       }
       //
       // CTC output line
       //
       else if(lt == stat_ctc) {
-         at.set_entry(r, c++, (string)"CTC:");
-         write_case_cols(it->first, at, r, c);
-         write_ctc_cols(it->second.cts_info, at, r, c);
-         if(job.stat_out) write_ctc_cols(it->second.cts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_ctc_cols(it->second.cts_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"CTC:");
+            write_case_cols(it->first, at, r, c);
+            write_ctc_cols(it->second.cts_info, at, r, c);
+         }
       }
       //
       // CTS output line
@@ -1221,19 +1233,30 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, (string)"CTS:");
-         write_case_cols(it->first, at, r, c);
-         write_cts_cols(it->second.cts_info, 0, at, r, c);
-         if(job.stat_out) write_cts_cols(it->second.cts_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_cts_cols(it->second.cts_info, 0, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"CTS:");
+            write_case_cols(it->first, at, r, c);
+            write_cts_cols(it->second.cts_info, 0, at, r, c);
+         }
       }
       //
       // ECLV output line
       //
       else if(lt == stat_eclv) {
-         at.set_entry(r, c++, (string)"ECLV:");
-         write_case_cols(it->first, at, r, c);
-         write_eclv_cols(it->second.cts_info.cts, job.out_eclv_points, at, r, c);
-         if(job.stat_out) write_eclv_cols(it->second.cts_info.cts, job.out_eclv_points, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_eclv_cols(it->second.cts_info.cts,
+                            job.out_eclv_points, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"ECLV:");
+            write_case_cols(it->first, at, r, c);
+            write_eclv_cols(it->second.cts_info.cts, job.out_eclv_points, at, r, c);
+         }
       }
       //
       // NBRCTC output line
@@ -1243,10 +1266,15 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
          nbrcts_info.clear();
          nbrcts_info.cts_info = it->second.cts_info;
 
-         at.set_entry(r, c++, (string)"NBRCTC:");
-         write_case_cols(it->first, at, r, c);
-         write_nbrctc_cols(nbrcts_info, at, r, c);
-         if(job.stat_out) write_nbrctc_cols(nbrcts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_nbrctc_cols(nbrcts_info, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"NBRCTC:");
+            write_case_cols(it->first, at, r, c);
+            write_nbrctc_cols(nbrcts_info, at, r, c);
+         }
       }
       //
       // NBRCTS output line
@@ -1272,10 +1300,15 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, (string)"NBRCTS:");
-         write_case_cols(it->first, at, r, c);
-         write_nbrcts_cols(nbrcts_info, 0, at, r, c);
-         if(job.stat_out) write_nbrcts_cols(nbrcts_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_nbrcts_cols(nbrcts_info, 0, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"NBRCTS:");
+            write_case_cols(it->first, at, r, c);
+            write_nbrcts_cols(nbrcts_info, 0, at, r, c);
+         }
       }
    } // end for it
 
@@ -1346,10 +1379,15 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
       // MCTC output line
       //
       if(lt == stat_mctc) {
-         at.set_entry(r, c++, (string)"MCTC:");
-         write_case_cols(it->first, at, r, c);
-         write_mctc_cols(it->second.mcts_info, at, r, c);
-         if(job.stat_out) write_mctc_cols(it->second.mcts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_mctc_cols(it->second.mcts_info, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"MCTC:");
+            write_case_cols(it->first, at, r, c);
+            write_mctc_cols(it->second.mcts_info, at, r, c);
+         }
       }
       //
       // MCTS output line
@@ -1372,10 +1410,15 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, (string)"MCTS:");
-         write_case_cols(it->first, at, r, c);
-         write_mcts_cols(it->second.mcts_info, 0, at, r, c);
-         if(job.stat_out) write_mcts_cols(it->second.mcts_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_mcts_cols(it->second.mcts_info, 0, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"MCTS:");
+            write_case_cols(it->first, at, r, c);
+            write_mcts_cols(it->second.mcts_info, 0, at, r, c);
+         }
       }
    } // end for it
 
@@ -1456,10 +1499,15 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       // PCT output line
       //
       if(lt == stat_pct) {
-         at.set_entry(r, c++, (string)"PCT:");
-         write_case_cols(it->first, at, r, c);
-         write_pct_cols(it->second.pct_info, at, r, c);
-         if(job.stat_out) write_pct_cols(it->second.pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pct_cols(it->second.pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"PCT:");
+            write_case_cols(it->first, at, r, c);
+            write_pct_cols(it->second.pct_info, at, r, c);
+         }
       }
       //
       // PSTD output line
@@ -1482,28 +1530,43 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, (string)"PSTD:");
-         write_case_cols(it->first, at, r, c);
-         write_pstd_cols(it->second.pct_info, 0, at, r, c);
-         if(job.stat_out) write_pstd_cols(it->second.pct_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pstd_cols(it->second.pct_info, 0, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"PSTD:");
+            write_case_cols(it->first, at, r, c);
+            write_pstd_cols(it->second.pct_info, 0, at, r, c);
+         }
       }
       //
       // PJC output line
       //
       else if(lt == stat_pjc) {
-         at.set_entry(r, c++, (string)"PJC:");
-         write_case_cols(it->first, at, r, c);
-         write_pjc_cols(it->second.pct_info, at, r, c);
-         if(job.stat_out) write_pjc_cols(it->second.pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pjc_cols(it->second.pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"PJC:");
+            write_case_cols(it->first, at, r, c);
+            write_pjc_cols(it->second.pct_info, at, r, c);
+         }
       }
       //
       // PRC output line
       //
       else if(lt == stat_prc) {
-         at.set_entry(r, c++, (string)"PRC:");
-         write_case_cols(it->first, at, r, c);
-         write_prc_cols(it->second.pct_info, at, r, c);
-         if(job.stat_out) write_prc_cols(it->second.pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_prc_cols(it->second.pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"PRC:");
+            write_case_cols(it->first, at, r, c);
+            write_prc_cols(it->second.pct_info, at, r, c);
+         }
       }
       //
       // ECLV output lines
@@ -1511,16 +1574,18 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_eclv) {
          ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str().c_str());
          for(i=0; i<it->second.pct_info.pct.nrows(); i++, r++) {
-            c = 0;
-            at.set_entry(r, c++, (string)"ECLV:");
-            write_case_cols(it->first, at, r, c);
-            write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
-                            job.out_eclv_points, at, r, c);
             if(job.stat_out) {
                shc.set_fcst_thresh(prob_ta[i]);
                write_header_cols(shc, job.stat_at, r);
                write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
                                job.out_eclv_points, job.stat_at, r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, (string)"ECLV:");
+               write_case_cols(it->first, at, r, c);
+               write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
+                               job.out_eclv_points, at, r, c);
             }
          }
       }
@@ -1596,37 +1661,57 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       // SL1L2 output line
       //
       if(lt == stat_sl1l2) {
-         at.set_entry(r, c++, (string)"SL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_sl1l2_cols(it->second.sl1l2_info, at, r, c);
-         if(job.stat_out) write_sl1l2_cols(it->second.sl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_sl1l2_cols(it->second.sl1l2_info, job.stat_at,
+                             r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"SL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_sl1l2_cols(it->second.sl1l2_info, at, r, c);
+         }
       }
       //
       // SAL1L2 output line
       //
       else if(lt == stat_sal1l2) {
-         at.set_entry(r, c++, (string)"SAL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_sal1l2_cols(it->second.sl1l2_info, at, r, c);
-         if(job.stat_out) write_sal1l2_cols(it->second.sl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_sal1l2_cols(it->second.sl1l2_info, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"SAL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_sal1l2_cols(it->second.sl1l2_info, at, r, c);
+         }
       }
       //
       // VL1L2 output line
       //
       else if(lt == stat_vl1l2) {
-         at.set_entry(r, c++, (string)"VL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
-         if(job.stat_out) write_vl1l2_cols(it->second.vl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_vl1l2_cols(it->second.vl1l2_info, job.stat_at,
+                             r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"VL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
+         }
       }
       //
       // VAL1L2 output line
       //
       else if(lt == stat_val1l2) {
-         at.set_entry(r, c++, (string)"VAL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_val1l2_cols(it->second.vl1l2_info, at, r, c);
-         if(job.stat_out) write_val1l2_cols(it->second.vl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_val1l2_cols(it->second.vl1l2_info, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"VAL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_val1l2_cols(it->second.vl1l2_info, at, r, c);
+         }
       }
       //
       // CNT output line
@@ -1649,19 +1734,29 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
          else
             compute_cntinfo(it->second.sl1l2_info, 1, it->second.cnt_info);
 
-         at.set_entry(r, c++, (string)"CNT:");
-         write_case_cols(it->first, at, r, c);
-         write_cnt_cols(it->second.cnt_info, 0, at, r, c);
-         if(job.stat_out) write_cnt_cols(it->second.cnt_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_cnt_cols(it->second.cnt_info, 0, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"CNT:");
+            write_case_cols(it->first, at, r, c);
+            write_cnt_cols(it->second.cnt_info, 0, at, r, c);
+         }
       }
       //
       // VCNT output line
       //
       else if(lt == stat_vcnt) {
-         at.set_entry(r, c++, (string)"VCNT:");
-         write_case_cols(it->first, at, r, c);
-         write_vcnt_cols(it->second.vl1l2_info, at, r, c);
-         if(job.stat_out) write_vcnt_cols(it->second.vl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, (string)"VCNT:");
+            write_case_cols(it->first, at, r, c);
+            write_vcnt_cols(it->second.vl1l2_info, at, r, c);
+         }
       }
       //
       // NBRCNT output line
@@ -1673,10 +1768,15 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
          //
          it->second.nbrcnt_info.allocate_n_alpha(1);
 
-         at.set_entry(r, c++, "NBRCNT:");
-         write_case_cols(it->first, at, r, c);
-         write_nbrcnt_cols(it->second.nbrcnt_info, 0, at, r, c);
-         if(job.stat_out) write_nbrcnt_cols(it->second.nbrcnt_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_nbrcnt_cols(it->second.nbrcnt_info, 0, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "NBRCNT:");
+            write_case_cols(it->first, at, r, c);
+            write_nbrcnt_cols(it->second.nbrcnt_info, 0, at, r, c);
+         }
       }
    } // end for it
 
@@ -1734,10 +1834,15 @@ void write_job_aggr_grad(STATAnalysisJob &job, STATLineType lt,
       //
       // GRAD output line
       //
-      at.set_entry(r, c++, "GRAD:");
-      write_case_cols(it->first, at, r, c);
-      write_grad_cols(it->second.grad_info, at, r, c);
-      if(job.stat_out) write_grad_cols(it->second.grad_info, job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_grad_cols(it->second.grad_info, job.stat_at,
+                         r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "GRAD:");
+         write_case_cols(it->first, at, r, c);
+         write_grad_cols(it->second.grad_info, at, r, c);
+      }
    } // end for it
 
    return;
@@ -1969,10 +2074,15 @@ void write_job_aggr_ecnt(STATAnalysisJob &job, STATLineType lt,
       //
       // ECNT output line
       //
-      at.set_entry(r, c++, "ECNT:");
-      write_case_cols(it->first, at, r, c);
-      write_ecnt_cols(ecnt_info, at, r, c);
-      if(job.stat_out) write_ecnt_cols(ecnt_info, job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_ecnt_cols(ecnt_info, job.stat_at,
+                         r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "ECNT:");
+         write_case_cols(it->first, at, r, c);
+         write_ecnt_cols(ecnt_info, at, r, c);
+      }
    } // end for it
 
    return;
@@ -2030,10 +2140,15 @@ void write_job_aggr_rps(STATAnalysisJob &job, STATLineType lt,
       //
       // RPS output line
       //
-      at.set_entry(r, c++, "RPS:");
-      write_case_cols(it->first, at, r, c);
-      write_rps_cols(it->second.rps_info, at, r, c);
-      if(job.stat_out) write_rps_cols(it->second.rps_info, job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_rps_cols(it->second.rps_info, job.stat_at,
+                        r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "RPS:");
+         write_case_cols(it->first, at, r, c);
+         write_rps_cols(it->second.rps_info, at, r, c);
+      }
    } // end for it
 
    return;
@@ -2098,10 +2213,15 @@ void write_job_aggr_rhist(STATAnalysisJob &job, STATLineType lt,
       //
       // RHIST output line
       //
-      at.set_entry(r, c++, "RHIST:");
-      write_case_cols(it->first, at, r, c);
-      write_rhist_cols(&(it->second.ens_pd), at, r, c);
-      if(job.stat_out) write_rhist_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_rhist_cols(&(it->second.ens_pd), job.stat_at,
+                          r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "RHIST:");
+         write_case_cols(it->first, at, r, c);
+         write_rhist_cols(&(it->second.ens_pd), at, r, c);
+      }
    } // end for it
 
    return;
@@ -2166,10 +2286,15 @@ void write_job_aggr_phist(STATAnalysisJob &job, STATLineType lt,
       //
       // PHIST output line
       //
-      at.set_entry(r, c++, "PHIST:");
-      write_case_cols(it->first, at, r, c);
-      write_phist_cols(&(it->second.ens_pd), at, r, c);
-      if(job.stat_out) write_phist_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_phist_cols(&(it->second.ens_pd), job.stat_at,
+                          r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "PHIST:");
+         write_case_cols(it->first, at, r, c);
+         write_phist_cols(&(it->second.ens_pd), at, r, c);
+      }
    } // end for it
 
    return;
@@ -2234,10 +2359,15 @@ void write_job_aggr_relp(STATAnalysisJob &job, STATLineType lt,
       //
       // RELP output line
       //
-      at.set_entry(r, c++, "RELP:");
-      write_case_cols(it->first, at, r, c);
-      write_relp_cols(&(it->second.ens_pd), at, r, c);
-      if(job.stat_out) write_relp_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
+      if(job.stat_out) {
+         write_relp_cols(&(it->second.ens_pd), job.stat_at,
+                         r, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "RELP:");
+         write_case_cols(it->first, at, r, c);
+         write_relp_cols(&(it->second.ens_pd), at, r, c);
+      }
    } // end for it
 
    return;
@@ -2327,47 +2457,6 @@ void write_job_aggr_ssvar(STATAnalysisJob &job, STATLineType lt,
          compute_cntinfo(bin_it->second.sl1l2_info, 0, cnt_info);
 
          //
-         // SSVAR output line
-         //
-         at.set_entry(r, c++, "SSVAR:");
-         write_case_cols(case_it->first, at, r, c);
-         at.set_entry(r, c++, n);
-         at.set_entry(r, c++, (int) case_it->second.ssvar_bins.size());
-         at.set_entry(r, c++, i);
-         at.set_entry(r, c++, bin_it->second.bin_n);
-         at.set_entry(r, c++, bin_it->second.var_min);
-         at.set_entry(r, c++, bin_it->second.var_max);
-         at.set_entry(r, c++, bin_it->second.var_mean);
-         at.set_entry(r, c++, bin_it->second.sl1l2_info.fbar);
-         at.set_entry(r, c++, bin_it->second.sl1l2_info.obar);
-         at.set_entry(r, c++, bin_it->second.sl1l2_info.fobar);
-         at.set_entry(r, c++, bin_it->second.sl1l2_info.ffbar);
-         at.set_entry(r, c++, bin_it->second.sl1l2_info.oobar);
-         at.set_entry(r, c++, cnt_info.fbar.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.fbar.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.fstdev.v);
-         at.set_entry(r, c++, cnt_info.fstdev.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.fstdev.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.obar.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.obar.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.ostdev.v);
-         at.set_entry(r, c++, cnt_info.ostdev.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.ostdev.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.pr_corr.v);
-         at.set_entry(r, c++, cnt_info.pr_corr.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.pr_corr.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.me.v);
-         at.set_entry(r, c++, cnt_info.me.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.me.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.estdev.v);
-         at.set_entry(r, c++, cnt_info.estdev.v_ncl[0]);
-         at.set_entry(r, c++, cnt_info.estdev.v_ncu[0]);
-         at.set_entry(r, c++, cnt_info.mbias.v);
-         at.set_entry(r, c++, cnt_info.mse.v);
-         at.set_entry(r, c++, cnt_info.bcmse.v);
-         at.set_entry(r, c++, cnt_info.rmse.v);
-
-         //
          // Write the output STAT line
          //
          if(job.stat_out) {
@@ -2408,6 +2497,48 @@ void write_job_aggr_ssvar(STATAnalysisJob &job, STATLineType lt,
             job.stat_at.set_entry(r, c++, cnt_info.mse.v);
             job.stat_at.set_entry(r, c++, cnt_info.bcmse.v);
             job.stat_at.set_entry(r, c++, cnt_info.rmse.v);
+         }
+         //
+         // SSVAR output line
+         //
+         else {
+            at.set_entry(r, c++, "SSVAR:");
+            write_case_cols(case_it->first, at, r, c);
+            at.set_entry(r, c++, n);
+            at.set_entry(r, c++, (int) case_it->second.ssvar_bins.size());
+            at.set_entry(r, c++, i);
+            at.set_entry(r, c++, bin_it->second.bin_n);
+            at.set_entry(r, c++, bin_it->second.var_min);
+            at.set_entry(r, c++, bin_it->second.var_max);
+            at.set_entry(r, c++, bin_it->second.var_mean);
+            at.set_entry(r, c++, bin_it->second.sl1l2_info.fbar);
+            at.set_entry(r, c++, bin_it->second.sl1l2_info.obar);
+            at.set_entry(r, c++, bin_it->second.sl1l2_info.fobar);
+            at.set_entry(r, c++, bin_it->second.sl1l2_info.ffbar);
+            at.set_entry(r, c++, bin_it->second.sl1l2_info.oobar);
+            at.set_entry(r, c++, cnt_info.fbar.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.fbar.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.fstdev.v);
+            at.set_entry(r, c++, cnt_info.fstdev.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.fstdev.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.obar.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.obar.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.ostdev.v);
+            at.set_entry(r, c++, cnt_info.ostdev.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.ostdev.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.pr_corr.v);
+            at.set_entry(r, c++, cnt_info.pr_corr.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.pr_corr.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.me.v);
+            at.set_entry(r, c++, cnt_info.me.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.me.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.estdev.v);
+            at.set_entry(r, c++, cnt_info.estdev.v_ncl[0]);
+            at.set_entry(r, c++, cnt_info.estdev.v_ncu[0]);
+            at.set_entry(r, c++, cnt_info.mbias.v);
+            at.set_entry(r, c++, cnt_info.mse.v);
+            at.set_entry(r, c++, cnt_info.bcmse.v);
+            at.set_entry(r, c++, cnt_info.rmse.v);
          }
       } // end for bin_it
    } // end for case_it
@@ -2541,14 +2672,18 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
          RPSInfo rps_info;
          rps_info.fthresh = job.out_fcst_thresh;
          rps_info.set(it->second.ens_pd);
-         at.set_entry(r, c++, "RPS:");
-         write_case_cols(it->first, at, r, c);
-         write_rps_cols(rps_info, at, r, c);
+
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
             write_header_cols(shc, job.stat_at, r);
             write_rps_cols(rps_info, job.stat_at, r, n_header_columns);
          }
+         else {
+            at.set_entry(r, c++, "RPS:");
+            write_case_cols(it->first, at, r, c);
+            write_rps_cols(rps_info, at, r, c);
+         }
+
          // Increment row counter
          r++;
       }
@@ -2558,13 +2693,17 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_rhist) {
          it->second.ens_pd.compute_rhist();
-         at.set_entry(r, c++, "RHIST:");
-         write_case_cols(it->first, at, r, c);
-         write_rhist_cols(&(it->second.ens_pd), at, r, c);
+
          if(job.stat_out) {
             write_header_cols(shc, job.stat_at, r);
             write_rhist_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
          }
+         else {
+            at.set_entry(r, c++, "RHIST:");
+            write_case_cols(it->first, at, r, c);
+            write_rhist_cols(&(it->second.ens_pd), at, r, c);
+         }
+
          // Increment row counter
          r++;
       }
@@ -2573,13 +2712,16 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       // PHIST output line
       //
       else if(lt == stat_phist) {
-         at.set_entry(r, c++, "PHIST:");
-         write_case_cols(it->first, at, r, c);
-         write_phist_cols(&(it->second.ens_pd), at, r, c);
          if(job.stat_out) {
             write_header_cols(shc, job.stat_at, r);
             write_phist_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
          }
+         else {
+            at.set_entry(r, c++, "PHIST:");
+            write_case_cols(it->first, at, r, c);
+            write_phist_cols(&(it->second.ens_pd), at, r, c);
+         }
+
          // Increment row counter
          r++;
       }
@@ -2589,13 +2731,18 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_relp) {
          it->second.ens_pd.compute_relp();
-         at.set_entry(r, c++, "RELP:");
-         write_case_cols(it->first, at, r, c);
-         write_relp_cols(&(it->second.ens_pd), at, r, c);
+
          if(job.stat_out) {
             write_header_cols(shc, job.stat_at, r);
-            write_relp_cols(&(it->second.ens_pd), job.stat_at, r, n_header_columns);
+            write_relp_cols(&(it->second.ens_pd), job.stat_at,
+                            r, n_header_columns);
          }
+         else {
+            at.set_entry(r, c++, "RELP:");
+            write_case_cols(it->first, at, r, c);
+            write_relp_cols(&(it->second.ens_pd), at, r, c);
+         }
+
          // Increment row counter
          r++;
       }
@@ -2611,14 +2758,18 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
          // Write a line for each ssvar bin
          //
          for(i=0; i<it->second.ens_pd.ssvar_bins[0].n_bin; i++) {
-            c = 0;
-            at.set_entry(r, c++, "SSVAR:");
-            write_case_cols(it->first, at, r, c);
-            write_ssvar_cols(&(it->second.ens_pd), i, job.out_alpha, at, r, c);
             if(job.stat_out) {
                write_header_cols(shc, job.stat_at, r);
-               write_ssvar_cols(&(it->second.ens_pd), i, job.out_alpha, job.stat_at, r, n_header_columns);
+               write_ssvar_cols(&(it->second.ens_pd), i, job.out_alpha, job.stat_at,
+                                r, n_header_columns);
             }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "SSVAR:");
+               write_case_cols(it->first, at, r, c);
+               write_ssvar_cols(&(it->second.ens_pd), i, job.out_alpha, at, r, c);
+            }
+
             // Increment row counter
             r++;
          }
@@ -2680,12 +2831,15 @@ void write_job_aggr_isc(STATAnalysisJob &job, STATLineType lt,
       // ISC output line
       //
       for(i=-1, c=0; i<=it->second.isc_info.n_scale; i++, r++, c=0) {
-         at.set_entry(r, c++, "ISC:");
-         write_case_cols(it->first, at, r, c);
-         write_isc_cols(it->second.isc_info, i, at, r, c);
          if(job.stat_out) {
             write_header_cols(shc, job.stat_at, r);
-            write_isc_cols(it->second.isc_info, i, job.stat_at, r, n_header_columns);
+            write_isc_cols(it->second.isc_info, i, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "ISC:");
+            write_case_cols(it->first, at, r, c);
+            write_isc_cols(it->second.isc_info, i, at, r, c);
          }
       }
    } // end for it
@@ -2802,130 +2956,195 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       if(lt == stat_fho) {
          mpr_to_ctc(job, it->second, cts_info);
-         at.set_entry(r, c++, "FHO:");
-         write_case_cols(it->first, at, r, c);
-         write_fho_cols(cts_info, at, r, c);
-         if(job.stat_out) write_fho_cols(cts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_fho_cols(cts_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "FHO:");
+            write_case_cols(it->first, at, r, c);
+            write_fho_cols(cts_info, at, r, c);
+         }
       }
       //
       // CTC output line
       //
       else if(lt == stat_ctc) {
          mpr_to_ctc(job, it->second, cts_info);
-         at.set_entry(r, c++, "CTC:");
-         write_case_cols(it->first, at, r, c);
-         write_ctc_cols(cts_info, at, r, c);
-         if(job.stat_out) write_ctc_cols(cts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_ctc_cols(cts_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "CTC:");
+            write_case_cols(it->first, at, r, c);
+            write_ctc_cols(cts_info, at, r, c);
+         }
       }
       //
       // CTS output line
       //
       else if(lt == stat_cts) {
          mpr_to_cts(job, it->second, cts_info, tmp_dir, rng_ptr);
-         at.set_entry(r, c++, "CTS:");
-         write_case_cols(it->first, at, r, c);
-         write_cts_cols(cts_info, 0, at, r, c);
-         if(job.stat_out) write_cts_cols(cts_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_cts_cols(cts_info, 0, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "CTS:");
+            write_case_cols(it->first, at, r, c);
+            write_cts_cols(cts_info, 0, at, r, c);
+         }
       }
       //
       // ECLV output line
       //
       else if(lt == stat_eclv) {
          mpr_to_ctc(job, it->second, cts_info);
-         at.set_entry(r, c++, "ECLV:");
-         write_case_cols(it->first, at, r, c);
-         write_eclv_cols(cts_info.cts, job.out_eclv_points, at, r, c);
-         if(job.stat_out) write_eclv_cols(cts_info.cts, job.out_eclv_points, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_eclv_cols(cts_info.cts, job.out_eclv_points,
+                            job.stat_at, r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "ECLV:");
+            write_case_cols(it->first, at, r, c);
+            write_eclv_cols(cts_info.cts, job.out_eclv_points, at, r, c);
+         }
       }
       //
       // MCTC output line
       //
       else if(lt == stat_mctc) {
          mpr_to_mctc(job, it->second, mcts_info);
-         at.set_entry(r, c++, "MCTC:");
-         write_case_cols(it->first, at, r, c);
-         write_mctc_cols(mcts_info, at, r, c);
-         if(job.stat_out) write_mctc_cols(mcts_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_mctc_cols(mcts_info, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "MCTC:");
+            write_case_cols(it->first, at, r, c);
+            write_mctc_cols(mcts_info, at, r, c);
+         }
       }
       //
       // MCTS output line
       //
       else if(lt == stat_mcts) {
          mpr_to_mcts(job, it->second, mcts_info, tmp_dir, rng_ptr);
-         at.set_entry(r, c++, "MCTS:");
-         write_case_cols(it->first, at, r, c);
-         write_mcts_cols(mcts_info, 0, at, r, c);
-         if(job.stat_out) write_mcts_cols(mcts_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_mcts_cols(mcts_info, 0, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "MCTS:");
+            write_case_cols(it->first, at, r, c);
+            write_mcts_cols(mcts_info, 0, at, r, c);
+         }
       }
       //
       // CNT output line
       //
       else if(lt == stat_cnt) {
          mpr_to_cnt(job, it->second, cnt_info, tmp_dir, rng_ptr);
-         at.set_entry(r, c++, "CNT:");
-         write_case_cols(it->first, at, r, c);
-         write_cnt_cols(cnt_info, 0, at, r, c);
-         if(job.stat_out) write_cnt_cols(cnt_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_cnt_cols(cnt_info, 0, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "CNT:");
+            write_case_cols(it->first, at, r, c);
+            write_cnt_cols(cnt_info, 0, at, r, c);
+         }
       }
       //
       // SL1L2 output line
       //
       else if(lt == stat_sl1l2) {
          mpr_to_psum(job, it->second, sl1l2_info);
-         at.set_entry(r, c++, "SL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_sl1l2_cols(sl1l2_info, at, r, c);
-         if(job.stat_out) write_sl1l2_cols(sl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_sl1l2_cols(sl1l2_info, job.stat_at,
+                             r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "SL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_sl1l2_cols(sl1l2_info, at, r, c);
+         }
       }
       //
       // SAL1L2 output line
       //
       else if(lt == stat_sal1l2) {
          mpr_to_psum(job, it->second, sl1l2_info);
-         at.set_entry(r, c++, "SAL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_sal1l2_cols(sl1l2_info, at, r, c);
-         if(job.stat_out) write_sal1l2_cols(sl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_sal1l2_cols(sl1l2_info, job.stat_at,
+                              r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "SAL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_sal1l2_cols(sl1l2_info, at, r, c);
+         }
       }
       //
       // PCT output line
       //
       else if(lt == stat_pct) {
          mpr_to_pct(job, it->second, pct_info);
-         at.set_entry(r, c++, "PCT:");
-         write_case_cols(it->first, at, r, c);
-         write_pct_cols(pct_info, at, r, c);
-         if(job.stat_out) write_pct_cols(pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pct_cols(pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "PCT:");
+            write_case_cols(it->first, at, r, c);
+            write_pct_cols(pct_info, at, r, c);
+         }
       }
       //
       // PSTD output line
       //
       else if(lt == stat_pstd) {
          mpr_to_pct(job, it->second, pct_info);
-         at.set_entry(r, c++, "PSTD:");
-         write_case_cols(it->first, at, r, c);
-         write_pstd_cols(pct_info, 0, at, r, c);
-         if(job.stat_out) write_pstd_cols(pct_info, 0, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pstd_cols(pct_info, 0, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "PSTD:");
+            write_case_cols(it->first, at, r, c);
+            write_pstd_cols(pct_info, 0, at, r, c);
+         }
       }
       //
       // PJC output line
       //
       else if(lt == stat_pjc) {
          mpr_to_pct(job, it->second, pct_info);
-         at.set_entry(r, c++, "PJC:");
-         write_case_cols(it->first, at, r, c);
-         write_pjc_cols(pct_info, at, r, c);
-         if(job.stat_out) write_pjc_cols(pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_pjc_cols(pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "PJC:");
+            write_case_cols(it->first, at, r, c);
+            write_pjc_cols(pct_info, at, r, c);
+         }
       }
       //
       // PRC output line
       //
       else if(lt == stat_prc) {
          mpr_to_pct(job, it->second, pct_info);
-         at.set_entry(r, c++, "PRC:");
-         write_case_cols(it->first, at, r, c);
-         write_prc_cols(pct_info, at, r, c);
-         if(job.stat_out) write_prc_cols(pct_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_prc_cols(pct_info, job.stat_at,
+                           r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "PRC:");
+            write_case_cols(it->first, at, r, c);
+            write_prc_cols(pct_info, at, r, c);
+         }
       }
    } // end for it
 
@@ -2989,19 +3208,29 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       // VL1L2 output line
       //
       if(lt == stat_vl1l2) {
-         at.set_entry(r, c++, "VL1L2:");
-         write_case_cols(it->first, at, r, c);
-         write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
-         if(job.stat_out) write_vl1l2_cols(it->second.vl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_vl1l2_cols(it->second.vl1l2_info, job.stat_at,
+                             r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "VL1L2:");
+            write_case_cols(it->first, at, r, c);
+            write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
+         }
       }
       //
       // VCNT output line
       //
       else if(lt == stat_vcnt) {
-         at.set_entry(r, c++, "VCNT:");
-         write_case_cols(it->first, at, r, c);
-         write_vcnt_cols(it->second.vl1l2_info, at, r, c);
-         if(job.stat_out) write_vcnt_cols(it->second.vl1l2_info, job.stat_at, r, n_header_columns);
+         if(job.stat_out) {
+            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+                            r, n_header_columns);
+         }
+         else {
+            at.set_entry(r, c++, "VCNT:");
+            write_case_cols(it->first, at, r, c);
+            write_vcnt_cols(it->second.vl1l2_info, at, r, c);
+         }
       }
    } // end for it
 
@@ -3446,28 +3675,31 @@ void write_job_ramp(STATAnalysisJob &job,
          }
       }
 
-      //
-      // Write the ramp CTC output lines
-      //
-      if(job.out_line_type.has(stat_ctc_str)) {
-         c = 0;
-         ctc_at.set_entry(r_ctc, c++, "RAMP_CTC:");
-         write_case_cols(it->first, ctc_at, r_ctc, c);
-         write_job_ramp_cols(job, ctc_at, r_ctc, c);
-         write_ctc_cols(cts_info, ctc_at, r_ctc, c);
-         r_ctc++;
-      }
+      else {
 
-      //
-      // Write the ramp CTS output lines
-      //
-      if(job.out_line_type.has(stat_cts_str)) {
-         c = 0;
-         cts_at.set_entry(r_cts, c++, "RAMP_CTS:");
-         write_case_cols(it->first, cts_at, r_cts, c);
-         write_job_ramp_cols(job, cts_at, r_cts, c);
-         write_cts_cols(cts_info, 0, cts_at, r_cts, c);
-         r_cts++;
+         //
+         // Write the ramp CTC output lines
+         //
+         if(job.out_line_type.has(stat_ctc_str)) {
+            c = 0;
+            ctc_at.set_entry(r_ctc, c++, "RAMP_CTC:");
+            write_case_cols(it->first, ctc_at, r_ctc, c);
+            write_job_ramp_cols(job, ctc_at, r_ctc, c);
+            write_ctc_cols(cts_info, ctc_at, r_ctc, c);
+            r_ctc++;
+         }
+
+         //
+         // Write the ramp CTS output lines
+         //
+         if(job.out_line_type.has(stat_cts_str)) {
+            c = 0;
+            cts_at.set_entry(r_cts, c++, "RAMP_CTS:");
+            write_case_cols(it->first, cts_at, r_cts, c);
+            write_job_ramp_cols(job, cts_at, r_cts, c);
+            write_cts_cols(cts_info, 0, cts_at, r_cts, c);
+            r_cts++;
+         }
       }
    } // end for it
 
