@@ -221,13 +221,15 @@ __________________________
                      type = [ { method = NEAREST; width = 1; } ]; }
   censor_thresh  = [];
   censor_val     = [];
+  mpr_column     = [];
+  mpr_thresh     = [];
   eclv_points    = 0.05;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
 ___________________________
 
