@@ -315,6 +315,21 @@
     </output>
   </test>
 
+  <test name="stat_analysis_POINT_STAT_FILTER_OBS_SID">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job filter -line_type MPR -fcst_var TMP -fcst_lev Z2 -vx_mask DTC165 \
+      -column_str     OBS_SID KDLN,KDHT,KDEN,KDLS,KDMA,KDMN,KDVT,KDEW \
+      -column_str_exc OBS_SID KDLN,KDHT \
+      -dump_row &OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_OBS_SID.stat \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_OBS_SID.stat</exist>
+    </output>
+  </test>
+
   <test name="stat_analysis_POINT_STAT_FILTER_TIMES">
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>

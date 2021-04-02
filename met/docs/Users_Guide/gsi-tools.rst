@@ -230,7 +230,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
     - PRS_MAX_WGT
     - Pressure of the maximum weighing function
 
-The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read MPR lines and compute partial sums (SL1L2), continuous statistics (CNT), contingency table counts (CTC), or contingency table statistics (CTS). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh** and **-column_str** job command options.
+The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read MPR lines and compute partial sums (SL1L2), continuous statistics (CNT), contingency table counts (CTC), or contingency table statistics (CTS). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
 
 An example of the Stat-Analysis calling sequence is shown below:
 
@@ -425,7 +425,7 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
     - TZFND
     - d(Tz)/d(Tr)
 
-The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read ORANK lines and ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh** and **-column_str** job command options.
+The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read ORANK lines and ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
 
 An example of the Stat-Analysis calling sequence is shown below:
 

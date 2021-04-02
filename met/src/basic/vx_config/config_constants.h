@@ -380,7 +380,7 @@ struct MaskLatLon {
 //
 
 enum DuplicateType {
-   DuplicateType_None,   // Apply no logic for duplicate point obs
+   DuplicateType_None,  // Apply no logic for duplicate point obs
    DuplicateType_Unique // Filter out duplicate observation values
 };
 
@@ -394,7 +394,7 @@ enum ObsSummary {
    ObsSummary_None,    // Keep all observations, no statistics
    ObsSummary_Nearest, // Keep only the observation closest in time
    ObsSummary_Min,     // Keep only smallest value
-   ObsSummary_Max,     // Keep only largest valueXS
+   ObsSummary_Max,     // Keep only largest value
    ObsSummary_UW_Mean, // Calculate un-weighted mean
    ObsSummary_DW_Mean, // Calculate time weighted mean
    ObsSummary_Median,  // Calculate median
@@ -536,6 +536,8 @@ static const char conf_key_obs_qty[]           = "obs_quality";
 static const char conf_key_convert[]           = "convert";
 static const char conf_key_censor_thresh[]     = "censor_thresh";
 static const char conf_key_censor_val[]        = "censor_val";
+static const char conf_key_mpr_column[]        = "mpr_column";
+static const char conf_key_mpr_thresh[]        = "mpr_thresh";
 static const char conf_key_cnt_thresh[]        = "cnt_thresh";
 static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
@@ -1037,10 +1039,14 @@ static const char conf_key_column_thresh_name[]       = "column_thresh_name";
 static const char conf_key_column_thresh_val[]        = "column_thresh_val";
 static const char conf_key_column_str_name[]          = "column_str_name";
 static const char conf_key_column_str_val[]           = "column_str_val";
+static const char conf_key_column_str_exc_name[]      = "column_str_exc_name";
+static const char conf_key_column_str_exc_val[]       = "column_str_exc_val";
 static const char conf_key_init_thresh_name[]         = "init_thresh_name";
 static const char conf_key_init_thresh_val[]          = "init_thresh_val";
 static const char conf_key_init_str_name[]            = "init_str_name";
 static const char conf_key_init_str_val[]             = "init_str_val";
+static const char conf_key_init_str_exc_name[]        = "init_str_exc_name";
+static const char conf_key_init_str_exc_val[]         = "init_str_exc_val";
 static const char conf_key_water_only[]               = "water_only";
 static const char conf_key_rirw_track[]               = "rirw.track";
 static const char conf_key_rirw_time_adeck[]          = "rirw.adeck.time";

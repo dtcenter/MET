@@ -92,6 +92,8 @@
 //   043    11/15/19  Halley Gotway  Apply climatology bins to
 //                    continuous and probabilistic statistics.
 //   044    01/24/20  Halley Gotway  Add HiRA RPS output.
+//   045    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
+//                    filtering options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -923,6 +925,7 @@ void process_scores() {
                   << "Rejected: bad fcst value  = " << conf_info.vx_opt[i].vx_pd.rej_fcst[j][k][l] << "\n"
                   << "Rejected: bad climo mean  = " << conf_info.vx_opt[i].vx_pd.rej_cmn[j][k][l] << "\n"
                   << "Rejected: bad climo stdev = " << conf_info.vx_opt[i].vx_pd.rej_csd[j][k][l] << "\n"
+                  << "Rejected: mpr filter      = " << conf_info.vx_opt[i].vx_pd.rej_mpr[j][k][l] << "\n"
                   << "Rejected: duplicates      = " << conf_info.vx_opt[i].vx_pd.rej_dup[j][k][l] << "\n";
 
                // Print report based on the number of matched pairs
@@ -1328,8 +1331,9 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
-      pd_thr = subset_pairs(*pd_ptr, vx_opt.fcnt_ta[i],
-                            vx_opt.ocnt_ta[i], vx_opt.cnt_logic);
+      pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
+                                               vx_opt.ocnt_ta[i],
+                                               vx_opt.cnt_logic);
 
       // Check for no matched pairs to process
       if(pd_thr.n_obs == 0) continue;

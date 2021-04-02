@@ -1231,7 +1231,7 @@ void process_point_scores() {
                   shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Subset pairs using the current obs_thresh
-                  pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
+                  pd = pd_ptr->subset_pairs_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Continue if there are no points
                   if(pd.n_obs == 0) continue;
@@ -1691,7 +1691,7 @@ void process_grid_vx() {
                shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
 
                // Subset pairs using the current obs_thresh
-               pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
+               pd = pd_all.subset_pairs_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
 
                // Continue if there are no points
                if(pd.n_obs == 0) continue;
