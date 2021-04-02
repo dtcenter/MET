@@ -77,7 +77,9 @@ const ConcatString genesis_name    ("GENESIS");
 const ConcatString genesis_dev_name("GENESIS_DEV");
 const ConcatString genesis_ops_name("GENESIS_OPS");
 
-static const int max_cyclone_number = 50;
+// Maximum Best track cyclone number to be processed
+// Cyclone numbers > 50 are for testing or invests
+static const int max_best_cyclone_number = 50;
 
 ////////////////////////////////////////////////////////////////////////
 //

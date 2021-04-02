@@ -752,15 +752,6 @@ void process_fcst_tracks(const StringArray &files,
             continue;
          }
 
-         // Skip invest tracks with a large cyclone number
-         if(atof(fcst_ta[j].cyclone().c_str()) > max_cyclone_number) {
-            mlog << Debug(6)
-                 << "Skipping forecast genesis event for cyclone number "
-                 << fcst_ta[j].cyclone() << " > " << max_cyclone_number
-                 << ".\n";
-            continue;
-         }
-
          // Check the forecast lead time window
          if(fcst_gi.genesis_lead() < conf_info.FcstSecBeg ||
             fcst_gi.genesis_lead() > conf_info.FcstSecEnd) {
@@ -918,10 +909,10 @@ void process_best_tracks(const StringArray &files,
       }
 
       // Skip invest tracks with a large cyclone number
-      if(atof(best_ta[i].cyclone().c_str()) > max_cyclone_number) {
+      if(atof(best_ta[i].cyclone().c_str()) > max_best_cyclone_number) {
          mlog << Debug(6)
               << "Skipping Best track genesis event for cyclone number "
-              << best_ta[i].cyclone() << " > " << max_cyclone_number
+              << best_ta[i].cyclone() << " > " << max_best_cyclone_number
               << ".\n";
          continue;
       }
