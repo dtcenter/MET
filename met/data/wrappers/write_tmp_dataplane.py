@@ -60,9 +60,9 @@ for attr, attr_val in met_info['attrs'].items():
     print(attr, attr_val, type(attr_val))
     if attr == 'name':
         setattr(ds, 'name_str', attr_val)
-    if type(attr_val) == str:
+    elif type(attr_val) == str:
         setattr(ds, attr, attr_val)
-    if type(attr_val) == dict:
+    elif type(attr_val) == dict:
         for key in attr_val:
             setattr(ds, attr + '.' + key, attr_val[key])
 ds.close()
