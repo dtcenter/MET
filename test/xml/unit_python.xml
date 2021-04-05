@@ -7,6 +7,7 @@
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
   <!ENTITY MET_PYTHON_EXE "/usr/local/python3/bin/python3">
+  <!ENTITY ANACONDA_BIN   "/usr/local/anaconda3-20190923/bin">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PYTHON "&INPUT_DIR;/python">
@@ -391,7 +392,8 @@
 
   <!-- Invokes Python pickle logic to read NUMPY text data -->
   <test name="python_numpy_plot_data_plane_pickle">
-    <exec>&MET_BIN;/plot_data_plane</exec>
+    <exec>export PATH='&ANACONDA_BIN;:${PATH}'; \
+          &MET_BIN;/plot_data_plane</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
