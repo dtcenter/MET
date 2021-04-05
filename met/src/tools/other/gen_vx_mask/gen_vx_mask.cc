@@ -1161,8 +1161,10 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    // List the number of points inside the mask
    if(logic != SetLogic_None) {
       mlog << Debug(3)
-           << "Mask " << setlogic_to_string(logic) << ": " << n_in
-           << " of " << grid.nx() * grid.ny() << " points inside\n";
+           << "Mask " << setlogic_to_string(logic)
+	   << (logic == SetLogic_Intersection ? ":\t" : ":\t\t")
+           << n_in << " of " << grid.nx() * grid.ny()
+	   << " points inside\n";
    }
 
    return(dp);
