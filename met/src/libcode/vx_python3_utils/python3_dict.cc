@@ -164,6 +164,14 @@ if ( ! a )  {
 
 }
 
+// If not a Long, try interpreting as LongLong for numpy.int64 values
+
+if ( ! PyLong_Check(a) )  {
+
+   a = PyLong_FromLongLong(PyLong_AsLongLong(a));
+
+}
+
 if ( ! PyLong_Check(a) )  {
 
    mlog << Error << "\nPython3_Dict::lookup_int(const char *) -> "
