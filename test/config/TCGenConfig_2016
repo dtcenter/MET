@@ -96,6 +96,12 @@ filter = [
       genesis_match_window = { beg = 0; end = 24; };
    },
    {
+      desc                         = "AL_POINT2POINT";
+      basin_mask                   = "AL";
+      genesis_match_window         = { beg = 0; end = 24; };
+      genesis_match_point_to_track = FALSE;
+   },
+   {
       desc          = "AL_DLAND_300NM";
       basin_mask    = "AL";
       dland_thresh  = >0&&<300;
