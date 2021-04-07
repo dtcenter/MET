@@ -648,29 +648,15 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
           i<ota.n() && is_bad_data(i_oper);
           i++) {
 
-         // Check all operational track points
-         if(point2track) {
+         // Each operational track contains only lead time 0
+         if(ota[i].n_points() == 0) continue;
 
-            for(j=0; j<ota[i].n_points(); j++) {
-               if(fcst_gi.is_match(ota[i][j], rad, beg, end)) {
-                  i_oper = i;
-                  mlog << Debug(4) << case_cs
-                       << " MATCHES operational " << ota[i].technique()
-                       << " genesis track " << ota[i].storm_id() << ".\n";
-                  break;
-               }
-            }
-         }
-         // Check only the opeartional genesis points
-         else {
-
-            if(fcst_gi.is_match(ota[i], rad, beg, end)) {
-               i_oper = i;
-               mlog << Debug(4) << case_cs
-                    << " MATCHES operational " << ota[i].technique()
-                    << " genesis point " << ota[i].storm_id() << ".\n";
-               break;
-            }
+         if(fcst_gi.is_match(ota[i][0], rad, beg, end)) {
+            i_oper = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES operational " << ota[i].technique()
+                 << " genesis track " << ota[i].storm_id() << ".\n";
+            break;
          }
       } // end for ota
 
