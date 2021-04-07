@@ -252,7 +252,8 @@ ConcatString ATCFLineBase::basin() const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::cyclone_number() const {
-   return(get_item(CycloneNumberOffset));   }
+   return(get_item(CycloneNumberOffset));
+}
 
 ////////////////////////////////////////////////////////////////////////
 
