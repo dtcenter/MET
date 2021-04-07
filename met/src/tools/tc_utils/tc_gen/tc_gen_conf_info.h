@@ -131,6 +131,9 @@ class TCGenVxOpt {
       // Distance to land threshold
       SingleThresh DLandThresh;
 
+      // Matching logic
+      bool GenesisMatchPointTrack;
+
       // Temporal and spatial matching criteria
       double GenesisMatchRadius;
       int    GenesisMatchBeg, GenesisMatchEnd;

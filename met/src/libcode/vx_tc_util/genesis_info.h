@@ -55,11 +55,8 @@ class GenesisInfo : public TrackInfo {
 
       bool IsSet;
 
-      // TrackInfo for this Genesis event
-      TrackInfo Track;
-      int       GenesisIndex;
-
       // Genesis Information
+      int      GenesisIndex;
       unixtime GenesisTime;
       int      GenesisLead;
       double   Lat;
@@ -104,7 +101,11 @@ class GenesisInfo : public TrackInfo {
          //  do stuff
          //
 
-      bool is_match(const TrackPoint &, const double,
+      bool is_match(const TrackPoint &,
+                    const double,
+                    const int, const int) const;
+      bool is_match(const GenesisInfo &,
+                    const double,
                     const int, const int) const;
 };
 

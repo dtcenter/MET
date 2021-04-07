@@ -83,7 +83,7 @@ static void   do_genesis_ctc       (const TCGenVxOpt &,
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
-                                    double, int, int);
+                                    bool, double, int, int);
 
 static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
@@ -378,6 +378,7 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
       
       // Search for a BEST track match
       i_bga = find_genesis_match(fga[i], bga, ota,
+                                 vx_opt.GenesisMatchPointTrack,
                                  vx_opt.GenesisMatchRadius,
                                  vx_opt.GenesisMatchBeg,
                                  vx_opt.GenesisMatchEnd);
@@ -594,8 +595,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 int find_genesis_match(const GenesisInfo      &fcst_gi,
                        const GenesisInfoArray &bga,
                        const TrackInfoArray   &ota,
-                       const double rad,
-                       const int beg, const int end) {
+                       bool point2track, double rad,
+                       int beg, int end) {
    int i, j;
    int i_best = bad_data_int;
    int i_oper = bad_data_int;
@@ -609,15 +610,31 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
            << " forecast genesis at (" << fcst_gi.lat() << ", "
            << fcst_gi.lon() << ")";
 
-   // Search the BEST track points for a match
+   // Search for a BEST track genesis match
    for(i=0, i_best=bad_data_int;
        i<bga.n() && is_bad_data(i_best);
        i++) {
-      for(j=0; j<bga[i].n_points(); j++) {
-         if(fcst_gi.is_match(bga[i][j], rad, beg, end)) {
+
+      // Check all BEST track points
+      if(point2track) {
+
+         for(j=0; j<bga[i].n_points(); j++) {
+            if(fcst_gi.is_match(bga[i][j], rad, beg, end)) {
+               i_best = i;
+               mlog << Debug(4) << case_cs
+                    << " MATCHES BEST genesis track "
+                    << bga[i].storm_id() << ".\n";
+               break;
+            }
+         }
+      }
+      // Check only the BEST genesis points
+      else {
+
+         if(fcst_gi.is_match(bga[i], rad, beg, end)) {
             i_best = i;
             mlog << Debug(4) << case_cs
-                 << " MATCHES BEST track "
+                 << " MATCHES BEST genesis point "
                  << bga[i].storm_id() << ".\n";
             break;
          }
@@ -630,12 +647,28 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
       for(i=0, i_oper=bad_data_int;
           i<ota.n() && is_bad_data(i_oper);
           i++) {
-         for(j=0; j<ota[i].n_points(); j++) {
-            if(fcst_gi.is_match(ota[i][j], rad, beg, end)) {
+
+         // Check all operational track points
+         if(point2track) {
+
+            for(j=0; j<ota[i].n_points(); j++) {
+               if(fcst_gi.is_match(ota[i][j], rad, beg, end)) {
+                  i_oper = i;
+                  mlog << Debug(4) << case_cs
+                       << " MATCHES operational " << ota[i].technique()
+                       << " genesis track " << ota[i].storm_id() << ".\n";
+                  break;
+               }
+            }
+         }
+         // Check only the opeartional genesis points
+         else {
+
+            if(fcst_gi.is_match(ota[i], rad, beg, end)) {
                i_oper = i;
                mlog << Debug(4) << case_cs
                     << " MATCHES operational " << ota[i].technique()
-                    << " track " << ota[i].storm_id() << ".\n";
+                    << " genesis point " << ota[i].storm_id() << ".\n";
                break;
             }
          }

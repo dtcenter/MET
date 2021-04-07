@@ -199,6 +199,12 @@ dland_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Genesis matching logic. Compare the forecast genesis point to all points in
+// the Best track (TRUE) or the single Best track genesis point (FALSE).
+//
+genesis_match_point_to_track = TRUE;
+
+//
 // Radius in km to search for a matching genesis event
 //
 genesis_match_radius = 500;

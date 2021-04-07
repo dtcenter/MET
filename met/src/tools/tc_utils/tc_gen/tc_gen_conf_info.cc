@@ -156,6 +156,7 @@ void TCGenVxOpt::clear() {
    VxBasinMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
+   GenesisMatchPointTrack = false;
    GenesisMatchRadius = bad_data_double;
    GenesisMatchBeg = GenesisMatchEnd = bad_data_int;
    DevHitRadius = bad_data_double;
@@ -242,6 +243,10 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
    // Conf: dland_thresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
+
+   // Conf: genesis_match_point_to_track
+   GenesisMatchPointTrack =
+      dict.lookup_bool(conf_key_genesis_match_point_to_track);
 
    // Conf: genesis_match_radius
    GenesisMatchRadius =
