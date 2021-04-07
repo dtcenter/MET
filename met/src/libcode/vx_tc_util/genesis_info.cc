@@ -313,7 +313,7 @@ bool GenesisInfo::is_match(const GenesisInfo &gi, const double rad,
                            const int beg, const int end) const {
 
    return(is_bad_data(GenesisIndex) ? false :
-          is_match((*this)[GenesisIndex], rad, beg, end));
+          is_match(gi[GenesisIndex], rad, beg, end));
 }
 
 ////////////////////////////////////////////////////////////////////////

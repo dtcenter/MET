@@ -371,7 +371,7 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        conf_info.InitFreqHr*sec_per_hour,
                        vx_opt.InitBeg, vx_opt.InitEnd,
                        vx_opt.InitInc, vx_opt.InitExc);
-   }
+   } // end for i bga
 
    // Loop over the model genesis events looking for pairs.
    for(i=0; i<fga.n(); i++) {
@@ -639,7 +639,7 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
             break;
          }
       }
-   } // end for bta
+   } // end for bga
 
    // If no BEST track match was found, search the operational tracks
    if(is_bad_data(i_best)) {
