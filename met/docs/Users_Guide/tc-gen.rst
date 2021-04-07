@@ -67,9 +67,9 @@ The TC-Gen tool implements the following logic:
 
  * For each Best track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
  
- * For each forecast genesis event, search for a matching Best track. A Best track matches if the valid time of one of its track points matches the forecast genesis time and is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
+ * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
  
- * In no Best track match is found, apply the same logic to search the 0-hour operational track points. If an operational match is found, store the storm ID.
+ * In no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
  
  * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
  
@@ -248,6 +248,14 @@ ______________________
   dland_thresh = NA;
 
 The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on its distance to land. The default threshold (**NA**) always evaluates to true.
+
+______________________
+
+.. code-block:: none
+
+  genesis_match_point_to_track = TRUE;
+
+The **genesis_match_point_to_track** entry is a boolean which controls the matching logic. When set to its default value of TRUE, for each forecast genesis event, all Best track points are searched for a match. This logic implements the method used by the NOAA National Hurricane Center. When set to FALSE, only the single Best track genesis point is considered for a match. When selecting FALSE, users are encouraged to adjust the **genesis_match_radius** and/or **gensesis_match_window** options, described below, to enable matches to be found.
 
 ______________________
 
