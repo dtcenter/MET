@@ -90,6 +90,8 @@ class GenesisInfo : public TrackInfo {
          //  get stuff
          //
    
+      const TrackPoint *genesis() const;
+
       double   lat()          const;
       double   lon()          const;
       double   dland()        const;

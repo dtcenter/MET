@@ -597,9 +597,7 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
                        const TrackInfoArray   &ota,
                        bool point2track, double rad,
                        int beg, int end) {
-   int i, j;
-   int i_best = bad_data_int;
-   int i_oper = bad_data_int;
+   int i, j, i_best, i_oper;
 
    ConcatString case_cs;
    case_cs << fcst_gi.technique() << " "

@@ -259,6 +259,7 @@ void GenesisInfo::set_dland(double d) {
 
 bool GenesisInfo::set(const TrackInfo &ti,
                       const GenesisEventInfo &event_info) {
+
    // Initialize
    clear();
 
@@ -298,6 +299,12 @@ int GenesisInfo::genesis_fhr() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const TrackPoint * GenesisInfo::genesis() const {
+   return(is_bad_data(GenesisIndex) ? 0 : &(Point[GenesisIndex]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool GenesisInfo::is_match(const TrackPoint &p, const double rad,
                            const int beg, const int end) const {
 
@@ -312,8 +319,10 @@ bool GenesisInfo::is_match(const TrackPoint &p, const double rad,
 bool GenesisInfo::is_match(const GenesisInfo &gi, const double rad,
                            const int beg, const int end) const {
 
-   return(is_bad_data(GenesisIndex) ? false :
-          is_match(gi[GenesisIndex], rad, beg, end));
+   // Input genesis point
+   const TrackPoint *p = gi.genesis();
+ 
+   return(p ? is_match(*p, rad, beg, end) : false);
 }
 
 ////////////////////////////////////////////////////////////////////////
