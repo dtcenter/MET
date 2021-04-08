@@ -211,10 +211,11 @@ ConcatString ATCFLineBase::get_item(int i) const {
    int i_col = i;
 
    // For ATCFLineType_GenTrack:
-   //    Columns 1 and 2 are consistent, use offsets 0 and 1
-   //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track
-   // Shift those column indices by 1.
-   if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
+   //    Columns 1 and 2 are consistent: use offsets 0 and 1
+   //    Column  3 has the GenStormIdOffset: use offset 2
+   //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track:
+   //       Shift offsets 3 through 18 up by 1.
+   if(Type == ATCFLineType_GenTrack && i >= 3 && i <= 18) i_col++;
 
    cs = DataLine::get_item(i_col);
 
