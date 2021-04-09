@@ -120,7 +120,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nc_obs_util.h"
-#include "met_nc_point_obs.h"
+#include "nc_point_obs.h"
 
 ////////////////////////////////////////////////////////////////////////
 

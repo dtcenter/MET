@@ -39,7 +39,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 #include "nc_obs_util.h"
-#include "met_nc_point_obs.h"
+#include "nc_point_obs.h"
 
 #include "point2grid_conf_info.h"
 

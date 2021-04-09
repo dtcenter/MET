@@ -65,7 +65,7 @@ using namespace std;
 #include "vx_render.h"
 #include "vx_plot_util.h"
 #include "nc_obs_util.h"
-#include "met_nc_point_obs.h"
+#include "nc_point_obs.h"
 
 ////////////////////////////////////////////////////////////////////////
 

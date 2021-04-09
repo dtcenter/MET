@@ -13,6 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_nc_obs.a
 libvx_nc_obs_a_SOURCES = \
               nc_obs_util.cc nc_obs_util.h \
-              met_nc_point_obs.cc met_nc_point_obs.h \
+              nc_point_obs.cc nc_point_obs.h \
+              nc_point_obs2.cc \
               nc_summary.cc nc_summary.h
 libvx_nc_obs_a_CPPFLAGS = ${MET_CPPFLAGS}
