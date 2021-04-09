@@ -211,11 +211,13 @@ ConcatString ATCFLineBase::get_item(int i) const {
    int i_col = i;
 
    // For ATCFLineType_GenTrack:
-   //    Columns 1 and 2 are consistent: use offsets 0 and 1
-   //    Column  3 has the GenStormIdOffset: use offset 2
+   //    Columns 1 and 2 are consistent:
+   //       Use offsets 0 and 1
+   //    Column 3 for is an EXTRA column for this line type:
+   //       Add special handling in storm_id()
    //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track:
-   //       Shift offsets 3 through 18 up by 1.
-   if(Type == ATCFLineType_GenTrack && i >= 3 && i <= 18) i_col++;
+   //       Shift those column indices by 1.
+   if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
 
    cs = DataLine::get_item(i_col);
 
@@ -359,8 +361,10 @@ int ATCFLineBase::lead() const {
 ConcatString ATCFLineBase::storm_id() const {
    ConcatString cs;
 
+   // For ATCFLineType_GenTrack, use the contents of the extra 3rd column
+   // Call DataLine::get_item() to avoid the column shifting logic
    if(Type == ATCFLineType_GenTrack) {
-       cs = get_item(GenStormIdOffset);
+      cs = DataLine::get_item(GenStormIdOffset);
    }
    else {
       unixtime ut = valid();
