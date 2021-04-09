@@ -151,9 +151,24 @@ dland_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Genesis matching logic. Compare the forecast genesis point to all points in
+// the Best track (TRUE) or the single Best track genesis point (FALSE).
+//
+genesis_match_point_to_track = TRUE;
+
+//
 // Radius in km to search for a matching genesis event
 //
 genesis_match_radius = 500;
+
+//
+// Time window in hours, relative to the model genesis time, to search for a
+// matching Best track point
+//
+genesis_match_window = {
+   beg = 0;
+   end = 0;
+}
 
 //
 // Radius in km for a development scoring method hit
@@ -161,7 +176,8 @@ genesis_match_radius = 500;
 dev_hit_radius = 500;
 
 //
-// Time window in hours for a development scoring method hit
+// Time window in hours, relative to the model genesis time, for a development
+// scoring method hit
 //
 dev_hit_window = {
    beg = -24;
@@ -169,10 +185,13 @@ dev_hit_window = {
 }
 
 //
-// Maximum Best track genesis minus model initialization time difference for an
-// operational scoring method hit
+// Time window in hours for the Best track genesis minus model initialization
+// time difference for an operational scoring method hit
 //
-ops_hit_tdiff = 48;
+ops_hit_window = {
+   beg =  0;
+   end = 48;
+}
 
 //
 // Discard genesis forecasts for initializations at or after the matching

@@ -156,10 +156,12 @@ void TCGenVxOpt::clear() {
    VxBasinMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
+   GenesisMatchPointTrack = false;
    GenesisMatchRadius = bad_data_double;
+   GenesisMatchBeg = GenesisMatchEnd = bad_data_int;
    DevHitRadius = bad_data_double;
    DevHitBeg = DevHitEnd = bad_data_int;
-   OpsHitDSec = bad_data_int;
+   OpsHitBeg = OpsHitEnd = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
    CIAlpha = bad_data_double;
@@ -242,24 +244,34 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: dland_thresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
+   // Conf: genesis_match_point_to_track
+   GenesisMatchPointTrack =
+      dict.lookup_bool(conf_key_genesis_match_point_to_track);
+
    // Conf: genesis_match_radius
    GenesisMatchRadius =
       dict.lookup_double(conf_key_genesis_match_radius);
 
-   // Conf: dev_hit_radius
-   DevHitRadius =
-      dict.lookup_double(conf_key_dev_hit_radius);
+   // Conf: genesis_match_window
+   dict2 = dict.lookup_dictionary(conf_key_genesis_match_window);
+   parse_conf_range_int(dict2, beg, end);
+   GenesisMatchBeg = beg*sec_per_hour;
+   GenesisMatchEnd = end*sec_per_hour;
 
-   // Conf: genesis_hit_window
+   // Conf: dev_hit_radius
+   DevHitRadius = dict.lookup_double(conf_key_dev_hit_radius);
+
+   // Conf: dev_hit_window
    dict2 = dict.lookup_dictionary(conf_key_dev_hit_window);
    parse_conf_range_int(dict2, beg, end);
    DevHitBeg = beg*sec_per_hour;
    DevHitEnd = end*sec_per_hour;
 
-   // Conf: ops_hit_tdiff
-   OpsHitDSec = nint(
-      dict.lookup_double(conf_key_ops_hit_tdiff) *
-      sec_per_hour);
+   // Conf: ops_hit_window
+   dict2 = dict.lookup_dictionary(conf_key_ops_hit_window);
+   parse_conf_range_int(dict2, beg, end);
+   OpsHitBeg = beg*sec_per_hour;
+   OpsHitEnd = end*sec_per_hour;
 
    // Conf: discard_init_post_genesis_flag
    DiscardFlag =
