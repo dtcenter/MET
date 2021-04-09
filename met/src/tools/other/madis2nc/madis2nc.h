@@ -143,7 +143,6 @@ int    processed_count;
 ////////////////////////////////////////////////////////////////////////
 
 static Madis2NcConfInfo conf_info;
-static NcObsOutputData nc_out_data;
 
 static bool do_summary;
 static bool save_summary_only = false;

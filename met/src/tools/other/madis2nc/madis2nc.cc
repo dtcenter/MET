@@ -61,6 +61,7 @@ using namespace netCDF;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "nc_point_obs.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +71,7 @@ static const int FIELD_COUNT =  50;
 static const int BUFFER_SIZE = OBS_BUFFER_SIZE / FIELD_COUNT;
 
 static int nc_buf_size;
-static NetcdfObsVars obs_vars;
+static MetNcPointObs2Write nc_point_obs;
 static vector< Observation > obs_vector;
 static vector< ConcatString > md_files;
 
@@ -144,7 +145,8 @@ int main(int argc, char *argv[]) {
    //
    process_command_line(argc, argv);
 
-   obs_vars.init_data_buffer();
+//   bool use_var_id = false;
+   nc_point_obs.init_buffer();
 
    //
    // Process the MADIS file
@@ -155,9 +157,8 @@ int main(int argc, char *argv[]) {
      process_madis_file((*it_mdfile).c_str());
    }
 
-   bool use_var_id = true;
-   bool do_header = false;
-   int nhdr = obs_vars.get_obs_index();
+//   bool do_header = false;
+   int nhdr = nc_point_obs.get_obs_index();
 
    if (conf_info.getSummaryInfo().flag) {
       int summmary_hdr_cnt = 0;
@@ -172,7 +173,8 @@ int main(int argc, char *argv[]) {
    }
    setup_netcdf_out(nhdr);
 
-   write_observations(f_out, obs_vars, nc_out_data);
+   StringArray obs_names, descs, units;
+   nc_point_obs.write_to_netcdf(obs_names, units, descs);
 
    //
    // Deallocate memory and clean up
@@ -387,19 +389,27 @@ void setup_netcdf_out(int nhdr) {
    }
 
    bool use_var_id = false;
-   obs_vars.reset(use_var_id);
-   obs_vars.obs_cnt = obs_vector.size();
+   int obs_cnt, hdr_cnt;
+   nc_point_obs.set_netcdf(f_out, true);
+   nc_point_obs.set_using_var_id(use_var_id);
+
+   NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();
+   obs_vars->deflate_level = compress_level;
+
+   //obs_vars.reset(use_var_id);
+   obs_vars->obs_cnt = obs_vector.size();
    mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
-        << "\tobs_cnt:\t" << obs_vars.obs_cnt << "\n";
+        << "\tobs_cnt:\t" << obs_vars->obs_cnt << "\n";
 
-   nc_out_data.processed_hdr_cnt = 0;
-   nc_out_data.deflate_level = compress_level;
-   nc_out_data.observations = obs_vector;
-   nc_out_data.summary_obs = summary_obs;
-   nc_out_data.summary_info = conf_info.getSummaryInfo();
+   NcObsOutputData *nc_out_data = nc_point_obs.get_output_data();
+   set_nc_out_data(nc_out_data, obs_vector, summary_obs, conf_info.getSummaryInfo());
 
-   init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
-
+//   init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
+//H   bool reset_hdr_buffer = get_hdr_obs_count(f_out, &nc_out_data, &obs_cnt, &hdr_cnt);
+//H   nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, reset_hdr_buffer, program_name);
+   nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
+   nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
+   
    //
    // Add the command line arguments that were applied.
    //
@@ -1594,7 +1604,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = obs_vars.get_obs_index();
+         hdr_idx = nc_point_obs.get_obs_index();
 
          //
          // Process the station name.
@@ -2170,7 +2180,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = obs_vars.get_obs_index();
+         hdr_idx = nc_point_obs.get_obs_index();
 
          //
          // Initialize the observation array: hdr_id
@@ -2504,7 +2514,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = obs_vars.get_obs_index();
+         hdr_idx = nc_point_obs.get_obs_index();
 
 
          //
@@ -2981,7 +2991,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          if(is_bad_data(tmp_dbl)) continue;
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = obs_vars.get_obs_index();
+         hdr_idx = nc_point_obs.get_obs_index();
 
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -3428,7 +3438,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            hdr_idx = obs_vars.get_obs_index();
+            hdr_idx = nc_point_obs.get_obs_index();
 
             //
             // Use cur to index into the NetCDF variables.
