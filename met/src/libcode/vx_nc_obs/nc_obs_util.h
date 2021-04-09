@@ -128,20 +128,12 @@ struct NetcdfObsVars {
    NetcdfObsVars();
    bool is_valid(bool exit_on_error=false);
    void reset(bool _use_var_id = true);
-   void reset_header_buffer(int buf_size, bool reset_all);
-
-   bool add_header(const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
-                   const float hdr_lat, const float hdr_lon, const float hdr_elv);
-   bool add_header_prepbufr (const int pb_report_type, const int in_report_type,
-                             const int instrument_type);
-   bool add_header_strings(const char *hdr_typ, const char *hdr_sid);
-   bool add_header_vld(const char *hdr_vld);
 
    void create_dimensions(NcFile *f_out);
    void create_hdr_vars (NcFile *f_out, const int hdr_count);
    void create_obs_vars (NcFile *f_out);
    void create_obs_name_vars (NcFile *f_out, const int var_count, const int unit_count);
-   void create_table_vars (NcFile *f_out);
+   void create_table_vars (NcFile *f_out, NcHeaderData &hdr_data, NcDataBuffer &data_buffer);
    void create_pb_hdrs (NcFile *f_out, const int hdr_count);
    NcDim create_var_obs_var (NcFile *f_out, int var_count);
 
@@ -150,7 +142,7 @@ struct NetcdfObsVars {
    //NcHeaderData *get_header_data();
    //void set_header_data();
 
-   void init_data_buffer();
+//   void init_data_buffer();
 
    void read_dims_vars(NcFile *f_in);
    NcHeaderData read_header_data();
@@ -158,20 +150,18 @@ struct NetcdfObsVars {
                       int *qty_idx_arr, char *obs_qty_buf);
    void read_pb_hdr_data(NcHeaderData *hdr_data_P);
 
-   void write_arr_headers();
-   void write_buf_headers ();
-   void write_header (const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
-                         const float hdr_lat, const float hdr_lon, const float hdr_elv);
    void write_header_to_nc(NcDataBuffer &data_buf, const int buf_size, const bool is_pb = false);
-   void write_obs_buffer(const int buf_size);
+   void write_obs_buffer(NcDataBuffer &data_buffer, const int buf_size);
    void write_obs_var_names(StringArray &obs_names);
    void write_obs_var_units(StringArray &units);
    void write_obs_var_descriptions(StringArray &descriptions);
-   void write_observation();
-   void write_observation(const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
-   int  write_observations(const vector< Observation > observations,
-                             const bool do_header = true);
-   void write_table_vars();
+//   void write_observation();
+//   void write_observation(const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
+//   int  write_observations(const vector< Observation > observations,
+//                           NcDataBuffer &data_buffer, const bool do_header = true);
+//   int  write_observations(const vector< Observation > observations,
+//                           NcDataBuffer &data_buffer, const bool do_header = true);
+   void write_table_vars(NcHeaderData &hdr_data, NcDataBuffer &data_buffer);
 
 };  // NetcdfObsVars
 

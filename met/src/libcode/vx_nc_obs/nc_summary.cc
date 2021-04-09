@@ -19,14 +19,10 @@ using namespace std;
 //#include <algorithm>
 #include <iostream>
 
-//#include "vx_math.h"
-//#include "vx_nc_util.h"
 #include "write_netcdf.h"
 
 #include "nc_obs_util.h"
 #include "nc_summary.h"
-
-////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,94 +49,187 @@ string _secsToTimeString(const int secs)
 ////////////////////////////////////////////////////////////////////////
 // If raw_hdr_cnt is greater than 0, skip updating header index for obs.
 
-void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
-      NcObsOutputData &nc_out_data, string program_name)
+//void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
+//      NcObsOutputData &nc_out_data, string program_name)
+//{
+//   string method_name = "init_netcdf_output() ";
+//   SummaryObs *summary_obs = nc_out_data.summary_obs;
+//   bool do_summary = nc_out_data.summary_info.flag;
+//   
+//   //
+//   // Initialize the header and observation record counters
+//   //
+//   int obs_count = nc_out_data.observations.size();
+//   int hdr_count = (nc_out_data.processed_hdr_cnt > 0)
+//         ? nc_out_data.processed_hdr_cnt
+//         : summary_obs->countHeaders(nc_out_data.observations); // count and reset header index
+//   if (do_summary) {
+//      int summary_count = summary_obs->getSummaries().size();
+//      int summary_hdr_count = summary_obs->countSummaryHeaders();
+//      if (nc_out_data.summary_info.raw_data) {
+//         obs_count += summary_count;
+//         hdr_count += summary_hdr_count;
+//      }
+//      else {
+//         if (nc_out_data.processed_hdr_cnt > 0) {
+//            bool hdr_cnt = obs_vars.get_hdr_index();
+//            bool reset_array = true;
+//            obs_vars.reset_header_buffer(hdr_cnt, reset_array);
+//            mlog << Debug(5) << method_name << "reset headers (" << hdr_cnt << ") raw data.\n";
+//         }
+//         obs_count = summary_count;
+//         hdr_count = summary_hdr_count;
+//      }
+//   }
+//   mlog << Debug(7) << method_name << "obs_count: "
+//        << obs_count << " header count: " << hdr_count << "\n";
+//   obs_vars.obs_cnt = obs_count;
+//   obs_vars.deflate_level = nc_out_data.deflate_level;
+//   
+//   obs_vars.create_hdr_vars(nc_file, hdr_count);
+//   obs_vars.create_obs_vars(nc_file);
+//
+//   //
+//   // Add global attributes
+//   //
+//   write_netcdf_global(nc_file, nc_file->getName().c_str(), program_name.c_str());
+//
+//   if (do_summary) write_summary_attributes(nc_file, nc_out_data.summary_info);
+//   
+//}
+
+////////////////////////////////////////////////////////////////////////
+// If raw_hdr_cnt is greater than 0, skip updating header index for obs.
+
+bool get_hdr_obs_count(NcFile *nc_file, NcObsOutputData *nc_out_data,
+                       int *obs_cnt, int *hdr_cnt)
 {
-   string method_name = "init_netcdf_output() ";
-   SummaryObs *summary_obs = nc_out_data.summary_obs;
-   bool do_summary = nc_out_data.summary_info.flag;
+   string method_name = "get_hdr_obs_count() ";
+   bool reset_header_buffer = false;
+   SummaryObs *summary_obs = nc_out_data->summary_obs;
+   bool do_summary = nc_out_data->summary_info.flag;
    
    //
    // Initialize the header and observation record counters
    //
-   int obs_count = nc_out_data.observations.size();
-   int hdr_count = (nc_out_data.processed_hdr_cnt > 0)
-         ? nc_out_data.processed_hdr_cnt
-         : summary_obs->countHeaders(nc_out_data.observations); // count and reset header index
+   int obs_count = nc_out_data->observations.size();
+   int hdr_count = (nc_out_data->processed_hdr_cnt > 0)
+         ? nc_out_data->processed_hdr_cnt
+         : summary_obs->countHeaders(nc_out_data->observations); // count and reset header index
    if (do_summary) {
       int summary_count = summary_obs->getSummaries().size();
       int summary_hdr_count = summary_obs->countSummaryHeaders();
-      if (nc_out_data.summary_info.raw_data) {
+      if (nc_out_data->summary_info.raw_data) {
          obs_count += summary_count;
          hdr_count += summary_hdr_count;
       }
       else {
-         if (nc_out_data.processed_hdr_cnt > 0) {
-            bool hdr_cnt = obs_vars.get_hdr_index();
-            bool reset_array = true;
-            obs_vars.reset_header_buffer(hdr_cnt, reset_array);
-            mlog << Debug(5) << method_name << "reset headers (" << hdr_cnt << ") raw data.\n";
+         if (nc_out_data->processed_hdr_cnt > 0) {
+            reset_header_buffer = true;
          }
          obs_count = summary_count;
          hdr_count = summary_hdr_count;
       }
    }
+   *obs_cnt = obs_count;
+   *hdr_cnt = hdr_count;
    mlog << Debug(7) << method_name << "obs_count: "
         << obs_count << " header count: " << hdr_count << "\n";
-   obs_vars.obs_cnt = obs_count;
-   obs_vars.deflate_level = nc_out_data.deflate_level;
-   
-   obs_vars.create_hdr_vars(nc_file, hdr_count);
-   obs_vars.create_obs_vars(nc_file);
 
    //
    // Add global attributes
    //
-   write_netcdf_global(nc_file, nc_file->getName().c_str(), program_name.c_str());
 
-   if (do_summary) write_summary_attributes(nc_file, nc_out_data.summary_info);
-   
+   if (do_summary) write_summary_attributes(nc_file, nc_out_data->summary_info);
+
+   return reset_header_buffer;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
-      NcObsOutputData &nc_out_data)
-{
-  string method_name = "write_observations() ";
-  bool do_summary = nc_out_data.summary_info.flag;
-  bool do_save_raw_data = nc_out_data.summary_info.raw_data;
-  bool do_header = (nc_out_data.processed_hdr_cnt == 0);
-
-  mlog << Debug(5) << method_name << "do_header: " << (do_header ? "true" : "false")
-       << ", do_summary: " << (do_summary ? "true" : "false")
-       << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
-       << "\n";
-  
-  if (!do_summary || (do_summary && do_save_raw_data)) {
-    mlog << Debug(5) << method_name << "writing " 
-         << (int)nc_out_data.observations.size() << " raw data...\n";
-    obs_vars.write_observations(nc_out_data.observations, do_header);
-  }
-  if (do_summary) {
-    mlog << Debug(5) << method_name << "writing summary"
-         << (do_save_raw_data ? " " : " (summary only)") << "...\n";
-    bool tmp_do_header = true;
-    obs_vars.write_observations(nc_out_data.summary_obs->getSummaries(),
-                                tmp_do_header);
-  }
-  
-  int obs_buf_index = obs_vars.get_obs_index();
-  if (obs_buf_index > 0) {
-    obs_vars.write_obs_buffer(obs_buf_index);
-  }
-  
-  obs_vars.create_table_vars (nc_file);
-  obs_vars.write_arr_headers();
-  //obs_vars.write_table_vars();
-
-  return true;
+void set_nc_out_data(NcObsOutputData *out_data, vector<Observation> observations,
+                     SummaryObs *summary_obs, TimeSummaryInfo summary_info) {
+   out_data->processed_hdr_cnt = 0;
+   out_data->observations = observations;
+   out_data->summary_obs = summary_obs;
+   out_data->summary_info = summary_info;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+//bool write_observations(NetcdfObsVars *obs_vars,
+//                        NcObsOutputData &nc_out_data)
+//{
+//  string method_name = "write_observations() ";
+//  bool do_summary = nc_out_data->summary_info.flag;
+//  bool do_save_raw_data = nc_out_data->summary_info.raw_data;
+//  bool do_header = (nc_out_data->processed_hdr_cnt == 0);
+//
+//  mlog << Debug(5) << method_name << "do_header: " << (do_header ? "true" : "false")
+//       << ", do_summary: " << (do_summary ? "true" : "false")
+//       << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
+//       << "\n";
+//
+//  if (!do_summary || (do_summary && do_save_raw_data)) {
+//    mlog << Debug(5) << method_name << "writing " 
+//         << (int)nc_out_data->observations.size() << " raw data...\n";
+//    obs_vars->write_observations(nc_out_data->observations, do_header);
+//  }
+//  if (do_summary) {
+//    mlog << Debug(5) << method_name << "writing summary"
+//         << (do_save_raw_data ? " " : " (summary only)") << "...\n";
+//    bool tmp_do_header = true;
+//    obs_vars->write_observations(nc_out_data->summary_obs->getSummaries(),
+//                                 tmp_do_header);
+//  }
+//
+//  int obs_buf_index = obs_vars->get_obs_index();
+//  if (obs_buf_index > 0) {
+//    obs_vars->write_obs_buffer(obs_buf_index);
+//  }
+//
+//  return true;
+//}
+//
+////////////////////////////////////////////////////////////////////////
+
+//bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
+//      NcObsOutputData &nc_out_data)
+//{
+//  string method_name = "write_observations() ";
+//  bool do_summary = nc_out_data.summary_info.flag;
+//  bool do_save_raw_data = nc_out_data.summary_info.raw_data;
+//  bool do_header = (nc_out_data.processed_hdr_cnt == 0);
+//
+//  mlog << Debug(5) << method_name << "do_header: " << (do_header ? "true" : "false")
+//       << ", do_summary: " << (do_summary ? "true" : "false")
+//       << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
+//       << "\n";
+//  
+//  if (!do_summary || (do_summary && do_save_raw_data)) {
+//    mlog << Debug(5) << method_name << "writing " 
+//         << (int)nc_out_data.observations.size() << " raw data...\n";
+//    obs_vars.write_observations(nc_out_data.observations, do_header);
+//  }
+//  if (do_summary) {
+//    mlog << Debug(5) << method_name << "writing summary"
+//         << (do_save_raw_data ? " " : " (summary only)") << "...\n";
+//    bool tmp_do_header = true;
+//    obs_vars.write_observations(nc_out_data.summary_obs->getSummaries(),
+//                                tmp_do_header);
+//  }
+//  
+//  int obs_buf_index = obs_vars.get_obs_index();
+//  if (obs_buf_index > 0) {
+//    obs_vars.write_obs_buffer(obs_buf_index);
+//  }
+//  
+//  obs_vars.create_table_vars (nc_file);
+//  obs_vars.write_arr_headers();
+//  //obs_vars.write_table_vars();
+//
+//  return true;
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -184,4 +273,3 @@ void write_summary_attributes(NcFile *nc_file, TimeSummaryInfo summary_info) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
