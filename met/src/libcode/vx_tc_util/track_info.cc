@@ -299,7 +299,7 @@ void TrackInfo::initialize(const ATCFTrackLine &l, bool check_anly) {
    MinValidTime = MaxValidTime = l.valid();
 
    // Create the storm id
-   set_storm_id();
+   set_storm_id(l.storm_id().c_str());
 
    return;
 }

@@ -65,15 +65,15 @@ The TC-Gen tool implements the following logic:
 
 * Parse the forecast genesis data and identify forecast genesis events separately for each model present.
 
-* Parse the Best and operational track data, and identify Best track genesis events.
+* Parse the Best and operational track data, and identify Best track genesis events. Note that Best tracks with a cyclone number greater than 50 are automatically discarded from the analysis. Large cyclone numbers are used for pre-season testing or to track invests prior to a storm actually forming. Running this tool at verbosity level 6 (-v 6) prints details about which tracks are discarded.
 
 * Loop over the filters defined in the configuration file and apply the following logic for each.
 
  * For each Best track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
  
- * For each forecast genesis event, search for a matching Best track. A Best track matches if the valid time of one of its track points matches the forecast genesis time and is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
+ * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
  
- * In no Best track match is found, apply the same logic to search the 0-hour operational track points. If an operational match is found, store the storm ID.
+ * In no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
  
  * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
  
@@ -257,9 +257,28 @@ ______________________
 
 .. code-block:: none
 
+  genesis_match_point_to_track = TRUE;
+
+The **genesis_match_point_to_track** entry is a boolean which controls the matching logic. When set to its default value of TRUE, for each forecast genesis event, all Best track points are searched for a match. This logic implements the method used by the NOAA National Hurricane Center. When set to FALSE, only the single Best track genesis point is considered for a match. When selecting FALSE, users are encouraged to adjust the **genesis_match_radius** and/or **gensesis_match_window** options, described below, to enable matches to be found.
+
+______________________
+
+.. code-block:: none
+
   genesis_match_radius = 500;
 
-The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those Best genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only Best or operational tracks with a track point within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+
+______________________
+
+.. code-block:: none
+
+  genesis_match_window = {
+     beg = 0;
+     end = 0;
+  }
+
+The **genesis_match_window** entry defines a time window, in hours, relative to the forecast genesis time. When searching for a match, only Best or operational tracks with a track point falling within this time window will be considered. The default time window of 0 requires a Best or operational track to exist at the forecast genesis time for a match to be found. Increasing this time window should lead to an increase in the number matched genesis pairs. For example, setting *end = 12;* would allow forecast genesis events to match Best tracks up to 12 hours prior to their existence.
 
 ______________________
 
@@ -278,15 +297,18 @@ ______________________
      end =  24;
   }
 
-The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
+The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as a contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
 
 ______________________
 
 .. code-block:: none
 
-  ops_hit_tdiff = 48;
+  ops_hit_window = {
+     beg =  0;
+     end = 48;
+  }
 
-The **ops_hit_tdiff** entry is an integer which defines a maximum allowable time difference in hours. For each matching forecast and Best track genesis event, if the difference between the Best track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a contingency table HIT for the operational scoring method. Otherwise, it is counted as a FALSE ALARM.
+The **ops_hit_window** entry defines a time window, in hours, relative to the Best track genesis time. The model initialization time for the forecast genesis event must occur within this time window for the pairs to be counted as a contingency table HIT for the operationl scoring method. Otherwise, the pair is counted as a FALSE ALARM.
 
 ______________________
 

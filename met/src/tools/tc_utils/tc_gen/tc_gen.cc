@@ -19,6 +19,7 @@
 //   002    12/15/20  Halley Gotway   Matching logic for MET #1448
 //   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
 //   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
+//   005    04/02/21  Halley Gotway   Refinements for MET #1714
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +83,7 @@ static void   do_genesis_ctc       (const TCGenVxOpt &,
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
-                                    double);
+                                    bool, double, int, int);
 
 static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
@@ -370,14 +371,17 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        conf_info.InitFreqHr*sec_per_hour,
                        vx_opt.InitBeg, vx_opt.InitEnd,
                        vx_opt.InitInc, vx_opt.InitExc);
-   }
+   } // end for i bga
 
    // Loop over the model genesis events looking for pairs.
    for(i=0; i<fga.n(); i++) {
       
       // Search for a BEST track match
       i_bga = find_genesis_match(fga[i], bga, ota,
-                                 vx_opt.GenesisMatchRadius);
+                                 vx_opt.GenesisMatchPointTrack,
+                                 vx_opt.GenesisMatchRadius,
+                                 vx_opt.GenesisMatchBeg,
+                                 vx_opt.GenesisMatchEnd);
 
       // Add the matched genesis pair
       if(!is_bad_data(i_bga)) {
@@ -523,19 +527,19 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                // FALSE ALARM for the development method
                diff.DevCategory = FYONGenesis;
             }
-            
-            // Ops Method:
-            // HIT if forecast init time is close enough to
-            // the BEST genesis time.
 
-            // Compute time offset
+            // Compute init/genesis time offset
             diff.OpsDSec = bgi->genesis_time() - fgi->init();
 
             offset_cs << cs_erase
                       << "with an init vs genesis time offset of "
                       << diff.OpsDSec/sec_per_hour << " hours.\n";
 
-            if(diff.OpsDSec <= vx_opt.OpsHitDSec) {
+            // Ops Method:
+            // HIT if forecast init time is close enough to
+            // the BEST genesis time.
+            if(diff.OpsDSec >= vx_opt.OpsHitBeg &&
+               diff.OpsDSec <= vx_opt.OpsHitEnd) {
 
                mlog << Debug(4) << case_cs
                     << " is an ops method HIT " << offset_cs;
@@ -591,10 +595,9 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 int find_genesis_match(const GenesisInfo      &fcst_gi,
                        const GenesisInfoArray &bga,
                        const TrackInfoArray   &ota,
-                       const double rad) {
-   int i, j;
-   int i_best = bad_data_int;
-   int i_oper = bad_data_int;
+                       bool point2track, double rad,
+                       int beg, int end) {
+   int i, j, i_best, i_oper;
 
    ConcatString case_cs;
    case_cs << fcst_gi.technique() << " "
@@ -605,20 +608,36 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
            << " forecast genesis at (" << fcst_gi.lat() << ", "
            << fcst_gi.lon() << ")";
 
-   // Search the BEST track points for a match
+   // Search for a BEST track genesis match
    for(i=0, i_best=bad_data_int;
        i<bga.n() && is_bad_data(i_best);
        i++) {
-      for(j=0; j<bga[i].n_points(); j++) {
-         if(fcst_gi.is_match(bga[i][j], rad)) {
+
+      // Check all BEST track points
+      if(point2track) {
+
+         for(j=0; j<bga[i].n_points(); j++) {
+            if(fcst_gi.is_match(bga[i][j], rad, beg, end)) {
+               i_best = i;
+               mlog << Debug(4) << case_cs
+                    << " MATCHES BEST genesis track "
+                    << bga[i].storm_id() << ".\n";
+               break;
+            }
+         }
+      }
+      // Check only the BEST genesis points
+      else {
+
+         if(fcst_gi.is_match(bga[i], rad, beg, end)) {
             i_best = i;
             mlog << Debug(4) << case_cs
-                 << " MATCHES BEST track "
+                 << " MATCHES BEST genesis point "
                  << bga[i].storm_id() << ".\n";
             break;
          }
       }
-   } // end for bta
+   } // end for bga
 
    // If no BEST track match was found, search the operational tracks
    if(is_bad_data(i_best)) {
@@ -626,14 +645,16 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
       for(i=0, i_oper=bad_data_int;
           i<ota.n() && is_bad_data(i_oper);
           i++) {
-         for(j=0; j<ota[i].n_points(); j++) {
-            if(fcst_gi.is_match(ota[i][j], rad)) {
-               i_oper = i;
-               mlog << Debug(4) << case_cs
-                    << " MATCHES operational " << ota[i].technique()
-                    << " track " << ota[i].storm_id() << ".\n";
-               break;
-            }
+
+         // Each operational track contains only lead time 0
+         if(ota[i].n_points() == 0) continue;
+
+         if(fcst_gi.is_match(ota[i][0], rad, beg, end)) {
+            i_oper = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES operational " << ota[i].technique()
+                 << " genesis track " << ota[i].storm_id() << ".\n";
+            break;
          }
       } // end for ota
 
@@ -751,15 +772,20 @@ void process_fcst_tracks(const StringArray &files,
          // Check the forecast lead time window
          if(fcst_gi.genesis_lead() < conf_info.FcstSecBeg ||
             fcst_gi.genesis_lead() > conf_info.FcstSecEnd) {
-            mlog << Debug(6) << "Skipping genesis event for forecast hour "
-                 << fcst_gi.genesis_fhr() << ".\n";
+            mlog << Debug(6)
+                 << "Skipping forecast genesis event for forecast hour "
+                 << fcst_gi.genesis_fhr() << " not between "
+                 << conf_info.FcstSecBeg/sec_per_hour << " and "
+                 << conf_info.FcstSecEnd/sec_per_hour << ".\n";
             continue;
          }
 
          // Check the forecast track minimum duration
          if(fcst_gi.duration() < conf_info.MinDur*sec_per_hour) {
-            mlog << Debug(6) << "Skipping genesis event for track duration of "
-                 << fcst_gi.duration()/sec_per_hour << ".\n";
+            mlog << Debug(6)
+                 << "Skipping forecast genesis event for track duration of "
+                 << fcst_gi.duration()/sec_per_hour << " < "
+                 << conf_info.MinDur << ".\n";
             continue;
          }
 
@@ -896,6 +922,15 @@ void process_best_tracks(const StringArray &files,
 
       // Attempt to define genesis
       if(!best_gi.set(best_ta[i], conf_info.BestEventInfo)) {
+         continue;
+      }
+
+      // Skip invest tracks with a large cyclone number
+      if(atof(best_ta[i].cyclone().c_str()) > max_best_cyclone_number) {
+         mlog << Debug(6)
+              << "Skipping Best track genesis event for cyclone number "
+              << best_ta[i].cyclone() << " > " << max_best_cyclone_number
+              << ".\n";
          continue;
       }
 
