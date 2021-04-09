@@ -45,7 +45,7 @@ tc_dland has one required argument and accepts several optional ones.
 Required arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **out_file** argument indicates indicates the NetCDF output file containing the computed distances to land.
+1. The **out_file** argument indicates the NetCDF output file containing the computed distances to land.
 
 Optional arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

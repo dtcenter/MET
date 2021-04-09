@@ -6,7 +6,9 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlines in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
+The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlines in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+
+.. _tc-gen_stat_aspects:
 
 Statistical aspects
 ___________________
@@ -15,7 +17,9 @@ The TC-Gen tool populates a contingency table with hits, misses, and false alarm
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
-Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See section 21.3 for more detail.
+Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
+
+.. _tc-gen_practical_info:
 
 Practical information
 _____________________
