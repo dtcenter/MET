@@ -6,7 +6,9 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
+The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+
+.. _tc-gen_stat_aspects:
 
 Statistical aspects
 ___________________
@@ -15,7 +17,9 @@ The TC-Gen tool populates a contingency tables with hits, misses, and false alar
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
-Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See section 21.3 for more detail.
+Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
+
+.. _tc-gen_practical_info:
 
 Practical information
 _____________________
@@ -61,15 +65,15 @@ The TC-Gen tool implements the following logic:
 
 * Parse the forecast genesis data and identify forecast genesis events separately for each model present.
 
-* Parse the Best and operational track data, and identify Best track genesis events.
+* Parse the Best and operational track data, and identify Best track genesis events. Note that Best tracks with a cyclone number greater than 50 are automatically discarded from the analysis. Large cyclone numbers are used for pre-season testing or to track invests prior to a storm actually forming. Running this tool at verbosity level 6 (-v 6) prints details about which tracks are discarded.
 
 * Loop over the filters defined in the configuration file and apply the following logic for each.
 
  * For each Best track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
  
- * For each forecast genesis event, search for a matching Best track. A Best track matches if the valid time of one of its track points matches the forecast genesis time and is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
+ * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
  
- * In no Best track match is found, apply the same logic to search the 0-hour operational track points. If an operational match is found, store the storm ID.
+ * In no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
  
  * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
  
@@ -253,9 +257,28 @@ ______________________
 
 .. code-block:: none
 
+  genesis_match_point_to_track = TRUE;
+
+The **genesis_match_point_to_track** entry is a boolean which controls the matching logic. When set to its default value of TRUE, for each forecast genesis event, all Best track points are searched for a match. This logic implements the method used by the NOAA National Hurricane Center. When set to FALSE, only the single Best track genesis point is considered for a match. When selecting FALSE, users are encouraged to adjust the **genesis_match_radius** and/or **gensesis_match_window** options, described below, to enable matches to be found.
+
+______________________
+
+.. code-block:: none
+
   genesis_match_radius = 500;
 
-The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those Best genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+The **genesis_match_radius** entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only Best or operational tracks with a track point within this radius will be considered. Increasing this search radius should lead to an increase in the number of matched genesis pairs.
+
+______________________
+
+.. code-block:: none
+
+  genesis_match_window = {
+     beg = 0;
+     end = 0;
+  }
+
+The **genesis_match_window** entry defines a time window, in hours, relative to the forecast genesis time. When searching for a match, only Best or operational tracks with a track point falling within this time window will be considered. The default time window of 0 requires a Best or operational track to exist at the forecast genesis time for a match to be found. Increasing this time window should lead to an increase in the number matched genesis pairs. For example, setting *end = 12;* would allow forecast genesis events to match Best tracks up to 12 hours prior to their existence.
 
 ______________________
 
@@ -274,15 +297,18 @@ ______________________
      end =  24;
   }
 
-The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
+The **dev_hit_window** entry defines a time window, in hours, relative to the forecast genesis time. The Best track genesis event must occur within this time window for the pair to be counted as a contingency table HIT for the development scoring method. Tightening this window may cause development method HITS to become FALSE ALARMS.
 
 ______________________
 
 .. code-block:: none
 
-  ops_hit_tdiff = 48;
+  ops_hit_window = {
+     beg =  0;
+     end = 48;
+  }
 
-The **ops_hit_tdiff** entry is an integer which defines a maximum allowable time difference in hours. For each matching forecast and Best track genesis event, if the difference between the Best track genesis time and the forecast initialization time is less than or equal to this value, then the pair is counted as a contingency table HIT for the operational scoring method. Otherwise, it is counted as a FALSE ALARM.
+The **ops_hit_window** entry defines a time window, in hours, relative to the Best track genesis time. The model initialization time for the forecast genesis event must occur within this time window for the pairs to be counted as a contingency table HIT for the operationl scoring method. Otherwise, the pair is counted as a FALSE ALARM.
 
 ______________________
 

@@ -91,6 +91,17 @@ filter = [
       output_flag   = { genmpr = BOTH; }
    },
    {
+      desc                 = "AL_MATCH24HR";
+      basin_mask           = "AL";
+      genesis_match_window = { beg = 0; end = 24; };
+   },
+   {
+      desc                         = "AL_POINT2POINT";
+      basin_mask                   = "AL";
+      genesis_match_window         = { beg = 0; end = 24; };
+      genesis_match_point_to_track = FALSE;
+   },
+   {
       desc          = "AL_DLAND_300NM";
       basin_mask    = "AL";
       dland_thresh  = >0&&<300;
@@ -119,7 +130,7 @@ filter = [
    {
       desc                 = "ALL_MATCH_600KM_OPS60HR";
       genesis_match_radius = 600;
-      ops_hit_tdiff        = 60;
+      ops_hit_window       = { beg = -60; end = 60; };
       dev_method_flag      = FALSE;
       ops_method_flag      = TRUE;
    }
@@ -194,9 +205,24 @@ dland_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Genesis matching logic. Compare the forecast genesis point to all points in
+// the Best track (TRUE) or the single Best track genesis point (FALSE).
+//
+genesis_match_point_to_track = TRUE;
+
+//
 // Radius in km to search for a matching genesis event
 //
 genesis_match_radius = 500;
+
+//
+// Time window in hours, relative to the model genesis time, to search for a
+// matching Best track point
+//
+genesis_match_window = {
+   beg = 0;
+   end = 0;
+}
 
 //
 // Radius in km for a development scoring method hit
@@ -204,7 +230,8 @@ genesis_match_radius = 500;
 dev_hit_radius = 500;
 
 //
-// Time window in hours for a development scoring method hit
+// Time window in hours, relative to the model genesis time, for a development 
+// scoring method hit
 //
 dev_hit_window = {
    beg = -24;
@@ -212,10 +239,13 @@ dev_hit_window = {
 }
 
 //
-// Maximum Best track genesis minus model initialization time difference for an
-// operational scoring method hit
+// Time window in hours for the Best track genesis minus model initialization
+// time difference for an operational scoring method hit
 //
-ops_hit_tdiff = 48;
+ops_hit_window = {
+   beg =  0;
+   end = 48;
+}
 
 //
 // Discard genesis forecasts for initializations at or after the matching

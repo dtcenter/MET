@@ -27,7 +27,6 @@ for attr, attr_val in ds.__dict__.items():
         grid[grid_attr] = attr_val
     else:
         met_attrs[attr] = attr_val
-grid['nx'], grid['ny'] = int(grid['nx']), int(grid['ny'])
 met_attrs['grid'] = grid
 met_attrs['name'] = met_attrs['name_str']
 del met_attrs['name_str']

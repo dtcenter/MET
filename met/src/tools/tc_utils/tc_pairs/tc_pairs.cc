@@ -1740,7 +1740,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
                        NumArray &altk_err, NumArray &crtk_err) {
    int i, i_adeck, i_bdeck, status;
    unixtime ut, ut_min, ut_max;
-   int ut_inc, n_ut;
+   int bd_inc, ut_inc, n_ut;
    float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
    float crtk[mxp], altk[mxp];
    double x, y, tk, lon_min, lon_max;
@@ -1760,8 +1760,10 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    // Determine the valid increment
    // For BEST tracks, use a constant time step
    // For non-BEST tracks, select the most common BDECK time step
-   if(bdeck.is_best_track()) ut_inc = best_track_time_step;
-   else                      ut_inc = bdeck.valid_inc();
+   // Check for 0 and bad data
+   bd_inc = bdeck.valid_inc();
+   ut_inc = (bdeck.is_best_track() || bd_inc == 0 || is_bad_data(bd_inc) ?
+             best_track_time_step : bd_inc);
 
    // Round the valid times to the nearest valid increment
    if(ut_min%ut_inc != 0) ut_min = (ut_min/ut_inc + 1)*ut_inc;
