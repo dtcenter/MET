@@ -33,6 +33,8 @@
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
 //   014    04/01/19  Fillmore        Add FCST and OBS units.
 //   015    01/24/20  Halley Gotway   Add aggregate RPS lines.
+//   016    04/12/21  Halley Gotway   MET #1735 Multiple -out_thresh for
+//                    aggregate_stat MPR jobs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2175,32 +2177,6 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          key = job.get_case_info(line);
 
          //
-         // Apply the continuous statistics filtering threshold
-         //
-         if((job.out_line_type.has(stat_cnt_str) ||
-             job.out_line_type.has(stat_sl1l2_str)) &&
-            (job.out_fcst_thresh.n() > 0 ||
-             job.out_obs_thresh.n()  > 0)) {
-
-            SingleThresh fst, ost;
-            if(job.out_fcst_thresh.n() > 0) fst = job.out_fcst_thresh[0];
-            if(job.out_obs_thresh.n()  > 0) ost = job.out_obs_thresh[0];
-
-            if(!check_fo_thresh(cur.fcst, cur.obs, cur.climo_mean, cur.climo_stdev,
-                                fst, ost, job.out_cnt_logic)) {
-               mlog << Debug(4) << "aggr_mpr_lines() -> "
-                    << "skipping forecast ("
-                    << cur.fcst << " " << job.out_fcst_thresh.get_str()
-                    << ") and observation ("
-                    << cur.obs << " " << job.out_obs_thresh.get_str()
-                    << ") matched pair with "
-                    << setlogic_to_string(job.out_cnt_logic)
-                    << " logic.\n";
-               continue;
-            }
-         }
-
-         //
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
@@ -3370,23 +3346,20 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CTSInfo &cts_info) {
+                int i_thresh, CTSInfo &cts_info) {
    int i;
-   int n = info.pd.f_na.n();
-   SingleThresh ft = job.out_fcst_thresh[0];
-   SingleThresh ot = job.out_obs_thresh[0];
 
    //
    // Initialize
    //
    cts_info.clear();
-   cts_info.fthresh = ft;
-   cts_info.othresh = ot;
+   cts_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cts_info.othresh = job.out_obs_thresh[i_thresh];
 
    //
    // Populate the contingency table
    //
-   for(i=0; i<n; i++) {
+   for(i=0; i<info.pd.n_obs; i++) {
       cts_info.add(info.pd.f_na[i], info.pd.o_na[i],
                    info.pd.cmn_na[i], info.pd.csd_na[i]);
    }
@@ -3397,14 +3370,16 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CTSInfo &cts_info, const char *tmp_dir,
-                gsl_rng *rng_ptr) {
+                int i_thresh, CTSInfo &cts_info,
+                const char *tmp_dir, gsl_rng *rng_ptr) {
    CTSInfo *cts_info_ptr = (CTSInfo *) 0;
 
    //
    // Initialize
    //
    cts_info.clear();
+   cts_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cts_info.othresh = job.out_obs_thresh[i_thresh];
 
    //
    // If there are no matched pairs to process, return
@@ -3416,12 +3391,6 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    cts_info.allocate_n_alpha(1);
    cts_info.alpha[0] = job.out_alpha;
-
-   //
-   // Store the thresholds
-   //
-   cts_info.fthresh = job.out_fcst_thresh[0];
-   cts_info.othresh = job.out_obs_thresh[0];
 
    //
    // Compute the counts, stats, normal confidence intervals, and
@@ -3455,10 +3424,6 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    mcts_info.clear();
-
-   //
-   // Setup
-   //
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
@@ -3481,18 +3446,14 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    mcts_info.clear();
+   mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.set_fthresh(job.out_fcst_thresh);
+   mcts_info.set_othresh(job.out_obs_thresh);
 
    //
    // If there are no matched pairs to process, return
    //
    if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
-
-   //
-   // Setup
-   //
-   mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
-   mcts_info.set_fthresh(job.out_fcst_thresh);
-   mcts_info.set_othresh(job.out_obs_thresh);
 
    //
    // Store the out_alpha value
@@ -3523,8 +3484,9 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CNTInfo &cnt_info, const char *tmp_dir,
+                int i_thresh, CNTInfo &cnt_info, const char *tmp_dir,
                 gsl_rng *rng_ptr) {
+   PairDataPoint pd_thr;
    bool precip_flag = false;
    NumArray w_na;
 
@@ -3532,11 +3494,19 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    cnt_info.clear();
+   cnt_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cnt_info.othresh = job.out_obs_thresh[i_thresh];
+
+   // Apply continuous filtering thresholds to subset pairs
+   pd_thr = info.pd.subset_pairs_cnt_thresh(
+               job.out_fcst_thresh[i_thresh],
+               job.out_obs_thresh[i_thresh],
+               job.out_cnt_logic);
 
    //
    // If there are no matched pairs to process, return
    //
-   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) return;
 
    //
    // Set the precip flag based on fcst_var and obs_var
@@ -3556,13 +3526,13 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    if(job.boot_interval == boot_bca_flag) {
 
-      compute_cnt_stats_ci_bca(rng_ptr, info.pd,
+      compute_cnt_stats_ci_bca(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
 
-      compute_cnt_stats_ci_perc(rng_ptr, info.pd,
+      compute_cnt_stats_ci_perc(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep, job.boot_rep_prop,
          cnt_info, tmp_dir);
    }
@@ -3573,19 +3543,34 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
-                 SL1L2Info &s_info) {
+                 int i_thresh, SL1L2Info &s_info) {
    int i;
-   int n = info.pd.f_na.n();
    int scount, sacount;
    double f, o, c;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
    double abs_err_sum;
+   PairDataPoint pd_thr;
 
    //
-   // Initialize the SL1L2Info object and counts
+   // Initialize
    //
    s_info.clear();
+
+   // Apply continuous filtering thresholds to subset pairs
+   pd_thr = info.pd.subset_pairs_cnt_thresh(
+               job.out_fcst_thresh[i_thresh],
+               job.out_obs_thresh[i_thresh],
+               job.out_cnt_logic);
+
+   //
+   // If there are no matched pairs to process, return
+   //
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) return;
+
+   //
+   // Initialize counts
+   //
    scount = sacount = 0;
    f_sum  = o_sum  =  ff_sum  = oo_sum  = fo_sum  = 0.0;
    fa_sum = oa_sum =  ffa_sum = ooa_sum = foa_sum = 0.0;
@@ -3594,14 +3579,14 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Update the partial sums
    //
-   for(i=0; i<n; i++) {
+   for(i=0; i<pd_thr.n_obs; i++) {
 
       //
       // Update the counts for this matched pair
       //
-      f = info.pd.f_na[i];
-      o = info.pd.o_na[i];
-      c = info.pd.cmn_na[i];
+      f = pd_thr.f_na[i];
+      o = pd_thr.o_na[i];
+      c = pd_thr.cmn_na[i];
 
       f_sum       += f;
       o_sum       += o;
@@ -3672,7 +3657,7 @@ void mpr_to_pct(STATAnalysisJob &job, const AggrMPRInfo &info,
    pct_info.alpha[0] = job.out_alpha;
 
    if(job.out_line_type.has(stat_pstd_str)) pstd_flag = 1;
-   else                                   pstd_flag = 0;
+   else                                     pstd_flag = 0;
 
    //
    // Compute the probabilistic counts and statistics

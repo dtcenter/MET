@@ -40,6 +40,8 @@
 //   019    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //   020    04/02/21  Halley Gotway   MET #1736, write output to -out or
 //                    -out_stat, but not both.
+//   021    04/12/21  Halley Gotway   MET #1735 Multiple -out_thresh for
+//                    aggregate_stat MPR jobs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -767,6 +769,29 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             out_lt == stat_eclv)) {
 
       //
+      // Check output thresholds for continuous line types
+      //
+      if(out_lt == stat_cnt   ||
+         out_lt == stat_sl1l2 ||
+         out_lt == stat_sal1l2) {
+
+         if(job.out_fcst_thresh.n() != job.out_obs_thresh.n()) {
+            mlog << Error << "\ndo_job_aggr_stat() -> "
+                 << "when \"-out_line_type\" is set to CNT, SL1L2, "
+                 << "or SAL1L2, the \"-out_fcst_thresh\" and "
+                 << "\"-out_obs_thresh\" options must specify the "
+                 << "same number of thresholds.\n\n";
+            throw(1);
+         }
+
+         // Store a single NA threshold
+         if(job.out_fcst_thresh.n() == 0) {
+            job.out_fcst_thresh.add("NA");
+            job.out_obs_thresh.add("NA");
+         }
+      }
+
+      //
       // Check output threshold values for 2x2 contingency table
       //
       if(out_lt == stat_fho ||
@@ -774,13 +799,15 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          out_lt == stat_cts ||
          out_lt == stat_eclv) {
 
-         if(job.out_fcst_thresh.n() != 1 ||
-            job.out_obs_thresh.n()  != 1) {
+         if(job.out_fcst_thresh.n() == 0 ||
+            job.out_obs_thresh.n()  == 0 ||
+            job.out_fcst_thresh.n() != job.out_obs_thresh.n()) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to FHO, CTC, "
                  << "CTS, or ECLV, the \"-out_thresh\" option or "
                  << "\"-out_fcst_thresh\" and \"-out_obs_thresh\" "
-                 << "options must specify exactly one threshold.\n\n";
+                 << "options must specify the same number of thresholds "
+                 << "and at least one.\n\n";
             throw(1);
          }
       }
@@ -2854,7 +2881,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
                         AsciiTable &at, const char *tmp_dir,
                         gsl_rng *rng_ptr) {
    map<ConcatString, AggrMPRInfo>::iterator it;
-   int n, n_row, n_col, r, c;
+   int n, n_row, n_col, r, c, i;
    StatHdrColumns shc;
 
    CTSInfo   cts_info;
@@ -2866,8 +2893,21 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
    //
    // Setup the output table
    //
-   n     = 0;
-   n_row = 1 + m.size();
+   n = 0;
+
+   // Number of rows
+   n_row = 1;
+   if(lt == stat_fho    || lt == stat_ctc   ||
+      lt == stat_cts    || lt == stat_eclv  ||
+      lt == stat_cnt    || lt == stat_sl1l2 ||
+      lt == stat_sal1l2) {
+      n_row += job.out_fcst_thresh.n() * m.size();
+   }
+   else {
+      n_row += m.size();
+   }
+
+   // Number of columns
    n_col = 1 + job.by_column.n();
         if(lt == stat_fho)    { n_col += n_fho_columns; }
    else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
@@ -2922,94 +2962,108 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
    for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
       //
-      // Process percentile thresholds.
+      // Process percentile thresholds
       //
       job.set_perc_thresh(it->second.pd.f_na, it->second.pd.o_na, it->second.pd.cmn_na);
 
       //
-      // Write the output STAT header columns
+      // Prepare the output STAT header columns
       //
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
-      if(job.stat_out) {
-         if(lt == stat_cts || lt == stat_nbrcts || lt == stat_mcts ||
-            lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) {
-            shc.set_alpha(job.out_alpha);
-         }
-         if(job.out_fcst_thresh.n() > 0 || job.out_obs_thresh.n() > 0) {
-            shc.set_fcst_thresh(job.out_fcst_thresh);
-            shc.set_obs_thresh(job.out_obs_thresh);
-            if(lt == stat_cnt || lt == stat_sl1l2) {
-               shc.set_thresh_logic(job.out_cnt_logic);
-            }
-         }
-         write_header_cols(shc, job.stat_at, r);
-      }
-
-      //
-      // Initialize
-      //
-      c = 0;
 
       //
       // FHO output line
       //
       if(lt == stat_fho) {
-         mpr_to_ctc(job, it->second, cts_info);
-         if(job.stat_out) {
-            write_fho_cols(cts_info, job.stat_at,
-                           r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "FHO:");
-            write_case_cols(it->first, at, r, c);
-            write_fho_cols(cts_info, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_ctc(job, it->second, i, cts_info);
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               write_header_cols(shc, job.stat_at, r);
+               write_fho_cols(cts_info, job.stat_at,
+                              r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "FHO:");
+               write_case_cols(it->first, at, r, c);
+               write_fho_cols(cts_info, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // CTC output line
       //
       else if(lt == stat_ctc) {
-         mpr_to_ctc(job, it->second, cts_info);
-         if(job.stat_out) {
-            write_ctc_cols(cts_info, job.stat_at,
-                           r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "CTC:");
-            write_case_cols(it->first, at, r, c);
-            write_ctc_cols(cts_info, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_ctc(job, it->second, i, cts_info);
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               write_header_cols(shc, job.stat_at, r);
+               write_ctc_cols(cts_info, job.stat_at,
+                              r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "CTC:");
+               write_case_cols(it->first, at, r, c);
+               write_ctc_cols(cts_info, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // CTS output line
       //
       else if(lt == stat_cts) {
-         mpr_to_cts(job, it->second, cts_info, tmp_dir, rng_ptr);
-         if(job.stat_out) {
-            write_cts_cols(cts_info, 0, job.stat_at,
-                           r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "CTS:");
-            write_case_cols(it->first, at, r, c);
-            write_cts_cols(cts_info, 0, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_cts(job, it->second, i, cts_info, tmp_dir, rng_ptr);
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               shc.set_alpha(job.out_alpha);
+               write_header_cols(shc, job.stat_at, r);
+               write_cts_cols(cts_info, 0, job.stat_at,
+                              r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "CTS:");
+               write_case_cols(it->first, at, r, c);
+               write_cts_cols(cts_info, 0, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // ECLV output line
       //
       else if(lt == stat_eclv) {
-         mpr_to_ctc(job, it->second, cts_info);
-         if(job.stat_out) {
-            write_eclv_cols(cts_info.cts, job.out_eclv_points,
-                            job.stat_at, r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "ECLV:");
-            write_case_cols(it->first, at, r, c);
-            write_eclv_cols(cts_info.cts, job.out_eclv_points, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_ctc(job, it->second, i, cts_info);
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               write_header_cols(shc, job.stat_at, r);
+               write_eclv_cols(cts_info.cts, job.out_eclv_points,
+                               job.stat_at, r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "ECLV:");
+               write_case_cols(it->first, at, r, c);
+               write_eclv_cols(cts_info.cts, job.out_eclv_points, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // MCTC output line
@@ -3017,10 +3071,14 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_mctc) {
          mpr_to_mctc(job, it->second, mcts_info);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            write_header_cols(shc, job.stat_at, r);
             write_mctc_cols(mcts_info, job.stat_at,
                             r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "MCTC:");
             write_case_cols(it->first, at, r, c);
             write_mctc_cols(mcts_info, at, r, c);
@@ -3032,10 +3090,15 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_mcts) {
          mpr_to_mcts(job, it->second, mcts_info, tmp_dir, rng_ptr);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            shc.set_alpha(job.out_alpha);
+            write_header_cols(shc, job.stat_at, r);
             write_mcts_cols(mcts_info, 0, job.stat_at,
                             r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "MCTS:");
             write_case_cols(it->first, at, r, c);
             write_mcts_cols(mcts_info, 0, at, r, c);
@@ -3045,46 +3108,77 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       // CNT output line
       //
       else if(lt == stat_cnt) {
-         mpr_to_cnt(job, it->second, cnt_info, tmp_dir, rng_ptr);
-         if(job.stat_out) {
-            write_cnt_cols(cnt_info, 0, job.stat_at,
-                           r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "CNT:");
-            write_case_cols(it->first, at, r, c);
-            write_cnt_cols(cnt_info, 0, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_cnt(job, it->second, i, cnt_info, tmp_dir, rng_ptr);
+            if(cnt_info.n == 0) continue;
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               shc.set_thresh_logic(job.out_cnt_logic);
+               shc.set_alpha(job.out_alpha);
+               write_header_cols(shc, job.stat_at, r);
+               write_cnt_cols(cnt_info, 0, job.stat_at,
+                              r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "CNT:");
+               write_case_cols(it->first, at, r, c);
+               write_cnt_cols(cnt_info, 0, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // SL1L2 output line
       //
       else if(lt == stat_sl1l2) {
-         mpr_to_psum(job, it->second, sl1l2_info);
-         if(job.stat_out) {
-            write_sl1l2_cols(sl1l2_info, job.stat_at,
-                             r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "SL1L2:");
-            write_case_cols(it->first, at, r, c);
-            write_sl1l2_cols(sl1l2_info, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_psum(job, it->second, i, sl1l2_info);
+            if(sl1l2_info.scount == 0) continue;
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               shc.set_thresh_logic(job.out_cnt_logic);
+               write_header_cols(shc, job.stat_at, r);
+               write_sl1l2_cols(sl1l2_info, job.stat_at,
+                                r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "SL1L2:");
+               write_case_cols(it->first, at, r, c);
+               write_sl1l2_cols(sl1l2_info, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // SAL1L2 output line
       //
       else if(lt == stat_sal1l2) {
-         mpr_to_psum(job, it->second, sl1l2_info);
-         if(job.stat_out) {
-            write_sal1l2_cols(sl1l2_info, job.stat_at,
-                              r, n_header_columns);
-         }
-         else {
-            at.set_entry(r, c++, "SAL1L2:");
-            write_case_cols(it->first, at, r, c);
-            write_sal1l2_cols(sl1l2_info, at, r, c);
-         }
+         for(i=0; i<job.out_fcst_thresh.n(); i++) {
+            mpr_to_psum(job, it->second, i, sl1l2_info);
+            if(sl1l2_info.sacount == 0) continue;
+            if(job.stat_out) {
+               shc.set_fcst_thresh(job.out_fcst_thresh[i]);
+               shc.set_obs_thresh(job.out_obs_thresh[i]);
+               shc.set_thresh_logic(job.out_cnt_logic);
+               write_header_cols(shc, job.stat_at, r);
+               write_sal1l2_cols(sl1l2_info, job.stat_at,
+                                 r, n_header_columns);
+            }
+            else {
+               c = 0;
+               at.set_entry(r, c++, "SAL1L2:");
+               write_case_cols(it->first, at, r, c);
+               write_sal1l2_cols(sl1l2_info, at, r, c);
+            }
+            // Increment row counter
+            r++;
+         } // end for i
       }
       //
       // PCT output line
@@ -3092,10 +3186,14 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_pct) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            write_header_cols(shc, job.stat_at, r);
             write_pct_cols(pct_info, job.stat_at,
                            r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "PCT:");
             write_case_cols(it->first, at, r, c);
             write_pct_cols(pct_info, at, r, c);
@@ -3107,10 +3205,15 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_pstd) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            shc.set_alpha(job.out_alpha);
+            write_header_cols(shc, job.stat_at, r);
             write_pstd_cols(pct_info, 0, job.stat_at,
                             r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "PSTD:");
             write_case_cols(it->first, at, r, c);
             write_pstd_cols(pct_info, 0, at, r, c);
@@ -3122,10 +3225,15 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_pjc) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            shc.set_alpha(job.out_alpha);
+            write_header_cols(shc, job.stat_at, r);
             write_pjc_cols(pct_info, job.stat_at,
                            r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "PJC:");
             write_case_cols(it->first, at, r, c);
             write_pjc_cols(pct_info, at, r, c);
@@ -3137,10 +3245,15 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       else if(lt == stat_prc) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
+            shc.set_fcst_thresh(job.out_fcst_thresh);
+            shc.set_obs_thresh(job.out_obs_thresh);
+            shc.set_alpha(job.out_alpha);
+            write_header_cols(shc, job.stat_at, r);
             write_prc_cols(pct_info, job.stat_at,
                            r, n_header_columns);
          }
          else {
+            c = 0;
             at.set_entry(r, c++, "PRC:");
             write_case_cols(it->first, at, r, c);
             write_prc_cols(pct_info, at, r, c);
