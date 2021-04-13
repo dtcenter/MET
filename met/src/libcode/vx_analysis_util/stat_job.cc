@@ -186,6 +186,8 @@ void STATAnalysisJob::clear() {
    if(dump_row)  { delete [] dump_row;  dump_row  = (char *) 0; }
    if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
 
+   stat_row = 0;
+
    out_line_type.clear();
 
    out_fcst_thresh.clear();
@@ -307,8 +309,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    wmo_fisher_stats     = aj.wmo_fisher_stats;
 
    column_thresh_map    = aj.column_thresh_map;
-   column_str_inc_map       = aj.column_str_inc_map;
-   column_str_exc_map       = aj.column_str_exc_map;
+   column_str_inc_map   = aj.column_str_inc_map;
+   column_str_exc_map   = aj.column_str_exc_map;
 
    by_column            = aj.by_column;
 
@@ -353,6 +355,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    mask_area            = aj.mask_area;
    mask_poly            = aj.mask_poly;
    mask_sid             = aj.mask_sid;
+
+   stat_row             = aj.stat_row;
 
    set_dump_row (aj.dump_row);
    set_stat_file(aj.stat_file);
@@ -1880,6 +1884,8 @@ void STATAnalysisJob::open_stat_file() {
 
    close_stat_file();
 
+   stat_row = 0;
+
    if(!stat_file) return;
 
    stat_out = new ofstream;
@@ -1904,9 +1910,10 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    int i, c, n_col;
 
    //
-   // Nothing to do unless output STAT file stream is defined
+   // Nothing to do if no output STAT file stream is defined
+   // or if the output table has already been setup
    //
-   if(!stat_out) return;
+   if(!stat_out || stat_at.nrows() > 0) return;
 
    //
    // Check for a single output line type
@@ -1915,6 +1922,11 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
              out_line_type : line_type);
    out_lt = (out_sa.n() == 1 ?
              string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
+
+   //
+   // Multiply number of rows by the number of output line types
+   //
+   n_row *= out_sa.n();
 
    //
    // Loop through the output line types and determine the number of
@@ -2028,6 +2040,11 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          exit(1);
          break;
    }
+
+   //
+   // Initialize the stat row counter after writing the header line
+   //
+   stat_row = 1;
 
    return;
 }
