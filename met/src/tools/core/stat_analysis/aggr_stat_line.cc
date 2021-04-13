@@ -33,8 +33,8 @@
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
 //   014    04/01/19  Fillmore        Add FCST and OBS units.
 //   015    01/24/20  Halley Gotway   Add aggregate RPS lines.
-//   016    04/12/21  Halley Gotway   MET #1735 Multiple -out_thresh for
-//                    aggregate_stat MPR jobs.
+//   016    04/12/21  Halley Gotway   MET #1735 Support multiple
+//                    -out_thresh and -out_line_type options.
 //
 ////////////////////////////////////////////////////////////////////////
 
