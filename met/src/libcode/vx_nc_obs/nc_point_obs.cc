@@ -22,8 +22,8 @@ using namespace std;
 
 #include "vx_log.h"
 
-#include "met_nc_point_obs.h"
-
+#include "nc_point_obs.h"
+#include "write_netcdf.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,12 +86,18 @@ void MetNcPointObs::close() {
       obs_nc = (NcFile *) 0;
    }
 
-   //header_data.clear();
    //obs_vars.reset();
    obs_data.clear();
    header_data.clear();
    return;
 }
+
+
+////////////////////////////////////////////////////////////////////////
+// Requies nc_summary
+//void MetNcPointObs::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
+//   reset_hdr_buffer = get_hdr_obs_count(obs_nc, &out_data, obs_cnt, hdr_cnt);
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -177,14 +183,6 @@ bool MetNcPointObs::get_lons(float *hdr_lons) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPointObs::read_obs_data(int buf_size, int start, float *obs_arr_block,
-                                  int *obs_qty_idx_block, char *obs_qty_str_block) {
-  return obs_vars.read_obs_data(buf_size, start, qty_length, obs_arr_block,
-                                obs_qty_idx_block, obs_qty_str_block);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 //StringArray MetNcPointObs::get_qty_data() {
 //   const char *method_name = "MetNcPointObs::get_qty_data()";
 //   if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)) {
@@ -224,7 +222,7 @@ bool MetNcPointObs::read_obs_data(int buf_size, int start, float *obs_arr_block,
 //   }
 //   return _var_names;
 //}
-//
+
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObs::open(const char * filename) {
@@ -240,10 +238,12 @@ bool MetNcPointObs::read_dim_headers() {
       obs_vars.read_dims_vars(obs_nc);
       nobs = obs_vars.obs_cnt = GET_NC_SIZE(obs_vars.obs_dim);
       nhdr = obs_vars.hdr_cnt = GET_NC_SIZE(obs_vars.hdr_dim);
+      //obs_vars.set_hdr_count(nhdr);
+      //obs_vars.set_obs_count(nobs);
       obs_vars.use_var_id = use_var_id = IS_VALID_NC(obs_vars.obs_vid_var);
       use_arr_vars = IS_VALID_NC(obs_vars.obs_arr_var);
       header_data = obs_vars.read_header_data();
-      //seg fault!!! get_nc_pb_hdr_data(obs_vars, &header_data);
+      //FIXME seg fault!!! get_nc_pb_hdr_data(obs_vars, &header_data);
    }
    return status;
 }
@@ -253,6 +253,14 @@ bool MetNcPointObs::read_dim_headers() {
 bool MetNcPointObs::read_obs_data() {
    bool status = read_obs_data_numbers() && read_obs_data_strings();
    return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetNcPointObs::read_obs_data(int buf_size, int start, float *obs_arr_block,
+                                  int *obs_qty_idx_block, char *obs_qty_str_block) {
+  return obs_vars.read_obs_data(buf_size, start, qty_length, obs_arr_block,
+                                obs_qty_idx_block, obs_qty_str_block);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,3 +293,10 @@ bool MetNcPointObs::set_netcdf(NcFile *nc_file, bool _keep_nc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void MetNcPointObs::set_using_var_id(bool using_var_id) {
+   use_var_id = obs_vars.use_var_id = using_var_id; 
+}
+
+////////////////////////////////////////////////////////////////////////
+
