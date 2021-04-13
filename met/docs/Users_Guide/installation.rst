@@ -69,7 +69,7 @@ NCEP's BUFRLIB is used by the MET to decode point-based observation datasets in 
 .. code-block:: none
 		
   gcc -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log
-  gfortran -c -fno-second-underscore `./getdefflags_F.sh` modv*.F moda*.F \
+  gfortran -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F \
   `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log
   ar crv libbufr.a *.o
 
