@@ -1911,9 +1911,8 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
 
    //
    // Nothing to do if no output STAT file stream is defined
-   // or if the output table has already been setup
    //
-   if(!stat_out || stat_at.nrows() > 0) return;
+   if(!stat_out) return;
 
    //
    // Check for a single output line type
@@ -1922,11 +1921,6 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
              out_line_type : line_type);
    out_lt = (out_sa.n() == 1 ?
              string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
-
-   //
-   // Multiply number of rows by the number of output line types
-   //
-   n_row *= out_sa.n();
 
    //
    // Loop through the output line types and determine the number of
@@ -1982,69 +1976,105 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    n_col += n_header_columns;
 
    //
-   // Setup the STAT table
+   // Create table from scratch
    //
-   stat_at.set_size(n_row, n_col);
-   justify_stat_cols(stat_at);
-   stat_at.set_precision(precision);
-   stat_at.set_bad_data_value(bad_data_double);
-   stat_at.set_bad_data_str(na_str);
-   stat_at.set_delete_trailing_blank_rows(1);
-
-   //
-   // Write the STAT header row
-   //
-   switch(out_lt) {
-      case stat_sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
-      case stat_sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
-      case stat_vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
-      case stat_val1l2: write_header_row       (val1l2_columns, n_val1l2_columns, 1,     stat_at, 0, 0); break;
-      case stat_fho:    write_header_row       (fho_columns, n_fho_columns, 1,           stat_at, 0, 0); break;
-      case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
-      case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
-      case stat_mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
-      case stat_mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
-      case stat_cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
-      case stat_vcnt:   write_header_row       (vcnt_columns, n_vcnt_columns, 1,         stat_at, 0, 0); break;
-      case stat_pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
-      case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
-      case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
-      case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
-      case stat_eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
-      case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
-      case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
-      case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
-      case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
-      case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
-      case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
-      case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
-      case stat_ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
-      case stat_rps:    write_header_row       (rps_columns, n_rps_columns, 1,           stat_at, 0, 0); break;
-      case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
-      case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
-      case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
-      case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
-      case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
-      case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+   if(stat_row == 0) {
+   
+      //
+      // Multiply the number of rows by the number of
+      // output line types to avoid resizing later
+      //
+      n_row *= max(1, out_sa.n());
 
       //
-      // Write only header columns for unspecified line type
+      // Setup the STAT table
       //
-      case no_stat_line_type:
-                        write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+      stat_at.set_size(n_row, n_col);
+      justify_stat_cols(stat_at);
+      stat_at.set_precision(precision);
+      stat_at.set_bad_data_value(bad_data_double);
+      stat_at.set_bad_data_str(na_str);
+      stat_at.set_delete_trailing_blank_rows(1);
 
-      default:
-         mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
-              << "unexpected stat line type \"" << statlinetype_to_string(out_lt)
-              << "\"!\n\n";
-         exit(1);
-         break;
+      //
+      // Write the STAT header row
+      //
+      switch(out_lt) {
+         case stat_sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
+         case stat_sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
+         case stat_vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
+         case stat_val1l2: write_header_row       (val1l2_columns, n_val1l2_columns, 1,     stat_at, 0, 0); break;
+         case stat_fho:    write_header_row       (fho_columns, n_fho_columns, 1,           stat_at, 0, 0); break;
+         case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
+         case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
+         case stat_mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case stat_mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
+         case stat_cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
+         case stat_vcnt:   write_header_row       (vcnt_columns, n_vcnt_columns, 1,         stat_at, 0, 0); break;
+         case stat_pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case stat_eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
+         case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+         case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+         case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+         case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
+         case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
+         case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
+         case stat_ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
+         case stat_rps:    write_header_row       (rps_columns, n_rps_columns, 1,           stat_at, 0, 0); break;
+         case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
+         case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
+         case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
+         case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
+         case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+
+         //
+         // Write only header columns for unspecified line type
+         //
+         case no_stat_line_type:
+                           write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+
+         default:
+            mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
+                 << "unexpected stat line type \"" << statlinetype_to_string(out_lt)
+                 << "\"!\n\n";
+            exit(1);
+            break;
+      }
+
+      //
+      // Increment row counter
+      //
+      stat_row++;
    }
+   //
+   // Expand the table, if needed
+   //
+   else {
 
-   //
-   // Initialize the stat row counter after writing the header line
-   //
-   stat_row = 1;
+      //
+      // Determine the required dimensions
+      //
+      int need_rows = max(stat_at.nrows(), stat_row + n_row);
+      int need_cols = max(stat_at.ncols(), n_col);
+
+      if(need_rows > stat_at.nrows() || need_cols > stat_at.ncols()) {
+
+         //
+         // Resize the STAT table
+         //
+         stat_at.expand(need_rows, need_cols);
+         justify_stat_cols(stat_at);
+         stat_at.set_precision(precision);
+         stat_at.set_bad_data_value(bad_data_double);
+         stat_at.set_bad_data_str(na_str);
+         stat_at.set_delete_trailing_blank_rows(1);
+      }
+   }
 
    return;
 }
