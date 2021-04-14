@@ -3506,7 +3506,15 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) return;
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) {
+      mlog << Warning << "\nmpr_to_cnt() -> "
+           << "no MPR lines retained for -out_fcst_thresh "
+           << job.out_fcst_thresh[i_thresh].get_str() << " -out_obs_thresh "
+           << job.out_obs_thresh[i_thresh].get_str() << " -out_cnt_logic "
+           << setlogic_to_string(job.out_cnt_logic)
+           << "\n\n";
+      return;
+   }
 
    //
    // Set the precip flag based on fcst_var and obs_var
@@ -3566,7 +3574,15 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) return;
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) {
+      mlog << Warning << "\nmpr_to_psum() -> "
+           << "no MPR lines retained for -out_fcst_thresh "
+           << job.out_fcst_thresh[i_thresh].get_str() << " -out_obs_thresh "
+           << job.out_obs_thresh[i_thresh].get_str() << " -out_cnt_logic "
+           << setlogic_to_string(job.out_cnt_logic)
+           << "\n\n";
+      return;
+   }
 
    //
    // Initialize counts

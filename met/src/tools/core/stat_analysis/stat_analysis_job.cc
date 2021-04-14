@@ -3329,6 +3329,11 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       }
    } // end for it
 
+   //
+   // Discard contents of an empty AsciiTable
+   //
+   if(r == 1) at.clear();
+
    return;
 }
 
@@ -4200,6 +4205,11 @@ void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_table(AsciiTable &at, ofstream *sa_out) {
+
+   //
+   // Do not write an empty table
+   //
+   if(at.nrows() == 0 && at.ncols() == 0) return;
 
    if(sa_out) *(sa_out) << at << "\n" << flush;
    else       cout      << at << "\n" << flush;
