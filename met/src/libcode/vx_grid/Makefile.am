@@ -17,6 +17,8 @@ libvx_grid_a_SOURCES = \
               grid_base.cc grid_base.h \
               latlon_grid_defs.h \
               latlon_grid.cc latlon_grid.h \
+              laea_grid_defs.h \
+              laea_grid.cc laea_grid.h \
               lc_grid_defs.h \
               lc_grid.cc lc_grid.h \
               merc_grid_defs.h \
