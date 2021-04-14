@@ -68,7 +68,7 @@ export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib:${MET_PYTHON}/lib:${MET_NE
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # Constants
-if [ -z ${MET_GRIB2CLIB} ]; then
+if [ [ -z ${MET_GRIB2CLIB} && -z ${MET_GRIB2CINC} ] ]; then
     COMPILE_ZLIB=1
     COMPILE_LIBPNG=1
     COMPILE_JASPER=1
@@ -128,18 +128,18 @@ COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
 
 echo "USE_MODULES = ${USE_MODULES}"
 
-if [ ${USE_MODULES} == "TRUE" ]; then 
+if [ ${USE_MODULES} = "TRUE" ]; then 
     echo "module load ${COMPILER_FAMILY}/${COMPILER_VERSION}"
     echo ${COMPILER_FAMILY}/${COMPILER_VERSION}
 
     module load ${COMPILER_FAMILY}/${COMPILER_VERSION}
-    if [ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]; then
+    if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
 	module load craype
 	module switch craype craype-sandybridge
     fi
 fi
 
-if [ ${COMPILER_FAMILY} == "gnu" ]; then
+if [ ${COMPILER_FAMILY} = "gnu" ]; then
     if [ -z ${CC} ]; then
 	export CC=`which gcc`
     else
@@ -165,7 +165,7 @@ if [ ${COMPILER_FAMILY} == "gnu" ]; then
     else
 	export F90=${F90}
     fi
-elif [ ${COMPILER_FAMILY} == "pgi" ]; then
+elif [ ${COMPILER_FAMILY} = "pgi" ]; then
     if [ -z ${CC} ]; then
 	export CC=`which pgcc`
     else
@@ -225,7 +225,7 @@ echo "export F90=${F90}"
 
 # Load Python module
 
-if [ ${USE_MODULES} == "TRUE" ]; then
+if [ ${USE_MODULES} = "TRUE" ]; then
     if [ ! -z ${PYTHON_MODULE} ]; then
 	PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
 	PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
@@ -241,7 +241,7 @@ python --version
 # Compile GSL
 if [ $COMPILE_GSL -eq 1 ]; then
 
-  if [ ${COMPILER_FAMILY} == "pgi" ]; then
+  if [ ${COMPILER_FAMILY} = "pgi" ]; then
     vrs="1.11";
   else
     vrs="2.1";
@@ -295,8 +295,8 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
   # For GNU and Intel follow BUFRLIB11 instructions                                                                                                                                                    
   if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
-    ${FC} -c -fno-second-underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
-  elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]]; then
+    ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+  elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
     ${FC} -c `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
   elif [[ ${COMPILER_FAMILY} == "pgi" ]]; then
     ${FC} -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
@@ -460,8 +460,14 @@ if [ $COMPILE_HDF -eq 1 ]; then
      echo "configure returned with non-zero ($ret) status"
      exit 1
   fi
-  cat mfhdf/hdiff/Makefile | sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' > Makefile_NEW
-  mv Makefile_NEW mfhdf/hdiff/Makefile
+  cat mfhdf/hdiff/Makefile | \
+    sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
+    > Makefile_new
+  mv Makefile_new mfhdf/hdiff/Makefile
+  cat hdf/src/Makefile | \
+    sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
+    > Makefile_new
+  mv Makefile_new hdf/src/Makefile
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
@@ -624,7 +630,7 @@ fi
 if [ $COMPILE_CAIRO -eq 1 ]; then
 
     # If on Cray, compile PIXMAN                                                                                                                                                                                                
-    if [ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]; then
+    if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
 	echo
 	echo "Compiling pixman at `date`"
 	mkdir -p  ${LIB_DIR}/pixman
@@ -664,7 +670,7 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
   tar -xf ${TAR_DIR}/cairo*.tar*
   cd cairo*
   export PKG_CONFIG=`which pkg-config`
-  if [ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]; then
+  if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
       export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
@@ -699,7 +705,7 @@ if [ $COMPILE_MET -eq 1 ]; then
   cd ${MET_DIR}
   # If using source from a tar file remove everything and unpack the tar file
   # FALSE = compiling from github repo and we don't want to overwrite the files
-  if [ ${USE_MET_TAR_FILE} == "TRUE" ]; then
+  if [ ${USE_MET_TAR_FILE} = "TRUE" ]; then
     rm -rf met*
     tar -xzf ${MET_TARBALL}
   fi
@@ -712,7 +718,11 @@ if [ $COMPILE_MET -eq 1 ]; then
   fi
 
   if [ -z ${MET_GRIB2CLIB} ]; then
-      export MET_GRIB2C=${LIB_DIR}
+      export MET_GRIB2CLIB=${LIB_DIR}/lib
+      export MET_GRIB2CINC=${LIB_DIR}/include
+      export LIB_JASPER=${LIB_DIR}/lib
+      export LIB_LIBPNG=${LIB_DIR}/lib
+      export LIB_Z=${LIB_DIR}/lib
   else
       export MET_GRIB2CLIB=${MET_GRIB2CLIB}
       export MET_GRIB2CINC=${MET_GRIB2CINC}
@@ -744,7 +754,7 @@ if [ $COMPILE_MET -eq 1 ]; then
   export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
-  if [ ${SET_D64BIT} == "TRUE" ]; then
+  if [ ${SET_D64BIT} = "TRUE" ]; then
       export CFLAGS="-D__64BIT__"
       export CXXFLAGS="-D__64BIT__"
   fi
