@@ -469,13 +469,12 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
          }
       }
    }
-   else if (time_as_value) {
-      idx = convert_time_to_offset(dim_offset);
-      if (0 <= idx && idx < time_dim_size) time_offsets.add(idx);
+   else {
+      if (time_as_value) dim_offset = convert_time_to_offset(dim_offset);
+      if (0 <= time_dim_slot && dim_offset < time_dim_size)
+         time_offsets.add(dim_offset);
+      else error_code = error_code_unknown;
    }
-   else if (0 <= time_dim_slot && dim_offset < time_dim_size)
-      time_offsets.add(dim_offset);
-   else error_code = error_code_unknown;
 
    int time_count = time_offsets.n_elements();
    if (0 < time_count)
