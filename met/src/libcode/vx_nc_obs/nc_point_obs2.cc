@@ -13,12 +13,8 @@
 using namespace std;
 
 #include <iostream>
-//#include <unistd.h>
-//#include <stdlib.h>
 #include <string.h>
 #include <cstdio>
-//#include <cmath>
-//#include <time.h>
 
 #include "vx_log.h"
 
@@ -89,8 +85,8 @@ bool MetNcPointObs2Write::add_header(const char *hdr_typ, const char *hdr_sid,
    header_data.lon_array.add(hdr_lon);  // Longitude
    header_data.elv_array.add(hdr_elv);  // Elevation
    data_buffer.cur_hdr_idx++;
-   mlog << Debug(9) << method_name << "header is added (cur_index="
-        << data_buffer.cur_hdr_idx << ")\n";
+   mlog << Debug(9) << method_name << "header is added (cur_hdr_idx="
+        << data_buffer.cur_hdr_idx << ", obs_idx=" << data_buffer.cur_obs_idx << ")\n";
    added = true;
    return added;
 }
@@ -165,13 +161,49 @@ void MetNcPointObs2Write::create_pb_hdrs(int pb_hdr_count) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// If raw_hdr_cnt is greater than 0, skip updating header index for obs.
 
 void MetNcPointObs2Write::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
-   reset_hdr_buffer = get_hdr_obs_count(obs_nc, &out_data, obs_cnt, hdr_cnt);
+   string method_name = "get_dim_counts() ";
+   SummaryObs *summary_obs = out_data.summary_obs;
+   bool do_summary = out_data.summary_info.flag;
+
+   //
+   // Initialize the header and observation record counters
+   //
+   int obs_count = out_data.observations.size();
+   int hdr_count = (out_data.processed_hdr_cnt > 0)
+         ? out_data.processed_hdr_cnt
+         : summary_obs->countHeaders(out_data.observations); // count and reset header index
+   if (do_summary) {
+      int summary_count = summary_obs->getSummaries().size();
+      int summary_hdr_count = summary_obs->countSummaryHeaders();
+      if (out_data.summary_info.raw_data) {
+         obs_count += summary_count;
+         hdr_count += summary_hdr_count;
+      }
+      else {
+         obs_count = summary_count;
+         hdr_count = summary_hdr_count;
+         if (out_data.processed_hdr_cnt > 0) {
+            reset_hdr_buffer = true;
+         }
+      }
+   }
+   *obs_cnt = obs_count;
+   *hdr_cnt = hdr_count;
+   mlog << Debug(7) << method_name << "obs_count: "
+        << obs_count << " header count: " << hdr_count << "\n";
+
+   //
+   // Add global attributes
+   //
+
+   if (do_summary) write_summary_attributes(obs_nc, out_data.summary_info);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
-// If raw_hdr_cnt is greater than 0, skip updating header index for obs.
 
 void MetNcPointObs2Write::init_buffer() {
    //string method_name = "init_buffer(() ";
@@ -192,17 +224,18 @@ void MetNcPointObs2Write::init_buffer() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// If raw_hdr_cnt is greater than 0, skip updating header index for obs.
+// get_dim_counts() must be called before caling init_netcdf because
+// reset_hdr_buffer is updated by get_dim_counts().
 
 bool MetNcPointObs2Write::init_netcdf(int obs_count, int hdr_count,
-                                     string program_name) {
+                                      string program_name) {
    string method_name = "init_netcdf() ";
 
    if (reset_hdr_buffer) {
       bool hdr_cnt = get_hdr_index();
       bool reset_array = true;
       reset_header_buffer(hdr_cnt, reset_array);
-      mlog << Debug(5) << method_name << "reset headers (" << hdr_cnt << ") raw data.\n";
+      mlog << Debug(5) << method_name << "reset " << hdr_cnt << " headers (" << hdr_count << ").\n";
    }
 
    //nobs = obs_count;
@@ -219,7 +252,8 @@ bool MetNcPointObs2Write::init_netcdf(int obs_count, int hdr_count,
    //
    write_netcdf_global(obs_nc, obs_nc->getName().c_str(), program_name.c_str());
 
-   return reset_hdr_buffer;
+   //return reset_hdr_buffer;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -229,7 +263,7 @@ void MetNcPointObs2Write::init_obs_vars(bool using_var_id, int deflate_level,
    use_var_id = using_var_id;
    obs_vars.reset(using_var_id);
    obs_vars.attr_agl = attr_agl;
-//FIXME   out_data.deflate_level = obs_vars.deflate_level = deflate_level;
+   out_data.deflate_level = obs_vars.deflate_level = deflate_level;
 
    header_data.clear();
 }
@@ -262,7 +296,19 @@ void MetNcPointObs2Write::reset_header_buffer(int buf_size, bool reset_all) {
    }
 }
 
+////////////////////////////////////////////////////////////////////////
 
+void MetNcPointObs2Write::set_nc_out_data(vector<Observation> observations,
+                                          SummaryObs *summary_obs,
+                                          TimeSummaryInfo summary_info,
+                                          int processed_hdr_cnt) {
+   out_data.processed_hdr_cnt = processed_hdr_cnt;
+   out_data.observations = observations;
+   out_data.summary_obs = summary_obs;
+   out_data.summary_info = summary_info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Saves the headers at NcHeaderData header_data
 //
 void MetNcPointObs2Write::write_arr_headers() {
@@ -282,7 +328,6 @@ void MetNcPointObs2Write::write_arr_headers() {
    int hdr_data_idx = 0;
    bool is_pb_hdr = (0 < header_data.prpt_typ_array.n_elements())
          && !IS_INVALID_NC(obs_vars.hdr_prpt_typ_var);
-   // FIXME nc_data_buffer.obs_vars = obs_vars;
    data_buffer.hdr_buf_size = buf_size;
    data_buffer.hdr_data_idx = hdr_data_idx;
    int pb_raw_hdr_cnt = raw_hdr_cnt;
@@ -398,7 +443,6 @@ void MetNcPointObs2Write::write_header(const char *hdr_typ, const char *hdr_sid,
 void MetNcPointObs2Write::write_observation()
 {
    if (0 < data_buffer.obs_data_idx){
-      //CHECKME data_buffer.obs_vars = obs_vars;
       obs_vars.write_obs_buffer(data_buffer, data_buffer.obs_data_idx);
    }
 }
@@ -483,16 +527,6 @@ int MetNcPointObs2Write::write_obs_data(const vector< Observation > observations
    int obs_buf_size = observations.size();
    if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
    
-   //if (reset) {
-   //   data_buffer.obs_vars = obs_vars;
-   //   data_buffer.obs_buf_size = obs_buf_size;
-   //   data_buffer.obs_data_idx = 0;
-   //   data_buffer.obs_data_offset = 0;
-   //   data_buffer.hdr_data_idx = 0;
-   //   data_buffer.hdr_data_offset = 0;
-   //   
-   //   data_buffer.processed_count =0;
-   //}
    float obs_arr[OBS_ARRAY_LEN];
    bool header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var)
          || IS_INVALID_NC(obs_vars.hdr_lat_var);
@@ -556,27 +590,26 @@ int MetNcPointObs2Write::write_obs_data(const vector< Observation > observations
 bool MetNcPointObs2Write::write_to_netcdf(StringArray obs_names, StringArray obs_units,
                                           StringArray obs_descs) {
    const char *method_name = "  write_to_netcdf() ";
-   //if( using_obs_vars ) 
-   //else 
-   //write_observations(&obs_vars, &out_data);
+
    write_obs_data();
-   
    obs_vars.create_table_vars (obs_nc, header_data, data_buffer);
    write_arr_headers();
 
-   int var_count = obs_names.n_elements();
-   if (var_count > 0) {
-      int unit_count = obs_units.n();
-      obs_vars.create_obs_name_vars (obs_nc, var_count, unit_count);
-      obs_vars.write_obs_var_names(obs_names);
-      if( unit_count > 0 ) obs_vars.write_obs_var_units(obs_units);
-      if( obs_descs.n() > 0 ) obs_vars.write_obs_var_descriptions(obs_descs);
-      mlog << Debug(7) << method_name << var_count
-           << " variable names were saved\n";
+   if (use_var_id) {
+      int var_count = obs_names.n_elements();
+      if (var_count > 0) {
+         int unit_count = obs_units.n();
+         obs_vars.create_obs_name_vars (obs_nc, var_count, unit_count);
+         obs_vars.write_obs_var_names(obs_names);
+         if( unit_count > 0 ) obs_vars.write_obs_var_units(obs_units);
+         if( obs_descs.n() > 0 ) obs_vars.write_obs_var_descriptions(obs_descs);
+         mlog << Debug(7) << method_name << var_count
+              << " variable names were saved\n";
+      }
+      else mlog << Warning << "\n" << method_name 
+                << "variable names are not added because of empty names\n\n";
    }
-   else mlog << Debug(7) << method_name << "no var_names\n";
-   //else mlog << Debug(7) << method_name << "use_var_id is false\n";
-
+   else mlog << Debug(7) << method_name << "use_var_id is false\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

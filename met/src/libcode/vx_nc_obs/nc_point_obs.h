@@ -25,8 +25,11 @@
 #include "nc_utils.h"
 #include "nc_obs_util.h"
 #include "nc_var_info.h"
-#include "nc_summary.h"
+#include "vx_summary.h"
 
+
+////////////////////////////////////////////////////////////////////////
+// struct definition
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -142,8 +145,8 @@ class MetNcPointObs2Write : public MetNcPointObs {
          
       int get_buf_size();
       void get_dim_counts(int *obs_cnt, int *hdr_cnt);
-//      NcHeaderData *get_header_data();
       int get_hdr_index();
+//      bool get_hdr_obs_count(int *obs_cnt, int *hdr_cnt);
 //      int get_obs_cnt();
       int get_obs_index();
       NcObsOutputData *get_output_data();
@@ -154,8 +157,9 @@ class MetNcPointObs2Write : public MetNcPointObs {
       bool init_netcdf(int obs_count, int hdr_count, string program_name);
 
       void reset_header_buffer(int buf_size, bool reset_all);
-//      void set_nc_out_data(vector<Observation> observations, SummaryObs *summary_obs,
-//                           TimeSummaryInfo summary_info);
+      void set_nc_out_data(vector<Observation> observations,
+                           SummaryObs *summary_obs, TimeSummaryInfo summary_info,
+                           int processed_hdr_cnt=0);
 //      bool set_reset_hdr_buffer(bool reset_buffer);
 
       void write_arr_headers();
