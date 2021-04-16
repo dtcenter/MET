@@ -247,9 +247,9 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    // Define the NetCDF dimensions and variables
    //
    nc_point_obs.set_netcdf(_ncFile, true);
-   // Note: use_var_id will be set by the handler
+   // Note: use_var_id was set by the handler
    nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
-   set_nc_out_data(nc_point_obs.get_output_data(), _observations, &summary_obs, _summaryInfo);
+   nc_point_obs.set_nc_out_data(_observations, &summary_obs, _summaryInfo);
 
    int obs_cnt, hdr_cnt;
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
@@ -337,7 +337,6 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  if (use_var_id) nc_point_obs.set_using_var_id(use_var_id);
   StringArray descs, units;
   nc_point_obs.write_to_netcdf(obs_names, units, descs);
 

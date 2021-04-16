@@ -781,7 +781,6 @@ void open_netcdf() {
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
    nc_point_obs.set_netcdf(f_out, true);
-   //nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
    nc_point_obs.init_obs_vars(use_var_id, deflate_level);
 
    return;
@@ -2385,15 +2384,12 @@ void process_pbfile_metadata(int i_pb) {
 void write_netcdf_hdr_data() {
    long dim_count, pb_hdr_count;
    bool is_prepbufr = is_prepbufr_file(&event_names);
+   TimeSummaryInfo summary_info = conf_info.getSummaryInfo();
    static const string method_name = "write_netcdf_hdr_data() ";
 
    pb_hdr_count = (long) nc_point_obs.get_hdr_index();
-
-   NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();
-   NcObsOutputData *nc_out_data = nc_point_obs.get_output_data();
-   set_nc_out_data(nc_out_data, observations, summary_obs,
-                   conf_info.getSummaryInfo());
-   nc_out_data->processed_hdr_cnt = pb_hdr_count;
+   nc_point_obs.set_nc_out_data(observations, summary_obs,
+                                summary_info, pb_hdr_count);
 
    int obs_cnt, hdr_cnt;
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
@@ -2408,11 +2404,11 @@ void write_netcdf_hdr_data() {
       exit(1);
    }
 
-   obs_vars->attr_pb2nc = true;
+   nc_point_obs.get_obs_vars()->attr_pb2nc = true;
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
 
    if (is_prepbufr) {
-      if (!nc_out_data->summary_info.flag || nc_out_data->summary_info.raw_data) {
+      if (!summary_info.flag || summary_info.raw_data) {
          nc_point_obs.create_pb_hdrs(pb_hdr_count);
       }
    }
@@ -2502,6 +2498,8 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
+
+   nc_point_obs.close();
 
    if(f_out) {
       delete f_out;

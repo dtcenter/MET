@@ -905,8 +905,7 @@ void write_netcdf_hdr_data() {
    const long hdr_count = (long) nc_point_obs.get_hdr_index();
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   NcObsOutputData *nc_out_data = nc_point_obs.get_output_data();
-   set_nc_out_data(nc_out_data, observations, summary_obs, conf_info.getSummaryInfo());
+   nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
 
@@ -973,6 +972,8 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
+
+   nc_point_obs.close();
 
    if(f_out) {
       delete f_out;

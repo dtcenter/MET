@@ -145,7 +145,6 @@ int main(int argc, char *argv[]) {
    //
    process_command_line(argc, argv);
 
-//   bool use_var_id = false;
    nc_point_obs.init_buffer();
 
    //
@@ -157,7 +156,6 @@ int main(int argc, char *argv[]) {
      process_madis_file((*it_mdfile).c_str());
    }
 
-//   bool do_header = false;
    int nhdr = nc_point_obs.get_obs_index();
 
    if (conf_info.getSummaryInfo().flag) {
@@ -356,6 +354,8 @@ void clean_up() {
 
    if (summary_obs) delete summary_obs;
    
+   nc_point_obs.close();
+
    //
    // Close the output NetCDF file
    //
@@ -401,12 +401,7 @@ void setup_netcdf_out(int nhdr) {
    mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
         << "\tobs_cnt:\t" << obs_vars->obs_cnt << "\n";
 
-   NcObsOutputData *nc_out_data = nc_point_obs.get_output_data();
-   set_nc_out_data(nc_out_data, obs_vector, summary_obs, conf_info.getSummaryInfo());
-
-//   init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
-//H   bool reset_hdr_buffer = get_hdr_obs_count(f_out, &nc_out_data, &obs_cnt, &hdr_cnt);
-//H   nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, reset_hdr_buffer, program_name);
+   nc_point_obs.set_nc_out_data(obs_vector, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
    
