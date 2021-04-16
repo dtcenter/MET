@@ -36,16 +36,6 @@ extern string _secsToTimeString(const int secs);
 
 // Not moved to nc_obs_util to reduce the dependency (library)
 
-//extern bool init_netcdf_output(NcFile *, NetcdfObsVars *obs_vars,
-//                               NcObsOutputData *nc_out_data, string program_name);
-extern bool get_hdr_obs_count(NcFile *nc_file, NcObsOutputData *nc_out_data,
-                              int *obs_cnt, int *hdr_cnt);
-
-extern void set_nc_out_data(NcObsOutputData *out_data, vector<Observation> observations,
-                            SummaryObs *summary_obs, TimeSummaryInfo summary_info);
-
-//extern bool write_observations(NetcdfObsVars *, NcObsOutputData *nc_out_data);
-
 extern void write_summary_attributes(NcFile *, TimeSummaryInfo);
 
 ////////////////////////////////////////////////////////////////////////
