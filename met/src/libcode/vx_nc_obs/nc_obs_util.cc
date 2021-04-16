@@ -26,10 +26,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//NcDataBuffer nc_data_buffer;
-//NcDataBuffer data_buffer;
-//struct NcHeaderData hdr_data;
-
 float  hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,8 +44,33 @@ static const string err_msg_hdr_arr =
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// struct NcPointObsData
+// struct NcDataBuffer
 
+NcDataBuffer::NcDataBuffer() {
+   reset_counters();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void NcDataBuffer::reset_counters() {
+   processed_count = 0;
+   obs_count = 0;
+   obs_buf_size = 0;
+   cur_obs_idx = 0;
+   obs_data_idx = 0;
+   obs_data_offset = 0;
+   hdr_count = 0;
+   hdr_buf_size = 0;
+   cur_hdr_idx = 0;
+   hdr_data_idx = 0;
+   hdr_data_offset = 0;
+   pb_hdr_count = 0;
+   pb_hdr_data_offset = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// struct NcPointObsData
 
 NcPointObsData::NcPointObsData():
    obs_cnt(0),
@@ -60,7 +81,6 @@ NcPointObsData::NcPointObsData():
    obs_hgts((float *)0),
    obs_vals((float *)0),
    obs_arr((float *)0),
-//   data_buf(new NcDataBuffer),
    is_obs_array(false)
 {
 }
@@ -273,44 +293,6 @@ NetcdfObsVars::NetcdfObsVars()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//bool NetcdfObsVars::add_header(const char *hdr_typ, const char *hdr_sid,
-//                               const time_t hdr_vld, const float hdr_lat,
-//                               const float hdr_lon, const float hdr_elv)
-//{
-//   bool added = false;
-////   bool new_vld = false;
-//   
-//   // Can't filter duplicated one because header index was
-//   // assigned before checking
-//   int hdr_index;
-//   add_header_strings(hdr_typ, hdr_sid);
-//
-//   if (hdr_data.min_vld_time == -1 || hdr_data.min_vld_time > hdr_vld) {
-//      if (hdr_data.min_vld_time == -1) hdr_data.max_vld_time = hdr_vld; 
-//      hdr_data.min_vld_time = hdr_vld;
-//      new_vld = true;
-//   }
-//   else if (hdr_data.max_vld_time < hdr_vld) {
-//      hdr_data.max_vld_time = hdr_vld;
-//      new_vld = true;
-//   }
-//   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index, false)) {
-//      hdr_index = hdr_data.vld_array.n_elements();
-//      hdr_data.vld_array.add(unix_to_yyyymmdd_hhmmss(hdr_vld)); // Valid time
-//      hdr_data.vld_num_array.add(hdr_vld);   // Valid time
-//   }
-//   hdr_data.vld_idx_array.add(hdr_index);       // Index of Valid time
-//   
-//   hdr_data.lat_array.add(hdr_lat);  // Latitude
-//   hdr_data.lon_array.add(hdr_lon);  // Longitude
-//   hdr_data.elv_array.add(hdr_elv);  // Elevation
-//   data_buffer.cur_hdr_idx++;
-//   added = true;
-//   return added;
-//}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void NetcdfObsVars::create_dimensions(NcFile *f_out) {
    const string method_name = "  create_dimensions()";
    mlog << Debug(7) << method_name << "  is called" << "\n";
@@ -325,7 +307,6 @@ void NetcdfObsVars::create_dimensions(NcFile *f_out) {
       if (obs_cnt > 0) obs_dim = add_dim(f_out, nc_dim_nobs, obs_cnt);   // fixed dimension;
       else             obs_dim = add_dim(f_out, nc_dim_nobs);   // unlimited dimension;
    }
-   //nc_data_buffer.obs_vars = obs_vars;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,7 +349,6 @@ void NetcdfObsVars::create_hdr_vars (NcFile *f_out, const int hdr_count) {
    add_att(&hdr_elv_var, "long_name",  "elevation");
    add_att(&hdr_elv_var, "_FillValue", FILL_VALUE);
    add_att(&hdr_elv_var, "units", "meters above sea level (msl)");
-   //FIXME nc_data_buffer.obs_vars = obs_vars;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -419,7 +399,6 @@ void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
          : "height in meters above sea level (msl)";
    add_att(&obs_hgt_var,  "long_name", long_name_str);
    add_att(&obs_hgt_var, "_FillValue", FILL_VALUE);
-//FIXME   nc_data_buffer.obs_vars = obs_vars;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -483,7 +462,6 @@ void NetcdfObsVars::create_table_vars (NcFile *f_out, NcHeaderData &hdr_data,
    add_att(&hdr_sid_tbl_var, "long_name", "station identification");
    add_att(&hdr_vld_tbl_var, "long_name", "valid time");
    add_att(&hdr_vld_tbl_var, "units", "YYYYMMDD_HHMMSS UTC");
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -499,12 +477,6 @@ NcDim NetcdfObsVars::create_var_obs_var (NcFile *f_out, int var_count) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-//NcHeaderData *NetcdfObsVars::get_header_data() {
-//   return &hdr_data;
-//}
-
-///////////////////////////////////////////////////////////////////////////////
 
 bool NetcdfObsVars::is_valid(bool exit_on_error) {
    bool valid = true;
@@ -554,7 +526,6 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
    
    NcVar ncVar;
    // Define netCDF dimensions
-   //hdr_cnt     ; // header array length (fixed dimension if hdr_cnt > 0)
    strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);       // header string dimension
    if (has_dim(f_in, nc_dim_mxstr2))
       strl2_dim   = get_nc_dim(f_in, nc_dim_mxstr2);   // header string dimension (bigger dimension)
@@ -635,7 +606,6 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
    }
 
    use_var_id = _use_var_id;
-   //FIXME nc_data_buffer.obs_vars = obs_vars;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -685,7 +655,7 @@ NcHeaderData NetcdfObsVars::read_header_data() {
    my_hdr_data.vld_idx_array.extend(nhdr_count);
    
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
-        ? NC_BUFFER_SIZE_32K : (nhdr_count));
+                   ? NC_BUFFER_SIZE_32K : (nhdr_count));
    
    //
    // Allocate space to store the data
@@ -1094,12 +1064,6 @@ void NetcdfObsVars::reset(bool _use_var_id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//void NetcdfObsVars::set_header_data() {
-//  header_data = new NcHeader_data()
-//}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
                                        const int buf_size, const bool is_pb)
 {
@@ -1228,7 +1192,6 @@ void NetcdfObsVars::write_table_vars (NcHeaderData &hdr_data, NcDataBuffer &data
 
 void NetcdfObsVars::write_obs_buffer(NcDataBuffer &data_buffer, const int buf_size)
 {
-   //CHECKME const NetcdfObsVars &obs_vars = data_buffer.obs_vars;
    long offsets[2] = { data_buffer.obs_data_offset, 0 };
    long lengths[1] = { buf_size} ;
    const string method_name = "  write_obs_buffer()";
@@ -1284,92 +1247,6 @@ void NetcdfObsVars::write_obs_buffer(NcDataBuffer &data_buffer, const int buf_si
    data_buffer.obs_data_offset += buf_size;
    data_buffer.obs_data_idx = 0;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-//int NetcdfObsVars::write_observations(const vector< Observation > observations,
-//                                      NcDataBuffer &data_buffer, const bool do_header)
-//{
-//   int prev_hdr_idx = -1;
-//   string prev_header_type = "";
-//   string prev_station_id = "";
-//   ConcatString obs_qty;
-//   int headerOffset = data_buffer.cur_hdr_idx;
-//   //float obs_arr[obs_arr_len];
-//   const string method_name = "  write_observations()";
-//
-//   int obs_buf_size = observations.size();
-//   mlog << Debug(7) << method_name << "  obs_count: " << obs_buf_size << "\n";
-//   if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
-//   
-//   //if (reset) {
-//   //   data_buffer.obs_vars = obs_vars;
-//   //   data_buffer.obs_buf_size = obs_buf_size;
-//   //   data_buffer.obs_data_idx = 0;
-//   //   data_buffer.obs_data_offset = 0;
-//   //   data_buffer.hdr_data_idx = 0;
-//   //   data_buffer.hdr_data_offset = 0;
-//   //   
-//   //   data_buffer.processed_count =0;
-//   //}
-//   float obs_arr[OBS_ARRAY_LEN];
-//   bool header_to_vector = IS_INVALID_NC(hdr_arr_var)
-//         || IS_INVALID_NC(hdr_lat_var);
-//   mlog << Debug(5) << method_name << "  do_header: " << do_header
-//        << "  header_to_vector: " << header_to_vector << "\n";
-//   for (vector< Observation >::const_iterator obs = observations.begin();
-//        obs != observations.end(); ++obs)
-//   {
-//      data_buffer.processed_count++;
-//      
-//      if (do_header) {
-//         if (obs->getHeaderIndex() != prev_hdr_idx) {
-//            mlog << Debug(9) << method_name << "  obs->getHeaderIndex(): "
-//                 << obs->getHeaderIndex() << " at obs " << data_buffer.processed_count << "\n";
-//            prev_hdr_idx = obs->getHeaderIndex();
-///*
-//            if (header_to_vector) {
-//               add_header(
-//                     obs->getHeaderType().c_str(),
-//                     obs->getStationId().c_str(),
-//                     obs->getValidTime(),
-//                     obs->getLatitude(),
-//                     obs->getLongitude(),
-//                     obs->getElevation());
-//            }
-//            else {
-//               write_header(
-//                     obs->getHeaderType().c_str(),
-//                     obs->getStationId().c_str(),
-//                     obs->getValidTime(),
-//                     obs->getLatitude(),
-//                     obs->getLongitude(),
-//                     obs->getElevation());
-//            }
-//         }
-//*/
-//      }
-//      
-//      obs_arr[0] = obs->getHeaderIndex();
-//      obs_arr[1] = (use_var_id ? obs->getVarCode() : obs->getGribCode());
-//      obs_arr[2] = obs->getPressureLevel();
-//      obs_arr[3] = obs->getHeight();
-//      obs_arr[4] = obs->getValue();
-//      obs_qty = (obs->getQualityFlag().length() == 0 ? na_str : obs->getQualityFlag().c_str());
-//      if (do_header) obs_arr[0] += headerOffset;
-//
-//      write_observation(obs_arr, obs_qty.text());
-//      
-//   } /* endfor - obs */
-//   
-//   if (data_buffer.obs_data_idx > 0) {
-//      write_obs_buffer(data_buffer, data_buffer.obs_data_idx);
-//   }
-//
-//   //Caller handles writing headers
-//
-//   return data_buffer.processed_count;
-//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1481,34 +1358,7 @@ long count_nc_headers(vector< Observation > &observations)
 }
 
 
-
-//////////////////////////////////////////////////////////////////////////
-//
-//NcHeaderData *get_hdr_data_buffer() {
-//   return &hdr_data;
-//}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//int get_nc_hdr_cur_index() {
-//   //return (nc_data_buffer.cur_hdr_idx < 0) ? 0 : nc_data_buffer.cur_hdr_idx;
-//   return nc_data_buffer.cur_hdr_idx;
-//}
-//
-//////////////////////////////////////////////////////////////////////////
-//
-//int get_nc_obs_buf_index() {
-//   return nc_data_buffer.obs_data_idx;
-//}
-//
 ///////////////////////////////////////////////////////////////////////////////
-
-//void init_nc_dims_vars_config(NetcdfObsVars &obs_vars, bool use_var_id) {
-//   obs_vars.reset(use_var_id);
-//   //CHECKME nc_data_buffer.obs_vars = obs_vars;
-//}
-
-////////////////////////////////////////////////////////////////////////
 
 bool is_using_var_id(const char * nc_name) {
    bool use_var_id = false;
@@ -1532,7 +1382,6 @@ bool is_using_var_id(NcFile *nc_file) {
 
 int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_len)
 {
-   //float obs_arr[obs_arr_len];
    const string method_name = "  write_nc_string_array() ";
    int data_count = strArray.n_elements();
    int max_buf_size = (1024 * 8);
