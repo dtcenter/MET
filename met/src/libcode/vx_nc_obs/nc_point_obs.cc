@@ -174,8 +174,7 @@ bool MetNcPointObs::read_dim_headers() {
       nhdr = obs_vars.hdr_cnt = GET_NC_SIZE(obs_vars.hdr_dim);
       obs_vars.use_var_id = use_var_id = IS_VALID_NC(obs_vars.obs_vid_var);
       use_arr_vars = IS_VALID_NC(obs_vars.obs_arr_var);
-      header_data = obs_vars.read_header_data();
-      obs_vars.read_pb_hdr_data(&header_data);
+      obs_vars.read_header_data();
    }
    return status;
 }
