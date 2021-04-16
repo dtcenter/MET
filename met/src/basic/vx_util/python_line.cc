@@ -242,8 +242,8 @@ sublist = PyList_GetItem(main_list, index);
 
 if ( ! sublist )  {
 
-   mlog << Error
-        << "\n\n  PyLineDataFile::make_data_line() -> nul sublist pointer!\n\n";
+   mlog << Error << "\nPyLineDataFile::make_data_line() ->"
+        << "nul sublist pointer!\n\n";
 
    exit ( 1 );
 
@@ -255,8 +255,8 @@ if ( ! sublist )  {
 
 if ( ! PyList_Check(sublist) )  {
 
-   mlog << Error
-        << "\n\n  PyLineDataFile::make_data_line() -> python object is not a list!\n\n";
+   mlog << Error << "\nPyLineDataFile::make_data_line() ->"
+        << "python object is not a list!\n\n";
 
    exit ( 1 );
 
@@ -336,8 +336,7 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Error
-        << "\nPyLineDataFile::do_straight() -> "
+   mlog << Error << "\nPyLineDataFile::do_straight() -> "
         << "an error occurred importing module "
         << '\"' << user_base.text() << "\"\n\n";
 
@@ -411,6 +410,9 @@ for (j=0; j<N; ++j)  {
 
 };
 
+mlog << Debug(4) << "Writing temporary Python line data file:\n\t"
+     << command << "\n";
+
 status = system(command.text());
 
 if ( status )  {
@@ -429,14 +431,17 @@ wrapper = generic_pickle_wrapper;
 
 script = new Python3_Script (wrapper.text());
 
+mlog << Debug(4) << "Reading temporary Python line data file: "
+     << pickle_path << "\n";
+
 script->read_pickle(list_name, pickle_path.text());
 
 main_list = script->lookup(list_name);
 
 if ( ! main_list )  {
 
-   mlog << Error
-        << "\n\n  PyLineDataFile::do_pickle() -> nul main list pointer!\n\n";
+   mlog << Error << "\nPyLineDataFile::do_pickle() ->"
+        << "nul main list pointer!\n\n";
 
    exit ( 1 );
 
