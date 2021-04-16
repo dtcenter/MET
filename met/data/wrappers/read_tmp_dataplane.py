@@ -10,11 +10,8 @@ import sys
 import numpy as np
 import netCDF4 as nc
 
-print('Python Script:\t', sys.argv[0])
 met_info = {}
-
 netcdf_filename = sys.argv[1]
-print('Read NetCDF:\t',  netcdf_filename)
 
 # read NetCDF file
 ds = nc.Dataset(netcdf_filename, 'r')
@@ -32,4 +29,4 @@ met_attrs['name'] = met_attrs['name_str']
 del met_attrs['name_str']
 met_info['met_data'] = met_data
 met_info['attrs'] = met_attrs
-print(met_info)
+
