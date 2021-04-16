@@ -13,13 +13,7 @@ import sys
 import importlib.util
 import netCDF4 as nc
 
-print('Python Script:\t', sys.argv[0])
-print('User Command:\t',  sys.argv[2:])
-
 netcdf_filename = sys.argv[1]
-
-print('Write NetCDF:\t',  netcdf_filename)
-
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
 
@@ -44,25 +38,25 @@ else:
     attrs = met_in.attrs
 met_info['attrs'] = attrs
 
-print('write_tmp_dataplane')
-print(met_info)
-
 # write NetCDF file
 ds = nc.Dataset(netcdf_filename, 'w')
 
+# create dimensions and variable
 nx, ny = met_in.met_data.shape
 ds.createDimension('x', nx)
 ds.createDimension('y', ny)
-dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'))
+dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'),
+                       fill_value=met_in.met_data.get_fill_value())
 dp[:] = met_in.met_data
 
+# append attributes
 for attr, attr_val in met_info['attrs'].items():
-    print(attr, attr_val, type(attr_val))
     if attr == 'name':
         setattr(ds, 'name_str', attr_val)
-    elif type(attr_val) == str:
-        setattr(ds, attr, attr_val)
     elif type(attr_val) == dict:
         for key in attr_val:
             setattr(ds, attr + '.' + key, attr_val[key])
+    else:
+        setattr(ds, attr, attr_val)
+
 ds.close()
