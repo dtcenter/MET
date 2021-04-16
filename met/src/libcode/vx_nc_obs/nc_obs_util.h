@@ -17,6 +17,7 @@
 
 using namespace netCDF;
 
+#include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,8 +27,6 @@ static const char empty_name[] = "";
 
 ////////////////////////////////////////////////////////////////////////
 // struct definition
-
-struct NcHeaderData;
 
 struct NcDataBuffer {
    int   processed_count;
@@ -73,7 +72,45 @@ struct NcDataBuffer {
    float obs_lvl_buf[OBS_BUFFER_SIZE];
    float obs_hgt_buf[OBS_BUFFER_SIZE];
    float obs_val_buf[OBS_BUFFER_SIZE];
+
+   NcDataBuffer();
+   void reset_counters();
 };
+
+////////////////////////////////////////////////////////////////////////
+
+struct NcHeaderData {
+   bool valid_point_obs;
+   int typ_len;
+   int sid_len;
+   int vld_len;
+   int strl_len;
+   int strll_len;
+   int min_vld_time;
+   int max_vld_time;
+   int hdr_count;
+   int hdr_type_count;
+
+   StringArray typ_array;
+   StringArray sid_array;
+   StringArray vld_array;
+   IntArray    vld_num_array;
+   IntArray    typ_idx_array;
+   IntArray    sid_idx_array;
+   IntArray    vld_idx_array;
+   NumArray    lat_array;
+   NumArray    lon_array;
+   NumArray    elv_array;
+   IntArray    prpt_typ_array;
+   IntArray    irpt_typ_array;
+   IntArray    inst_typ_array;
+
+   NcHeaderData();
+   void clear();
+   void reset_counters();
+};
+
+////////////////////////////////////////////////////////////////////////
 
 struct NetcdfObsVars {
    bool  attr_agl    ;
@@ -83,8 +120,6 @@ struct NetcdfObsVars {
    int   obs_cnt     ; // obs. array count (fixed dimension if obs_cnt > 0)
    int   raw_hdr_cnt ; // raw data (PrepBufr) header array count
    int   deflate_level;
-   //NcDataBuffer data_buffer;
-   //NcHeaderData *hdr_data;
 
    NcDim strl_dim    ; // header string dimension (16 bytes)
    NcDim strl2_dim   ; // header string dimension (40 bytes)
@@ -139,10 +174,6 @@ struct NetcdfObsVars {
 
    int get_hdr_index();
    int get_obs_index();
-   //NcHeaderData *get_header_data();
-   //void set_header_data();
-
-//   void init_data_buffer();
 
    void read_dims_vars(NcFile *f_in);
    NcHeaderData read_header_data();
@@ -155,46 +186,11 @@ struct NetcdfObsVars {
    void write_obs_var_names(StringArray &obs_names);
    void write_obs_var_units(StringArray &units);
    void write_obs_var_descriptions(StringArray &descriptions);
-//   void write_observation();
-//   void write_observation(const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
-//   int  write_observations(const vector< Observation > observations,
-//                           NcDataBuffer &data_buffer, const bool do_header = true);
-//   int  write_observations(const vector< Observation > observations,
-//                           NcDataBuffer &data_buffer, const bool do_header = true);
    void write_table_vars(NcHeaderData &hdr_data, NcDataBuffer &data_buffer);
 
 };  // NetcdfObsVars
 
-struct NcHeaderData {
-   bool valid_point_obs;
-   int typ_len;
-   int sid_len;
-   int vld_len;
-   int strl_len;  
-   int strll_len;
-   int min_vld_time;
-   int max_vld_time;
-   int hdr_count;
-   int hdr_type_count;
-   
-   StringArray typ_array;
-   StringArray sid_array;
-   StringArray vld_array;
-   IntArray    vld_num_array;
-   IntArray    typ_idx_array;
-   IntArray    sid_idx_array;
-   IntArray    vld_idx_array;
-   NumArray    lat_array;
-   NumArray    lon_array;
-   NumArray    elv_array;
-   IntArray    prpt_typ_array;
-   IntArray    irpt_typ_array;
-   IntArray    inst_typ_array;
-
-   NcHeaderData();
-   void clear();
-   void reset_counters();
-};
+////////////////////////////////////////////////////////////////////////
 
 struct NcPointObsData {
    int obs_cnt;
@@ -220,12 +216,13 @@ struct NcPointObsData {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
 // extern variables
 
 ////////////////////////////////////////////////////////////////////////
 
 extern bool add_nc_header_prepbufr (const int pb_report_type,
-      const int in_report_type, const int instrument_type);
+                                    const int in_report_type, const int instrument_type);
       
 extern long count_nc_headers   (vector< Observation > &observations);
 
@@ -237,6 +234,8 @@ extern bool is_using_var_id    (NcFile * nc_file);
 
 extern void reset_header_buffer(int buf_size, bool reset_all=false);
 extern void set_header_buffer(int buf_size, bool reset_all=false);
+
+extern string seconds_to_time_string(const int secs);
 
 extern void write_nc_obs_buffer     (const int buf_size);
 extern int  write_nc_string_array   (NcVar *ncVar, StringArray &strArray,
