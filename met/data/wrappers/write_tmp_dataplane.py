@@ -38,6 +38,12 @@ else:
     attrs = met_in.attrs
 met_info['attrs'] = attrs
 
+# determine fill value
+try:
+    fill = met_data.get_fill_value()
+except:
+    fill = -9999.
+
 # write NetCDF file
 ds = nc.Dataset(netcdf_filename, 'w')
 
@@ -45,8 +51,7 @@ ds = nc.Dataset(netcdf_filename, 'w')
 nx, ny = met_in.met_data.shape
 ds.createDimension('x', nx)
 ds.createDimension('y', ny)
-dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'),
-                       fill_value=met_in.met_data.get_fill_value())
+dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'), fill_value=fill)
 dp[:] = met_in.met_data
 
 # append attributes
