@@ -469,13 +469,17 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
          }
       }
    }
-   else if (0 <= time_dim_slot && dim_offset < time_dim_size)
-      time_offsets.add(dim_offset);
-   else error_code = error_code_unknown;
+   else {
+      if (time_as_value) dim_offset = convert_time_to_offset(dim_offset);
+      if (0 <= time_dim_slot && dim_offset < time_dim_size)
+         time_offsets.add(dim_offset);
+      else error_code = error_code_unknown;
+   }
 
-   if (0 < time_offsets.n_elements())
-      mlog << Debug(7) << method_name << " Found " << time_offsets.n_elements()
-           << " times from between "
+   int time_count = time_offsets.n_elements();
+   if (0 < time_count)
+      mlog << Debug(7) << method_name << " Found " << time_count
+           << (time_count==1 ? " time" : " times") << " between "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_dim_size-1]) << "\n";
    else {
