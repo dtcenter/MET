@@ -864,6 +864,7 @@ NcHeaderData NetcdfObsVars::read_header_data() {
          }
       }
    }
+
    if (!IS_INVALID_NC(pb_hdr_dim)) {
       read_pb_hdr_data(&my_hdr_data);
       int last_prpt_typ = my_hdr_data.prpt_typ_array.n_elements() - 1;
@@ -981,14 +982,20 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
 ////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
+   const char *method_name = "get_nc_pb_hdr_data() -> ";
+
+   int pb_hdr_count = get_dim_size(&pb_hdr_dim);
+   if (pb_hdr_count < 0) {
+      mlog << Warning << "\n" << method_name
+           << "No extra header for PREPBUFR\n\n";
+      return;
+   }
 
    long offsets[1] = { 0 };
    long lengths[1] = { 1 };
-   int pb_hdr_count = get_dim_size(&pb_hdr_dim);
    bool has_hdr_prpt_typ_var = !IS_INVALID_NC(hdr_prpt_typ_var);
    bool has_hdr_irpt_typ_var = !IS_INVALID_NC(hdr_irpt_typ_var);
    bool has_hdr_inst_typ_var = !IS_INVALID_NC(hdr_inst_typ_var);
-   const char *method_name = "get_nc_pb_hdr_data() -> ";
 
    if (has_hdr_prpt_typ_var) hdr_data_p->prpt_typ_array.extend(pb_hdr_count);
    if (has_hdr_irpt_typ_var) hdr_data_p->irpt_typ_array.extend(pb_hdr_count);
@@ -1005,7 +1012,7 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
       if (buf_size > NC_BUFFER_SIZE_32K) buf_size = NC_BUFFER_SIZE_32K;
       offsets[0] = i_start;
       lengths[0] = buf_size;
-      
+
       if (has_hdr_prpt_typ_var) {
          // Get the corresponding header PB message type (string)
          if(!get_nc_data(&hdr_prpt_typ_var,
@@ -1015,7 +1022,7 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
             exit(1);
          }
       }
-         
+
       if (has_hdr_irpt_typ_var) {
          // Get the corresponding header In message type (string)
          if(!get_nc_data(&hdr_irpt_typ_var,
@@ -1025,7 +1032,7 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
             exit(1);
          }
       }
-         
+
       if (has_hdr_inst_typ_var) {
          // Get the corresponding header instrument type (string)
          if(!get_nc_data(&hdr_inst_typ_var,
@@ -1035,7 +1042,7 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
             exit(1);
          }
       }
-         
+
       for (int hIndex = 0; hIndex < buf_size; hIndex++) {
          hdr_data_p->prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
          hdr_data_p->irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
