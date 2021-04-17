@@ -361,6 +361,9 @@ for (j=0; j<N; ++j)  {
 
 };
 
+mlog << Debug(4) << "Writing temporary Python ascii observation file:\n\t"
+     << command << "\n";
+
 status = system(command.text());
 
 if ( status )  {
@@ -378,6 +381,9 @@ ConcatString wrapper;
 wrapper = generic_python_wrapper;
 
 Python3_Script script(wrapper.text());
+
+mlog << Debug(4) << "Reading temporary Python ascii observation file: "
+     << tmp_ascii_path << "\n";
 
 script.import_read_tmp_ascii_py();
 
