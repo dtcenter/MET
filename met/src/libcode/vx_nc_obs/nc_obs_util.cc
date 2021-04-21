@@ -287,7 +287,6 @@ bool NcPointObsData::read_obs_data_strings(NetcdfObsVars obs_vars, bool stop) {
 
 NetcdfObsVars::NetcdfObsVars()
 {
-   //hdr_data = new NcHeaderData;
    reset();
 }
 
@@ -610,8 +609,7 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcHeaderData NetcdfObsVars::read_header_data() {
-   NcHeaderData my_hdr_data;
+void NetcdfObsVars::read_header_data(NcHeaderData &hdr_data) {
    bool is_valid_obs_nc = true;
    long nhdr_count  = get_dim_size(&hdr_dim);
    int  strl_len    = get_dim_size(&strl_dim);
@@ -641,18 +639,18 @@ NcHeaderData NetcdfObsVars::read_header_data() {
       if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
    }
    
-   my_hdr_data.typ_len   = typ_len;
-   my_hdr_data.sid_len   = sid_len;
-   my_hdr_data.vld_len   = vld_len;
-   my_hdr_data.strl_len  = strl_len;
-   my_hdr_data.strll_len = strl2_len;
+   hdr_data.typ_len   = typ_len;
+   hdr_data.sid_len   = sid_len;
+   hdr_data.vld_len   = vld_len;
+   hdr_data.strl_len  = strl_len;
+   hdr_data.strll_len = strl2_len;
 
-   my_hdr_data.lat_array.extend(nhdr_count);
-   my_hdr_data.lon_array.extend(nhdr_count);
-   my_hdr_data.elv_array.extend(nhdr_count);
-   my_hdr_data.typ_idx_array.extend(nhdr_count);
-   my_hdr_data.sid_idx_array.extend(nhdr_count);
-   my_hdr_data.vld_idx_array.extend(nhdr_count);
+   hdr_data.lat_array.extend(nhdr_count);
+   hdr_data.lon_array.extend(nhdr_count);
+   hdr_data.elv_array.extend(nhdr_count);
+   hdr_data.typ_idx_array.extend(nhdr_count);
+   hdr_data.sid_idx_array.extend(nhdr_count);
+   hdr_data.vld_idx_array.extend(nhdr_count);
    
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
                    ? NC_BUFFER_SIZE_32K : (nhdr_count));
@@ -729,12 +727,12 @@ NcHeaderData NetcdfObsVars::read_header_data() {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            my_hdr_data.typ_array.add(hdr_typ_block[hIndex]);
-            my_hdr_data.sid_array.add(hdr_sid_block[hIndex]);
-            my_hdr_data.vld_array.add(hdr_vld_block[hIndex]);
-            my_hdr_data.lat_array.add(hdr_arr_block[hIndex][0]);
-            my_hdr_data.lon_array.add(hdr_arr_block[hIndex][1]);
-            my_hdr_data.elv_array.add(hdr_arr_block[hIndex][2]);
+            hdr_data.typ_array.add(hdr_typ_block[hIndex]);
+            hdr_data.sid_array.add(hdr_sid_block[hIndex]);
+            hdr_data.vld_array.add(hdr_vld_block[hIndex]);
+            hdr_data.lat_array.add(hdr_arr_block[hIndex][0]);
+            hdr_data.lon_array.add(hdr_arr_block[hIndex][1]);
+            hdr_data.elv_array.add(hdr_arr_block[hIndex][2]);
          }
       }
       else {
@@ -784,12 +782,12 @@ NcHeaderData NetcdfObsVars::read_header_data() {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            my_hdr_data.typ_idx_array.add(hdr_typ_idx_block[hIndex]);
-            my_hdr_data.sid_idx_array.add(hdr_sid_idx_block[hIndex]);
-            my_hdr_data.vld_idx_array.add(hdr_vld_idx_block[hIndex]);
-            my_hdr_data.lat_array.add(hdr_lat_block[hIndex]);
-            my_hdr_data.lon_array.add(hdr_lon_block[hIndex]);
-            my_hdr_data.elv_array.add(hdr_elv_block[hIndex]);
+            hdr_data.typ_idx_array.add(hdr_typ_idx_block[hIndex]);
+            hdr_data.sid_idx_array.add(hdr_sid_idx_block[hIndex]);
+            hdr_data.vld_idx_array.add(hdr_vld_idx_block[hIndex]);
+            hdr_data.lat_array.add(hdr_lat_block[hIndex]);
+            hdr_data.lon_array.add(hdr_lon_block[hIndex]);
+            hdr_data.elv_array.add(hdr_elv_block[hIndex]);
          }
       }
    }
@@ -820,7 +818,7 @@ NcHeaderData NetcdfObsVars::read_header_data() {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            my_hdr_data.typ_array.add(hdr_typ_block[hIndex]);
+            hdr_data.typ_array.add(hdr_typ_block[hIndex]);
          }
       }
       
@@ -840,7 +838,7 @@ NcHeaderData NetcdfObsVars::read_header_data() {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            my_hdr_data.sid_array.add(hdr_sid_block[hIndex]);
+            hdr_data.sid_array.add(hdr_sid_block[hIndex]);
          }
       }
 
@@ -860,30 +858,29 @@ NcHeaderData NetcdfObsVars::read_header_data() {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            my_hdr_data.vld_array.add(hdr_vld_block[hIndex]);
+            hdr_data.vld_array.add(hdr_vld_block[hIndex]);
          }
       }
    }
 
    if (!IS_INVALID_NC(pb_hdr_dim)) {
-      read_pb_hdr_data(&my_hdr_data);
-      int last_prpt_typ = my_hdr_data.prpt_typ_array.n_elements() - 1;
-      int last_irpt_typ = my_hdr_data.irpt_typ_array.n_elements() - 1; 
-      int last_inst_typ = my_hdr_data.inst_typ_array.n_elements() - 1; 
+      read_pb_hdr_data(hdr_data);
+      int last_prpt_typ = hdr_data.prpt_typ_array.n_elements() - 1;
+      int last_irpt_typ = hdr_data.irpt_typ_array.n_elements() - 1; 
+      int last_inst_typ = hdr_data.inst_typ_array.n_elements() - 1; 
       if (0 > last_prpt_typ) mlog << Debug(7) << "    prpt_typ is empty\n";
       else if (0 > last_irpt_typ) mlog << Debug(7) << "    irpt_typ is empty\n";
       else if (0 > last_inst_typ) mlog << Debug(7) << "    inst_typ is empty\n";
       else {
          mlog << Debug(10)
-              << "    prpt_typ[0,-1] " << my_hdr_data.prpt_typ_array[0]
-              << "," << my_hdr_data.prpt_typ_array[last_prpt_typ]
-              << "    irpt_typ[0,-1] " << my_hdr_data.irpt_typ_array[0]
-              << "," << my_hdr_data.irpt_typ_array[last_irpt_typ]
-              << "    inst_typ[0,-1] " << my_hdr_data.inst_typ_array[0]
-              << "," << my_hdr_data.inst_typ_array[last_inst_typ] << "\n";
+              << "    prpt_typ[0,-1] " << hdr_data.prpt_typ_array[0]
+              << "," << hdr_data.prpt_typ_array[last_prpt_typ]
+              << "    irpt_typ[0,-1] " << hdr_data.irpt_typ_array[0]
+              << "," << hdr_data.irpt_typ_array[last_irpt_typ]
+              << "    inst_typ[0,-1] " << hdr_data.inst_typ_array[0]
+              << "," << hdr_data.inst_typ_array[last_inst_typ] << "\n";
       }
    }
-   return my_hdr_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -981,7 +978,7 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
 
 ////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
+void NetcdfObsVars::read_pb_hdr_data(NcHeaderData &hdr_data) {
    const char *method_name = "get_nc_pb_hdr_data() -> ";
 
    int pb_hdr_count = get_dim_size(&pb_hdr_dim);
@@ -997,9 +994,9 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
    bool has_hdr_irpt_typ_var = !IS_INVALID_NC(hdr_irpt_typ_var);
    bool has_hdr_inst_typ_var = !IS_INVALID_NC(hdr_inst_typ_var);
 
-   if (has_hdr_prpt_typ_var) hdr_data_p->prpt_typ_array.extend(pb_hdr_count);
-   if (has_hdr_irpt_typ_var) hdr_data_p->irpt_typ_array.extend(pb_hdr_count);
-   if (has_hdr_inst_typ_var) hdr_data_p->inst_typ_array.extend(pb_hdr_count);
+   if (has_hdr_prpt_typ_var) hdr_data.prpt_typ_array.extend(pb_hdr_count);
+   if (has_hdr_irpt_typ_var) hdr_data.irpt_typ_array.extend(pb_hdr_count);
+   if (has_hdr_inst_typ_var) hdr_data.inst_typ_array.extend(pb_hdr_count);
    
    // Read PB report type
    int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)
@@ -1044,9 +1041,9 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData *hdr_data_p) {
       }
 
       for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-         hdr_data_p->prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
-         hdr_data_p->irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
-         hdr_data_p->inst_typ_array.add(hdr_inst_typ_block[hIndex]);
+         hdr_data.prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
+         hdr_data.irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
+         hdr_data.inst_typ_array.add(hdr_inst_typ_block[hIndex]);
       }
    }
 
@@ -1066,7 +1063,6 @@ void NetcdfObsVars::reset(bool _use_var_id) {
    hdr_cnt     = 0;     // header array length (fixed dimension if hdr_cnt > 0)
    obs_cnt     = 0;     // obs. array length (fixed dimension if obs_cnt > 0)
    //hdr_str_len = 0;    // string length for header (message) type header
-   //hdr_data.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

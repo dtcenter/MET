@@ -176,10 +176,10 @@ struct NetcdfObsVars {
    int get_obs_index();
 
    void read_dims_vars(NcFile *f_in);
-   NcHeaderData read_header_data();
+   void read_header_data(NcHeaderData &hdr_data);
    bool read_obs_data(int buf_size, int offset, int qty_len, float *obs_arr,
                       int *qty_idx_arr, char *obs_qty_buf);
-   void read_pb_hdr_data(NcHeaderData *hdr_data_P);
+   void read_pb_hdr_data(NcHeaderData &hdr_data);
 
    void write_header_to_nc(NcDataBuffer &data_buf, const int buf_size, const bool is_pb = false);
    void write_obs_buffer(NcDataBuffer &data_buffer, const int buf_size);
