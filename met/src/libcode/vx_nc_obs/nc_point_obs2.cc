@@ -592,7 +592,7 @@ bool MetNcPointObs2Write::write_to_netcdf(StringArray obs_names, StringArray obs
    const char *method_name = "  write_to_netcdf() ";
 
    write_obs_data();
-   obs_vars.create_table_vars (obs_nc, header_data, data_buffer);
+   obs_vars.create_table_vars(obs_nc, header_data, data_buffer);
    write_arr_headers();
 
    if (use_var_id) {
