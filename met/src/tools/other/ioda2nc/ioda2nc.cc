@@ -337,8 +337,8 @@ void open_netcdf() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_ioda_file(int i_pb) {
-   int npbmsg, npbmsg_total, hdr_cnt;
-   int idx, i_msg, i_read, n_file_obs, i_ret, n_hdr_obs;
+   int npbmsg, npbmsg_total;
+   int idx, i_msg, i_read, n_file_obs, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_nobs;
    double   x, y;
@@ -538,7 +538,6 @@ void process_ioda_file(int i_pb) {
    ConcatString unit_attr;
    ConcatString desc_attr;
    map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
-   hdr_cnt = 0;
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
       int *qc_data = new int[nlocs];
       float *obs_data = new float[nlocs];
@@ -566,7 +565,7 @@ void process_ioda_file(int i_pb) {
    }
 
    // Initialize counts
-   i_ret   = n_file_obs = i_msg      = 0;
+   n_file_obs = i_msg = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_nobs   = 0;
 
@@ -595,7 +594,7 @@ void process_ioda_file(int i_pb) {
    for(int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the IODA messages from the input file
-   for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
+   for(i_read=0; i_read<npbmsg; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
          if(bin_count > 0 && (i_read+1)%bin_count == 0) {

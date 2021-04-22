@@ -1119,14 +1119,12 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       usage();
    }
 
-   bool is_2d_time = false;
    unixtime valid_time = bad_data_int;
    valid_beg_ut = valid_end_ut = conf_info.valid_time;
    
    NcVar time_var = get_nc_var_time(nc_in);
    if( IS_VALID_NC(time_var) ) {
       if( 1 < get_dim_count(&time_var) ) {
-         is_2d_time = true;
          double max_time = bad_data_double;
          skip_times = new bool[from_size];
          valid_times = new double[from_size];

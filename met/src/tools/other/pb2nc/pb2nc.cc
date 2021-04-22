@@ -3215,7 +3215,7 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
 void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
       map<float, float*> pqtzuv_map_aux, map<float, float*> &pqtzuv_map_merged) {
 
-   float cur_pres, next_pres;
+   float cur_pres;
    float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
    float *pqtzuv_merged;
    std::map<float,float*>::iterator it_pivot, it_aux;
@@ -3235,7 +3235,6 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
    for (; it_aux!=pqtzuv_map_aux.end(); ++it_aux) {
       // Skip the records below the first mathcing/interpolated level
       if (it_pivot->first < it_aux->first) {
-         next_pres = it_aux->first;
          break;
       }
       prev_pqtzuv = (float *)it_aux->second;

@@ -1145,18 +1145,16 @@ void process_madis_metar(NcFile *&f_in) {
          // Snow Cover
          obs_arr[2] = bad_data_float;
          obs_arr[4] = snowCover[i_idx];
-         //count += process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
-         //            snowCover_var, hdr_typ, hdr_sid, hdr_vld,
-         //            hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-         process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
-            snowCover_var, hdr_typ, hdr_sid, hdr_vld,
-            hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         count += process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
+                     snowCover_var, hdr_typ, hdr_sid, hdr_vld,
+                     hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
       }
 
    } // end for i_hdr
 
    print_rej_counts();
+   mlog << Debug(5) << "    Added " << count << "data\n";
 
    //
    // Cleanup
@@ -2600,18 +2598,16 @@ void process_madis_maritime(NcFile *&f_in) {
          // APCP_24
          obs_arr[2] = 86400;
          obs_arr[4] = precip24Hour_arr[i_idx];
-         //count += process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
-         //            in_precip24Hour_var, hdr_typ, hdr_sid, hdr_vld,
-         //               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-         process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
-            in_precip24Hour_var, hdr_typ, hdr_sid, hdr_vld,
-            hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         count += process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
+                     in_precip24Hour_var, hdr_typ, hdr_sid, hdr_vld,
+                     hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
       }
 
    } // end for i_hdr
 
    print_rej_counts();
+   mlog << Debug(5) << "    Added " << count << "data\n";
 
    //
    // Cleanup

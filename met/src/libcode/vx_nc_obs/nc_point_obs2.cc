@@ -330,8 +330,6 @@ void MetNcPointObs2Write::write_arr_headers() {
          && !IS_INVALID_NC(obs_vars.hdr_prpt_typ_var);
    data_buffer.hdr_buf_size = buf_size;
    data_buffer.hdr_data_idx = hdr_data_idx;
-   int pb_raw_hdr_cnt = raw_hdr_cnt;
-   if (0 == pb_raw_hdr_cnt) pb_raw_hdr_cnt = obs_vars.raw_hdr_cnt;
    for (int index=0; index<cur_hdr_idx; index++) {
       // Message type
       data_buffer.hdr_typ_buf[hdr_data_idx] = header_data.typ_idx_array[index];
