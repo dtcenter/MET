@@ -22,7 +22,7 @@ if len(sys.argv) == 2:
         # Read MPR lines, skipping the header row and first column.
         mpr_data = pd.read_csv(input_file, header=None,
                         delim_whitespace=True, keep_default_na=False,
-                        skiprows=1, usecols=range(1,36),
+                        skiprows=1, usecols=range(1,37),
                         dtype=str).values.tolist()
         print("Data Length:\t" + repr(len(mpr_data)))
         print("Data Type:\t" + repr(type(mpr_data)))
