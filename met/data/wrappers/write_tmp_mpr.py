@@ -10,7 +10,6 @@
 
 import os
 import sys
-import pickle
 import importlib.util
 
 print("Python Script:\t"  + repr(sys.argv[0]))
