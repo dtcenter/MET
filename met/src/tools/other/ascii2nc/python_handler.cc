@@ -26,7 +26,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char generic_python_wrapper [] = "generic_python";
+static const char set_python_env_wrapper [] = "set_python_env";
 
 static const char write_tmp_ascii_wrapper[] = "MET_BASE/wrappers/write_tmp_point.py";
 
@@ -230,8 +230,8 @@ bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_
 
 bool status = false;
 
-if ( use_tmp_ascii )  status = do_tmp_ascii   ();
-else               status = do_straight ();
+if ( use_tmp_ascii )  status = do_tmp_ascii ();
+else                  status = do_straight ();
 
 return ( status );
 
@@ -247,7 +247,7 @@ bool PythonHandler::do_straight()
 
 ConcatString command, path, user_base;
 
-path = generic_python_wrapper;
+path = set_python_env_wrapper;
 
 mlog << Debug(3)
      << "Running user's python script ("
@@ -319,7 +319,9 @@ return ( true );
 
 
    //
-   //  wrapper usage:  /path/to/python wrapper.py tmp_output_filename user_script_name [ user_script args ... ]
+   //  wrapper usage:  /path/to/python wrapper.py
+   //                  tmp_output_filename user_script_name
+   //                  [ user_script args ... ]
    //
 
 bool PythonHandler::do_tmp_ascii()
@@ -378,7 +380,7 @@ if ( status )  {
 
 ConcatString wrapper;
 
-wrapper = generic_python_wrapper;
+wrapper = set_python_env_wrapper;
 
 Python3_Script script(wrapper.text());
 
