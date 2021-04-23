@@ -21,8 +21,7 @@ SUBDIRS =
 wrappersdir = $(pkgdatadir)/wrappers
 
 wrappers_DATA = \
-     generic_python.py \
-     generic_pickle.py \
+     set_python_env.py \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
      write_tmp_dataplane.py \
