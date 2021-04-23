@@ -38,6 +38,8 @@ static const char write_tmp_mpr_wrapper  [] = "MET_BASE/wrappers/write_tmp_mpr.p
 
 static const char list_name              [] = "mpr_data";
 
+static const char tmp_list_name          [] = "ascii_data";
+
 static const char tmp_base_name          [] = "tmp_mpr";
 
 static const char line_type              [] = "MPR";
@@ -445,18 +447,7 @@ script.import_read_tmp_ascii_py();
 
 PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
 
-PyObject * obj = script.lookup_ascii(list_name);
-
-if ( ! PyList_Check(obj) )  {
-
-   mlog << Error << "\nPyLineDataFile::do_tmp_ascii() -> "
-        << "tmp ascii object is not a list!\n\n";
-
-   exit ( 1 );
-
-}
-
-// JHG this doesn't compile load_python_obs(obj);
+main_list = script.lookup_ascii(tmp_list_name);
 
    //
    //  cleanup

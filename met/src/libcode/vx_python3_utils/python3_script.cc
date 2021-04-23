@@ -177,6 +177,25 @@ PyObject * var = 0;
 
 var = PyDict_GetItemString (DictAscii, name);
 
+if ( ! var )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not found\n\n";
+
+
+   exit ( 1 );
+
+}
+
+if ( ! PyList_Check(var) )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not a python list\n\n";
+
+   exit ( 1 );
+
+}
+
 return ( var );
 
 }
@@ -290,8 +309,6 @@ command << "read_tmp_ascii(\""
         << tmp_filename
         << "\")";
 
-mlog << Debug(3) << command << "\n";
-
 PyErr_Clear();
 
 PyObject * pobj;
@@ -305,10 +322,6 @@ if ( PyErr_Occurred() )  {
 
    exit ( 1 );
 }
-
-PyTypeObject* type = pobj->ob_type;
-
-const char* p = type->tp_name;
 
 return pobj;
 
