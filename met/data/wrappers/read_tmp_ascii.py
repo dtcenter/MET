@@ -28,7 +28,6 @@ def read_tmp_ascii(filename):
     Returns:
         (list of lists): point data
     """
-    print('read_tmp_ascii:' + filename)
     f = open(filename, 'r')
     lines = f.readlines()
     f.close()
