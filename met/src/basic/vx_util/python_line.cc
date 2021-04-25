@@ -438,16 +438,16 @@ ConcatString wrapper;
 
 wrapper = set_python_env_wrapper;
 
-Python3_Script script(wrapper.text());
+script = new Python3_Script (wrapper.text());
 
 mlog << Debug(4) << "Reading temporary Python line data file: "
      << tmp_ascii_path << "\n";
 
-script.import_read_tmp_ascii_py();
+script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
+PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
 
-main_list = script.lookup_ascii(tmp_list_name);
+main_list = script->lookup_ascii(tmp_list_name);
 
    //
    //  cleanup
