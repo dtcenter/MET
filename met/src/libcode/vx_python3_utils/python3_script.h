@@ -83,8 +83,6 @@ class Python3_Script {
 
       PyObject * run(const char * command) const;   //  runs a command in the namespace of the script
 
-      void read_pickle  (const char * variable_name, const char * pickle_filename) const;
-
       void import_read_tmp_ascii_py (void);
 
       PyObject * read_tmp_ascii (const char * tmp_filename) const;
