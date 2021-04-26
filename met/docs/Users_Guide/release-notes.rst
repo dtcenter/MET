@@ -7,6 +7,59 @@ describes the bugfix, enhancement, or new feature: `MET GitHub issues. <https://
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
+
+Version `10.0.0-beta5 <https://github.com/dtcenter/MET/projects/33>`_ release notes (20210426)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Bugfixes:
+
+   * Fix Grid-Diag bug when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
+   * Fix Stat-Analysis failure when aggregating ECNT lines (`#1706 <http://github.com/dtcenter/MET/issues/1706>`_).
+   * Fix intermittent PB2NC segfault when deriving PBL (`#1715 <http://github.com/dtcenter/MET/issues/1715>`_).
+   * Fix parsing error for floating point percentile thresholds, like ">SFP33.3" (`#1716 <http://github.com/dtcenter/MET/issues/1716>`_).
+   * Fix ascii2nc to handle bad records in little_r format (`#1737 <http://github.com/dtcenter/MET/issues/1737>`_).
+
+* Documentation:
+
+   * Migrate the MET documetation to Read the Docs (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
+
+* Library code:
+
+   * Miscellaneous:
+
+      * Add support for climatological probabilities for complex CDP thresholds, like >=CDP33&&<=CDP67 (`#1705 <http://github.com/dtcenter/MET/issues/1705>`_).
+
+   * NetCDF library:
+
+      * Extend CF-compliant NetCDF file support when defining the time dimension as a time string (`#1755 <http://github.com/dtcenter/MET/issues/1755>`_).
+
+   * Python embedding:
+
+      * Replace the pickle format for temporary python files with NetCDF for gridded data (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
+      * Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
+      * Enhance python embedding to support the "grid" being defined as a named grid or specification string (`#1471 <http://github.com/dtcenter/MET/issues/1471>`_).
+      * Enhance the python embedding library code to parse python longlong variables as integers to make the python embedding scripts less particular (`#1747 <http://github.com/dtcenter/MET/issues/1747>`_).
+      * Fix the read_ascii_mpr.py python embedding script to pass all 37 columns of MPR data to Stat-Analysis (`#1620 <http://github.com/dtcenter/MET/issues/1620>`_).
+      * Fix the read_tmp_dataplane.py python embedding script to handle the fill value correctly (`#1753 <http://github.com/dtcenter/MET/issues/1753>`_).
+
+* Application code:
+
+   * Point-Stat and Grid-Stat Tools:
+
+      * Enhance Point-Stat and Grid-Stat by adding mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
+
+   * Stat-Analysis Tool:
+
+      * Enhance Stat-Analysis to process multiple output thresholds and write multiple output line types in a single aggregate_stat job (`#1735 <http://github.com/dtcenter/MET/issues/1735>`_).
+      * Enhance Stat-Analysis to skip writing job output to the logfile when the -out_stat option is provided (`#1736 <http://github.com/dtcenter/MET/issues/1736>`_).
+      * Enhance Stat-Analysis by adding a -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
+
+   * MET-TC Tools:
+   
+      * Fix TC-Pairs to report the correct number of lines read from input track data files (`#1725 <http://github.com/dtcenter/MET/issues/1725>`_).
+      * Enhance TC-Stat by adding a -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
+      * Enhance the TC-Gen matching logic and update several config options to support its S2S application (`#1714 <http://github.com/dtcenter/MET/issues/1714>`_).
+
 Version `10.0.0-beta4 <https://github.com/dtcenter/MET/projects/26>`_ release notes (20210302)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
