@@ -200,7 +200,7 @@ ProbPairInfoBase * new_prob_pair(const ATCFLineType t) {
    ProbPairInfoBase *new_pair = (ProbPairInfoBase *) 0;
 
    switch(t) {
-      case ATCFLineType_ProbRIRW:
+      case ATCFLineType_ProbRI:
          new_pair = new ProbRIRWPairInfo;
          break;
 

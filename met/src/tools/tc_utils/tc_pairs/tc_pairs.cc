@@ -949,7 +949,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRIRW) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info

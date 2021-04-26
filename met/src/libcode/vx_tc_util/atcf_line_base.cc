@@ -482,7 +482,7 @@ ATCFLineType string_to_atcflinetype(const char *s) {
    else if(strlen(s) == 0)           t = ATCFLineType_Track;  // BDECK
    else if(strcasecmp(s, "TR") == 0) t = ATCFLineType_ProbTR;
    else if(strcasecmp(s, "IN") == 0) t = ATCFLineType_ProbIN;
-   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRIRW;
+   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRI;
    else if(strcasecmp(s, "RW") == 0) t = ATCFLineType_ProbRW;
    else if(strcasecmp(s, "WR") == 0) t = ATCFLineType_ProbWR;
    else if(strcasecmp(s, "PR") == 0) t = ATCFLineType_ProbPR;
@@ -504,7 +504,7 @@ ConcatString atcflinetype_to_string(const ATCFLineType t) {
       case ATCFLineType_GenTrack: s = "GenTrack"; break;
       case ATCFLineType_ProbTR:   s = "ProbTR";   break;
       case ATCFLineType_ProbIN:   s = "ProbIN";   break;
-      case ATCFLineType_ProbRIRW: s = "ProbRIRW"; break;
+      case ATCFLineType_ProbRI:   s = "ProbRI";   break;
       case ATCFLineType_ProbRW:   s = "ProbRW";   break;
       case ATCFLineType_ProbWR:   s = "ProbWR";   break;
       case ATCFLineType_ProbPR:   s = "ProbPR";   break;

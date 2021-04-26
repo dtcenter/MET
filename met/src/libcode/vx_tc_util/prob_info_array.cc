@@ -184,7 +184,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType_ProbRIRW):
+      case(ATCFLineType_ProbRI):
 
          // Check for no entries or a mismatch with the latest entry
          if( ProbRIRW.size() == 0 ||

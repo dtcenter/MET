@@ -34,7 +34,7 @@ enum ATCFLineType {
    ATCFLineType_GenTrack, // Genesis Track and intensity line type (numeric)
    ATCFLineType_ProbTR,   // Track probability (TR)
    ATCFLineType_ProbIN,   // Intensity probability (IN)
-   ATCFLineType_ProbRIRW, // Rapid intensification probability (RI)
+   ATCFLineType_ProbRI,   // Rapid intensification probability (RI)
    ATCFLineType_ProbRW,   // Rapid weakening probability (RW)
    ATCFLineType_ProbWR,   // Wind radii probability (WR)
    ATCFLineType_ProbPR,   // Pressure probability (PR)
