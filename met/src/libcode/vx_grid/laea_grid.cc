@@ -252,11 +252,72 @@ void LaeaGrid::xy_to_latlon(double x, double y, double & lat, double & lon) cons
 
 {
 
+double u, v, uu, vv;
+double D, Rq, rho, beta, beta1, lambda0, lat1, ce, m1;
+double num, denom, cor;
+double s2, s4, s6, t2, t4, t6;
+const double E  = geoid.e();
+const double A  = geoid.a_km();
+const double Qp = geoid.qp_direct();
+const double E2 = E*E;
+const double E4 = E2*E2;
+const double E6 = E2*E4;
 
-mlog << Error
-     << "\n\n  LaeaGrid::xy_to_latlon() const -> not yet implemented\n\n";
 
-exit ( 1 );
+xy_to_uv(x, y, u, v);
+
+
+
+lat1    = (Data.lat_pole);
+
+lambda0 = -(Data.lon_pole);
+
+
+beta1 = geoid.beta(lat1);
+
+m1 = geoid.m_func(lat1);
+
+Rq = A*sqrt(0.5*Qp);           //  Eq 3-13, page 187
+
+D = (A*m1)/(Rq*cosd(beta1));   //  Eq 24-20, page 187
+
+uu = u/D;
+
+vv = D*v;
+
+rho = sqrt( uu*uu + vv*vv );   //  Eq 24-28, page 189
+
+ce = 2.0*asind(rho/(2.0*Rq));  //  Eq 24-29, page 189
+
+
+beta = asind( cosd(ce)*sind(beta1) + ((D*v)/rho)*sind(ce)*cosd(beta1) );   //  Eq 24-30, page 189
+
+s2 = sind(2.0*beta);
+s4 = sind(4.0*beta);
+s6 = sind(6.0*beta);
+
+num = u*sind(ce);
+
+denom = D*rho*cosd(beta1)*cosd(ce) - D*D*v*sind(beta1)*sind(ce);
+
+
+// lon = lambda0 + atand(num/denom);   //  maybe want atan2 here?   //  Eq 24-26, page 188
+lon = lambda0 + atan2d(num, denom);   //  maybe want atan2 here?
+
+lon = -lon;
+
+
+t2 = E2/3.0 + (31.0*E4)/180.0 + (517.0*E6)/5040.0;
+
+t4 = (23.0*E4)/360.0 + (251.0*E6)/3780.0;
+
+t6 = (761.0*E6)/45360.0;
+
+
+cor = t2*s2 + t4*s4 + t6*s6;   //  Eq 3-18, page 189
+
+lat = beta + cor*deg_per_rad;
+
 
 
 return;

@@ -515,6 +515,28 @@ return ( asind(q/qp) );
 ////////////////////////////////////////////////////////////////////////
 
 
+double Spheroid::m_func(double lat) const
+
+{
+
+double m, c, s;
+
+c = cosd(lat);
+
+s = sind(lat);
+
+m = sqrt( 1.0 - E*E*s*s );
+
+m = c/m;
+
+return ( m );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

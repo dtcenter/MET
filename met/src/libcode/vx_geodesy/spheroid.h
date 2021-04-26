@@ -105,6 +105,7 @@ class Spheroid {
 
       double beta(double lat) const;       //  Snyder, page 16, Eq. 3-11
 
+      double m_func(double lat) const;     //  Snyder, page 101, Eq. 14-15
 
 };
 
