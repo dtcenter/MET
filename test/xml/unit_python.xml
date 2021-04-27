@@ -374,24 +374,24 @@
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to read point data  -->
-  <test name="python_ascii2nc_pickle">
+  <!-- Invokes user-python logic to read point data  -->
+  <test name="python_ascii2nc_user_python">
     <exec>&MET_BIN;/ascii2nc</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
       "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
-      &OUTPUT_DIR;/python/ascii2nc_pickle.nc \
+      &OUTPUT_DIR;/python/ascii2nc_user_python.nc \
       -format python
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/python/ascii2nc_pickle.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_user_python.nc</point_nc>
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to read NUMPY text data -->
-  <test name="python_numpy_plot_data_plane_pickle">
+  <!-- Invokes user-python logic to read NUMPY text data -->
+  <test name="python_numpy_plot_data_plane_user_python">
     <exec>export PATH='&ANACONDA_BIN;:${PATH}'; \
           &MET_BIN;/plot_data_plane</exec>
     <env>
@@ -399,19 +399,19 @@
     </env>
     <param> \
       PYTHON_NUMPY \
-      &OUTPUT_DIR;/python/letter_pickle.ps \
+      &OUTPUT_DIR;/python/letter_user_python.ps \
       'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane" \
       -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/python/letter_pickle.ps</ps>
+      <ps>&OUTPUT_DIR;/python/letter_user_python.ps</ps>
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to pass MPR data to Stat-Analysis  -->
-  <test name="python_stat_analysis_pickle">
+  <!-- Invokes user-python logic to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis_user_python">
     <exec>&MET_BIN;/stat_analysis</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -419,10 +419,10 @@
     <param> \
       -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
       -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
-      -out_stat &OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_user_python_AGGR_MPR_to_SL1L2.stat
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat</stat>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_user_python_AGGR_MPR_to_SL1L2.stat</stat>
     </output>
   </test>
 

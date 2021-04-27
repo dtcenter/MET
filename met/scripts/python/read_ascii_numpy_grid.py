@@ -6,7 +6,7 @@ import sys
 
 ###########################################
 
-print('Python Script:\t', sys.argv[0])
+print("Python Script:\t" + repr(sys.argv[0]))
 
    ##
    ##  input file specified on the command line

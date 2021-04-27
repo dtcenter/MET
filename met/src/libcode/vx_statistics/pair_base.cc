@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -496,8 +496,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_point_obs() -> "
            << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
+           << n_obs << ").\n\n";
       exit(1);
    }
 

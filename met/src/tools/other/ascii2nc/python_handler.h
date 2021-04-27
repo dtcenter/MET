@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -68,11 +68,10 @@ class PythonHandler : public FileHandler
 
       virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
 
-      bool do_tmp_ascii();
-      bool do_straight ();   //  straight-up python, no temporary ascii
+      bool do_straight ();  //  run compiled python interpreter
+      bool do_tmp_ascii();  //  run user-defined MET_PYTHON_EXE
 
       void load_python_obs(PyObject *);   //  python object is list of lists
-
 
       bool read_obs_from_script (const char * script_name, const char * variable_name);
   

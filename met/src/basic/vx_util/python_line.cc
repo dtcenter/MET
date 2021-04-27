@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -32,14 +32,15 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char generic_python_wrapper [] = "generic_python";
-static const char generic_pickle_wrapper [] = "generic_pickle";
+static const char set_python_env_wrapper [] = "set_python_env";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_pickle_mpr.py";
+static const char write_tmp_mpr_wrapper  [] = "MET_BASE/wrappers/write_tmp_mpr.py";
 
 static const char list_name              [] = "mpr_data";
 
-static const char pickle_base_name       [] = "tmp_mpr_pickle";
+static const char tmp_list_name          [] = "ascii_data";
+
+static const char tmp_base_name          [] = "tmp_mpr";
 
 static const char line_type              [] = "MPR";
 
@@ -122,7 +123,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PyLineDataFile::open(const char * user_script_path, const StringArray & user_script_args)
+bool PyLineDataFile::open(const char * user_script_path,
+                          const StringArray & user_script_args)
 
 {
 
@@ -142,7 +144,7 @@ if ( c )  {
 
    UserPathToPython = c;
 
-   do_pickle();
+   do_tmp_ascii ();
 
 } else {
 
@@ -157,7 +159,7 @@ if ( c )  {
 if ( ! PyList_Check(main_list) )  {
 
    mlog << Error << "\nPyLineDataFile::open() -> "
-        << "pickle object is not a list!\n\n";
+        << "tmp ascii object is not a list!\n\n";
 
    exit ( 1 );
 
@@ -301,7 +303,7 @@ void PyLineDataFile::do_straight()
 
 ConcatString command, path, user_base;
 
-path = generic_python_wrapper;
+path = set_python_env_wrapper;
 
 mlog << Debug(3) 
      << "PyLineDataFile::do_straight() -> "
@@ -372,7 +374,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PyLineDataFile::do_pickle()
+   //
+   //  wrapper usage:  /path/to/python wrapper.py
+   //                  tmp_output_filename user_script_name
+   //                  [ user_script args ... ]
+   //
+
+void PyLineDataFile::do_tmp_ascii()
 
 {
 
@@ -380,7 +388,7 @@ int j;
 const int N = UserScriptArgs.n();
 ConcatString command;
 ConcatString path;
-ConcatString pickle_path;
+ConcatString tmp_ascii_path;
 const char * tmp_dir = 0;
 int status;
 
@@ -394,15 +402,16 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << pickle_base_name;
+     << tmp_base_name;
 
-pickle_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path << ".txt";
 
 command << cs_erase
-        << UserPathToPython                   << ' '    //  user's path to python
-        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
-        << pickle_path                        << ' '    //  pickle output filename
-        << UserScriptPath;                              //  user's script name
+        << UserPathToPython                    << ' '    //  user's path to python
+        << replace_path(write_tmp_mpr_wrapper) << ' '    //  write_tmp_mpr.py
+        << tmp_ascii_path                      << ' '    //  temporary ascii output filename
+        << UserScriptPath;                               //  user's script name
 
 for (j=0; j<N; ++j)  {
 
@@ -417,7 +426,7 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error << "\nPyLineDataFile::do_pickle() -> "
+   mlog << Error << "\nPyLineDataFile::do_tmp_ascii() -> "
         << "command \"" << command.text() << "\" failed ... status = "
         << status << "\n\n";
 
@@ -427,31 +436,25 @@ if ( status )  {
 
 ConcatString wrapper;
 
-wrapper = generic_pickle_wrapper;
+wrapper = set_python_env_wrapper;
 
 script = new Python3_Script (wrapper.text());
 
 mlog << Debug(4) << "Reading temporary Python line data file: "
+     << tmp_ascii_path << "\n";
      << pickle_path << "\n";
 
-script->read_pickle(list_name, pickle_path.text());
+script->import_read_tmp_ascii_py();
 
-main_list = script->lookup(list_name);
+PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
 
-if ( ! main_list )  {
-
-   mlog << Error << "\nPyLineDataFile::do_pickle() ->"
-        << "nul main list pointer!\n\n";
-
-   exit ( 1 );
-
-}
+main_list = script->lookup_ascii(tmp_list_name);
 
    //
    //  cleanup
    //
 
-remove_temp_file(pickle_path);
+remove_temp_file(tmp_ascii_path);
 
    //
    //  done

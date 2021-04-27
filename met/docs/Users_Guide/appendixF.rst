@@ -35,11 +35,11 @@ The types of Python embedding supported in MET are described below. In all cases
 
 Setting this environment variable triggers slightly different processing logic in MET. Rather than executing the user-specified script with compiled Python instance directly, MET does the following:
 
-1. Wrap the user's Python script and arguments with a wrapper script (write_pickle_mpr.py, write_pickle_point.py, or write_pickle_dataplane.py) and specify the name of a temporary file to be written.
+1. Wrap the user's Python script and arguments with a wrapper script (write_tmp_mpr.py, write_tmp_point.py, or write_tmp_dataplane.py) and specify the name of a temporary file to be written.
 
-2. Use a system call to the **MET_PYTHON_EXE** Python instance to execute these commands and write the resulting data objects to a temporary Python pickle file.
+2. Use a system call to the **MET_PYTHON_EXE** Python instance to execute these commands and write the resulting data objects to a temporary ASCII or NetCDF file.
 
-3. Use the compiled Python instance to read data from that temporary pickle file.
+3. Use the compiled Python instance to run a wrapper script (read_tmp_ascii.py or read_tmp_dataplane.py) to read data from that temporary file.
 
 With this approach, users should be able to execute Python scripts in their own custom environments.
 

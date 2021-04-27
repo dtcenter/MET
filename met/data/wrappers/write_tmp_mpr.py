@@ -3,7 +3,7 @@
 #    Adapted from a script provided by George McCabe
 #    Adapted by Randy Bullock
 #
-#    usage:  /path/to/python write_tmp_point.py \
+#    usage:  /path/to/python write_tmp_mpr.py \
 #            tmp_output_filename <user_python_script>.py <args>
 #
 ########################################################################
@@ -35,5 +35,5 @@ met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
 
 f = open(tmp_filename, 'w')
-for line in met_in.point_data:
+for line in met_in.mpr_data:
     f.write(str(line) + '\n')
