@@ -442,6 +442,7 @@ script = new Python3_Script (wrapper.text());
 
 mlog << Debug(4) << "Reading temporary Python line data file: "
      << tmp_ascii_path << "\n";
+     << pickle_path << "\n";
 
 script->import_read_tmp_ascii_py();
 
