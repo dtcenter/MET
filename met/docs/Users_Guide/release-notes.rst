@@ -11,8 +11,8 @@ MET Version |version| release notes (|release_date|)
 * Repository and build:
   
    * **Migrate GitHub respository from the NCAR to DTCenter organization** (`#1462 <http://github.com/dtcenter/MET/issues/1462>`_).
+   * **Switch to consistent vX.Y.Z version numbering, from v10.0 to v10.0.0** (`#1590 <http://github.com/dtcenter/MET/issues/1590>`_).
    * Switch from tagging releases as met-X.Y.Z to vX.Y.Z instead (`#1541 <http://github.com/dtcenter/MET/issues/1541>`_).
-   * Switch to consistent vX.Y.Z version numbering, from v10.0 to v10.0.0 (`#1590 <http://github.com/dtcenter/MET/issues/1590>`_).
    * Add a GitHub pull request template (`#1516 <http://github.com/dtcenter/MET/issues/1516>`_).
    * Resolve warnings from autoconf (`#1498 <http://github.com/dtcenter/MET/issues/1498>`_).
    * Restructure nightly builds (`#1510 <http://github.com/dtcenter/MET/issues/1510>`_).
