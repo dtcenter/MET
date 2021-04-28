@@ -23,7 +23,7 @@ Version |version| release notes (|release_date|)
 
 * Documentation:
 
-   * **Migrate the MET documentation to `Read the Docs<https://met.readthedocs.io/en/latest/>`_** (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
+   * **Migrate the MET documentation to** `Read the Docs<https://met.readthedocs.io/en/latest/>`_ (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
    * Enhance and update documentation (`#1459 <http://github.com/dtcenter/MET/issues/1459>`_ and `#1460 <http://github.com/dtcenter/MET/issues/1460>`_).
    * Update comments at the top of each MET config file directing users to the MET User's Guide (`#1598 <http://github.com/dtcenter/MET/issues/1598>`_).
    * Migrate content from README and README_TC in data/config to the MET User's Guide (`#1474 <http://github.com/dtcenter/MET/issues/1474>`_).
@@ -47,7 +47,7 @@ Version |version| release notes (|release_date|)
    * Python embedding enhancements:
 
 	   * **Replace the pickle format for temporary python files with NetCDF for gridded data** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
-	   * **Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
+      * **Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
 		* **Complete support for Python XArray embedding** (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).
       * Treat gridded fields of entirely missing data as missing files and fix python embedding to call common data processing code (`#1494 <http://github.com/dtcenter/MET/issues/1494>`_).
       * Clarify error messages for Xarray python embedding (`#1472 <http://github.com/dtcenter/MET/issues/1472>`_).
@@ -140,8 +140,8 @@ Version |version| release notes (|release_date|)
 
    * MODE Tool:
 
-      * **Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area** (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).**
-		* **Incremental development toward the Multivariate MODE tool** (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
+      * **Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area** (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).
+      * **Incremental development toward the Multivariate MODE tool** (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
 
    * TC-Pairs Tool:
 
