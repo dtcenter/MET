@@ -23,7 +23,7 @@ Version |version| release notes (|release_date|)
 
 * Documentation:
 
-   * **Migrate the MET documentation to** `**Read the Docs** <https://met.readthedocs.io/en/latest/>`_ (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
+   * **Migrate the MET documentation to Read the Docs** (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
    * Enhance and update documentation (`#1459 <http://github.com/dtcenter/MET/issues/1459>`_ and `#1460 <http://github.com/dtcenter/MET/issues/1460>`_).
    * Update comments at the top of each MET config file directing users to the MET User's Guide (`#1598 <http://github.com/dtcenter/MET/issues/1598>`_).
    * Migrate content from README and README_TC in data/config to the MET User's Guide (`#1474 <http://github.com/dtcenter/MET/issues/1474>`_).
