@@ -46,16 +46,16 @@ Version |version| release notes (|release_date|)
 
    * Python embedding enhancements:
 
-	   * **Replace the pickle format for temporary python files with NetCDF for gridded data** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
+      * **Replace the pickle format for temporary python files with NetCDF for gridded data** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
       * **Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
-		* **Complete support for Python XArray embedding** (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).
+      * **Complete support for Python XArray embedding** (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).
       * Treat gridded fields of entirely missing data as missing files and fix python embedding to call common data processing code (`#1494 <http://github.com/dtcenter/MET/issues/1494>`_).
       * Clarify error messages for Xarray python embedding (`#1472 <http://github.com/dtcenter/MET/issues/1472>`_).
       * Add support for Gaussian grids with python embedding (`#1477 <http://github.com/dtcenter/MET/issues/1477>`_).
       * Correct error messages from python embedding (`#1473 <http://github.com/dtcenter/MET/issues/1473>`_).
-	   * Enhance to support the "grid" being defined as a named grid or specification string (`#1471 <http://github.com/dtcenter/MET/issues/1471>`_).
-	   * Enhance to parse python longlong variables as integers to make the python embedding scripts less particular (`#1747 <http://github.com/dtcenter/MET/issues/1747>`_).
-	   * Fix the read_ascii_mpr.py python embedding script to pass all 37 columns of MPR data to Stat-Analysis (`#1620 <http://github.com/dtcenter/MET/issues/1620>`_).
+      * Enhance to support the "grid" being defined as a named grid or specification string (`#1471 <http://github.com/dtcenter/MET/issues/1471>`_).
+      * Enhance to parse python longlong variables as integers to make the python embedding scripts less particular (`#1747 <http://github.com/dtcenter/MET/issues/1747>`_).
+      * Fix the read_ascii_mpr.py python embedding script to pass all 37 columns of MPR data to Stat-Analysis (`#1620 <http://github.com/dtcenter/MET/issues/1620>`_).
       * Fix the read_tmp_dataplane.py python embedding script to handle the fill value correctly (`#1753 <http://github.com/dtcenter/MET/issues/1753>`_).
 
    * Miscellaneous:
@@ -116,7 +116,7 @@ Version |version| release notes (|release_date|)
    * Point-Stat Tool:
 
       * **Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences** (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
-		* **Print the rejection code reason count log messages at verbosity level 2 for zero matched pairs** (`#1644 <http://github.com/dtcenter/MET/issues/1644>`_).
+      * **Print the rejection code reason count log messages at verbosity level 2 for zero matched pairs** (`#1644 <http://github.com/dtcenter/MET/issues/1644>`_).
       * **Add detailed log messages when discarding observations** (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).
       * Update log messages (`#1514 <http://github.com/dtcenter/MET/issues/1514>`_).
       * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
@@ -136,7 +136,7 @@ Version |version| release notes (|release_date|)
 
    * Grid-Diag Tool:
 
-	   * Fix bug when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
+      * Fix bug when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
 
    * MODE Tool:
 
