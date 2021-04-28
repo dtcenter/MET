@@ -1,15 +1,16 @@
 MET release notes
 _________________
 
-When applicable, release notes are followed by the GitHub issue number which
-describes the bugfix, enhancement, or new feature: `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
+When applicable, release notes are followed by the GitHub issue number
+which describes the bugfix, enhancement, or new feature:
+`MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
 Version |version| release notes (|release_date|)
 ------------------------------------------------
 
 * Repository and build:
   
-   * Migrate GitHub respository from the NCAR to DTCenter organization (`#1462 <http://github.com/dtcenter/MET/issues/1462>`_).
+   * **Migrate GitHub respository from the NCAR to DTCenter organization (`#1462 <http://github.com/dtcenter/MET/issues/1462>`_).**
    * Switch from tagging releases as met-X.Y.Z to vX.Y.Z instead (`#1541 <http://github.com/dtcenter/MET/issues/1541>`_).
    * Switch to consistent vX.Y.Z version numbering, from v10.0 to v10.0.0 (`#1590 <http://github.com/dtcenter/MET/issues/1590>`_).
    * Add a GitHub pull request template (`#1516 <http://github.com/dtcenter/MET/issues/1516>`_).
@@ -22,7 +23,7 @@ Version |version| release notes (|release_date|)
 
 * Documentation:
 
-   * Migrate the MET documentation to `Read the Docs<https://met.readthedocs.io/en/latest/>`_ (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
+   * **Migrate the MET documentation to `Read the Docs<https://met.readthedocs.io/en/latest/>`_ (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).**
    * Enhance and update documentation (`#1459 <http://github.com/dtcenter/MET/issues/1459>`_ and `#1460 <http://github.com/dtcenter/MET/issues/1460>`_).
    * Update comments at the top of each MET config file directing users to the MET User's Guide (`#1598 <http://github.com/dtcenter/MET/issues/1598>`_).
    * Migrate content from README and README_TC in data/config to the MET User's Guide (`#1474 <http://github.com/dtcenter/MET/issues/1474>`_).
@@ -45,12 +46,12 @@ Version |version| release notes (|release_date|)
 
    * Python embedding enhancements:
 
-	   * Replace the pickle format for temporary python files with NetCDF for gridded data (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
-	   * Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
+	   * **Replace the pickle format for temporary python files with NetCDF for gridded data (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).**
+	   * **Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).**
+		* **Complete support for Python XArray embedding (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).**
       * Treat gridded fields of entirely missing data as missing files and fix python embedding to call common data processing code (`#1494 <http://github.com/dtcenter/MET/issues/1494>`_).
       * Clarify error messages for Xarray python embedding (`#1472 <http://github.com/dtcenter/MET/issues/1472>`_).
       * Add support for Gaussian grids with python embedding (`#1477 <http://github.com/dtcenter/MET/issues/1477>`_).
-      * Complete support for Python XArray embedding (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).
       * Correct error messages from python embedding (`#1473 <http://github.com/dtcenter/MET/issues/1473>`_).
 	   * Enhance to support the "grid" being defined as a named grid or specification string (`#1471 <http://github.com/dtcenter/MET/issues/1471>`_).
 	   * Enhance to parse python longlong variables as integers to make the python embedding scripts less particular (`#1747 <http://github.com/dtcenter/MET/issues/1747>`_).
@@ -59,8 +60,8 @@ Version |version| release notes (|release_date|)
 
    * Miscellaneous:
 
+      * **Enhance support for rotated latlon grids and update related documentation (`#1574 <http://github.com/dtcenter/MET/issues/1574>`_).**
       * Parse the -v and -log options prior to application-specific command line options (`#1527 <http://github.com/dtcenter/MET/issues/1527>`_).
-      * Enhance support for rotated latlon grids and update related documentation (`#1574 <http://github.com/dtcenter/MET/issues/1574>`_).
       * Update GRIB1/2 table entries for the MXUPHL, MAXREF, MAXUVV, and MAXDVV variables (`#1658 <http://github.com/dtcenter/MET/issues/1658>`_).
       * Update the Air Force GRIB tables to reflect current AF usage (`#1519 <http://github.com/dtcenter/MET/issues/1519>`_).
       * Enhance the DataLine::get_item() error message to include the file name, line number, and column (`#1429 <http://github.com/dtcenter/MET/issues/1429>`_).
@@ -78,10 +79,10 @@ Version |version| release notes (|release_date|)
 
    * Statistics computations:
 
-      * Add support for the Hersbach CRPS algorithm by add new columns to the ECNT line type (`#1450 <http://github.com/dtcenter/MET/issues/1450>`_).
+      * **Modify the climatological Brier Score computation to match the NOAA/EMC VSDB method (`#1684 <http://github.com/dtcenter/MET/issues/1684>`_).**
+      * **Add support for the Hersbach CRPS algorithm by add new columns to the ECNT line type (`#1450 <http://github.com/dtcenter/MET/issues/1450>`_).**
       * Enhance MET to derive the Hersbach CRPSCL_EMP and CRPSS_EMP statistics from a single deterministic reference model (`#1685 <http://github.com/dtcenter/MET/issues/1685>`_).
       * Correct the climatological CRPS computation to match the NOAA/EMC VSDB method (`#1451 <http://github.com/dtcenter/MET/issues/1451>`_).
-      * Modify the climatological Brier Score computation to match the NOAA/EMC VSDB method (`#1684 <http://github.com/dtcenter/MET/issues/1684>`_).
       * Refine log messages when verifying probabilities (`#1502 <http://github.com/dtcenter/MET/issues/1502>`_).
 
 * Application code:
@@ -101,33 +102,33 @@ Version |version| release notes (|release_date|)
 
    * Point2Grid Tool:
 
-      * Support additional NetCDF point observation data sources (`#1345 <http://github.com/dtcenter/MET/issues/1345>`_, `#1509 <http://github.com/dtcenter/MET/issues/1509>`_, and `#1511 <http://github.com/dtcenter/MET/issues/1511>`_).
+      * **Support additional NetCDF point observation data sources (`#1345 <http://github.com/dtcenter/MET/issues/1345>`_, `#1509 <http://github.com/dtcenter/MET/issues/1509>`_, and `#1511 <http://github.com/dtcenter/MET/issues/1511>`_).**
+      * Support the 2-dimensional time variable in Himawari data files (`#1580 <http://github.com/dtcenter/MET/issues/1580>`_).
       * Create empty output files for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
 		* Improve the point2grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
       * Process point observations by variable name instead of GRIB code (`#1408 <http://github.com/dtcenter/MET/issues/1408>`_).
-      * Support the 2-dimensional time variable in Himawari data files (`#1580 <http://github.com/dtcenter/MET/issues/1580>`_).
 
    * Plot-Point-Obs Tool:
 
-      * Overhaul Plot-Point-Obs to make it highly configurable (`#213 <http://github.com/dtcenter/MET/issues/213>`_, `#1528 <http://github.com/dtcenter/MET/issues/1528>`_, and `#1052 <http://github.com/dtcenter/MET/issues/1052>`_).
+      * **Overhaul Plot-Point-Obs to make it highly configurable (`#213 <http://github.com/dtcenter/MET/issues/213>`_, `#1528 <http://github.com/dtcenter/MET/issues/1528>`_, and `#1052 <http://github.com/dtcenter/MET/issues/1052>`_).**
       * Support regridding option in the config file (`#1627 <http://github.com/dtcenter/MET/issues/1627>`_).
 
    * Point-Stat Tool:
 
-      * Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
+      * **Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).**
+		* **Print the rejection code reason count log messages at verbosity level 2 for zero matched pairs (`#1644 <http://github.com/dtcenter/MET/issues/1644>`_).**
+      * **Add detailed log messages when discarding observations (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).**
       * Update log messages (`#1514 <http://github.com/dtcenter/MET/issues/1514>`_).
       * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
-      * Print the rejection code reason count log messages at verbosity level 2 for zero matched pairs (`#1644 <http://github.com/dtcenter/MET/issues/1644>`_).
-      * Add detailed log messages when discarding observations (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).
 
    * Grid-Stat Tool:
 
-      * Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
+      * **Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).**
       * Correct the climatological CDF values in the NetCDF matched pairs output files and correct the climatological probability values for climatgological distribution percentile (CDP) threshold types (`#1638 <http://github.com/dtcenter/MET/issues/1638>`_).
 
    * Stat-Analysis Tool:
 
-      * Process multiple output thresholds and write multiple output line types in a single aggregate_stat job (`#1735 <http://github.com/dtcenter/MET/issues/1735>`_).
+      * **Process multiple output thresholds and write multiple output line types in a single aggregate_stat job (`#1735 <http://github.com/dtcenter/MET/issues/1735>`_).**
       * Skip writing job output to the logfile when the -out_stat option is provided (`#1736 <http://github.com/dtcenter/MET/issues/1736>`_).
       * Add -fcst_init_inc/_exc and -fcst_valid_inc/_exc job command filtering options to Stat-Analysis (`#1135 <http://github.com/dtcenter/MET/issues/1135>`_).
       * Add -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
@@ -139,8 +140,8 @@ Version |version| release notes (|release_date|)
 
    * MODE Tool:
 
-      * Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).
-		* Incremental development toward the Multivariate MODE tool (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
+      * **Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).**
+		* **Incremental development toward the Multivariate MODE tool (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).**
 
    * TC-Pairs Tool:
 
@@ -153,7 +154,7 @@ Version |version| release notes (|release_date|)
 
    * TC-Gen Tool:
 
-      * Overhaul the genesis matching logic, add the development and operational scoring algorithms, and add many config file options (`#1448 <http://github.com/dtcenter/MET/issues/1448>`_).
+      * **Overhaul the genesis matching logic, add the development and operational scoring algorithms, and add many config file options (`#1448 <http://github.com/dtcenter/MET/issues/1448>`_).**
       * Add config file options to filter data by initialization time (init_inc and init_exc) and hurricane basin (basin_mask) (`#1626 <http://github.com/dtcenter/MET/issues/1626>`_).
       * Add the genesis matched pair (GENMPR) output line type (`#1597 <http://github.com/dtcenter/MET/issues/1597>`_).
       * Add a gridded NetCDF output file with counts for genesis events and track points (`#1430 <http://github.com/dtcenter/MET/issues/1430>`_).
@@ -162,4 +163,4 @@ Version |version| release notes (|release_date|)
 
    * IODA2NC Tool:
 
-      * Add the new ioda2nc tool (`#1355 <http://github.com/dtcenter/MET/issues/1355>`_).
+      * **Add the new ioda2nc tool (`#1355 <http://github.com/dtcenter/MET/issues/1355>`_).**
