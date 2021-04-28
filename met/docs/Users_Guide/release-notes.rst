@@ -1,12 +1,12 @@
 MET release notes
 _________________
 
-When applicable, release notes are followed by the GitHub issue number
-which describes the bugfix, enhancement, or new feature:
+When applicable, release notes are followed by the GitHub issue number which
+describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-Version |version| release notes (|release_date|)
-------------------------------------------------
+MET Version |version| release notes (|release_date|)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Repository and build:
   
