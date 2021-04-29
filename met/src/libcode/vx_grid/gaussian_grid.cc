@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -507,7 +503,8 @@ rep = new GaussianGrid ( data );
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const GaussianData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const GaussianData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -519,5 +516,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

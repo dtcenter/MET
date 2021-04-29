@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -289,6 +285,3 @@ extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

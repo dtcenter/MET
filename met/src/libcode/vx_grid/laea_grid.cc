@@ -1,3 +1,10 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2021
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,8 +100,7 @@ if ( strcmp(data.geoid, "WGS_84") == 0 )  {
 
 } else {
 
-   mlog << Error
-        << "\n\n  LaeaGrid::LaeaGrid(const LaeaData &) -> "
+   mlog << Error << "\nLaeaGrid::LaeaGrid(const LaeaData &) -> "
         << "unrecognized geoid ... \"" << data.geoid << "\"\n\n";
 
    exit ( 1 );
@@ -136,18 +142,6 @@ y_LR = 0.0;
 x_UL = 0.0;
 y_UL = Data.ny  - 1.0;
 
-
-// aff.set_three_points_v2(
-// 
-//    u_LL, v_LL, x_LL, y_LL, 
-// 
-//    u_LR, v_LR, x_LR, y_LR, 
-// 
-//    u_UL, v_UL, x_UL, y_UL
-// 
-// );
-
-
 aff.set_three_points(
 
    u_LL, v_LL, u_LR, v_LR, u_UL, v_UL, 
@@ -184,45 +178,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::latlon_old_to_rot(double lat_old, double lon_old, double & lat_rot, double & lon_rot) const
-
-{
-
-double u, v, w, uu, vv, ww;
-
-
-grid_latlon_to_xyz(lat_old, lon_old, u, v, w);
-
-grid_xyz_to_latlon(uu, vv, ww, lat_rot, lon_rot);
-
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::latlon_rot_to_old(double lat_rot, double lon_rot, double & lat_old, double & lon_old) const
-
-{
-
-double u, v, w, uu, vv, ww;
-
-grid_latlon_to_xyz(lat_rot, lon_rot, uu, vv, ww);
-
-grid_xyz_to_latlon(u, v, w, lat_old, lon_old);
-
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -300,9 +255,7 @@ num = u*sind(ce);
 
 denom = D*rho*cosd(beta1)*cosd(ce) - D*D*v*sind(beta1)*sind(ce);
 
-
-// lon = lambda0 + atand(num/denom);   //  maybe want atan2 here?   //  Eq 24-26, page 188
-lon = lambda0 + atan2d(num, denom);   //  maybe want atan2 here?
+lon = lambda0 + atan2d(num, denom);   //  Eq 24-26, page 188
 
 lon = -lon;
 
@@ -444,8 +397,8 @@ v = new double [n];
 
 if ( !u || !v )  {
 
-   mlog << Error
-        << "\n\n  LaeaGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
+   mlog << Error << "\nLaeaGrid::xy_closedpolyline_area() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -468,39 +421,6 @@ return ( sum );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::latlon_to_rt(double lat_deg, double lon_deg, double & r, double & theta) const
-
-{
-
-theta = 90.0 - lon_deg;
-
-r = laea_r(lat_deg);
-
-return;
-
-}
-*/
-
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::rt_to_latlon(double r, double theta, double & lat_deg, double & lon_deg) const
-
-{
-
-lon_deg = 90.0 - theta;
-
-lat_deg = laea_r_inv(r);
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -529,38 +449,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::rt_to_uv(double r, double theta, double & u, double & v) const
-
-{
-
-u = r*sind(theta);
-
-v = r*cosd(theta);
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void LaeaGrid::uv_to_rt(double u, double v, double & r, double & theta) const
-
-{
-
-r = sqrt( u*u + v*v );
-
-theta = atan2d(u, v);   //  NOT atan2d(v, u)
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -603,42 +491,31 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString LaeaGrid::serialize(int version) const
+ConcatString LaeaGrid::serialize() const
 
 {
 
 ConcatString a;
-// char junk[256];
+char junk[256];
 
+a << "Projection: Lambert Azimuthal Equal Area";
 
-// a << grid_proj_ser_name << ' ' << stereographic_proj_ser_name;
-// 
-// a << ' ' << grid_version_ser_name << ' ' << version;
-// 
-// a << ' ' << grid_nx_ser_name << ' ' << Nx;
-// a << ' ' << grid_ny_ser_name << ' ' << Ny;
-// 
-// a << ' ' << north_hemi_ser_name << ' ' << ( IsNorthHemisphere ? "true" : "false");
-// 
-// a << ' ' << lon_orient_ser_name << ' ';
-// snprintf(junk, sizeof(junk), "%.3f", Lon_orient);
-// fix_float(junk);
-// a << junk;
-// 
-// a << ' ' << bx_ser_name << ' ';
-// snprintf(junk, sizeof(junk), "%.3f", Bx);
-// fix_float(junk);
-// a << junk;
-// 
-// a << ' ' << by_ser_name << ' ';
-// snprintf(junk, sizeof(junk), "%.3f", By);
-// fix_float(junk);
-// a << junk;
-// 
-// a << ' ' << alpha_ser_name << ' ';
-// snprintf(junk, sizeof(junk), "%.5f", Alpha);
-// fix_float(junk);
-// a << junk;
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
+
+a << " geoid: " << Data.geoid;
+
+snprintf(junk, sizeof(junk), " lat_ll: %.3f", Data.lat_LL);   a << junk;
+snprintf(junk, sizeof(junk), " lon_ll: %.3f", Data.lon_LL);   a << junk;
+
+snprintf(junk, sizeof(junk), " lat_ul: %.3f", Data.lat_UL);   a << junk;
+snprintf(junk, sizeof(junk), " lon_ul: %.3f", Data.lon_UL);   a << junk;
+
+snprintf(junk, sizeof(junk), " lat_lr: %.3f", Data.lat_LR);   a << junk;
+snprintf(junk, sizeof(junk), " lon_lr: %.3f", Data.lon_LR);   a << junk;
+
+snprintf(junk, sizeof(junk), " lat_pole: %.3f", Data.lat_pole);   a << junk;
+snprintf(junk, sizeof(junk), " lon_pole: %.3f", Data.lon_pole);   a << junk;
 
    //
    //  done
@@ -656,8 +533,8 @@ void LaeaGrid::deserialize(const StringArray &)
 
 {
 
-mlog << Error
-     << "\n\n  LaeaGrid::deserialize(const StringArray &) -> not yet implemented\n\n";
+mlog << Error << "\nLaeaGrid::deserialize(const StringArray &) -> "
+     << " not yet implemented\n\n";
 
 exit ( 1 );
 
@@ -749,8 +626,6 @@ double beta1, beta;
 double m1, lambda, lambda0, lat1, delta;
 
 A = geoid.a_km();
-// A = 1.0;
-
 
 lambda  = -lon;
 
@@ -772,7 +647,6 @@ Rq = A*sqrt(0.5*Qp);
 
 
 m1 = snyder_m_func(lat1);
-
 
 
 B = 1.0 + sind(beta1)*sind(beta) + cosd(beta1)*cosd(beta)*cosd(delta);
@@ -835,29 +709,12 @@ void LaeaGrid::shift_right(int)
 
 {
 
-mlog << Error
-     << "\n\n  LaeaGrid::shift_right(int) -> not yet implemented!\n\n";
+mlog << Error << "\nLaeaGrid::shift_right(int) -> "
+     << "not yet implemented!\n\n";
 
 exit ( 1 );
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-ConcatString LaeaGrid::serialize() const
-
-{
-
-mlog << Error
-     << "\n\n  LaeaGrid::serialize() -> not yet implemented!\n\n";
-
-exit ( 1 );
-
-return ( ConcatString () );
 
 }
 
@@ -890,8 +747,6 @@ return;
 double laea_segment_area(double u0, double v0, double u1, double v1)
  
 {
-
-// cerr << "  warning -> laea_segment_area() -> hasn't been tested yet!\n";
  
 double answer;
  
@@ -972,8 +827,8 @@ rep = new LaeaGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error
-        << "\n\n  Grid::set(const LaeaData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const LaeaData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -985,7 +840,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-

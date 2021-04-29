@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -94,6 +92,3 @@ inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

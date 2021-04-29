@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,11 +28,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-// static double     st_func (double lat, bool is_north_hemisphere);
-// static double st_der_func (double lat, bool is_north_hemisphere);
-// 
-// static double st_inv_func (double r, bool is_north_hemisphere);
 
 static void reduce(double & angle);
 
@@ -109,7 +100,6 @@ Ny = data.ny;
 Name = data.name;
 
 Lon_orient = data.lon_orient;
-
 
    //
    //  calculate Alpha
@@ -263,18 +253,10 @@ double StereographicGrid::calc_area(int x, int y) const
 double u[4], v[4];
 double sum;
 
-
-// xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-// xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-// xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-// xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
-
-
 xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
 xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
 xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
 xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
-
 
 sum = uv_closedpolyline_area(u, v, 4);
 
@@ -740,34 +722,6 @@ set(data);
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-Grid::Grid(const StereoType2Data & data)
-
-{
-
-init_from_scratch();
-
-set(data);
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-Grid::Grid(const StereoType3Data & data)
-
-{
-
-init_from_scratch();
-
-set(data);
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void Grid::set(const StereographicData & data)
 
@@ -790,54 +744,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void Grid::set(const StereoType2Data & data)
-
-{
-
-clear();
-
-rep = new StereographicGrid (data);
-
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereoType2Data &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void Grid::set(const StereoType3Data & data)
-
-{
-
-clear();
-
-rep = new StereographicGrid (data);
-
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereoType3Data &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -921,9 +827,3 @@ return ( g_new );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-

@@ -1,3 +1,10 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2021
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -44,18 +51,7 @@ class LaeaGrid : public GridRep {
 
       void clear();
 
-
       void calc_aff();
-
-      // void latlon_old_to_rot(double lat_old, double lon_old, double & lat_rot, double & lon_rot) const;
-
-      // void latlon_rot_to_old(double lat_rot, double lon_rot, double & lat_old, double & lon_old) const;
-
-      // void latlon_to_rt(double lat, double lon, double & r, double & theta) const;
-      // void rt_to_latlon(double r, double theta, double & lat, double & lon) const;
-
-      // void rt_to_uv(double r, double theta, double & u, double & v) const;
-      // void uv_to_rt(double u, double v, double & r, double & theta) const;
 
       void xy_to_uv(double x, double y, double & u, double & v) const;
       void uv_to_xy(double u, double v, double & x, double & y) const;
@@ -95,7 +91,7 @@ class LaeaGrid : public GridRep {
 
       void dump(ostream &, int = 0) const;
 
-      ConcatString serialize(int version = 1) const;
+      ConcatString serialize() const;
 
       void deserialize(const StringArray &);
 
@@ -105,15 +101,11 @@ class LaeaGrid : public GridRep {
 
       GridRep * copy() const;
 
-
-
       double scale_km() const;
 
       bool is_global() const;
 
       void shift_right(int);
-
-      ConcatString serialize() const;
 
 };
 
@@ -134,6 +126,3 @@ inline void LaeaGrid::set_so2(double) { return; }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
