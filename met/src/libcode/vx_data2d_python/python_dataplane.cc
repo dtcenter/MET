@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -317,6 +317,9 @@ for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
 
 }
 
+mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
+     << command << "\n";
+
 status = system(command.text());
 
 if ( status )  {
@@ -353,9 +356,6 @@ if ( PyErr_Occurred() )  {
 
 }
 
-mlog << Debug(3) << "Reading temporary tmp_nc file: "
-     << tmp_nc_path << "\n";
-
    //
    //  set the arguments
    //
@@ -369,6 +369,9 @@ a.add(tmp_nc_path);
 wa.set(a);
 
 PySys_SetArgv (wa.wargc(), wa.wargv());
+
+mlog << Debug(4) << "Reading temporary Python dataplane file: "
+     << tmp_nc_path << "\n";
 
    //
    //  import the python wrapper script as a module

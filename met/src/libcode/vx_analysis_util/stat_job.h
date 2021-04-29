@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -249,6 +249,7 @@ class STATAnalysisJob {
       char        *stat_file; // dump output statistics to a STAT file
       ofstream    *stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
+      int         stat_row;   // Counter for the current stat row
 
       StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)

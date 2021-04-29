@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -949,7 +949,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRIRW) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -200,7 +200,7 @@ ProbPairInfoBase * new_prob_pair(const ATCFLineType t) {
    ProbPairInfoBase *new_pair = (ProbPairInfoBase *) 0;
 
    switch(t) {
-      case ATCFLineType_ProbRIRW:
+      case ATCFLineType_ProbRI:
          new_pair = new ProbRIRWPairInfo;
          break;
 
