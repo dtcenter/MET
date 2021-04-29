@@ -68,7 +68,7 @@ export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib:${MET_PYTHON}/lib:${MET_NE
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # Constants
-if [ [ -z ${MET_GRIB2CLIB} && -z ${MET_GRIB2CINC} ] ]; then
+if [[ -z ${MET_GRIB2CLIB} && -z ${MET_GRIB2CINC} ]]; then
     COMPILE_ZLIB=1
     COMPILE_LIBPNG=1
     COMPILE_JASPER=1
@@ -750,7 +750,7 @@ if [ $COMPILE_MET -eq 1 ]; then
   export LDFLAGS="-Wl,--disable-new-dtags"
   export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib:${MET_GSL}/lib"
   export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER}:${LIB_LIBPNG}:${LIB_Z}"
-  export LDFLAGS="${LDFLAGS} -L${LIB_JASPER} -L${MET_HDF5}/lib"
+  export LDFLAGS="${LDFLAGS} -L${LIB_JASPER} -L${LIB_LIBPNG} -L${MET_HDF5}/lib"
   export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
