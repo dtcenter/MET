@@ -90,7 +90,48 @@ Acronyms
 * **HIWPP** - High Impact Weather Predication Project
 * **NGGPS** - Next Generation Global Predicatio System
 * **GSD** - Global Systems Division
-					  
+
+Authors
+-------
+
+Many authors, listed below in alphabetical order, have contributed to the documentation of MET.
+To cite this documentation in publications, please refer to the MET User's Guide :ref:`Citation Instructions<citations>`.
+
+* David Ahijevych [#NCAR]_
+* Lindsay Blank
+* Barbara Brown [#NCAR]_
+* Randy Bullock [#NCAR]_
+* Tatiana Burek [#NCAR]_
+* David Fillmore [#NCAR]_
+* Tressa Fowler
+* Eric Gilleland [#NCAR]_
+* Lisa Goodrich [#NCAR]_
+* John Halley Gotway [#NCAR]_
+* Tracy Hertneky [#NCAR]_
+* Lacey Holland
+* Anne Holmes
+* Michelle Harrold [#NCAR]_
+* Tara Jensen [#NCAR]_
+* George McCabe [#NCAR]_
+* Kathryn Newman [#NCAR]_
+* Paul Oldenburg
+* John Opatz [#NCAR]_
+* Julie Prestopnik [#NCAR]_
+* Paul Prestopnik [#NCAR]_
+* Nancy Rehak [#NCAR]_
+* Howard Soh [#NCAR]_
+* Bonny Strong [#CIR]_
+* Minna Win-Gildenmeister [#NCAR]_
+
+.. rubric:: Organization
+
+.. [#NCAR] `National Center for Atmospheric Research, Research
+       Applications Laboratory <https://ral.ucar.edu/>`_, `Developmental Testbed Center <https://dtcenter.org/>`_
+.. [#CIR] `Cooperative Institute for Research in the Atmosphere at
+       National Oceanic and Atmospheric Administration (NOAA) Earth
+       System Research Laboratory <https://www.esrl.noaa.gov/>`_
+
+
 .. toctree::
    :hidden:
    :caption: Model Evaluation Tools
@@ -102,7 +143,3 @@ Index
 =====
 
 * :ref:`genindex`
-
-  
-	     
-		      
