@@ -118,16 +118,16 @@ To cite this documentation in publications, please refer to the MET User's Guide
 * John Opatz [#NCAR]_
 * Julie Prestopnik [#NCAR]_
 * Paul Prestopnik [#NCAR]_
-* Nancy Rehak [#NCAR]_
+* Nancy Rehak
 * Howard Soh [#NCAR]_
-* Bonny Strong [#CIR]_
+* Bonny Strong [#CIRA]_
 * Minna Win-Gildenmeister [#NCAR]_
 
 .. rubric:: Organization
 
 .. [#NCAR] `National Center for Atmospheric Research, Research
        Applications Laboratory <https://ral.ucar.edu/>`_, `Developmental Testbed Center <https://dtcenter.org/>`_
-.. [#CIR] `Cooperative Institute for Research in the Atmosphere at
+.. [#CIRA] `Cooperative Institute for Research in the Atmosphere at
        National Oceanic and Atmospheric Administration (NOAA) Earth
        System Research Laboratory <https://www.esrl.noaa.gov/>`_
 
