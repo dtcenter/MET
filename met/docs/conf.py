@@ -75,13 +75,9 @@ numfig_format = {
 
 # -- Export variables --------------------------------------------------------
 
-rst_epilog = """
-.. |copyright|    replace:: {copyrightstr}
-.. |author_list|  replace:: {author_liststr}
-.. |release_date| replace:: {release_datestr}
-.. |release_year| replace:: {release_yearstr}
-""".format(copyrightstr    = copyright,
-           author_liststr  = author_list,
-           release_datestr = release_date,
-           release_yearstr = release_year)
-
+rst_epilog = f"""
+.. |copyright|    replace:: {copyright}
+.. |author_list|  replace:: {author_list}
+.. |release_date| replace:: {release_date}
+.. |release_year| replace:: {release_year}
+"""
