@@ -931,9 +931,9 @@ _________________
 		message_type_group_map = [];
 		message_type_map       = [];
 		station_id             = [];
-      elevation_range        = { ... };
-      level_range            = { ... };
-      obs_var                = [];
+		elevation_range        = { ... };
+		level_range            = { ... };
+		obs_var                = [];
 		quality_mark_thresh    = 0;
 		time_summary           = { ... }
 
