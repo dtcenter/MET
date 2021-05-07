@@ -43,14 +43,16 @@ Setting this environment variable triggers slightly different processing logic i
 
 With this approach, users should be able to execute Python scripts in their own custom environments.
 
+.. _pyembed-2d-data:
+
 Python Embedding for 2D data
 ____________________________
 
-We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy arrays or by using Xarray objects. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy array or an Xarray object by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy array or an Xarray object. MET can then ingest the data via the Python script. Note that whether a NumPy array or an Xarray object is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
+We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy N-dimensional arrays (ndarrays) or by using Xarray DataArrays. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy ndarray or an Xarray DataArray by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy ndarray or an Xarray DataArray. MET can then ingest the data via the Python script. Note that whether a NumPy ndarray or an Xarray DataArray is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
 
-**Using NumPy**
+**Using NumPy N-dimensional Arrays**
 
-The data must be loaded into a 2D NumPy array named **met_data**. In addition there must be a Python dictionary named **attrs** which contains metadata such as timestamps, grid projection and other information. Here is an example **attrs** dictionary:
+The data must be loaded into a 2D NumPy ndarray named **met_data**. In addition there must be a Python dictionary named **attrs** which contains metadata such as timestamps, grid projection and other information. Here is an example **attrs** dictionary:
 
 .. code-block:: none
 
@@ -87,8 +89,7 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
   
   }
 
-
-In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
+In the **attrs** dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
 
 If specified as a string, **grid** can be defined as follows:
 
@@ -171,9 +172,17 @@ When specified as a dictionary, the contents of the **grid** dictionary vary bas
 
 Additional information about supported grids can be found in :ref:`appendixB`.
 
-**Using Xarray Objects**
+**Using Xarray DataArrays**
 
-To use Xarray objects, a similar procedure to the NumPy case is followed. An Xarray object has a NumpyArray called **values**, and an attributes dictionary called **attrs**. The user must name the Xarray object to be **met_data**. When one of the MET tools runs the Python script, it will look for an Xarray object named **met_data**, and will retrieve the data and metadata from the **values** and **attrs** parts, respectively, of the Xarray object. The Xarray **attrs** dictionary is populated in the same way as for the NumPy interface. The **values** Numpy array part of the Xarray object is also populated in the same way as the NumPy case.
+To use Xarray DataArrays, a similar procedure to the NumPy case is followed. The Xarray DataArray can be represented as a NumPy N-dimensional array (ndarray) via the **values** property of the DataArray, and an **attrs** property that contains a dictionary of attributes. The user must name the Xarray DataArray to be **met_data**. When one of the MET tools runs the Python script, it will look for an Xarray DataArray named **met_data**, and will retrieve the data and metadata from the **values** and **attrs** properties, respectively, of the Xarray DataArray. The Xarray DataArray **attrs** dictionary is populated in the same way as for the NumPy interface (please see :ref:`pyembed-2d-data` for requirements of each entry in the **attrs** dictionary). The **values** NumPy ndarray property of the Xarray DataArray is also populated in the same way as the NumPy case.
+
+.. note::
+   Currently, MET does not support Xarray Dataset structures. If you have a Dataset in Xarray, you can create a DataArray of a single variable using:
+
+   met_data = xr.DataArray(ds.varname,attrs=ds.attrs)
+
+   | ds = your Dataset name
+   | varname = variable name in the Dataset you'd like to use in MET
 
 __________________
 
