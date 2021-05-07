@@ -39,7 +39,7 @@ Required arguments for tc_pairs
 
 2. The **-edeck source** argument indicates the edeck ATCF format data source containing probabilistic track data to be verified. It specifies the name of an ATCF format file or top-level directory containing ATCF format files ending in “.dat” to be processed. The **-adeck** or **-edeck** option must be used at least once.
 
-3. The **-bdeck source** argument indicates the TC-Pairs acceptable format data source containing the tropical cyclone reference dataset to be used for verifying the adeck source. This source is typically the NHC Best Track Analysis, but could be any TC-Pairs acceptable formatted reference. The acceptable data formats for bdecks are the same as those for adecks. This arguement specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in “.dat” to be processed. 
+3. The **-bdeck source** argument indicates the TC-Pairs acceptable format data source containing the tropical cyclone reference dataset to be used for verifying the adeck source. This source is typically the NHC Best Track Analysis, but could be any TC-Pairs acceptable formatted reference. The acceptable data formats for bdecks are the same as those for adecks. This argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in “.dat” to be processed. 
 
 4. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
