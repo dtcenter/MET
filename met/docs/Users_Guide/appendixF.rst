@@ -43,7 +43,6 @@ Setting this environment variable triggers slightly different processing logic i
 
 With this approach, users should be able to execute Python scripts in their own custom environments.
 
-.. _pyembed-2d-data:
 Python Embedding for 2D data
 ____________________________
 
@@ -87,6 +86,8 @@ The data must be loaded into a 2D NumPy ndarray named **met_data**. In addition 
       }
   
   }
+
+.. _pyembed-2d-data:
 
 In the **attrs** dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
 
