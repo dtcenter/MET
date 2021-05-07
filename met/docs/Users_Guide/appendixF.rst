@@ -179,11 +179,10 @@ To use Xarray DataArrays, a similar procedure to the NumPy case is followed. The
 .. note::
    Currently, MET does not support Xarray Dataset structures. If you have a Dataset in Xarray, you can create a DataArray of a single variable using::
 
-   met_data = xr.DataArray(ds.varname,attrs=ds.attrs)
+   **met_data = xr.DataArray(ds.varname,attrs=ds.attrs)**
 
    | ds = your Dataset name
    | varname = variable name in the Dataset you'd like to use in MET
-   |
 
 __________________
 
