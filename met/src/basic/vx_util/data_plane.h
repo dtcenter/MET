@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -68,7 +68,7 @@ class DataPlane {
          // Set functions
          //
 
-      void set_size(int Nx, int Ny);
+      void set_size(int nx, int ny, double v = 0.0);
 
       void set(double, int, int);   //  x, y
       void set_block(double *, int, int);   //  nx, ny

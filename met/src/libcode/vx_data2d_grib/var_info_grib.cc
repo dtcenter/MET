@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -194,18 +194,6 @@ void VarInfoGrib::set_field_rec(int v) {
 void VarInfoGrib::set_tri(int v) {
    TRI = v;
    return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfoGrib::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-   MagicStr << cs_erase << nstr << "/" << lstr;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

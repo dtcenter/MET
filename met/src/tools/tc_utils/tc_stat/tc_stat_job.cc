@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -112,11 +112,11 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
    a = job->parse_job_command(jobstring);
 
    // Check for unused arguments
-   if(a.n_elements() > 0) {
+   if(a.n() > 0) {
 
       // Build list of unknown args
-      for(i=0; i<a.n_elements()-1; i++) err_str << a[i] << " ";
-      err_str << a[a.n_elements()-1];
+      for(i=0; i<a.n()-1; i++) err_str << a[i] << " ";
+      err_str << a[a.n()-1];
 
       mlog << Error
            << "\nTCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) -> "
@@ -220,9 +220,11 @@ void TCStatJob::clear() {
    LineType.clear();
    TrackWatchWarn.clear();
    ColumnThreshMap.clear();
-   ColumnStrMap.clear();
+   ColumnStrIncMap.clear();
+   ColumnStrExcMap.clear();
    InitThreshMap.clear();
-   InitStrMap.clear();
+   InitStrIncMap.clear();
+   InitStrExcMap.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -301,9 +303,11 @@ void TCStatJob::assign(const TCStatJob & j) {
    LineType = j.LineType;
    TrackWatchWarn = j.TrackWatchWarn;
    ColumnThreshMap = j.ColumnThreshMap;
-   ColumnStrMap = j.ColumnStrMap;
+   ColumnStrIncMap = j.ColumnStrIncMap;
+   ColumnStrExcMap = j.ColumnStrExcMap;
    InitThreshMap = j.InitThreshMap;
-   InitStrMap = j.InitStrMap;
+   InitStrIncMap = j.InitStrIncMap;
+   InitStrExcMap = j.InitStrExcMap;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -423,8 +427,14 @@ void TCStatJob::dump(ostream & out, int depth) const {
       thr_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "ColumnStrMap ...\n";
-   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+   out << prefix << "ColumnStrIncMap ...\n";
+   for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
+      out << prefix << str_it->first << ": \n";
+      str_it->second.dump(out, depth + 1);
+   }
+
+   out << prefix << "ColumnStrExcMap ...\n";
+   for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -435,8 +445,14 @@ void TCStatJob::dump(ostream & out, int depth) const {
       thr_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "InitStrMap ...\n";
-   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
+   out << prefix << "InitStrIncMap ...\n";
+   for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
+      out << prefix << str_it->first << ": \n";
+      str_it->second.dump(out, depth + 1);
+   }
+
+   out << prefix << "InitStrExcMap ...\n";
+   for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -501,7 +517,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TrackWatchWarn for each TrackPoint
-   if(TrackWatchWarn.n_elements() > 0) {
+   if(TrackWatchWarn.n() > 0) {
 
       // Assume track will not be kept
       keep = false;
@@ -539,7 +555,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          keep = false;
          n.RejInitThresh += pair.n_points();
       }
-      else if(InitStrMap.size() > 0) {
+      else if(InitStrIncMap.size() > 0) {
+         keep = false;
+         n.RejInitStr += pair.n_points();
+      }
+      else if(InitStrExcMap.size() > 0) {
          keep = false;
          n.RejInitStr += pair.n_points();
       }
@@ -567,16 +587,33 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       }
    }
 
-   // Check InitStr
+   // Check InitStrInc
    if(keep == true) {
 
-      for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
+      for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = pair.line(i_init)->get_item(str_it->first.c_str());
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
+            keep = false;
+            n.RejInitStr += pair.n_points();
+            break;
+         }
+      }
+   }
+
+   // Check InitStrExc
+   if(keep == true) {
+
+      for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
+
+         // Retrieve the column value
+         v_str = pair.line(i_init)->get_item(str_it->first.c_str());
+
+         // Check the string value
+         if(str_it->second.has(v_str)) {
             keep = false;
             n.RejInitStr += pair.n_points();
             break;
@@ -606,11 +643,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 
    // MET-667 Check this track for required lead times
    // If no required lead times were defined, do nothing.
-   if(keep == true && LeadReq.n_elements() > 0){
+   if(keep == true && LeadReq.n() > 0){
       // Loop through the points and see if any of the
       // lead times are in the list of required lead times
       // defined in the configuration file.
-      for(int j=0; j<LeadReq.n_elements(); j++){
+      for(int j=0; j<LeadReq.n(); j++){
          if(pair.adeck().lead_index(LeadReq[j]) == -1){
             // If we don't have a match, break out and discard this track.
             keep = false;
@@ -638,48 +675,48 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TC-STAT header columns
-   if(AModel.n_elements() > 0 &&
+   if(AModel.n() > 0 &&
      !AModel.has(line.amodel()))        { keep = false; n.RejAModel++;    }
-   else if(BModel.n_elements() > 0 &&
+   else if(BModel.n() > 0 &&
      !BModel.has(line.bmodel()))        { keep = false; n.RejBModel++;    }
-   else if(Desc.n_elements() > 0 &&
+   else if(Desc.n() > 0 &&
      !Desc.has(line.desc()))            { keep = false; n.RejDesc++;      }
-   else if(StormId.n_elements() > 0 &&
+   else if(StormId.n() > 0 &&
    !has_storm_id(StormId, (string)line.basin(), (string)line.cyclone(), line.init()))
                                         { keep = false; n.RejStormId++;   }
-   else if(Basin.n_elements() > 0 &&
+   else if(Basin.n() > 0 &&
      !Basin.has(line.basin()))          { keep = false; n.RejBasin++;     }
-   else if(Cyclone.n_elements() > 0 &&
+   else if(Cyclone.n() > 0 &&
      !Cyclone.has(line.cyclone()))      { keep = false; n.RejCyclone++;   }
-   else if(StormName.n_elements() > 0 &&
+   else if(StormName.n() > 0 &&
      !StormName.has(line.storm_name())) { keep = false; n.RejStormName++; }
    else if(InitBeg > 0 &&
       line.init() < InitBeg)            { keep = false; n.RejInit++;      }
    else if(InitEnd > 0 &&
       line.init() > InitEnd)            { keep = false; n.RejInit++;      }
-   else if(InitInc.n_elements() > 0 &&
+   else if(InitInc.n() > 0 &&
      !InitInc.has(line.init()))         { keep = false; n.RejInit++;      }
-   else if(InitExc.n_elements() > 0 &&
+   else if(InitExc.n() > 0 &&
      InitExc.has(line.init()))          { keep = false; n.RejInit++;      }
-   else if(InitHour.n_elements() > 0 &&
+   else if(InitHour.n() > 0 &&
      !InitHour.has(line.init_hour()))   { keep = false; n.RejInitHour++;  }
-   else if(Lead.n_elements() > 0 &&
+   else if(Lead.n() > 0 &&
      !Lead.has(line.lead()))            { keep = false; n.RejLead++;      }
    else if(ValidBeg > 0 &&
       line.valid() < ValidBeg)          { keep = false; n.RejValid++;     }
    else if(ValidEnd > 0 &&
       line.valid() > ValidEnd)          { keep = false; n.RejValid++;     }
-   else if(ValidInc.n_elements() > 0 &&
+   else if(ValidInc.n() > 0 &&
      !ValidInc.has(line.valid()))       { keep = false; n.RejValid++;     }
-   else if(ValidExc.n_elements() > 0 &&
+   else if(ValidExc.n() > 0 &&
      ValidExc.has(line.valid()))        { keep = false; n.RejValid++;     }
-   else if(ValidHour.n_elements() > 0 &&
+   else if(ValidHour.n() > 0 &&
      !ValidHour.has(line.valid_hour())) { keep = false; n.RejValidHour++; }
-   else if(InitMask.n_elements() > 0 &&
+   else if(InitMask.n() > 0 &&
      !InitMask.has(line.init_mask()))   { keep = false; n.RejInitMask++;  }
-   else if(ValidMask.n_elements() > 0 &&
+   else if(ValidMask.n() > 0 &&
      !ValidMask.has(line.valid_mask())) { keep = false; n.RejValidMask++; }
-   else if(LineType.n_elements() > 0 &&
+   else if(LineType.n() > 0 &&
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
    // Check that PROBRIRW lines include the requested probability type
@@ -701,27 +738,45 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
 
          // Check the column threshold
          if(!thr_it->second.check_dbl(v_dbl)) {
-           keep = false;
-           n.RejColumnThresh++;
-           break;
+            keep = false;
+            n.RejColumnThresh++;
+            break;
          }
       }
    }
 
-   // Check ColumnStrMap
+   // Check ColumnStrIncMap
    if(keep == true) {
 
       // Loop through the column string matching
-      for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+      for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
 
          // Retrieve the column value
          v_str = line.get_item(str_it->first.c_str());
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
-           keep = false;
-           n.RejColumnStr++;
-           break;
+            keep = false;
+            n.RejColumnStr++;
+            break;
+         }
+      }
+   }
+
+   // Check ColumnStrExcMap
+   if(keep == true) {
+
+      // Loop through the column string matching
+      for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
+
+         // Retrieve the column value
+         v_str = line.get_item(str_it->first.c_str());
+
+         // Check the string value
+         if(str_it->second.has(v_str)) {
+            keep = false;
+            n.RejColumnStr++;
+            break;
          }
       }
    }
@@ -805,10 +860,10 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    v = atof(line.get_item(sa[0].c_str()));
 
    // If multiple columns, compute the requested difference
-   if(sa.n_elements() > 1) {
+   if(sa.n() > 1) {
 
       // Loop through the column
-      for(i=1; i<sa.n_elements(); i++) {
+      for(i=1; i<sa.n(); i++) {
 
          // Get the current column value
          v_cur = atof(line.get_item(sa[i].c_str()));
@@ -836,7 +891,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
    a.parse_wsss(jobstring);
 
    // Loop over the StringArray elements
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       c = to_lower(a[i]);
 
@@ -876,11 +931,15 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1].c_str());            a.shift_down(i, 1); }
       else if(c.compare("-column_thresh"     ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), ColumnThreshMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrMap);
+      else if(c.compare("-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrIncMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-column_str_exc"    ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrExcMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-init_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitThreshMap);
                                                                                                           a.shift_down(i, 2); }
-      else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrMap);
+      else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrIncMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-init_str_exc"      ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrExcMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
       else if(c.compare("-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
@@ -897,7 +956,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
       else if(c.compare("-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
       else if(c.compare("-rirw_window"       ) == 0) {
-         if(i+2 < a.n_elements() && is_number(a[i+2].c_str())) {
+         if(i+2 < a.n() && is_number(a[i+2].c_str())) {
                                                        RIRWWindowBeg = timestring_to_sec(a[i+1].c_str());
                                                        RIRWWindowEnd = timestring_to_sec(a[i+2].c_str()); a.shift_down(i, 2); }
          else {
@@ -908,7 +967,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1].c_str());         a.shift_down(i, 1); }
       else if(c.compare("-landfall_window")    == 0) {
                                                        Landfall = true; // For -landfall_window, set -landfall true
-         if(i+2 < a.n_elements() && is_number(a[i+2].c_str())) {
+         if(i+2 < a.n() && is_number(a[i+2].c_str())) {
                                                        LandfallBeg = timestring_to_sec(a[i+1].c_str());
                                                        LandfallEnd = timestring_to_sec(a[i+2].c_str());   a.shift_down(i, 2); }
          else {
@@ -1113,73 +1172,85 @@ ConcatString TCStatJob::serialize() const {
 
    if(JobType != NoTCStatJobType)
       s << "-job " << tcstatjobtype_to_string(JobType) << " ";
-   for(i=0; i<AModel.n_elements(); i++)
+   for(i=0; i<AModel.n(); i++)
       s << "-amodel " << AModel[i] << " ";
-   for(i=0; i<BModel.n_elements(); i++)
+   for(i=0; i<BModel.n(); i++)
       s << "-bmodel " << BModel[i] << " ";
-   for(i=0; i<Desc.n_elements(); i++)
+   for(i=0; i<Desc.n(); i++)
       s << "-desc " << Desc[i] << " ";
-   for(i=0; i<StormId.n_elements(); i++)
+   for(i=0; i<StormId.n(); i++)
       s << "-storm_id " << StormId[i] << " ";
-   for(i=0; i<Basin.n_elements(); i++)
+   for(i=0; i<Basin.n(); i++)
       s << "-basin " << Basin[i] << " ";
-   for(i=0; i<Cyclone.n_elements(); i++)
+   for(i=0; i<Cyclone.n(); i++)
       s << "-cyclone " << Cyclone[i] << " ";
-   for(i=0; i<StormName.n_elements(); i++)
+   for(i=0; i<StormName.n(); i++)
       s << "-storm_name " << StormName[i] << " ";
    if(InitBeg > 0)
       s << "-init_beg " << unix_to_yyyymmdd_hhmmss(InitBeg) << " ";
    if(InitEnd > 0)
       s << "-init_end " << unix_to_yyyymmdd_hhmmss(InitEnd) << " ";
-   for(i=0; i<InitInc.n_elements(); i++)
+   for(i=0; i<InitInc.n(); i++)
       s << "-init_inc " << unix_to_yyyymmdd_hhmmss(InitInc[i]) << " ";
-   for(i=0; i<InitExc.n_elements(); i++)
+   for(i=0; i<InitExc.n(); i++)
       s << "-init_exc " << unix_to_yyyymmdd_hhmmss(InitExc[i]) << " ";
-   for(i=0; i<InitHour.n_elements(); i++)
+   for(i=0; i<InitHour.n(); i++)
       s << "-init_hour " << sec_to_hhmmss(nint(InitHour[i])) << " ";
-   for(i=0; i<Lead.n_elements(); i++)
+   for(i=0; i<Lead.n(); i++)
       s << "-lead " << sec_to_hhmmss(nint(Lead[i])) << " ";
-   for(i=0; i<LeadReq.n_elements(); i++)
+   for(i=0; i<LeadReq.n(); i++)
          s << "-lead_req " << sec_to_hhmmss(nint(LeadReq[i])) << " ";
    if(ValidBeg > 0)
       s << "-valid_beg " << unix_to_yyyymmdd_hhmmss(ValidBeg) << " ";
    if(ValidEnd > 0)
       s << "-valid_end " << unix_to_yyyymmdd_hhmmss(ValidEnd) << " ";
-   for(i=0; i<ValidInc.n_elements(); i++)
+   for(i=0; i<ValidInc.n(); i++)
       s << "-valid_inc " << unix_to_yyyymmdd_hhmmss(ValidInc[i]) << " ";
-   for(i=0; i<ValidExc.n_elements(); i++)
+   for(i=0; i<ValidExc.n(); i++)
       s << "-valid_exc " << unix_to_yyyymmdd_hhmmss(ValidExc[i]) << " ";
-   for(i=0; i<ValidHour.n_elements(); i++)
+   for(i=0; i<ValidHour.n(); i++)
       s << "-valid_hour " << sec_to_hhmmss(nint(ValidHour[i])) << " ";
-   for(i=0; i<InitMask.n_elements(); i++)
+   for(i=0; i<InitMask.n(); i++)
       s << "-init_mask " << InitMask[i] << " ";
-   for(i=0; i<ValidMask.n_elements(); i++)
+   for(i=0; i<ValidMask.n(); i++)
       s << "-valid_mask " << ValidMask[i] << " ";
-   for(i=0; i<LineType.n_elements(); i++)
+   for(i=0; i<LineType.n(); i++)
       s << "-line_type " << LineType[i] << " ";
-   for(i=0; i<TrackWatchWarn.n_elements(); i++)
+   for(i=0; i<TrackWatchWarn.n(); i++)
       s << "-track_watch_warn " << TrackWatchWarn[i] << " ";
    for(thr_it=ColumnThreshMap.begin(); thr_it!= ColumnThreshMap.end(); thr_it++) {
-      for(i=0; i<thr_it->second.n_elements(); i++) {
+      for(i=0; i<thr_it->second.n(); i++) {
          s << "-column_thresh " << thr_it->first << " "
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
-      for(i=0; i<str_it->second.n_elements(); i++) {
+   for(str_it=ColumnStrIncMap.begin(); str_it!= ColumnStrIncMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n(); i++) {
          s << "-column_str " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
+   for(str_it=ColumnStrExcMap.begin(); str_it!= ColumnStrExcMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n(); i++) {
+         s << "-column_str_exc " << str_it->first << " "
+           << str_it->second[i] << " ";
+      }
+   }
    for(thr_it=InitThreshMap.begin(); thr_it!= InitThreshMap.end(); thr_it++) {
-      for(i=0; i<thr_it->second.n_elements(); i++) {
+      for(i=0; i<thr_it->second.n(); i++) {
          s << "-init_thresh " << thr_it->first << " "
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
-      for(i=0; i<str_it->second.n_elements(); i++) {
+   for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n(); i++) {
          s << "-init_str " << str_it->first << " "
+           << str_it->second[i] << " ";
+      }
+   }
+   for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n(); i++) {
+         s << "-init_str_exc " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
@@ -1223,7 +1294,7 @@ ConcatString TCStatJob::serialize() const {
       s << "-match_points " << bool_to_string(MatchPoints) << " ";
    if(EventEqual != default_event_equal)
       s << "-event_equal " << bool_to_string(EventEqual) << " ";
-   for(i=0; i<EventEqualLead.n_elements(); i++)
+   for(i=0; i<EventEqualLead.n(); i++)
       s << "-event_equal_lead " << sec_to_hhmmss(nint(EventEqualLead[i])) << " ";
    if(OutInitMaskFile.nonempty())
       s << "-out_init_mask " << OutInitMaskFile << " ";
@@ -1280,7 +1351,7 @@ void TCStatJob::event_equalize_tracks() {
       subset_track_pair(pair, n);
 
       // Skip tracks missing any of the required lead times
-      for(i=0, skip=false; i<EventEqualLead.n_elements(); i++) {
+      for(i=0, skip=false; i<EventEqualLead.n(); i++) {
          if(pair.adeck().lead_index(EventEqualLead[i]) < 0) {
             skip = true;
             break;
@@ -1319,12 +1390,12 @@ void TCStatJob::event_equalize_tracks() {
 
    mlog << Debug(3)
         << "For track-based event equalization, identified "
-        << EventEqualCases.n_elements() << " common cases for "
+        << EventEqualCases.n() << " common cases for "
         << (int) case_map.size() << " models: " << models << "\n";
 
-   for(i=0; i<EventEqualCases.n_elements(); i++) {
+   for(i=0; i<EventEqualCases.n(); i++) {
       mlog << Debug(4)
-           << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
+           << "[Case " << i+1 << " of " << EventEqualCases.n()
            << "] " << EventEqualCases[i] << "\n";
    }
 
@@ -1391,12 +1462,12 @@ void TCStatJob::event_equalize_lines() {
 
    mlog << Debug(3)
         << "For line-based event equalization, identified "
-        << EventEqualCases.n_elements() << " common cases for "
+        << EventEqualCases.n() << " common cases for "
         << (int) case_map.size() << " models: " << models << "\n";
 
-   for(i=0; i<EventEqualCases.n_elements(); i++) {
+   for(i=0; i<EventEqualCases.n(); i++) {
       mlog << Debug(4)
-           << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
+           << "[Case " << i+1 << " of " << EventEqualCases.n()
            << "] " << EventEqualCases[i] << "\n";
    }
 
@@ -1565,7 +1636,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    //
 
    // If not specified, assume TCMPR by adding it to the LineType
-   if(LineType.n_elements() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+   if(LineType.n() == 0) LineType.add(TCStatLineType_TCMPR_Str);
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -1574,7 +1645,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    if(LineType.has(TCStatLineType_TCMPR_Str)) {
 
       // TCMPR and non-TCMPR LineTypes cannot be mixed
-      for(i=0; i<LineType.n_elements(); i++) {
+      for(i=0; i<LineType.n(); i++) {
          if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
             mlog << Error << "\nTCStatJobFilter::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
@@ -1611,7 +1682,7 @@ void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
    if(EventEqual == true) event_equalize_tracks();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization of tracks found no common cases.\n";
    }
@@ -1650,7 +1721,7 @@ void TCStatJobFilter::filter_lines(TCLineCounts &n) {
    if(EventEqual == true) event_equalize_lines();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization of lines found no common cases.\n";
    }
@@ -1793,7 +1864,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    a = TCStatJob::parse_job_command(jobstring);
 
    // Loop over the StringArray elements
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       // Point at the current entry
       c = to_lower(a[i]);
@@ -1827,7 +1898,7 @@ void TCStatJobSummary::add_column(const char *c) {
    sa.add_css(c);
 
    // Loop over the entries, handling special column names
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
 
       // Track errors
       if(strcasecmp(sa[i].c_str(), "TRACK") == 0) {
@@ -1868,11 +1939,11 @@ ConcatString TCStatJobSummary::serialize() const {
    s = TCStatJob::serialize();
 
    // Add summary job-specific options
-   for(i=0; i<ReqColumn.n_elements(); i++)
+   for(i=0; i<ReqColumn.n(); i++)
       s << "-column " << ReqColumn[i] << " ";
    if(ColumnUnion != default_column_union)
       s << "-column_union " << bool_to_string(ColumnUnion) << " ";
-   for(i=0; i<ByColumn.n_elements(); i++)
+   for(i=0; i<ByColumn.n(); i++)
       s << "-by " << ByColumn[i] << " ";
    if(!(FSPThresh == default_fsp_thresh))
       s << "-fsp_thresh " << FSPThresh.get_str();
@@ -1891,7 +1962,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    int i;
 
    // Check that the -column option has been supplied
-   if(Column.n_elements() == 0) {
+   if(Column.n() == 0) {
       mlog << Error << "\nTCStatJobSummary::do_job() -> "
            << "this function may only be called when using the "
            << "-column option in the job command line:\n"
@@ -1904,7 +1975,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    //
 
    // If not specified, assume TCMPR by adding it to the LineType
-   if(LineType.n_elements() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+   if(LineType.n() == 0) LineType.add(TCStatLineType_TCMPR_Str);
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -1913,7 +1984,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    if(LineType.has(TCStatLineType_TCMPR_Str)) {
 
       // TCMPR and non-TCMPR LineTypes cannot be mixed
-      for(i=0; i<LineType.n_elements(); i++) {
+      for(i=0; i<LineType.n(); i++) {
          if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
             mlog << Error << "\nTCStatJobSummary::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
@@ -1950,7 +2021,7 @@ void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
    if(EventEqual == true) event_equalize_tracks();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization of tracks found no common cases.\n";
    }
@@ -1992,7 +2063,7 @@ void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
    if(EventEqual == true) event_equalize_lines();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization of lines found no common cases.\n";
    }
@@ -2039,7 +2110,7 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
    for(i=0; i<pair.n_lines(); i++) {
 
       // Add summary info to the current map
-      for(j=0; j<Column.n_elements(); j++) {
+      for(j=0; j<Column.n(); j++) {
 
          // Build the key and get the current column value
          // For -column_union, put all columns in the same key
@@ -2081,7 +2152,7 @@ void TCStatJobSummary::process_line(TCStatLine &line) {
    cur_map.clear();
 
    // Add summary info to the current map
-   for(i=0; i<Column.n_elements(); i++) {
+   for(i=0; i<Column.n(); i++) {
 
       // Build the key and get the current column value
       // For -column_union, put all columns in the same key
@@ -2121,7 +2192,7 @@ void TCStatJobSummary::add_map(map<ConcatString,SummaryMapData,cs_cmp>&m) {
 
          mlog << Debug(5)
               << "Summary Map Insert (" << it->first << ") "
-              << it->second.Val.n_elements() << " values: "
+              << it->second.Val.n() << " values: "
               << it->second.Val.serialize() << "\n";
 
          // Add the pair to the map
@@ -2132,7 +2203,7 @@ void TCStatJobSummary::add_map(map<ConcatString,SummaryMapData,cs_cmp>&m) {
 
          mlog << Debug(5)
               << "Summary Map Add (" << it->first << ") "
-              << it->second.Val.n_elements() << " values: "
+              << it->second.Val.n() << " values: "
               << it->second.Val.serialize() << "\n";
 
          // Add the value for the existing key
@@ -2165,11 +2236,11 @@ void TCStatJobSummary::do_output(ostream &out) {
 
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1,
-                   ByColumn.n_elements() + 24);
+                   ByColumn.n() + 24);
 
    // Left-justify case info and right-justify summary output
    for(i=0; i<out_at.ncols(); i++) {
-      if(i < ByColumn.n_elements()) out_at.set_column_just(i, LeftJust);
+      if(i < ByColumn.n()) out_at.set_column_just(i, LeftJust);
       else                            out_at.set_column_just(i, RightJust);
    }
    out_at.set_precision(get_precision());
@@ -2189,7 +2260,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "COLUMN");
 
    // Write case column names
-   for(i=0; i<ByColumn.n_elements(); i++) {
+   for(i=0; i<ByColumn.n(); i++) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
@@ -2233,7 +2304,7 @@ void TCStatJobSummary::do_output(ostream &out) {
       init.clear();
       lead.clear();
       valid.clear();
-      for(i=0; i<it->second.Val.n_elements(); i++) {
+      for(i=0; i<it->second.Val.n(); i++) {
          if(!is_bad_data(it->second.Val[i])) {
             v.add(it->second.Val[i]);
             init.add(it->second.Init[i]);
@@ -2244,7 +2315,7 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Build index array
       index.clear();
-      for(i=0; i<v.n_elements(); i++) index.add(i);
+      for(i=0; i<v.n(); i++) index.add(i);
 
       // Compute mean and standard deviation
       compute_mean_stdev(v, index, 1, OutAlpha, mean_ci, stdev_ci);
@@ -2266,11 +2337,11 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, sa[0]);
 
       // Write case column values
-      for(i=1; i<sa.n_elements(); i++)
+      for(i=1; i<sa.n(); i++)
          out_at.set_entry(r, c++, sa[i]);
 
-      out_at.set_entry(r, c++, it->second.Val.n_elements());
-      out_at.set_entry(r, c++, v.n_elements());
+      out_at.set_entry(r, c++, it->second.Val.n());
+      out_at.set_entry(r, c++, v.n());
       out_at.set_entry(r, c++, mean_ci.v);
       out_at.set_entry(r, c++, mean_ci.v_ncl[0]);
       out_at.set_entry(r, c++, mean_ci.v_ncu[0]);
@@ -2352,11 +2423,11 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
    mlog << Debug(4)
         << "Computing frequency of superior performance for "
-        << Column.n_elements() << " columns and "
-        << case_list.n_elements() << " cases.\n";
+        << Column.n() << " columns and "
+        << case_list.n() << " cases.\n";
 
    // Loop over the columns being summarized
-   for(i=0; i<Column.n_elements(); i++) {
+   for(i=0; i<Column.n(); i++) {
 
       // Check if FSP should be computed for this column
       s = to_upper(Column[i]);
@@ -2369,7 +2440,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       }
 
       // Loop over the cases
-      for(j=0; j<case_list.n_elements(); j++) {
+      for(j=0; j<case_list.n(); j++) {
 
          // Initialize top performer
          best_mod = na_str;
@@ -2379,7 +2450,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
          for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
             // Loop over the values for this entry
-            for(k=0; k<it->second.Hdr.n_elements(); k++) {
+            for(k=0; k<it->second.Hdr.n(); k++) {
 
                // Check if entry matches the current case
                if(strncasecmp(Column[i].c_str(), it->first.c_str(),
@@ -2498,9 +2569,9 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    dsec = bad_data_int;
 
    // The arrays should all be of the same length > 1
-   if(init.n_elements() != lead.n_elements() ||
-      init.n_elements() != valid.n_elements() ||
-      init.n_elements() < 2) {
+   if(init.n() != lead.n() ||
+      init.n() != valid.n() ||
+      init.n() < 2) {
       mlog << Debug(4)
            << "Skipping time-series computations since the array "
            << "lengths differ.\n";
@@ -2513,7 +2584,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    dvalid = valid[1] - valid[0];
 
    // Loop over the entries to determine the time spacing
-   for(i=0; i<init.n_elements()-1; i++) {
+   for(i=0; i<init.n()-1; i++) {
 
       // Make sure the time spacing remains fixed
       if(dinit!= (init[i+1] - init[i])) {
@@ -2581,7 +2652,7 @@ int compute_time_to_indep(const NumArray &val, int ds) {
    prv_abv = false;
 
    // Count the number of values above and belwo the mean
-   for(i=0; i<val.n_elements(); i++) {
+   for(i=0; i<val.n(); i++) {
 
       // Store the current state
       cur_abv = (val[i] >= mean);
@@ -2609,8 +2680,8 @@ int compute_time_to_indep(const NumArray &val, int ds) {
    exp_runs = 1.0 + 2.0*(n_abv * n_bel)/(n_abv + n_bel);
 
    // Calculate effective sample size, time to independence
-   eff_size = val.n_elements()*(n_run_abv + n_run_bel)/exp_runs;
-   tind     = ds*val.n_elements()/eff_size;
+   eff_size = val.n()*(n_run_abv + n_run_bel)/exp_runs;
+   tind     = ds*val.n()/eff_size;
 
    return(nint(tind));
 }
@@ -2622,7 +2693,7 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
    int i;
 
    // Add elements common to both list
-   for(i=0; i<s1.n_elements(); i++) {
+   for(i=0; i<s1.n(); i++) {
       if(s2.has(s1[i])) s.add(s1[i]);
    }
 
@@ -2770,7 +2841,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    if(a.has("-out_line_type")) OutLineType.clear();
 
    // Loop over the StringArray elements
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       // Point at the current entry
       c = to_lower(a[i]);
@@ -2876,10 +2947,10 @@ ConcatString TCStatJobRIRW::serialize() const {
      << sec_to_hhmmss(RIRWWindowEnd) << " ";
 
    // Add RIRW job-specific options
-   for(i=0; i<ByColumn.n_elements(); i++)
+   for(i=0; i<ByColumn.n(); i++)
       s << "-by " << ByColumn[i] << " ";
 
-   for(i=0; i<OutLineType.n_elements(); i++)
+   for(i=0; i<OutLineType.n(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
 
    // Always list the output alpha value used
@@ -2901,7 +2972,7 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
    if(EventEqual == true) event_equalize_tracks();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
    }
@@ -3157,8 +3228,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + ByColumn.n_elements() + n_ctc_columns);
-   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
+                   9 + ByColumn.n() + n_ctc_columns);
+   setup_table(out_at, 9 + ByColumn.n(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3177,7 +3248,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<ByColumn.n_elements(); i++) {
+   for(i=0; i<ByColumn.n(); i++) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
@@ -3207,7 +3278,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
       out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
 
       // Write case column values
-      for(i=1; i<sa.n_elements(); i++) {
+      for(i=1; i<sa.n(); i++) {
          out_at.set_entry(r, c++, sa[i]);
       }
 
@@ -3231,8 +3302,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + ByColumn.n_elements() + n_cts_columns);
-   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
+                   9 + ByColumn.n() + n_cts_columns);
+   setup_table(out_at, 9 + ByColumn.n(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3251,7 +3322,7 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<ByColumn.n_elements(); i++) {
+   for(i=0; i<ByColumn.n(); i++) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
@@ -3289,7 +3360,7 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
       out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
 
       // Write case column values
-      for(i=1; i<sa.n_elements(); i++) {
+      for(i=1; i<sa.n(); i++) {
          out_at.set_entry(r, c++, sa[i]);
       }
 
@@ -3314,13 +3385,13 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
    // Determine the required number of rows
    for(it=RIRWMap.begin(),r=0; it!=RIRWMap.end(); it++) {
-      r += it->second.Hdr.n_elements();
+      r += it->second.Hdr.n();
    }
 
    // Format the output table
    out_at.set_size(r + 1,
-                   9 + ByColumn.n_elements() + 15);
-   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
+                   9 + ByColumn.n() + 15);
+   setup_table(out_at, 9 + ByColumn.n(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3339,7 +3410,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<ByColumn.n_elements(); i++) {
+   for(i=0; i<ByColumn.n(); i++) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
@@ -3364,7 +3435,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    for(it=RIRWMap.begin(),r=1; it!=RIRWMap.end(); it++) {
 
       // Loop through the current points
-      for(i=0; i<it->second.Hdr.n_elements(); i++,r++) {
+      for(i=0; i<it->second.Hdr.n(); i++,r++) {
 
          // Initialize column counter
          c = 0;
@@ -3384,14 +3455,14 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
          // Write case column values
          sa = it->first.split(":");
-         for(j=1; j<sa.n_elements(); j++) {
+         for(j=1; j<sa.n(); j++) {
             out_at.set_entry(r, c++, sa[j]);
          }
 
          // Write the header information
          cs = it->second.Hdr[i];
          sa = cs.split(":");
-         for(j=0; j<sa.n_elements(); j++) {
+         for(j=0; j<sa.n(); j++) {
             out_at.set_entry(r, c++, sa[j]);
          }
       }
@@ -3516,7 +3587,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    if(a.has("-probrirw_prob_thresh")) ProbRIRWProbThresh.clear();
 
    // Loop over the StringArray elements
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       // Point at the current entry
       c = to_lower(a[i]);
@@ -3621,10 +3692,10 @@ ConcatString TCStatJobProbRIRW::serialize() const {
    s << "-probrirw_prob_thresh " << prob_thresh_to_string(ProbRIRWProbThresh) << " ";
 
    // Add ProbRIRW job-specific options
-   for(i=0; i<ByColumn.n_elements(); i++)
+   for(i=0; i<ByColumn.n(); i++)
       s << "-by " << ByColumn[i] << " ";
 
-   for(i=0; i<OutLineType.n_elements(); i++)
+   for(i=0; i<OutLineType.n(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
 
    // Always list the output alpha value used
@@ -3663,7 +3734,7 @@ void TCStatJobProbRIRW::do_job(const StringArray &file_list,
    if(EventEqual == true) event_equalize_lines();
 
    // Check for no common cases
-   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
    }
@@ -3725,11 +3796,11 @@ void TCStatJobProbRIRW::process_pair(ProbRIRWPairInfo &pair) {
 
    // Add map entry for this key, if necessary
    if(ProbRIRWMap.count(key) == 0) {
-      for(i=0; i<ProbRIRWProbThresh.n_elements(); i++) {
+      for(i=0; i<ProbRIRWProbThresh.n(); i++) {
          p_thresh.add(ProbRIRWProbThresh[i].get_value());
       }
       data.Info.clear();
-      data.Info.pct.set_size(ProbRIRWProbThresh.n_elements() - 1);
+      data.Info.pct.set_size(ProbRIRWProbThresh.n() - 1);
       data.Info.pct.set_thresholds(p_thresh.vals());
       data.Info.fthresh = ProbRIRWProbThresh;
       data.Info.othresh = ProbRIRWBDeltaThresh;
@@ -3795,7 +3866,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
    }
 
    // Loop over the output line types
-   for(i=0; i<OutLineType.n_elements(); i++) {
+   for(i=0; i<OutLineType.n(); i++) {
 
       // Parse the output line type
       out_lt = string_to_statlinetype(OutLineType[i].c_str());
@@ -3814,8 +3885,8 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       // Initialize the output table
       out_at.clear();
       out_at.set_size((int) ProbRIRWMap.size() + 1,
-                      5 + ByColumn.n_elements() + lt_cols);
-      setup_table(out_at, 5 + ByColumn.n_elements(), get_precision());
+                      5 + ByColumn.n() + lt_cols);
+      setup_table(out_at, 5 + ByColumn.n(), get_precision());
 
       // Initialize row and column indices
       r = c = 0;
@@ -3831,7 +3902,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       out_at.set_entry(r, c++, "PROB_THRESH");
 
       // Write case column names
-      for(j=0; j<ByColumn.n_elements(); j++)
+      for(j=0; j<ByColumn.n(); j++)
          out_at.set_entry(r, c++, ByColumn[j]);
 
       // Write the header columns
@@ -3859,7 +3930,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
          out_at.set_entry(r, c++, prob_thresh_to_string(ProbRIRWProbThresh));
 
          // Write case column values
-         for(j=1; j<sa.n_elements(); j++)
+         for(j=1; j<sa.n(); j++)
             out_at.set_entry(r, c++, sa[j]);
 
          // Compute PSTD statistics
@@ -3924,7 +3995,7 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    if(prefix) key = prefix;
 
    // Build case information for the map key
-   for(i=0; i<case_cols.n_elements(); i++) {
+   for(i=0; i<case_cols.n(); i++) {
 
      cur = l.get(case_cols[i].c_str());
 
@@ -3958,7 +4029,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
    double grid_x, grid_y;
 
    //
-   // Check polyline masking.
+   // Check polyline masking
    //
    if(mask_poly.n_points() > 0) {
       if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
@@ -3967,7 +4038,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
    }
 
    //
-   // Check grid masking.
+   // Check grid masking
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
       mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
@@ -3977,7 +4048,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
       }
 
       //
-      // Check area mask.
+      // Check area mask
       //
       if(mask_area.nx() > 0 || mask_area.ny() > 0) {
          if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {

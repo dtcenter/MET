@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,16 @@ using namespace std;
 #include "tc_stat_conf_info.h"
 
 #include "vx_log.h"
+
+////////////////////////////////////////////////////////////////////////
+
+// Functions for parsing config entries
+static void parse_conf_thresh_map(MetConfig &,
+               const char *, const char *,
+               map<ConcatString,ThreshArray> &);
+static void parse_conf_string_map(MetConfig &,
+               const char *, const char *,
+               map<ConcatString,StringArray> &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -63,7 +73,7 @@ void TCStatConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatConfInfo::read_config(const char *default_file_name,
-                                  const char *user_file_name) {
+                                 const char *user_file_name) {
 
    // Read the config file constants
    Conf.read(replace_path(config_const_filename).c_str());
@@ -84,8 +94,7 @@ void TCStatConfInfo::read_config(const char *default_file_name,
 
 void TCStatConfInfo::process_config() {
    int i;
-   StringArray sa, sa_val, sa_new;
-   ThreshArray ta_val, ta_new;
+   StringArray sa;
    ConcatString poly_file;
 
    // Conf: Version
@@ -119,12 +128,12 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.InitInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.InitExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
@@ -133,32 +142,32 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::ValidInc
    sa = Conf.lookup_string_array(conf_key_valid_inc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.ValidInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidExc
    sa = Conf.lookup_string_array(conf_key_valid_exc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.ValidExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::InitHour
    sa = Conf.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.InitHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidHour
    sa = Conf.lookup_string_array(conf_key_valid_hour);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.ValidHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::Lead
    sa = Conf.lookup_string_array(conf_key_lead);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.Lead.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       Filter.LeadReq.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::InitMask
@@ -174,106 +183,34 @@ void TCStatConfInfo::process_config() {
    Filter.TrackWatchWarn = Conf.lookup_string_array(conf_key_track_watch_warn);
 
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
-   sa     = Conf.lookup_string_array(conf_key_column_thresh_name);
-   ta_val = Conf.lookup_thresh_array(conf_key_column_thresh_val);
+   parse_conf_thresh_map(Conf,
+                         conf_key_column_thresh_name, conf_key_column_thresh_val,
+                         Filter.ColumnThreshMap);
 
-   // Check that they are the same length
-   if(sa.n_elements() != ta_val.n_elements()) {
-      mlog << Error
-           << "\nTCStatConfInfo::process_config() -> "
-           << "the \"column_thresh_name\" and \"column_thresh_val\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
+   // Conf: TCStatJob::ColumnStrIncName, TCStatJob::ColumnStrIncVal
+   parse_conf_string_map(Conf,
+                         conf_key_column_str_name, conf_key_column_str_val,
+                         Filter.ColumnStrIncMap);
 
-   // Add entries to the map
-   for(i=0; i<sa.n_elements(); i++) {
-      if(Filter.ColumnThreshMap.count(sa[i]) > 0) {
-         Filter.ColumnThreshMap[sa[i]].add(ta_val[i]);
-      }
-      else {
-         ta_new.clear();
-         ta_new.add(ta_val[i]);
-         Filter.ColumnThreshMap.insert(pair<ConcatString,ThreshArray>(sa[i], ta_new));
-      }
-   } // end for i
-
-   // Conf: TCStatJob::ColumnStrName, TCStatJob::ColumnStrVal
-   sa     = Conf.lookup_string_array(conf_key_column_str_name);
-   sa_val = Conf.lookup_string_array(conf_key_column_str_val);
-
-   // Check that they are the same length
-   if(sa.n_elements() != sa_val.n_elements()) {
-      mlog << Error
-           << "\nTCStatConfInfo::process_config() -> "
-           << "the \"column_str_name\" and \"column_str_val\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
-
-   // Add entries to the map
-   for(i=0; i<sa.n_elements(); i++) {
-      if(Filter.ColumnStrMap.count(sa[i]) > 0) {
-         Filter.ColumnStrMap[sa[i]].add(sa_val[i]);
-      }
-      else {
-         sa_new.clear();
-         sa_new.set_ignore_case(1);
-         sa_new.add(sa_val[i]);
-         Filter.ColumnStrMap.insert(pair<ConcatString,StringArray>(sa[i], sa_new));
-      }
-   } // end for i
+   // Conf: TCStatJob::ColumnStrExcName, TCStatJob::ColumnStrExcVal
+   parse_conf_string_map(Conf,
+                         conf_key_column_str_exc_name, conf_key_column_str_exc_val,
+                         Filter.ColumnStrExcMap);
 
    // Conf: TCStatJob::InitThreshName, TCStatJob::InitThreshVal
-   sa     = Conf.lookup_string_array(conf_key_init_thresh_name);
-   ta_val = Conf.lookup_thresh_array(conf_key_init_thresh_val);
+   parse_conf_thresh_map(Conf,
+                         conf_key_init_thresh_name, conf_key_init_thresh_val,
+                         Filter.InitThreshMap);
 
-   // Check that they are the same length
-   if(sa.n_elements() != ta_val.n_elements()) {
-      mlog << Error
-           << "\nTCStatConfInfo::process_config() -> "
-           << "the \"init_thresh_name\" and \"init_thresh_val\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
+   // Conf: TCStatJob::InitStrIncName, TCStatJob::InitStrIncVal
+   parse_conf_string_map(Conf,
+                         conf_key_init_str_name, conf_key_init_str_val,
+                         Filter.InitStrIncMap);
 
-   // Add entries to the map
-   for(i=0; i<sa.n_elements(); i++) {
-      if(Filter.InitThreshMap.count(sa[i]) > 0) {
-         Filter.InitThreshMap[sa[i]].add(ta_val[i]);
-      }
-      else {
-         ta_new.clear();
-         ta_new.add(ta_val[i]);
-         Filter.InitThreshMap.insert(pair<ConcatString,ThreshArray>(sa[i], ta_new));
-      }
-   } // end for i
-
-   // Conf: TCStatJob::InitStrName, TCStatJob::InitStrVal
-   sa     = Conf.lookup_string_array(conf_key_init_str_name);
-   sa_val = Conf.lookup_string_array(conf_key_init_str_val);
-
-   // Check that they are the same length
-   if(sa.n_elements() != sa_val.n_elements()) {
-      mlog << Error
-           << "\nTCStatConfInfo::process_config() -> "
-           << "the \"init_str_name\" and \"init_str_val\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
-
-   // Add entries to the map
-   for(i=0; i<sa.n_elements(); i++) {
-      if(Filter.InitStrMap.count(sa[i]) > 0) {
-         Filter.InitStrMap[sa[i]].add(sa_val[i]);
-      }
-      else {
-         sa_new.clear();
-         sa_new.set_ignore_case(1);
-         sa_new.add(sa_val[i]);
-         Filter.InitStrMap.insert(pair<ConcatString,StringArray>(sa[i], sa_new));
-      }
-   } // end for i
+   // Conf: TCStatJob::InitStrExcName, TCStatJob::InitStrExcVal
+   parse_conf_string_map(Conf,
+                         conf_key_init_str_exc_name, conf_key_init_str_exc_val,
+                         Filter.InitStrExcMap);
 
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
@@ -311,12 +248,82 @@ void TCStatConfInfo::process_config() {
 
    // Conf: Jobs
    Jobs = Conf.lookup_string_array(conf_key_jobs);
-   if(Jobs.n_elements() == 0) {
+   if(Jobs.n() == 0) {
       mlog << Error
            << "\nTCStatConfInfo::process_config() -> "
            << "must specify at least one entry in \"jobs\".\n\n";
       exit(1);
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_conf_thresh_map(MetConfig &conf,
+                           const char *conf_key_name, const char *conf_key_val,
+                           map<ConcatString,ThreshArray> &m) {
+   StringArray sa;
+   ThreshArray ta_val, ta_new;
+   
+   sa     = conf.lookup_string_array(conf_key_name);
+   ta_val = conf.lookup_thresh_array(conf_key_val);
+
+   // Check that they are the same length
+   if(sa.n() != ta_val.n()) {
+      mlog << Error
+           << "\nTCStatConfInfo::parse_conf_thresh_map() -> "
+           << "the \"" << conf_key_name << "\" and \"" << conf_key_val << "\" "
+           << "entries must have the same length.\n\n";
+      exit(1);
+   }
+
+   // Add entries to the map
+   for(int i=0; i<sa.n(); i++) {
+      if(m.count(sa[i]) > 0) {
+         m[sa[i]].add(ta_val[i]);
+      }
+      else {
+         ta_new.clear();
+         ta_new.add(ta_val[i]);
+         m.insert(pair<ConcatString,ThreshArray>(sa[i], ta_new));
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_conf_string_map(MetConfig &conf,
+                           const char *conf_key_name, const char *conf_key_val,
+                           map<ConcatString,StringArray> &m) {
+   StringArray sa, sa_val, sa_new;
+   
+   sa     = conf.lookup_string_array(conf_key_name);
+   sa_val = conf.lookup_string_array(conf_key_val);
+
+   // Check that they are the same length
+   if(sa.n() != sa_val.n()) {
+      mlog << Error
+           << "\nTCStatConfInfo::parse_conf_string_map() -> "
+           << "the \"" << conf_key_name << "\" and \"" << conf_key_val << "\" "
+           << "entries must have the same length.\n\n";
+      exit(1);
+   }
+
+   // Add entries to the map
+   for(int i=0; i<sa.n(); i++) {
+      if(m.count(sa[i]) > 0) {
+         m[sa[i]].add(sa_val[i]);
+      }
+      else {
+         sa_new.clear();
+         sa_new.set_ignore_case(1);
+         sa_new.add(sa_val[i]);
+         m.insert(pair<ConcatString,StringArray>(sa[i], sa_new));
+      }
+   } // end for i
 
    return;
 }

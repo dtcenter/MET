@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -540,7 +540,7 @@ void NumArray::sort_array()
 
 {
 
-sort(e, Nelements);
+if(!Sorted) sort(e, Nelements);
 
 Sorted = true;
 
@@ -784,7 +784,7 @@ double var;
 
 compute_mean_variance(mn, var);
 
-stdev = square_root(var);
+stdev = (is_bad_data(var) ? bad_data_double : square_root(var));
 
 return;
 

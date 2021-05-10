@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1207,7 +1207,7 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
    zero_out();
 
    // Apply continuous filtering thresholds to subset pairs
-   pd = subset_pairs(pd_all, fthresh, othresh, logic);
+   pd = pd_all.subset_pairs_cnt_thresh(fthresh, othresh, logic);
 
    // Check for no matched pairs to process
    if(pd.n_obs == 0) return;

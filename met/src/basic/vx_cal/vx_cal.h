@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -171,6 +171,7 @@ static const int Friday    = 5;
 static const int Saturday  = 6;
 static const int Sunday    = 7;
 
+static const double TIME_EPSILON = 0.001;
 
 ////////////////////////////////////////////////////////////////////////
 

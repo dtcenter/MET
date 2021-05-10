@@ -44,9 +44,11 @@ The Stat-Analysis “aggregate” job aggregates values from multiple STAT lines
 Aggregate STAT lines and produce aggregated statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Stat-Analysis “aggregate-stat” job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, a contingency table statistics (CTS, PSTD, MCTS, or NBRCTS) line type will be written out. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, a continuous statistics (CNT) line type will be written out. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type will be written out. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, the user may choose the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV).
+The Stat-Analysis “aggregate-stat” job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each “aggregate-stat” job, as long as each output is derivable from the input.
 
-When aggregating the matched pair line type (MPR) and computing an output contingency table statistics (CTS) or continuous statistics (CNT) line type, the bootstrapping method is applied for computing confidence intervals. The bootstrapping method is applied here in the same way that it is applied in the statistics tools. For a set of n matched forecast-observation pairs, the matched pairs are resampled with replacement many times. For each replicated sample, the corresponding statistics are computed. The confidence intervals are derived from the statistics computed for each replicated sample.
+When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the “-out_thresh” (or “-out_fcst_thresh” and  “-out_obs_thresh” options) are required to compute contingnecy table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
+
+When aggregating the matched pair line type (MPR) and computing an output contingency table statistics (CTS) or continuous statistics (CNT) line type, the bootstrapping method can be applied to compute confidence intervals. The bootstrapping method is applied here in the same way that it is applied in the statistics tools. For a set of n matched forecast-observation pairs, the matched pairs are resampled with replacement many times. For each replicated sample, the corresponding statistics are computed. The confidence intervals are derived from the statistics computed for each replicated sample.
 
 .. _StA_Skill-Score-Index:
 
@@ -303,12 +305,21 @@ ___________________
 
   fcst_valid_beg  = "";
   fcst_valid_end  = "";
-  fcst_valid_hour = "";
-  obs_valid_beg   = "";
-  obs_valid_end   = "" 
-  obs_valid_hour  = "";
+  fcst_valid_inc  = [];
+  fcst_valid_exc  = [];
+  fcst_valid_hour = [];
 
-The user may specify the beginning, ending, and instantaneous valid times in YYYYMMDD[_HH[MMSS]] format to be used for all analyses performed. If multiple valid times fall within the valid time window, the analyses will be performed on their union. These selections may be further refined by using the **"-fcst_valid_beg", "-fcst_valid_end", "-obs_valid_beg", "-obs_valid_end", “fcst_valid_hour"** and **"-obs_valid_hour"** options within the job command line.
+  obs_valid_beg   = "";
+  obs_valid_end   = "";
+  obs_valid_inc   = [];
+  obs_valid_exc   = [];
+  obs_valid_hour  = [];
+
+The user may filter data based on its valid time. The fcst/obs_valid_beg and fcst/obs_valid_end options are strings in YYYYMMDD[_HH[MMSS]] format which define retention time windows for all analyses to be performed. The analyses are performed on all data whose valid time falls within these windows. If left as empty strings, no valid time window filtering is applied.
+
+The fcst/obs_valid_hour options are arrays of strings in HH format which define the valid hour(s) of the data to be used. If specified, only data whose valid hour appears in the list of hours is used. The fcst/obs_valid_inc/exc options are arrays of strings in YYYYMMDD[_HH[MMSS]] format which explicitly define the valid times for data to be included or excluded from all analyses.
+
+These selections may be further refined by using the **"-fcst_valid_beg", "-fcst_valid_end", "-fcst_valid_inc", "-fcst_valid_exc", "-fcst_valid_hour", "-obs_valid_beg", "-obs_valid_end", "-obs_valid_inc", "-obs_valid_exc",** and **"-obs_valid_hour"** options within the job command line.
 
 ___________________
 
@@ -316,12 +327,17 @@ ___________________
 
   fcst_init_beg  = "";
   fcst_init_end  = "";
-  fcst_init_hour = "";
+  fcst_init_inc  = [];
+  fcst_init_exc  = [];
+  fcst_init_hour = [];
+
   obs_init_beg   = "";
   obs_init_end   = "";
-  obs_init_hour  = "";
+  obs_init_inc   = [];
+  obs_init_exc   = [];
+  obs_init_hour  = [];
 
-The user may specify the beginning, ending, or exact model initialization times in YYYYMMDD[_HH[MMSS]] format to be used for all analyses performed. If multiple init times fall within the init time window, the analyses will be performed on their union. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-obs_init_beg", "-obs_init_end", fcst_init_hour"** and **"-obs_init_hour"** options within the job command line.
+These time filtering options are the same as described above but applied to initialization times rather than valid times. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-fcst_init_inc", "-fcst_init_exc", "-fcst_init_hour"," "-obs_init_beg", "-obs_init_end", "-obs_init_inc", "-obs_init_exc"** and **"-obs_init_hour"** options within the job command line.
 
 ___________________
 
@@ -508,13 +524,14 @@ This job command option is extremely useful. It can be used multiple times to sp
 
 .. code-block:: none
 		
-  -column_min    col_name value
-  -column_max    col_name value
-  -column_eq     col_name value
-  -column_thresh col_name thresh
-  -column_str    col_name string
+  -column_min     col_name value
+  -column_max     col_name value
+  -column_eq      col_name value
+  -column_thresh  col_name thresh
+  -column_str     col_name string
+  -column_str_exc col_name string
 
-The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined or matches one of the strings defined by the **-column_str** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
+The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the string defined by the **-column_str_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
 		
@@ -526,14 +543,16 @@ Each analysis job is performed over a subset of the input data. Filtering the in
 		
   -out_line_type name
 
-This option specifies the desired output line type for the **aggregate_stat** job type.
+This option specifies the desired output line type(s) for the **aggregate_stat** job type.
 
 .. code-block:: none
 		
   -out_stat file
   -set_hdr  col_name string
 
-The Stat-Analysis tool writes its output to either standard out or the file specified using the **-out** command line option. However that output lacks the standard STAT header columns. The **-out_stat** job command option may be used for each job to specify the name of an output file to which full STAT output lines should be written. Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as “mask1”, “mask2”, and “mask3”. The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: “mask1,mask2,mask3”. Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as “-set_hdr VX_MASK all_three_masks”.
+The Stat-Analysis tool writes its output to either the log file or the file specified using the **-out** command line option. However the **aggregate** and **aggregate_stat** jobs create STAT output lines and the standard output written lacks the full set of STAT header columns. The **-out_stat** job command option may be used for these jobs to specify the name of an output file to which full STAT output lines should be written. When the **-out_stat** job command option is used for **aggregate** and **aggregate_stat** jobs the output is sent to the **-out_stat** file instead of the log or **-out** file.
+
+Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as “mask1”, “mask2”, and “mask3”. The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: “mask1,mask2,mask3”. Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as “-set_hdr VX_MASK all_three_masks”.
 
 When using the “-out_stat” option to create a .stat output file and stratifying results using one or more “-by” job command options, those columns may be referenced in the “-set_hdr” option. When using multiple “-by” options, use “CASE” to reference the full case information string:
 

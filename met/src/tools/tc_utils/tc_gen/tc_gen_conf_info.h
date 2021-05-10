@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,51 +26,70 @@
 
 // Indices for the output flag types in the configuration file
 
-static const int i_fho = 0;
-static const int i_ctc = 1;
-static const int i_cts = 2;
+static const int i_fho    = 0;
+static const int i_ctc    = 1;
+static const int i_cts    = 2;
+static const int i_genmpr = 3;
 
-static const int n_txt = 3;
+static const int n_txt = 4;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_fho,        //  0
-   stat_ctc,        //  1
-   stat_cts         //  2
+   stat_fho,   //  0
+   stat_ctc,   //  1
+   stat_cts,   //  2
+   stat_genmpr //  3
+};
+
+// Names for output data plane types
+
+static const string fgen_str       = "fcst_genesis";
+static const string ftrk_str       = "fcst_track";
+static const string fdev_fyoy_str  = "fcst_dev_fy_oy";
+static const string fdev_fyon_str  = "fcst_dev_fy_on";
+static const string fops_fyoy_str  = "fcst_ops_fy_oy";
+static const string fops_fyon_str  = "fcst_ops_fy_on";
+static const string bgen_str       = "best_genesis";
+static const string btrk_str       = "best_track";
+static const string bdev_fyoy_str  = "best_dev_fy_oy";
+static const string bdev_fnoy_str  = "best_dev_fy_on";
+static const string bops_fyoy_str  = "best_ops_fy_oy";
+static const string bops_fnoy_str  = "best_ops_fy_on";
+
+static const int n_ncout = 12;
+
+static const string ncout_str[n_ncout] = {
+   fgen_str,      ftrk_str,      bgen_str,      btrk_str,
+   fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
+   fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-//
-// Struct to store genesis event defintion criteria
-//
+struct TCGenNcOutInfo {
 
-struct GenesisEventInfo {
-   ConcatString         Technique;
-   vector<CycloneLevel> Category;
-   SingleThresh         VMaxThresh;
-   SingleThresh         MSLPThresh;
+   bool do_latlon;
+   bool do_fcst_genesis;
+   bool do_fcst_tracks;
+   bool do_fcst_fy_oy;
+   bool do_fcst_fy_on;
+   bool do_best_genesis;
+   bool do_best_tracks;
+   bool do_best_fy_oy;
+   bool do_best_fn_oy;
 
-   bool                 is_keeper(const TrackPoint &);
-   void                 clear();
-};
 
-extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
+      //////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
+   TCGenNcOutInfo();
+   TCGenNcOutInfo & operator+=(const TCGenNcOutInfo &);
 
-struct GenCTCInfo {
-   ConcatString model;
-   CTSInfo cts_info;
-   unixtime fbeg, fend, obeg, oend;
+   void clear();   //  sets everything to true
 
-   GenCTCInfo();
+   bool all_false() const;
 
-   void clear();
-   GenCTCInfo & operator+=(const GenCTCInfo &);
-
-   void add_fcst_valid(const unixtime, const unixtime);
-   void add_obs_valid (const unixtime, const unixtime);
+   void set_all_false();
+   void set_all_true();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,30 +116,53 @@ class TCGenVxOpt {
 
       // Timing information
       unixtime  InitBeg, InitEnd;
+      TimeArray InitInc, InitExc;
       unixtime  ValidBeg, ValidEnd;
       NumArray  InitHour;
       NumArray  Lead;
 
-      // Polyline masking region
+      // Spatial masking information
       ConcatString VxMaskName;
       MaskPoly     VxPolyMask;
       Grid         VxGridMask;
+      StringArray  VxBasinMask;
       MaskPlane    VxAreaMask;
 
       // Distance to land threshold
       SingleThresh DLandThresh;
 
+      // Matching logic
+      bool GenesisMatchPointTrack;
+
       // Temporal and spatial matching criteria
-      int GenesisSecBeg, GenesisSecEnd;
-      double GenesisRadius;
+      double GenesisMatchRadius;
+      int    GenesisMatchBeg, GenesisMatchEnd;
+
+      // Temporal and spatial scoring options
+      double DevHitRadius;
+      int    DevHitBeg, DevHitEnd;
+      int    OpsHitBeg, OpsHitEnd;
+      bool   DiscardFlag, DevFlag, OpsFlag;
+
+      // Output file options
+      double CIAlpha;
+      map<STATLineType,STATOutputType> OutputMap;
+      TCGenNcOutInfo NcInfo;
+      SingleThresh ValidGenesisDHrThresh;
+      bool BestUniqueFlag;
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void process_config(Dictionary &);
+      void process_basin_mask(const Grid &, const DataPlane &,
+                              const StringArray &);
+      void parse_nc_info(Dictionary &);
 
-      bool is_keeper(const GenesisInfo &);
+      bool is_keeper(const GenesisInfo &) const;
+
+      STATOutputType output_map(STATLineType) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,17 +180,20 @@ class TCGenConfInfo {
 
       //////////////////////////////////////////////////////////////////
 
-      // TCPairs configuration object
+      // TCGen configuration object
       MetConfig Conf;
 
       // Vector of vx task filtering options [n_vx]
       std::vector<TCGenVxOpt> VxOpt;
 
       // Forecast initialization frequency in hours
-      int InitFreqSec;
+      int InitFreqHr;
+
+      // Forecast lead time frequency in hours
+      int ValidFreqHr;
 
       // Begin and end forecast hours for genesis
-      int LeadSecBeg, LeadSecEnd;
+      int FcstSecBeg, FcstSecEnd;
 
       // Minimum track duration
       int MinDur;
@@ -156,19 +201,28 @@ class TCGenConfInfo {
       // Genesis event criteria
       GenesisEventInfo FcstEventInfo;
       GenesisEventInfo BestEventInfo;
-      GenesisEventInfo OperEventInfo;
+      ConcatString     OperTechnique;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;
       Grid         DLandGrid;
       DataPlane    DLandData;
 
+      // Gridded data file containing TC basins
+      ConcatString BasinFile;
+      Grid         BasinGrid;
+      DataPlane    BasinData;
+      StringArray  BasinAbbr;
+
+      // Grid for NetCDF output file
+      Grid NcOutGrid;
+
+      // Summary of output file options across all filters
+      map<STATLineType,STATOutputType> OutputMap;
+      TCGenNcOutInfo NcInfo;
+   
       // Config file version
       ConcatString Version;
-
-      // Output file options
-      double CIAlpha;
-      map<STATLineType,STATOutputType> OutputMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -177,15 +231,75 @@ class TCGenConfInfo {
       void read_config(const char *, const char *);
 
       void process_config();
+      void process_flags(const map<STATLineType,STATOutputType> &,
+                         const TCGenNcOutInfo &);
 
       double compute_dland(double lat, double lon);
 
+      ConcatString compute_basin(double lat, double lon);
+
       int n_vx() const;
+      int compression_level();
+   
+      STATOutputType output_map(STATLineType) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCGenConfInfo::n_vx() const { return(VxOpt.size()); }
+inline int TCGenConfInfo::n_vx()         const { return(VxOpt.size());          }
+inline int TCGenConfInfo::compression_level()  { return(Conf.nc_compression()); }
+
+////////////////////////////////////////////////////////////////////////
+
+class GenCTCInfo {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      GenCTCInfo();
+     ~GenCTCInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+   ConcatString Model;
+   unixtime FcstBeg, FcstEnd;
+   unixtime BestBeg, BestEnd;
+   CTSInfo CTSDev, CTSOps;
+
+   const TCGenVxOpt* VxOpt;
+   const Grid *NcOutGrid;
+
+   SingleThresh ValidGenesisDHrThresh;
+   bool BestUniqueFlag;
+
+   // Number of hits per BEST track genesis event
+   map<const GenesisInfo *,int> BestDevHitMap;
+   map<const GenesisInfo *,int> BestOpsHitMap;
+
+   // Output DataPlane variables
+   map<const string,DataPlane> DpMap;
+
+      //////////////////////////////////////////////////////////////////
+
+   void clear();
+
+   void set_vx_opt(const TCGenVxOpt *, const Grid *);
+
+   void inc_dev(GenesisPairCategory,
+                const GenesisInfo *, const GenesisInfo *);
+   void inc_ops(GenesisPairCategory,
+                const GenesisInfo *, const GenesisInfo *);
+   void inc_best_unique();
+
+   void add_fcst_gen(const GenesisInfo &);
+   void add_best_gen(const GenesisInfo &);
+
+   void inc_pnt(double, double, const string &);
+   void inc_trk(const GenesisInfo &, const string &);
+};
 
 ////////////////////////////////////////////////////////////////////////
 

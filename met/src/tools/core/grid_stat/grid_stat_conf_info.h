@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -144,6 +144,9 @@ class GridStatVxOpt {
       ConcatString     var_name;         // nc_pairs_var_name string
       ConcatString     var_suffix;       // nc_pairs_var_suffix string
                                          // nc_pairs_var_str is deprecated
+
+      StringArray      mpr_sa;           // MPR filtering columns
+      ThreshArray      mpr_ta;           // MPR filtering thresholds
 
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds

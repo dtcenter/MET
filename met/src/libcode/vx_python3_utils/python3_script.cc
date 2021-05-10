@@ -27,6 +27,8 @@ using namespace std;
 
 static const char sq = '\'';   //  single quote
 
+static const char read_tmp_ascii_py [] = "MET_BASE/wrappers/read_tmp_ascii.py";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +77,11 @@ void Python3_Script::clear()
 
 Module = 0;
 
+ModuleAscii = 0;
+
 Dict = 0;
+
+DictAscii = 0;
 
 Script_Filename.clear();
 
@@ -163,9 +169,46 @@ return ( var );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Python3_Script::run(const char * command) const
+PyObject * Python3_Script::lookup_ascii(const char * name) const
 
 {
+
+PyObject * var = 0;
+
+var = PyDict_GetItemString (DictAscii, name);
+
+if ( ! var )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not found\n\n";
+
+
+   exit ( 1 );
+
+}
+
+if ( ! PyList_Check(var) )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not a python list\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( var );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject * Python3_Script::run(const char * command) const
+
+{
+
+PyObject * pobj;
 
 if ( empty(command) )  {
 
@@ -176,7 +219,9 @@ if ( empty(command) )  {
 
 }
 
-if ( ! PyRun_String(command, Py_file_input, Dict, Dict) )  {
+pobj = PyRun_String(command, Py_file_input, Dict, Dict);
+
+if ( ! pobj )  {
 
    mlog << Error << "\nPython3_Script::run(const char *) -> "
         << "command \"" << command << "\" failed!\n\n";
@@ -188,7 +233,7 @@ if ( ! PyRun_String(command, Py_file_input, Dict, Dict) )  {
 fflush(stdout);
 fflush(stderr);
 
-return;
+return pobj;
 
 }
 
@@ -196,41 +241,89 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  example:
-   //
-   //      data = pickle.load( open( "save.p", "rb" ) )
-   //
-
-
-void Python3_Script::read_pickle(const char * variable, const char * pickle_filename) const
+void Python3_Script::import_read_tmp_ascii_py(void)
 
 {
 
-mlog << Debug(3) << "Reading temporary pickle file: "
-     << pickle_filename << "\n";
+ConcatString module;
+
+module << cs_erase
+       << replace_path(read_tmp_ascii_py);
 
 ConcatString command;
 
-command << variable 
-        << " = pickle.load(open(\""
-        << pickle_filename
-        << "\", \"rb\"))";
+run_python_string("import sys");
 
-PyErr_Clear();
+command << cs_erase
+        << "sys.path.append(\""
+        << module.dirname().c_str()
+        << "\")";
 
-run(command.text());
+mlog << Debug(3) << command << "\n";
 
-if ( PyErr_Occurred() )  {
+run_python_string(command.text());
 
-   mlog << Error << "\nPython3_Script::read_pickle() -> "
-        << "command \"" << command << "\" failed!\n\n";
+mlog << Debug(2) << "Importing " << module << "\n";
+
+ConcatString path = "read_tmp_ascii";
+
+ModuleAscii = PyImport_ImportModule(path.text());
+
+if ( ! ModuleAscii )  {
+
+   PyErr_Print();
+   mlog << Error << "\nPython3_Script::Python3_Script(const char *) -> "
+        << "unable to import module \"" << path << "\"\n\n";
+
+   Py_Finalize();
 
    exit ( 1 );
 
 }
 
-return;
+DictAscii = PyModule_GetDict(ModuleAscii);
+
+   //
+   //  done
+   //
+
+fflush(stdout);
+fflush(stderr);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject* Python3_Script::read_tmp_ascii(const char * tmp_filename) const
+
+{
+
+mlog << Debug(2) << "Reading temporary ascii file: "
+     << tmp_filename << "\n";
+
+ConcatString command;
+
+command << "read_tmp_ascii(\""
+        << tmp_filename
+        << "\")";
+
+PyErr_Clear();
+
+PyObject * pobj;
+
+pobj = PyRun_String(command.text(), Py_file_input, DictAscii, DictAscii);
+
+if ( PyErr_Occurred() )  {
+
+   mlog << Error << "\nPython3_Script::read_tmp_ascii() -> "
+        << "command \"" << command << "\" failed!\n\n";
+
+   exit ( 1 );
+}
+
+return pobj;
 
 }
 

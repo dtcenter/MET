@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -396,8 +396,8 @@ void process_ioda_file(int i_pb) {
    // Initialize
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
-   min_time_str[0] = NULL;
-   max_time_str[0] = NULL;
+   min_time_str[0] = 0;
+   max_time_str[0] = 0;
 
    // Set the file name for the IODA file
    file_name << ioda_files[i_pb];
@@ -658,7 +658,7 @@ void process_ioda_file(int i_pb) {
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
          strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring);
-         hdr_typ[nstring] = NULL;
+         hdr_typ[nstring] = 0;
          // Null terminate the message type string
          cleanup_hdr_buf(hdr_typ, nstring);
 
@@ -681,13 +681,13 @@ void process_ioda_file(int i_pb) {
          else {
             strncpy(modified_hdr_typ, hdr_typ, buf_len);
          }
-         modified_hdr_typ[buf_len-1] = NULL;
+         modified_hdr_typ[buf_len-1] = 0;
       }
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
          strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring);
-         tmp_sid[nstring] = NULL;
+         tmp_sid[nstring] = 0;
          cleanup_hdr_buf(tmp_sid, nstring);
          hdr_sid = tmp_sid;
       }

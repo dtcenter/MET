@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -315,7 +315,7 @@ void set_attrs(const VarInfo *info, DataPlane &dp) {
       mlog << Debug(3) << "Resetting accumulation interval from "
            << sec_to_hhmmss(dp.accum()) << " to "
            << sec_to_hhmmss(info->accum_attr()) << ".\n";
-      dp.set_lead(info->accum_attr());
+      dp.set_accum(info->accum_attr());
    }
 
    return;

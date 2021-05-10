@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,6 +57,8 @@
 //   028    12/17/19  Halley Gotway  Apply climatology bins to ensemble
 //                    continuous statistics.
 //   029    01/21/20  Halley Gotway  Add RPS output line type.
+//   030    02/19/21  Halley Gotway  MET #1450, #1451 Overhaul CRPS
+//                    statistics in the ECNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1218,6 +1220,7 @@ int process_point_ens(int i_ens, int &n_miss) {
 void process_point_scores() {
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
    PairDataEnsemble pd;
+   ConcatString cs;
    int i, j, k, l, m, n;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1252,7 +1255,9 @@ void process_point_scores() {
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
+      cs = conf_info.vx_opt[i].vx_pd.obs_info->units_attr();
+      if(cs.empty()) cs = na_string;
+      shc.set_obs_units(cs);
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
@@ -1314,7 +1319,7 @@ void process_point_scores() {
                   shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Subset pairs using the current obs_thresh
-                  pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
+                  pd = pd_ptr->subset_pairs_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Continue if there are no points
                   if(pd.n_obs == 0) continue;
@@ -1730,6 +1735,7 @@ void process_grid_vx() {
             // Initialize
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
+            pd_all.set_climo_cdf_info(conf_info.vx_opt[i].cdf_info);
             pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
@@ -1773,7 +1779,7 @@ void process_grid_vx() {
                shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
 
                // Subset pairs using the current obs_thresh
-               pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
+               pd = pd_all.subset_pairs_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
 
                // Continue if there are no points
                if(pd.n_obs == 0) continue;
@@ -1972,69 +1978,25 @@ void process_grid_scores(int i_vx,
 void do_ecnt(const EnsembleStatVxOpt &vx_opt,
              const SingleThresh &othresh,
              const PairDataEnsemble *pd_ptr) {
-   int i, n_bin;
-   PairDataEnsemble pd;
-   ECNTInfo *ecnt_info = (ECNTInfo *) 0;
+   ECNTInfo ecnt_info;
 
    // Check for valid pointer
    if(!pd_ptr) return;
 
-   // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
-            pd_ptr->csd_na.n_valid() > 0 ?
-            vx_opt.get_n_cdf_bin() : 1);
+   // Store threshold
+   ecnt_info.othresh = othresh;
 
-   // Allocate memory
-   ecnt_info = new ECNTInfo [n_bin];
+   // Compute continuous ensemble statistics
+   ecnt_info.set(*pd_ptr);
 
-   // Process the climo CDF bins
-   for(i=0; i<n_bin; i++) {
-
-      // Apply climo CDF bins logic to subset pairs
-      if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
-                            vx_opt.cdf_info.cdf_ta, i);
-      else          pd = *pd_ptr;
-
-      // Store threshold
-      ecnt_info[i].othresh = othresh;
-
-      // Check for no matched pairs to process
-      if(pd.n_obs == 0) continue;
-
-      // Compute ensemble statistics
-      ecnt_info[i].set(pd);
-
-      // Write out ECNT
-      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_ecnt] != STATOutputType_None &&
-         ecnt_info[i].n_pair > 0) {
-         write_ecnt_row(shc, ecnt_info[i], vx_opt.output_flag[i_ecnt],
-                        i, n_bin, stat_at, i_stat_row,
-                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
-      }
-   } // end for i (n_bin)
-
-   // Write the mean of the climo CDF bins
-   if(n_bin > 1) {
-
-      // Compute ECNT climo CDF bin means
-      if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
-
-         ECNTInfo ecnt_mean;
-         compute_ecnt_mean(ecnt_info, n_bin, ecnt_mean);
-
-         if(ecnt_mean.n_pair > 0) {
-            write_ecnt_row(shc, ecnt_mean,
-                           vx_opt.output_flag[i_ecnt],
-                           -1, n_bin, stat_at, i_stat_row,
-                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
-         }
-      }
-   } // end if n_bin > 1
-
-   // Dealloate memory
-   if(ecnt_info) { delete [] ecnt_info; ecnt_info = (ECNTInfo *) 0; }
-
+   // Write out ECNT
+   if(vx_opt.output_flag[i_ecnt] != STATOutputType_None &&
+      ecnt_info.n_pair > 0) {
+      write_ecnt_row(shc, ecnt_info, vx_opt.output_flag[i_ecnt],
+                     stat_at, i_stat_row,
+                     txt_at[i_ecnt], i_txt_row[i_ecnt]);
+   }
+   
    return;
 }
 

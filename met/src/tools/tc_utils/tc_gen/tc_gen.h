@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,6 +29,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "tc_gen_conf_info.h"
 
 #include "vx_tc_util.h"
@@ -57,18 +60,26 @@ static const char * default_config_filename =
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   fho_columns, ctc_columns, cts_columns
+   fho_columns, ctc_columns, cts_columns, genmpr_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_fho_columns, n_ctc_columns, n_cts_columns
+   n_fho_columns, n_ctc_columns, n_cts_columns, n_genmpr_columns
 };
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "fho", "ctc", "cts"
+   "fho", "ctc", "cts", "genmpr"
 };
+
+const ConcatString genesis_name    ("GENESIS");
+const ConcatString genesis_dev_name("GENESIS_DEV");
+const ConcatString genesis_ops_name("GENESIS_OPS");
+
+// Maximum Best track cyclone number to be processed
+// Cyclone numbers > 50 are for testing or invests
+static const int max_best_cyclone_number = 50;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -90,6 +101,15 @@ static ConcatString out_base;
 // Variables for Output Files
 //
 ////////////////////////////////////////////////////////////////////////
+
+// Output NetCDF file
+static ConcatString out_nc_file;
+static NcFile      *nc_out = (NcFile *) 0;
+static NcDim        lat_dim;
+static NcDim        lon_dim;
+
+// List of output NetCDF variable names
+static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString stat_file;

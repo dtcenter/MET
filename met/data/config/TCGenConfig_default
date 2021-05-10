@@ -13,25 +13,30 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Genesis event definition criteria.
+// Genesis event definition criteria
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Model initialization frequency in hours, starting at 0.
+// Model initialization frequency in hours, starting at 0
 //
 init_freq = 6;
 
 //
-// Lead times in hours to be searched for genesis events.
+// Valid hour frequency to be analyzed in hours, starting at 0
 //
-lead_window = {
-   beg = 24;
+valid_freq = 6;
+
+//
+// Forecast hours to be searched for genesis events
+//
+fcst_hr_window = {
+   beg = 6;
    end = 120;
 }
 
 //
-// Minimum track duration for genesis event in hours.
+// Minimum track duration for genesis event in hours
 //
 min_duration = 12;
 
@@ -60,36 +65,27 @@ best_genesis = {
 }
 
 //
-// Operational track genesis event criteria.  Defined as tracks reaching the
-// specified intensity category, maximum wind speed threshold, and minimum
-// sea-level pressure threshold.  The operational track genesis time is valid
-// time of the first track point where all of these criteria are met.
+// Operational track technique name
 //
-oper_genesis = {
-   technique   = "CARQ";
-   category    = [ "DB", "LO", "WV" ];
-   vmax_thresh = NA;
-   mslp_thresh = NA;
-}
+oper_technique = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Track filtering options which may be specified separately in each filter
-// array entry.
+// Track filtering options
+// May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Filter is an array of dictionaries containing the track filtering options
-// listed below.  If empty, a single filter is defined using the top-level
-// settings.
+// Array of dictionaries containing the track filtering options
+// If empty, a single filter is defined using the top-level settings.
 //
 filter = [];
 
 //
 // Description written to output DESC column
 //
-desc = "NA";
+desc = "ALL";
 
 //
 // Forecast ATCF ID's
@@ -109,10 +105,12 @@ storm_id = [];
 storm_name = [];
 
 //
-// Forecast and operational initialization time window
+// Forecast and operational initialization times to include or exclude
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
+init_exc = [];
 
 //
 // Forecast, BEST, and operational valid time window
@@ -136,26 +134,81 @@ lead = [];
 vx_mask = "";
 
 //
+// Spatial masking of hurricane basin names from the basin_file
+//
+basin_mask = [];
+
+//
 // Distance to land threshold
 //
 dland_thresh = NA;
 
+////////////////////////////////////////////////////////////////////////////////
 //
-// Genesis matching time window, in hours relative to the forecast genesis time
+// Matching and scoring options
+// May be specified separately in each filter array entry.
 //
-genesis_window = {
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Genesis matching logic. Compare the forecast genesis point to all points in
+// the Best track (TRUE) or the single Best track genesis point (FALSE).
+//
+genesis_match_point_to_track = TRUE;
+
+//
+// Radius in km to search for a matching genesis event
+//
+genesis_match_radius = 500;
+
+//
+// Time window in hours, relative to the model genesis time, to search for a
+// matching Best track point
+//
+genesis_match_window = {
+   beg = 0;
+   end = 0;
+}
+
+//
+// Radius in km for a development scoring method hit
+//
+dev_hit_radius = 500;
+
+//
+// Time window in hours, relative to the model genesis time, for a development
+// scoring method hit
+//
+dev_hit_window = {
    beg = -24;
    end =  24;
 }
 
 //
-// Genesis matching search radius in km.
+// Time window in hours for the Best track genesis minus model initialization
+// time difference for an operational scoring method hit
 //
-genesis_radius = 300;
+ops_hit_window = {
+   beg =  0;
+   end = 48;
+}
+
+//
+// Discard genesis forecasts for initializations at or after the matching
+// BEST track genesis time
+//
+discard_init_post_genesis_flag = TRUE;
+
+//
+// Scoring methods to be applied
+//
+dev_method_flag = TRUE;
+ops_method_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Global settings.
+// Output options
+// May be specified separately in each filter array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -171,13 +224,59 @@ output_flag = {
    fho    = NONE;
    ctc    = BOTH; 
    cts    = BOTH;
+   genmpr = NONE;
 }
+
+//
+// NetCDF genesis pair counts
+//
+nc_pairs_flag = {
+   latlon       = TRUE;
+   fcst_genesis = TRUE;
+   fcst_tracks  = TRUE;
+   fcst_fy_oy   = TRUE;
+   fcst_fy_on   = TRUE;
+   best_genesis = TRUE;
+   best_tracks  = TRUE;
+   best_fy_oy   = TRUE;
+   best_fn_oy   = TRUE;
+}
+
+//
+// Specify which track points should be counted by thresholding the track point
+// valid time minus genesis time difference.
+//
+valid_minus_genesis_diff_thresh = NA;
+
+//
+// Count unique BEST track genesis event locations (TRUE) versus counting the
+// location for all pairs (FALSE).
+//
+best_unique_flag = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Global settings
+// May only be specified once.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
 dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
+
+//
+// Specify the NetCDF file containing a gridded representation of the
+// global basins.
+//
+basin_file = "MET_BASE/tc_data/basin_global_tenth_degree.nc";
+
+//
+// NetCDF genesis pairs grid
+//
+nc_pairs_grid = "G003";
 
 //
 // Indicate a version number for the contents of this configuration file.

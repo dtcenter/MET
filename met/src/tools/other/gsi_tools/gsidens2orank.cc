@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -623,12 +623,13 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    }
    at.set_entry(row, col++, cs);                                // OBS_QC
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);               // ENS_MEAN
-   at.set_entry(row, col++, bad_data_double);                   // CLIMO
+   at.set_entry(row, col++, bad_data_double);                   // CLIMO_MEAN
    at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // ENS_SPREAD
 
    at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
+   at.set_entry(row, col++, bad_data_double);          // CLIMO_STDEV
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE

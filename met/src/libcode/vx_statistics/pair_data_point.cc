@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -116,6 +116,8 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    // Allocate memory for output pairs
    extend(pd.n_obs);
 
+   cdf_info = pd.cdf_info;
+
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
    set_msg_typ(pd.msg_typ.c_str());
@@ -172,8 +174,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
            << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
+           << n_obs << ").\n\n";
       exit(1);
    }
 
@@ -231,6 +232,67 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
+                 const SingleThresh &ft, const SingleThresh &ot,
+                 const SetLogic type) const {
+
+   // Check for no work to be done
+   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
+      return(*this);
+   }
+
+   int i;
+   PairDataPoint out_pd;
+
+   // Allocate memory for output pairs
+   out_pd.extend(n_obs);
+   out_pd.set_climo_cdf_info(cdf_info);
+
+   bool cmn_flag = set_climo_flag(f_na, cmn_na);
+   bool csd_flag = set_climo_flag(f_na, csd_na);
+   bool wgt_flag = set_climo_flag(f_na, wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<n_obs; i++) {
+
+      // Check for bad data
+      if(is_bad_data(f_na[i])                 ||
+         is_bad_data(o_na[i])                 ||
+         (cmn_flag && is_bad_data(cmn_na[i])) ||
+         (csd_flag && is_bad_data(csd_na[i])) ||
+         (wgt_flag && is_bad_data(wgt_na[i]))) continue;
+
+      // Keep pairs which meet the threshold criteria
+      if(check_fo_thresh(f_na[i], o_na[i], cmn_na[i], csd_na[i],
+                         ft, ot, type)) {
+
+         // Handle point data
+         if(is_point_vx()) {
+            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
+                      lon_na[i], x_na[i], y_na[i],
+                      vld_ta[i], lvl_na[i], elv_na[i],
+                      f_na[i], o_na[i], o_qc_sa[i].c_str(),
+                      cmn_na[i], csd_na[i], wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd.add_grid_pair(f_na[i], o_na[i], cmn_na[i],
+                      csd_na[i], wgt_na[i]);
+         }
+      }
+   } // end for
+
+   mlog << Debug(3)
+        << "Using " << out_pd.n_obs << " of " << n_obs
+        << " pairs for forecast filtering threshold " << ft.get_str()
+        << ", observation filtering threshold " << ot.get_str()
+        << ", and field logic " << setlogic_to_string(type) << ".\n";
+
+   return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class VxPairDataPoint
 //
@@ -280,6 +342,7 @@ void VxPairDataPoint::init_from_scratch() {
    rej_fcst     = (int ***) 0;
    rej_cmn      = (int ***) 0;
    rej_csd      = (int ***) 0;
+   rej_mpr      = (int ***) 0;
    rej_dup      = (int ***) 0;
 
    n_msg_typ    = 0;
@@ -310,6 +373,8 @@ void VxPairDataPoint::clear() {
    sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_filt.clear();
+   mpr_column.clear();
+   mpr_thresh.clear();
 
    fcst_ut     = (unixtime) 0;
    beg_ut      = (unixtime) 0;
@@ -334,6 +399,7 @@ void VxPairDataPoint::clear() {
             rej_fcst[i][j][k] = 0;
             rej_cmn[i][j][k]  = 0;
             rej_csd[i][j][k]  = 0;
+            rej_mpr[i][j][k]  = 0;
             rej_dup[i][j][k]  = 0;
          }
       }
@@ -369,6 +435,9 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
+   mpr_column = vx_pd.mpr_column;
+   mpr_thresh = vx_pd.mpr_thresh;
+
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;
    end_ut   = vx_pd.end_ut;
@@ -379,6 +448,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    rej_fcst = vx_pd.rej_fcst;
    rej_cmn  = vx_pd.rej_cmn;
    rej_csd  = vx_pd.rej_csd;
+   rej_mpr  = vx_pd.rej_mpr;
    rej_dup  = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
@@ -399,6 +469,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
             rej_fcst[i][j][k] = vx_pd.rej_fcst[i][j][k];
             rej_cmn[i][j][k]  = vx_pd.rej_cmn[i][j][k];
             rej_csd[i][j][k]  = vx_pd.rej_csd[i][j][k];
+            rej_mpr[i][j][k]  = vx_pd.rej_mpr[i][j][k];
             rej_dup[i][j][k]  = vx_pd.rej_dup[i][j][k];
          }
       }
@@ -540,7 +611,7 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
+void VxPairDataPoint::set_sid_inc_filt(const StringArray &sa) {
 
    sid_inc_filt = sa;
 
@@ -549,7 +620,7 @@ void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
+void VxPairDataPoint::set_sid_exc_filt(const StringArray &sa) {
 
    sid_exc_filt = sa;
 
@@ -558,9 +629,9 @@ void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_obs_qty_filt(const StringArray q) {
+void VxPairDataPoint::set_obs_qty_filt(const StringArray &sa) {
 
-   obs_qty_filt = q;
+   obs_qty_filt = sa;
 
    return;
 }
@@ -582,6 +653,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
    rej_fcst = new int **           [n_msg_typ];
    rej_cmn  = new int **           [n_msg_typ];
    rej_csd  = new int **           [n_msg_typ];
+   rej_mpr  = new int **           [n_msg_typ];
    rej_dup  = new int **           [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
@@ -591,6 +663,7 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
       rej_fcst[i] = new int *           [n_mask];
       rej_cmn[i]  = new int *           [n_mask];
       rej_csd[i]  = new int *           [n_mask];
+      rej_mpr[i]  = new int *           [n_mask];
       rej_dup[i]  = new int *           [n_mask];
 
       for(j=0; j<n_mask; j++) {
@@ -600,15 +673,17 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
          rej_fcst[i][j] = new int           [n_interp];
          rej_cmn[i][j]  = new int           [n_interp];
          rej_csd[i][j]  = new int           [n_interp];
+         rej_mpr[i][j]  = new int           [n_interp];
          rej_dup[i][j]  = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
-            rej_typ[i][j][k]   = 0;
-            rej_mask[i][j][k]  = 0;
-            rej_fcst[i][j][k]  = 0;
-            rej_cmn[i][j][k] = 0;
-            rej_csd[i][j][k] = 0;
-            rej_dup[i][j][k]   = 0;
+            rej_typ[i][j][k]  = 0;
+            rej_mask[i][j][k] = 0;
+            rej_fcst[i][j][k] = 0;
+            rej_cmn[i][j][k]  = 0;
+            rej_csd[i][j][k]  = 0;
+            rej_mpr[i][j][k]  = 0;
+            rej_dup[i][j][k]  = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -730,6 +805,41 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &ta) {
+
+   // Check for constant length
+   if(sa.n() != ta.n()) {
+      mlog << Error << "\nVxPairDataPoint::set_mpr_thresh() -> "
+           << "the \"" << conf_key_mpr_column << "\" ("
+           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" (" << write_css(ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
+   mpr_column = sa;
+   mpr_thresh = ta;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_climo_cdf_info(const ClimoCDFInfo &info) {
+
+   for(int i=0; i<n_msg_typ; i++) {
+      for(int j=0; j<n_mask; j++) {
+         for(int k=0; k<n_interp; k++) {
+            pd[i][j][k].set_climo_cdf_info(info);
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_msg_typ_sfc(const StringArray &sa) {
 
    msg_typ_sfc = sa;
@@ -778,6 +888,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    int f_lvl_blw, f_lvl_abv;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
+   ConcatString reason_cs;
 
    // Increment the number of tries count
    n_try++;
@@ -792,7 +903,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the GRIB code for the observation matches
    // the specified code
    if((var_name != 0) && (0 < strlen(var_name))) {
-      if ( var_name != obs_info->name() ) {
+      if(var_name != obs_info->name()) {
          rej_var++;
          return;
       }
@@ -805,10 +916,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check if the observation quality flag is included in the list
    if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_filt[i] ) qty_match = true;
-
-      if( !qty_match ){
+      for(i=0; i<obs_qty_filt.n() && !qty_match; i++) {
+         if(obs_qty == obs_qty_filt[i]) qty_match = true;
+      }
+      if(!qty_match) {
          rej_qty++;
          return;
       }
@@ -833,6 +944,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
+      mlog << Debug(4)
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation with bad data value:\n"
+           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                  hdr_ut, obs_qty, obs_arr, var_name)
+           << "\n";
       rej_obs++;
       return;
    }
@@ -845,6 +963,15 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check if the observation's lat/lon is on the grid
    if(x < 0 || x >= gr.nx() ||
       y < 0 || y >= gr.ny()) {
+      mlog << Debug(4)
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping observation off the grid where (x, y) = ("
+           << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
+           << ", " << gr.ny() << "):\n"
+           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                  hdr_ut, obs_qty, obs_arr, var_name)
+           << "\n";
       rej_grd++;
       return;
    }
@@ -861,12 +988,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
          mlog << Debug(4)
-              << "Skipping observation due to missing topography values for "
-              << "[msg_typ:sid:lat:lon:elevation] = ["
-              << hdr_typ_str << ":" << hdr_sid_str << ":"
-              << hdr_lat << ":" << -1.0*hdr_lon << ":"
-              << hdr_elv << "] and model topography = "
-              << topo << ".\n";
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to bad topography values "
+              << "where observation elevation = " << hdr_elv
+              << " and model topography = " << topo << ":\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
          rej_topo++;
          return;
       }
@@ -874,14 +1003,16 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Check the topography difference threshold
       if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
          mlog << Debug(4)
-              << "Skipping observation for topography difference since "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation due to topography difference "
+              << "where observation elevation (" << hdr_elv
+              << ") minus model topography (" << topo << ") = "
               << topo - hdr_elv << " is not "
-              << sfc_info.topo_use_obs_thresh.get_str() << " for "
-              << "[msg_typ:sid:lat:lon:elevation] = ["
-              << hdr_typ_str << ":" << hdr_sid_str << ":"
-              << hdr_lat << ":" << -1.0*hdr_lon << ":"
-              << hdr_elv << "] and model topography = "
-              << topo << ".\n";
+              << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
          rej_topo++;
          return;
       }
@@ -1099,7 +1230,30 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             if(is_bad_data(fcst_v)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation due to bad data in the interpolated "
+                    << "forecast value:\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
                inc_count(rej_fcst, i, j, k);
+               continue;
+            }
+
+            // Check matched pair filtering options
+            if(!check_mpr_thresh(fcst_v, obs_v, cmn_v, csd_v,
+                                 mpr_column, mpr_thresh, &reason_cs)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation due to matched pair filter since "
+                    << reason_cs << ":\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
+               inc_count(rej_mpr, i, j, k);
                continue;
             }
 
@@ -1113,6 +1267,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
                   obs_hgt, fcst_v, obs_v, obs_qty, cmn_v, csd_v,
                   wgt_v)) {
+               mlog << Debug(4)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str()
+                    << ", skipping observation since it is a duplicate:\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
                inc_count(rej_dup, i, j, k);
             }
 
@@ -1284,63 +1445,199 @@ void VxPairDataPoint::inc_count(int ***&rej, int i, int j, int k) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-PairDataPoint subset_pairs(const PairDataPoint &pd,
-                           const SingleThresh &ft, const SingleThresh &ot,
-                           const SetLogic type) {
+bool check_fo_thresh(double f, double o, double cmn, double csd,
+                     const SingleThresh &ft, const SingleThresh &ot,
+                     const SetLogic type) {
+   bool status = true;
+   bool fcheck = ft.check(f, cmn, csd);
+   bool ocheck = ot.check(o, cmn, csd);
+   SetLogic t  = type;
 
-   // Check for no work to be done
-   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
-      return(pd);
+   // If either of the thresholds is NA, reset the logic to intersection
+   // because an NA threshold is always true.
+   if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
+      t = SetLogic_Intersection;
    }
 
-   int i;
-   PairDataPoint out_pd;
+   switch(t) {
+      case(SetLogic_Union):
+         if(!fcheck && !ocheck) status = false;
+         break;
 
-   // Allocate memory for output pairs
-   out_pd.extend(pd.n_obs);
+      case(SetLogic_Intersection):
+         if(!fcheck || !ocheck) status = false;
+         break;
 
-   bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
-   bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
-   bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
+      case(SetLogic_SymDiff):
+         if(fcheck == ocheck) status = false;
+         break;
+
+      default:
+         mlog << Error << "\ncheck_fo_thresh() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_mpr_thresh(double f, double o, double cmn, double csd,
+                      const StringArray &col_sa, const ThreshArray &col_ta,
+                      ConcatString *reason_ptr) {
+   // Initialize
+   if(reason_ptr) reason_ptr->erase();
+
+   // Check arrays
+   if(col_sa.n() == 0 || col_ta.n() == 0) return(true);
+
+   bool keep = true;
+   bool absv = false;
+   StringArray sa;
+   ConcatString cs;
+   double v, v_cur;
+   int i, j;
+
+   // Loop over all the column filter names
+   for(i=0; i<col_sa.n(); i++) {
+
+      // Check for absolute value
+      if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
+         absv = true;
+         cs   = col_sa[i];
+         sa   = cs.split("()");
+         cs   = sa[1];
+      }
+      else {
+         cs = col_sa[i];
+      }
+
+      // Split the input column name on hyphens for differences
+      sa = cs.split("-");
+
+      // Get the first value
+      v = get_mpr_column_value(f, o, cmn, csd, sa[0].c_str());
+
+      // If multiple columns, compute the requested difference
+      if(sa.n() > 1) {
+
+         // Loop through the columns
+         for(j=1; j<sa.n(); j++) {
+
+            // Get the current column value
+            v_cur = get_mpr_column_value(f, o, cmn, csd, sa[j].c_str());
+
+            // Compute the difference, checking for bad data
+            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+            else                                     v -= v_cur;
+         } // end for j
+      }
+
+      // Apply absolute value, if requested
+      if(absv && !is_bad_data(v)) v = fabs(v);
+
+      // Check the threshold
+      if(!col_ta[i].check(v)) {
+         if(reason_ptr) {
+            (*reason_ptr) << cs_erase << col_sa[i] << " = " << v
+                          << " is not " << col_ta[i].get_str();
+         }
+         keep = false;
+         break;
+      }
+   } // end for i
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Parse string to determine which value to use
+//
+////////////////////////////////////////////////////////////////////////
+
+double get_mpr_column_value(double f, double o, double cmn, double csd,
+                            const char *s) {
+   double v;
+
+        if(strcasecmp(s, "FCST")        == 0) v = f;
+   else if(strcasecmp(s, "OBS")         == 0) v = o;
+   else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
+   else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
+   else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
+      v = (is_bad_data(cmn) || is_bad_data(csd) ?
+           bad_data_double : normal_cdf(o, cmn, csd));
+   }
+   else {
+      mlog << Error << "\nget_mpr_column_value() -> "
+           << "unsupported matched pair column name requested in \""
+           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
+      exit(1);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
+                           DataPlane &cmn_dp, DataPlane &csd_dp,
+                           const StringArray &col_sa, const ThreshArray &col_ta) {
+
+   // Check for no work to be done
+   if(col_sa.n() == 0 && col_ta.n() == 0) return;
+
+   // Check for constant length
+   if(col_sa.n() != col_ta.n()) {
+      mlog << Error << "\napply_mpr_thresh_mask() -> "
+           << "the \"" << conf_key_mpr_column << "\" ("
+           << write_css(col_sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" (" << write_css(col_ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
+   int  nxy = fcst_dp.nx() * fcst_dp.ny();
+   int  n_skip = 0;
+   bool cmn_flag = !(cmn_dp.is_empty());
+   bool csd_flag = !(csd_dp.is_empty());
 
    // Loop over the pairs
-   for(i=0; i<pd.n_obs; i++) {
+   for(int i=0; i<nxy; i++) {
+
+      double cmn = (cmn_flag ? cmn_dp.buf()[i] : bad_data_double);
+      double csd = (csd_flag ? csd_dp.buf()[i] : bad_data_double);
 
       // Check for bad data
-      if(is_bad_data(pd.f_na[i])                 ||
-         is_bad_data(pd.o_na[i])                 ||
-         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
-         (csd_flag && is_bad_data(pd.csd_na[i])) ||
-         (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
+      if(is_bad_data(fcst_dp.buf()[i])  ||
+         is_bad_data(obs_dp.buf()[i])   ||
+         (cmn_flag && is_bad_data(cmn)) ||
+         (csd_flag && is_bad_data(csd))) continue;
 
-      // Keep pairs which meet the threshold criteria
-      if(check_fo_thresh(pd.f_na[i],   pd.o_na[i],
-                         pd.cmn_na[i], pd.csd_na[i],
-                         ft, ot, type)) {
+      // Discard pairs which do not meet the threshold criteria
+      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cmn, csd,
+                           col_sa, col_ta)) {
 
-         // Handle point data
-         if(pd.is_point_vx()) {
-            out_pd.add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i],
-                      pd.lon_na[i], pd.x_na[i], pd.y_na[i],
-                      pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
-                      pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                      pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
-         }
-         // Handle gridded data
-         else {
-            out_pd.add_grid_pair(pd.f_na[i], pd.o_na[i], pd.cmn_na[i],
-                      pd.csd_na[i], pd.wgt_na[i]);
-         }
+         // Increment skip counter
+         n_skip++;
+
+         // Set point to bad data
+         fcst_dp.buf()[i] = bad_data_double;
+         obs_dp.buf()[i]  = bad_data_double;
+         if(cmn_flag) cmn_dp.buf()[i] = bad_data_double;
+         if(csd_flag) csd_dp.buf()[i] = bad_data_double;
       }
-   } // end for
+   } // end for i
 
    mlog << Debug(3)
-        << "Using " << out_pd.n_obs << " of " << pd.n_obs
-        << " pairs for forecast filtering threshold " << ft.get_str()
-        << ", observation filtering threshold " << ot.get_str()
-        << ", and field logic " << setlogic_to_string(type) << ".\n";
+        << "Discarded " << n_skip << " of " << nxy
+        << " pairs for matched pair filtering columns ("
+        << write_css(col_sa) << ") and thresholds ("
+        << col_ta.get_str() << ").\n";
 
-   return(out_pd);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1365,6 +1662,8 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    out_pd_v.erase();
    out_pd_u.extend(pd_u.n_obs);
    out_pd_v.extend(pd_v.n_obs);
+   out_pd_u.set_climo_cdf_info(pd_u.cdf_info);
+   out_pd_v.set_climo_cdf_info(pd_v.cdf_info);
 
    bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
                    set_climo_flag(pd_v.f_na, pd_v.cmn_na);
@@ -1452,6 +1751,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
 
    // Allocate memory for output pairs
    out_pd.extend(pd.n_obs);
+   out_pd.set_climo_cdf_info(pd.cdf_info);
 
    bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
@@ -1492,6 +1792,36 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
         << " pairs for climatology bin number " << i_bin+1 << ".\n";
 
    return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Write the point observation in the MET point format for logging
+ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
+                                 const char *hdr_sid_str, unixtime hdr_ut,
+                                 const char *obs_qty, float *obs_arr,
+                                 const char *var_name) {
+   ConcatString obs_cs, name;
+
+   if((var_name != 0) && (0 < strlen(var_name))) name = var_name;
+   else                                          name = obs_arr[1];
+
+   //
+   // Write the 11-column MET point format:
+   //   Message_Type Station_ID Valid_Time(YYYYMMDD_HHMMSS)
+   //   Lat(Deg North) Lon(Deg East) Elevation(msl)
+   //   Var_Name(or GRIB_Code) Level Height(msl or agl)
+   //   QC_String Observation_Value
+   //
+   obs_cs << "   "
+          << hdr_typ_str << " " << hdr_sid_str << " "
+          << unix_to_yyyymmdd_hhmmss(hdr_ut) << " "
+          << hdr_arr[0] << " " << -1.0*hdr_arr[1] << " "
+          << hdr_arr[2] << " " << name << " "
+          << obs_arr[2] << " " << obs_arr[3] << " "
+          << obs_qty    << " " << obs_arr[4];
+
+   return(obs_cs);
 }
 
 ////////////////////////////////////////////////////////////////////////

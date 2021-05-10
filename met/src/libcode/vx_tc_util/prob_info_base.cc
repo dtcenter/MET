@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -280,7 +280,7 @@ void ProbInfoBase::set(const TCStatLine &l) {
    switch(l.type()) {
 
       case TCStatLineType_ProbRIRW:
-         Type = ATCFLineType_ProbRIRW;
+         Type = ATCFLineType_ProbRI;
          break;
 
       default:

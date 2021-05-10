@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-8.1})], [met_help@ucar.edu], [], [http://www.dtcenter.org/met/users])
+AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-development})], [met_help@ucar.edu], [], [http://dtcenter.org/community-code/model-evaluation-tools-met])
 AC_CONFIG_SRCDIR([src/tools/tc_utils/tc_dland/tc_dland.cc])
 AC_CONFIG_HEADERS([config.h])
 
@@ -1041,11 +1041,14 @@ CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
 AC_SUBST(FC_LIBS, [-lgfortran])
 
-# The CXXFLAGS default to "-O2 -g".  The optimization is causing
-# problems so just set it to "-g" if the user hasn't overridden it
-# themselves.
+# For GNU compilers, CFLAGS, CXXFLAGS, and FFLAGS default to "-O2 -g".
+# The CXXFLAGS "-O2" optimization has caused problems in the past.
+# For Intel compilers, "-g" slows down runtimes considerably (MET #1778).
+# For development, retain the "-g" option. Otherwise, discard it.
 
-: ${CXXFLAGS="-g"}
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CFLAGS="-g -O2"}], [: ${CFLAGS="-O2"}])
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CXXFLAGS="-g"}  ], [: ${CXXFLAGS=""}] )
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${FFLAGS="-g -O2"}], [: ${FFLAGS="-O2"}])
 
 # Checks for programs.
 

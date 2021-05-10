@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,6 +157,8 @@ class ThreshNode {
 
       virtual double pvalue() const = 0;
 
+      virtual double climo_prob() const = 0;
+
       virtual bool need_perc() const = 0;
 
       virtual void set_perc(const NumArray *, const NumArray *, const NumArray *) = 0;
@@ -197,6 +199,8 @@ class Or_Node : public ThreshNode {
 
       double pvalue() const;
 
+      double climo_prob() const;
+
       bool need_perc() const;
 
       void set_perc(const NumArray *, const NumArray *, const NumArray *);
@@ -217,10 +221,10 @@ class Or_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Or_Node::type()    const { return ( thresh_complex      ); }
-inline double         Or_Node::value()   const { return ( bad_data_double     ); }
-inline PercThreshType Or_Node::ptype()   const { return ( no_perc_thresh_type ); }
-inline double         Or_Node::pvalue()  const { return ( bad_data_double     ); }
+inline ThreshType     Or_Node::type()   const { return ( thresh_complex      ); }
+inline double         Or_Node::value()  const { return ( bad_data_double     ); }
+inline PercThreshType Or_Node::ptype()  const { return ( no_perc_thresh_type ); }
+inline double         Or_Node::pvalue() const { return ( bad_data_double     ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -243,6 +247,8 @@ class And_Node : public ThreshNode {
       PercThreshType ptype() const;
 
       double pvalue() const;
+
+      double climo_prob() const;
 
       bool need_perc() const;
 
@@ -292,6 +298,8 @@ class Not_Node : public ThreshNode {
       PercThreshType ptype() const;
 
       double pvalue() const;
+
+      double climo_prob() const;
 
       bool need_perc() const;
 
@@ -362,6 +370,8 @@ class Simple_Node : public ThreshNode {
       PercThreshType ptype() const;
 
       double pvalue() const;
+
+      double climo_prob() const;
 
       bool need_perc() const;
 
@@ -435,6 +445,7 @@ class SingleThresh {
       double         get_value() const;
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
+      double         get_climo_prob() const;
       void           get_simple_nodes(vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
@@ -451,11 +462,11 @@ class SingleThresh {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     SingleThresh::get_type()   const { return ( node ? node->type()   : thresh_na           ); }
-inline double         SingleThresh::get_value()  const { return ( node ? node->value()  : bad_data_double     ); }
-inline PercThreshType SingleThresh::get_ptype()  const { return ( node ? node->ptype()  : no_perc_thresh_type ); }
-inline double         SingleThresh::get_pvalue() const { return ( node ? node->pvalue() : bad_data_double     ); }
-
+inline ThreshType     SingleThresh::get_type()       const { return ( node ? node->type()       : thresh_na           ); }
+inline double         SingleThresh::get_value()      const { return ( node ? node->value()      : bad_data_double     ); }
+inline PercThreshType SingleThresh::get_ptype()      const { return ( node ? node->ptype()      : no_perc_thresh_type ); }
+inline double         SingleThresh::get_pvalue()     const { return ( node ? node->pvalue()     : bad_data_double     ); }
+inline double         SingleThresh::get_climo_prob() const { return ( node ? node->climo_prob() : bad_data_double     ); }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -62,8 +62,9 @@ struct MPRData {
 // Ensemble continuous statistics (ECNT) data structure
 struct ECNTData {
    int total, n_ens;
-   double crps, crpss, ign;
-   double me, rmse, spread;
+   double crps_emp, crpscl_emp, crpss_emp;
+   double crps_gaus, crpscl_gaus, crpss_gaus;
+   double ign, me, rmse, spread;
    double me_oerr, rmse_oerr, spread_oerr;
    double spread_plus_oerr;
 };
@@ -92,7 +93,7 @@ struct ORANKData {
    int total, index;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double obs, pit, climo;
+   double obs, pit, climo_mean, climo_stdev;
    double ens_mean, spread, ens_mean_oerr, spread_oerr;
    double spread_plus_oerr;
    int rank, n_ens_vld, n_ens;

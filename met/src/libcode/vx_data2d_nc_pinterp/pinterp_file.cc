@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,9 +57,6 @@ static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
 
 static const string init_time_att_name   = "START_DATE";
-
-static const string description_att_name  = "description";
-static const string units_att_name        = "units";
 
 static const int max_pinterp_args         = 30;
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -135,6 +135,7 @@ class VarInfo
 
       RegridInfo   regrid()         const;
 
+      ConcatString magic_str_attr() const;
       ConcatString name_attr()      const;
       ConcatString units_attr()     const;
       ConcatString level_attr()     const;

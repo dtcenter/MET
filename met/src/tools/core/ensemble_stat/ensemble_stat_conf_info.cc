@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -877,6 +877,9 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
+   // Store the climo CDF info
+   vx_pd.set_climo_cdf_info(cdf_info);
+
    // Store the list of surface message types
    vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
 
@@ -964,7 +967,6 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 
 int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
-   int n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -976,15 +978,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    // Check if this output line type is requested
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
 
-   // Determine row multiplier for climatology bins
-   if(cdf_info.write_bins) {
-      n_bin = get_n_cdf_bin();
-      if(n_bin > 1) n_bin++;
-   }
-   else {
-      n_bin = 1;
-   }
-
    // Switch on the index of the line type
    switch(i_txt_row) {
 
@@ -993,11 +986,11 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
 
          // Maximum number of ECNT and RPS lines possible =
          //    Point Vx: Message Types * Masks * Interpolations *
-         //                              Obs Thresholds * Climo Bins
+         //                              Obs Thresholds
          //     Grid Vx:                 Masks * Interpolations *
-         //                              Obs Thresholds * Climo Bins
+         //                              Obs Thresholds
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_o_thresh() * n_bin;
+              get_n_o_thresh();
          break;
 
       case(i_rhist):

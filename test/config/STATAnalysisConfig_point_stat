@@ -17,18 +17,26 @@ obs_lead  = [];
 
 fcst_valid_beg  = "";
 fcst_valid_end  = "";
+fcst_valid_inc  = [];
+fcst_valid_exc  = [];
 fcst_valid_hour = [];
 
 obs_valid_beg   = "";
 obs_valid_end   = "";
+obs_valid_inc   = [];
+obs_valid_exc   = [];
 obs_valid_hour  = [];
 
 fcst_init_beg   = "";
 fcst_init_end   = "";
+fcst_init_inc   = [];
+fcst_init_exc   = [];
 fcst_init_hour  = [];
 
 obs_init_beg    = "";
 obs_init_end    = "";
+obs_init_inc    = [];
+obs_init_exc    = [];
 obs_init_hour   = [];
 
 fcst_var = [];
@@ -64,7 +72,7 @@ weight = [];
 //
 jobs = [
    "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
-    -line_type MPR -out_line_type CNT \
+    -line_type MPR -out_line_type CNT,SL1L2 -out_thresh NA,gt273 \
     -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat \
     -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat \
     -set_hdr VX_MASK CONUS",
@@ -80,8 +88,8 @@ jobs = [
     -out_wind_thresh >0 -out_wind_logic INTERSECTION \
     -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat",
    "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
-    -line_type MPR -out_line_type ECLV \
-    -out_thresh >273 -out_eclv_points 0.1",
+    -line_type MPR -out_line_type ECLV,CTC,CTS \
+    -out_thresh >273,>278 -out_eclv_points 0.1",
    "-job filter -fcst_var TMP -fcst_lev Z2 \
     -line_type MPR -mask_sid ${CONFIG_DIR}/SID_CO.txt \
     -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat",

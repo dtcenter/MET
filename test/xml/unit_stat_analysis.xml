@@ -74,39 +74,37 @@
     </output>
   </test>
 
-  <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
+  <test name="stat_analysis_AGG_ECNT">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
-      -job aggregate_stat -line_type ORANK -out_line_type RHIST \
-      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
-      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat \
-      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_out.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate -line_type ECNT -by FCST_VAR -obs_thresh NA -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_ECNT_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_ECNT_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat</stat>
-      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_out.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ECNT_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ECNT_out.stat</stat>
     </output>
   </test>
 
-  <test name="stat_analysis_AGG_STAT_ORANK_PHIST">
+  <test name="stat_analysis_AGG_STAT_ORANK_RHIST_PHIST">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
-      -job aggregate_stat -line_type ORANK -out_line_type PHIST \
+      -job aggregate_stat -line_type ORANK -out_line_type RHIST,PHIST \
       -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB -out_bin_size 0.10 \
-      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat \
-      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_out.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST.out \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat</stat>
-      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_out.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_PHIST.out</exist>
     </output>
   </test>
 
@@ -296,6 +294,37 @@
     </param>
     <output>
       <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY_UNION.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_FILTER_OBS_SID">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job filter -line_type MPR -fcst_var TMP -fcst_lev Z2 -vx_mask DTC165 \
+      -column_str     OBS_SID KDLN,KDHT,KDEN,KDLS,KDMA,KDMN,KDVT,KDEW \
+      -column_str_exc OBS_SID KDLN,KDHT \
+      -dump_row &OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_OBS_SID.stat \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_OBS_SID.stat</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_FILTER_TIMES">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_filter_times \
+      -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_FILTER_TIMES.out</exist>
     </output>
   </test>
 

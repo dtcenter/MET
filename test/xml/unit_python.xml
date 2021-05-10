@@ -7,6 +7,7 @@
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
   <!ENTITY MET_PYTHON_EXE "/usr/local/python3/bin/python3">
+  <!ENTITY ANACONDA_BIN   "/usr/local/anaconda3-20190923/bin">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PYTHON "&INPUT_DIR;/python">
@@ -19,19 +20,96 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
+  <!-- Define a named grid -->
+  <test name="python_numpy_grid_name">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair><name>PYTHON_GRID</name> <value>G212</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_name.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Grid Name: 'G212'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_name.ps</ps>
+    </output>
+  </test>
+
+  <!-- Define a grid specification string -->
+  <test name="python_numpy_grid_string">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair>
+        <name>PYTHON_GRID</name>
+        <value>lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N</value>
+      </pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_string.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Grid String: 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_string.ps</ps>
+    </output>
+  </test>
+
+  <!-- Define the grid using a gridded data file -->
+  <test name="python_numpy_grid_data_file">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair>
+        <name>PYTHON_GRID</name>
+        <value>&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_data_file.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Gridded Data File: 'wrfprs_ruc13_12.tm00_G212'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_data_file.ps</ps>
+    </output>
+  </test>
+  
   <!-- Invokes Python script that reads in NUMPY text data -->
   <test name="python_numpy_plot_data_plane">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
-      &OUTPUT_DIR;/python/letter.ps \
+      &OUTPUT_DIR;/python/letter_numpy.ps \
       'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
-      -title "Python enabled plot_data_plane" \
+      -title "Python enabled numpy plot_data_plane" \
       -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/python/letter.ps</ps>
+      <ps>&OUTPUT_DIR;/python/letter_numpy.ps</ps>
+    </output>
+  </test>
+
+  <test name="python_xarray_plot_data_plane">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      PYTHON_XARRAY \
+      &OUTPUT_DIR;/python/letter_xarray.ps \
+      'name = "&MET_BASE;/python/read_ascii_xarray.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled xarray plot_data_plane" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_xarray.ps</ps>
     </output>
   </test>
 
@@ -127,6 +205,7 @@
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -295,43 +374,44 @@
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to read point data  -->
-  <test name="python_ascii2nc_pickle">
+  <!-- Invokes user-python logic to read point data  -->
+  <test name="python_ascii2nc_user_python">
     <exec>&MET_BIN;/ascii2nc</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
       "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
-      &OUTPUT_DIR;/python/ascii2nc_pickle.nc \
+      &OUTPUT_DIR;/python/ascii2nc_user_python.nc \
       -format python
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/python/ascii2nc_pickle.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_user_python.nc</point_nc>
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to read NUMPY text data -->
-  <test name="python_numpy_plot_data_plane_pickle">
-    <exec>&MET_BIN;/plot_data_plane</exec>
+  <!-- Invokes user-python logic to read NUMPY text data -->
+  <test name="python_numpy_plot_data_plane_user_python">
+    <exec>export PATH='&ANACONDA_BIN;:${PATH}'; \
+          &MET_BIN;/plot_data_plane</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
-      &OUTPUT_DIR;/python/letter_pickle.ps \
+      &OUTPUT_DIR;/python/letter_user_python.ps \
       'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane" \
       -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/python/letter_pickle.ps</ps>
+      <ps>&OUTPUT_DIR;/python/letter_user_python.ps</ps>
     </output>
   </test>
 
-  <!-- Invokes Python pickle logic to pass MPR data to Stat-Analysis  -->
-  <test name="python_stat_analysis_pickle">
+  <!-- Invokes user-python logic to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis_user_python">
     <exec>&MET_BIN;/stat_analysis</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -339,10 +419,10 @@
     <param> \
       -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
       -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
-      -out_stat &OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_user_python_AGGR_MPR_to_SL1L2.stat
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat</stat>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_user_python_AGGR_MPR_to_SL1L2.stat</stat>
     </output>
   </test>
 

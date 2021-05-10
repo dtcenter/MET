@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -365,16 +365,23 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
       return(time_offsets);
    }
 
+   int time_dim_slot = info->t_slot;
+   int time_dim_size = _file->ValidTime.n_elements();
+   if (0 < time_dim_size && time_dim_slot < 0) {
+     // The time dimension does not exist at the variable and the time
+     // variable exists. Stop time slicing and set the time offset to 0.
+     time_offsets.add(0);
+     return(time_offsets);
+   }
+
    double time_lower = bad_data_double;
    double time_upper = bad_data_double;
    int error_code = error_code_no_error;
-   int time_dim_slot = info->t_slot;
-   int time_dim_size = _file->ValidTime.n_elements();
    LevelInfo level = vinfo.level();
    LongArray dimension = vinfo_nc->dimension();
    bool is_time_range = (level.type() == LevelType_Time);
    bool time_as_value = !level.is_time_as_offset();
-   
+
    long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
    bool include_all_times = (dim_offset == vx_data2d_star);
 
@@ -469,13 +476,17 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
          }
       }
    }
-   else if (0 <= time_dim_slot && dim_offset < time_dim_size)
-      time_offsets.add(dim_offset);
-   else error_code = error_code_unknown;
+   else {
+      if (time_as_value) dim_offset = convert_time_to_offset(dim_offset);
+      if (0 <= time_dim_slot && dim_offset < time_dim_size)
+         time_offsets.add(dim_offset);
+      else error_code = error_code_unknown;
+   }
 
-   if (0 < time_offsets.n_elements())
-      mlog << Debug(7) << method_name << " Found " << time_offsets.n_elements()
-           << " times from between "
+   int time_count = time_offsets.n_elements();
+   if (0 < time_count)
+      mlog << Debug(7) << method_name << " Found " << time_count
+           << (time_count==1 ? " time" : " times") << " between "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_dim_size-1]) << "\n";
    else {

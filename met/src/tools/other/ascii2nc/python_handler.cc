@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,14 +26,15 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char generic_python_wrapper [] = "generic_python";
-static const char generic_pickle_wrapper [] = "generic_pickle";
+static const char set_python_env_wrapper [] = "set_python_env";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_pickle_point.py";
+static const char write_tmp_ascii_wrapper[] = "MET_BASE/wrappers/write_tmp_point.py";
 
 static const char list_name              [] = "point_data";
 
-static const char pickle_base_name       [] = "tmp_ascii2nc_pickle";
+static const char tmp_list_name          [] = "ascii_data";
+
+static const char tmp_base_name          [] = "tmp_ascii2nc";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -57,7 +58,7 @@ PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_n
 
 {
 
-use_pickle = false;
+use_tmp_ascii = false;
 
 }
 
@@ -82,13 +83,13 @@ for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
 
 }
 
-use_pickle = false;
+use_tmp_ascii = false;
 
 const char * c = getenv(user_python_path_env);
 
 if ( c )  {
 
-   use_pickle = true;
+   use_tmp_ascii = true;
 
    user_path_to_python = c;
 
@@ -231,8 +232,8 @@ bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_
 
 bool status = false;
 
-if ( use_pickle )  status = do_pickle   ();
-else               status = do_straight ();
+if ( use_tmp_ascii )  status = do_tmp_ascii ();
+else                  status = do_straight ();
 
 return ( status );
 
@@ -248,7 +249,7 @@ bool PythonHandler::do_straight()
 
 ConcatString command, path, user_base;
 
-path = generic_python_wrapper;
+path = set_python_env_wrapper;
 
 mlog << Debug(3)
      << "Running user's python script ("
@@ -320,10 +321,12 @@ return ( true );
 
 
    //
-   //  wrapper usage:  /path/to/python wrapper.py pickle_output_filename user_script_name [ user_script args ... ]
+   //  wrapper usage:  /path/to/python wrapper.py
+   //                  tmp_output_filename user_script_name
+   //                  [ user_script args ... ]
    //
 
-bool PythonHandler::do_pickle()
+bool PythonHandler::do_tmp_ascii()
 
 {
 
@@ -331,7 +334,7 @@ int j;
 const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
-ConcatString pickle_path;
+ConcatString tmp_ascii_path;
 const char * tmp_dir = 0;
 int status;
 
@@ -345,15 +348,16 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << pickle_base_name;
+     << tmp_base_name;
 
-pickle_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path << ".txt";
 
 command << cs_erase
-        << user_path_to_python                << ' '    //  user's path to python
-        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
-        << pickle_path                        << ' '    //  pickle output filename
-        << user_script_filename;                        //  user's script name
+        << user_path_to_python                   << ' '    //  user's path to python
+        << replace_path(write_tmp_ascii_wrapper) << ' '    //  write_tmp_point.py
+        << tmp_ascii_path                        << ' '    //  temporary ascii output filename
+        << user_script_filename;                           //  user's script name
 
 for (j=0; j<N; ++j)  {
 
@@ -361,11 +365,14 @@ for (j=0; j<N; ++j)  {
 
 };
 
+mlog << Debug(4) << "Writing temporary Python ascii observation file:\n\t"
+     << command << "\n";
+
 status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error << "\nPythonHandler::do_pickle() -> "
+   mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
         << "command \"" << command.text() << "\" failed ... status = "
         << status << "\n\n";
 
@@ -375,18 +382,23 @@ if ( status )  {
 
 ConcatString wrapper;
 
-wrapper = generic_pickle_wrapper;
+wrapper = set_python_env_wrapper;
 
 Python3_Script script(wrapper.text());
 
-script.read_pickle(list_name, pickle_path.text());
+mlog << Debug(4) << "Reading temporary Python ascii observation file: "
+     << tmp_ascii_path << "\n";
 
-PyObject * obj = script.lookup(list_name);
+script.import_read_tmp_ascii_py();
+
+PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
+
+PyObject * obj = script.lookup_ascii(tmp_list_name);
 
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error << "\nPythonHandler::do_pickle() -> "
-        << "pickle object is not a list!\n\n";
+   mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
+        << "tmp ascii object is not a list!\n\n";
 
    exit ( 1 );
 
@@ -398,7 +410,7 @@ load_python_obs(obj);
    //  cleanup
    //
 
-remove_temp_file(pickle_path);
+remove_temp_file(tmp_ascii_path);
 
    //
    //  done

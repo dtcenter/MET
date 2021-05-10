@@ -36,6 +36,25 @@
    </output>
   </test>
 
+  <test name="pb2nc_NDAS_no_mask">
+    <exec>&MET_BIN;/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120410.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PB2NCConfig \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc</point_nc>
+    </output>
+  </test>
+
   <test name="pb2nc_NDAS_mask_poly_conus">
     <exec>&MET_BIN;/pb2nc</exec>
     <env>
@@ -112,6 +131,25 @@
     </output>
   </test>
   
+  <test name="pb2nc_compute_pbl_cape">
+    <exec>&MET_BIN;/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/nam.20210311.t00z.prepbufr.tm00 \
+      &OUTPUT_DIR;/pb2nc/nam.20210311.t00z.prepbufr.tm00.pbl.nc \
+      &CONFIG_DIR;/PB2NCConfig_pbl \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/pb2nc/nam.20210311.t00z.prepbufr.tm00.pbl.nc</point_nc>
+    </output>
+  </test>
+
   <test name="pb2nc_NDAS_var_all">
     <exec>&MET_BIN;/pb2nc</exec>
     <env>

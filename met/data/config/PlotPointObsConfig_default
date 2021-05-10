@@ -12,12 +12,21 @@ grid_data = {
 
    field = [];
 
+   regrid = {
+      to_grid    = NONE;
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
    grid_plot_info = {
       color_table   = "MET_BASE/colortables/met_default.ctable";
       plot_min      = 0.0;
       plot_max      = 0.0;
       colorbar_flag = TRUE; 
    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

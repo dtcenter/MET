@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -33,6 +33,8 @@
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
 //   014    04/01/19  Fillmore        Add FCST and OBS units.
 //   015    01/24/20  Halley Gotway   Add aggregate RPS lines.
+//   016    04/12/21  Halley Gotway   MET #1735 Support multiple
+//                    -out_thresh and -out_line_type options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -575,7 +577,22 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for AggrTimeSeriesInfo structure.
+// Code for AggrENSInfo structure
+//
+////////////////////////////////////////////////////////////////////////
+
+void AggrENSInfo::clear() {
+   hdr.clear();
+   ens_pd.clear();
+   me_na.clear();
+   mse_na.clear();
+   me_oerr_na.clear();
+   mse_oerr_na.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for AggrTimeSeriesInfo structure
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2160,35 +2177,12 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          key = job.get_case_info(line);
 
          //
-         // Apply the continuous statistics filtering threshold
-         //
-         if((job.out_line_type.has(stat_cnt_str) ||
-             job.out_line_type.has(stat_sl1l2_str)) &&
-            (job.out_fcst_thresh.n() > 0 ||
-             job.out_obs_thresh.n()  > 0)) {
-
-            SingleThresh fst, ost;
-            if(job.out_fcst_thresh.n() > 0) fst = job.out_fcst_thresh[0];
-            if(job.out_obs_thresh.n()  > 0) ost = job.out_obs_thresh[0];
-
-            if(!check_fo_thresh(cur.fcst, cur.obs, cur.climo_mean, cur.climo_stdev,
-                                fst, ost, job.out_cnt_logic)) {
-               mlog << Debug(4) << "aggr_mpr_lines() -> "
-                    << "skipping forecast ("
-                    << cur.fcst << " " << job.out_fcst_thresh.get_str()
-                    << ") and observation ("
-                    << cur.obs << " " << job.out_obs_thresh.get_str()
-                    << ") matched pair with "
-                    << setlogic_to_string(job.out_cnt_logic)
-                    << " logic.\n";
-               continue;
-            }
-         }
-
-         //
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
+
+            bool center = false;
+            aggr.pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
 
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
@@ -2208,6 +2202,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
+
             m[key] = aggr;
          }
          //
@@ -2514,7 +2509,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   double crps_fcst, crps_climo, v;
+   double crps_emp, crpscl_emp, crps_gaus, crpscl_gaus, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2552,9 +2547,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.ens_pd.clear();
-            aggr.crps_climo_na.clear();
-            aggr.hdr.clear();
+            aggr.clear();
             m[key] = aggr;
          }
 
@@ -2571,12 +2564,16 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Store the current statistics and weight (TOTAL column)
          //
-         m[key].ens_pd.crps_na.add(cur.crps);
+         m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
+         m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
+         m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
+         m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.var_na.add(square(cur.spread));
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
          m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
          m[key].ens_pd.wgt_na.add(cur.total);
+         m[key].ens_pd.skip_ba.add(false);
 
          //
          // Store the summary statistics
@@ -2589,18 +2586,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
                                  bad_data_double :
                                  cur.rmse_oerr * cur.rmse_oerr));
-
-         //
-         // Compute and store climatological CRPS
-         //
-         if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss) &&
-            !is_eq(cur.crpss, 1.0)) {
-            crps_climo = cur.crps / (1.0 - cur.crpss);
-            m[key].crps_climo_na.add(crps_climo);
-         }
-         else {
-            m[key].crps_climo_na.add(bad_data_double);
-         }
 
          //
          // Keep track of the unique header column entries
@@ -2627,17 +2612,20 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       v                           = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
-      crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
-      // Compute aggregated CRPSS
-      if(!is_bad_data(crps_fcst) && !is_bad_data(crps_climo) &&
-         !is_eq(crps_climo, 0.0)) {
-         it->second.ens_pd.crpss = (crps_climo - crps_fcst)/crps_climo;
-      }
-      else {
-         it->second.ens_pd.crpss = bad_data_double;
-      }
+      // Compute aggregated empirical CRPSS
+      it->second.ens_pd.crpss_emp =
+         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) && is_eq(crpscl_emp, 0.0) ?
+         bad_data_double : (crpscl_emp - crps_emp)/crpscl_emp);
+
+      // Compute aggregated Gaussian CRPSS
+      it->second.ens_pd.crpss_gaus =
+         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) && is_eq(crpscl_gaus, 0.0) ?
+         bad_data_double : (crpscl_gaus - crps_gaus)/crpscl_gaus);
 
    } // end for it
 
@@ -2782,8 +2770,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.ens_pd.clear();
-            aggr.hdr.clear();
+            aggr.clear();
             for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
             m[key] = aggr;
          }
@@ -3007,8 +2994,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ORANKData cur;
    ConcatString key;
+   NumArray climo_vals;
    int i, n_valid, n_bin;
-   double esum, esumsq, crps, ign, pit;
+   double esum, esumsq;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -3051,15 +3039,17 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.ens_pd.clear();
+            aggr.clear();
+            bool center = false;
+            aggr.ens_pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
+            aggr.ens_pd.extend(cur.total);
             for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = job.out_bin_size;
             n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
-            aggr.hdr.clear();
             m[key] = aggr;
          }
 
@@ -3068,7 +3058,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m[key].ens_pd.n_ens != cur.n_ens) {
             mlog << Error << "\naggr_orank_lines() -> "
-                 << "the \"N_ENS\" column must remain constant.  "
+                 << "the \"N_ENS\" column must remain constant. "
                  << "Try setting \"-column_eq N_ENS n\".\n\n";
             throw(1);
          }
@@ -3078,8 +3068,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo,
-                                    bad_data_double, default_grid_weight);
+         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo_mean,
+                                    cur.climo_stdev, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
@@ -3102,11 +3092,19 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.esumsq_na.add(esumsq);
          m[key].ens_pd.v_na.add(n_valid);
 
-         // Compute CRPS, IGN, and PIT for the current point
-         compute_crps_ign_pit(cur.obs, cur.ens_na, crps, ign, pit);
-         m[key].ens_pd.crps_na.add(crps);
-         m[key].ens_pd.ign_na.add(ign);
-         m[key].ens_pd.pit_na.add(pit);
+         // Derive ensemble from climo mean and standard deviation
+         derive_climo_vals(m[key].ens_pd.cdf_info,
+                           cur.climo_mean, cur.climo_stdev, climo_vals);
+
+         // Store empirical CRPS stats
+         m[key].ens_pd.crps_emp_na.add(compute_crps_emp(cur.obs, cur.ens_na));
+         m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, climo_vals));
+
+         // Store Gaussian CRPS stats
+         m[key].ens_pd.crps_gaus_na.add(compute_crps_gaus(cur.obs, cur.ens_mean, cur.spread));
+         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
+         m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
+         m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
          //
          // Increment the RHIST counts
@@ -3348,23 +3346,20 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CTSInfo &cts_info) {
+                int i_thresh, CTSInfo &cts_info) {
    int i;
-   int n = info.pd.f_na.n();
-   SingleThresh ft = job.out_fcst_thresh[0];
-   SingleThresh ot = job.out_obs_thresh[0];
 
    //
    // Initialize
    //
    cts_info.clear();
-   cts_info.fthresh = ft;
-   cts_info.othresh = ot;
+   cts_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cts_info.othresh = job.out_obs_thresh[i_thresh];
 
    //
    // Populate the contingency table
    //
-   for(i=0; i<n; i++) {
+   for(i=0; i<info.pd.n_obs; i++) {
       cts_info.add(info.pd.f_na[i], info.pd.o_na[i],
                    info.pd.cmn_na[i], info.pd.csd_na[i]);
    }
@@ -3375,14 +3370,16 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CTSInfo &cts_info, const char *tmp_dir,
-                gsl_rng *rng_ptr) {
+                int i_thresh, CTSInfo &cts_info,
+                const char *tmp_dir, gsl_rng *rng_ptr) {
    CTSInfo *cts_info_ptr = (CTSInfo *) 0;
 
    //
    // Initialize
    //
    cts_info.clear();
+   cts_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cts_info.othresh = job.out_obs_thresh[i_thresh];
 
    //
    // If there are no matched pairs to process, return
@@ -3394,12 +3391,6 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    cts_info.allocate_n_alpha(1);
    cts_info.alpha[0] = job.out_alpha;
-
-   //
-   // Store the thresholds
-   //
-   cts_info.fthresh = job.out_fcst_thresh[0];
-   cts_info.othresh = job.out_obs_thresh[0];
 
    //
    // Compute the counts, stats, normal confidence intervals, and
@@ -3433,10 +3424,6 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    mcts_info.clear();
-
-   //
-   // Setup
-   //
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
@@ -3459,18 +3446,14 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    mcts_info.clear();
+   mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.set_fthresh(job.out_fcst_thresh);
+   mcts_info.set_othresh(job.out_obs_thresh);
 
    //
    // If there are no matched pairs to process, return
    //
    if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
-
-   //
-   // Setup
-   //
-   mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
-   mcts_info.set_fthresh(job.out_fcst_thresh);
-   mcts_info.set_othresh(job.out_obs_thresh);
 
    //
    // Store the out_alpha value
@@ -3501,8 +3484,9 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
-                CNTInfo &cnt_info, const char *tmp_dir,
+                int i_thresh, CNTInfo &cnt_info, const char *tmp_dir,
                 gsl_rng *rng_ptr) {
+   PairDataPoint pd_thr;
    bool precip_flag = false;
    NumArray w_na;
 
@@ -3510,11 +3494,27 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    cnt_info.clear();
+   cnt_info.fthresh = job.out_fcst_thresh[i_thresh];
+   cnt_info.othresh = job.out_obs_thresh[i_thresh];
+
+   // Apply continuous filtering thresholds to subset pairs
+   pd_thr = info.pd.subset_pairs_cnt_thresh(
+               job.out_fcst_thresh[i_thresh],
+               job.out_obs_thresh[i_thresh],
+               job.out_cnt_logic);
 
    //
    // If there are no matched pairs to process, return
    //
-   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) {
+      mlog << Warning << "\nmpr_to_cnt() -> "
+           << "no MPR lines retained for -out_fcst_thresh "
+           << job.out_fcst_thresh[i_thresh].get_str() << " -out_obs_thresh "
+           << job.out_obs_thresh[i_thresh].get_str() << " -out_cnt_logic "
+           << setlogic_to_string(job.out_cnt_logic)
+           << "\n\n";
+      return;
+   }
 
    //
    // Set the precip flag based on fcst_var and obs_var
@@ -3534,13 +3534,13 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    if(job.boot_interval == boot_bca_flag) {
 
-      compute_cnt_stats_ci_bca(rng_ptr, info.pd,
+      compute_cnt_stats_ci_bca(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
 
-      compute_cnt_stats_ci_perc(rng_ptr, info.pd,
+      compute_cnt_stats_ci_perc(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep, job.boot_rep_prop,
          cnt_info, tmp_dir);
    }
@@ -3551,19 +3551,42 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
-                 SL1L2Info &s_info) {
+                 int i_thresh, SL1L2Info &s_info) {
    int i;
-   int n = info.pd.f_na.n();
    int scount, sacount;
    double f, o, c;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
    double abs_err_sum;
+   PairDataPoint pd_thr;
 
    //
-   // Initialize the SL1L2Info object and counts
+   // Initialize
    //
    s_info.clear();
+
+   // Apply continuous filtering thresholds to subset pairs
+   pd_thr = info.pd.subset_pairs_cnt_thresh(
+               job.out_fcst_thresh[i_thresh],
+               job.out_obs_thresh[i_thresh],
+               job.out_cnt_logic);
+
+   //
+   // If there are no matched pairs to process, return
+   //
+   if(pd_thr.f_na.n() == 0 || pd_thr.o_na.n() == 0) {
+      mlog << Warning << "\nmpr_to_psum() -> "
+           << "no MPR lines retained for -out_fcst_thresh "
+           << job.out_fcst_thresh[i_thresh].get_str() << " -out_obs_thresh "
+           << job.out_obs_thresh[i_thresh].get_str() << " -out_cnt_logic "
+           << setlogic_to_string(job.out_cnt_logic)
+           << "\n\n";
+      return;
+   }
+
+   //
+   // Initialize counts
+   //
    scount = sacount = 0;
    f_sum  = o_sum  =  ff_sum  = oo_sum  = fo_sum  = 0.0;
    fa_sum = oa_sum =  ffa_sum = ooa_sum = foa_sum = 0.0;
@@ -3572,14 +3595,14 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Update the partial sums
    //
-   for(i=0; i<n; i++) {
+   for(i=0; i<pd_thr.n_obs; i++) {
 
       //
       // Update the counts for this matched pair
       //
-      f = info.pd.f_na[i];
-      o = info.pd.o_na[i];
-      c = info.pd.cmn_na[i];
+      f = pd_thr.f_na[i];
+      o = pd_thr.o_na[i];
+      c = pd_thr.cmn_na[i];
 
       f_sum       += f;
       o_sum       += o;
@@ -3650,7 +3673,7 @@ void mpr_to_pct(STATAnalysisJob &job, const AggrMPRInfo &info,
    pct_info.alpha[0] = job.out_alpha;
 
    if(job.out_line_type.has(stat_pstd_str)) pstd_flag = 1;
-   else                                   pstd_flag = 0;
+   else                                     pstd_flag = 0;
 
    //
    // Compute the probabilistic counts and statistics

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -378,16 +378,16 @@ void process_track_files(const StringArray& files,
     } // End loop over files
 
     // Check the number of tracks: exit for 0 and warning for > 1
-    if(tracks.n_tracks() == 0) {
+    if(tracks.n() == 0) {
         mlog << Error << "\nprocess_track_files() -> "
              << "no tracks retained! Adjust the configuration file "
              << "filtering options to select a single track.\n\n";
         exit(1);
     }
     // Issue warning if more than one track found
-    else if(tracks.n_tracks() > 1) {
+    else if(tracks.n() > 1) {
         mlog << Warning << "\nprocess_track_files() -> "
-             << "multiple tracks found (" << tracks.n_tracks()
+             << "multiple tracks found (" << tracks.n()
              << ")! Using the first one. Adjust the configuration file "
              << "filtering options to select a single track.\n\n";
     }

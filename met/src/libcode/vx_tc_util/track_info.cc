@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,6 +90,8 @@ void TrackInfo::clear() {
    InitTime        = (unixtime) 0;
    MinValidTime    = (unixtime) 0;
    MaxValidTime    = (unixtime) 0;
+   MinWarmCore     = (unixtime) 0;
+   MaxWarmCore     = (unixtime) 0;
    TrackLines.clear();
 
    clear_points();
@@ -124,9 +126,11 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << Technique.contents() << "\"\n";
    out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
-   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\n";
+   out << prefix << "InitTime        = \"" << (InitTime     > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text()     : na_str) << "\n";
    out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str) << "\n";
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
+   out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
+   out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
    out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
@@ -162,6 +166,8 @@ ConcatString TrackInfo::serialize() const {
      << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str)
      << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str)
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
+     << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
+     << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
      << ", NTrackLines = " << TrackLines.n_elements();
@@ -209,6 +215,8 @@ void TrackInfo::assign(const TrackInfo &t) {
    InitTime        = t.InitTime;
    MinValidTime    = t.MinValidTime;
    MaxValidTime    = t.MaxValidTime;
+   MinWarmCore     = t.MinWarmCore;
+   MaxWarmCore     = t.MaxWarmCore;
    TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
@@ -291,7 +299,7 @@ void TrackInfo::initialize(const ATCFTrackLine &l, bool check_anly) {
    MinValidTime = MaxValidTime = l.valid();
 
    // Create the storm id
-   set_storm_id();
+   set_storm_id(l.storm_id().c_str());
 
    return;
 }
@@ -377,6 +385,13 @@ int TrackInfo::duration() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackInfo::warm_core_dur() const {
+   return(MaxWarmCore == 0 || MinWarmCore == 0 ? bad_data_int :
+          MaxWarmCore - MinWarmCore);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -402,6 +417,14 @@ void TrackInfo::add(const TrackPoint &p) {
    if(MaxValidTime == (unixtime) 0 || p.valid() > MaxValidTime)
       MaxValidTime = p.valid();
 
+   // Check the warm core time range
+   if(p.warm_core()) {
+      if(MinWarmCore == (unixtime) 0 || p.valid() < MinWarmCore)
+         MinWarmCore = p.valid();
+      if(MaxWarmCore == (unixtime) 0 || p.valid() > MaxWarmCore)
+         MaxWarmCore = p.valid();
+   }
+
    return;
 }
 
@@ -424,8 +447,8 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    else if(StormName.length() > 0 && name.length() > 0 &&
            StormName != name) {
       mlog << Debug(4)
-           << "Updating storm name from \"" << StormName << "\" to \""
-           << name << "\" for " << StormId << ".\n";
+           << "Updating " << StormId << " storm name from \""
+           << StormName << "\" to \"" << name << "\".\n";
       StormName = name;
    }
 
@@ -462,6 +485,14 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
       MinValidTime = l.valid();
    if(MaxValidTime == (unixtime) 0 || l.valid() > MaxValidTime)
       MaxValidTime = l.valid();
+
+   // Check the warm core time range
+   if(l.warm_core()) {
+      if(MinWarmCore == (unixtime) 0 || l.valid() < MinWarmCore)
+         MinWarmCore = l.valid();
+      if(MaxWarmCore == (unixtime) 0 || l.valid() > MaxWarmCore)
+         MaxWarmCore = l.valid();
+   }
 
    // Store the ATCFTrackLine that was just added
    if(check_dup) TrackLines.add(l.get_line());
@@ -624,8 +655,6 @@ TrackInfoArray & TrackInfoArray::operator=(const TrackInfoArray & t) {
 
 void TrackInfoArray::init_from_scratch() {
 
-   Track = (TrackInfo *) 0;
-
    clear();
 
    return;
@@ -635,8 +664,7 @@ void TrackInfoArray::init_from_scratch() {
 
 void TrackInfoArray::clear() {
 
-   if(Track) { delete [] Track; Track = (TrackInfo *) 0; }
-   NTracks = NAlloc  = 0;
+   Track.clear();
 
    return;
 }
@@ -647,10 +675,9 @@ void TrackInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
-   out << prefix << "NTracks = " << NTracks << "\n";
-   out << prefix << "NAlloc  = " << NAlloc << "\n";
+   out << prefix << "NTracks = " << Track.size() << "\n";
 
-   for(i=0; i<NTracks; i++) {
+   for(i=0; i<Track.size(); i++) {
       out << prefix << "TrackInfo[" << i+1 << "]:" << "\n";
       Track[i].dump(out, indent_depth+1);
    }
@@ -667,8 +694,7 @@ ConcatString TrackInfoArray::serialize() const {
    ConcatString s;
 
    s << "TrackInfoArray: "
-     << "NTracks = " << NTracks
-     << ", NAlloc = " << NAlloc;
+     << "NTracks = " << n();
 
    return(s);
 
@@ -683,7 +709,7 @@ ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
 
    s << prefix << serialize() << ", Tracks:\n";
 
-   for(i=0; i<NTracks; i++)
+   for(i=0; i<Track.size(); i++)
       s << Track[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return(s);
@@ -697,55 +723,7 @@ void TrackInfoArray::assign(const TrackInfoArray &t) {
 
    clear();
 
-   if(t.NTracks == 0) return;
-
-   extend(t.NTracks);
-
-   for(i=0; i<t.NTracks; i++) Track[i] = t.Track[i];
-
-   NTracks = t.NTracks;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TrackInfoArray::extend(int n, bool exact) {
-   int j, k;
-   TrackInfo *new_info = (TrackInfo *) 0;
-
-   // Check if enough memory is already allocated
-   if(NAlloc >= n) return;
-
-   // Compute the allocation size 
-   if(!exact) {
-      k = n/TrackInfoArrayAllocInc;
-      if(n%TrackInfoArrayAllocInc) k++;
-      n = k*TrackInfoArrayAllocInc;
-   }
-
-   // Allocate a new TrackInfo array of the required length
-   new_info = new TrackInfo [n];
-
-   if(!new_info) {
-      mlog << Error
-           << "\nvoid TrackInfoArray::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   // Copy the array contents and delete the old one
-   if(Track) {
-      for(j=0; j<NTracks; j++) new_info[j] = Track[j];
-      delete [] Track;  Track = (TrackInfo *) 0;
-   }
-
-   // Point to the new array
-   Track     = new_info;
-   new_info = (TrackInfo *) 0;
-
-   // Store the allocated length
-   NAlloc = n;
+   for(i=0; i<t.n(); i++) Track.push_back(t[i]);
 
    return;
 }
@@ -755,7 +733,7 @@ void TrackInfoArray::extend(int n, bool exact) {
 const TrackInfo & TrackInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= NTracks)) {
+   if((n < 0) || (n >= Track.size())) {
       mlog << Error
            << "\nTrackInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
@@ -769,8 +747,7 @@ const TrackInfo & TrackInfoArray::operator[](int n) const {
 
 void TrackInfoArray::add(const TrackInfo &t) {
 
-   extend(NTracks + 1, false);
-   Track[NTracks++] = t;
+   Track.push_back(t);
 
    return;
 }
@@ -780,7 +757,7 @@ void TrackInfoArray::add(const TrackInfo &t) {
 void TrackInfoArray::set(int n, const TrackInfo &t) {
 
    // Check range
-   if((n < 0) || (n >= NTracks)) {
+   if((n < 0) || (n >= Track.size())) {
       mlog << Error
            << "\nTrackInfoArray::set(int, const TrackInfo &) -> "
            << "range check error for index value " << n << "\n\n";
@@ -811,7 +788,7 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
    }
 
    // Add ATCFTrackLine to an existing track if possible
-   for(i=NTracks-1; i>=0; i--) {
+   for(i=Track.size()-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
          status = Track[i].add(l, check_dup, check_anly);
@@ -821,8 +798,10 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
 
    // Otherwise, create a new track
    if(!found) {
-      extend(NTracks + 1, false);
-      status = Track[NTracks++].add(l, check_dup, check_anly);
+      TrackInfo t;
+      t.add(l, check_dup, check_anly);
+      Track.push_back(t);
+      status = true;
    }
 
    return(status);
@@ -835,7 +814,7 @@ bool TrackInfoArray::has(const ATCFTrackLine &l) const {
    int i;
 
    // Check if the TrackInfo data matches
-   for(i=NTracks-1; i>=0; i--) {
+   for(i=Track.size()-1; i>=0; i--) {
       if(Track[i].has(l)) {
          found = true;
          break;
@@ -844,6 +823,24 @@ bool TrackInfoArray::has(const ATCFTrackLine &l) const {
 
    // Return whether the TrackInfo matches
    return(found);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
+   bool status = false;
+   int i;
+
+   // Erase all tracks with this storm id
+   for(i=0; i<Track.size(); i++) {
+      if(Track[i].storm_id() == s) {
+         Track.erase(Track.begin()+i);
+         i--;
+         status = true;
+      }
+   }
+
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -868,7 +865,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    double     lon_range, lon_shift, lon_avg;
 
    // Check for at least one track
-   if(tracks.n_tracks() == 0) {
+   if(tracks.n() == 0) {
       mlog << Error
            << "\nTrackInfoArray::consensus() -> "
            << "cannot compute a consensus for zero tracks!\n\n";
@@ -885,7 +882,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_storm_id();
 
    // Loop through the tracks and build a list of lead times
-   for(i=0; i<tracks.n_tracks(); i++) {
+   for(i=0; i<tracks.n(); i++) {
 
       // Error out if these elements change
       if(tavg.basin()   != tracks[i].basin()   ||
@@ -931,7 +928,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
-      for(j=0; j<tracks.n_tracks(); j++) {
+      for(j=0; j<tracks.n(); j++) {
 
          // Get the index of the TrackPoint for this lead time
          i_pnt = tracks.Track[j].lead_index(nint(lead_list[i]));

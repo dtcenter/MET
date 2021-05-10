@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -39,6 +39,8 @@
 //   010    07/26/18  Halley Gotway  Support masks from gen_vx_mask.
 //   011    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
+//   012    04/25/21  Halley Gotway  Replace pickle files for temporary
+//                    ascii.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -635,8 +637,8 @@ void process_job(const char * jobstring, int n_job) {
    ConcatString full_jobstring;
    MetConfig go_conf;
 
-   mlog << Debug(4) << "process_job(jobstring):"
-        << jobstring << "\"\n";
+   mlog << Debug(4) << "process_job(jobstring): "
+        << jobstring << "\n";
 
    //
    // Initialize to the default job

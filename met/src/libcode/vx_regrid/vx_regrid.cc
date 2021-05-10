@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -85,6 +85,24 @@ out.censor(info.censor_thresh, info.censor_val);
    //
 
 return ( out );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DataPlane met_regrid_nearest (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid)
+
+{
+
+RegridInfo ri;
+ri.enable = true;
+ri.method = InterpMthd_Nearest;
+ri.width  = 1;
+ri.shape  = GridTemplateFactory::GridTemplate_Square;
+
+return ( met_regrid_generic(from_data, from_grid, to_grid, ri) );
 
 }
 

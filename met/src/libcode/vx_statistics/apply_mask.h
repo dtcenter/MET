@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,8 @@ static const char   poly_str_delim[]      = "{}";
 ////////////////////////////////////////////////////////////////////////
 
 extern Grid parse_vx_grid(const RegridInfo, const Grid *, const Grid *);
+
+extern Grid parse_grid_string(const char *);
 
 extern void parse_grid_weight(const Grid &, const GridWeightType,
                               DataPlane &);

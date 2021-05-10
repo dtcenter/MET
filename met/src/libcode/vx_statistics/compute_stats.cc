@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -743,7 +743,8 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+      else         climo_prob = derive_climo_prob(pd.cdf_info,
+                                                  pd.cmn_na, pd.csd_na,
                                                   pct_info.othresh);
    }
 
@@ -1306,12 +1307,23 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
    ecnt_mean.n_pair = na.sum();
 
    // Compute unweighted mean for each statistic
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps_emp);
+   ecnt_mean.crps_emp = na.mean();
 
-   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps);
-   ecnt_mean.crps = na.mean();
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpscl_emp);
+   ecnt_mean.crpscl_emp = na.mean();
 
-   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss);
-   ecnt_mean.crpss = na.mean();
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss_emp);
+   ecnt_mean.crpss_emp = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps_gaus);
+   ecnt_mean.crps_gaus = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpscl_gaus);
+   ecnt_mean.crpscl_gaus = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss_gaus);
+   ecnt_mean.crpss_gaus = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].ign);
    ecnt_mean.ign = na.mean();

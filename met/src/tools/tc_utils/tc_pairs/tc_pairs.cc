@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -251,7 +251,7 @@ void process_command_line(int argc, char **argv) {
 
    // Load the distance to land data file
    if(dland_dp.is_empty()) {
-      load_dland(conf_info.DLandFile, dland_grid, dland_dp);
+      load_tc_dland(conf_info.DLandFile, dland_grid, dland_dp);
    }
 
    return;
@@ -296,7 +296,7 @@ void process_bdecks(TrackInfoArray &bdeck_tracks) {
                        (conf_info.AnlyTrack == TrackType_BDeck ||
                         conf_info.AnlyTrack == TrackType_Both));
    mlog << Debug(2)
-        << "Found " << bdeck_tracks.n_tracks() << " BDECK track(s).\n";
+        << "Found " << bdeck_tracks.n() << " BDECK track(s).\n";
 
    return;
 }
@@ -357,7 +357,7 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
 
    // Filter the ADECK tracks using the config file information
    mlog << Debug(2)
-        << "Filtering " << adeck_tracks.n_tracks()
+        << "Filtering " << adeck_tracks.n()
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
 
@@ -366,12 +366,12 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    //
 
    mlog << Debug(2)
-        << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
-        << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
+        << "Matching " << adeck_tracks.n() << " ADECK tracks to "
+        << bdeck_tracks.n() << " BDECK tracks.\n";
 
-   for(i=0; i<adeck_tracks.n_tracks(); i++) {
+   for(i=0; i<adeck_tracks.n(); i++) {
 
-      for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
+      for(j=0,n_match=0; j<bdeck_tracks.n(); j++) {
 
          // Check if the BDECK track matches the current ADECK track
          if(adeck_tracks[i].is_match(bdeck_tracks[j])) {
@@ -440,11 +440,11 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Matching " << edeck_probs.n_probs()
         << " EDECK probabilities to "
-        << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
+        << bdeck_tracks.n() << " BDECK tracks.\n";
 
    for(i=0; i<edeck_probs.n_probs(); i++) {
 
-      for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
+      for(j=0,n_match=0; j<bdeck_tracks.n(); j++) {
 
          // Check if the BDECK track matches the current EDECK
          if(edeck_probs[i]->is_match(bdeck_tracks[j])) {
@@ -599,7 +599,7 @@ void process_track_files(const StringArray &files,
 
    // Dump out the track information
    mlog << Debug(3)
-        << "Identified " << tracks.n_tracks() << " track(s).\n";
+        << "Identified " << tracks.n() << " track(s).\n";
 
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
@@ -608,9 +608,9 @@ void process_track_files(const StringArray &files,
    }
    // Dump out track info
    else {
-      for(i=0; i<tracks.n_tracks(); i++) {
+      for(i=0; i<tracks.n(); i++) {
          mlog << Debug(4)
-              << "[Track " << i+1 << " of " << tracks.n_tracks()
+              << "[Track " << i+1 << " of " << tracks.n()
               << "] " << tracks[i].serialize() << "\n";
       }
    }
@@ -782,7 +782,7 @@ void filter_tracks(TrackInfoArray &tracks) {
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
    // basin, cyclone, initialization time, and initialization hour.
-   for(i=0; i<t.n_tracks(); i++) {
+   for(i=0; i<t.n(); i++) {
 
       // Check storm name
       if(conf_info.StormName.n_elements() > 0 &&
@@ -880,13 +880,13 @@ void filter_tracks(TrackInfoArray &tracks) {
 
    // Print summary filtering info
    mlog << Debug(3)
-        << "Total tracks read                = " << t.n_tracks()      << "\n"
-        << "Total tracks kept                = " << tracks.n_tracks() << "\n"
-        << "Rejected for storm name          = " << n_name            << "\n"
-        << "Rejected for valid time          = " << n_vld             << "\n"
-        << "Rejected for required lead times = " << n_req_lead        << "\n"
-        << "Rejected for init mask           = " << n_mask_init       << "\n"
-        << "Rejected for valid mask          = " << n_mask_vld        << "\n";
+        << "Total tracks read                = " << t.n()       << "\n"
+        << "Total tracks kept                = " << tracks.n()  << "\n"
+        << "Rejected for storm name          = " << n_name      << "\n"
+        << "Rejected for valid time          = " << n_vld       << "\n"
+        << "Rejected for required lead times = " << n_req_lead  << "\n"
+        << "Rejected for init mask           = " << n_mask_init << "\n"
+        << "Rejected for valid mask          = " << n_mask_vld  << "\n";
 
    return;
 }
@@ -949,7 +949,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRIRW) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info
@@ -1032,7 +1032,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    if(conf_info.Interp12 == Interp12Type_None) return;
 
    // Loop through the track array and store case information
-   for(i=0; i<tracks.n_tracks(); i++) {
+   for(i=0; i<tracks.n(); i++) {
 
       // Build track case information as AMODEL:STORMID:INIT
       track_case << cs_erase
@@ -1044,7 +1044,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    }
 
    // Loop through the track array and apply the interp12 logic
-   for(i=0, n_add=0, n_replace=0; i<tracks.n_tracks(); i++) {
+   for(i=0, n_add=0, n_replace=0; i<tracks.n(); i++) {
 
       // Skip AMODEL names not ending in '2' or '3'
      c = tracks[i].technique()[tracks[i].technique().length() - 1];
@@ -1128,7 +1128,7 @@ int derive_consensus(TrackInfoArray &tracks) {
    if(conf_info.NConsensus == 0) return(0);
 
    // Loop through the tracks to build a list of cases
-   for(i=0; i<tracks.n_tracks(); i++) {
+   for(i=0; i<tracks.n(); i++) {
 
       // Case defined as: Basin, Cyclone, InitTime
       cur_case.erase();
@@ -1170,7 +1170,7 @@ int derive_consensus(TrackInfoArray &tracks) {
             }
 
             // Loop through the tracks looking for a match
-            for(l=0, found=false; l<tracks.n_tracks(); l++) {
+            for(l=0, found=false; l<tracks.n(); l++) {
 
                // If the consenus member was found for this case,
                // add it to the TrackInfoArray object
@@ -1216,12 +1216,12 @@ int derive_consensus(TrackInfoArray &tracks) {
          if(skip) continue;
 
          // Check that the required number of tracks were found
-         if(con_tracks.n_tracks() < conf_info.Consensus[j].MinReq) {
+         if(con_tracks.n() < conf_info.Consensus[j].MinReq) {
             mlog << Debug(4)
                  << "[Case " << i+1 << "] For case \"" << case_list[i]
                  << "\" skipping consensus model \"" << conf_info.Consensus[j].Name
                  << "\" since the minimum number of required members were not found ("
-                 << con_tracks.n_tracks() << " < "
+                 << con_tracks.n() << " < "
                  << conf_info.Consensus[j].MinReq << ").\n";
             continue;
          }
@@ -1255,7 +1255,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 int derive_lag(TrackInfoArray &tracks) {
-   int i, j, k, s, n_tracks;
+   int i, j, k, s;
    TrackInfo new_track;
    TrackPoint new_point;
    ConcatString lag_model;
@@ -1263,9 +1263,6 @@ int derive_lag(TrackInfoArray &tracks) {
 
    // If no time lags are requested, nothing to do
    if(conf_info.LagTime.n_elements() == 0) return(0);
-
-   // Store the input number of tracks to process
-   n_tracks = tracks.n_tracks();
 
    // Loop through the time lags to be applied
    for(i=0; i<conf_info.LagTime.n_elements(); i++) {
@@ -1278,7 +1275,7 @@ int derive_lag(TrackInfoArray &tracks) {
       s = nint(conf_info.LagTime[i]);
 
       // Loop through the tracks
-      for(j=0; j<n_tracks; j++) {
+      for(j=0; j<tracks.n(); j++) {
 
          // Make a copy of the current track
          new_track = tracks[j];
@@ -1346,7 +1343,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
         << conf_info.OperBaseline.n_elements() << " method(s).\n";
 
    // Loop over the ADECK tracks
-   for(i=0; i<atracks.n_tracks(); i++) {
+   for(i=0; i<atracks.n(); i++) {
 
       // Define the current case as stormid and initialization time
       cur_case << cs_erase
@@ -1375,7 +1372,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
         << case_list.n_elements() << " cases.\n";
 
    // Loop over the BDECK tracks
-   for(i=0; i<btracks.n_tracks(); i++) {
+   for(i=0; i<btracks.n(); i++) {
 
       // Only derive baselines from the BEST tracks
       if(!btracks[i].is_best_track()) continue;
@@ -1743,7 +1740,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
                        NumArray &altk_err, NumArray &crtk_err) {
    int i, i_adeck, i_bdeck, status;
    unixtime ut, ut_min, ut_max;
-   int ut_inc, n_ut;
+   int bd_inc, ut_inc, n_ut;
    float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
    float crtk[mxp], altk[mxp];
    double x, y, tk, lon_min, lon_max;
@@ -1763,8 +1760,10 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    // Determine the valid increment
    // For BEST tracks, use a constant time step
    // For non-BEST tracks, select the most common BDECK time step
-   if(bdeck.is_best_track()) ut_inc = best_track_time_step;
-   else                      ut_inc = bdeck.valid_inc();
+   // Check for 0 and bad data
+   bd_inc = bdeck.valid_inc();
+   ut_inc = (bdeck.is_best_track() || bd_inc == 0 || is_bad_data(bd_inc) ?
+             best_track_time_step : bd_inc);
 
    // Round the valid times to the nearest valid increment
    if(ut_min%ut_inc != 0) ut_min = (ut_min/ut_inc + 1)*ut_inc;

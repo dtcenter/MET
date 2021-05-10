@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -143,11 +143,8 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
    char *save_ptr = 0;
    const char *method_name = "VarInfoNcCF::set_magic() -> ";
 
-   // Validate the magic string
-   VarInfo::set_magic(nstr, lstr);
-
    // Store the magic string
-   MagicStr << cs_erase << nstr << lstr;
+   VarInfo::set_magic(nstr, lstr);
 
    // Set the requested name and default output name
    set_req_name(nstr.c_str());

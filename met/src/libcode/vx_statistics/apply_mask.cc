@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,10 +57,6 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    // Otherwise, process regridding logic
    else {
 
-      // Parse info.name as a white-space separated string
-      StringArray sa;
-      sa.parse_wsss(info.name);
-
       // Verify on the forecast grid
       if(info.field == FieldType_Fcst) {
          mlog << Debug(3)
@@ -73,33 +69,10 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
               << "Use the observation grid.\n";
          vx_grid = *ogrid;
       }
-      // Search for a named grid
-      else if(sa.n() == 1 && find_grid_by_name(info.name.c_str(), vx_grid)) {
-         mlog << Debug(3)
-              << "Use the grid named \"" << info.name << "\".\n";
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, vx_grid)) {
-         mlog << Debug(3)
-              << "Use the grid defined by string \"" << info.name << "\".\n";
-      }
-      // Extract the grid from a gridded data file
+      // Parse a named grid, grid specification string,
+      // or gridded data file
       else {
-
-         mlog << Debug(3)
-              << "Use the grid defined by file \"" << info.name << "\".\n";
-
-         Met2dDataFileFactory mtddf_factory;
-         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-
-         // Attempt to open the data file
-         if(!(mtddf = mtddf_factory.new_met_2d_data_file(info.name.c_str()))) {
-            mlog << Error << "\nparse_vx_grid() -> "
-                 << "can't open file \"" << info.name << "\"\n\n";
-            exit(1);
-         }
-         vx_grid = mtddf->grid();
-         delete mtddf;
+         parse_grid_mask(info.name, vx_grid);
       }
    }
 
@@ -107,6 +80,51 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
         << "Grid Definition: " << vx_grid.serialize() << "\n";
 
    return(vx_grid);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+Grid parse_grid_string(const char *grid_str) {
+   Grid grid;
+   StringArray sa;
+
+   // Parse as a white-space separated string
+   sa.parse_wsss(grid_str);
+
+   // Search for a named grid
+   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+      mlog << Debug(3) << "Use the grid named \""
+           << grid_str << "\".\n";
+   }
+   // Parse grid definition
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3) << "Use the grid defined by string \""
+           << grid_str << "\".\n";
+   }
+   // Extract the grid from a gridded data file
+   else {
+      mlog << Debug(3) << "Use the grid defined by file \""
+           << grid_str << "\".\n";
+
+      Met2dDataFileFactory m_factory;
+      Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
+
+      // Open the data file
+      if(!(met_ptr = m_factory.new_met_2d_data_file(grid_str))) {
+         mlog << Error << "\nparse_grid_string() -> "
+              << "can't open file \"" << grid_str
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Store the grid
+      grid = met_ptr->grid();
+
+      // Cleanup
+      if(met_ptr) { delete met_ptr; met_ptr = 0; }
+   }
+
+   return(grid);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -209,25 +227,40 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
    // Check for empty input string
    if(mask_grid_str.empty()) return;
 
-   Met2dDataFileFactory factory;
-   Met2dDataFile * datafile = (Met2dDataFile *) 0;
+   // Parse mask_grid_str as a white-space separated string
+   StringArray sa;
+   sa.parse_wsss(mask_grid_str);
+      
+   // Named grid
+   if(sa.n() == 1 && find_grid_by_name(mask_grid_str.c_str(), grid)) {
+      mlog << Debug(3)
+           << "Use the grid named \"" << mask_grid_str << "\".\n";
+   }
+   // Grid specification string
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3)
+           << "Use the grid defined by string \"" << mask_grid_str
+           << "\".\n";
+   }
+   // Extract the grid from a gridded data file
+   else {
+   
+      mlog << Debug(3)
+           << "Use the grid defined by file \""
+           << mask_grid_str << "\".\n";
 
-   // First, try to find the grid by name.
-   if(!find_grid_by_name(mask_grid_str.c_str(), grid)) {
+      Met2dDataFileFactory mtddf_factory;
+      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
-      // If that doesn't work, try to open a data file.
-      datafile = factory.new_met_2d_data_file(replace_path(mask_grid_str.c_str()).c_str());
-
-      if(!datafile) {
-        mlog << Error << "\nparse_grid_mask() -> "
-             << "can't open data file \"" << mask_grid_str << "\"\n\n";
-        exit(1);
+      // Attempt to open the data file
+      if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+                      replace_path(mask_grid_str.c_str()).c_str()))) {
+         mlog << Error << "\nparse_grid_mask() -> "
+              << "can't open file \"" << mask_grid_str << "\"\n\n";
+         exit(1);
       }
-
-      // Store the data file's grid
-      grid = datafile->grid();
-
-      delete datafile; datafile = (Met2dDataFile *) 0;
+      grid = mtddf->grid();
+      delete mtddf;
    }
 
    return;
@@ -281,18 +314,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
       // Regrid, if necessary, using nearest neighbor.
       if(!(mask_grid == grid)) {
 
-         RegridInfo ri;
-         ri.enable = true;
-         ri.method = InterpMthd_Nearest;
-         ri.width  = 1;
-         ri.shape  = GridTemplateFactory::GridTemplate_Square;
-
          mlog << Debug(2)
               << "Regridding mask grid to the verification grid using nearest "
               << "neighbor interpolation:\n"
               << mask_grid.serialize() << "!=\n" << grid.serialize() << "\n";
 
-         mask_dp = met_regrid(mask_dp, mask_grid, grid, ri);
+         mask_dp = met_regrid_nearest(mask_dp, mask_grid, grid);
       }
    }
 
@@ -346,7 +373,7 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Parse the poly mask information.  If it's a gridded data file,
+// Parse the poly mask information. If it's a gridded data file,
 // return the masking grid, mask plane, and the name of the mask.
 // If not, return the polyline object.
 //

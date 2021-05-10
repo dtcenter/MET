@@ -4,3 +4,4 @@ tc_stat
 .deps
 Makefile
 Makefile.in
+*.dSYM

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -347,10 +347,15 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.total  = atoi(l.get_item("TOTAL"));
    e_data.n_ens  = atof(l.get_item("N_ENS"));
 
-   e_data.crps   = atof(l.get_item("CRPS"));
-   e_data.crpss  = atof(l.get_item("CRPSS"));
-   e_data.ign    = atof(l.get_item("IGN"));
+   e_data.crps_emp   = atof(l.get_item("CRPS_EMP"));
+   e_data.crpscl_emp = atof(l.get_item("CRPSCL_EMP"));
+   e_data.crpss_emp  = atof(l.get_item("CRPSS_EMP"));
 
+   e_data.crps_gaus   = atof(l.get_item("CRPS"));
+   e_data.crpscl_gaus = atof(l.get_item("CRPSCL"));
+   e_data.crpss_gaus  = atof(l.get_item("CRPSS"));
+
+   e_data.ign    = atof(l.get_item("IGN"));
    e_data.me     = atof(l.get_item("ME"));
    e_data.rmse   = atof(l.get_item("RMSE"));
    e_data.spread = atof(l.get_item("SPREAD"));
@@ -456,8 +461,7 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_orank_line(STATLine &l, ORANKData &o_data) {
-   int i;
-   char col_str[max_str_len];
+   int i, ens1;
 
    o_data.total     = atoi(l.get_item("TOTAL"));
    o_data.index     = atoi(l.get_item("INDEX"));
@@ -475,19 +479,28 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.n_ens     = atoi(l.get_item("N_ENS"));
 
    // Parse out ENS_i
-   o_data.ens_na.clear();
+   o_data.ens_na.erase();
+   ens1 = l.get_offset("ENS_1");
    for(i=0; i<o_data.n_ens; i++) {
-      snprintf(col_str, sizeof(col_str), "ENS_%i", i+1);
-      o_data.ens_na.add(atof(l.get_item(col_str)));
+      o_data.ens_na.add(atof(l.get_item(ens1+i)));
    }
 
    o_data.obs_qc           =      l.get_item("OBS_QC", false);
    o_data.ens_mean         = atof(l.get_item("ENS_MEAN"));
-   o_data.climo            = atof(l.get_item("CLIMO"));
    o_data.spread           = atof(l.get_item("SPREAD"));
    o_data.ens_mean_oerr    = atof(l.get_item("ENS_MEAN_OERR"));
    o_data.spread_oerr      = atof(l.get_item("SPREAD_OERR"));
    o_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
+
+   // In met-10.0.0 and later, CLIMO column was replaced by CLIMO_MEAN
+   if(l.has("CLIMO")) {
+      o_data.climo_mean  = atof(l.get_item("CLIMO"));
+      o_data.climo_stdev = bad_data_double;
+   }
+   else {
+      o_data.climo_mean  = atof(l.get_item("CLIMO_MEAN"));
+      o_data.climo_stdev = atof(l.get_item("CLIMO_STDEV"));
+   }
 
    return;
 }

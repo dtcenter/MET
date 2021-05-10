@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -275,7 +275,7 @@ void GridStatConfInfo::process_flags() {
 
    // Check for at least one output data type
    if(!output_ascii_flag && !output_nc_flag) {
-      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+      mlog << Error << "\nGridStatConfInfo::process_flags() -> "
            << "At least one output STAT or NetCDF type must be "
            << " requested in \"" << conf_key_output_flag << "\" or \""
            << conf_key_nc_pairs_flag << "\".\n\n";
@@ -352,6 +352,9 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
               << i+1 << ".\n\n";
          exit(1);
       }
+
+      // Check for unique mask names
+      check_mask_names(vx_opt[i].mask_name);
 
    } // end for i
 
@@ -492,6 +495,9 @@ void GridStatVxOpt::clear() {
    var_name.clear();
    var_suffix.clear();
 
+   mpr_sa.clear();
+   mpr_ta.clear();
+
    fcat_ta.clear();
    ocat_ta.clear();
 
@@ -611,6 +617,10 @@ void GridStatVxOpt::process_config(
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
+   // Conf: mpr_column and mpr_thresh
+   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
+   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+
    // Conf: cat_thresh
    fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
@@ -641,6 +651,8 @@ void GridStatVxOpt::process_config(
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
+           << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
+           << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -872,6 +884,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
+   //    mpr_sa, mpr_ta,
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,

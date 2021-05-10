@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@ using namespace std;
 #include "vx_cal.h"
 
 unixtime get_att_value_unixtime(const NcAtt *att) {
+   ConcatString s;
    unixtime time_value = -1;
    switch ( GET_NC_TYPE_ID_P(att) )  {
       case NC_INT64:
@@ -36,13 +37,18 @@ unixtime get_att_value_unixtime(const NcAtt *att) {
          break;
 
       case NC_CHAR:
-         ConcatString s;
          get_att_value_chars(att, s);
-         time_value = string_to_unixtime(s.c_str());
+         // 20120410_120000 VS. 1333929600
+         if (0 > s.find('_') && 0 > s.find('-'))
+            time_value = string_to_unixtime(s.c_str());
+         else
+            time_value = yyyymmdd_hhmmss_to_unix(s.c_str());
          break;
 
-      //default:
-      //   break;
+      default:
+         mlog << Warning << "get_att_value_unixtime() The attribute type ("
+              << GET_NC_TYPE_NAME_P(att) << ") is not supported\n";
+         break;
    }   //  switch
    return time_value;
 }
@@ -326,12 +332,11 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
 
 {
 
-   NcVarAtt *att;
-   bool found = false;
    att_value = bad_data_int;
    
-   att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC_P(att)) {
+   NcVarAtt *att = get_nc_att(info.var, att_name, false);
+   bool found = IS_VALID_NC_P(att);
+   if (found) {
       att_value = get_att_value_int(att);
    
       // Check for the correct type
@@ -344,7 +349,6 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
    
          exit ( 1 );
       }
-      found = true;
    }
    if (att) delete att;
    
@@ -364,24 +368,11 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
 
 {
 
-   NcVarAtt *att;
-   bool found = false;
-   
    att_value = (unixtime) bad_data_int;
-   
-   
-   att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC_P(att)) {
-      found = true;
-   }
-   
-   if ( !found ) {
-     if (att) delete att;
-     return ( false );
-   }
-   
-   // Check the type
-   att_value = get_att_value_unixtime(att);
+
+   NcVarAtt *att = get_nc_att(info.var, att_name, false);
+   bool found = IS_VALID_NC_P(att);
+   if( found ) att_value = get_att_value_unixtime(att);
 
    if (att) delete att;
    
@@ -389,7 +380,7 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
    //  done
    //
    
-   return ( true );
+   return ( found );
 
 }
 

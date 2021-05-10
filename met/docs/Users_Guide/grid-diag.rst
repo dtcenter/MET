@@ -36,6 +36,8 @@ Required arguments for grid_diag
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used.
 
 When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
+In this case the first field in the config data field list is read from the files designated by the first **-data**, the second field in the field list is read from files designated by the second **-data**, and so forth.  All files within each set must be of the same file type, but the file types of each set may differ.
+A typical use case for this option is for the first **-data** to specify forecast data files and the second **-data** the observation data files.
 
 2. The **-out** argument is the NetCDF output file.
 
@@ -89,7 +91,9 @@ _____________________
      ];
   }
 
-The **name** and **level** entries in the **data** dictionary define the data to be processed. The **n_bins** parameter specifies the number of histogram bins for that variable, and the **range** parameter the lower and upper bounds of the histogram. The interval length is the upper and lower difference divided by **n_bins**.
+The **name** and **level** entries in the **data** dictionary define the data to be processed. The **n_bins** parameter specifies the number of histogram bins for that variable, and the **range** parameter the lower and upper bounds of the histogram. The interval length is the upper and lower difference divided by **n_bins**. Each bin is inclusive on the left side and exclusive on the right, such as [a,b).
+
+Grid-Diag prints a warning message if the actual range of data values falls outside the range defined for that variable in the configuration file. Any data values less than the configured range are counted in the first bin, while values greater than the configured range are counted in the last bin.
 
 grid_diag output file
 ~~~~~~~~~~~~~~~~~~~~~

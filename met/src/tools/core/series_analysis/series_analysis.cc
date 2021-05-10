@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1008,8 +1008,8 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
       }
 
       // Apply continuous filtering thresholds to subset pairs
-      pd = subset_pairs(*pd_ptr, cnt_info.fthresh, cnt_info.othresh,
-                        cnt_info.logic);
+      pd = pd_ptr->subset_pairs_cnt_thresh(cnt_info.fthresh, cnt_info.othresh,
+                                           cnt_info.logic);
 
       // Check for no matched pairs to process
       if(pd.n_obs == 0) continue;

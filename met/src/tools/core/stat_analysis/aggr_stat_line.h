@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -151,8 +151,8 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
-   NumArray crps_climo_na;
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
+   void clear();
 };
 
 struct AggrRPSInfo {
@@ -291,11 +291,11 @@ extern void aggr_time_series_lines(
 
 extern void mpr_to_ctc(
                STATAnalysisJob &, const AggrMPRInfo &,
-               CTSInfo &);
+               int, CTSInfo &);
 
 extern void mpr_to_cts(
                STATAnalysisJob &, const AggrMPRInfo &,
-               CTSInfo &, const char *, gsl_rng *);
+               int, CTSInfo &, const char *, gsl_rng *);
 
 extern void mpr_to_mctc(
                STATAnalysisJob &, const AggrMPRInfo &,
@@ -307,10 +307,10 @@ extern void mpr_to_mcts(
 
 extern void mpr_to_cnt(
                STATAnalysisJob &, const AggrMPRInfo &,
-               CNTInfo &, const char *, gsl_rng *);
+               int, CNTInfo &, const char *, gsl_rng *);
 
 extern void mpr_to_psum(STATAnalysisJob &, const AggrMPRInfo &,
-               SL1L2Info &);
+               int, SL1L2Info &);
 
 extern void mpr_to_pct(
                STATAnalysisJob &, const AggrMPRInfo &,

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_obs(const char *point_obs_filename) {
-   int i, h, v;
+   int h, v;
    int   obs_hid_block[DEF_NC_BUFFER_SIZE];
    int   obs_vid_block[DEF_NC_BUFFER_SIZE];
    int   obs_qty_block[DEF_NC_BUFFER_SIZE];
@@ -230,10 +230,6 @@ void process_point_obs(const char *point_obs_filename) {
    // Get the corresponding header:
    //   message type, staton_id, valid_time, and lat/lon/elv
    NcHeaderData header_data = get_nc_hdr_data(obsVars);
-   int strl_len = header_data.strl_len;
-   int typ_len  = header_data.typ_len;
-   int sid_len  = header_data.sid_len;
-   int vld_len  = header_data.vld_len;
 
    bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
    bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);
@@ -381,7 +377,6 @@ void process_point_obs(const char *point_obs_filename) {
 
       int typ_idx, sid_idx, vld_idx;
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
-         int str_length;
 
          if(use_obs_arr) {
              for(int j=0; j < obs_arr_len; j++) {

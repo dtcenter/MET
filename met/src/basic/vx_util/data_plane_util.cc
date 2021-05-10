@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -606,7 +606,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
 
 DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
                      const DataPlane &sd) {
-   DataPlane cdf = dp;
+   DataPlane cdf = mn;
    double v;
 
    // Check grid dimensions

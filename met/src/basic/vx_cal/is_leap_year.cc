@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -93,14 +93,18 @@ void increase_one_month(int &year, int &month) {
 unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
-  
+  unixtime time_value_ut = (unixtime)time_value;
+  double time_fraction = time_value - time_value_ut;
   if (!no_leap || sec_per_unit != 86400) {
-    ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
+    bool use_ut = true;
+    if ((1.0 - time_fraction) < TIME_EPSILON) time_value_ut += 1;
+    else if (time_fraction > TIME_EPSILON) use_ut = false;
+    if (use_ut) ut = (unixtime)(base_unixtime + sec_per_unit * time_value_ut);
+    else ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
   }
   else {
     int day_offset;
     int month, day, year, hour, minute, second;
-    double time_fraction = time_value - (int)time_value;
     
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
     day_offset = day + (int)time_value;
@@ -119,7 +123,8 @@ unixtime add_to_unixtime(unixtime base_unixtime,
     day = day_offset;
     if (day == 0) day = 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-    ut += (time_fraction * sec_per_unit);
+    if (time_fraction > (1-TIME_EPSILON) ) ut += sec_per_unit;
+    else if (time_fraction > TIME_EPSILON) ut += (time_fraction * sec_per_unit);
     mlog << Debug(5) << "add_to_unixtime() -> "
          << unix_to_yyyymmdd_hhmmss(base_unixtime)
          << " plus " << time_value << " days = "

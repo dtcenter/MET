@@ -21,20 +21,22 @@
 ##      file_list
 ##      [-line_type name]
 ##      [-out name]
+##      [-met_base path]
 ##      [-save]
 ##
 ##  Arguments:
-##    "file_list" is one or more files containing CNT lines.
+##    "file_list"       is one or more files containing CNT lines.
 ##    "-line_type name" specifies a line type to process (multiple).
-##    "-out name" specifies an output PDF file name.
-##    "-save"     calls save.image() before exiting R.
+##    "-out name"       specifies an output PDF file name.
+##    "-met_base path"  is MET_INSTALL_DIR/share/met for the headers.
+##    "-save"           calls save.image() before exiting R.
 ##
 ##  Details:
-##    Updated for MET version 8.0.
+##    Updated on 02/03/2021 to parse version-specific headers.
 ##
 ##  Examples:
 ##    Rscript plot_ensemble.R \
-##      met-8.0/out/ensemble_stat/*.stat
+##      out/ensemble_stat/*.stat
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -49,19 +51,6 @@ library(stats)
 # Constants.
 #
 ########################################################################
-
-# MET version 8.0 header columns
-met_header  <- c("VERSION", "MODEL", "DESC",
-                 "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
-                 "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
-                 "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV",
-                 "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS",
-                 "FCST_THRESH", "OBS_THRESH", "COV_THRESH", "ALPHA",
-                 "LINE_TYPE");
-rhist_header <-c("TOTAL", "N_RANK", "RANK_");
-relp_header  <-c("TOTAL", "N_ENS", "RELP_");
-ecnt_header  <-c("TOTAL", "N_ENS", "CRPS", "CRPSS", "IGN", "ME", "RMSE",
-                 "SPREAD", "ME_OERR", "RMSE_OERR", "SPREAD_OERR", "SPREAD_PLUS_OERR");
 
 # Temporary input file name
 tmp_file <- "ensemble_input.tmp"
@@ -83,21 +72,24 @@ args = commandArgs(TRUE)
 
 # Check the number of arguments
 if(length(args) < 1) {
-   cat("Usage: plot_ensemble.R\n")
-   cat("         file_list\n")
-   cat("         [-line_type name]\n")
-   cat("         [-out name]\n")
-   cat("         [-save]\n")
-   cat("         where \"file_list\"       is one or more files containing ensemble output.\n")
-   cat("               \"-line_type name\" specifies a line type to process (multiple).\n")
-   cat("               \"-out name\"       specifies an output PDF file name.\n")
-   cat("               \"-save\"           calls save.image() before exiting R.\n\n")
-   quit()
+  cat("Usage: plot_ensemble.R\n")
+  cat("         file_list\n")
+  cat("         [-line_type name]\n")
+  cat("         [-out name]\n")
+  cat("         [-met_base path]\n")
+  cat("         [-save]\n")
+  cat("         where \"file_list\"       is one or more files containing ensemble output.\n")
+  cat("               \"-line_type name\" specifies a line type to process (multiple).\n")
+  cat("               \"-out name\"       specifies an output PDF file name.\n")
+  cat("               \"-met_base path\"  is MET_INSTALL_DIR/share/met for the headers.\n")
+  cat("               \"-save\"           calls save.image() before exiting R.\n\n")
+  quit()
 }
 
 # Initialize
 file_list  = c()
 line_types = c()
+met_base   = ''
 save       = FALSE
 
 # Parse the arguments
@@ -119,6 +111,12 @@ while(i <= length(args)) {
     line_types = c(line_types, args[i+1])
     i = i+1
 
+   } else if(args[i] == "-met_base") {
+
+     # Set MET_BASE variable
+     met_base = args[i+1]
+     i = i+1
+
   } else {
 
     # Add input file to the file list
@@ -138,6 +136,12 @@ if(length(line_types) <= 0) line_types <- default_line_types
 #
 ########################################################################
 
+# Check for input files
+if(is.null(file_list)) {
+  cat("ERROR: No input files specified!\n")
+  quit()
+}
+
 read_line_type = function(line_type) {
 
   # Initialize
@@ -149,7 +153,7 @@ read_line_type = function(line_type) {
     cat("Reading:", file_list[i], "\n")
 
     # Select lines out of the input file and write it to a temp file
-    cmd <- paste("egrep \"", line_type, "\"", file_list[i], ">", tmp_file)
+    cmd <- paste("grep \"", line_type, "\"", file_list[i], ">", tmp_file)
     system(cmd)
 
     # Try to read the input file
@@ -167,19 +171,40 @@ read_line_type = function(line_type) {
     system(cmd)
   }
 
-  # Add column headers
-  if(line_type == "RHIST") {
-    h <- c(met_header, rhist_header)
-  } else if(line_type == "RELP") {
-    h <- c(met_header, relp_header)
-  } else if(line_type == "ECNT") {
-    h <- c(met_header, ecnt_header)
-  } else {
-    h <- met_header
+  # Check for no data
+  if(is.null(d)) {
+    return(d)
   }
-  colnames(d) <- h
 
-  return(d);
+  # Store version from the data
+  version = unlist(strsplit(as.character(d[1,1]), '\\.'))
+  vXY = paste(version[1], version[2], sep='.')
+
+  # Check met_base
+  if(nchar(met_base) == 0) {
+    met_base = Sys.getenv("MET_BASE")
+  }
+  if(nchar(met_base) == 0) {
+    cat("ERROR: The -met_base command line option or MET_BASE environment variable must be set!\n",
+        "ERROR: Define it as {MET INSTALLATION DIRECTORY}/share/met.\n", sep='')
+    quit()
+  }
+
+  # Get that header columns
+  header_file = paste(met_base, "/table_files/met_header_columns_", vXY, ".txt", sep='')
+  print(paste("Reading Header File:", header_file))
+  lty_str  = paste(" : ", line_type, " ", sep='')
+  hdr_line = grep(lty_str, readLines(header_file), value=TRUE)
+  hdr_line = gsub('[\\(,\\)]', '', hdr_line) # Strip parens from header line
+  hdr_cols = trimws(unlist(strsplit(hdr_line, ':'))[4])
+  hdr_lty  = unlist(strsplit(hdr_cols, ' '))
+
+  # Do not check that the number of header and data columns match
+  # since RHIST and RELP line types have variable length.
+
+  colnames(d) <- hdr_lty
+
+  return(d)
 }
 
 ########################################################################
@@ -197,7 +222,9 @@ plot_rhist = function(data, main_info, case_info) {
 
   n_rank <- max(data$N_RANK)
 
-  counts <- colSums(data[,25:(25+n_rank-1)])
+  i_n_rank <- grep("N_RANK", colnames(data))
+
+  counts <- colSums(data[,(i_n_rank+1):(i_n_rank+n_rank)])
   names(counts) <- as.character(seq(1,n_rank))
 
   barplot(counts, main=title, xlab="Ranks");
@@ -207,7 +234,7 @@ plot_rhist = function(data, main_info, case_info) {
 
 ########################################################################
 #
-# Plot the Relative Performance Histogram
+# Plot the Relative Performance Histogram.
 #
 ########################################################################
 
@@ -220,7 +247,9 @@ plot_relp = function(data, main_info, case_info) {
 
   n_ens <- max(data$N_ENS)
 
-  counts <- colSums(data[,25:(25+n_ens-1)])
+  i_n_ens <- grep("N_ENS", colnames(data))
+
+  counts <- colSums(data[,(i_n_ens+1):(i_n_ens+n_ens)])
   names(counts) <- as.character(seq(1,n_ens))
 
   barplot(counts, main=title, xlab="Ensemble Member");
@@ -230,7 +259,7 @@ plot_relp = function(data, main_info, case_info) {
 
 ########################################################################
 #
-# Plot the Continuous Ensemble Statistics
+# Plot the Continuous Ensemble Statistics.
 #
 ########################################################################
 
@@ -275,7 +304,7 @@ plot_ecnt_spread_skill = function(data, main_info, case_info) {
 
 ########################################################################
 #
-# Process the input data
+# Process the input data.
 #
 ########################################################################
 
@@ -288,6 +317,13 @@ for(i in 1:length(line_types)) {
 
   data = read_line_type(line_types[i]);
 
+  # Check for no data found
+  if(length(data) == 0) {
+    cat("WARNING: No input data for line type ",
+        line_types[i], "!\n", sep='')
+    next
+  }
+
   # Convert date/time columns to date/time objects
   data$FCST_VALID_BEG <- as.POSIXct(strptime(data$FCST_VALID_BEG,
                                     format="%Y%m%d_%H%M%S"))
@@ -298,7 +334,7 @@ for(i in 1:length(line_types)) {
   data$OBS_VALID_END  <- as.POSIXct(strptime(data$OBS_VALID_END,
                                     format="%Y%m%d_%H%M%S"))
 
-  # Construct an idex
+  # Construct an index
   data$index <- paste(data$MODEL, data$DESC,
                       data$FCST_VAR, data$FCST_LEV,
                       data$OBS_VAR, data$OBS_LEV,

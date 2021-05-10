@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __LOAD_DLAND_H__
-#define  __LOAD_DLAND_H__
+#ifndef  __LOAD_TC_DATA_H__
+#define  __LOAD_TC_DATA_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -18,12 +18,16 @@
 #include "vx_log.h"
 #include "vx_grid.h"
 #include "vx_data2d.h"
-////////////////////////////////////////////////////////////////////////
-
-extern void load_dland(const ConcatString &, Grid &, DataPlane &);
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __LOAD_DLAND_H__  */
+extern void load_tc_dland(const ConcatString &, Grid &, DataPlane &);
+
+extern void load_tc_basin(const ConcatString &, Grid &, DataPlane &,
+                          StringArray &);
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   /*  __LOAD_TC_DATA_H__  */
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -131,14 +131,10 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
   _countHeaders();
 
-  // Check for no data
+  // Print a warning for no data
   if (_nhdr == 0)
   {
-    mlog << Error << "\nZero observations retained.\n"
-         << "Cannot create NetCDF Observation file: "
-         << nc_filename << "\n\n";
-
-    return false;
+    mlog << Warning << "\nZero observations retained!\n\n";
   }
 
   mlog << Debug(2) << "Processing observations for " << _nhdr

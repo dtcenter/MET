@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,11 +24,6 @@ using namespace netCDF::exceptions;
 #include "vx_cal.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-static const string  level_att_name         = "level";
-static const string  units_att_name         = "units";
-static const string  missing_value_att_name = "missing_value";
-static const string  fill_value_att_name    = "_FillValue";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1395,6 +1390,7 @@ void _apply_scale_factor(float *data, const T *packed_data,
    int unpacked_count = 0;
    float min_value =  10e10;
    float max_value = -10e10;
+   clock_t start_clock = clock();
    const char *method_name = "apply_scale_factor(float)";
 
    for (int idx=0; idx<cell_count; idx++) {
@@ -1403,25 +1399,28 @@ void _apply_scale_factor(float *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((float)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
-         unpacked_count++;
+         if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) unpacked_count++;
       }
    }
    mlog << Debug(4) << method_name << " unpacked data: count="
         << unpacked_count << " out of " << cell_count
-        << ". FillValue(" << data_type << ")=" << fill_value
-        << " data range [" << min_value << " - " << max_value
+        << ". FillValue(" << data_type << ")=" << fill_value << "\n";
+   mlog << Debug(4) << method_name << "data range [" << min_value << " - " << max_value
         << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
         << positive_cnt << "\n";
+   mlog << Debug(7) << method_name << " took " 
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data) {
+   clock_t start_clock = clock();
    bool return_status = false;
    static const char *method_name = "get_nc_data(NcVar *, float *) ";
 
@@ -1455,7 +1454,7 @@ bool get_nc_data(NcVar *var, float *data) {
 
          switch ( type_id )  {
             case NcType::nc_INT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   int fill_value = bad_data_int;
                   int min_value =  2147483647;
                   int max_value = -2147483648;
@@ -1465,14 +1464,14 @@ bool get_nc_data(NcVar *var, float *data) {
                      fill_value = get_att_value_int(att_fill_value);
 
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "int",
-                        add_offset, scale_factor);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "int",
+                                      add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   short fill_value = (short)bad_data_int;
                   short *packed_data = new short[cell_count];
 
@@ -1482,8 +1481,13 @@ bool get_nc_data(NcVar *var, float *data) {
                   var->getVar(packed_data);
 
                   if (unsigned_value) {
-                     int value, unsigned_fill_value;
-                     unsigned_fill_value = (unsigned short)fill_value;
+                     unsigned short value;
+                     int positive_cnt = 0;
+                     int raw_min_value =  70000;
+                     int raw_max_value = -70000;
+                     float min_value =  10e10;
+                     float max_value = -10e10;
+                     unsigned short unsigned_fill_value = (unsigned short)fill_value;
                      for (int idx=0; idx<cell_count; idx++) {
                         value = (unsigned short)packed_data[idx];
                         if (unsigned_fill_value == value)
@@ -1491,20 +1495,8 @@ bool get_nc_data(NcVar *var, float *data) {
                         else {
                            data[idx] = (value * scale_factor) + add_offset;
                            unpacked_count++;
-                        }
-                     }
-                  
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     int tmp_value;
-                     for (int idx=0; idx<cell_count; idx++) {
-                        if (fill_value != packed_data[idx]) {
-                           tmp_value = (unsigned short)packed_data[idx];
-                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
-                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                           if (raw_min_value > value) raw_min_value = value;
+                           if (raw_max_value < value) raw_max_value = value;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
@@ -1528,10 +1520,10 @@ bool get_nc_data(NcVar *var, float *data) {
                }
                break;
             case NcType::nc_USHORT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
-                  unsigned short fill_value = (unsigned short)bad_data_int;
+               {
                   unsigned short min_value = 65535;
                   unsigned short max_value = 0;
+                  unsigned short fill_value = (unsigned short)bad_data_int;
                   unsigned short *packed_data = new unsigned short[cell_count];
 
                   if (IS_VALID_NC_P(att_fill_value))
@@ -1539,14 +1531,14 @@ bool get_nc_data(NcVar *var, float *data) {
 
                   var->getVar(packed_data);
 
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "unsigned short",
-                        add_offset, scale_factor);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "unsigned short",
+                                      add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   ncbyte fill_value = (ncbyte)bad_data_int;
                   ncbyte *packed_data = new ncbyte[cell_count];
 
@@ -1555,28 +1547,22 @@ bool get_nc_data(NcVar *var, float *data) {
                   }
 
                   if (unsigned_value) {
-                     int value, unsigned_fill_value;
-                     unsigned_fill_value = (ncbyte)fill_value;
-                     for (int idx=0; idx<cell_count; idx++) {
-                        value = (unsigned char)packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_float;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                        }
-                     }
+                     int value;
                      int positive_cnt = 0;
                      int raw_min_value =  70000;
                      int raw_max_value = -70000;
                      float min_value =  10e10;
                      float max_value = -10e10;
-                     int tmp_value;
+                     int unsigned_fill_value = (ncbyte)fill_value;
                      for (int idx=0; idx<cell_count; idx++) {
-                        if (fill_value != packed_data[idx]) {
-                           tmp_value = (unsigned char)packed_data[idx];
-                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
-                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                        value = packed_data[idx];
+                        if (unsigned_fill_value == value)
+                           data[idx] = bad_data_float;
+                        else {
+                           data[idx] = (value * scale_factor) + add_offset;
+                           unpacked_count++;
+                           if (raw_min_value > value) raw_min_value = value;
+                           if (raw_max_value < value) raw_max_value = value;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
@@ -1592,15 +1578,15 @@ bool get_nc_data(NcVar *var, float *data) {
                   else {
                      ncbyte min_value =  127;
                      ncbyte max_value = -127;
-                     _apply_scale_factor(data, packed_data,
-                           cell_count, fill_value, min_value, max_value, "ncbyte",
-                           add_offset, scale_factor);
+                     _apply_scale_factor(data, packed_data, cell_count,
+                                         fill_value, min_value, max_value, "ncbyte",
+                                         add_offset, scale_factor);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   unsigned char min_value = 255;
                   unsigned char max_value = 0;
                   unsigned char fill_value = (unsigned char)-99;
@@ -1610,9 +1596,9 @@ bool get_nc_data(NcVar *var, float *data) {
                      fill_value = get_att_value_char(att_fill_value);
                   }
 
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "unsigned char",
-                        add_offset, scale_factor);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "unsigned char",
+                                      add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
@@ -1627,6 +1613,10 @@ bool get_nc_data(NcVar *var, float *data) {
       }
       return_status = true;
    }
+
+   mlog << Debug(6) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC)
+        << " seconds for " << GET_NC_NAME_P(var) << "\n";
    return(return_status);
 }
 
@@ -1672,7 +1662,7 @@ template <typename T>
 int _apply_scale_factor(double *data, const T *packed_data,
                         const int cell_count, const T fill_value,
                         T &raw_min_val, T &raw_max_val, const char *data_type,
-                        float add_offset, float scale_factor) {
+                        double add_offset, double scale_factor) {
    int positive_cnt = 0;
    int unpacked_count = 0;
    double min_value =  10e10;
@@ -1685,11 +1675,11 @@ int _apply_scale_factor(double *data, const T *packed_data,
       else {
          if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
          if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+         data[idx] = ((double)packed_data[idx] * scale_factor) + add_offset;
          if (data[idx] > 0) positive_cnt++;
          if (min_value > data[idx]) min_value = data[idx];
          if (max_value < data[idx]) max_value = data[idx];
-         unpacked_count++;
+         if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) unpacked_count++;
       }
    }
    mlog << Debug(4) << method_name << " unpacked data: count="
@@ -1741,7 +1731,7 @@ bool get_nc_data(NcVar *var, double *data) {
 
          switch ( type_id )  {
             case NcType::nc_INT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   int fill_value = bad_data_int;
                   int min_value =  2147483647;
                   int max_value = -2147483648;
@@ -1751,14 +1741,14 @@ bool get_nc_data(NcVar *var, double *data) {
                      fill_value = get_att_value_int(att_fill_value);
 
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "int",
-                        add_offset, scale_factor);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "int",
+                                      add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   short fill_value = (short)bad_data_int;
                   short *packed_data = new short[cell_count];
 
@@ -1768,8 +1758,13 @@ bool get_nc_data(NcVar *var, double *data) {
                   var->getVar(packed_data);
 
                   if (unsigned_value) {
-                     int value, unsigned_fill_value;
-                     unsigned_fill_value = (unsigned short)fill_value;
+                     int value;
+                     int positive_cnt = 0;
+                     int raw_min_value =  70000;
+                     int raw_max_value = -70000;
+                     float min_value =  10e10;
+                     float max_value = -10e10;
+                     int unsigned_fill_value = (unsigned short)fill_value;
                      for (int idx=0; idx<cell_count; idx++) {
                         value = (unsigned short)packed_data[idx];
                         if (unsigned_fill_value == value)
@@ -1777,19 +1772,8 @@ bool get_nc_data(NcVar *var, double *data) {
                         else {
                            data[idx] = (value * scale_factor) + add_offset;
                            unpacked_count++;
-                        }
-                     }
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     int tmp_value;
-                     for (int idx=0; idx<cell_count; idx++) {
-                        if (fill_value != packed_data[idx]) {
-                           tmp_value = (unsigned short)packed_data[idx];
-                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
-                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                           if (raw_min_value > value) raw_min_value = value;
+                           if (raw_max_value < value) raw_max_value = value;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
@@ -1813,7 +1797,7 @@ bool get_nc_data(NcVar *var, double *data) {
                }
                break;
             case NcType::nc_USHORT:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   unsigned short fill_value = (unsigned short)bad_data_int;
                   unsigned short *packed_data = new unsigned short[cell_count];
 
@@ -1831,7 +1815,7 @@ bool get_nc_data(NcVar *var, double *data) {
                }
                break;
             case NcType::nc_BYTE:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
                   ncbyte fill_value = (ncbyte)bad_data_int;
                   ncbyte *packed_data = new ncbyte[cell_count];
 
@@ -1839,29 +1823,25 @@ bool get_nc_data(NcVar *var, double *data) {
                      fill_value = get_att_value_char(att_fill_value);
                   }
 
+                  var->getVar(packed_data);
+
                   if (unsigned_value) {
-                     int value, unsigned_fill_value;
-                     unsigned_fill_value = (ncbyte)fill_value;
-                     for (int idx=0; idx<cell_count; idx++) {
-                        value = (unsigned char)packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_double;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                        }
-                     }
+                     int value;
                      int positive_cnt = 0;
                      int raw_min_value =  70000;
                      int raw_max_value = -70000;
                      float min_value =  10e10;
                      float max_value = -10e10;
-                     int tmp_value;
+                     int unsigned_fill_value = (ncbyte)fill_value;
                      for (int idx=0; idx<cell_count; idx++) {
-                        if (fill_value != packed_data[idx]) {
-                           tmp_value = (unsigned char)packed_data[idx];
-                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
-                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                        value = packed_data[idx];
+                        if (unsigned_fill_value == value)
+                           data[idx] = bad_data_double;
+                        else {
+                           data[idx] = (value * scale_factor) + add_offset;
+                           unpacked_count++;
+                           if (raw_min_value > value) raw_min_value = value;
+                           if (raw_max_value < value) raw_max_value = value;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
@@ -1877,15 +1857,17 @@ bool get_nc_data(NcVar *var, double *data) {
                   else {
                      ncbyte min_value =  127;
                      ncbyte max_value = -127;
-                     _apply_scale_factor(data, packed_data,
-                           cell_count, fill_value, min_value, max_value, "ncbyte",
-                           add_offset, scale_factor);
+                     _apply_scale_factor(data, packed_data, cell_count,
+                                         fill_value, min_value, max_value, "ncbyte",
+                                         add_offset, scale_factor);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
-               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+               {
+                  signed char min_value = 255;
+                  signed char max_value = 0;
                   signed char fill_value = (signed char)bad_data_int;
                   signed char *packed_data = new signed char[cell_count];
 
@@ -1893,11 +1875,11 @@ bool get_nc_data(NcVar *var, double *data) {
                      fill_value = get_att_value_char(att_fill_value);
                   }
 
-                  signed char min_value = 255;
-                  signed char max_value = 0;
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "ncbyte",
-                        add_offset, scale_factor);
+                  var->getVar(packed_data);
+
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "ncbyte",
+                                      add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
@@ -3436,6 +3418,8 @@ NcVar get_nc_var_time(const NcFile *nc) {
       //if (is_nc_name_time(name)) found = true;
       if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
          if (is_nc_name_time(name)) found = true;
+         mlog << Debug(7) << method_name << "checked variable \""
+           << name << "\"  is_time: " << found << "\n";
       }
       if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
          if (is_nc_unit_time(name.c_str())) {

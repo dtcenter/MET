@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -245,7 +245,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(1)
+         mlog << Debug(2)
               << "Regridding the " << cur_ut_cs << " \""
               << info->magic_str()
               << "\" climatology field to the verification grid.\n";

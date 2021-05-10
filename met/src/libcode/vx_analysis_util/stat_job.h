@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -172,18 +172,26 @@ class STATAnalysisJob {
 
       unixtime    fcst_valid_beg;
       unixtime    fcst_valid_end;
+      TimeArray   fcst_valid_inc;
+      TimeArray   fcst_valid_exc;
       IntArray    fcst_valid_hour; // stored in seconds
 
       unixtime    obs_valid_beg;
       unixtime    obs_valid_end;
+      TimeArray   obs_valid_inc;
+      TimeArray   obs_valid_exc;
       IntArray    obs_valid_hour; // stored in seconds
 
       unixtime    fcst_init_beg;
       unixtime    fcst_init_end;
+      TimeArray   fcst_init_inc;
+      TimeArray   fcst_init_exc;
       IntArray    fcst_init_hour; // stored in seconds
 
       unixtime    obs_init_beg;
       unixtime    obs_init_end;
+      TimeArray   obs_init_inc;
+      TimeArray   obs_init_exc;
       IntArray    obs_init_hour;  // stored in seconds
 
       StringArray fcst_var;
@@ -219,7 +227,8 @@ class STATAnalysisJob {
       map<ConcatString,ThreshArray> column_thresh_map;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> column_str_map;
+      map<ConcatString,StringArray> column_str_inc_map;
+      map<ConcatString,StringArray> column_str_exc_map;
 
       StringArray hdr_name;
       StringArray hdr_value;
@@ -240,6 +249,7 @@ class STATAnalysisJob {
       char        *stat_file; // dump output statistics to a STAT file
       ofstream    *stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
+      int         stat_row;   // Counter for the current stat row
 
       StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)

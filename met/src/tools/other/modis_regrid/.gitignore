@@ -4,3 +4,4 @@ modis_regrid
 .deps
 Makefile
 Makefile.in
+*.dSYM

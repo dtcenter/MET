@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -348,6 +348,7 @@ void PairFeature::clear()
    convex_hull_dist           = 0.0;
    angle_diff                 = 0.0;
    aspect_diff                = 0.0;
+   fo_area_ratio              = 0.0;
    area_ratio                 = 0.0;
    intersection_area          = 0.0;
    union_area                 = 0.0;
@@ -374,6 +375,7 @@ void PairFeature::assign(const PairFeature &p) {
    convex_hull_dist           = p.convex_hull_dist;
    angle_diff                 = p.angle_diff;
    aspect_diff                = p.aspect_diff;
+   fo_area_ratio              = p.fo_area_ratio;
    area_ratio                 = p.area_ratio;
    intersection_area          = p.intersection_area;
    union_area                 = p.union_area;
@@ -454,8 +456,11 @@ void PairFeature::set(const SingleFeature &fcst,
    //
    // Area ratio
    //
-   area_ratio = min( (Obs->area)/(Fcst->area),
-                     (Fcst->area)/(Obs->area) );
+   fo_area_ratio = (Fcst->area)/(Obs->area);
+
+   area_ratio    = min( (Obs->area)/(Fcst->area),
+                        (Fcst->area)/(Obs->area) );
+
 
    //
    // Intersection, union, and symmetric diff areas
@@ -575,6 +580,7 @@ ostream & operator<<(ostream & out, const PairFeature & p)
    out << "Convex Hull Distance              = " << (p.convex_hull_dist)           << "\n";
    out << "Angle Difference                  = " << (p.angle_diff)                 << "\n";
    out << "Aspect Difference                 = " << (p.aspect_diff)                << "\n";
+   out << "Fcst/Obs Area Ratio               = " << (p.fo_area_ratio)              << "\n";
    out << "Area Ratio                        = " << (p.area_ratio)                 << "\n";
    out << "Intersection Area                 = " << nint(p.intersection_area)      << "\n";
    out << "Union Area                        = " << nint(p.union_area)             << "\n";

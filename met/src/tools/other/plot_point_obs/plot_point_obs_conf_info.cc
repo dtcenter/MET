@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -15,6 +15,8 @@ using namespace std;
 #include "vx_config.h"
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
+#include "vx_regrid.h"
+#include "vx_statistics.h"
 
 #include "plot_point_obs_conf_info.h"
 
@@ -485,6 +487,19 @@ void PlotPointObsConfInfo::process_config(
                  << grid_data_info->magic_str() << "\" from file \""
                  << plot_grid_string << "\"\n\n";
             exit(1);
+         }
+
+         // Regrid, if requested
+         if(grid_data_info->regrid().enable) {
+            mlog << Debug(1) << "Regridding field "
+                 << grid_data_info->magic_str() << ".\n";
+            Grid to_grid(parse_vx_grid(grid_data_info->regrid(),
+                                       &grid, &grid));
+            grid_data = met_regrid(grid_data, grid, to_grid,
+                                   grid_data_info->regrid());
+
+            // Store the new grid definition
+            grid = to_grid;
          }
 
          // Conf: grid_plot_info

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -139,21 +139,6 @@ void VarInfoPython::set_file_type(const GrdFileType t) {
    mlog << Error
         << "VarInfoPython::set_file_type(const GrdFileType) -> bad type ... "
         << grdfiletype_to_string(t) << "\n\n";
-
-   return;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void VarInfoPython::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-   MagicStr << cs_erase << nstr << "/" << lstr;
 
    return;
 }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -37,7 +37,7 @@ static const int MaxBestTrackTimeInc    = 24 * sec_per_hour;
 
 class TrackInfo {
 
-   private:
+   protected:
 
       void init_from_scratch();
       void assign(const TrackInfo &);
@@ -65,6 +65,8 @@ class TrackInfo {
       unixtime     InitTime;
       unixtime     MinValidTime;
       unixtime     MaxValidTime;
+      unixtime     MinWarmCore;
+      unixtime     MaxWarmCore;
 
       // TrackPoints
       TrackPoint  *Point;
@@ -131,6 +133,9 @@ class TrackInfo {
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
       int                  duration()         const;
+      unixtime             warm_core_min()    const;
+      unixtime             warm_core_max()    const;
+      int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
 
@@ -180,6 +185,8 @@ inline unixtime             TrackInfo::init()             const { return(InitTim
 inline int                  TrackInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
 inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);                 }
 inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);                 }
+inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
+inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
 inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
 
@@ -198,11 +205,8 @@ class TrackInfoArray {
 
       void init_from_scratch();
       void assign(const TrackInfoArray &);
-      void extend(int, bool exact = true);
 
-      TrackInfo     *Track;
-      int            NTracks;
-      int            NAlloc;
+      vector<TrackInfo> Track;
 
    public:
 
@@ -221,29 +225,24 @@ class TrackInfoArray {
          //  set stuff
          //
 
+      void add(const TrackInfo &);
+      void set(int, const TrackInfo &);
+      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
+      bool has(const ATCFTrackLine &) const;
+      bool erase_storm_id(const ConcatString &);
+
          //
          //  get stuff
          //
 
       const TrackInfo & operator[](int) const;
-      int n_tracks() const;
       int n() const;
-
-         //
-         //  do stuff
-         //
-
-      void add(const TrackInfo &);
-      void set(int, const TrackInfo &);
-      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
-      bool has(const ATCFTrackLine &) const;
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackInfoArray::n_tracks() const { return(NTracks); }
-inline int TrackInfoArray::n()        const { return(NTracks); }
+inline int TrackInfoArray::n() const { return(Track.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 

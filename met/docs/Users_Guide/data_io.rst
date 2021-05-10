@@ -10,13 +10,13 @@ Data must often be preprocessed prior to using it for verification. Several MET 
 Input data formats
 __________________
 
-The MET package can handle gridded input data in one of four formats: GRIB version 1, GRIB version 2, NetCDF files following the Climate and Forecast (CF) conventions, and NetCDF files produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF grib tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
+The MET package can handle multiple gridded input data formats: GRIB version 1, GRIB version 2, and NetCDF files following the Climate and Forecast (CF) conventions, containing WRF output post-processed using wrf_interp, or produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF GRIB tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
 
 When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, Ensemble-Stat, MODE, MTD, or Series-Analysis tools, the input model and observation datasets must be on the same grid. MET will regrid files according to user specified options. Alternatively, outside of MET, the copygb and wgrib2 utilities are recommended for re-gridding GRIB1 and GRIB2 files, respectively. To preserve characteristics of the observations, it is generally preferred to re-grid the model data to the observation grid, rather than vice versa.
 
-Input point observation files in PrepBUFR format are available through NCEP. The PrepBUFR observation files contain a wide variety of point-based observation types in a single file in a standard format. However, some users may wish to use observations not included in the standard PrepBUFR files. For this reason, prior to performing the verification step in the Point-Stat tool, the PrepBUFR file is reformatted with the PB2NC tool. In this step, the user can select various ways of stratifying the observation data spatially, temporally, and by type. The remaining observations are reformatted into an intermediate NetCDF file. The ASCII2NC tool may be used to convert ASCII point observations that are not available in the PrepBUFR files into this NetCDF format for use by the Point-Stat verification tool. Users with METAR or RAOB data from MADIS can convert these observations into NetCDF format with the MADIS2NC tool, then use them with the Point-Stat or Ensemble-Stat verification tools.
+Input point observation files in PrepBUFR format are available through NCEP. The PrepBUFR observation files contain a wide variety of point-based observation types in a single file in a standard format. However, some users may wish to use observations not included in the standard PrepBUFR files. For this reason, prior to performing the verification step in the Point-Stat tool, the PrepBUFR file is reformatted with the PB2NC tool. In this step, the user can select various ways of stratifying the observation data spatially, temporally, and by type. The remaining observations are reformatted into an intermediate NetCDF file. The ASCII2NC tool may be used to convert ASCII point observations that are not available in the PrepBUFR files into this common NetCDF point observation format. Several other MET tools, described below, are also provided to reformat point observations into this common NetCDF point observation format prior to passing them as input to the Point-Stat or Ensemble-Stat verification tools.
 
-Tropical cyclone forecasts and observations are typically provided in a specific ASCII format, in A Deck and B Deck files.
+Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
 .. _Intermediate data formats:
 
@@ -55,32 +55,38 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **PB2NC Tool**
 
-    * **Input**: One PrepBUFR point observation file and one configuration file.
+    * **Input**: PrepBUFR point observation file(s) and one configuration file.
 
     * **Output**: One NetCDF file containing the observations that have been retained.
 
 #. **ASCII2NC Tool**
 
-    * **Input**: One or more ASCII point observation file(s) that has (have) been formatted as expected, and optional configuration file.
+    * **Input**: ASCII point observation file(s) that has (have) been formatted as expected, and optional configuration file.
 
     * **Output**: One NetCDF file containing the reformatted observations.
 
 #. **MADIS2NC Tool**
 
-    * **Input**: One MADIS point observation file.
+    * **Input**: MADIS point observation file(s) in NetCDF format.
 
     * **Output**: One NetCDF file containing the reformatted observations.
 
 
 #. **LIDAR2NC Tool**
 
-    * **Input**: One CALIPSO satellite HDF file
+    * **Input**: One CALIPSO satellite HDF file.
+
+    * **Output**: One NetCDF file containing the reformatted observations.
+
+#. **IODA2NC Tool**
+
+    * **Input**: IODA observation file(s) in NetCDF format.
 
     * **Output**: One NetCDF file containing the reformatted observations.
 
 #. **Point2Grid Tool**
 
-    * **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
+    * **Input**: One NetCDF file in the common point observation format.
 
     * **Output**: One NetCDF file containing a gridded representation of the point observations.
 
@@ -116,7 +122,7 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **Point-Stat Tool**
 
-    * **Input**: One gridded model file, at least one point observation file in NetCDF format (as the output of the PB2NC, ASCII2NC, MADIS2NC, or LIDAR2NC tool), and one configuration file.
+    * **Input**: One gridded model file, at least one NetCDF file in the common point observation format, and one configuration file.
 
     * **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
 
@@ -194,9 +200,9 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **TC-Pairs Tool**
 
-    * **Input**: At least one A-deck and one B-deck ATCF format file containing output from a tropical cyclone tracker and one configuration file. The A-deck files contain forecast tracks while the B-deck files are typically the NHC Best Track Analysis but could also be any ATCF format reference.
+    * **Input**: At least one A-deck or E-deck file and one B-deck ATCF format file containing output from a tropical cyclone tracker and one configuration file. The A-deck files contain forecast tracks, the E-deck files contain forecast probabilities, and the B-deck files are typically the NHC Best Track Analysis but could also be any ATCF format reference.
 
-    * **Output**: ASCII output with the suffix .tcstat.
+    * **Output**: ASCII output with the suffix .tcst.
 
 #. **TC-Stat Tool**
 
@@ -208,7 +214,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more Tropical Cyclone genesis format files, one or more verifying operational and BEST track files in ATCF format, and one configuration file.
 
-    * **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
+    * **Output**: One STAT file containing all of the requested line types, several ASCII files for each line type requested, and one gridded NetCDF file containing counts of track points.
 
 #. **TC-RMW Tool**
 

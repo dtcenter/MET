@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -159,6 +159,37 @@ if ( right_child )  n->right_child = right_child->copy();
 n->threshnode_assign(this);
 
 return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Or_Node::climo_prob() const
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error << "\nOr_Node::climo_prob() -> "
+        << "node not populated!\n\n";
+
+   exit ( 1 );
+
+}
+
+double prob       = bad_data_double;
+double prob_left  = left_child->climo_prob();
+double prob_right = right_child->climo_prob();
+
+if ( !is_bad_data(prob_left) && !is_bad_data(prob_right) )  {
+
+   prob = min(prob_left + prob_right, 1.0);
+
+}
+
+return ( prob );
 
 }
 
@@ -356,6 +387,55 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
+double And_Node::climo_prob() const
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error << "\nAnd_Node::climo_prob() -> "
+        << "node not populated!\n\n";
+
+   exit ( 1 );
+
+}
+
+double prob       = bad_data_double;
+double prob_left  = left_child->climo_prob();
+double prob_right = right_child->climo_prob();
+
+   //
+   // For opposing inequalities, compute the difference in percentiles
+   //
+
+if ( !is_bad_data(prob_left) && !is_bad_data(prob_right) ) {
+
+   //
+   // Support complex threshold types >a&&<b and <a&&>b
+   //
+
+   if ( (  left_child->type() == thresh_gt ||  left_child->type() == thresh_ge ) &&
+        ( right_child->type() == thresh_lt || right_child->type() == thresh_le ) )  {
+
+      prob = max( 0.0, prob_right - ( 1.0 - prob_left ) );
+
+   }
+   else if ( (  left_child->type() == thresh_lt ||  left_child->type() == thresh_le ) &&
+             ( right_child->type() == thresh_gt || right_child->type() == thresh_ge ) )  {
+
+      prob = max( 0.0, prob_left - ( 1.0 - prob_right ) );
+
+   }
+}
+
+return ( prob );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool And_Node::need_perc() const
 
 {
@@ -533,6 +613,23 @@ if ( child )  n->child  = child->copy();
 n->threshnode_assign(this);
 
 return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Not_Node::climo_prob() const
+
+{
+
+double prob       = bad_data_double;
+double prob_child = child->climo_prob();
+
+if ( !is_bad_data(prob_child) )  prob = 1.0 - prob_child;
+
+return ( prob );
 
 }
 
@@ -1058,6 +1155,59 @@ else  {
 }
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Simple_Node::climo_prob() const
+
+{
+   
+double prob = bad_data_double;
+
+if ( Ptype == perc_thresh_climo_dist )  {
+
+   // Climo probability varies based on the threshold type
+   switch ( op )  {
+
+      case thresh_lt:
+      case thresh_le:
+
+         prob = PT/100.0;
+         break;
+
+      case thresh_eq:
+
+         prob = 0.0;
+         break;
+
+      case thresh_ne:
+
+         prob = 1.0;
+         break;
+
+      case thresh_gt:
+      case thresh_ge:
+
+         prob = 1.0 - PT/100.0;
+         break;
+
+      default:
+
+         mlog << Error << "\nSimple_Node::climo_prob() -> "
+              << "cannot convert climatological distribution percentile "
+              << "threshold to a probability!\n\n";
+
+         exit ( 1 );
+         break;
+
+   }  // switch
+}
+
+return ( prob );
 
 }
 

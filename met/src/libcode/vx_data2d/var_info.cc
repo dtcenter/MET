@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -416,12 +416,33 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
       (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
       mlog << Error << "\nVarInfo::set_magic() -> "
-           << "embedded whitespace found in the nstr \"" << nstr
-           << "\" or lstr \"" << lstr << "\".\n\n";
+           << "embedded whitespace found in the name \"" << nstr
+           << "\" or level \"" << lstr << "\" string.\n\n";
       exit(1);
    }
 
+   // Format as {name}/{level} or {name}{level}
+   if(lstr.nonempty() && lstr[0] != '(') {
+      MagicStr << cs_erase << nstr << "/" << lstr;
+   }
+   else {
+      MagicStr << cs_erase << nstr << lstr;
+   }
+
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString VarInfo::magic_str_attr() const {
+   ConcatString mstr(name_attr());
+   ConcatString lstr(level_attr());
+
+   // Format as {name}/{level} or {name}{level}
+   if(lstr.nonempty() && lstr[0] != '(') mstr << "/";
+   mstr << lstr;
+
+   return(mstr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,99 +22,89 @@ using namespace std;
 
 #include "vx_nc_util.h"
 #include "apply_mask.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for struct GenesisInfo
+//  Code for struct TCGenNcOutInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisEventInfo::clear() {
-   Technique.clear();
-   Category.clear();
-   VMaxThresh.clear();
-   MSLPThresh.clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool GenesisEventInfo::is_keeper(const TrackPoint &p) {
-   bool keep = true;
-
-   // Check event category
-   if(Category.size() > 0 &&
-      std::count(Category.begin(), Category.end(), p.level()) == 0) {
-      keep = false;
-   }
-
-   // Check VMax threshold
-   if(VMaxThresh.get_type() != thresh_na &&
-      !VMaxThresh.check(p.v_max())) {
-      keep = false;
-   }
-
-   // Check MSLP threshold
-   if(MSLPThresh.get_type() != thresh_na &&
-      !MSLPThresh.check(p.mslp())) {
-      keep = false;
-   }
-
-   return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Code for struct GenCTCInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-GenCTCInfo::GenCTCInfo() {
+TCGenNcOutInfo::TCGenNcOutInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::clear() {
-   model.clear();
-   cts_info.clear();
-   fbeg = fend = obeg = oend = (unixtime) 0;
-}
+TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
 
-////////////////////////////////////////////////////////////////////////
+   if(t.do_latlon)       do_latlon       = true;
+   if(t.do_fcst_genesis) do_fcst_genesis = true;
+   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
+   if(t.do_fcst_fy_oy)   do_fcst_fy_oy   = true;
+   if(t.do_fcst_fy_on)   do_fcst_fy_on   = true;
+   if(t.do_best_genesis) do_best_genesis = true;
+   if(t.do_best_tracks)  do_best_tracks  = true;
+   if(t.do_best_fy_oy)   do_best_fy_oy   = true;
+   if(t.do_best_fn_oy)   do_best_fn_oy   = true;
 
-GenCTCInfo & GenCTCInfo::operator+=(const GenCTCInfo &g) {
-
-   // Increment counts
-   cts_info.cts += g.cts_info.cts;
-
-   // Keep track of the minimum and maximum times
-   if(fbeg == 0 || g.fbeg < fbeg) fbeg = g.fbeg;
-   if(fend == 0 || g.fend > fend) fend = g.fend;
-   if(obeg == 0 || g.obeg < obeg) obeg = g.obeg;
-   if(oend == 0 || g.oend > oend) oend = g.oend;
 
    return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::add_fcst_valid(const unixtime beg,
-                                const unixtime end) {
+void TCGenNcOutInfo::clear() {
 
-   if(fbeg == 0 || fbeg > beg) fbeg = beg;
-   if(fend == 0 || fend < end) fend = end;
+   set_all_false();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::add_obs_valid(const unixtime beg,
-                               const unixtime end) {
+bool TCGenNcOutInfo::all_false() const {
 
-   if(obeg == 0 || obeg > beg) obeg = beg;
-   if(oend == 0 || oend < end) oend = end;
+   bool status = do_latlon       ||
+                 do_fcst_genesis || do_fcst_tracks ||
+                 do_fcst_fy_oy   || do_fcst_fy_on  ||
+                 do_best_genesis || do_best_tracks ||
+                 do_best_fy_oy   || do_best_fn_oy;
+
+   return(!status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenNcOutInfo::set_all_false() {
+
+   do_latlon       = false;
+   do_fcst_genesis = false;
+   do_fcst_tracks  = false;
+   do_fcst_fy_oy   = false;
+   do_fcst_fy_on   = false;
+   do_best_genesis = false;
+   do_best_tracks  = false;
+   do_best_fy_oy   = false;
+   do_best_fn_oy   = false;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenNcOutInfo::set_all_true() {
+
+   do_latlon       = true;
+   do_fcst_genesis = true;
+   do_fcst_tracks  = true;
+   do_fcst_fy_oy   = true;
+   do_fcst_fy_on   = true;
+   do_best_genesis = true;
+   do_best_tracks  = true;
+   do_best_fy_oy   = true;
+   do_best_fn_oy   = true;
 
    return;
 }
@@ -155,16 +145,30 @@ void TCGenVxOpt::clear() {
    StormId.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitHour.clear();
    Lead.clear();
    VxMaskName.clear();
    VxPolyMask.clear();
    VxGridMask.clear();
+   VxBasinMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
-   GenesisSecBeg = GenesisSecEnd = bad_data_int;
-   GenesisRadius = bad_data_double;
+   GenesisMatchPointTrack = false;
+   GenesisMatchRadius = bad_data_double;
+   GenesisMatchBeg = GenesisMatchEnd = bad_data_int;
+   DevHitRadius = bad_data_double;
+   DevHitBeg = DevHitEnd = bad_data_int;
+   OpsHitBeg = OpsHitEnd = bad_data_int;
+   DiscardFlag = false;
+   DevFlag = OpsFlag = false;
+   CIAlpha = bad_data_double;
+   OutputMap.clear();
+   NcInfo.clear();
+   ValidGenesisDHrThresh.clear();
+   BestUniqueFlag = false;
 
    return;
 }
@@ -172,10 +176,11 @@ void TCGenVxOpt::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
-   int i;
+   int i, beg, end;
    Dictionary *dict2 = (Dictionary *) 0;
    ConcatString file_name;
    StringArray sa;
+   bool status;
 
    // Conf: desc
    Desc = parse_conf_string(&dict, conf_key_desc);
@@ -193,19 +198,31 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    InitBeg = dict.lookup_unixtime(conf_key_init_beg);
    InitEnd = dict.lookup_unixtime(conf_key_init_end);
 
+   // Conf: InitInc
+   sa = dict.lookup_string_array(conf_key_init_inc);
+   for(i=0; i<sa.n(); i++) {
+      InitInc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: InitExc
+   sa = dict.lookup_string_array(conf_key_init_exc);
+   for(i=0; i<sa.n(); i++) {
+      InitExc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
    // Conf: valid_beg, valid_end
    ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = dict.lookup_unixtime(conf_key_valid_end);
 
    // Conf: init_hour
    sa = dict.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
       InitHour.add(timestring_to_sec(sa[i].c_str()));
    }
 
    // Conf: lead
    sa = dict.lookup_string_array(conf_key_lead);
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
       Lead.add(timestring_to_sec(sa[i].c_str()));
    }
 
@@ -217,25 +234,202 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
                       VxMaskName);
    }
 
+   // Conf: basin_mask
+   VxBasinMask = dict.lookup_string_array(conf_key_basin_mask);
+   if(VxBasinMask.n() > 0) {
+      mlog << Debug(2) << "Basin Mask: "
+           << write_css(VxBasinMask) << "\n";
+   }
+
    // Conf: dland_thresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
-   // Conf: genesis_window
-   int beg, end;
-   dict2 = dict.lookup_dictionary(conf_key_genesis_window);
-   parse_conf_range_int(dict2, beg, end);
-   GenesisSecBeg = beg*sec_per_hour;
-   GenesisSecEnd = end*sec_per_hour;
+   // Conf: genesis_match_point_to_track
+   GenesisMatchPointTrack =
+      dict.lookup_bool(conf_key_genesis_match_point_to_track);
 
-   // Conf: genesis_radius
-   GenesisRadius = dict.lookup_double(conf_key_genesis_radius);
+   // Conf: genesis_match_radius
+   GenesisMatchRadius =
+      dict.lookup_double(conf_key_genesis_match_radius);
+
+   // Conf: genesis_match_window
+   dict2 = dict.lookup_dictionary(conf_key_genesis_match_window);
+   parse_conf_range_int(dict2, beg, end);
+   GenesisMatchBeg = beg*sec_per_hour;
+   GenesisMatchEnd = end*sec_per_hour;
+
+   // Conf: dev_hit_radius
+   DevHitRadius = dict.lookup_double(conf_key_dev_hit_radius);
+
+   // Conf: dev_hit_window
+   dict2 = dict.lookup_dictionary(conf_key_dev_hit_window);
+   parse_conf_range_int(dict2, beg, end);
+   DevHitBeg = beg*sec_per_hour;
+   DevHitEnd = end*sec_per_hour;
+
+   // Conf: ops_hit_window
+   dict2 = dict.lookup_dictionary(conf_key_ops_hit_window);
+   parse_conf_range_int(dict2, beg, end);
+   OpsHitBeg = beg*sec_per_hour;
+   OpsHitEnd = end*sec_per_hour;
+
+   // Conf: discard_init_post_genesis_flag
+   DiscardFlag =
+      dict.lookup_bool(conf_key_discard_init_post_genesis_flag);
+
+   // Conf: dev_method_flag and ops_method_flag
+   DevFlag = dict.lookup_bool(conf_key_dev_method_flag);
+   OpsFlag = dict.lookup_bool(conf_key_ops_method_flag);
+
+   if(!DevFlag && !OpsFlag) {
+      mlog << Error << "\nTCGenVxOpt::process_config() -> "
+           << "at least one of " << conf_key_dev_method_flag
+           << " or " << conf_key_ops_method_flag
+           << " must be set to true!\n\n";
+      exit(1);
+   }
+   
+   // Conf: ci_alpha
+   CIAlpha = dict.lookup_double(conf_key_ci_alpha);
+
+   // Conf: output_flag
+   OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
+
+   for(i=0, status=false; i<OutputMap.size(); i++) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+         status = true;
+         break;
+      }
+   }
+
+   // Check for at least one output line type
+   if(!status) {
+      mlog << Error << "\nTCGenVxOpt::process_config() -> "
+           << "at least one output line type must be requested in \""
+           << conf_key_output_flag << "\"!\n\n";
+      exit(1);
+   }
+
+   // Conf: nc_pairs_flag
+   parse_nc_info(dict);
+
+   // Conf: valid_minus_genesis_diff_thresh
+   ValidGenesisDHrThresh =
+      dict.lookup_thresh(conf_key_valid_minus_genesis_diff_thresh);
+
+   // Conf: bset_unique_flag
+   BestUniqueFlag =
+      dict.lookup_bool(conf_key_best_unique_flag);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
+void TCGenVxOpt::process_basin_mask(const Grid &basin_grid,
+                                    const DataPlane &basin_data,
+                                    const StringArray &basin_abbr) {
+
+   // Nothing to do for an empty list
+   if(VxBasinMask.n() == 0) return;
+
+   int i, j;
+   DataPlane dp;
+   ConcatString cs;
+   SingleThresh st;
+   MaskPlane mp;
+
+   // If no grid has been defined, use the basin grid
+   if(VxGridMask.nxy() == 0) VxGridMask = basin_grid;
+
+   // Regrid the basin data, if necessary
+   dp = (VxGridMask == basin_grid ? basin_data :
+         met_regrid_nearest(basin_data, basin_grid, VxGridMask));
+
+   // Construct the threshold
+   for(i=0; i<VxBasinMask.n(); i++) {
+
+      // Convert string to integer
+      if(!basin_abbr.has(VxBasinMask[i], j)) {
+         mlog << Error << "\nTCGenConfInfo::process_basin_mask() -> "
+              << "\"" << VxBasinMask[i]
+              << "\" is not a valid basin name!\n\n";
+         exit(1);
+      }
+
+      // Build the threshold string
+      if(cs.nonempty()) cs << "||";
+      cs << "==" << j;
+   }
+   st.set(cs.c_str());
+
+   // Apply the threshold and create the mask
+   dp.threshold(st);
+   mp = dp.mask_plane();
+
+   // Set the area mask
+   if(VxAreaMask.is_empty()) VxAreaMask = mp;
+   else                      apply_mask(VxAreaMask, mp);
+
+   // Append to the mask name
+   if(VxMaskName.nonempty()) VxMaskName << ",";
+   VxMaskName << write_css(VxBasinMask);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = odict.lookup(conf_key_nc_pairs_flag);
+
+   if(!e) {
+      mlog << Error << "\nTCGenVxOpt::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(value) NcInfo.set_all_true();
+      else      NcInfo.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error << "\nTCGenVxOpt::parse_nc_info() -> "
+           << "bad type for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   NcInfo.do_latlon       = d->lookup_bool(conf_key_latlon_flag);
+   NcInfo.do_fcst_genesis = d->lookup_bool(conf_key_fcst_genesis);
+   NcInfo.do_fcst_tracks  = d->lookup_bool(conf_key_fcst_tracks);
+   NcInfo.do_fcst_fy_oy   = d->lookup_bool(conf_key_fcst_fy_oy);
+   NcInfo.do_fcst_fy_on   = d->lookup_bool(conf_key_fcst_fy_on);
+   NcInfo.do_best_genesis = d->lookup_bool(conf_key_best_genesis);
+   NcInfo.do_best_tracks  = d->lookup_bool(conf_key_best_tracks);
+   NcInfo.do_best_fy_oy   = d->lookup_bool(conf_key_best_fy_oy);
+   NcInfo.do_best_fn_oy   = d->lookup_bool(conf_key_best_fn_oy);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
    bool keep = true;
 
    // ATCF ID processed elsewhere
@@ -243,15 +437,15 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    // Only check basin, storm ID, cyclone number, and storm name for
    // BEST and operational tracks.
 
-   if(g.is_best_track() || g.is_oper_track()) {
+   if(gi.is_best_track() || gi.is_oper_track()) {
 
       // Check storm id
       if(StormId.n() > 0 &&
-         !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
+         !has_storm_id(StormId, gi.basin(), gi.cyclone(), gi.init()))
          keep = false;
 
       // Check storm name
-      if(StormName.n() > 0 && !StormName.has(g.storm_name()))
+      if(StormName.n() > 0 && !StormName.has(gi.storm_name()))
          keep = false;
    }
 
@@ -260,38 +454,40 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    // Only check intialization and lead times for forecast and
    // operational tracks.
 
-   if(!g.is_best_track() || g.is_oper_track()) {
+   if(!gi.is_best_track() || gi.is_oper_track()) {
 
-      // Initialization time window
-      if((InitBeg     > 0 &&  InitBeg > g.init()) ||
-         (InitEnd     > 0 &&  InitEnd < g.init()))
+      // Initialization times
+      if((InitBeg     > 0 &&  InitBeg >   gi.init())  ||
+         (InitEnd     > 0 &&  InitEnd <   gi.init())  ||
+         (InitInc.n() > 0 && !InitInc.has(gi.init())) ||
+         (InitExc.n() > 0 &&  InitExc.has(gi.init())))
          keep = false;
 
       // Initialization hours
-      if(InitHour.n() > 0 && !InitHour.has(g.init_hour()))
+      if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
          keep = false;
 
       // Lead times
-      if(Lead.n() > 0 && !Lead.has(g.lead_time()))
+      if(Lead.n() > 0 && !Lead.has(gi.genesis_lead()))
          keep = false;
    }
 
    if(!keep) return(keep);
 
    // Valid time window
-   if((ValidBeg > 0 && ValidBeg > g.valid_min()) ||
-      (ValidEnd > 0 && ValidEnd < g.valid_max()))
+   if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
+      (ValidEnd > 0 && ValidEnd < gi.valid_max()))
       keep = false;
 
    // Poly masking
    if(VxPolyMask.n_points() > 0 &&
-     !VxPolyMask.latlon_is_inside(g.lat(), g.lon()))
+     !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
       keep = false;
 
    // Area masking
    if(!VxAreaMask.is_empty()) {
       double x, y;
-      VxGridMask.latlon_to_xy(g.lat(), -1.0*g.lon(), x, y);
+      VxGridMask.latlon_to_xy(gi.lat(), -1.0*gi.lon(), x, y);
       if(x < 0 || x >= VxGridMask.nx() ||
          y < 0 || y >= VxGridMask.ny()) {
          keep = false;
@@ -303,11 +499,17 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
 
    // Distance to land
    if((DLandThresh.get_type() != no_thresh_type) &&
-      (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+      (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
       keep = false;
 
    // Return the keep status
    return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+STATOutputType TCGenVxOpt::output_map(STATLineType t) const {
+   return(OutputMap.at(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -342,19 +544,25 @@ void TCGenConfInfo::init_from_scratch() {
 void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
-   InitFreqSec = bad_data_int;
-   LeadSecBeg = bad_data_int;
-   LeadSecEnd = bad_data_int;
+   InitFreqHr = bad_data_int;
+   ValidFreqHr = bad_data_int;
+   FcstSecBeg = bad_data_int;
+   FcstSecEnd = bad_data_int;
    MinDur = bad_data_int;
    FcstEventInfo.clear();
    BestEventInfo.clear();
-   OperEventInfo.clear();
+   OperTechnique.clear();
    DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
-   Version.clear();
-   CIAlpha = bad_data_double;
+   BasinFile.clear();
+   BasinGrid.clear();
+   BasinData.clear();
+   BasinAbbr.clear();
+   NcOutGrid.clear();
    OutputMap.clear();
+   NcInfo.clear();
+   Version.clear();
 
    return;
 }
@@ -384,24 +592,33 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 void TCGenConfInfo::process_config() {
    Dictionary *dict = (Dictionary *) 0;
    TCGenVxOpt vx_opt;
-   bool status;
    int i, beg, end;
 
    // Conf: init_freq
-   InitFreqSec = Conf.lookup_int(conf_key_init_freq)*sec_per_hour;
+   InitFreqHr = Conf.lookup_int(conf_key_init_freq);
 
-   if(InitFreqSec <= 0) {
+   if(InitFreqHr <= 0) {
       mlog << Error << "\nTCGenConfInfo::process_config() -> "
            << "\"" << conf_key_init_freq << "\" must be greater than "
            << "zero!\n\n";
       exit(1);
    }
 
-   // Conf: lead_window
-   dict = Conf.lookup_dictionary(conf_key_lead_window);
+   // Conf: valid_freq
+   ValidFreqHr = Conf.lookup_int(conf_key_valid_freq);
+
+   if(ValidFreqHr <= 0) {
+      mlog << Error << "\nTCGenConfInfo::process_config() -> "
+           << "\"" << conf_key_valid_freq << "\" must be greater than "
+           << "zero!\n\n";
+      exit(1);
+   }
+
+   // Conf: fcst_hr_window
+   dict = Conf.lookup_dictionary(conf_key_fcst_hr_window);
    parse_conf_range_int(dict, beg, end);
-   LeadSecBeg = beg*sec_per_hour;
-   LeadSecEnd = end*sec_per_hour;
+   FcstSecBeg = beg*sec_per_hour;
+   FcstSecEnd = end*sec_per_hour;
 
    // Conf: min_duration
    MinDur = Conf.lookup_int(conf_key_min_duration);
@@ -414,37 +631,22 @@ void TCGenConfInfo::process_config() {
    dict = Conf.lookup_dictionary(conf_key_best_genesis);
    BestEventInfo = parse_conf_genesis_event_info(dict);
 
-   // Conf: oper_genesis
-   dict = Conf.lookup_dictionary(conf_key_oper_genesis);
-   OperEventInfo = parse_conf_genesis_event_info(dict);
+   // Conf: oper_technique
+   OperTechnique = Conf.lookup_string(conf_key_oper_technique);
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);
 
+   // Conf: BasinFile
+   BasinFile = Conf.lookup_string(conf_key_basin_file);
+
+   // Conf: NcOutGrid
+   parse_grid_mask(Conf.lookup_string(conf_key_nc_pairs_grid),
+                   NcOutGrid);
+
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version.c_str());
-
-   // Conf: CIAlpha
-   CIAlpha = Conf.lookup_double(conf_key_ci_alpha);
-
-   // Conf: OutputMap
-   OutputMap = parse_conf_output_flag(dict, txt_file_type, n_txt);
-
-   for(i=0, status=false; i<OutputMap.size(); i++) {
-      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
-         status = true;
-         break;
-      }
-   }
-
-   // Check for at least one output line type
-   if(!status) {
-      mlog << Error << "\nTCGenConfInfo::process_config() -> "
-           << "at least one output line type must be requested in \""
-           << conf_key_output_flag << "\"!\n\n";
-      exit(1);
-   }
 
    // Conf: Filter
    dict = Conf.lookup_array(conf_key_filter, false);
@@ -480,34 +682,46 @@ void TCGenConfInfo::process_config() {
       } // end for i
    }
 
-   // If not already set, define the valid time window relative to the
-   // initialization time window.
+   // Loop through the filters
    for(size_t j=0; j<VxOpt.size(); j++) {
 
+      // Process the basin mask
+      if(VxOpt[j].VxBasinMask.n() > 0) {
+
+         // Load the basin data, if needed.
+         if(BasinData.is_empty()) {
+            load_tc_basin(BasinFile, BasinGrid, BasinData, BasinAbbr);
+         }
+
+         // Apply the basin mask
+         VxOpt[j].process_basin_mask(BasinGrid, BasinData, BasinAbbr);
+      }
+
+      // Update the summary OutputMap and NcInfo
+      process_flags(VxOpt[j].OutputMap, VxOpt[j].NcInfo);
+
+      // If not already set, define the valid time window relative to the
+      // initialization time window.
       if(VxOpt[j].InitBeg != 0 && VxOpt[j].ValidBeg == 0) {
-         VxOpt[j].ValidBeg = VxOpt[j].InitBeg + LeadSecBeg + VxOpt[j].GenesisSecBeg;
+         VxOpt[j].ValidBeg = VxOpt[j].InitBeg + FcstSecBeg;
          mlog << Debug(3) << "For filter " << j+1 << " setting "
               << conf_key_valid_beg << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidBeg)
               <<  ") = " << conf_key_init_beg << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitBeg)
-              << ") + " << conf_key_lead_window << ".beg ("
-              << LeadSecBeg/sec_per_hour
-              << ") + " << conf_key_genesis_window << ".beg ("
-              << VxOpt[j].GenesisSecBeg/sec_per_hour << ").\n";
+              << ") + " << conf_key_fcst_hr_window << ".beg ("
+              << FcstSecBeg/sec_per_hour << ").\n";
       }
 
       if(VxOpt[j].InitEnd != 0 && VxOpt[j].ValidEnd == 0) {
-         VxOpt[j].ValidEnd = VxOpt[j].InitEnd + LeadSecEnd + VxOpt[j].GenesisSecEnd;
+         VxOpt[j].ValidEnd = VxOpt[j].InitEnd + FcstSecEnd;
          mlog << Debug(3) << "For filter " << j+1 << " setting "
               << conf_key_valid_end << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidEnd)
               <<  ") = " << conf_key_init_end << " ("
               << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitEnd)
-              << ") + " << conf_key_lead_window << ".end ("
-              << LeadSecEnd/sec_per_hour
-              << ") + " << conf_key_genesis_window << ".end ("
-              << VxOpt[j].GenesisSecEnd/sec_per_hour << ").\n";
+              << ") + " << conf_key_fcst_hr_window << ".end ("
+              << FcstSecEnd/sec_per_hour << ").\n";
       }
    }
 
@@ -516,13 +730,39 @@ void TCGenConfInfo::process_config() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TCGenConfInfo::process_flags(
+        const map<STATLineType,STATOutputType> &m,
+        const TCGenNcOutInfo &n) {
+   int i;
+
+   // Initialize output map
+   if(OutputMap.empty()) OutputMap = m;
+
+   // Update output map
+   for(i=0; i<n_txt; i++) {
+      if(m.at(txt_file_type[i]) == STATOutputType_Both) {
+         OutputMap[txt_file_type[i]] = STATOutputType_Both;
+      }
+      else if(m.at(txt_file_type[i]) == STATOutputType_Stat &&
+              OutputMap[txt_file_type[i]] == STATOutputType_None) {
+         OutputMap[txt_file_type[i]] = STATOutputType_Stat;
+      }
+   }
+
+   // Update NcInfo flags
+   NcInfo += n;
+   
+   return;
+}
+////////////////////////////////////////////////////////////////////////
+
 double TCGenConfInfo::compute_dland(double lat, double lon) {
    double x_dbl, y_dbl, dist;
    int x, y;
 
    // Load the distance to land data, if needed.
    if(DLandData.is_empty()) {
-      load_dland(DLandFile, DLandGrid, DLandData);
+      load_tc_dland(DLandFile, DLandGrid, DLandData);
    }
 
    // Convert lat,lon to x,y
@@ -541,38 +781,357 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Miscellaneous utility functions.
-//
-////////////////////////////////////////////////////////////////////////
 
-GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
-   GenesisEventInfo info;
-   StringArray sa;
-   int i;
+ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
+   double x_dbl, y_dbl;
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_genesis_event_info() -> "
-           << "empty dictionary!\n\n";
+   int x, y, i;
+
+   // Load the basin data, if needed.
+   if(BasinData.is_empty()) {
+      load_tc_basin(BasinFile, BasinGrid, BasinData, BasinAbbr);
+   }
+
+   // Convert lat,lon to x,y
+   BasinGrid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
+
+   // Round to nearest int
+   x = nint(x_dbl);
+   y = nint(y_dbl);
+
+   // Basin ID
+   i = ((x < 0 || x >= BasinGrid.nx() ||
+         y < 0 || y >= BasinGrid.ny()) ?
+         bad_data_int :
+         nint(BasinData.get(x, y)));
+
+   // Convert to string
+   if(i < 0 || i >= BasinAbbr.n()) {
+      mlog << Error << "\nTCGenConfInfo::compute_basin() -> "
+           << "unexpected basin id value (" << i
+           << ") found in basin file \"" << BasinFile
+           << "\"\n\n";
       exit(1);
    }
 
-   // Conf: technique (optional)
-   info.Technique = dict->lookup_string(conf_key_technique, false);
+   return(BasinAbbr[i]);
+}
 
-   // Conf: category (optional)
-   sa = dict->lookup_string_array(conf_key_category, false);
-   for(i=0; i<sa.n(); i++) {
-      info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
+////////////////////////////////////////////////////////////////////////
+
+STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
+   return(OutputMap.at(t));
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class GenCTCInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo::GenCTCInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo::~GenCTCInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::clear() {
+
+   Model.clear();
+   FcstBeg = FcstEnd = (unixtime) 0;
+   BestBeg = BestEnd = (unixtime) 0;
+
+   CTSDev.clear();
+   CTSOps.clear();
+
+   VxOpt     = (const TCGenVxOpt *) 0;
+   NcOutGrid = (const Grid *) 0;
+
+   ValidGenesisDHrThresh.clear();
+   BestUniqueFlag = false;
+
+   BestDevHitMap.clear();
+   BestOpsHitMap.clear();
+
+   DpMap.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::set_vx_opt(const TCGenVxOpt *vx_opt,
+                            const Grid *nc_out_grid) {
+
+   if(!vx_opt) return;
+
+   // Store pointer
+   VxOpt = vx_opt;
+
+   // Store config options
+   ValidGenesisDHrThresh = VxOpt->ValidGenesisDHrThresh;
+   BestUniqueFlag        = VxOpt->BestUniqueFlag;
+
+   // Setup alpha value
+   if(VxOpt->DevFlag) {
+      CTSDev.allocate_n_alpha(1);
+      CTSDev.alpha[0] = VxOpt->CIAlpha;
+   }
+   if(VxOpt->OpsFlag) {
+      CTSOps.allocate_n_alpha(1);
+      CTSOps.alpha[0] = VxOpt->CIAlpha;
    }
 
-   // Conf: vmax_thresh
-   info.VMaxThresh = dict->lookup_thresh(conf_key_vmax_thresh);
+   // Setup NetCDF pairs output fields
+   if(!VxOpt->NcInfo.all_false()) {
+      NcOutGrid = nc_out_grid;
 
-   // Conf: mslp_thresh
-   info.MSLPThresh = dict->lookup_thresh(conf_key_mslp_thresh);
+      // Initialize data plane of all zeros
+      DataPlane dp;
+      dp.set_size(NcOutGrid->nx(), NcOutGrid->ny(), 0.0);
 
-   return(info);
+      // Add map entries for requested outputs
+      if(VxOpt->NcInfo.do_fcst_genesis) DpMap[fgen_str] = dp;
+      if(VxOpt->NcInfo.do_fcst_tracks)  DpMap[ftrk_str] = dp;
+      if(VxOpt->NcInfo.do_best_genesis) DpMap[bgen_str] = dp;
+      if(VxOpt->NcInfo.do_best_tracks)  DpMap[btrk_str] = dp;
+      if(VxOpt->DevFlag) {
+         if(VxOpt->NcInfo.do_fcst_fy_oy) DpMap[fdev_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_fcst_fy_on) DpMap[fdev_fyon_str] = dp;
+         if(VxOpt->NcInfo.do_best_fy_oy) DpMap[bdev_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_best_fn_oy) DpMap[bdev_fnoy_str] = dp;
+      }
+      if(VxOpt->OpsFlag) {
+         if(VxOpt->NcInfo.do_fcst_fy_oy) DpMap[fops_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_fcst_fy_on) DpMap[fops_fyon_str] = dp;
+         if(VxOpt->NcInfo.do_best_fy_oy) DpMap[bops_fyoy_str] = dp;
+         if(VxOpt->NcInfo.do_best_fn_oy) DpMap[bops_fnoy_str] = dp;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_dev(GenesisPairCategory c,
+                         const GenesisInfo *fgi,
+                         const GenesisInfo *bgi) {
+
+   // Discard
+   if(c == DiscardGenesis) {
+      return;
+   }
+   // Hits
+   else if(c == FYOYGenesis) {
+      CTSDev.cts.inc_fy_oy();
+      inc_pnt(fgi->lat(), fgi->lon(), fdev_fyoy_str);
+      BestDevHitMap[bgi] += 1;
+      
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), bdev_fyoy_str);
+      }
+   }
+   // False Alarms
+   else if(c == FYONGenesis) {
+      CTSDev.cts.inc_fy_on();
+      inc_pnt(fgi->lat(), fgi->lon(), fdev_fyon_str);
+   }
+   // Misses
+   else if(c == FNOYGenesis) {
+      CTSDev.cts.inc_fn_oy();
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), bdev_fnoy_str);
+      }
+   }
+   // Correct Negatives (should be none)
+   else {
+      CTSDev.cts.inc_fn_on();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_ops(GenesisPairCategory c,
+                         const GenesisInfo *fgi,
+                         const GenesisInfo *bgi) {
+
+   // Discard
+   if(c == DiscardGenesis) {
+      return;
+   }
+   // Hits
+   else if(c == FYOYGenesis) {
+      CTSOps.cts.inc_fy_oy();
+      inc_pnt(fgi->lat(), fgi->lon(), fops_fyoy_str);
+      BestOpsHitMap[bgi] += 1;
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), bops_fyoy_str);
+      }
+   }
+   // False Alarms
+   else if(c == FYONGenesis) {
+      CTSOps.cts.inc_fy_on();
+      inc_pnt(fgi->lat(), fgi->lon(), fops_fyon_str);
+   }
+   // Misses
+   else if(c == FNOYGenesis) {
+      CTSOps.cts.inc_fn_oy();
+
+      // Count all BEST track genesis pairs
+      if(!BestUniqueFlag) {
+         inc_pnt(bgi->lat(), bgi->lon(), bops_fnoy_str);
+      }
+   }
+   // Correct Negatives (should be none)
+   else {
+      CTSOps.cts.inc_fn_on();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_best_unique() {
+
+   // Only process when the flag is set
+   if(!BestUniqueFlag) return;
+
+   map<const GenesisInfo *,int>::iterator it;
+
+   // Count the dev BEST track hits and false alarms
+   for(it=BestDevHitMap.begin(); it!=BestDevHitMap.end(); it++) {
+
+      // Zero hits is a miss
+      if(it->second == 0) {
+         inc_pnt(it->first->lat(), it->first->lon(), bdev_fnoy_str);
+      }
+      // Otherwise, it's a hit
+      else {
+         inc_pnt(it->first->lat(), it->first->lon(), bdev_fyoy_str);
+      }
+   }
+
+   // Count the ops BEST track hits and false alarms
+   for(it=BestOpsHitMap.begin(); it!=BestOpsHitMap.end(); it++) {
+
+      // Zero hits is a miss
+      if(it->second == 0) {
+         inc_pnt(it->first->lat(), it->first->lon(), bops_fnoy_str);
+      }
+      // Otherwise, it's a hit
+      else {
+         inc_pnt(it->first->lat(), it->first->lon(), bops_fyoy_str);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_fcst_gen(const GenesisInfo &gi) {
+
+   // Track the range of valid times
+   if(FcstBeg == 0 || FcstBeg > gi.valid_min()) FcstBeg = gi.valid_min();
+   if(FcstEnd == 0 || FcstEnd < gi.valid_max()) FcstEnd = gi.valid_max();
+   
+   // Count the genesis and track points
+   inc_pnt(gi.lat(), gi.lon(), fgen_str);
+   inc_trk(gi, ftrk_str);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_best_gen(const GenesisInfo &gi) {
+
+   // Nothing to do if this genesis has already been counted
+   if(BestDevHitMap.count(&gi) > 0 ||
+      BestOpsHitMap.count(&gi) > 0) return;
+
+   // Add hit counter entries for this storm
+   BestDevHitMap[&gi] = 0;
+   BestOpsHitMap[&gi] = 0;
+
+   // Track the range of valid times
+   if(BestBeg == 0 || BestBeg > gi.valid_min()) BestBeg = gi.valid_min();
+   if(BestEnd == 0 || BestEnd < gi.valid_max()) BestEnd = gi.valid_max();
+
+   // Count the genesis and track points
+   inc_pnt(gi.lat(), gi.lon(), bgen_str);
+   inc_trk(gi, btrk_str);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_pnt(double lat, double lon, const string &s) {
+
+   // Nothing to do if there is no DataPlane map entry
+   if(DpMap.count(s) == 0) return;
+
+   int x, y;
+   double x_dbl, y_dbl;
+
+   NcOutGrid->latlon_to_xy(lat, -1.0*lon, x_dbl, y_dbl);
+   x = nint(x_dbl);
+   y = nint(y_dbl);
+
+   // Only increment points on the grid
+   if(x >= 0 && x < NcOutGrid->nx() &&
+      y >= 0 && y < NcOutGrid->ny()) {
+      DpMap[s].set((DpMap[s])(x, y) + 1, x, y);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
+
+   // Nothing to do if there is no DataPlane map entry
+   if(DpMap.count(s) == 0) return;
+
+   // Loop through the track points
+   for(int i=0; i<gi.n_points(); i++) {
+
+      // Count points whose valid time is close enough to genesis time
+      int dhr = (gi[i].valid() - gi.genesis_time())/sec_per_hour;
+      if(ValidGenesisDHrThresh.check(dhr)) {
+         inc_pnt(gi[i].lat(), gi[i].lon(), s);
+      }
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

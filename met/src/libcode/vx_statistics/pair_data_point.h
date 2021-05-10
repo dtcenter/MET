@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -64,6 +64,10 @@ class PairDataPoint : public PairBase {
       bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
                          const NumArray &cmn_in, const NumArray &csd_in,
                          const NumArray &w_in);
+
+      PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
+                                            const SingleThresh &ot,
+                                            const SetLogic type) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,6 +132,11 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray mpr_column;    // Names of MPR columns or diffs of columns
+      ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
+
+      //////////////////////////////////////////////////////////////////
+
       StringArray msg_typ_sfc;   // List of surface message types
       StringArray msg_typ_lnd;   // List of surface land message types
       StringArray msg_typ_wtr;   // List of surface water message types
@@ -165,6 +174,7 @@ class VxPairDataPoint {
       int ***rej_fcst;           // Reject forecast bad data
       int ***rej_cmn;            // Reject climo mean bad data
       int ***rej_csd;            // Reject climo stdev bad data
+      int ***rej_mpr;            // Reject based on MPR filtering logic
       int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
@@ -187,9 +197,9 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
-      void set_sid_inc_filt(const StringArray);
-      void set_sid_exc_filt(const StringArray);
-      void set_obs_qty_filt(const StringArray);
+      void set_sid_inc_filt(const StringArray &);
+      void set_sid_exc_filt(const StringArray &);
+      void set_obs_qty_filt(const StringArray &);
 
       // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
@@ -204,6 +214,10 @@ class VxPairDataPoint {
                       GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
+
+      void set_mpr_thresh(const StringArray &, const ThreshArray &);
+
+      void set_climo_cdf_info(const ClimoCDFInfo &);
 
       void set_msg_typ_sfc(const StringArray &);
       void set_msg_typ_lnd(const StringArray &);
@@ -239,10 +253,20 @@ class VxPairDataPoint {
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Apply conditional thresholds to subset the pairs
-extern PairDataPoint subset_pairs(const PairDataPoint &,
+extern bool check_fo_thresh(double, double, double, double,
                         const SingleThresh &, const SingleThresh &,
                         const SetLogic);
+
+extern bool check_mpr_thresh(double, double, double, double,
+                        const StringArray &, const ThreshArray &,
+                        ConcatString * = 0);
+
+extern double get_mpr_column_value(double, double, double, double,
+                        const char *);
+
+extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
+                        DataPlane &, DataPlane &,
+                        const StringArray &, const ThreshArray &);
 
 // Apply conditional thresholds to subset the wind pairs
 extern void subset_wind_pairs(const PairDataPoint &,
@@ -253,6 +277,13 @@ extern void subset_wind_pairs(const PairDataPoint &,
 // Subset pairs for a specific climatology CDF bin
 extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
                         const ThreshArray &, int i_bin);
+
+// Write the point observation in the MET point format for logging
+extern ConcatString point_obs_to_string(
+                       float *hdr_arr, const char *hdr_typ_str,
+                       const char *hdr_sid_str, unixtime hdr_ut,
+                       const char *obs_qty, float *obs_arr,
+                       const char *var_name);
 
 ////////////////////////////////////////////////////////////////////////
 

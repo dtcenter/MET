@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -63,10 +63,10 @@ int main(int argc, char *argv[]) {
         << "Read " << count << " lines from input file \""
         << input_filename << "\"\n";
    mlog << Debug(1)
-        << "TrackInfoArray contains " << t_array.n_tracks()
+        << "TrackInfoArray contains " << t_array.n()
         << " tracks.\n";
 
-   for(i=0; i<t_array.n_tracks(); i++) {
+   for(i=0; i<t_array.n(); i++) {
       mlog << Debug(1)
            << "TrackInfo[" << i+1 << "] contains "
            << t_array[i].n_points() << " points.\n";

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -161,13 +161,13 @@ void DataPlane::dump(ostream & out, int depth) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void DataPlane::set_size(int x, int y) {
+void DataPlane::set_size(int nx, int ny, double v) {
 
       //
       //  if already requested size, erase existing data
       //
 
-   if ( Nx == x && Ny == y ) {
+   if ( Nx == nx && Ny == ny ) {
       erase();
       return;
    }
@@ -176,8 +176,8 @@ void DataPlane::set_size(int x, int y) {
       //  delete exisiting data, if necessary
       //
 
-   Nx = x;
-   Ny = y;
+   Nx = nx;
+   Ny = ny;
 
    Nxy = Nx*Ny;
 
@@ -186,7 +186,7 @@ void DataPlane::set_size(int x, int y) {
       //
 
    Data.resize(Nxy);
-   Data.assign(Nxy, 0);
+   Data.assign(Nxy, v);
 
    return;
 }
@@ -242,9 +242,7 @@ void DataPlane::set_constant(double v) {
       exit(1);
    }
 
-   int j;
-
-   for(j=0; j<Nxy; ++j) Data[j] = v;
+   Data.assign(Nxy, v);
 
    return;
 }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,6 +18,7 @@
 #include "track_info.h"
 #include "track_pair_info.h"
 #include "atcf_prob_line.h"
+#include "pair_data_genesis.h"
 #include "prob_info_base.h"
 #include "prob_info_array.h"
 #include "prob_rirw_info.h"

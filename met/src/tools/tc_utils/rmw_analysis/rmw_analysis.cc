@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -345,7 +345,7 @@ void process_files() {
         // Filter tracks
         filter_tracks(adeck_tracks);
 
-        if (adeck_tracks.n_tracks() > 0) {
+        if (adeck_tracks.n() > 0) {
 
             for(int i_var = 0; i_var < data_names.size(); i_var++) {
                 NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
@@ -620,7 +620,7 @@ void process_track_file(const ConcatString& filename,
 
     // Dump out the track information
     mlog << Debug(3)
-         << "Identified " << tracks.n_tracks() << " track(s).\n";
+         << "Identified " << tracks.n() << " track(s).\n";
 
     remove(adeck_source.c_str());
 
@@ -673,7 +673,7 @@ void filter_tracks(TrackInfoArray& tracks) {
     tracks.clear();
 
     // Loop over tracks
-    for(int i = 0; i < t.n_tracks(); i++) {
+    for(int i = 0; i < t.n(); i++) {
         // Valid time window
         if((conf_info.ValidBeg > 0 &&
             conf_info.ValidBeg > t[i].valid_min()) ||

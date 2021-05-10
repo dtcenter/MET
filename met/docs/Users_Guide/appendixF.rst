@@ -6,18 +6,20 @@ Appendix F Python Embedding
 Introduction
 ____________
 
-MET includes the ability to embed Python to a limited degree. Users may use Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET version 9.0 is built on Python 3.6+. 
+MET includes the ability to embed Python to a limited degree. Users may use Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
 
 Compiling Python Support
 ________________________
 
 In order to use Python embedding, the user's local Python installation must have the C-language Python header files and libraries. Sometimes when Python is installed locally, these header files and libraries are deleted at the end of the installation process, leaving only the binary executable and run-time shared object files. But the Python header files and libraries must be present to compile support in MET for Python embedding. Assuming the requisite Python files are present, and that Python embedding is enabled when building MET (which is done by passing the **--enable-python** option to the **configure** command line), the MET C++ code will use these in the compilation process to link directly to the Python libraries.
 
-In addition to the **configure** option mentioned above, two variables, **MET_PYTHON_CC** and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python header files and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python-config**, whose output can be used to set these environment variables as follows:
+The local Python installation must also support a minimum set of required packages. The MET build includes some python wrapper scripts to facilitate the passing of data in memory as well as the reading and writing of temporary files. The packages required by those wrapper scripts are **sys, os, argparse, importlib, numpy and netCDF4**. While most of these are standard packages and readily available, numpy and netCDF4 may not be. Users are advised to confirm their availability prior to compiling MET with python embedding support.
 
-• On the command line, run “**python-config --cflags**”. Set the value of **MET_PYTHON_CC** to the output of that command.
+In addition to the **configure** option mentioned above, two variables, **MET_PYTHON_CC** and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python header files and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
 
-• Again on the command line, run “**python-config --ldflags**”. Set the value of **MET_PYTHON_LD** to the output of that command.
+• On the command line, run “**python3-config --cflags**”. Set the value of **MET_PYTHON_CC** to the output of that command.
+
+• Again on the command line, run “**python3-config --ldflags**”. Set the value of **MET_PYTHON_LD** to the output of that command.
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
@@ -35,22 +37,24 @@ The types of Python embedding supported in MET are described below. In all cases
 
 Setting this environment variable triggers slightly different processing logic in MET. Rather than executing the user-specified script with compiled Python instance directly, MET does the following:
 
-1. Wrap the user's Python script and arguments with a wrapper script (write_pickle_mpr.py, write_pickle_point.py, or write_pickle_dataplane.py) and specify the name of a temporary file to be written.
+1. Wrap the user's Python script and arguments with a wrapper script (write_tmp_mpr.py, write_tmp_point.py, or write_tmp_dataplane.py) and specify the name of a temporary file to be written.
 
-2. Use a system call to the **MET_PYTHON_EXE** Python instance to execute these commands and write the resulting data objects to a temporary Python pickle file.
+2. Use a system call to the **MET_PYTHON_EXE** Python instance to execute these commands and write the resulting data objects to a temporary ASCII or NetCDF file.
 
-3. Use the compiled Python instance to read data from that temporary pickle file.
+3. Use the compiled Python instance to run a wrapper script (read_tmp_ascii.py or read_tmp_dataplane.py) to read data from that temporary file.
 
 With this approach, users should be able to execute Python scripts in their own custom environments.
+
+.. _pyembed-2d-data:
 
 Python Embedding for 2D data
 ____________________________
 
-We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy arrays or by using Xarray objects. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy array or an Xarray object by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy array or an Xarray object. MET can then ingest the data via the Python script. Note that whether a NumPy array or an Xarray object is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
+We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy N-dimensional arrays (ndarrays) or by using Xarray DataArrays. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy ndarray or an Xarray DataArray by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy ndarray or an Xarray DataArray. MET can then ingest the data via the Python script. Note that whether a NumPy ndarray or an Xarray DataArray is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
 
-**Using NumPy**
+**Using NumPy N-dimensional Arrays**
 
-The data must be loaded into a 2D NumPy array named **met_data**. In addition there must be a Python dictionary named **attrs** which contains metadata such as timestamps, grid projection and other information. Here is an example **attrs** dictionary:
+The data must be loaded into a 2D NumPy ndarray named **met_data**. In addition there must be a Python dictionary named **attrs** which contains metadata such as timestamps, grid projection and other information. Here is an example **attrs** dictionary:
 
 .. code-block:: none
 
@@ -65,7 +69,9 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
      'long_name': 'FooBar',
      'level':     'Surface',
      'units':     'None',
-  
+ 
+     # Define 'grid' as a string or a dictionary
+ 
      'grid': {
         'type': 'Lambert Conformal',
         'hemisphere': 'N',
@@ -83,12 +89,31 @@ The data must be loaded into a 2D NumPy array named **met_data**. In addition th
         'ny': 129,
       }
   
-     }
+  }
 
+In the **attrs** dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
 
-In the dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary is itself a dictionary.
+If specified as a string, **grid** can be defined as follows:
 
-The supported grid **type** strings are described below:
+• As a named grid:
+
+.. code-block:: none
+
+  'grid': 'G212'
+
+• As a grid specification string, as described in :ref:`appendixB`:
+
+.. code-block:: none
+
+  'grid': 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'
+
+• As the path to an existing gridded data file:
+
+.. code-block:: none
+
+  'grid': '/path/to/sample_data.grib'
+
+When specified as a dictionary, the contents of the **grid** dictionary vary based on the grid **type** string. The entries for the supported grid types are described below:
 
 • **Lambert Conformal** grid dictionary entries:
 
@@ -149,9 +174,17 @@ The supported grid **type** strings are described below:
 
 Additional information about supported grids can be found in :ref:`appendixB`.
 
-**Using Xarray Objects**
+**Using Xarray DataArrays**
 
-To use Xarray objects, a similar procedure to the NumPy case is followed. An Xarray object has a NumpyArray called **values**, and an attributes dictionary called **attrs**. The user must name the Xarray object to be **met_data**. When one of the MET tools runs the Python script, it will look for an Xarray object named **met_data**, and will retrieve the data and metadata from the **values** and **attrs** parts, respectively, of the Xarray object. The Xarray **attrs** dictionary is populated in the same way as for the NumPy interface. The **values** Numpy array part of the Xarray object is also populated in the same way as the NumPy case.
+To use Xarray DataArrays, a similar procedure to the NumPy case is followed. The Xarray DataArray can be represented as a NumPy N-dimensional array (ndarray) via the **values** property of the DataArray, and an **attrs** property that contains a dictionary of attributes. The user must name the Xarray DataArray to be **met_data**. When one of the MET tools runs the Python script, it will look for an Xarray DataArray named **met_data**, and will retrieve the data and metadata from the **values** and **attrs** properties, respectively, of the Xarray DataArray. The Xarray DataArray **attrs** dictionary is populated in the same way as for the NumPy interface (please see :ref:`pyembed-2d-data` for requirements of each entry in the **attrs** dictionary). The **values** NumPy ndarray property of the Xarray DataArray is also populated in the same way as the NumPy case.
+
+.. note::
+   Currently, MET does not support Xarray Dataset structures. If you have a Dataset in Xarray, you can create a DataArray of a single variable using:
+
+   met_data = xr.DataArray(ds.varname,attrs=ds.attrs)
+
+   | ds = your Dataset name
+   | varname = variable name in the Dataset you'd like to use in MET
 
 __________________
 

@@ -21,12 +21,12 @@ SUBDIRS =
 wrappersdir = $(pkgdatadir)/wrappers
 
 wrappers_DATA = \
-     generic_python.py \
-     generic_pickle.py \
-     read_pickle_dataplane.py \
-     write_pickle_dataplane.py \
-     write_pickle_mpr.py \
-     write_pickle_point.py
+     set_python_env.py \
+     read_tmp_dataplane.py \
+     read_tmp_ascii.py \
+     write_tmp_dataplane.py \
+     write_tmp_point.py \
+     write_tmp_mpr.py
 
 EXTRA_DIST = ${wrappers_DATA}
 

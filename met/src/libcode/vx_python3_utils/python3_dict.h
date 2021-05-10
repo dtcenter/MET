@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -68,7 +68,7 @@ class Python3_Dict {
 
       int           lookup_int    (const char * key) const;
       double        lookup_double (const char * key) const;
-      ConcatString  lookup_string (const char * key) const;
+      ConcatString  lookup_string (const char * key, bool error_out = true) const;
 
       PyObject *    lookup_dict   (const char * key) const;
       PyObject *    lookup_list   (const char * key) const;

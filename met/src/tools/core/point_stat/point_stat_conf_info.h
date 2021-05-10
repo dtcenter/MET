@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -122,6 +122,9 @@ class PointStatVxOpt {
       StringArray     mask_grid;          // Masking grid strings
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
+
+      StringArray     mpr_sa;             // MPR column names
+      ThreshArray     mpr_ta;             // MPR column thresholds
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;

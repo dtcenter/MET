@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -97,7 +97,6 @@ class VarInfoGrib2 : public VarInfo
          // set stuff
          //
 
-      void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &);
 
       void set_record(int);

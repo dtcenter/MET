@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,6 +12,7 @@
 #include "string.h"
 
 #include "vx_python3_utils.h"
+#include "vx_statistics.h"
 #include "check_endian.h"
 
 #include "data_plane.h"
@@ -98,8 +99,8 @@ int nrows, ncols, Nx, Ny;
 
 if ( np.n_dims() != 2 )  {
 
-   mlog << Error << "\ndataplane_from_numpy_array() -> "
-        << "numpy array is not 2-dimensional! ... "
+   mlog << Error << "\ndataplane_from_data_array() -> "
+        << "data array is not 2-dimensional! ... "
         << "(dim = " << (np.n_dims()) << ")\n\n";
 
    exit ( 1 );
@@ -170,8 +171,8 @@ else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bi
 
 else  {
 
-   mlog << Error << "\ndataplane_from_numpy_array() -> "
-        << "unsupported numpy data type \""  << dtype << "\"\n\n";
+   mlog << Error << "\ndataplane_from_data_array() -> "
+        << "unsupported data type \""  << dtype << "\"\n\n";
 
    exit ( 1 );
 
@@ -219,9 +220,43 @@ dp_out.set_accum(t);
 
      ////////////////////
 
-PyObject * py_grid = attrs.lookup_dict("grid");
+   //
+   // attempt to parse "grid" as a string
+   //
 
-grid_from_python_dict(Python3_Dict(py_grid), grid_out);
+s = attrs.lookup_string("grid", false);
+
+if ( s.nonempty() ) {
+
+   grid_out = parse_grid_string(s.c_str());
+
+}
+else {
+
+   //
+   // otherwise, parse "grid" as a dictionary
+   //
+
+   PyObject * py_grid = attrs.lookup_dict("grid");
+
+   grid_from_python_dict(Python3_Dict(py_grid), grid_out);
+
+}
+
+   //
+   // make sure the grid and data dimensions match
+   //
+
+if ( grid_out.nx() != Nx || grid_out.ny() != Ny ) {
+
+   mlog << Error << "\ndataplane_from_numpy_array() -> "
+        << "the grid dimensions (" << grid_out.nx() << ", "
+        << grid_out.ny() << ") and data dimensions (" << Nx
+        << ", " << Ny << ") do not match!\n\n";
+
+   exit ( 1 );
+
+}
 
      ////////////////////
 

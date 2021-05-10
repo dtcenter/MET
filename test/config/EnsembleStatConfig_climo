@@ -82,8 +82,8 @@ nmep_smooth = {
 //
 fcst = {
    field = [
-      { name  = "TMP"; level = "Z2";   },
-      { name  = "TMP"; level = "P850"; }
+      { name  = "TMP"; level = "Z2";   message_type = [ "ADPSFC" ]; },
+      { name  = "TMP"; level = "P850"; message_type = [ "ADPUPA" ]; }
    ];
 }
 obs = fcst;
@@ -117,9 +117,8 @@ climo_stdev = {
 // May be set separately in each "obs.field" entry
 //
 climo_cdf = {
-   cdf_bins    = 4;
+   cdf_bins    = 10;
    center_bins = FALSE;
-   write_bins  = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,11 +208,11 @@ interp = {
 // Statistical output types
 //
 output_flag = {
-   ecnt  = STAT;
+   ecnt  = BOTH;
    rps   = STAT;
    rhist = STAT;
    phist = STAT;
-   orank = STAT;
+   orank = BOTH;
    ssvar = STAT;
    relp  = STAT;
 }

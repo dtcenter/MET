@@ -4,3 +4,4 @@ rmw_analysis
 .deps
 Makefile
 Makefile.in
+*.dSYM

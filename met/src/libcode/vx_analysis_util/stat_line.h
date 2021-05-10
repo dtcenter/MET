@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -61,10 +61,11 @@ class STATLine : public DataLine {
          //  retrieve values of the header columns
          //
 
-      bool         has      (const char *)                       const;
-      ConcatString get      (const char *, bool check_na = true) const;
-      const char * get_item (const char *, bool check_na = true) const;
-      const char * get_item (int,          bool check_na = true) const;
+      bool         has       (const char *)                       const;
+      int          get_offset(const char *)                       const;
+      ConcatString get       (const char *, bool check_na = true) const;
+      const char * get_item  (const char *, bool check_na = true) const;
+      const char * get_item  (int,          bool check_na = true) const;
 
       const char * version        () const;
       const char * model          () const;

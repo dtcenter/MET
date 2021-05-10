@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -331,8 +331,6 @@ if ( e.size() != NRC )  {
 
 }
 
-//for (j=0; j<NRC; ++j)  e[j] = "";
-
 Nrows = NR;
 Ncols = NC;
 
@@ -345,8 +343,6 @@ if ( !ColWidth.size() )  {
    exit ( 1 );
 
 }
-
-//for (j=0; j<Ncols; ++j)  ColWidth[j] = 0;
 
 InterColumnSpace.resize(Ncols - 1, default_ics);
 InterRowSpace.resize(Nrows - 1, default_irs);
@@ -421,6 +417,52 @@ for (jr=0; jr<NR; ++jr)  {
    for (jc=0; jc<Ncols; ++jc)  {
 
      Just[rc_to_n(jr + n_rows_old, jc)] = Just[rc_to_n(n_rows_old - 1, jc)];
+
+   }
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void AsciiTable::expand(const int NR, const int NC)
+
+{
+
+   //
+   // already big enough, nothing to do
+   //
+
+if ( NR < Nrows && NC < Ncols )  return;
+
+   //
+   // stash existing table
+   //
+
+AsciiTable at = *this;
+
+   //
+   // resize and copy over data
+   //
+
+set_size(max(Nrows, NR), max(Ncols, NC));
+
+int r, c;
+
+for (r=0; r<at.nrows(); ++r)  {
+
+   for (c=0; c<at.ncols(); ++c)  {
+
+      set_entry(r, c, at(r, c));
 
    }
 

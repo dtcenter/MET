@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -3157,8 +3157,8 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    // Difference in aspect ratio
    at.set_entry(row, c++, eng.pair_single[n].aspect_diff);
 
-   // Area ratio
-   at.set_entry(row, c++, eng.pair_single[n].area_ratio);
+   // Fcst/Obs area ratio
+   at.set_entry(row, c++, eng.pair_single[n].fo_area_ratio);
 
    // Intersection area
    at.set_entry(row, c++,
@@ -3460,8 +3460,8 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    // Difference in aspect ratio
    at.set_entry(row, c++, eng.pair_cluster[n].aspect_diff);
 
-   // Area ratio
-   at.set_entry(row, c++, eng.pair_cluster[n].area_ratio);
+   // Fcst/Obs area ratio
+   at.set_entry(row, c++, eng.pair_cluster[n].fo_area_ratio);
 
    // Intersection area
    at.set_entry(row, c++,

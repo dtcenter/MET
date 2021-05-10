@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -327,6 +327,18 @@ bool STATLine::has(const char *col_str) const
 
 {
 
+return ( !is_bad_data(get_offset(col_str)) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int STATLine::get_offset(const char *col_str) const
+
+{
+
 int offset = bad_data_int;
 int dim = bad_data_int;
 
@@ -353,10 +365,10 @@ if ( is_bad_data(offset) ) {
 }
 
    //
-   // Return whether a valid offset value was found
+   // Return the offset value
    //
 
-return ( !is_bad_data(offset) );
+return ( offset );
 
 }
 

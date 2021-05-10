@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -127,6 +127,15 @@ static const char nc_var_unit[]         = "obs_unit";
 static const string nc_att_use_var_id   = "use_var_id";
 static const char nc_att_obs_version[]  = "MET_Obs_version";
 static const char nc_att_met_point_nccf[] = "MET_point_NCCF";
+
+static const string description_att_name   = "description";
+static const string fill_value_att_name    = "_FillValue";
+static const string level_att_name         = "level";
+static const string long_name_att_name     = "long_name";
+static const string missing_value_att_name = "missing_value";
+static const string name_att_name          = "name";
+static const string units_att_name         = "units";
+
 
 static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* since [0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 

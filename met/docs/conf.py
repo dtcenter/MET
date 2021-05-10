@@ -19,12 +19,12 @@ print(sys.path)
 
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
-author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T.'
+author_list = 'Halley Gotway, J., K. Newman, H. Soh, J. Opatz, T. Jensen, J. Prestopnik, L. Goodrich, D. Fillmore, B. Brown, R. Bullock, T. Fowler'
 version = 'develop'
 verinfo = version
 release = f'{version}'
-release_year = '2020'
-release_date = f'{release_year}1022'
+release_year = '2021'
+release_date = f'{release_year}-05-10'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -53,8 +53,6 @@ suppress_warnings = ['ref.citation']
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 html_js_files = ['pop_ver.js']
-html_theme_options = {'canonical_url': 'https://dtcenter.github.io/MET/latest/'}
-html_theme_options['versions'] = {'latest': '../latest', 'develop': '../develop'}
 html_css_files = ['theme_override.css']
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -77,13 +75,9 @@ numfig_format = {
 
 # -- Export variables --------------------------------------------------------
 
-rst_epilog = """
-.. |copyright|    replace:: {copyrightstr}
-.. |author_list|  replace:: {author_liststr}
-.. |release_date| replace:: {release_datestr}
-.. |release_year| replace:: {release_yearstr}
-""".format(copyrightstr    = copyright,
-           author_liststr  = author_list,
-           release_datestr = release_date,
-           release_yearstr = release_year)
-
+rst_epilog = f"""
+.. |copyright|    replace:: {copyright}
+.. |author_list|  replace:: {author_list}
+.. |release_date| replace:: {release_date}
+.. |release_year| replace:: {release_year}
+"""

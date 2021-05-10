@@ -4,3 +4,4 @@ shift_data_plane
 .deps
 Makefile
 Makefile.in
+*.dSYM

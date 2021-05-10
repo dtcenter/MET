@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,6 +66,8 @@ static const string lr_grib_names[] = {
 
 // Little-R regular expression used to determine file type
 static const char *lr_rpt_reg_exp = "FM-[0-9]";
+static const char *lr_dtg_reg_exp = "[0-9]\\{14\\}";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -137,46 +139,49 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
   int n_data_hdr;
   StringArray mappedTypes;
   StringArray unmappedTypes;
+  bool is_bad_header = false;
   
   while (ascii_file.read_fwf_line(data_line, lr_rpt_wdth, n_lr_rpt_wdth))
   {
+  
     // Check for expected header line
 
     if (!check_reg_exp(lr_rpt_reg_exp, data_line[4]))
     {
       mlog << Error << "\nLittleRHandler::_readObservations() -> "
            << "the fifth entry of the little_r report on line "
-           << data_line.line_number() << " does not match \""
+           << data_line.line_number()
+           << " does not match the regular expression \""
            << lr_rpt_reg_exp << "\":\n\"" << data_line[4] << "\"\n\n";
       return false;
     }
 
     // Store the message type
 
-    ConcatString concat_string = (string)data_line[4];
-    concat_string.ws_strip();
+    ConcatString cs = (string)data_line[4];
+    cs.ws_strip();
     ConcatString hdr_typ;
     
-    if (_messageTypeMap[concat_string] != "")
+    if (_messageTypeMap.count(cs) > 0)
     {
-      hdr_typ = _messageTypeMap[concat_string];
-      if (!mappedTypes.has(concat_string)) {
+      hdr_typ = _messageTypeMap[cs];
+      if (!mappedTypes.has(cs)) {
          mlog << Debug(5)
-              << "Switching little_r report type \"" << concat_string
+              << "Switching little_r report type \"" << cs
               << "\" to message type \"" << hdr_typ << "\".\n";
-         mappedTypes.add(concat_string);
+         mappedTypes.add(cs);
       }
     }
     else
     {
-      hdr_typ = concat_string;
+      hdr_typ = cs;
       hdr_typ.replace(" ", "_", false);
-      
-      if (!unmappedTypes.has(concat_string)) {
-         mlog << Warning << "\nLittleRHandler::_processObs() -> "
+
+      if (!unmappedTypes.has(cs)) {
+         mlog << Warning << "\nLittleRHandler::_readObservations() -> "
               << "Storing message type as \"" << hdr_typ
-              << "\" for unexpected report type \"" << concat_string << "\".\n\n";
-         unmappedTypes.add(concat_string);
+              << "\" for unexpected report type \"" << cs << "\".\n\n";
+         unmappedTypes.add(cs);
       }
     }
 
@@ -188,16 +193,29 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     // Store the valid time in YYYYMMDD_HHMMSS format
 
-    ConcatString hdr_vld_str;
-    
-    concat_string = data_line[17];      
-    concat_string.ws_strip();
-    hdr_vld_str << cs_erase;
-    hdr_vld_str.format("%.8s_%.6s",
-                       concat_string.text(), concat_string.text()+8);
+    time_t hdr_vld = 0;
 
-    time_t hdr_vld = _getValidTime(hdr_vld_str.text());
+    if (check_reg_exp(lr_dtg_reg_exp, data_line[17]))
+    {
+       ConcatString hdr_vld_str;
     
+       cs = data_line[17];
+       cs.ws_strip();
+       hdr_vld_str << cs_erase;
+       hdr_vld_str.format("%.8s_%.6s", cs.text(), cs.text()+8);
+       hdr_vld = _getValidTime(hdr_vld_str.text());
+       is_bad_header = false;
+
+   } else
+   {
+      mlog << Warning << "\nLittleRHandler::_readObservations() -> "
+           << "the 18 entry of the little_r report on line "
+           << data_line.line_number()
+           << " does not match the timestring regular expression \""
+           << lr_dtg_reg_exp << "\":\n\"" << data_line[17] << "\"\n\n";
+      is_bad_header = true;
+   }
+   
     // Store the station location
 
     double hdr_lat = atof(data_line[0]);
@@ -211,7 +229,8 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     // Observation of sea level pressure in pascals.
 
-    if (!is_eq(atof(data_line[18]), lr_missing_value))
+    if (!is_eq(atof(data_line[18]), lr_missing_value) &&
+        !is_bad_header)
     {
       ConcatString obs_qty = (is_eq(atof(data_line[19]), lr_missing_value) ?
                               na_string : (string)data_line[19]);
@@ -237,11 +256,15 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     int i_data = 0;
     while (ascii_file.read_fwf_line(data_line, lr_meas_wdth, n_lr_meas_wdth))
     {
+
       // Check for the end of report
 
       if (is_eq(atof(data_line[0]), lr_end_value) &&
-              is_eq(atof(data_line[2]), lr_end_value))
+          is_eq(atof(data_line[2]), lr_end_value))
         break;
+
+      // Skip data lines if the header line is bad
+      if (is_bad_header)  continue;
 
       // Retrieve pressure and height
 
@@ -305,7 +328,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     if (n_data_hdr != i_data)
     {
-      mlog << Warning << "\nprocess_little_r_obs() -> "
+      mlog << Warning << "\nLittleRHandler::_readObservations() -> "
            << "the number of data lines specified in the header ("
            << n_data_hdr
            << ") does not match the number found in the data ("

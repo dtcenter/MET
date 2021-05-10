@@ -132,11 +132,10 @@ References
 |   forecasts. *Monthly Weather Review*, 129, 550-560.
 | 
 
-.. _Hogan-2009:
+.. _Hersbach-2000:
 
-| Hogan, R., E. O'Connor, and A. Illingworth, 2009: Verification of
-|   cloud-fraction forecasts. *Quarterly Journal of the Royal*
-|   *Meteorological Society*, 135, 1494-1511.
+| Hersbach, H., 2000: Decomposition of the Continuous Ranked Probability Score
+| for Ensemble Prediction Systems. *Weather and Forecasting*, 15, 559-570.
 | 
 
 .. _Jolliffe-2012:

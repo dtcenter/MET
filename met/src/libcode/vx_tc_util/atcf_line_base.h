@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -13,8 +13,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Based on Best Track file format information at:
+// Best Track file format information:
 //    http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//
+// EDeck file format information:
+//    https://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,11 +34,13 @@ enum ATCFLineType {
    ATCFLineType_GenTrack, // Genesis Track and intensity line type (numeric)
    ATCFLineType_ProbTR,   // Track probability (TR)
    ATCFLineType_ProbIN,   // Intensity probability (IN)
-   ATCFLineType_ProbRIRW, // Rapid intensification probability (RI)
-   ATCFLineType_ProbWD,   // Wind radii probability (WD)
+   ATCFLineType_ProbRI,   // Rapid intensification probability (RI)
+   ATCFLineType_ProbRW,   // Rapid weakening probability (RW)
+   ATCFLineType_ProbWR,   // Wind radii probability (WR)
    ATCFLineType_ProbPR,   // Pressure probability (PR)
    ATCFLineType_ProbGN,   // TC genesis probability (GN)
    ATCFLineType_ProbGS,   // TC genesis shape probability (GS)
+   ATCFLineType_ProbER,   // Eyewall replacement probability (ER)
 
    NoATCFLineType
 };

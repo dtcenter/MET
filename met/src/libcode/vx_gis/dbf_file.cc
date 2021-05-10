@@ -1,6 +1,6 @@
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -301,13 +301,11 @@ void DbfHeader::set_subrecords(int fd)
 int j;
 int bytes, n_read;
 int pos;
-unsigned char * buf = 0;
-
 
 
 subrec = new DbfSubRecord [n_subrecs];
 
-buf = new unsigned char [record_length];
+unsigned char buf[32];
 
    //
    //  seek to the first record
@@ -359,8 +357,6 @@ for (j=0; j<n_subrecs; ++j)  {
    //
    //  done
    //
-
-if ( buf )  { delete [] buf;  buf = 0; }
 
 return;
 

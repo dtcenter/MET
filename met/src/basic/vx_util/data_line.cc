@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -193,17 +193,11 @@ out << prefix << "\n";
 
 if ( N_items == 0 )  { out.flush();  return; }
 
-// std::ostringstream sstream;
-// sstream.width(2);
-
 for (j=0; j<N_items; ++j)  {
 
    snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
    out << prefix << junk << Items[j] << "\"\n";
-
-   // sstream << "Item[" << j << "]       = \"";
-   // out << prefix << sstream.str() << Line.substr(j) << "\"\n";
 
    if ( (j%5) == 4 )  out << prefix << '\n';
 
@@ -213,25 +207,17 @@ for (j=0; j<N_items; ++j)  {
 
 out << prefix << "\n";
 
-
-// sstream.str("");
-// sstream.clear();
-
 for (j=0; j<N_items; ++j)  {
 
    snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
 
    out << prefix << junk << Offset[j] << '\n';
 
-   // sstream << "Offset[" << j << "]     = ";
-   // out << prefix << sstream.str() << Offset[j] << "\n";
-
    if ( (j%5) == 4 )  out << prefix << '\n';
 
    out.flush();
 
 }
-
 
    //
    //  done
@@ -253,7 +239,12 @@ const char * DataLine::get_item(int k) const
 
 if ( (k < 0) || (k >= N_items) )  {
 
-   mlog << Error << "\nDataLine::get_item(int) -> range check error\n\n";
+   ConcatString cs = (File ? File->filename() : "");
+
+   mlog << Error << "\nDataLine::get_item(int) -> "
+        << "range check error reading line number " << LineNumber
+        << ", item number " << k+1 << " of " << N_items
+        << " from file \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -271,7 +262,7 @@ const LineDataFile * DataLine::get_file() const
 
 {
 
-  return File;
+return File;
 
 }
 
@@ -328,18 +319,14 @@ clear();
 
 size_t pos, count;
 
-
 pos = 0;
 count = 0;
-
 
    //
    //  get a line from the file
    //
 
-
 if ( ! read_single_text_line(ldf) )  { clear();  return ( 0 ); }
-
 
    //
    //  parse the line with strtok
@@ -379,6 +366,7 @@ return ( 1 );
 int DataLine::read_fwf_line(LineDataFile * ldf, const int *wdth, int n_wdth)
 
 {
+
 const char *method_name = "DataLine::read_fwf_line() -> ";
 
 clear();
@@ -415,7 +403,6 @@ for( i=0; i<n_wdth; i++ )  {
    if ( !f )  { clear();  return ( 0 ); }
 
    ++count;
-
    
    //
    //  get the next entry
@@ -511,7 +498,6 @@ bool DataLine::is_header() const
 
 {
 
-// return ( false );
 return ( IsHeader );
 
 }
@@ -523,7 +509,9 @@ return ( IsHeader );
 void DataLine::set_delimiter(const char *delimiter)
 
 {
-  Delimiter.assign(delimiter);
+
+Delimiter.assign(delimiter);
+
 }
 
 
@@ -534,21 +522,19 @@ bool DataLine::read_single_text_line(LineDataFile * ldf)
 
 {
 
-////////////////////////////////////////////////////
 #ifdef  WITH_PYTHON
 
-   PyLineDataFile * pldf = dynamic_cast<PyLineDataFile *>(ldf);
+PyLineDataFile * pldf = dynamic_cast<PyLineDataFile *>(ldf);
 
-   if ( pldf )  {
+if ( pldf )  {
 
-      const bool status = read_py_single_text_line(pldf);
+   const bool status = read_py_single_text_line(pldf);
 
-      return ( status );
+	return ( status );
 
-   }
+}
 
 #endif   /*  WITH_PYTHON  */
-////////////////////////////////////////////////////
 
 ifstream & f = *(ldf->in);
 
@@ -601,6 +587,7 @@ return ( true );
 
 #endif   /*  WITH_PYTHON  */
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -640,7 +627,8 @@ LineDataFile::LineDataFile(const LineDataFile &)
 
 {
 
-mlog << Error << "\nLineDataFile::LineDataFile(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nLineDataFile::LineDataFile(const LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -654,7 +642,8 @@ LineDataFile & LineDataFile::operator=(const LineDataFile &)
 
 {
 
-mlog << Error << "\nLineDataFile::operator=(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nLineDataFile::operator=(const LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -698,7 +687,8 @@ in = new ifstream;
 
 if ( !in )  {
 
-   mlog << Error << "\nLineDataFile::open(const char *) -> can't allocate input stream\n\n";
+   mlog << Error << "\nLineDataFile::open(const char *) -> "
+        << "can't allocate input stream\n\n";
 
    exit ( 1 );
 
@@ -840,6 +830,7 @@ for (j=0; j<a.n_items(); ++j)  {
 
 }
 
+ 
 return;
 
 }
@@ -899,6 +890,7 @@ out.put('\n');
 
 out.flush();
 
+
 return ( out );
 
 }
@@ -913,33 +905,14 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return ( lgr );
 
-int j;
-
-// k = L.N_items - 1;   //  last item
-// 
-// N = L.Offset[k] + strlen(L[k]);
-// 
-// for (j=0; j<N; ++j)  {
-// 
-//    c = L.Line[j];
-// 
-//       //
-//       //  patch the nul chars put there by strtok
-//       //
-// 
-//    if ( c == 0 )  lgr << ' ';
-//    else           lgr << c;
-// 
-// }
-
-for (j = 0; j < L.Items.size(); j++) {
+for (int j = 0; j < L.Items.size(); j++) {
     lgr << L.Items[j];
     if (j < (L.Items.size() - 1))
         lgr << ' ';
 }
 
-
 lgr << '\n';
+
 
 return ( lgr );
 
@@ -947,7 +920,3 @@ return ( lgr );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
