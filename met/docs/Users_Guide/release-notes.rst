@@ -27,7 +27,9 @@ MET Version |version| release notes (|release_date|)
 * Documentation:
 
    * **Migrate the MET documentation to Read the Docs** (`#1649 <http://github.com/dtcenter/MET/issues/1649>`_).
-   * Enhance and update documentation (`#1459 <http://github.com/dtcenter/MET/issues/1459>`_ and `#1460 <http://github.com/dtcenter/MET/issues/1460>`_).
+   * Enhance and update documentation (`#1459 <http://github.com/dtcenter/MET/issues/1459>`_ and `#1460 <http://github.com/dtcenter/MET/issues/1460>`_, and `#1731 <http://github.com/dtcenter/MET/issues/1731>`_).
+   * Enhance the python embedding documentation (`#1468 <http://github.com/dtcenter/MET/issues/1468>`_).
+   * Document the supported grid definition templates (`#1469 <http://github.com/dtcenter/MET/issues/1469>`_).
    * Update comments at the top of each MET config file directing users to the MET User's Guide (`#1598 <http://github.com/dtcenter/MET/issues/1598>`_).
    * Migrate content from README and README_TC in data/config to the MET User's Guide (`#1474 <http://github.com/dtcenter/MET/issues/1474>`_).
    * Add version selector to the Sphinx documentation page (`#1461 <http://github.com/dtcenter/MET/issues/1461>`_).
@@ -128,7 +130,7 @@ MET Version |version| release notes (|release_date|)
       * **Add detailed log messages when discarding observations** (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).
       * Update log messages (`#1514 <http://github.com/dtcenter/MET/issues/1514>`_).
       * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
-      * Fix Point-Stat runtime error when verifying certain CF-complaint NetCDF files (`#1782 <http://github.com/dtcenter/MET/issues/1782>`_).
+      * Fix Point-Stat runtime error for some CF-complaint NetCDF files (`#1782 <http://github.com/dtcenter/MET/issues/1782>`_).
 
    * Grid-Stat Tool:
 
