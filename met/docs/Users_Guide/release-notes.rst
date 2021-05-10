@@ -20,6 +20,7 @@ MET Version |version| release notes (|release_date|)
    * Run the nightly build as the shared met_test user (`#1116 <http://github.com/dtcenter/MET/issues/1116>`_).
    * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
    * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
+   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1788 <http://github.com/dtcenter/MET/issues/1788>`_).
 
 * Documentation:
 
@@ -46,6 +47,7 @@ MET Version |version| release notes (|release_date|)
 
    * Python embedding enhancements:
 
+      * Note that the netCDF4 Python package is now required in place of the pickle package!
       * **Replace the pickle format for temporary python files with NetCDF for gridded data** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1697 <http://github.com/dtcenter/MET/issues/1697>`_).
       * **Replace the pickle format for temporary python files with ASCII for point observations in ascii2nc and matched pair data in Stat-Analysis** (`#1319 <http://github.com/dtcenter/MET/issues/1319>`_, `#1700 <http://github.com/dtcenter/MET/issues/1700>`_).
       * **Complete support for Python XArray embedding** (`#1534 <http://github.com/dtcenter/MET/issues/1534>`_).
@@ -108,6 +110,10 @@ MET Version |version| release notes (|release_date|)
       * Improve the point2grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
       * Process point observations by variable name instead of GRIB code (`#1408 <http://github.com/dtcenter/MET/issues/1408>`_).
 
+   * GIS Tools:
+
+      * Fix memory corruption bug in the gis_dump_dbf utility which causes it to abort at runtime (`#1777 <http://github.com/dtcenter/MET/issues/1777>`_).
+
    * Plot-Point-Obs Tool:
 
       * **Overhaul Plot-Point-Obs to make it highly configurable** (`#213 <http://github.com/dtcenter/MET/issues/213>`_, `#1528 <http://github.com/dtcenter/MET/issues/1528>`_, and `#1052 <http://github.com/dtcenter/MET/issues/1052>`_).
@@ -120,6 +126,7 @@ MET Version |version| release notes (|release_date|)
       * **Add detailed log messages when discarding observations** (`#1588 <http://github.com/dtcenter/MET/issues/1588>`_).
       * Update log messages (`#1514 <http://github.com/dtcenter/MET/issues/1514>`_).
       * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
+      * Fix Point-Stat runtime error when verifying certain CF-complaint NetCDF files (`#1782 <http://github.com/dtcenter/MET/issues/1782>`_).
 
    * Grid-Stat Tool:
 
