@@ -20,7 +20,8 @@ test_table_read_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_log \
 	-lvx_data2d \
-	-lvx_grid  \
+	-lvx_grid \
+	-lvx_geodesy  \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_math \
@@ -35,6 +36,7 @@ dump_default_table_LDADD = -lvx_config \
 	-lvx_log \
 	-lvx_data2d \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_math \

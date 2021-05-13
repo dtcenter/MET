@@ -42,6 +42,7 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_gsl_prob \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_util \
