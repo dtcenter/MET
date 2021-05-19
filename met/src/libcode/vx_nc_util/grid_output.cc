@@ -36,6 +36,7 @@ static void rotated_latlon_grid_output (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
+static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,7 @@ else if ( info.ll  )  latlon_grid_output          (info, ncfile);
 else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
+else if ( info.la  )  laea_grid_output            (info, ncfile);
 else {
 
    mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
@@ -637,4 +639,121 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 
+{
+
+char junk[256];
+double t;
+const LaeaData & data = *(info.la);
+
+ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
+
+ncfile->putAtt("geoid", data.geoid);
+
+   //
+   //  lat_LL
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_LL);
+
+ncfile->putAtt("lat_LL", junk);
+
+   //
+   //  lon_LL
+   //
+
+t = data.lon_LL;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_LL", junk);
+
+   //
+   //  lat_UL
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_UL);
+
+ncfile->putAtt("lat_UL", junk);
+
+   //
+   //  lon_UL
+   //
+
+t = data.lon_UL;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_UL", junk);
+
+   //
+   //  lat_LR
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_LR);
+
+ncfile->putAtt("lat_LR", junk);
+
+   //
+   //  lon_LR
+   //
+
+t = data.lon_LR;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_LR", junk);
+
+   //
+   //  lat_pole
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_pole);
+
+ncfile->putAtt("lat_pole", junk);
+
+   //
+   //  lon_pole
+   //
+
+t = data.lon_pole;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_pole", junk);
+
+   //
+   //  nx
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.nx);
+
+ncfile->putAtt("nx", junk);
+
+   //
+   //  ny
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.ny);
+
+ncfile->putAtt("ny", junk);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
