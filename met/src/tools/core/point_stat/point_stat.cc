@@ -20,6 +20,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    04/18/07  Halley Gotway  New
+//   000    04/18/07  Halley Gotway  New
 //   001    12/20/07  Halley Gotway  Allow verification for level 0
 //                    for verifying PRMSL
 //   002    01/24/08  Halley Gotway  In compute_cnt, print a warning
@@ -120,7 +121,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_in.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -660,7 +661,7 @@ void process_obs_file(int i_nc) {
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
    // output of the PB2NC or ASCII2NC tool.
-   MetNcPointObs nc_point_obs;
+   MetNcPointObsIn nc_point_obs;
    if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
       nc_point_obs.close();
 

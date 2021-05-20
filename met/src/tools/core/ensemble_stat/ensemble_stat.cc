@@ -86,7 +86,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_in.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -949,7 +949,7 @@ void process_point_obs(int i_nc) {
         << point_obs_file_list[i_nc] << "\n";
 
    // Open the observation file as a NetCDF file.
-   MetNcPointObs nc_point_obs;
+   MetNcPointObsIn nc_point_obs;
    if(!nc_point_obs.open(point_obs_file_list[i_nc].c_str())) {
       nc_point_obs.close();
 

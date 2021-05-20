@@ -65,7 +65,7 @@ using namespace std;
 #include "vx_render.h"
 #include "vx_plot_util.h"
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_in.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -156,7 +156,7 @@ void process_point_obs(const char *point_obs_filename) {
    mlog << Debug(1) << "Reading point observation file: "
         << point_obs_filename << "\n";
 
-   MetNcPointObs nc_point_obs;
+   MetNcPointObsIn nc_point_obs;
    if(!nc_point_obs.open(point_obs_filename)) {
       nc_point_obs.close();
 

@@ -39,7 +39,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_in.h"
 
 #include "point2grid_conf_info.h"
 
@@ -627,7 +627,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       usage();
    }
 
-   MetNcPointObs nc_point_obs;
+   MetNcPointObsIn nc_point_obs;
    nc_point_obs.set_netcdf(nc_in, true);
    // Read the dimensions and variables
    nc_point_obs.read_dim_headers();
