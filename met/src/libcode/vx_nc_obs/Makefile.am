@@ -14,6 +14,7 @@ noinst_LIBRARIES = libvx_nc_obs.a
 libvx_nc_obs_a_SOURCES = \
               nc_obs_util.cc nc_obs_util.h \
               nc_point_obs.cc nc_point_obs.h \
-              nc_point_obs2.cc \
+              nc_point_obs_in.cc nc_point_obs_in.h \
+              nc_point_obs_out.cc nc_point_obs_out.h \
               nc_summary.cc nc_summary.h
 libvx_nc_obs_a_CPPFLAGS = ${MET_CPPFLAGS}
