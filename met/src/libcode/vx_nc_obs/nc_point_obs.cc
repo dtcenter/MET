@@ -65,17 +65,17 @@ void MetNcPointObs::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPointObs::check_nc(const char *nc_name, const char *caller) {
-   bool exit_on_error = false;
-   bool valid = obs_vars.is_valid(exit_on_error);
-   if (!valid) {
-      mlog << Error << "\n" << (0 != caller ? caller : "") << " -> "
-           << "missing core data from the netCDF file: "
-           << nc_name << "\n\n";
-      exit(1);
-   }
-   return valid;
-}
+//bool MetNcPointObs::check_nc(const char *nc_name, const char *caller) {
+//   bool exit_on_error = false;
+//   bool valid = obs_vars.is_valid(exit_on_error);
+//   if (!valid) {
+//      mlog << Error << "\n" << (0 != caller ? caller : "") << " -> "
+//           << "missing core data from the netCDF file: "
+//           << nc_name << "\n\n";
+//      exit(1);
+//   }
+//   return valid;
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -163,57 +163,57 @@ bool MetNcPointObs::open(const char * filename) {
    return set_netcdf(open_ncfile(filename));
 }
 
-////////////////////////////////////////////////////////////////////////
-
-bool MetNcPointObs::read_dim_headers() {
-   bool status = false;
-   if( IS_VALID_NC_P(obs_nc) ) {
-      status = true;
-      obs_vars.read_dims_vars(obs_nc);
-      nobs = obs_vars.obs_cnt = GET_NC_SIZE(obs_vars.obs_dim);
-      nhdr = obs_vars.hdr_cnt = GET_NC_SIZE(obs_vars.hdr_dim);
-      obs_vars.use_var_id = use_var_id = IS_VALID_NC(obs_vars.obs_vid_var);
-      use_arr_vars = IS_VALID_NC(obs_vars.obs_arr_var);
-      obs_vars.read_header_data(header_data);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool MetNcPointObs::read_obs_data() {
-   bool status = read_obs_data_numbers() && read_obs_data_strings();
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool MetNcPointObs::read_obs_data(int buf_size, int start, float *obs_arr_block,
-                                  int *obs_qty_idx_block, char *obs_qty_str_block) {
-  return obs_vars.read_obs_data(buf_size, start, qty_length, obs_arr_block,
-                                obs_qty_idx_block, obs_qty_str_block);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool MetNcPointObs::read_obs_data_numbers() {
-   bool status = false;
-   if( IS_VALID_NC_P(obs_nc) ) {
-      status = obs_data.read_obs_data_numbers(obs_vars);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool MetNcPointObs::read_obs_data_strings() {
-   bool status = false;
-   if( IS_VALID_NC_P(obs_nc) ) {
-      status = obs_data.read_obs_data_strings(obs_vars);
-   }
-   return status;
-}
-
+//////////////////////////////////////////////////////////////////////////
+//
+//bool MetNcPointObs::read_dim_headers() {
+//   bool status = false;
+//   if( IS_VALID_NC_P(obs_nc) ) {
+//      status = true;
+//      obs_vars.read_dims_vars(obs_nc);
+//      nobs = obs_vars.obs_cnt = GET_NC_SIZE(obs_vars.obs_dim);
+//      nhdr = obs_vars.hdr_cnt = GET_NC_SIZE(obs_vars.hdr_dim);
+//      obs_vars.use_var_id = use_var_id = IS_VALID_NC(obs_vars.obs_vid_var);
+//      use_arr_vars = IS_VALID_NC(obs_vars.obs_arr_var);
+//      obs_vars.read_header_data(header_data);
+//   }
+//   return status;
+//}
+//
+//////////////////////////////////////////////////////////////////////////
+//
+//bool MetNcPointObs::read_obs_data() {
+//   bool status = read_obs_data_numbers() && read_obs_data_strings();
+//   return status;
+//}
+//
+//////////////////////////////////////////////////////////////////////////
+//
+//bool MetNcPointObs::read_obs_data(int buf_size, int start, float *obs_arr_block,
+//                                  int *obs_qty_idx_block, char *obs_qty_str_block) {
+//  return obs_vars.read_obs_data(buf_size, start, qty_length, obs_arr_block,
+//                                obs_qty_idx_block, obs_qty_str_block);
+//}
+//
+//////////////////////////////////////////////////////////////////////////
+//
+//bool MetNcPointObs::read_obs_data_numbers() {
+//   bool status = false;
+//   if( IS_VALID_NC_P(obs_nc) ) {
+//      status = obs_data.read_obs_data_numbers(obs_vars);
+//   }
+//   return status;
+//}
+//
+//////////////////////////////////////////////////////////////////////////
+//
+//bool MetNcPointObs::read_obs_data_strings() {
+//   bool status = false;
+//   if( IS_VALID_NC_P(obs_nc) ) {
+//      status = obs_data.read_obs_data_strings(obs_vars);
+//   }
+//   return status;
+//}
+//
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObs::set_netcdf(NcFile *nc_file, bool _keep_nc) {
@@ -224,10 +224,10 @@ bool MetNcPointObs::set_netcdf(NcFile *nc_file, bool _keep_nc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void MetNcPointObs::set_using_var_id(bool using_var_id) {
-   use_var_id = obs_vars.use_var_id = using_var_id; 
-}
-
-////////////////////////////////////////////////////////////////////////
+//
+//void MetNcPointObs::set_using_var_id(bool using_var_id) {
+//   use_var_id = obs_vars.use_var_id = using_var_id; 
+//}
+//
+//////////////////////////////////////////////////////////////////////////
 
