@@ -61,7 +61,7 @@ using namespace netCDF;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@ static const int FIELD_COUNT =  50;
 static const int BUFFER_SIZE = OBS_BUFFER_SIZE / FIELD_COUNT;
 
 static int nc_buf_size;
-static MetNcPointObs2Write nc_point_obs;
+static MetNcPointObsOut nc_point_obs;
 static vector< Observation > obs_vector;
 static vector< ConcatString > md_files;
 

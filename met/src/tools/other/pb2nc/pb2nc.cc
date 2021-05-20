@@ -88,7 +88,7 @@ using namespace std;
 
 #include "vx_summary.h"
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ static ConcatString ncfile;
 // Input configuration file
 static ConcatString  config_file;
 static PB2NCConfInfo conf_info;
-static MetNcPointObs2Write nc_point_obs;
+static MetNcPointObsOut nc_point_obs;
 
 // Beginning and ending retention times
 static unixtime valid_beg_ut, valid_end_ut;

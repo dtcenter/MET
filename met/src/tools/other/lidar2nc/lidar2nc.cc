@@ -60,7 +60,7 @@ using namespace std;
 
 #include "calipso_5km.h"
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +73,7 @@ static const int na_len = strlen(na_str);
 static IntArray    valid_times;
 
 static NcFile *ncf;
-static MetNcPointObs2Write nc_point_obs;
+static MetNcPointObsOut nc_point_obs;
 
 ////////////////////////////////////////////////////////////////////////
 

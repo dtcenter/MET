@@ -36,7 +36,7 @@ using namespace netCDF;
 #include "vx_summary.h"
 
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ protected:
   // Variables for writing output NetCDF file
 
   NcFile *_ncFile;
-  MetNcPointObs2Write nc_point_obs;
+  MetNcPointObsOut nc_point_obs;
 
   long _nhdr;
 

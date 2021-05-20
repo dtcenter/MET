@@ -46,7 +46,7 @@ using namespace std;
 
 #include "vx_summary.h"
 #include "nc_obs_util.h"
-#include "nc_point_obs.h"
+#include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ static IntArray filtered_times;
 static bool do_summary;
 static bool save_summary_only = false;
 static SummaryObs *summary_obs;
-static MetNcPointObs2Write nc_point_obs;
+static MetNcPointObsOut nc_point_obs;
 
 
 ////////////////////////////////////////////////////////////////////////
