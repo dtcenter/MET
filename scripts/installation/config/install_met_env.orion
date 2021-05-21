@@ -1,14 +1,14 @@
-module load intel/2020
-module load intelpython3/2020
+module load intel/2020.2
+module load intelpython3/2020.2
 
-export TEST_BASE=/apps/contrib/MET/9.1
+export TEST_BASE=/apps/contrib/MET/10.0.0
 export COMPILER=intel_2020
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=met-9.1.20200810.tar.gz
+export MET_TARBALL=met-10.0.0.20210510.tar.gz
 export USE_MODULES=TRUE
-export MET_PYTHON=/apps/intel-2020/intel-2020/intelpython3/
-export MET_PYTHON_CC=-I/apps/intel-2020/intel-2020/intelpython3/include/python3.7m 
-export MET_PYTHON_LD=-L/apps/intel-2020/intel-2020/intelpython3/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
+export MET_PYTHON=/apps/intel-2020.2/intel-2020.2/intelpython3
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m 
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
 export SET_D64BIT=FALSE
 export CFLAGS="-Wall -g"
 export CXXFLAGS="-Wall -g"
