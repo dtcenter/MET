@@ -157,20 +157,18 @@ for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
 for (j=0; j<ny_half; ++j)  {
 
-   k = j + ny_half;
+   i = j + ny_half;
 
-   k = Ny - 1 - k;
+   k = Ny - 1 - i;
 
    L.lether_root_weight(k, r, w);
    // L.d_and_r_root_weight(k, r, w);
 
    latitude = asind(r);
 
-   i = j + ny_half;
-
    Latitudes[i] = latitude;
 
-   Latitudes[Ny - 1 - i] = -latitude;
+   Latitudes[k] = -latitude;
 
 }
 
