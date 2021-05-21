@@ -49,7 +49,7 @@ Describe the steps to reproduce the behavior:
 
 ### Projects and Milestone ###
 - [ ] Select **Organization** level **Project** for support of the current coordinated release
-- [ ] Select **Repository** level **Project** for development toward the next official release or add **alert:NEED PROJECT ASSIGNMENT** label
+- [ ] Select **Repository** level **Project** for development toward the next official release or add **alert: NEED PROJECT ASSIGNMENT** label
 - [ ] Select **Milestone** as the next bugfix version
 
 ## Define Related Issue(s) ##
