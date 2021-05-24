@@ -157,7 +157,7 @@ void RenderInfo::add_filter(const int k)
 {
 
 
-if ( Nfilters > max_filters )  {
+if ( Nfilters >= max_filters )  {
 
    mlog << Error << "\nRenderInfo::add_filter() -> "
         << "too many filters!\n\n";

@@ -477,12 +477,6 @@ for(i in 1:length(info_list)) {
   cat("Found ", length(uniq_list), " unique entries for ", info_list[i], ": ",
       paste(uniq_list, collapse=", "), "\n", sep='');
 
-  # Check for a single BDECK model
-  if(info_list[i] == "BMODEL" & length(uniq_list) != 1) {
-    cat("ERROR: Must have exactly 1 BDECK model name.  ",
-        "Try setting \"-bmodel name\" in the \"-filter\" option.\n");
-    quit(status=1);
-  }
 }
 
 ########################################################################

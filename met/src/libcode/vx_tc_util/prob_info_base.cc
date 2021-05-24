@@ -280,7 +280,7 @@ void ProbInfoBase::set(const TCStatLine &l) {
    switch(l.type()) {
 
       case TCStatLineType_ProbRIRW:
-         Type = ATCFLineType_ProbRIRW;
+         Type = ATCFLineType_ProbRI;
          break;
 
       default:

@@ -374,6 +374,26 @@
     </output>
   </test>
 
+  <!-- Invokes user-python logic to read a grid string -->
+  <test name="python_numpy_grid_name_user_python">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+      <pair><name>PYTHON_GRID</name> <value>G212</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_grid_name_user_python.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Grid Name: 'G212'" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_grid_name_user_python.ps</ps>
+    </output>
+  </test>
+ 
   <!-- Invokes user-python logic to read point data  -->
   <test name="python_ascii2nc_user_python">
     <exec>&MET_BIN;/ascii2nc</exec>

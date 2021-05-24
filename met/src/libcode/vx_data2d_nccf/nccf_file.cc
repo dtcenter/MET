@@ -375,6 +375,7 @@ bool NcCfFile::open(const char * filepath)
         }
       }
     }
+    delete [] time_values;
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");

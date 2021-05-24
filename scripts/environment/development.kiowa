@@ -42,4 +42,4 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
              /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin"
 
 # Fortify bin directory
-export FORTIFY_BIN=/d1/projects/Fortify/19.2.0/Fortify_SCA_and_Apps_19.2.0/bin
+export FORTIFY_BIN=/d1/projects/Fortify/20.2.1/Fortify_SCA_and_Apps_20.2.1/bin

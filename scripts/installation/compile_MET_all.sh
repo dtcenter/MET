@@ -64,11 +64,11 @@ if [ ! -e $TAR_DIR ]; then
 fi
 
 # Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib:${MET_PYTHON}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${LIB_JASPER}:${LIB_LIBPNG}:${LIB_Z}:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_JASPER}${LIB_Z:+$LIB_Z}${MET_GSL:+:$MET_GSL/lib}:${LD_LIBRARY_PATH}
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # Constants
-if [ [ -z ${MET_GRIB2CLIB} && -z ${MET_GRIB2CINC} ] ]; then
+if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
     COMPILE_ZLIB=1
     COMPILE_LIBPNG=1
     COMPILE_JASPER=1
@@ -185,7 +185,7 @@ elif [ ${COMPILER_FAMILY} = "pgi" ]; then
 	export F77=${F90}
 	export FC=${F90}
     fi
-elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} ==  "PrgEnv-intel" ]]; then
+elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
     if [ -z ${CC} ]; then
 	export CC=`which icc`
     else
@@ -353,8 +353,8 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   tar -xzf ${TAR_DIR}/libpng*.tar.gz
   cd libpng*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L/${LIB_DIR}/lib CPPFLAGS=-I/${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} LDFLAGS=-L/${LIB_DIR}/lib CPPFLAGS=-I/${LIB_DIR}/include > configure.log 2>&1
+  echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
      echo "configure returned with non-zero ($ret) status"
@@ -530,8 +530,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz
   cd hdf5*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_DIR}/lib CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:{LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
+  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_DIR}/lib CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
      echo "configure returned with non-zero ($ret) status"
@@ -674,8 +674,8 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
       export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L/${LIB_DIR}/lib CPPFLAGS=-I/${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L/${LIB_DIR}/lib CPPFLAGS=-I/${LIB_DIR}/include > configure.log 2>&1
+  echo "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  ./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
      echo "configure returned with non-zero ($ret) status"
@@ -748,9 +748,12 @@ if [ $COMPILE_MET -eq 1 ]; then
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib:${MET_GSL}/lib"
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER}:${LIB_LIBPNG}:${LIB_Z}"
-  export LDFLAGS="${LDFLAGS} -L${LIB_JASPER} -L${MET_HDF5}/lib"
+  # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+  # ${parameter:+word}
+  # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
+  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
+  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
+  export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib}"
   export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
