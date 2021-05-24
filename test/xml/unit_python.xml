@@ -393,7 +393,7 @@
       <ps>&OUTPUT_DIR;/python/letter_numpy_grid_name_user_python.ps</ps>
     </output>
   </test>
-
+ 
   <!-- Invokes user-python logic to read point data  -->
   <test name="python_ascii2nc_user_python">
     <exec>&MET_BIN;/ascii2nc</exec>
