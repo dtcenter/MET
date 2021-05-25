@@ -292,8 +292,6 @@ Settings common to multiple tools
 _________________________________
 
 .. rst:role:: exit_on_warning
-	      
-:rst:role:`exit_on_warning`
 
 The "exit_on_warning" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
