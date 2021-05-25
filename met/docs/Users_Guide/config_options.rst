@@ -291,7 +291,7 @@ References:
 Settings common to multiple tools
 _________________________________
 
-.. rst:role::
+.. _exit_on_warning
 
    exit_on_warning
 
