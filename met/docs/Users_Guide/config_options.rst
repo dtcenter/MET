@@ -291,7 +291,7 @@ References:
 Settings common to multiple tools
 _________________________________
 
-.. _exit_on_warning
+.. _exit_on_warning:
 
    exit_on_warning
 
