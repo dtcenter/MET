@@ -14,7 +14,6 @@
 #define  __NC_OBS_UTIL_H__
 
 #include <netcdf>
-
 using namespace netCDF;
 
 #include "nc_summary.h"
