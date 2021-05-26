@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -62,7 +60,6 @@ class MetNcPointObs {
 
       bool open(const char * filename);
       void close();
-//      bool check_nc(const char *nc_name, const char *caller=empty_name);
       bool set_netcdf(NcFile *nc_file, bool _keep_nc=false);
 
       int get_buf_size();
@@ -71,11 +68,9 @@ class MetNcPointObs {
       bool get_header(int header_offset, float hdr_arr[HDR_ARRAY_LEN],
                       ConcatString &hdr_typ_str, ConcatString &hdr_sid_str,
                       ConcatString &hdr_vld_str);
-      //int  get_hdr_arr_len();
       bool get_header_type(int header_offset, int hdr_typ_arr[HDR_TYPE_ARR_LEN]);
       bool get_lats(float *hdr_lats);
       bool get_lons(float *hdr_lons);
-      //int  get_obs_arr_len();
       int get_obs_cnt();
       NcPointObsData get_point_obs_data();
       StringArray get_qty_data();
@@ -85,15 +80,6 @@ class MetNcPointObs {
       bool is_using_var_id();
       bool is_using_obs_arr();
 
-//      bool read_dim_headers();
-//      bool read_obs_data();
-//      bool read_obs_data(int buf_size, int start, float *obs_arr_block,
-//                         int *obs_qty_idx_block, char *obs_qty_str_block);
-//      bool read_obs_data_numbers();
-//      bool read_obs_data_strings();
-
-//      void set_using_var_id(bool using_var_id);
-
       //  variables
 
       //  data
@@ -102,7 +88,6 @@ class MetNcPointObs {
 
 ////////////////////////////////////////////////////////////////////////
 
-//inline NetcdfObsVars MetNcPointObs::get_obs_vars() { return obs_vars; }
 inline NcHeaderData MetNcPointObs::get_header_data() { return header_data; }
 inline int MetNcPointObs::get_buf_size() { return OBS_BUFFER_SIZE; }
 inline int MetNcPointObs::get_hdr_cnt() { return nhdr; }
@@ -120,5 +105,4 @@ inline bool MetNcPointObs::is_using_var_id() { return use_var_id; }
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

@@ -23,7 +23,6 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nc_point_obs_in.h"
-//#include "write_netcdf.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -112,21 +111,6 @@ bool MetNcPointObsIn::read_obs_data_strings() {
    }
    return status;
 }
-
-////////////////////////////////////////////////////////////////////////
-
-//bool MetNcPointObsIn::set_netcdf(NcFile *nc_file, bool _keep_nc) {
-//   close();
-//   keep_nc = _keep_nc;
-//   obs_nc = nc_file;
-//   return IS_VALID_NC_P(obs_nc);
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//void MetNcPointObsIn::set_using_var_id(bool using_var_id) {
-//   use_var_id = obs_vars.use_var_id = using_var_id; 
-//}
 
 ////////////////////////////////////////////////////////////////////////
 

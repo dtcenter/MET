@@ -7,14 +7,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __NC_POINT_OBS_IN_H__
 #define  __NC_POINT_OBS_IN_H__
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,7 +21,6 @@
 #include "nc_utils.h"
 #include "nc_obs_util.h"
 #include "nc_var_info.h"
-//#include "vx_summary.h"
 #include "nc_point_obs.h"
 
 
@@ -42,39 +37,13 @@ class MetNcPointObsIn : public MetNcPointObs {
       MetNcPointObsIn();
      ~MetNcPointObsIn();
 
-//      bool open(const char * filename);
-//      void close();
       bool check_nc(const char *nc_name, const char *caller=empty_name);
-//      bool set_netcdf(NcFile *nc_file, bool _keep_nc=false);
-//
-//      int get_buf_size();
-//      int get_hdr_cnt();
-//      NcHeaderData get_header_data();
-//      bool get_header(int header_offset, float hdr_arr[HDR_ARRAY_LEN],
-//                      ConcatString &hdr_typ_str, ConcatString &hdr_sid_str,
-//                      ConcatString &hdr_vld_str);
-//      //int  get_hdr_arr_len();
-//      bool get_header_type(int header_offset, int hdr_typ_arr[HDR_TYPE_ARR_LEN]);
-//      bool get_lats(float *hdr_lats);
-//      bool get_lons(float *hdr_lons);
-//      //int  get_obs_arr_len();
-//      int get_obs_cnt();
-//      NcPointObsData get_point_obs_data();
-//      StringArray get_qty_data();
-//      int get_qty_length();
-//      StringArray get_var_names();
-//
-//      bool is_using_var_id();
-//      bool is_using_obs_arr();
-//
       bool read_dim_headers();
       bool read_obs_data();
       bool read_obs_data(int buf_size, int start, float *obs_arr_block,
                          int *obs_qty_idx_block, char *obs_qty_str_block);
       bool read_obs_data_numbers();
       bool read_obs_data_strings();
-//
-//      void set_using_var_id(bool using_var_id);
 
       //  variables
 
@@ -84,16 +53,6 @@ class MetNcPointObsIn : public MetNcPointObs {
 
 ////////////////////////////////////////////////////////////////////////
 
-// HS //inline NetcdfObsVars MetNcPointObs::get_obs_vars() { return obs_vars; }
-// HS inline NcHeaderData MetNcPointObs::get_header_data() { return header_data; }
-// HS inline int MetNcPointObs::get_buf_size() { return OBS_BUFFER_SIZE; }
-// HS inline int MetNcPointObs::get_hdr_cnt() { return nhdr; }
-// HS inline int MetNcPointObs::get_obs_cnt() { return nobs; }
-// HS inline NcPointObsData MetNcPointObs::get_point_obs_data() { return obs_data; }
-// HS inline StringArray MetNcPointObs::get_qty_data() { return obs_data.qty_names; }
-// HS inline StringArray MetNcPointObs::get_var_names() { return obs_data.var_names; }
-// HS inline bool MetNcPointObs::is_using_obs_arr() { return use_arr_vars; }
-// HS inline bool MetNcPointObs::is_using_var_id() { return use_var_id; }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,8 +87,6 @@ class MetNcPointObs2Write : public MetNcPointObs {
       int get_buf_size();
       void get_dim_counts(int *obs_cnt, int *hdr_cnt);
       int get_hdr_index();
-//      bool get_hdr_obs_count(int *obs_cnt, int *hdr_cnt);
-//      int get_obs_cnt();
       int get_obs_index();
       NcObsOutputData *get_output_data();
       NetcdfObsVars *get_obs_vars();
@@ -142,7 +99,6 @@ class MetNcPointObs2Write : public MetNcPointObs {
       void set_nc_out_data(vector<Observation> observations,
                            SummaryObs *summary_obs, TimeSummaryInfo summary_info,
                            int processed_hdr_cnt=0);
-//      bool set_reset_hdr_buffer(bool reset_buffer);
 
       void write_arr_headers();
       void write_buf_headers ();
@@ -169,7 +125,6 @@ inline int MetNcPointObs2Write::get_hdr_index() { return data_buffer.cur_hdr_idx
 inline int MetNcPointObs2Write::get_obs_index() { return data_buffer.obs_data_idx; }
 inline NcObsOutputData *MetNcPointObs2Write::get_output_data() { return &out_data; }
 inline NetcdfObsVars *MetNcPointObs2Write::get_obs_vars() { return &obs_vars; }
-//inline bool MetNcPointObs2Write::set_reset_hdr_buffer(bool reset_buffer) { reset_hdr_buffer = reset_buffer; }
 
 ////////////////////////////////////////////////////////////////////////
 

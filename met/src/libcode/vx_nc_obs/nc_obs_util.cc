@@ -16,10 +16,8 @@
 
 using namespace std;
 
-//#include <algorithm>
 #include <iostream>
 
-//#include "vx_math.h"
 #include "vx_nc_util.h"
 
 #include "nc_obs_util.h"

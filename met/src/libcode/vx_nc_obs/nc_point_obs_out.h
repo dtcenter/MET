@@ -7,17 +7,12 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __NC_POINT_OBS_OUT_H__
 #define  __NC_POINT_OBS_OUT_H__
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <ostream>
 
@@ -27,7 +22,6 @@
 #include "nc_point_obs.h"
 #include "nc_var_info.h"
 #include "vx_summary.h"
-
 
 ////////////////////////////////////////////////////////////////////////
 // struct definition
@@ -45,9 +39,6 @@ class MetNcPointObsOut : public MetNcPointObs {
 
       NcDataBuffer data_buffer;
       NcObsOutputData out_data;
-
-      //MetNcPointObsOut(const MetNcPointObsOut &);
-      //MetNcPointObsOut & operator=(const MetNcPointObsOut &);
 
       void init_from_scratch();
 
@@ -68,8 +59,6 @@ class MetNcPointObsOut : public MetNcPointObs {
       int get_buf_size();
       void get_dim_counts(int *obs_cnt, int *hdr_cnt);
       int get_hdr_index();
-//      bool get_hdr_obs_count(int *obs_cnt, int *hdr_cnt);
-//      int get_obs_cnt();
       int get_obs_index();
       NcObsOutputData *get_output_data();
       NetcdfObsVars *get_obs_vars();
@@ -82,7 +71,6 @@ class MetNcPointObsOut : public MetNcPointObs {
       void set_nc_out_data(vector<Observation> observations,
                            SummaryObs *summary_obs, TimeSummaryInfo summary_info,
                            int processed_hdr_cnt=0);
-//      bool set_reset_hdr_buffer(bool reset_buffer);
       void set_using_var_id(bool using_var_id);
 
       void write_arr_headers();
@@ -110,7 +98,6 @@ inline int MetNcPointObsOut::get_hdr_index() { return data_buffer.cur_hdr_idx; }
 inline int MetNcPointObsOut::get_obs_index() { return data_buffer.obs_data_idx; }
 inline NcObsOutputData *MetNcPointObsOut::get_output_data() { return &out_data; }
 inline NetcdfObsVars *MetNcPointObsOut::get_obs_vars() { return &obs_vars; }
-//inline bool MetNcPointObsOut::set_reset_hdr_buffer(bool reset_buffer) { reset_hdr_buffer = reset_buffer; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -238,11 +238,8 @@ bool MetNcPointObsOut::init_netcdf(int obs_count, int hdr_count,
       mlog << Debug(5) << method_name << "reset " << hdr_cnt << " headers (" << hdr_count << ").\n";
    }
 
-   //nobs = obs_count;
    nobs = obs_vars.obs_cnt = obs_count;
    nhdr = obs_vars.hdr_cnt = hdr_count;
-   //obs_vars.set_obs_count(obs_count);
-   //obs_vars.deflate_level = out_data.deflate_level;
    
    obs_vars.create_hdr_vars(obs_nc, hdr_count);
    obs_vars.create_obs_vars(obs_nc);
@@ -464,9 +461,6 @@ void MetNcPointObsOut::write_observation(const float obs_arr[OBS_ARRAY_LEN],
    }
    data_buffer.qty_idx_buf[obs_data_idx] = qty_index;
       
-   //for (int idx=0; idx<OBS_ARRAY_LEN; idx++) {
-   //   data_buffer.obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
-   //}
    data_buffer.obs_hid_buf[obs_data_idx] = obs_arr[0];
    data_buffer.obs_vid_buf[obs_data_idx] = obs_arr[1];
    data_buffer.obs_lvl_buf[obs_data_idx] = obs_arr[2];
@@ -525,7 +519,6 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
    string prev_station_id = "";
    ConcatString obs_qty;
    int headerOffset = data_buffer.cur_hdr_idx;
-   //float obs_arr[obs_arr_len];
    const string method_name = "  write_obs_data()";
 
    int obs_buf_size = observations.size();
