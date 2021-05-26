@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -98,6 +98,7 @@ void ATCFProbLine::dump(ostream &out, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void ATCFProbLine::clear() {
+
    ATCFLineBase::clear();
 
    return;
@@ -106,40 +107,44 @@ void ATCFProbLine::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFProbLine::read_line(LineDataFile * ldf) {
-   int status;
+   int status = 0;
    int n_expect;
 
-   clear();
+   // Read lines until good status is found
+   while(status == 0) {
 
-   status = ATCFLineBase::read_line(ldf);
+      clear();
 
-   // Check for bad return status or blank line
-   if(!status) return(0);
+      // Return bad status from the base class
+      if(!(status = ATCFLineBase::read_line(ldf))) return(0);
 
-   // Check the line type
-   switch(Type) {
-      case ATCFLineType_ProbRIRW:
-         n_expect = MinATCFProbRIRWElements;
-         break;
+      // Check the line type
+      switch(Type) {
+         case ATCFLineType_ProbRI:
+            n_expect = MinATCFProbRIRWElements;
+            break;
 
-      default:
+         default:
+            mlog << Debug(4)
+                 << "ATCFProbLine::read_line(LineDataFile * ldf) -> "
+                 << "skipping ATCF line type ("
+                 << atcflinetype_to_string(Type) << ")\n";
+            status = 0;
+            continue;
+      }
+
+      // Check for the minumum number of elements
+      if(n_items() < n_expect) {
          mlog << Warning
               << "\nint ATCFProbLine::read_line(LineDataFile * ldf) -> "
-              << "unexpected ATCF line type ("
-              << atcflinetype_to_string(Type) << ")\n\n";
-         return(0);
-   }
-
-   // Check for the minumum number of elements
-   if(n_items() < n_expect) {
-      mlog << Warning
-           << "\nint ATCFProbLine::read_line(LineDataFile * ldf) -> "
-           << "found fewer than the expected number of elements ("
-           << n_items() << "<" << n_expect
-           << ") in ATCF " << atcflinetype_to_string(Type) << " line:\n"
-           << DataLine::get_line() << "\n\n";
-      return(0);
-   }
+              << "found fewer than the expected number of elements ("
+              << n_items() << "<" << n_expect
+              << ") in ATCF " << atcflinetype_to_string(Type) << " line:\n"
+              << DataLine::get_line() << "\n\n";
+         status = 0;
+         continue;
+      }
+	}
 
    return(1);
 }

@@ -165,7 +165,9 @@ return ( var );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 PyObject * Python3_Script::lookup_ascii(const char * name) const
 
@@ -175,9 +177,29 @@ PyObject * var = 0;
 
 var = PyDict_GetItemString (DictAscii, name);
 
+if ( ! var )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not found\n\n";
+
+
+   exit ( 1 );
+
+}
+
+if ( ! PyList_Check(var) )  {
+
+   mlog << Error << "\nPython3_Script::lookup_ascii(const char * name) -> "
+        << "value for name \"" << name << "\" not a python list\n\n";
+
+   exit ( 1 );
+
+}
+
 return ( var );
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -218,46 +240,6 @@ return pobj;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-   //
-   //  example:
-   //
-   //      data = pickle.load( open( "save.p", "rb" ) )
-   //
-
-
-void Python3_Script::read_pickle(const char * variable, const char * pickle_filename) const
-
-{
-
-mlog << Debug(3) << "Reading temporary pickle file: "
-     << pickle_filename << "\n";
-
-ConcatString command;
-
-command << variable 
-        << " = pickle.load(open(\""
-        << pickle_filename
-        << "\", \"rb\"))";
-
-PyErr_Clear();
-
-run(command.text());
-
-if ( PyErr_Occurred() )  {
-
-   mlog << Error << "\nPython3_Script::read_pickle() -> "
-        << "command \"" << command << "\" failed!\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void Python3_Script::import_read_tmp_ascii_py(void)
 
@@ -310,7 +292,9 @@ fflush(stderr);
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 PyObject* Python3_Script::read_tmp_ascii(const char * tmp_filename) const
 
@@ -324,8 +308,6 @@ ConcatString command;
 command << "read_tmp_ascii(\""
         << tmp_filename
         << "\")";
-
-mlog << Debug(3) << command << "\n";
 
 PyErr_Clear();
 
@@ -341,14 +323,10 @@ if ( PyErr_Occurred() )  {
    exit ( 1 );
 }
 
-PyTypeObject* type = pobj->ob_type;
-
-const char* p = type->tp_name;
-
-mlog << Debug(2) << "read_tmp_ascii return type: " << p << "\n";
-
 return pobj;
+
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -184,7 +184,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType_ProbRIRW):
+      case(ATCFLineType_ProbRI):
 
          // Check for no entries or a mismatch with the latest entry
          if( ProbRIRW.size() == 0 ||

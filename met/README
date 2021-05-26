@@ -2,7 +2,7 @@
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
 ================================================================================
 
-Copyright 2020, UCAR/NCAR, NOAA, and CSU/CIRA
+Copyright 2021, UCAR/NCAR, NOAA, and CSU/CIRA
 Licensed under the Apache License, Version 2.0 (the "License");
    You may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -20,8 +20,8 @@ This is the main directory for the Model Evaluation Tools source code release.
 ================================================================================
 
 For questions, please:
-- Refer to the MET User's Guide in the /doc sub-directory.
-- Refer to the MET website: http://www.dtcenter.org/met/users
+- Refer to the MET User's Guide: https://met.readthedocs.io/en/latest
+- Refer to the MET website: http://dtcenter.org/community-code/model-evaluation-tools-met
 - Send mail to met_help@ucar.edu.
 
 Dependencies
@@ -52,7 +52,7 @@ Dependencies
 
 - It is suggested that the following tools be used in conjunction with MET:
    - Unified Post-Processor
-      - http://www.dtcenter.org/wrf-nmm/users
+      - http://dtcenter.org/community-code/unified-post-processor-upp
 
 NOTE: The required libraries should be compiled with the same set of compilers
       to be used in compiling MET.
@@ -63,7 +63,7 @@ How to compile and run?
 For more detailed instructions on building MET and for a list of supported
 platforms and compilers, please refer to the MET User's Guide in the doc/
 sub-directory, or the MET Online Tutorial:
-  http://www.dtcenter.org/met/users/support/online_tutorial
+  http://dtcenter.org/community-code/model-evaluation-tools-met/online-tutorial
 
 - Set the $CXX and $F77 environment variables to specify the C++ and FORTRAN
   compilers to be used.  If not set, configure will search for compilers and the

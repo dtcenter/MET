@@ -599,13 +599,13 @@ MADIS2NC tool
 _____________
 
 
-This section describes how to run the MADIS2NC tool. The MADIS2NC tool is used to reformat `Meteorological Assimilation Data Ingest System (MADIS) <http://madis.noaa.gov>`_ point observations into the NetCDF format expected by the MET statistics tools. Since the MADIS2NC tool simply performs a reformatting step, no configuration file is needed. The MADIS2NC tool supports many of the MADIS data types, as listed in the usage statement below. Support for additional MADIS data types may be added in the future based on user feedback.
+This section describes how to run the MADIS2NC tool. The MADIS2NC tool is used to reformat `Meteorological Assimilation Data Ingest System (MADIS) <http://madis.noaa.gov>`_ point observations into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The MADIS2NC tool supports many of the MADIS data types, as listed in the usage statement below. Support for additional MADIS data types may be added in the future based on user feedback.
 
 
 madis2nc usage
 ~~~~~~~~~~~~~~
 
-The usage statement for MADIS2NC tool is shown below:
+The usage statement for the MADIS2NC tool is shown below:
 
 .. code-block:: none
 		
@@ -635,7 +635,7 @@ Required arguments for madis2nc
 1. The **madis_file** argument is one or more input MADIS point observation files to be processed.
 
 
-2. The **netcdf_file** argument is the NetCDF output file to be written.
+2. The **out_file** argument is the NetCDF output file to be written.
 
 
 3. The argument **-type str** is a type of MADIS observations (metar, raob, profiler, maritime, mesonet or acarsProfiles).
@@ -778,7 +778,6 @@ We will not give a detailed description of each CALIPSO data product that lidar2
 **Layer_Base** gives the elevation in meters above ground level of the cloud base for each cloud level at each observation location. Similarly, **Layer_Top** gives the elevation of the top of each cloud layer. Note that if there are multiple cloud layers at a particular location, then there will be more than one base (or top) given for that location. For convenience, **Min_Base** and **Max_Top** give, respectively, the base elevation for the bottom cloud layer, and the top elevation for the top cloud layer. For these data types, there will be only one value per observation location regardless of how many cloud layers there are at that location.
 
 
-
 .. _lidar2nc_grib_code_table:
 
 .. list-table:: lidar2nc GRIB codes and their meaning, units, and abbreviations
@@ -837,7 +836,145 @@ We will not give a detailed description of each CALIPSO data product that lidar2
     - Horizontal Averaging
     - NA
     - Horizontal_Averaging
+
+
+IODA2NC tool
+____________
+
+
+This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <http://jcsda.org>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
+
+
+ioda2nc usage
+~~~~~~~~~~~~~
+
+The usage statement for the IODA2NC tool is shown below:
+
+.. code-block:: none
+		
+  Usage: ioda2nc
+         ioda_file
+         netcdf_file
+         [-config config_file]
+         [-obs_var var]
+         [-iodafile ioda_file]
+         [-valid_beg time]
+         [-valid_end time]
+         [-nmsg n]
+         [-log file]
+         [-v level]
+         [-compress level]
+
+ioda2nc has required arguments and can also take optional ones.
+
+Required arguments for ioda2nc
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. The **ioda_file** argument is an input IODA NetCDF point observation file to be processed.
+
+2. The **netcdf_file** argument is the NetCDF output file to be written.
+
+Optional arguments for ioda2nc
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+3. The **-config config_file** is a IODA2NCConfig file to filter the point observations and define time summaries.
+
+4. The **-obs_var var_list** setting is a comma-separated list of variables to be saved from input the input file (by defaults, saves "all").
+
+5. The **-iodafile ioda_file** option specifies additional input IODA observation files to be processed.
+
+6. The **-valid_beg time** and **-valid_end time** options in YYYYMMDD[_HH[MMSS]] format overrides the retention time window from the configuration file.
+
+7. The  **-nmsg n** indicates the number of IODA records to process.
+
+8. The **-log** file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+
+9. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+
+An example of the ioda2nc calling sequence is shown below:
+
+.. code-block:: none
+
+    ioda2nc \
+    ioda.NC001007.2020031012.nc ioda2nc.2020031012.nc \
+    -config IODA2NCConfig -v 3 -lg run_ioda2nc.log
       
+In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the ioda2nc.log file, and the verbosity level is three.
+
+
+ioda2nc configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default configuration file for the IODA2NC tool named **IODA2NcConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
+
+The IODA2NC configuration file is optional and only necessary when defining filtering the input observations or defining time summaries. The contents of the default IODA2NC configuration file are described below.
+
+__________________
+
+.. code-block:: none
+
+		obs_window = { beg  = -5400; end  = 5400; }
+		mask       = { grid = "";    poly = "";   }
+		tmp_dir    = "/tmp";
+		version    = "VN.N";
+
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+
+_________________
+
+
+.. code-block:: none
+
+		message_type           = [];
+		message_type_group_map = [];
+		message_type_map       = [];
+		station_id             = [];
+		elevation_range        = { ... };
+		level_range            = { ... };
+		obs_var                = [];
+		quality_mark_thresh    = 0;
+		time_summary           = { ... }
+
+The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
+
+_________________
+
+.. code-block:: none
+
+		obs_name_map = [];
+
+This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input IODA variable names to output variable names. The default IODA map, obs_var_map, is appended to this map.
+
+_________________
+
+.. code-block:: none
+		
+		metadata_map = [
+		{ key = "message_type"; val = "msg_type"; },
+		{ key = "station_id";   val = "report_identifier"; },
+		{ key = "pressure";     val = "air_pressure,pressure"; },
+		{ key = "height";       val = "height,height_above_mean_sea_level"; },
+		{ key = "elevation";    val = ""; }
+		];
+
+This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
+
+_________________
+
+.. code-block:: none
+
+		missing_thresh = [ <=-1e9, >=1e9, ==-9999 ];
+
+The **missing_thresh** option is an array of thresholds. Any data values which meet any of these thresholds are interpreted as being bad, or missing, data.
+
+
+ioda2nc output
+~~~~~~~~~~~~~~
+
+The NetCDF output of the IODA2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
+
 
 Point2Grid tool
 _______________

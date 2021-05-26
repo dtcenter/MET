@@ -13,6 +13,10 @@ import sys
 import importlib.util
 import netCDF4 as nc
 
+print("Python Script:\t"  + repr(sys.argv[0]))
+print("User Command:\t"   + repr(' '.join(sys.argv[2:])))
+print("Temporary File:\t" + repr(sys.argv[1]))
+
 netcdf_filename = sys.argv[1]
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -52,8 +52,8 @@ class PyLineDataFile : public LineDataFile {
 
       ConcatString UserPathToPython;
 
-      void do_straight ();   //  straight-up python, no pickle
-      void do_pickle   ();   //  pickle
+      void do_straight ();  //  run compiled python interpreter
+      void do_tmp_ascii();  //  run user-defined MET_PYTHON_EXE
 
       ConcatString make_header_line () const;
       ConcatString make_data_line   ();
