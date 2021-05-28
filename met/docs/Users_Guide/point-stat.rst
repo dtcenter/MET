@@ -337,8 +337,8 @@ ________________________
   mpr_column     = [];
   mpr_thresh     = [];
   eclv_points    = 0.05;
-  rank_corr_flag = TRUE;
   hss_ec_value   = NA;
+  rank_corr_flag = TRUE;
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;

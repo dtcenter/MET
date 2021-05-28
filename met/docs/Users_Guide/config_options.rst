@@ -1955,17 +1955,6 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
-**rank_corr_flag**
-
-The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
-and Spearman's Rank Correlation Coefficients (in the CNT line type) should
-be computed. Computing them over large datasets is computationally
-intensive and slows down the runtime significantly.
-
-.. code-block:: none
-		
-  rank_corr_flag = FALSE;
-
 **hss_ec_value**
 
 The "hss_ec_value" entry is a floating point number used in the computation
@@ -1981,6 +1970,17 @@ It set, it must greater than or equal to 0.0 and less than 1.0. A value of
 .. code-block:: none
 		
   hss_ec_value = NA;
+
+**rank_corr_flag**
+
+The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
+and Spearman's Rank Correlation Coefficients (in the CNT line type) should
+be computed. Computing them over large datasets is computationally
+intensive and slows down the runtime significantly.
+
+.. code-block:: none
+		
+  rank_corr_flag = FALSE;
 
 **duplicate_flag**
 
@@ -3852,7 +3852,8 @@ Where "job_name" is set to one of the following:
     "-boot_seed       value"
 
   .. code-block:: none
-		  
+
+    "-hss_ec_value    value"
     "-rank_corr_flag  value"
     "-vif_flag        value"
 

@@ -224,8 +224,8 @@ __________________________
   mpr_column     = [];
   mpr_thresh     = [];
   eclv_points    = 0.05;
-  rank_corr_flag = TRUE;
   hss_ec_value   = NA;
+  rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
   version        = "VN.N";
