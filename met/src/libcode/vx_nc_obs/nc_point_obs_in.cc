@@ -27,9 +27,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class MetNcPointObs
    //
@@ -80,14 +77,14 @@ bool MetNcPointObsIn::read_dim_headers() {
 //////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObsIn::read_obs_data() {
-   bool status = read_obs_data_numbers() && read_obs_data_strings();
+   bool status = read_obs_data_numbers() && read_obs_data_table_lookups();
    return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObsIn::read_obs_data(int buf_size, int start, float *obs_arr_block,
-                                  int *obs_qty_idx_block, char *obs_qty_str_block) {
+                                    int *obs_qty_idx_block, char *obs_qty_str_block) {
   return obs_vars.read_obs_data(buf_size, start, qty_length, obs_arr_block,
                                 obs_qty_idx_block, obs_qty_str_block);
 }
@@ -104,10 +101,10 @@ bool MetNcPointObsIn::read_obs_data_numbers() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPointObsIn::read_obs_data_strings() {
+bool MetNcPointObsIn::read_obs_data_table_lookups() {
    bool status = false;
    if( IS_VALID_NC_P(obs_nc) ) {
-      status = obs_data.read_obs_data_strings(obs_vars);
+      status = obs_data.read_obs_data_table_lookups(obs_vars);
    }
    return status;
 }
