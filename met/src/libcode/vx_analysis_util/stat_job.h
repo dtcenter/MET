@@ -324,6 +324,11 @@ class STATAnalysisJob {
       char *boot_seed;
 
       //
+      // MCTS HSS Expected Correct rate
+      //
+      double hss_ec_value;
+
+      //
       // Rank correlation flag
       //
       int rank_corr_flag;

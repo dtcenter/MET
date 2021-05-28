@@ -104,6 +104,7 @@ boot = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+hss_ec_value   = NA;
 rank_corr_flag = TRUE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";

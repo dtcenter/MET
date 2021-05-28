@@ -153,6 +153,7 @@ boot = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";

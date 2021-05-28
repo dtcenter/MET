@@ -1131,6 +1131,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
+            cur.set_ec_value(job.hss_ec_value);
             aggr.valid_ts.clear();
             aggr.acc_ts.clear();
             aggr.mcts_info = cur;
@@ -3449,6 +3450,7 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
+   mcts_info.set_ec_value(job.hss_ec_value);
 
    //
    // If there are no matched pairs to process, return

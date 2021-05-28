@@ -108,6 +108,7 @@ wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
 
 ////////////////////////////////////////////////////////////////////////////////
 
+hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
