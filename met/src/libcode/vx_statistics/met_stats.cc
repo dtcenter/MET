@@ -519,10 +519,12 @@ void MCTSInfo::clear() {
    cts.zero_out();
    fthresh.clear();
    othresh.clear();
+   ec_value = bad_data_double;
 
    acc.clear();
    hk.clear();
    hss.clear();
+   hss_ec.clear();
    ger.clear();
 
    return;
@@ -538,6 +540,7 @@ void MCTSInfo::assign(const MCTSInfo &c) {
    cts = c.cts;
    fthresh = c.fthresh;
    othresh = c.othresh;
+   ec_value = c.ec_value;
 
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
@@ -545,6 +548,7 @@ void MCTSInfo::assign(const MCTSInfo &c) {
    acc = c.acc;
    hk = c.hk;
    hss = c.hss;
+   hss_ec = c.hss_ec;
    ger = c.ger;
 
    return;
@@ -569,6 +573,7 @@ void MCTSInfo::allocate_n_alpha(int i) {
       acc.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
+      hss_ec.allocate_n_alpha(n_alpha);
       ger.allocate_n_alpha(n_alpha);
    }
 
@@ -599,6 +604,13 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void MCTSInfo::set_ec_value(double v) {
+   ec_value = v;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void MCTSInfo::add(double f, double o) {
    add(f, o, bad_data_double, bad_data_double);
    return;
@@ -623,10 +635,11 @@ void MCTSInfo::add(double f, double o, double cmn, double csd) {
 
 void MCTSInfo::compute_stats() {
 
-   acc.v = cts.gaccuracy();
-   hk.v  = cts.gkuiper();
-   hss.v = cts.gheidke();
-   ger.v = cts.gerrity();
+   acc.v    = cts.gaccuracy();
+   hk.v     = cts.gkuiper();
+   hss.v    = cts.gheidke();
+   hss_ec.v = cts.gheidke_ec(ec_value);
+   ger.v    = cts.gerrity();
 
    return;
 }

@@ -873,6 +873,18 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
                               mcts_info.hss.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for hss_ec
+      //
+      s = mcts_info.hss_ec.v;
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.hss_ec.v_bcl[i],
+                              mcts_info.hss_ec.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for ger
       //
       s = mcts_info.ger.v;
@@ -1907,6 +1919,18 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                mcts_info.hss.v_bcl[i],
                                mcts_info.hss.v_bcu[i]);
 
+      //
+      // Compute bootstrap interval for hss_ec
+      //
+      s = mcts_info.hss_ec.v;
+      read_ldf(mcts_r_file, c++, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.hss_ec.v_bcl[i],
+                               mcts_info.hss_ec.v_bcu[i]);
+
+      //
       //
       // Compute bootstrap interval for ger
       //

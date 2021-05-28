@@ -72,7 +72,8 @@ static const char * mcts_columns [] = {
    "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
    "HK",          "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "GER",         "GER_BCL",     "GER_BCU"
+   "GER",         "GER_BCL",     "GER_BCU",
+   "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU", "EC_VALUE"
 };
 
 static const char * cnt_columns [] = {

@@ -2679,7 +2679,9 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
    //    HK,          HK_BCL,      HK_BCU,
    //    HSS,         HSS_BCL,     HSS_BCU,
-   //    GER,         GER_BCL,     GER_BCU
+   //    GER,         GER_BCL,     GER_BCU,
+   //    HSS_EC,      HSS_EC_BCL,  HSS_EC_BCU,
+   //    EC_VALUE
    //
    at.set_entry(r, c+0,  // Total count
       mcts_info.cts.total());
@@ -2728,6 +2730,18 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
 
    at.set_entry(r, c+15, // Gerrity Score BCU
       mcts_info.ger.v_bcu[i]);
+
+   at.set_entry(r, c+10, // Heidke Skill Score with Expected Correct
+      mcts_info.hss_ec.v);
+
+   at.set_entry(r, c+11, // Heidke Skill Score EC BCL
+      mcts_info.hss_ec.v_bcl[i]);
+
+   at.set_entry(r, c+12, // Heidke Skill Score EC BCU
+      mcts_info.hss_ec.v_bcu[i]);
+
+   at.set_entry(r, c+13, // Expected Correct value
+      mcts_info.ec_value);
 
    return;
 }

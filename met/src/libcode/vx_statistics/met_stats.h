@@ -127,13 +127,15 @@ class MCTSInfo {
       ContingencyTable cts;
       ThreshArray      fthresh;
       ThreshArray      othresh;
+      double           ec_value;
 
-      CIInfo acc, hk, hss, ger;
+      CIInfo acc, hk, hss, hss_ec, ger;
 
       void clear();
       void allocate_n_alpha(int);
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
+      void set_ec_value(double);
       void add(double, double);
       void add(double, double, double, double);
       void compute_stats();

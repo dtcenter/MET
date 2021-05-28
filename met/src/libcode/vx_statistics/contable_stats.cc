@@ -795,7 +795,7 @@ double ContingencyTable::gaccuracy() const {
 ////////////////////////////////////////////////////////////////////////
 
 
-double ContingencyTable::gheidke()const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
+double ContingencyTable::gheidke() const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
 
 {
 
@@ -878,7 +878,43 @@ return ( ans );
 ////////////////////////////////////////////////////////////////////////
 
 
-double ContingencyTable::gkuiper()const  //  Reference: Eq. 7.13, page 250 in Wilks, 1st Ed.
+double ContingencyTable::gheidke_ec(double ec_value) const
+
+{
+
+if ( Nrows != Ncols )  {
+
+   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
+        << "table not square!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ec_value < 0.0 || ec_value >= 1.0 )  {
+
+   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
+        << "ec_value (" << ec_value << ") must be >=0 and <1.0!\n\n";
+
+   exit ( 1 );
+
+}
+
+// JHG work here!
+
+   //
+   //  done
+   //
+
+return ( 0.0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double ContingencyTable::gkuiper() const  //  Reference: Eq. 7.13, page 250 in Wilks, 1st Ed.
 
 {
 

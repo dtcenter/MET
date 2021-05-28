@@ -125,6 +125,7 @@ class ContingencyTable {
 
       virtual double gaccuracy () const;
       virtual double gheidke   () const;
+      virtual double gheidke_ec(double) const;
       virtual double gkuiper   () const;
       virtual double gerrity   () const;
 
