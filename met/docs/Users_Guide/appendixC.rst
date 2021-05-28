@@ -240,7 +240,7 @@ HK is also known as the True Skill Statistic (TSS) and less commonly (although p
 Heidke Skill Score (HSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called "HSS" in CTS output :numref:`table_PS_format_info_CTS`
+Called "HSS" in CTS output :numref:`table_PS_format_info_CTS` and "HSS" in MCTS output :numref:`table_PS_format_info_MCTS`
 
 HSS is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular, 
 
@@ -251,6 +251,21 @@ where
 .. math:: C_2 = \frac{(n_{11} + n_{10}) (n_{11} + n_{01}) + (n_{01} + n_{00}) (n_{10} + n_{00})}{T}.
 
 HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
+
+Heidke Skill Score - Expected Correct (HSS_EC)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Called "HSS_EC" in MCTS output :numref:`table_PS_format_info_MCTS`
+
+HSS_EC is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular,
+
+.. math:: \text{HSS } = \frac{n_{11} + n_{00} - C_2}{T - C_2},
+
+where
+
+The C_2 value is user-configurable with a default value of T divided by the number of contingency table categories.
+
+HSS_EC can range from minus infinity to 1. A perfect forecast would have HSS_EC = 1.
 
 Odds Ratio (OR)
 ~~~~~~~~~~~~~~~

@@ -1966,6 +1966,22 @@ intensive and slows down the runtime significantly.
 		
   rank_corr_flag = FALSE;
 
+**hss_ec_value**
+
+The "hss_ec_value" entry is a floating point number used in the computation
+of the HSS_EC statistic in the MCTS line type. It specifies the expected
+correct (EC) rate by chance for multi-category contingency tables. If set
+to its default value of NA, it will automatically be replaced with 1.0
+divided by the MCTC table dimension. For example, for a 4x4 table, the
+default hss_ec_value is 1.0 / 4 = 0.25.
+
+It set, it must greater than or equal to 0.0 and less than 1.0. A value of
+0.0 produces an HSS_EC statistic equal to the Accuracy statistic.
+
+.. code-block:: none
+		
+  hss_ec_value = NA;
+
 **duplicate_flag**
 
 The "duplicate_flag" entry specifies how to handle duplicate point

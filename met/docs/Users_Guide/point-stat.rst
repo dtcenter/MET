@@ -338,6 +338,7 @@ ________________________
   mpr_thresh     = [];
   eclv_points    = 0.05;
   rank_corr_flag = TRUE;
+  hss_ec_value   = NA;
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;
@@ -914,6 +915,12 @@ The first set of header columns are common to all of the output files generated 
   * - 38-40
     - GER, :raw-html:`<br />` GER_BCL, :raw-html:`<br />` GER_BCU
     - Gerrity Score and bootstrap confidence limits
+  * - 41-43
+    - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
+    - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+  * - 44
+    - EC_VALUE
+    - Expected correct rate for HSS_EC
 
 .. _table_PS_format_info_PCT:
 
