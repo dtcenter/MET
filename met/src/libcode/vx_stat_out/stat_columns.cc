@@ -2731,16 +2731,16 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    at.set_entry(r, c+15, // Gerrity Score BCU
       mcts_info.ger.v_bcu[i]);
 
-   at.set_entry(r, c+10, // Heidke Skill Score with Expected Correct
+   at.set_entry(r, c+16, // Heidke Skill Score with Expected Correct
       mcts_info.hss_ec.v);
 
-   at.set_entry(r, c+11, // Heidke Skill Score EC BCL
+   at.set_entry(r, c+17, // Heidke Skill Score EC BCL
       mcts_info.hss_ec.v_bcl[i]);
 
-   at.set_entry(r, c+12, // Heidke Skill Score EC BCU
+   at.set_entry(r, c+18, // Heidke Skill Score EC BCU
       mcts_info.hss_ec.v_bcu[i]);
 
-   at.set_entry(r, c+13, // Expected Correct value
+   at.set_entry(r, c+19, // Expected Correct value
       mcts_info.ec_value);
 
    return;
