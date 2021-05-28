@@ -143,7 +143,6 @@ output_stats = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// JHG, this could be specified as a constant or a DataPlane
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
