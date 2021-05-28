@@ -211,7 +211,7 @@ struct NcPointObsData {
    void clear_strings();
    float get_obs_val(int index);
    bool read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop=true);
-   bool read_obs_data_strings(NetcdfObsVars obs_vars, bool stop=true);
+   bool read_obs_data_table_lookups(NetcdfObsVars obs_vars, bool stop=true);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ extern bool is_using_var_id    (const char * nc_name);
 extern bool is_using_var_id    (NcFile * nc_file);
 
 extern void reset_header_buffer(int buf_size, bool reset_all=false);
-extern void set_header_buffer(int buf_size, bool reset_all=false);
+extern void set_header_buffer  (int buf_size, bool reset_all=false);
 
 extern string seconds_to_time_string(const int secs);
 
