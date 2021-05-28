@@ -1899,6 +1899,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    mcts_info.cts.set_size(conf_info.vx_opt[i_vx].fcat_ta.n() + 1);
    mcts_info.set_fthresh(conf_info.vx_opt[i_vx].fcat_ta);
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
+   mcts_info.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
    for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
