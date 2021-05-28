@@ -46,6 +46,7 @@ using namespace std;
 
 #include "vx_summary.h"
 #include "nc_obs_util.h"
+#include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,7 +77,6 @@ static ConcatString ncfile;
 // Input configuration file
 static ConcatString  config_file;
 static IODA2NCConfInfo conf_info;
-static NcObsOutputData nc_out_data;
 
 static Grid        mask_grid;
 static MaskPlane   mask_area;
@@ -105,7 +105,7 @@ static IntArray filtered_times;
 static bool do_summary;
 static bool save_summary_only = false;
 static SummaryObs *summary_obs;
-static NetcdfObsVars obs_vars;
+static MetNcPointObsOut nc_point_obs;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -205,7 +205,7 @@ void initialize() {
 
    n_total_obs = 0;
 
-   nc_obs_initialize();
+   nc_point_obs.init_buffer();
 
    core_dims.clear();
    core_dims.add("nvars");
@@ -323,7 +323,10 @@ void open_netcdf() {
    }
 
    // Define netCDF variables
-   init_nc_dims_vars_config(obs_vars);
+   int deflate_level = compress_level;
+   if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+   nc_point_obs.set_netcdf(f_out, true);
+   nc_point_obs.init_obs_vars(true, deflate_level);
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -335,7 +338,7 @@ void open_netcdf() {
 
 void process_ioda_file(int i_pb) {
    int npbmsg, npbmsg_total;
-   int idx, i_msg, i_read, n_file_obs, i_ret, n_hdr_obs;
+   int idx, i_msg, i_read, n_file_obs, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_nobs;
    double   x, y;
@@ -525,7 +528,7 @@ void process_ioda_file(int i_pb) {
            << "trouble getting datetime\n\n";
       exit(1);
    }
-   
+
    StringArray raw_var_names;
    if(do_all_vars || obs_var_names.n() == 0) raw_var_names = obs_value_vars;
    else raw_var_names = obs_var_names;
@@ -562,7 +565,7 @@ void process_ioda_file(int i_pb) {
    }
 
    // Initialize counts
-   i_ret   = n_file_obs = i_msg      = 0;
+   n_file_obs = i_msg = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_nobs   = 0;
 
@@ -591,7 +594,7 @@ void process_ioda_file(int i_pb) {
    for(int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the IODA messages from the input file
-   for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
+   for(i_read=0; i_read<npbmsg; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
          if(bin_count > 0 && (i_read+1)%bin_count == 0) {
@@ -768,7 +771,7 @@ void process_ioda_file(int i_pb) {
       }
 
       // Store the index to the header data
-      obs_arr[0] = (float) get_nc_hdr_cur_index();
+      obs_arr[0] = (float) nc_point_obs.get_hdr_index();
 
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
@@ -792,8 +795,8 @@ void process_ioda_file(int i_pb) {
       // store the header data and increment the IODA record
       // counter
       if(n_hdr_obs > 0) {
-         add_nc_header_to_array(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
-                                hdr_lat, hdr_lon, hdr_elv);
+         //nc_point_obs.add_header(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
+         //                        hdr_lat, hdr_lon, hdr_elv);
          i_msg++;
       }
       else {
@@ -810,8 +813,7 @@ void process_ioda_file(int i_pb) {
       cout << log_message << "\n";
    }
 
-   int obs_buf_index = get_nc_obs_buf_index();
-   if(obs_buf_index > 0) write_nc_obs_buffer(obs_buf_index);
+   nc_point_obs.write_observation();
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
@@ -831,7 +833,7 @@ void process_ioda_file(int i_pb) {
         << rej_elv << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
-        << "Total Records retained\t\t= "
+        << "Total Records retained\t\t\t= "
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
@@ -898,22 +900,16 @@ void process_ioda_file(int i_pb) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_hdr_data() {
+   int obs_cnt, hdr_cnt;
+   const long hdr_count = (long) nc_point_obs.get_hdr_index();
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   const long hdr_count = (long) get_nc_hdr_cur_index();
-   int deflate_level = compress_level;
-   if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-
-   nc_out_data.processed_hdr_cnt = hdr_count;
-   nc_out_data.deflate_level = deflate_level;
-   nc_out_data.observations = observations;
-   nc_out_data.summary_obs = summary_obs;
-   nc_out_data.summary_info = conf_info.getSummaryInfo();
-
-   init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
+   nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
+   nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
+   nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
 
    // Check for no messages retained
-   if(obs_vars.hdr_cnt <= 0) {
+   if(hdr_cnt <= 0) {
       mlog << Error << method_name << " -> "
            << "No IODA reocrds retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
@@ -922,8 +918,6 @@ void write_netcdf_hdr_data() {
    }
 
    // Make sure all obs data is processed before handling header
-   write_observations(f_out, obs_vars, nc_out_data);
-
    StringArray nc_var_name_arr;
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
@@ -940,10 +934,7 @@ void write_netcdf_hdr_data() {
       nc_var_desc_arr.add(obs_var_descs[i]);
    }
 
-   create_nc_obs_name_vars(obs_vars, f_out, var_count, units_count, deflate_level);
-   write_obs_var_names(obs_vars,  nc_var_name_arr);
-   write_obs_var_units(obs_vars, nc_var_unit_arr);
-   write_obs_var_descriptions(obs_vars, nc_var_desc_arr);
+   nc_point_obs.write_to_netcdf(nc_var_name_arr, nc_var_unit_arr, nc_var_desc_arr);
 
    return;
 }
@@ -980,6 +971,8 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
+
+   nc_point_obs.close();
 
    if(f_out) {
       delete f_out;
