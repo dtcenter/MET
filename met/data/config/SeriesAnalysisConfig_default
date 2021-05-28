@@ -42,6 +42,8 @@ censor_val    = [];
 cat_thresh    = [ NA ];
 cnt_thresh    = [ NA ];
 cnt_logic     = UNION;
+// JHG, this could be specified as a constant or a DataPlane
+hss_ec_value  = NA;
 
 //
 // Forecast and observation fields to be verified
