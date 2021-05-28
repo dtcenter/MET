@@ -20,7 +20,6 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    04/18/07  Halley Gotway  New
-//   000    04/18/07  Halley Gotway  New
 //   001    12/20/07  Halley Gotway  Allow verification for level 0
 //                    for verifying PRMSL
 //   002    01/24/08  Halley Gotway  In compute_cnt, print a warning
@@ -673,7 +672,7 @@ void process_obs_file(int i_nc) {
 
    nc_point_obs.read_dim_headers();
    nc_point_obs.check_nc(obs_file[i_nc].c_str(), method_name);
-   nc_point_obs.read_obs_data_strings();
+   nc_point_obs.read_obs_data_table_lookups();
 
    bool use_var_id = nc_point_obs.is_using_var_id();
    int hdr_count = nc_point_obs.get_hdr_cnt();
@@ -718,7 +717,7 @@ void process_obs_file(int i_nc) {
          int qty_offset = use_arr_vars ? i_obs : obs_qty_idx_block[i_block_idx];
          obs_qty_str = obs_qty_array[qty_offset];
 
-         int headerOffset = obs_arr[0];
+         int headerOffset = nc_point_obs.get_header_offset(obs_arr);
 
          // Range check the header offset
          if(headerOffset < 0 || headerOffset >= hdr_count) {
@@ -736,20 +735,21 @@ void process_obs_file(int i_nc) {
                                  hdr_sid_str, hdr_vld_str);
 
          // Store the variable name
-         int grib_code = obs_arr[1];
+         int org_grib_code = nc_point_obs.get_grib_code_or_var_index(obs_arr);
+         int grib_code = org_grib_code;
          if (use_var_id && grib_code < var_names.n()) {
             var_name   = var_names[grib_code];
-            obs_arr[1] = bad_data_int;
+            grib_code = bad_data_int;
          }
          else {
             var_name = "";
          }
 
          // Check for wind components
-         is_ugrd = ( use_var_id &&         var_name == ugrd_abbr_str ) ||
-                   (!use_var_id && nint(obs_arr[1]) == ugrd_grib_code);
-         is_vgrd = ( use_var_id &&         var_name == vgrd_abbr_str ) ||
-                   (!use_var_id && nint(obs_arr[1]) == vgrd_grib_code);
+         is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
+                   (!use_var_id && nint(grib_code) == ugrd_grib_code);
+         is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
+                   (!use_var_id && nint(grib_code) == vgrd_grib_code);
 
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
@@ -764,9 +764,7 @@ void process_obs_file(int i_nc) {
          // and at the same vertical level.
          if(vflag && is_vgrd) {
 
-            if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
-               !is_eq(obs_arr[2], prev_obs_arr[2]) ||
-               !is_eq(obs_arr[3], prev_obs_arr[3])) {
+            if(!nc_point_obs.is_same_obs_values(obs_arr, prev_obs_arr)) {
                mlog << Error << "\n" << method_name
                     << "for observation index " << i_obs
                     << ", when computing VL1L2 and/or VAL1L2 vector winds "
@@ -794,7 +792,7 @@ void process_obs_file(int i_nc) {
                     grid, var_name.c_str());
          }
 
-         obs_arr[1] = grib_code;
+         nc_point_obs.set_grib_code_or_var_index(obs_arr, org_grib_code);
       }
 
    } // end for i_block_start_idx

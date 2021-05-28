@@ -21,12 +21,9 @@ using namespace std;
 #include <time.h>
 
 #include "vx_log.h"
+#include "is_bad_data.h"
 
 #include "nc_point_obs.h"
-#include "write_netcdf.h"
-
-////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,7 +68,6 @@ void MetNcPointObs::close() {
       obs_nc = (NcFile *) 0;
    }
 
-   //obs_vars.reset();
    obs_data.clear();
    header_data.clear();
    return;
@@ -141,6 +137,15 @@ bool MetNcPointObs::get_lons(float *hdr_lons) {
       hdr_lons[idx] = header_data.lon_array[idx];
    }
    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetNcPointObs::is_same_obs_values(const float obs_arr1[OBS_ARRAY_LEN],
+                                       const float obs_arr2[OBS_ARRAY_LEN]) {
+   return is_eq(obs_arr1[0], obs_arr1[0]) &&  is_eq(obs_arr1[2], obs_arr2[2])
+          && is_eq(obs_arr1[3], obs_arr2[3]);
 }
 
 ////////////////////////////////////////////////////////////////////////

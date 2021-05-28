@@ -962,7 +962,7 @@ void process_point_obs(int i_nc) {
    // Read the dimensions and variables
    nc_point_obs.read_dim_headers();
    nc_point_obs.check_nc(point_obs_file_list[i_nc].c_str(), method_name);   // exit if missing dims/vars
-   nc_point_obs.read_obs_data_strings();
+   nc_point_obs.read_obs_data_table_lookups();
 
    int hdr_count = nc_point_obs.get_hdr_cnt();
    int obs_count = nc_point_obs.get_obs_cnt();
@@ -1008,7 +1008,7 @@ void process_point_obs(int i_nc) {
          int qty_offset = use_arr_vars ? i_obs : obs_qty_idx_block[i_offset];
          obs_qty_str = obs_qty_array[qty_offset];
 
-         int headerOffset  = obs_arr[0];
+         int headerOffset  = nc_point_obs.get_header_offset(obs_arr);
 
          // Range check the header offset
          if(headerOffset < 0 || headerOffset >= hdr_count) {
@@ -1023,7 +1023,7 @@ void process_point_obs(int i_nc) {
          // Read the corresponding header array for this observation
          // - the corresponding header type, header Station ID, and valid time
          nc_point_obs.get_header(headerOffset, hdr_arr, hdr_typ_str,
-                                  hdr_sid_str, hdr_vld_str);
+                                 hdr_sid_str, hdr_vld_str);
 
          // Read the header integer types
          nc_point_obs.get_header_type(headerOffset, hdr_typ_arr);
@@ -1031,8 +1031,9 @@ void process_point_obs(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str.c_str());
 
-         if (use_var_id && obs_arr[1] < var_names.n()) {
-            var_name = var_names[obs_arr[1]];
+         int grib_code = nc_point_obs.get_grib_code_or_var_index(obs_arr);
+         if (use_var_id && grib_code < var_names.n()) {
+            var_name = var_names[grib_code];
          }
          else {
             var_name = "";
