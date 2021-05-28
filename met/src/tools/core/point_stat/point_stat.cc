@@ -94,6 +94,7 @@
 //   044    01/24/20  Halley Gotway  Add HiRA RPS output.
 //   045    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
+//   046    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 

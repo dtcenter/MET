@@ -635,6 +635,14 @@ void MCTSInfo::add(double f, double o, double cmn, double csd) {
 
 void MCTSInfo::compute_stats() {
 
+   //
+   // Set the HSS expected correct value, if needed.
+   // Default to 1 divided by the number of categories.
+   //
+   if(is_bad_data(ec_value) && cts.nrows() > 0) {
+      ec_value = 1.0/cts.nrows();
+   }
+
    acc.v    = cts.gaccuracy();
    hk.v     = cts.gkuiper();
    hss.v    = cts.gheidke();

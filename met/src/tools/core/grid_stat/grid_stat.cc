@@ -108,6 +108,7 @@
 //                    nc_pairs_var_str to nc_pairs_var_suffix.
 //   051    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
+//   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 

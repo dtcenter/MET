@@ -530,6 +530,7 @@ void GridStatVxOpt::clear() {
    grad_dy.clear();
 
    rank_corr_flag = false;
+   hss_ec_value = bad_data_double;
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
@@ -813,6 +814,9 @@ void GridStatVxOpt::process_config(
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
+   // Conf: hss_ec_value
+   hss_ec_value = odict.lookup_double(conf_key_hss_ec_value);
+
    // Conf: nc_pairs_flag
    parse_nc_info(odict);
 
@@ -891,7 +895,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,
-   //    rank_corr_flag, output_flag, nc_info
+   //    rank_corr_flag, hss_ec_value, output_flag, nc_info
    //
 
    if(!(mask_grid   == v.mask_grid  ) ||

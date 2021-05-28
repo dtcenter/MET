@@ -142,6 +142,7 @@ class PointStatVxOpt {
       HiRAInfo        hira_info;          // HiRA verification logic
 
       bool            rank_corr_flag;     // Flag for computing rank correlations
+      double          hss_ec_value;       // MCTS HSS expected correct value
 
       StringArray     msg_typ;            // Array of message types
 
