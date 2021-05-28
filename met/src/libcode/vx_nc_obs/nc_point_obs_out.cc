@@ -53,8 +53,8 @@ void MetNcPointObsOut::init_from_scratch() {
 }
 
 bool MetNcPointObsOut::add_header(const char *hdr_typ, const char *hdr_sid,
-                                     const time_t hdr_vld, const float hdr_lat,
-                                     const float hdr_lon, const float hdr_elv)
+                                  const time_t hdr_vld, const float hdr_lat,
+                                  const float hdr_lon, const float hdr_elv)
 {
    bool added = false;
    bool new_vld = false;
@@ -94,8 +94,8 @@ bool MetNcPointObsOut::add_header(const char *hdr_typ, const char *hdr_sid,
 ///////////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObsOut::add_header_prepbufr(const int pb_report_type,
-                                              const int in_report_type,
-                                              const int instrument_type)
+                                           const int in_report_type,
+                                           const int instrument_type)
 {
    bool added = true;
    const char *method_name = "add_header_prepbufr() ";
@@ -206,7 +206,6 @@ void MetNcPointObsOut::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::init_buffer() {
-   //string method_name = "init_buffer(() ";
 
    data_buffer.obs_data_idx    = 0;
    data_buffer.obs_data_offset = 0;
@@ -228,7 +227,7 @@ void MetNcPointObsOut::init_buffer() {
 // reset_hdr_buffer is updated by get_dim_counts().
 
 bool MetNcPointObsOut::init_netcdf(int obs_count, int hdr_count,
-                                      string program_name) {
+                                   string program_name) {
    string method_name = "init_netcdf() ";
 
    if (reset_hdr_buffer) {
@@ -249,14 +248,13 @@ bool MetNcPointObsOut::init_netcdf(int obs_count, int hdr_count,
    //
    write_netcdf_global(obs_nc, obs_nc->getName().c_str(), program_name.c_str());
 
-   //return reset_hdr_buffer;
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::init_obs_vars(bool using_var_id, int deflate_level,
-                                        bool attr_agl) {
+                                     bool attr_agl) {
    use_var_id = using_var_id;
    obs_vars.reset(using_var_id);
    obs_vars.attr_agl = attr_agl;
@@ -296,9 +294,9 @@ void MetNcPointObsOut::reset_header_buffer(int buf_size, bool reset_all) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::set_nc_out_data(vector<Observation> observations,
-                                          SummaryObs *summary_obs,
-                                          TimeSummaryInfo summary_info,
-                                          int processed_hdr_cnt) {
+                                       SummaryObs *summary_obs,
+                                       TimeSummaryInfo summary_info,
+                                       int processed_hdr_cnt) {
    out_data.processed_hdr_cnt = processed_hdr_cnt;
    out_data.observations = observations;
    out_data.summary_obs = summary_obs;
@@ -343,8 +341,7 @@ void MetNcPointObsOut::write_arr_headers() {
       // Valid Time
       data_buffer.hdr_vld_buf[hdr_data_idx] = header_data.vld_idx_array[index];
       
-      // Write the header array which consists of the following:
-      //    LAT LON ELV
+      // Write the header array which consists of the following: LAT LON ELV
       data_buffer.hdr_lat_buf[hdr_data_idx] = (float) header_data.lat_array[index];
       data_buffer.hdr_lon_buf[hdr_data_idx] = (float) header_data.lon_array[index];
       data_buffer.hdr_elv_buf[hdr_data_idx] = (float) header_data.elv_array[index];
@@ -368,7 +365,6 @@ void MetNcPointObsOut::write_arr_headers() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//FIXME to remove
 
 void MetNcPointObsOut::write_buf_headers () {
    if (0 < data_buffer.hdr_data_idx) {
@@ -380,8 +376,8 @@ void MetNcPointObsOut::write_buf_headers () {
 ///////////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::write_header(const char *hdr_typ, const char *hdr_sid,
-                                       const time_t hdr_vld, const float hdr_lat,
-                                       const float hdr_lon, const float hdr_elv)
+                                    const time_t hdr_vld, const float hdr_lat,
+                                    const float hdr_lon, const float hdr_elv)
 {
    // Can't filter duplicated one because header index was
    // assigned before checking
@@ -451,7 +447,7 @@ void MetNcPointObsOut::write_observation()
 ///////////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::write_observation(const float obs_arr[OBS_ARRAY_LEN],
-                                            const char *obs_qty)
+                                         const char *obs_qty)
 {
    int qty_index;
    int obs_data_idx = data_buffer.obs_data_idx;
@@ -482,12 +478,12 @@ void MetNcPointObsOut::write_obs_data()
    bool do_summary = out_data.summary_info.flag;
    bool do_save_raw_data = out_data.summary_info.raw_data;
    bool do_header = (out_data.processed_hdr_cnt == 0);
-  
+
    mlog << Debug(5) << method_name << "do_header: " << (do_header ? "true" : "false")
         << ", do_summary: " << (do_summary ? "true" : "false")
         << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
         << "\n";
-  
+
    if (!do_summary || (do_summary && do_save_raw_data)) {
      mlog << Debug(5) << method_name << "writing " 
           << (int)out_data.observations.size() << " raw data...\n";
@@ -500,19 +496,18 @@ void MetNcPointObsOut::write_obs_data()
      write_obs_data(out_data.summary_obs->getSummaries(),
                     tmp_do_header);
    }
-  
+
    int obs_buf_index = get_obs_index();
    if (obs_buf_index > 0) {
      obs_vars.write_obs_buffer(data_buffer, obs_buf_index);
    }
-  
-   //return true;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
-                                        const bool do_header)
+                                     const bool do_header)
 {
    int prev_hdr_idx = -1;
    string prev_header_type = "";
@@ -585,7 +580,7 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObsOut::write_to_netcdf(StringArray obs_names, StringArray obs_units,
-                                          StringArray obs_descs) {
+                                       StringArray obs_descs) {
    const char *method_name = "  write_to_netcdf() ";
 
    write_obs_data();
