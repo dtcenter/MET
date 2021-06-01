@@ -63,12 +63,6 @@ static const char * program_name = "point_stat";
 static const char * default_config_filename =
    "MET_BASE/config/PointStatConfig_default";
 
-// Observation header length
-static const int hdr_arr_len = 3;
-
-// Observation values length
-static const int obs_arr_len = 5;
-
 // Header columns
 static const char **txt_columns[n_txt] = {
    fho_columns,    ctc_columns,    cts_columns,

@@ -2342,10 +2342,11 @@ e.g. nc_var_str = "MIN";
 **obs_thresh**
 
 The "obs_thresh" entry is an array of thresholds for filtering observation
-values prior to applying ensemble verification logic. The default setting
-of NA means that no observations should be filtered out. Verification output
-will be computed separately for each threshold specified. This option may be
-set separately for each obs.field entry.
+values prior to applying ensemble verification logic. They specify the values
+to be included in the verification, not excluded. The default setting of NA,
+which always evaluates to true, means that all observations should be used.
+Verification output will be computed separately for each threshold specified.
+This option may be set separately for each obs.field entry.
 
 .. code-block:: none
 		
