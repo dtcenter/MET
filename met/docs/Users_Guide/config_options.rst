@@ -303,6 +303,11 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
+.. _nc_compression:
+
+:ref:`nc_compression <nc_compression>`
+ 
+  
 .. _output_precision:
 
 :ref:`output_precision <output_precision>`  
