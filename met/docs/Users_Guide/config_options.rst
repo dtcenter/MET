@@ -326,7 +326,9 @@ writing of NetCDF files within MET significantly.
 		
   nc_compression = 0;
 
-**output_precision**  
+.. _output_precision:
+
+:ref: `output_precision <output_precision>`  
   
 The "output_precision" entry in ConfigConstants defines the precision
 (number of significant decimal places) to be written to the ASCII output
@@ -337,8 +339,10 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
-**tmp_dir**
-  
+.. _tmp_dir:
+
+:ref: `tmp_dir <tmp_dir>`
+      
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
 variable MET_TMP_DIR overrides the default value at the configuration file.
@@ -349,8 +353,10 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
-**message_type_group_map**
+.. _message_type_group_map:
 
+:ref: `message_type_group_map <message_type_group_map>`
+      
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
 message type group names to a comma-separated list of values. This map is
@@ -368,7 +374,9 @@ which surface verification logic should be applied.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
-**message_type_map**
+.. _message_type_map:
+
+:ref: `message_type_map <message_type_map>`
   
 The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
@@ -391,8 +399,10 @@ types.
      { key = "FM-97 ACARS";  val = "AIRCFT"; }
   ];
 
-**model**
-  
+.. _model:
+
+:ref: `model <model>`
+      
 The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
 verifying multiple models, you should choose descriptive model names (no
@@ -403,8 +413,10 @@ e.g. model = "GFS";
 		
   model = "WRF";
 
-**desc**
-  
+.._desc:
+
+:ref: `desc <desc>`
+      
 The "desc" entry specifies a user-specified description for each verification
 task. This string is written to the DESC column of the ASCII output
 generated. It may be set separately in each "obs.field" verification task
@@ -418,8 +430,10 @@ e.g. desc = "QC_9";
 		
   desc = "NA";
 
-**obtype**  
-  
+.. _obtype:  
+
+:ref: `obtype <obtype>`
+      
 The "obtype" entry specifies a name to describe the type of verifying gridded
 observation used. This name is written to the OBTYPE column in the ASCII
 output generated. If you're using multiple types of verifying observations,
@@ -432,8 +446,10 @@ the configuration file obtype value is written.
 		
   obtype = "ANALYS";
 
-**regrid**
-  
+.. _regrid:
+
+:ref: `regrid <regrid>`
+      
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
@@ -539,7 +555,9 @@ using the following entries:
      censor_val      = [];
   }
 
-**fcst**
+.. _fcst:
+
+:ref: `fcst <fcst:`
   
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
@@ -966,8 +984,10 @@ File-format specific settings for the "field" entry:
      ];
   }
 
-**obs**  
-  
+.. _obs:
+
+:ref: `obs <obs>`
+
 The "obs" entry specifies the same type of information as "fcst", but for
 the observation data. It will often be set to the same things as "fcst",
 as shown in the example below. However, when comparing forecast and
@@ -1089,8 +1109,10 @@ or
 		
   obs = fcst;
 
-**climo_mean**
-  
+.. _climo_mean:
+
+:ref: `climo_mean <climo_mean>`
+      
 The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
 of several entires defining the climatology file names and fields to be used.
@@ -1145,8 +1167,10 @@ of several entires defining the climatology file names and fields to be used.
      hour_interval      = 6;
   }
 
-**climo_stdev**
-  
+.. _climo_stdev:
+
+:ref: `climo_stdev <climo_stdev>`
+      
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
 tools. The "climo_mean" and "climo_stdev" data define the climatological
@@ -1175,8 +1199,10 @@ over the "climo_mean" setting and then updating the "file_name" entry.
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
   }
 
-**climo_cdf**
-  
+.. _climo_cdf:
+
+:ref: `climo_cdf <climo_cdf>`
+      
 The "climo_cdf" dictionary specifies how the the climatological mean
 ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
@@ -1238,8 +1264,11 @@ all pairs into a single climatological bin.
      write_bins  = FALSE; or TRUE
   }
 
-**climatology data for probability forecasts**
+.. _climatology data for probability forecasts:
 
+:ref: `climatology data for probability forecasts <climatology data for
+      probability forecasts>`
+      
 When specifying climatology data for probability forecasts, either supply a
 probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
 "climo_stdev" fields from which a normal approximation of the climatological
