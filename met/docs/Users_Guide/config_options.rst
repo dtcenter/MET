@@ -328,7 +328,7 @@ writing of NetCDF files within MET significantly.
 
 .. _output_precision:
 
-:ref: `output_precision <output_precision>`  
+:ref:`output_precision <output_precision>`  
   
 The "output_precision" entry in ConfigConstants defines the precision
 (number of significant decimal places) to be written to the ASCII output
@@ -341,7 +341,7 @@ override the default value set in ConfigConstants.
 
 .. _tmp_dir:
 
-:ref: `tmp_dir <tmp_dir>`
+:ref:`tmp_dir <tmp_dir>`
       
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
@@ -355,7 +355,7 @@ Some tools override the temporary directory by the command line argument
 
 .. _message_type_group_map:
 
-:ref: `message_type_group_map <message_type_group_map>`
+:ref:`message_type_group_map <message_type_group_map>`
       
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
@@ -376,7 +376,7 @@ which surface verification logic should be applied.
 
 .. _message_type_map:
 
-:ref: `message_type_map <message_type_map>`
+:ref:`message_type_map <message_type_map>`
   
 The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
@@ -401,7 +401,7 @@ types.
 
 .. _model:
 
-:ref: `model <model>`
+:ref:`model <model>`
       
 The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
@@ -415,7 +415,7 @@ e.g. model = "GFS";
 
 .._desc:
 
-:ref: `desc <desc>`
+:ref:`desc <desc>`
       
 The "desc" entry specifies a user-specified description for each verification
 task. This string is written to the DESC column of the ASCII output
@@ -432,7 +432,7 @@ e.g. desc = "QC_9";
 
 .. _obtype:  
 
-:ref: `obtype <obtype>`
+:ref:`obtype <obtype>`
       
 The "obtype" entry specifies a name to describe the type of verifying gridded
 observation used. This name is written to the OBTYPE column in the ASCII
@@ -448,7 +448,7 @@ the configuration file obtype value is written.
 
 .. _regrid:
 
-:ref: `regrid <regrid>`
+:ref:`regrid <regrid>`
       
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
@@ -557,7 +557,7 @@ using the following entries:
 
 .. _fcst:
 
-:ref: `fcst <fcst:`
+:ref:`fcst <fcst:`
   
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
@@ -986,7 +986,7 @@ File-format specific settings for the "field" entry:
 
 .. _obs:
 
-:ref: `obs <obs>`
+:ref:`obs <obs>`
 
 The "obs" entry specifies the same type of information as "fcst", but for
 the observation data. It will often be set to the same things as "fcst",
@@ -1111,7 +1111,7 @@ or
 
 .. _climo_mean:
 
-:ref: `climo_mean <climo_mean>`
+:ref:`climo_mean <climo_mean>`
       
 The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
@@ -1169,7 +1169,7 @@ of several entires defining the climatology file names and fields to be used.
 
 .. _climo_stdev:
 
-:ref: `climo_stdev <climo_stdev>`
+:ref:`climo_stdev <climo_stdev>`
       
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
@@ -1201,7 +1201,7 @@ over the "climo_mean" setting and then updating the "file_name" entry.
 
 .. _climo_cdf:
 
-:ref: `climo_cdf <climo_cdf>`
+:ref:`climo_cdf <climo_cdf>`
       
 The "climo_cdf" dictionary specifies how the the climatological mean
 ("climo_mean") and standard deviation ("climo_stdev") data are used to
@@ -1266,7 +1266,7 @@ all pairs into a single climatological bin.
 
 .. _climatology_data_for_probability_forecasts:
 
-:ref: `climatology data for probability forecasts <climatology_data_for_probability_forecasts>`
+:ref:`climatology data for probability forecasts <climatology_data_for_probability_forecasts>`
       
 When specifying climatology data for probability forecasts, either supply a
 probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
