@@ -307,8 +307,14 @@ with bad status after writing the warning message.
 
 :ref:`nc_compression <nc_compression>`
 
-test text
-  
+The "nc_compression" entry in ConfigConstants defines the compression level
+for the NetCDF variables. Setting this option in the config file of one of
+the tools overrides the default value set in ConfigConstants. The
+environment variable MET_NC_COMPRESS overrides the compression level
+from configuration file. The command line argument "-compress n" for some
+tools overrides it.
+The range is 0 to 9.
+
 .. _output_precision:
 
 :ref:`output_precision <output_precision>`  
