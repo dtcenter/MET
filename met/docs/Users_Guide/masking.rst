@@ -21,7 +21,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
          input_grid
          mask_file
          out_file
-         [-type str]
+         -type str
          [-input_field string]
          [-mask_field string]
          [-complement]
@@ -36,7 +36,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
          [-v level]
          [-compress level]
 
-gen_vx_mask has three required arguments and can take optional ones.
+gen_vx_mask has three required arguments and can take optional ones. Note, -type string (masking type is now required)
 
 Required arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57,10 +57,10 @@ Required arguments for gen_vx_mask
 
 3. The **out_file** argument is the output NetCDF mask file to be written.
 
+4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See description of supported types below.
+   
 Optional arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-4. The **-type string** option can be used to override the default masking type (poly). See description of supported types below.
 
 5. The **-input_field string** option can be used to read existing mask data from “input_file”.
 
