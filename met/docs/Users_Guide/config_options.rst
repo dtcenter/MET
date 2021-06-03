@@ -322,6 +322,10 @@ The range is 0 to 9.
 WARNING: Selecting a high compression level may slow down the reading and
 writing of NetCDF files within MET significantly.
 
+.. code-block:: none
+		
+  nc_compression = 0;
+
 .. _output_precision:
 
 :ref:`output_precision <output_precision>`  
