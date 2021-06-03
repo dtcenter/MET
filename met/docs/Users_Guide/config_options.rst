@@ -303,8 +303,10 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
-**nc_compression**
-  
+.. _nc_compression:
+
+:ref:`nc_compression <nc_compression>`
+     
 The "nc_compression" entry in ConfigConstants defines the compression level
 for the NetCDF variables. Setting this option in the config file of one of
 the tools overrides the default value set in ConfigConstants. The
