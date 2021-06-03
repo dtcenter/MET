@@ -1283,7 +1283,9 @@ the MET tools use the mean, standard deviation, and observation event
 threshold to derive a normal approximation of the climatological
 probabilities. Those derived probability values are used to compute BSS.
 
-**mask_missing_flag**
+.. _mask_missing_flag:
+
+:ref:`mask_missing_flag <mask_missing_flag>`
 
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
