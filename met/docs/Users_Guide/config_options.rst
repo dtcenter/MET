@@ -315,6 +315,10 @@ from configuration file. The command line argument "-compress n" for some
 tools overrides it.
 The range is 0 to 9.
 
+* 0 is to disable the compression.
+
+* 1 to 9: Lower number is faster, higher number for smaller files.
+
 .. _output_precision:
 
 :ref:`output_precision <output_precision>`  
