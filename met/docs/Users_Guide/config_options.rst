@@ -1302,7 +1302,9 @@ in the Wavelet-Stat and MODE tools:
   mask_missing_flag = BOTH;
 
 
-**obs_window**
+.. _obs_window:
+
+:ref:`obs_window <obs_window>`
 
 The "obs_window" entry is a dictionary specifying a beginning ("beg"
 entry) and ending ("end" entry) time offset values in seconds. It defines
@@ -1318,8 +1320,10 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
-**mask**
+.. _mask:
 
+:ref:`mask <mask>`
+     
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
 geographic extent, and any matched pairs falling inside that area will be
@@ -1428,7 +1432,9 @@ is included in the mask.
   }
 
 
-**ci_alpha**
+.. _ci_alpha:
+
+:ref:`ci_alpha <ci_alpha>`
 
 The "ci_alpha" entry is an array of floats specifying the values for alpha
 to be used when computing confidence intervals. Values of alpha must be
@@ -1440,7 +1446,9 @@ interval.
 		
   ci_alpha = [ 0.05, 0.10 ];
 
-**boot**
+.. _boot:
+
+:ref:`boot <boot>`
 
 The "boot" entry defines the parameters to be used in calculation of
 bootstrap confidence intervals. The interval variable indicates what method
@@ -1502,7 +1510,9 @@ should be used for computing bootstrap confidence intervals:
      seed     = "";
   }
 
-**interp**
+.. _interp:
+
+:ref:`interp <interp>`
 
 The "interp" entry is a dictionary that specifies what interpolation or
 smoothing (for the Grid-Stat tool) methods should be applied.
@@ -1605,8 +1615,10 @@ This dictionary may include the following entries:
      ];
   }
 
-**nbrhd**
-  
+.. _nbrhd:
+
+:ref:`nbrhd <nbrhd>`
+     
 The "nbrhd" entry is a dictionary that is very similar to the "interp"
 entry. It specifies information for computing neighborhood statistics in
 Grid-Stat. This dictionary may include the following entries:
@@ -1650,8 +1662,10 @@ Grid-Stat. This dictionary may include the following entries:
      cov_thresh = [ >=0.5 ];
   }
 
-**fourier**
+.. _fourier:
 
+:ref:`fourier <fourier>`
+     
 The "fourier" entry is a dictionary which specifies the application of the
 Fourier decomposition method. It consists of two arrays of the same length
 which define the beginning and ending wave numbers to be included. If the
@@ -1681,7 +1695,9 @@ of the verification grid:
      wave_1d_end = [ 3, 9, 20 ];
   }
 
-**gradient**  
+.. _gradient:
+
+:ref:`gradient <gradient>`
   
 The "gradient" entry is a dictionary which specifies the number and size of
 gradients to be computed. The "dx" and "dy" entries specify the size of the
@@ -1701,8 +1717,10 @@ This configuration option may be set separately in each "obs.field" entry.
      dy = [ 1 ];
   }
 
-**distance_map**
-  
+.. _distance_map:
+
+:ref:`distance_map <distance_map>`
+     
 The "distance_map" entry is a dictionary containing options related to the
 distance map statistics in the DMAP output line type. The "baddeley_p" entry
 is an integer specifying the exponent used in the Lp-norm when computing the
@@ -1727,8 +1745,10 @@ This configuration option may be set separately in each "obs.field" entry.
      zhu_weight        = 0.5;
   }
   
-**land_mask**
-  
+.. _land_mask:
+
+:ref:`land_mask <land_mask>`
+     
 The "land_mask" dictionary defines the land/sea mask field which is used
 when verifying at the surface. For point observations whose message type
 appears in the "LANDSF" entry of the "message_type_group_map" setting,
@@ -1754,8 +1774,10 @@ land_mask.flag may be set separately in each "obs.field" entry.
      thresh    = eq1;
   }
 
-**topo_mask**
-		
+.. _topo_mask:
+
+:ref:`topo_mask <topo_mask>`
+     
 The "topo_mask" dictionary defines the model topography field which is used
 when verifying at the surface. This logic is applied to point observations
 whose message type appears in the "SURFACE" entry of the
@@ -1783,8 +1805,10 @@ topo_mask.flag may be set separately in each "obs.field" entry.
      interp_fcst_thresh = ge-50&&le50;
   }
 
-**hira**
+.. _hira:
 
+:ref:`hira <hira>`
+     
 The "hira" entry is a dictionary that is very similar to the "interp" and
 "nbrhd" entries. It specifies information for applying the High Resolution
 Assessment (HiRA) verification logic in Point-Stat. HiRA is analogous to
@@ -1835,8 +1859,10 @@ This dictionary may include the following entries:
      prob_cat_thresh = [];
   }
 
-**output_flag**
+.. _output_flag:
 
+:ref:`output_flag <output_flag>`
+     
 The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
 output line type from the MET tools. Each line type may be set to one of:
@@ -1885,7 +1911,9 @@ output line type from the MET tools. Each line type may be set to one of:
      grad   = NONE;  Gradient statistics (S1 score)
   }
 
-**nc_pairs_flag**
+.. _nc_pairs_flag:
+
+:ref:`nc_pairs_flag <nc_pairs_flag>`
 
 The "nc_pairs_flag" can be set either to a boolean value or a dictionary
 in either Grid-Stat, Wavelet-Stat or MODE. The dictionary (with slightly
