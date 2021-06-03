@@ -1266,8 +1266,7 @@ all pairs into a single climatological bin.
 
 .. _climatology data for probability forecasts:
 
-:ref:`climatology data for probability forecasts <climatology data for
-     probability forecasts>`
+:ref:`climatology data for probability forecasts <climatology data for probability forecasts>`
       
 When specifying climatology data for probability forecasts, either supply a
 probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
