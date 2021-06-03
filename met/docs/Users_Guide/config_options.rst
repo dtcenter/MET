@@ -303,29 +303,6 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
-.. _nc_compression:
-
-:ref:`nc_compression <nc_compression>`
-     
-The "nc_compression" entry in ConfigConstants defines the compression level
-for the NetCDF variables. Setting this option in the config file of one of
-the tools overrides the default value set in ConfigConstants. The
-environment variable MET_NC_COMPRESS overrides the compression level
-from configuration file. The command line argument "-compress n" for some
-tools overrides it.
-The range is 0 to 9.
-
-* 0 is to disable the compression.
-
-* 1 to 9: Lower number is faster, higher number for smaller files.
-
-WARNING: Selecting a high compression level may slow down the reading and
-writing of NetCDF files within MET significantly.
-
-.. code-block:: none
-		
-  nc_compression = 0;
-
 .. _output_precision:
 
 :ref:`output_precision <output_precision>`  
