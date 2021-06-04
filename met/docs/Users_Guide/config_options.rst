@@ -3381,8 +3381,10 @@ retained.
      end = 100000;
   }
 
-**pb_report_type**
-		
+.. _pb_report_type:
+
+:ref:`pb_report_type <pb_report_type>`
+
 The "pb_report_type" entry is an array of PREPBUFR report types to be
 retained. The numeric "pb_report_type" entry allows for further
 stratification within message types. An empty list indicates that all should
@@ -3401,8 +3403,10 @@ For example:
 		
   pb_report_type  = [];
 
-**in_report_type**
-		
+.. _in_report_type:
+
+:ref:`in_report_type <in_report_type>`
+
 The "in_report_type" entry is an array of input report type values to be
 retained. The numeric "in_report_type" entry provides additional
 stratification of observations. An empty list indicates that all should
@@ -3420,7 +3424,9 @@ For example:
 		
   in_report_type = [];
 
-**instrument_type**
+.. _instrument_type:
+
+:ref:`instrument_type <instrument_type>`
 
 The "instrument_type" entry is an array of instrument types to be retained.
 An empty list indicates that all should be retained.
@@ -3429,8 +3435,10 @@ An empty list indicates that all should be retained.
 		
   instrument_type = [];
 
-**level_range**
-  
+.. _level_range:
+
+:ref:`level_range <level_range>`
+
 The "level_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of vertical levels (1 to 255) to be retained.
 
@@ -3441,8 +3449,10 @@ entries specifying the range of vertical levels (1 to 255) to be retained.
      end = 255;
   }
 
-**level_category**
-  
+.. _level_category:
+
+:ref:`level_category <level_category>`
+
 The "level_category" entry is an array of integers specifying which level
 categories should be retained:
 
@@ -3477,7 +3487,9 @@ See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.no
 		
   level_category = [];
 
-**obs_bufr_var**
+.. _obs_bufr_var:
+
+:ref:`obs_bufr_var <obs_bufr_var>`
 
 The "obs_bufr_var" entry is an array of strings containing BUFR variable
 names to be retained or derived. This replaces the "obs_grib_code" setting
@@ -3497,7 +3509,9 @@ command line option to see the list of available observation variables.
 		
   obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
-**obs_bufr_map**
+.. _obs_bufr_map:
+
+:ref:`obs_bufr_map <obs_bufr_map>`
 
 Mapping of input BUFR variable names to output variables names.
 The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
@@ -3508,8 +3522,10 @@ of the forecast the observation is used to verify.
 		
   obs_bufr_map = [];
 
-**obs_prefbufr_map**
-  
+.. _obs_prefbufr_map:
+
+:ref:`obs_prefbufr_map <obs_prefbufr_map>`
+
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
 abbreviations in the output. This default map is appended to obs_bufr_map.
 This should not typically be overridden. This default mapping provides
@@ -3533,8 +3549,10 @@ abbreviations to the output.
      { key = "D_PRMSL"; val = "PRMSL"; }
   ];
 
-**quality_mark_thresh**
-  
+.. _quality_mark_thresh:
+
+:ref:`quality_mark_thresh <quality_mark_thresh>`
+     
 The "quality_mark_thresh" entry specifies the maximum quality mark value
 to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
 this threshold will be retained, while observations with a quality mark
@@ -3546,8 +3564,10 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 		
   quality_mark_thresh = 2;
 
-**event_stack_flag**
-  
+.. _event_stack_flag:
+
+:ref:`event_stack_flag <event_stack_flag>`
+
 The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
 specify whether observations should be drawn from the top of the event
 stack (most quality controlled) or the bottom of the event stack (most raw).
@@ -3559,7 +3579,9 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
 SeriesAnalysisConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**block_size**
+.. _block_size:
+
+:ref:`block_size <block_size>`
 
 Computation may be memory intensive, especially for large grids.
 The "block_size" entry sets the number of grid points to be processed
@@ -3570,8 +3592,10 @@ require less memory but increase the number of passes through the data.
 		
   block_size = 1024;
 
-**vld_thresh**
-  
+.. _vld_thresh:
+
+:ref:`vld_thresh <vld_thresh>`
+
 Ratio of valid matched pairs to total length of series for a grid
 point. If valid threshold is exceeded at that grid point the statistics
 are computed and stored. If not, a bad data flag is stored. The default
@@ -3582,8 +3606,10 @@ setting requires all data in the series to be valid.
 		
   vld_thresh = 1.0;
 
-**output_stats**
-  
+.. _output_stats:
+
+:ref:`output_stats <output_stats>`
+
 Statistical output types need to be specified explicitly. Refer to User's
 Guide for available output types. To keep output file size reasonable,
 it is recommended to process a few output types at a time, especially if the
@@ -3608,7 +3634,9 @@ grid is large.
 STATAnalysisConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**jobs**
+.. _jobs:
+
+:ref:`jobs <jobs>`
 
 The "jobs" entry is an array of STAT-Analysis jobs to be performed.
 Each element in the array contains the specifications for a single analysis
@@ -4074,7 +4102,9 @@ confidence intervals computed for the aggregated statistics.
 WaveletStatConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**grid_decomp_flag**
+.. _grid_decomp_flag:
+
+:ref:`grid_decomp_flag <grid_decomp_flag>`
 
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
@@ -4089,8 +4119,10 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 		
   grid_decomp_flag = AUTO;
 
-**tile**
-		
+.. _tile:
+
+:ref:`tile <tile>`
+
 The "tile" entry is a dictionary that specifies how tiles should be defined
 in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
 
@@ -4113,8 +4145,10 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
      ];
   }
 
-**wavelet** 
-  
+.. _wavelet:
+
+:ref:`wavelet <wavelet>`
+
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
 
@@ -4148,8 +4182,10 @@ wavelet decomposition should be performed:
      member = 2;
   }
 
-**obs_raw_plot, wvlt_plot, object_plot**  
-  
+.. _obs_raw_wvlt_object_plots:
+
+:ref:`obs_raw_plot, wvlt_plot, object_plot <obs_raw_wvlt_object_plots>`
+
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described in the "Settings common to multiple
 tools" section.
@@ -4157,12 +4193,16 @@ tools" section.
 WWMCARegridConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**to_grid**
+.. _to_grid:
+
+:ref:`to_grid <to_grid>`
 
 Please see the description of the "to_grid" entry in the "regrid" dictionary above.
 
-**NetCDF output information**  
-  
+.. _NetCDF output information:  
+
+:ref:`NetCDF output information <NetCDF output information>`
+
 Supply the NetCDF output information.  For example:
 
 .. code-block:: none
@@ -4179,15 +4219,19 @@ Supply the NetCDF output information.  For example:
   long_name     = "";
   level         = "";
 
-**max_minutes (pixel age)**  
-  
+.. _max_minutes (pixel age):
+
+:ref:`max_minutes (pixel age) <max_minutes (pixel age)>`
+
 Maximum pixel age in minutes
 
 .. code-block:: none
 
   max_minutes = 120;
 
-**swap_endian**
+.. _swap_endian:
+
+:ref:`swap_endian <swap_endian>`
 
 The WWMCA pixel age data is stored in binary data files in 4-byte blocks.
 The swap_endian option indicates whether the endian-ness of the data should
@@ -4197,8 +4241,10 @@ be swapped after reading.
 		
   swap_endian = TRUE;
 
-**write_pixel_age**  
-  
+.. _write_pixel_age:
+
+:ref:`write_pixel_age <write_pixel_age>`
+
 By default, wwmca_regrid writes the cloud percent data specified on the
 command line to the output file. This option writes the pixel age data,
 in minutes, to the output file instead.
