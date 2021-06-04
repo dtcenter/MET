@@ -30,7 +30,9 @@ This may also be set using basin, cyclone, and timing information below.
 
    storm_id = [];
 
-**basin**
+.. _basin:
+
+:ref:`basin <basin>`
 
 Specify a comma-separated list of basins to be used. Expected format is
 a 2-letter basin identifier. An empty list indicates that all should be used.
@@ -48,8 +50,10 @@ For example:
    basin = [];
 
 
-**cyclone**
-   
+.. _cyclone:
+
+:ref:`cyclone <cyclone>`
+
 Specify a comma-separated list of cyclone numbers (01-99) to be used.
 An empty list indicates that all should be used.
 
@@ -62,7 +66,9 @@ For example:
 		
   cyclone = [];
 
-**storm_name**
+.. _storm_name:
+
+:ref:`storm_name <storm_name>`
 
 Specify a comma-separated list of storm names to be used. An empty list
 indicates that all should be used.
@@ -76,7 +82,9 @@ For example:
 		
   storm_name = [];
 
-**init_beg, init_end, init_inc, init_exc**
+.. _init_beg end inc exc:
+
+:ref:`init_beg, init_end, init_inc, init_exc <init_beg end inc exc>`
 
 Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
 or provide a list of specific initialization times to include (inc)
@@ -100,8 +108,10 @@ For example:
   init_exc = [];
 
 
-**valid_beg, valid_end**
-  
+.. _valid_beg, valid_end:
+
+:ref:`valid_beg, valid_end <valid_beg, valid_end>`
+
 Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
 Tracks for which all valid times fall within the time window will be used.
 An empty string indicates that all times should be used.
@@ -118,7 +128,9 @@ For example:
   valid_beg = "";
   valid_end = "";
 
-**init_hour**
+.. _init_hour:
+
+:ref:`init_hour <init_hour>`
 
 Specify a comma-separated list of model initialization hours to be used
 in HH[MMSS] format. An empty list indicates that all hours should be used.
@@ -132,7 +144,9 @@ For example:
 		
   init_hour = [];
 
-**lead_req**
+.. _lead_req:
+
+:ref:`lead_req <lead_req>`
 
 Specify the required lead time in HH[MMSS] format.
 Tracks that contain all of these required times will be
@@ -145,7 +159,9 @@ all lead times will be used.
 		
   lead_req  = [];
 
-**init_mask, valid_mask**
+.. _init_mask, valid_mask:
+
+:ref:`init_mask, valid_mask <init_mask, valid_mask>`
 
 Specify lat/lon polylines defining masking regions to be applied.
 Tracks whose initial location falls within init_mask will be used.
@@ -161,7 +177,9 @@ For example:
   init_mask  = "";
   valid_mask = "";
 
-**version**
+.. _version:
+
+:ref:`version <version>`
 
 Indicate the version number for the contents of this configuration file.
 The value should generally not be modified.
@@ -178,7 +196,9 @@ _____________________________________
 TCPairsConfig_default
 ~~~~~~~~~~~~~~~~~~~~~
 
-**model**
+.. _model:
+
+:reff:`model <model>`
 
 The "model" entry specifies an array of model names to be verified. If
 verifying multiple models, choose descriptive model names (no whitespace)
@@ -193,8 +213,9 @@ For example:
 		  
   model  = [];
 
+.. _check_dup:
 
-**check_dup**
+:ref:`check_dup <check_dup>`
 
 Specify whether the code should check for duplicate ATCF lines when
 building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
@@ -208,8 +229,10 @@ For example:
 		
   check_dup = FALSE;
 
-**interp12**
-  
+interp12:
+
+:ref:`interp12 <interp12>`
+
 Specify whether special processing should be performed for interpolated model
 names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
 name ends in '2' (e.g. AHW2) and apply the following logic:
@@ -226,8 +249,10 @@ name ends in '2' (e.g. AHW2) and apply the following logic:
 		
   interp12 = REPLACE;
 
-**consensus**
-  
+.. _consensus:
+
+:ref:`consensus <consensus>`
+
 Specify how consensus forecasts should be defined:
 
 | name = consensus model name
@@ -253,8 +278,10 @@ For example:
   consensus = [];
 
 
-**lag_time**
-  
+.. _lag_time:
+
+:ref:`lag_time <lag_time>`
+
 Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
 format.  For each ADECK track identified, a lagged track will be derived
 for each entry listed.
@@ -269,8 +296,11 @@ For example:
   lag_time = [];
 
 
-**best_technique, best_baseline, oper_technique, oper_baseline**
-  
+.. _best_tech baseline oper_technique baseline:
+
+:ref:`best_technique, best_baseline, oper_technique, oper_baseline
+     <best_tech baseline oper_technique baseline>`
+
 Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
 derived from the BEST and operational tracks, as defined by the
 best_technique and oper_technique settings.
