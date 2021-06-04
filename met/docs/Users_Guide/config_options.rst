@@ -2288,7 +2288,9 @@ _____________________________________
 EnsembleStatConfig_default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**ens**
+.. _ens:
+
+:ref:`ens <ens>`
 
 The "ens" entry is a dictionary that specifies the fields for which ensemble
 products should be generated. This is very similar to the "fcst" and "obs"
@@ -2330,8 +2332,10 @@ entries. This dictionary may include the following entries:
      ];
   }
 
-**nbrhd_prob**
-		
+.. _nbrhd_prob:
+
+:ref:`nbrhd_prob <nbrhd_prob>`
+
 The nbrhd_prob dictionary defines the neighborhoods used to compute NEP
 and NMEP output. The neighborhood shape is a SQUARE or CIRCLE centered on
 the current point, and the width array specifies the width of the square or
@@ -2351,7 +2355,9 @@ specified.
      vld_thresh = 0.0;
   }
 
-**nmep_smooth**
+.. _nmep_smooth:
+
+:ref:`nmep_smooth <nmep_smooth>`
 
 Similar to the interp dictionary, the nmep_smooth dictionary includes a type
 array of dictionaries to define one or more methods for smoothing the NMEP
@@ -2377,7 +2383,9 @@ combination of the categorical threshold (cat_thresh), neighborhood width
      ];
   }
 
-**fcst, obs**
+.. _fcst, obs:
+
+:ref:`fcst, obs <fcst, obs>`
 
 The fcst and obs entries define the fields for which Ensemble-Stat should
 compute rank histograms, probability integral transform histograms,
@@ -2415,8 +2423,10 @@ data is provided, the climo_cdf thresholds will be used instead.
   }
 
 
-**nc_var_str**
-		
+.. _nc_var_str:
+
+:ref:`nc_var_str <nc_var_str>`
+
 The "nc_var_str" entry specifies a string for each ensemble field and
 verification task in Ensemble-Stat. This string is parsed from each
 "ens.field" and "obs.field" dictionary entry and is used to customize
@@ -2431,7 +2441,9 @@ e.g. nc_var_str = "MIN";
 		
   nc_var_str = "";
 
-**obs_thresh**
+.. _obs_thresh:
+
+:ref:`obs_thresh <obs_thresh>`
 
 The "obs_thresh" entry is an array of thresholds for filtering observation
 values prior to applying ensemble verification logic. They specify the values
@@ -2444,7 +2456,9 @@ This option may be set separately for each obs.field entry.
 		
   obs_thresh = [ NA ];
 
-**skip_const**
+.. _skip_const:
+
+:ref:`skip_const <skip_const>`
 
 Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all
 the ensemble members and the observation have a constant value. For example,
@@ -2457,7 +2471,9 @@ random.
 		
   skip_const = FALSE;
 
-**obs_error**
+.. _obs_error:
+
+:ref:`obs_error <obs_error>`
 
 Observation error options
 
@@ -2514,7 +2530,9 @@ levels, and range of values.
      max              = NA;
   }
 
-**ensemble_flag**
+.. _ensemble_flag:
+
+:ref:`ensemble_flag <ensemble_flag>`
   
 The "ensemble_flag" entry is a dictionary of boolean value indicating
 which ensemble products should be generated:
@@ -2565,7 +2583,9 @@ which ensemble products should be generated:
      weight    = FALSE;
   }
 
-**rng**
+.. _rng:
+
+:ref:`rng <rng>`
 
 See: `Random Number Generator Performance <https://www.gnu.org/software/gsl/doc/html/rng.html#performance>`_
 used for random assignment of ranks when they are tied.
@@ -2918,7 +2938,9 @@ MET User's Guide for a description of these attributes.
 MODEConfig_default
 ~~~~~~~~~~~~~~~~~~
 
-**quilt**
+.. _quilt:
+
+:ref:`quilt <quilt>`
 
 The "quilt" entry is a boolean to indicate whether all permutations of
 convolution radii and thresholds should be run. If set to false, the number
@@ -2933,7 +2955,9 @@ MODE will be run.
 		
   quilt = false;
 
-**fcst, obs**
+.. _fcst, obs:
+
+:ref:`fcst, obs <fcst, obs>`
 
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
@@ -3017,7 +3041,9 @@ The object definition settings for MODE are contained within the "fcst" and
      merge_flag         = THRESH;
   }
 
-**grid_res**
+.. _grid_res:
+
+:ref:`grid_res <grid_res>`
 
 The "grid_res" entry is the nominal spacing for each grid square in
 kilometers. The variable is not used directly in the code, but subsequent
@@ -3029,7 +3055,9 @@ are used for these variables.
 		
   grid_res = 4;
 
-**match_flag**
+.. _match_flag:
+
+:ref:`match_flag <match_flag>`
 
 The "match_flag" entry specifies the matching method to be applied:
 
@@ -3047,8 +3075,10 @@ The "match_flag" entry specifies the matching method to be applied:
 		
   match_flag = MERGE_BOTH;
 
-**max_centroid_dist**
-		
+.. _max_centroid_dist:
+
+:ref:`max_centroid_dist <max_centroid_dist>`
+
 The "max_centroid_dist" entry specifies the maximum allowable distance in
 grid squares between the centroids of objects for them to be compared.
 Setting this to a reasonable value speeds up the runtime enabling MODE to
@@ -3058,8 +3088,10 @@ skip unreasonable object comparisons.
 		
   max_centroid_dist = 800.0/grid_res;
 
-**weight**
-  
+.. _weight:
+
+:ref:`weight <weight>`
+     
 The weight variables control how much weight is assigned to each pairwise
 attribute when computing a total interest value for object pairs. The weights
 need not sum to any particular value but must be non-negative. When the
@@ -3080,7 +3112,9 @@ sum of the weights listed.
      inten_perc_value = 50;
   }
 
-**interest_function**
+.. _interest_function:
+
+:ref:`interest_function <interest_function>`
 		
 The set of interest function variables listed define which values are of
 interest for each pairwise attribute measured. The interest functions may be
@@ -3136,7 +3170,9 @@ mathematical functions.
      inten_perc_ratio = ratio_if;
   }
 
-**total_interest_thresh**
+.. _total_interest_thresh:
+
+:ref:`total_interest_thresh <total_interest_thresh>`
   
 The total_interest_thresh variable should be set between 0 and 1. This
 threshold is applied to the total interest values computed for each pair of
@@ -3146,8 +3182,10 @@ objects and is used in determining matches.
 		
   total_interest_thresh = 0.7;
 
-**print_interest_thresh**
-		
+.. _print_interest_thresh:
+
+:ref:`print_interest_thresh <print_interest_thresh>`
+
 The print_interest_thresh variable determines which pairs of object
 attributes will be written to the output object attribute ASCII file. The
 user may choose to set the print_interest_thresh to the same value as the
@@ -3160,7 +3198,9 @@ the max_centroid_dist variable.
 		
   print_interest_thresh = 0.0;
 
-**plot_valid_flag**
+.. _plot_valid_flag:
+
+:ref:`plot_valid_flag <plot_valid_flag>`
 
 When applied, the plot_valid_flag variable indicates that only the region
 containing valid data after masking is applied should be plotted. TRUE
@@ -3171,7 +3211,9 @@ region containing valid data after masking should be plotted.
 		
   plot_valid_flag = FALSE;
 
-**plot_gcarc_flag**
+.. _plot_gcarc_flag:
+
+:ref:`plot_gcarc_flag <plot_gcarc_flag>`
 
 When applied, the plot_gcarc_flag variable indicates that the edges of
 polylines should be plotted using great circle arcs as opposed to straight
@@ -3181,7 +3223,9 @@ lines in the grid.
 		
   plot_gcarc_flag = FALSE;
 
-**ct_stats_flag**
+.. _ct_stats_flag:
+
+:ref:`ct_stats_flag <ct_stats_flag>`
   
 The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
 in the form of contingency table counts and statistics.
@@ -3190,8 +3234,10 @@ in the form of contingency table counts and statistics.
 		
   ct_stats_flag = TRUE;
 
-**shift_right**
-		
+.. _shift_right:
+
+:ref:`shift_right <shift_right>`
+
 When MODE is run on global grids, this parameter specifies how many grid
 squares to shift the grid to the right. MODE does not currently connect
 objects from one side of a global grid to the other, potentially causing
@@ -3265,7 +3311,9 @@ following criteria:
      7 - Auxiliary levels generated via interpolation from spanning levels
      (upper-air profile reports)
 
-**message_type**
+.. _message_type:
+
+:ref:`message_type <message_type>`
 
 In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
@@ -3286,7 +3334,9 @@ For example:
 		
   message_type = [];
 
-**message_type_group_map**
+.. _message_type_group_map:
+
+:ref:`message_type_group_map <message_type_group_map>`
 
 Mapping of message type group name to comma-separated list of values.
 The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
@@ -3301,8 +3351,10 @@ Derive PRMSL only for SURFACE message types.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
-**station_id**
-		
+.. _station_id:
+
+:ref:`station_id <station_id>`
+
 The "station_id" entry is an array of station ids to be retained or
 the filename which contains station ids. An array of station ids
 contains a comma-separated list. An empty list indicates that all
@@ -3314,7 +3366,9 @@ For example:  station_id = [ "KDEN" ];
 		
   station_id = [];
 
-**elevation_range**
+.. _elevation_range:
+
+:ref:`elevation_range <elevation_range>`
 
 The "elevation_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of observing locations elevations to be
