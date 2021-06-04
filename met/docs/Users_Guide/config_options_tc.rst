@@ -229,7 +229,7 @@ For example:
 		
   check_dup = FALSE;
 
-interp12:
+.. _interp12:
 
 :ref:`interp12 <interp12>`
 
