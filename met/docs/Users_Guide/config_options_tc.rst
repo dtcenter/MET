@@ -8,7 +8,9 @@ See :numref:`config_options` for a description of the configuration file syntax.
 Configuration settings common to multiple tools
 _______________________________________________
 
-**storm_id**
+.. _storm_id:
+
+:ref:`storm_id <storm_id>`
 
 Specify a comma-separated list of storm id's to be used:
 
