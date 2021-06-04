@@ -1458,7 +1458,7 @@ void usage() {
 void set_type(const StringArray & a) {
    if(type_is_set) {
       mlog << Error << "\n" << program_name << " -> "
-           << "the -type command line requirment can only be used once!\n"
+           << "the -type command line requirement can only be used once!\n"
            << "To apply multiple masks, run this tool multiple times "
            << "using the output of one run as the input to the next."
            << "\n\n"; 
