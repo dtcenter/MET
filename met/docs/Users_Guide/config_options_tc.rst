@@ -198,7 +198,7 @@ TCPairsConfig_default
 
 .. _model:
 
-:reff:`model <model>`
+:ref:`model <model>`
 
 The "model" entry specifies an array of model names to be verified. If
 verifying multiple models, choose descriptive model names (no whitespace)
@@ -296,10 +296,10 @@ For example:
   lag_time = [];
 
 
-.. _best_tech baseline oper_technique baseline:
+.. _best_tech baseline oper_tech baseline:
 
 :ref:`best_technique, best_baseline, oper_technique, oper_baseline
-     <best_tech baseline oper_technique baseline>`
+     <best_tech baseline oper_tech baseline>`
 
 Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
 derived from the BEST and operational tracks, as defined by the
