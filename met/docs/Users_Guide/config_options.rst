@@ -1943,7 +1943,9 @@ netcdf output will be generated.
      apply_mask   = TRUE;
   }
 
-**nc_pairs_var_name**
+.. _nc_pairs_var_name:
+
+:ref:`nc_pairs_var_name <nc_pairs_var_name>`
   
 The "nc_pairs_var_name" entry specifies a string for each verification task
 in Grid-Stat. This string is parsed from each "obs.field" dictionary entry
@@ -1962,8 +1964,10 @@ For example:
 		
   nc_pairs_var_name = "";
 
-**nc_pairs_var_suffix**  
-  
+.. _nc_pairs_var_suffix:
+
+:ref:`nc_pairs_var_suffix <nc_pairs_var_suffix>`
+     
 The "nc_pairs_var_suffix" entry is similar to the "nc_pairs_var_name" entry
 described above.  It is also parsed from each "obs.field" dictionary entry.
 However, it defines a suffix to be appended to the output variable name.
@@ -1984,8 +1988,10 @@ now deprecated.
 		
   nc_pairs_var_suffix = "";
 
-**ps_plot_flag**
-  
+.. _ps_plot_flag:
+
+:ref:`ps_plot_flag <ps_plot_flag>`
+     
 The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 indicating whether a PostScript plot should be generated summarizing
 the verification.
@@ -1994,8 +2000,10 @@ the verification.
 		
   ps_plot_flag = TRUE;
 
-**grid_weight_flag**
+.. _grid_weight_flag:
 
+:ref:`grid_weight_flag <grid_weight_flag>`
+     
 The "grid_weight_flag" specifies how grid weighting should be applied
 during the computation of continuous statistics and partial sums. It is
 meant to account for grid box area distortion and is often applied to global
@@ -2017,7 +2025,9 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
-**rank_corr_flag**
+.. _rank_corr_flag:
+
+ref:`rank_corr_flag <rank_corr_flag>`
 
 The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
 and Spearman's Rank Correlation Coefficients (in the CNT line type) should
@@ -2028,7 +2038,9 @@ intensive and slows down the runtime significantly.
 		
   rank_corr_flag = FALSE;
 
-**duplicate_flag**
+.. _duplicate_flag:
+
+:ref:`duplicate_flag <duplicate_flag>`
 
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
@@ -2049,7 +2061,9 @@ in those cases.
 		
   duplicate_flag = NONE;
 
-**obs_summary**
+.. _obs_summary:
+
+:ref:`obs_summary <obs_summary>`
 
 The "obs_summary" entry specifies how to compute statistics on
 observations that appear at a single location (lat,lon,level,elev)
@@ -2084,8 +2098,10 @@ in those cases.
   obs_summary = NONE;
 
 
-**obs_perc_value**
+.. _obs_perc_value:
 
+:ref:`*obs_perc_value <*obs_perc_value>`
+     
 Percentile value to use when obs_summary = PERC
 
 .. code-block:: none
@@ -2093,7 +2109,9 @@ Percentile value to use when obs_summary = PERC
   obs_perc_value = 50;
 
   
-**obs_quality**
+.. _obs_quality:
+
+:ref:`obs_quality <obs_quality>`
 		
 The "obs_quality" entry specifies the quality flag values that are to be
 retained and used for verification. An empty list signifies that all
@@ -2107,7 +2125,9 @@ an array of strings, even if the values themselves are numeric.
   obs_quality = [ "1", "2", "3", "9" ];
 
   
-**met_data_dir**
+.. _met_data_dir:
+
+:ref:`met_data_dir <met_data_dir>`
 
 The "met_data_dir" entry specifies the location of the internal MET data
 sub-directory which contains data files used when generating plots. It
@@ -2118,8 +2138,10 @@ locate the static data files they need at run time.
 		
   met_data_dir = "MET_BASE";
 
-**fcst_raw_plot, obs_raw_plot, wvlt_plot, object_plot**
-		
+.. _many_plots:
+
+:ref:`fcst_raw_plot, obs_raw_plot, wvlt_plot, object_plot <many_plots>`
+
 The "fcst_raw_plot" entry is a dictionary used by Wavelet-Stat and MODE
 containing colortable plotting information for the plotting of the raw
 forecast field:
@@ -2149,7 +2171,9 @@ forecast field:
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described above.
 
-**tmp_dir**
+.. _tmp_dir:
+
+:ref:`tmp_dir <tmp_dir>`
 
 The "tmp_dir" entry is a string specifying the location where temporary
 files should be written.
@@ -2159,7 +2183,9 @@ files should be written.
   tmp_dir = "/tmp";
 
 
-**output_prefix**
+.. _output_prefix:
+
+:ref:`output_prefix <output_prefix>`
 
 The "output_prefix" entry specifies a string to be included in the output
 file name. The MET statistics tools construct output file names that
@@ -2171,8 +2197,10 @@ of the same tool.
 		
   output_prefix  = "";
 
-**version**
-		
+.. _version:
+
+:ref:`version <version>`
+
 The "version" entry specifies the version number of the configuration file.
 The configuration file version number should match the version number of
 the MET code being run. This value should generally not be modified.
@@ -2181,8 +2209,10 @@ the MET code being run. This value should generally not be modified.
 		
   version = "VN.N";
 
-**time_summary**
-		
+.. _time_summary:
+
+:ref:`time_summary <time_summary>`
+
 This feature was implemented to allow additional processing of observations
 with high temporal resolution. The "flag" entry toggles the "time_summary"
 on (TRUE) and off (FALSE). Obs may be summarized across the user specified
