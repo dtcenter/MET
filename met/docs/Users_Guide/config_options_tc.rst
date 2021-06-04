@@ -296,10 +296,9 @@ For example:
   lag_time = [];
 
 
-.. _best_tech baseline oper_tech baseline:
+.. _best:
 
-:ref:`best_technique, best_baseline, oper_technique, oper_baseline
-     <best_tech baseline oper_tech baseline>`
+:ref:`best_technique, best_baseline, oper_technique, oper_baseline <best>`
 
 Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
 derived from the BEST and operational tracks, as defined by the
