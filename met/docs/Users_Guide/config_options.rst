@@ -2383,9 +2383,9 @@ combination of the categorical threshold (cat_thresh), neighborhood width
      ];
   }
 
-.. _fcst, obs:
+.. _fcst, obs_1:
 
-:ref:`fcst, obs <fcst, obs>`
+:ref:`fcst, obs <fcst, obs_1>`
 
 The fcst and obs entries define the fields for which Ensemble-Stat should
 compute rank histograms, probability integral transform histograms,
@@ -2955,9 +2955,9 @@ MODE will be run.
 		
   quilt = false;
 
-.. _fcst, obs:
+.. _fcst, obs_2:
 
-:ref:`fcst, obs <fcst, obs>`
+:ref:`fcst, obs <fcst, obs_2>`
 
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
