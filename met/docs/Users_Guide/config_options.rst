@@ -557,7 +557,7 @@ using the following entries:
 
 .. _fcst:
 
-:ref:`fcst <fcst:`
+:ref:`fcst <fcst>:`
   
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
@@ -2100,7 +2100,7 @@ in those cases.
 
 .. _obs_perc_value:
 
-:ref:`*obs_perc_value <*obs_perc_value>`
+:ref:`*obs_perc_value <obs_perc_value>`
      
 Percentile value to use when obs_summary = PERC
 

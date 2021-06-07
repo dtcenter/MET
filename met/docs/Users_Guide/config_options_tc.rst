@@ -545,9 +545,9 @@ For example:
   track_watch_warn = [];
 
 
-.. _column_thresh_name and val:
+.. _column_thresh_name_and_val:
 
-:ref:`column_thresh_name, column_thresh_val <column_thresh_name and_val>`
+:ref:`column_thresh_name, column_thresh_val <column_thresh_name_and_val>`
 
 Stratify by applying thresholds to numeric data columns.
 Specify a comma-separated list of columns names and thresholds
