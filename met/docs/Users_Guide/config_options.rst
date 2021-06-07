@@ -339,9 +339,9 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
-.. _tmp_dir:
+.. _tmp_dir_1:
 
-:ref:`tmp_dir <tmp_dir>`
+:ref:`tmp_dir <tmp_dir_1>`
       
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
@@ -353,9 +353,9 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
-.. _message_type_group_map:
+.. _message_type_group_map_1:
 
-:ref:`message_type_group_map <message_type_group_map>`
+:ref:`message_type_group_map <message_type_group_map_1>`
       
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
@@ -2171,9 +2171,9 @@ forecast field:
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described above.
 
-.. _tmp_dir:
+.. _tmp_dir_2:
 
-:ref:`tmp_dir <tmp_dir>`
+:ref:`tmp_dir <tmp_dir_2>`
 
 The "tmp_dir" entry is a string specifying the location where temporary
 files should be written.
@@ -3334,9 +3334,9 @@ For example:
 		
   message_type = [];
 
-.. _message_type_group_map:
+.. _message_type_group_map_2:
 
-:ref:`message_type_group_map <message_type_group_map>`
+:ref:`message_type_group_map <message_type_group_map_2>`
 
 Mapping of message type group name to comma-separated list of values.
 The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
