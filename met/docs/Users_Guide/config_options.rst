@@ -557,7 +557,7 @@ using the following entries:
 
 .. _fcst:
 
-:ref:`fcst <fcst>:`
+:ref:`fcst <fcst>`
   
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
