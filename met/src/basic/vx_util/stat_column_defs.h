@@ -64,7 +64,7 @@ static const char * cts_columns [] = {
 };
 
 static const char * mctc_columns [] = {
-   "TOTAL",       "N_CAT"
+   "TOTAL",       "N_CAT",       "EC_VALUE"
 };
 
 static const char * mcts_columns [] = {
