@@ -875,6 +875,9 @@ The first set of header columns are common to all of the output files generated 
     - N_CAT
     - Dimension of the contingency table
   * - 27
+    - EC_VALUE
+    - Expected correct rate for HSS_EC
+  * - 28
     - Fi_Oj
     - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
 

@@ -2644,7 +2644,7 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    //
    // Multi-Category Contingency Table Counts
    // Dump out the MCTC line:
-   //    TOTAL,       N_CAT,     Fi_Oj
+   //    TOTAL,       N_CAT,     EC_VALUE,    Fi_Oj
    //
    at.set_entry(r, c+0,  // Total Count
       mcts_info.cts.total());
@@ -2652,10 +2652,13 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    at.set_entry(r, c+1,  // N_CAT
       mcts_info.cts.nrows());
 
+   at.set_entry(r, c+2,  // EC_VALUE 
+      mcts_info.cts.ec_value());
+
    //
    // Loop through the contingency table rows and columns
    //
-   for(i=0, col=c+2; i<mcts_info.cts.nrows(); i++) {
+   for(i=0, col=c+3; i<mcts_info.cts.nrows(); i++) {
       for(j=0; j<mcts_info.cts.ncols(); j++) {
 
          at.set_entry(r, col,      // Fi_Oj
@@ -2741,7 +2744,7 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
       mcts_info.hss_ec.v_bcu[i]);
 
    at.set_entry(r, c+19, // Expected Correct value
-      mcts_info.ec_value);
+      mcts_info.cts.ec_value());
 
    return;
 }
