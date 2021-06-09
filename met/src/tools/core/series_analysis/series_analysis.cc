@@ -944,9 +944,9 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
 
    // Setup the MCTSInfo object
    mcts_info.cts.set_size(conf_info.fcat_ta.n() + 1);
+   mcts_info.cts.set_ec_value(conf_info.hss_ec_value);
    mcts_info.set_fthresh(conf_info.fcat_ta);
    mcts_info.set_othresh(conf_info.ocat_ta);
-   mcts_info.set_ec_value(conf_info.hss_ec_value);
 
    mcts_info.allocate_n_alpha(conf_info.ci_alpha.n());
    for(i=0; i<conf_info.ci_alpha.n(); i++) {
@@ -1403,8 +1403,9 @@ void store_stat_mctc(int n, const ConcatString &col,
    ConcatString d = c;
 
    // Get the column value
-        if(c == "TOTAL") { v = (double) mcts_info.cts.total(); }
-   else if(c == "N_CAT") { v = (double) mcts_info.cts.nrows(); }
+        if(c == "TOTAL")    { v = (double) mcts_info.cts.total();    }
+   else if(c == "N_CAT")    { v = (double) mcts_info.cts.nrows();    }
+   else if(c == "EC_VALUE") { v =          mcts_info.cts.ec_value(); }
    else if(check_reg_exp("F[0-9]*_O[0-9]*", c.c_str())) {
 
       d = "FI_OJ";
@@ -1493,7 +1494,7 @@ void store_stat_mcts(int n, const ConcatString &col,
       else if(c == "HSS_EC")     { v = mcts_info.hss_ec.v;             }
       else if(c == "HSS_EC_BCL") { v = mcts_info.hss_ec.v_bcl[i];      }
       else if(c == "HSS_EC_BCU") { v = mcts_info.hss_ec.v_bcu[i];      }
-      else if(c == "EC_VALUE")   { v = mcts_info.ec_value;             }
+      else if(c == "EC_VALUE")   { v = mcts_info.cts.ec_value();       }
       else {
         mlog << Error << "\nstore_stat_mcts() -> "
              << "unsupported column name requested \"" << c
