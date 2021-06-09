@@ -2100,7 +2100,7 @@ in those cases.
 
 .. _obs_perc_value:
 
-:ref:`*obs_perc_value <obs_perc_value>`
+:ref:`obs_perc_value <obs_perc_value>`
      
 Percentile value to use when obs_summary = PERC
 
