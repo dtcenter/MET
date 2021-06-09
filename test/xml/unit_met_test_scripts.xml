@@ -32,7 +32,7 @@
       &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc \
-      -v 2
+      -type poly -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc</grid_nc>

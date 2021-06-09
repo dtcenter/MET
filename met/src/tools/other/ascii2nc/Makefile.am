@@ -31,7 +31,6 @@ ascii2nc_LDFLAGS = ${MET_LDFLAGS}
 ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
-	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
@@ -39,22 +38,21 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
 	$(PYTHON_LIBS) \
-	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_summary \
+	-lvx_pb_util \
 	-lvx_config \
 	-lvx_gsl_prob \
-	-lvx_pb_util \
-	-lvx_cal \
-	-lvx_util \
-	$(PYTHON_LIBS) \
-	-lvx_math \
 	-lvx_color \
+	-lvx_util \
+	-lvx_cal \
+	-lvx_math \
 	-lvx_log \
-	-lvx_summary \
+	$(PYTHON_LIBS) \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 
