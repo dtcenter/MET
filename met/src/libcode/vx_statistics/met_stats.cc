@@ -625,20 +625,19 @@ void MCTSInfo::add(double f, double o, double cmn, double csd) {
 ////////////////////////////////////////////////////////////////////////
 
 void MCTSInfo::compute_stats() {
-   double ec_value = cts.ec_value();
 
    //
-   // Set the HSS expected correct value, if needed.
+   // Define the HSS expected correct value, if needed.
    // Default to 1 divided by the number of categories.
    //
-   if(is_bad_data(ec_value) && cts.nrows() > 0) {
-      ec_value = 1.0/cts.nrows();
+   if(is_bad_data(cts.ec_value()) && cts.nrows() > 0) {
+      cts.set_ec_value(1.0/cts.nrows());
    }
 
    acc.v    = cts.gaccuracy();
    hk.v     = cts.gkuiper();
    hss.v    = cts.gheidke();
-   hss_ec.v = cts.gheidke_ec(ec_value);
+   hss_ec.v = cts.gheidke_ec(cts.ec_value());
    ger.v    = cts.gerrity();
 
    return;
