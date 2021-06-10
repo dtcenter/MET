@@ -132,9 +132,10 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
    // Write the columns names specific to the MCTC line type
    at.set_entry(r, c+0, (string)mctc_columns[0]);
    at.set_entry(r, c+1, (string)mctc_columns[1]);
+   at.set_entry(r, c+2, (string)mctc_columns[2]);
 
    // Write Fi_Oj for each cell of the NxN table
-   for(i=0, col=c+2; i<n_cat; i++) {
+   for(i=0, col=c+3; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
          cs.format("F%i_O%i", i+1, j+1);
          at.set_entry(r, col, cs); // Fi_Oj
