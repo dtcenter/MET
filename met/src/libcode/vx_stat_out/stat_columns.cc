@@ -132,7 +132,6 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
    // Write the columns names specific to the MCTC line type
    at.set_entry(r, c+0, (string)mctc_columns[0]);
    at.set_entry(r, c+1, (string)mctc_columns[1]);
-   at.set_entry(r, c+2, (string)mctc_columns[2]);
 
    // Write Fi_Oj for each cell of the NxN table
    for(i=0, col=c+3; i<n_cat; i++) {
@@ -142,6 +141,9 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
          col++;
       }
    }
+
+   at.set_entry(r, col, (string)mctc_columns[3]);
+   col++;
 
    return;
 }
@@ -2645,16 +2647,13 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    //
    // Multi-Category Contingency Table Counts
    // Dump out the MCTC line:
-   //    TOTAL,       N_CAT,     EC_VALUE,    Fi_Oj
+   //    TOTAL,       N_CAT,     Fi_Oj,     EC_VALUE
    //
    at.set_entry(r, c+0,  // Total Count
       mcts_info.cts.total());
 
-   at.set_entry(r, c+1,  // N_CAT
+   at.set_entry(r, c+1,  // Number of categories 
       mcts_info.cts.nrows());
-
-   at.set_entry(r, c+2,  // EC_VALUE 
-      mcts_info.cts.ec_value());
 
    //
    // Loop through the contingency table rows and columns
@@ -2662,11 +2661,15 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    for(i=0, col=c+3; i<mcts_info.cts.nrows(); i++) {
       for(j=0; j<mcts_info.cts.ncols(); j++) {
 
-         at.set_entry(r, col,      // Fi_Oj
+         at.set_entry(r, col,      // Fi_Oj table counts
             mcts_info.cts.entry(i, j));
          col++;
       }
    }
+
+   at.set_entry(r, col,  // Expected Correct value 
+      mcts_info.cts.ec_value());
+   col++;
 
    return;
 }

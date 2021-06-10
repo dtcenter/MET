@@ -2777,8 +2777,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which write MCTC or MCTS output
-   if(out_line_type.has(stat_mctc_str) ||
-      out_line_type.has(stat_mcts_str)) {
+   if(!is_bad_data(hss_ec_value) &&
+      (out_line_type.has(stat_mctc_str) ||
+       out_line_type.has(stat_mcts_str))) {
 
       // hss_ec_value
       js << "-hss_ec_value " << hss_ec_value << " ";

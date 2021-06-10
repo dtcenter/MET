@@ -240,9 +240,18 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
 
       // Fixed columns after variable ones
       else if(match >= (VarBegOffset + NVarCols)) {
-         offset = match +            // Matching column offset
-                  (dim * NVarCols) - // Plus total of variable columns
-                  NVarCols;          // Minus variable column names
+
+         // Handle MCTC special case for dim*dim
+         if(is_mctc()) {
+            offset = match +                  // Matching column offset
+                     (dim * dim * NVarCols) - // Plus total of variable columns
+                     NVarCols;                // Minus variable column names
+         }
+         else {
+            offset = match +            // Matching column offset
+                     (dim * NVarCols) - // Plus total of variable columns
+                     NVarCols;          // Minus variable column names
+         }
       }
 
       // Variable columns

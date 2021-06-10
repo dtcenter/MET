@@ -874,12 +874,12 @@ The first set of header columns are common to all of the output files generated 
   * - 26
     - N_CAT
     - Dimension of the contingency table
-  * - 27
-    - EC_VALUE
-    - Expected correct rate for HSS_EC
   * - 28
     - Fi_Oj
     - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
+  * - \*
+    - EC_VALUE
+    - Expected correct rate, used for MCTS HSS_EC
 
 
 .. role:: raw-html(raw)
@@ -923,7 +923,7 @@ The first set of header columns are common to all of the output files generated 
     - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
   * - 44
     - EC_VALUE
-    - Expected correct rate for HSS_EC
+    - Expected correct rate, used for MCTS HSS_EC
 
 .. _table_PS_format_info_PCT:
 
@@ -1091,7 +1091,7 @@ The first set of header columns are common to all of the output files generated 
   * - 29
     - POFD_i
     - Probability of false detection when forecast is greater than the ith probability thresholds (repeated)
-  * - *
+  * - \*
     - THRESH_n
     - Last probability threshold value
 
