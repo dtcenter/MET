@@ -105,6 +105,9 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    n_cat = atoi(l.get_item("N_CAT"));
    ct.set_size(n_cat);
 
+   // EC_VALUE
+   ct.set_ec_value(atof(l.get_item("EC_VALUE")));
+
    // Fi_Oj
    for(i=0; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
