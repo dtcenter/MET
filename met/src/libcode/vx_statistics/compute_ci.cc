@@ -3917,8 +3917,8 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
 void write_mctsinfo(ofstream &tmp_out, const MCTSInfo &c) {
    char line[max_line_len];
 
-   snprintf(line, max_line_len, "%f %f %f %f",
-           c.acc.v, c.hk.v, c.hss.v, c.ger.v);
+   snprintf(line, max_line_len, "%f %f %f %f %f",
+           c.acc.v, c.hk.v, c.hss.v, c.hss_ec.v, c.ger.v);
 
    tmp_out << line << "\n";
 
