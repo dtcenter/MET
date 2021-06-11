@@ -2025,7 +2025,9 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
-**hss_ec_value**
+.. _hss_ec_value:
+
+ref:`hss_ec_value <hss_ec_value>`
 
 The "hss_ec_value" entry is a floating point number used in the computation
 of the HSS_EC statistic in the MCTS line type. It specifies the expected
@@ -2041,8 +2043,6 @@ It set, it must greater than or equal to 0.0 and less than 1.0. A value of
 		
   hss_ec_value = NA;
 
-**rank_corr_flag**
-=======
 .. _rank_corr_flag:
 
 ref:`rank_corr_flag <rank_corr_flag>`
