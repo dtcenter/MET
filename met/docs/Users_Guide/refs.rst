@@ -181,6 +181,7 @@ References
 | Ou, M. H., Charles, M., & Collins, D. C. 2016: Sensitivity of calibrated week-2
 |   probabilistic forecast skill to reforecast sampling of the NCEP global
 |   ensemble forecast system. *Weather and Forecasting,* 31(4), 1093-1107.
+|
 
 .. _Roberts-2008:
 
