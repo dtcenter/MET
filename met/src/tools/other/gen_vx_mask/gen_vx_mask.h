@@ -17,6 +17,7 @@
 //   000    12/09/14  Halley Gotway   New
 //   001    06/02/16  Halley Gotway   Add box masking type.
 //   002    11/15/16  Halley Gotway   Add solar masking types.
+//   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None  
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +76,7 @@ extern const char * masktype_to_string(MaskType);
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const MaskType default_mask_type = MaskType_Poly;
+static const MaskType default_mask_type = MaskType_None;
 static const double default_mask_val = 1.0;
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,10 +87,10 @@ static const double default_mask_val = 1.0;
 
 // Input data file, mask file, and output NetCDF file
 static ConcatString input_gridname, mask_filename, out_filename;
-
-// Optional arguments
 static MaskType mask_type = default_mask_type;
 static bool type_is_set = false;
+
+// Optional arguments
 static ConcatString input_field_str, mask_field_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;

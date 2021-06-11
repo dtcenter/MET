@@ -26,7 +26,7 @@
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc \
-      -v 2
+      -type poly -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</grid_nc>
