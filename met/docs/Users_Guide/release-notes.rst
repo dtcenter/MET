@@ -5,7 +5,18 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version |version| release notes (|release_date|)
+MET Version 10.1.0-beta1 release notes (|release_date|)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Add the HSS_EC statistic to the MCTS line type and a configurable option for its computation (`#1749 <http://github.com/dtcenter/MET/issues/1749>`_).
+* Implement a common API for reading and writing the common NetCDF point observation file format (`#1402 <http://github.com/dtcenter/MET/issues/1402>`_ and `#1581 <http://github.com/dtcenter/MET/issues/1581>`_).
+* Change -type for gen_vx_mask from an optional argument to a required one (`#1792 <http://github.com/dtcenter/MET/issues/1792>`_).
+* Fix python embedding when using a named grid with MET_PYTHON_EXE set (`#1798 <http://github.com/dtcenter/MET/issues/1798>`_).
+* Fix Fortify High finding for src/libcode/vx_data2d_nccf/nccf_file.cc (`#1795 <http://github.com/dtcenter/MET/issues/1795>`_).
+* Modify plot_tcmpr.R script to support plotting of extra-tropical cyclone tracks not verified against BEST tracks (`#1801 <http://github.com/dtcenter/MET/issues/1801>`_).
+* Add anchors to link directly to configuration items in the MET User's Guide (`#1811 <http://github.com/dtcenter/MET/issues/1811>`_).
+
+MET Version 10.0.0 release notes (20210510)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Repository and build:
