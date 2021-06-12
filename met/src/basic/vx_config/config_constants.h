@@ -591,6 +591,7 @@ static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_obs_summary[]       = "obs_summary";
 static const char conf_key_percentile[]        = "obs_perc_value";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
+static const char conf_key_hss_ec_value[]      = "hss_ec_value";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
 static const char conf_key_met_data_dir[]      = "met_data_dir";

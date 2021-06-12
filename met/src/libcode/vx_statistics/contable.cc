@@ -110,6 +110,16 @@ if ( Nrows != t.Nrows || Ncols != t.Ncols )  {
 
 }
 
+if ( !is_eq(ECvalue, t.ECvalue) )  {
+
+   mlog << Error << "\nContingencyTable::operator+=() -> "
+        << "the expected correct values do not match: "
+        << ECvalue << " != " << t.ECvalue << "\n\n";
+
+   exit ( 1 );
+
+}
+
 if ( E )  {
    for ( int i=0; i<E->size(); ++i )  (*E)[i] += (*t.E)[i];
 }
@@ -137,7 +147,8 @@ void ContingencyTable::clear()
 {
     if (E) delete E;
     E = new vector<int>();
-    
+
+    ECvalue = bad_data_double;
     Name.clear();
     Nrows = Ncols = 0;
     
@@ -160,6 +171,7 @@ void ContingencyTable::assign(const ContingencyTable & t)
     
     if (E) delete E;
     E = new vector<int>(*(t.E));
+    ECvalue = t.ECvalue;
     Name = t.Name;
     
     //
@@ -198,14 +210,14 @@ int r, c;
 Indent prefix(depth);
 ConcatString junk;
 
-out << prefix << "Name  = ";
+out << prefix << "Name    = ";
 
 if ( Name.length() > 0 )  out << '\"' << Name << "\"\n";
 else                      out << "(nul)\n";
 
-out << prefix << "Nrows = " << Nrows << "\n";
-out << prefix << "Ncols = " << Ncols << "\n";
-
+out << prefix << "Nrows   = " << Nrows << "\n";
+out << prefix << "Ncols   = " << Ncols << "\n";
+out << prefix << "ECvalue = " << ECvalue << "\n";
 out << prefix << "\n";
 
 if ( E->empty() )  { out.flush();  return; }
@@ -488,6 +500,20 @@ Ncols = NC;
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ContingencyTable::set_ec_value(double v)
+
+{
+
+ECvalue = v;
 
 return;
 

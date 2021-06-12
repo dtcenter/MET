@@ -3425,6 +3425,7 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    mcts_info.clear();
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.cts.set_ec_value(job.hss_ec_value);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
 
@@ -3447,6 +3448,7 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    mcts_info.clear();
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.cts.set_ec_value(job.hss_ec_value);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
 

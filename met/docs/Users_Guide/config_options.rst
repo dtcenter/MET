@@ -2025,6 +2025,24 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
+.. _hss_ec_value:
+
+ref:`hss_ec_value <hss_ec_value>`
+
+The "hss_ec_value" entry is a floating point number used in the computation
+of the HSS_EC statistic in the MCTS line type. It specifies the expected
+correct (EC) rate by chance for multi-category contingency tables. If set
+to its default value of NA, it will automatically be replaced with 1.0
+divided by the MCTC table dimension. For example, for a 4x4 table, the
+default hss_ec_value is 1.0 / 4 = 0.25.
+
+It set, it must greater than or equal to 0.0 and less than 1.0. A value of
+0.0 produces an HSS_EC statistic equal to the Accuracy statistic.
+
+.. code-block:: none
+		
+  hss_ec_value = NA;
+
 .. _rank_corr_flag:
 
 ref:`rank_corr_flag <rank_corr_flag>`
@@ -4010,7 +4028,8 @@ Where "job_name" is set to one of the following:
     "-boot_seed       value"
 
   .. code-block:: none
-		  
+
+    "-hss_ec_value    value"
     "-rank_corr_flag  value"
     "-vif_flag        value"
 

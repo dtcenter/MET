@@ -202,6 +202,7 @@ void STATAnalysisJob::clear() {
    boot_interval  = bad_data_int;
    boot_rep_prop  = bad_data_double;
    n_boot_rep     = bad_data_int;
+   hss_ec_value   = bad_data_double;
    rank_corr_flag = false;
    vif_flag       = false;
 
@@ -344,6 +345,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    boot_rep_prop        = aj.boot_rep_prop;
    n_boot_rep           = aj.n_boot_rep;
 
+   hss_ec_value         = aj.hss_ec_value;
    rank_corr_flag       = aj.rank_corr_flag;
    vif_flag             = aj.vif_flag;
 
@@ -625,6 +627,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "boot_seed = "
        << boot_seed << "\n";
+
+   out << prefix << "hss_ec_value = "
+       << hss_ec_value << "\n";
 
    out << prefix << "rank_corr_flag = "
        << rank_corr_flag << "\n";
@@ -1599,6 +1604,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(jc_array[i] == "-boot_seed") {
          set_boot_seed(jc_array[i+1].c_str());
+         i++;
+      }
+      else if(jc_array[i] == "-hss_ec_value") {
+         hss_ec_value = atof(jc_array[i+1].c_str());
          i++;
       }
       else if(jc_array[i] == "-rank_corr_flag") {
@@ -2765,6 +2774,15 @@ ConcatString STATAnalysisJob::get_jobstring() const {
             }
          }
       }
+   }
+
+   // Jobs which write MCTC or MCTS output
+   if(!is_bad_data(hss_ec_value) &&
+      (out_line_type.has(stat_mctc_str) ||
+       out_line_type.has(stat_mcts_str))) {
+
+      // hss_ec_value
+      js << "-hss_ec_value " << hss_ec_value << " ";
    }
 
    // Jobs which compute rank correlations

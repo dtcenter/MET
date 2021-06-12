@@ -42,6 +42,7 @@
 //                    -out_stat, but not both.
 //   021    04/12/21  Halley Gotway   MET #1735 Support multiple 
 //                    -out_thresh and -out_line_type options.
+//   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,13 +114,14 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
 
    job.out_alpha       = c.lookup_double(conf_key_out_alpha, false);
 
-   boot_info         = parse_conf_boot(&c);
+   boot_info           = parse_conf_boot(&c);
    job.boot_interval   = boot_info.interval;
    job.boot_rep_prop   = boot_info.rep_prop;
    job.n_boot_rep      = boot_info.n_rep;
    job.set_boot_rng(boot_info.rng.c_str());
    job.set_boot_seed(boot_info.seed.c_str());
 
+   job.hss_ec_value    = c.lookup_double(conf_key_hss_ec_value);
    job.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    job.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
 

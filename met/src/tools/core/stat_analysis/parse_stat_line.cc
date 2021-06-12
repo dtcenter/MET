@@ -113,6 +113,9 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
       }
    }
 
+   // EC_VALUE
+   ct.set_ec_value(atof(l.get_item("EC_VALUE")));
+
    return;
 }
 

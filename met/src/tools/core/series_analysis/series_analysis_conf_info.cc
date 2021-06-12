@@ -81,6 +81,7 @@ void SeriesAnalysisConfInfo::clear() {
    mask_area.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
+   hss_ec_value = bad_data_double;
    rank_corr_flag = false;
    tmp_dir.clear();
    version.clear();
@@ -423,6 +424,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    n_boot_rep    = boot_info.n_rep;
    boot_rng      = boot_info.rng;
    boot_seed     = boot_info.seed;
+
+   // Conf: hss_ec_value
+   hss_ec_value = conf.lookup_double(conf_key_hss_ec_value);
 
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
