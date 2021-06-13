@@ -17,7 +17,7 @@ MET Version 10.1.0-beta1 release notes (|release_date|)
 * Add anchors to link directly to configuration items in the MET User's Guide (`#1811 <http://github.com/dtcenter/MET/issues/1811>`_).
 
 MET Version 10.0.0 release notes (20210510)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Repository and build:
   
