@@ -108,6 +108,7 @@
 //                    nc_pairs_var_str to nc_pairs_var_suffix.
 //   051    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
+//   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1896,6 +1897,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
    mcts_info.cts.set_size(conf_info.vx_opt[i_vx].fcat_ta.n() + 1);
+   mcts_info.cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
    mcts_info.set_fthresh(conf_info.vx_opt[i_vx].fcat_ta);
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());

@@ -268,6 +268,7 @@ ________________________
 
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                    rng = "mt19937"; seed = ""; }
+  hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   version        = "VN.N";

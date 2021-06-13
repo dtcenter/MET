@@ -134,13 +134,16 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
    at.set_entry(r, c+1, (string)mctc_columns[1]);
 
    // Write Fi_Oj for each cell of the NxN table
-   for(i=0, col=c+2; i<n_cat; i++) {
+   for(i=0, col=c+3; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
          cs.format("F%i_O%i", i+1, j+1);
          at.set_entry(r, col, cs); // Fi_Oj
          col++;
       }
    }
+
+   at.set_entry(r, col, (string)mctc_columns[3]);
+   col++;
 
    return;
 }
@@ -2644,25 +2647,29 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    //
    // Multi-Category Contingency Table Counts
    // Dump out the MCTC line:
-   //    TOTAL,       N_CAT,     Fi_Oj
+   //    TOTAL,       N_CAT,     Fi_Oj,     EC_VALUE
    //
    at.set_entry(r, c+0,  // Total Count
       mcts_info.cts.total());
 
-   at.set_entry(r, c+1,  // N_CAT
+   at.set_entry(r, c+1,  // Number of categories 
       mcts_info.cts.nrows());
 
    //
    // Loop through the contingency table rows and columns
    //
-   for(i=0, col=c+2; i<mcts_info.cts.nrows(); i++) {
+   for(i=0, col=c+3; i<mcts_info.cts.nrows(); i++) {
       for(j=0; j<mcts_info.cts.ncols(); j++) {
 
-         at.set_entry(r, col,      // Fi_Oj
+         at.set_entry(r, col,      // Fi_Oj table counts
             mcts_info.cts.entry(i, j));
          col++;
       }
    }
+
+   at.set_entry(r, col,  // Expected Correct value 
+      mcts_info.cts.ec_value());
+   col++;
 
    return;
 }
@@ -2679,7 +2686,9 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
    //    HK,          HK_BCL,      HK_BCU,
    //    HSS,         HSS_BCL,     HSS_BCU,
-   //    GER,         GER_BCL,     GER_BCU
+   //    GER,         GER_BCL,     GER_BCU,
+   //    HSS_EC,      HSS_EC_BCL,  HSS_EC_BCU,
+   //    EC_VALUE
    //
    at.set_entry(r, c+0,  // Total count
       mcts_info.cts.total());
@@ -2728,6 +2737,18 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
 
    at.set_entry(r, c+15, // Gerrity Score BCU
       mcts_info.ger.v_bcu[i]);
+
+   at.set_entry(r, c+16, // Heidke Skill Score with Expected Correct
+      mcts_info.hss_ec.v);
+
+   at.set_entry(r, c+17, // Heidke Skill Score EC BCL
+      mcts_info.hss_ec.v_bcl[i]);
+
+   at.set_entry(r, c+18, // Heidke Skill Score EC BCU
+      mcts_info.hss_ec.v_bcu[i]);
+
+   at.set_entry(r, c+19, // Expected Correct value
+      mcts_info.cts.ec_value());
 
    return;
 }

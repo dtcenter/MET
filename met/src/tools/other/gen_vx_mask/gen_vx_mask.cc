@@ -24,6 +24,7 @@
 //   006    07/09/18  Bullock         Add shapefile masking type.
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //   008    04/06/20  Halley Gotway   Generalize input_grid option.
+//   009    06/01/21  Seth Linden     Change -type from optional to required
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +139,17 @@ void process_command_line(int argc, char **argv) {
    mask_filename  = cline[1];
    out_filename   = cline[2];
 
+   // Check for the mask type (from -type string)
+   if(mask_type == MaskType_None) {
+     mlog << Error << "\n" << program_name << " -> "
+	  << "the -type command line requirement must be set to a specific masking type!\n"
+          << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
+	  << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
+	  << "or \"shape\""
+          << "\n\n";
+     exit(1);
+   }
+   
    // List the input files
    mlog << Debug(1)
         << "Input Grid:\t\t" << input_gridname << "\n"
@@ -1340,7 +1352,7 @@ void usage() {
         << "\tinput_grid\n"
         << "\tmask_file\n"
         << "\tout_file\n"
-        << "\t[-type string]\n"
+        << "\t-type string\n"
         << "\t[-input_field string]\n"
         << "\t[-mask_field string]\n"
         << "\t[-complement]\n"
@@ -1380,12 +1392,12 @@ void usage() {
         << "\t\t\"out_file\" is the output NetCDF mask file to be "
         << "written (required).\n"
 
-        << "\t\t\"-type string\" overrides the default masking type ("
-        << masktype_to_string(default_mask_type) << ") (optional)\n"
+        << "\t\t\"-type string\" specify the masking type "
+        << "(required).\n"
         << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
         << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
         << "or \"shape\"\n"
-
+        
         << "\t\t\"-input_field string\" reads existing mask data from "
         << "the \"input_grid\" gridded data file (optional).\n"
 
@@ -1446,7 +1458,7 @@ void usage() {
 void set_type(const StringArray & a) {
    if(type_is_set) {
       mlog << Error << "\n" << program_name << " -> "
-           << "the -type command line option can only be used once!\n"
+           << "the -type command line requirement can only be used once!\n"
            << "To apply multiple masks, run this tool multiple times "
            << "using the output of one run as the input to the next."
            << "\n\n"; 

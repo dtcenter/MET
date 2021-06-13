@@ -64,7 +64,7 @@ static const char * cts_columns [] = {
 };
 
 static const char * mctc_columns [] = {
-   "TOTAL",       "N_CAT"
+   "TOTAL",       "N_CAT",       "Fi_Oj",       "EC_VALUE"
 };
 
 static const char * mcts_columns [] = {
@@ -72,7 +72,8 @@ static const char * mcts_columns [] = {
    "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
    "HK",          "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "GER",         "GER_BCL",     "GER_BCU"
+   "GER",         "GER_BCL",     "GER_BCU",
+   "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
 static const char * cnt_columns [] = {
@@ -415,11 +416,11 @@ static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
-inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); }
-inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
-inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
+inline int get_n_mctc_columns  (int n) { return(3  + n*n);             } // n = N_CAT
+inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
+inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); } // n = N_THRESH
+inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); } // n = N_THRESH
+inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
 inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
 inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS

@@ -873,6 +873,18 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
                               mcts_info.hss.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for hss_ec
+      //
+      s = mcts_info.hss_ec.v;
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.hss_ec.v_bcl[i],
+                              mcts_info.hss_ec.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for ger
       //
       s = mcts_info.ger.v;
@@ -1907,6 +1919,18 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                mcts_info.hss.v_bcl[i],
                                mcts_info.hss.v_bcu[i]);
 
+      //
+      // Compute bootstrap interval for hss_ec
+      //
+      s = mcts_info.hss_ec.v;
+      read_ldf(mcts_r_file, c++, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.hss_ec.v_bcl[i],
+                               mcts_info.hss_ec.v_bcu[i]);
+
+      //
       //
       // Compute bootstrap interval for ger
       //
@@ -3893,8 +3917,8 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
 void write_mctsinfo(ofstream &tmp_out, const MCTSInfo &c) {
    char line[max_line_len];
 
-   snprintf(line, max_line_len, "%f %f %f %f",
-           c.acc.v, c.hk.v, c.hss.v, c.ger.v);
+   snprintf(line, max_line_len, "%f %f %f %f %f",
+           c.acc.v, c.hk.v, c.hss.v, c.hss_ec.v, c.ger.v);
 
    tmp_out << line << "\n";
 

@@ -523,6 +523,7 @@ void MCTSInfo::clear() {
    acc.clear();
    hk.clear();
    hss.clear();
+   hss_ec.clear();
    ger.clear();
 
    return;
@@ -545,6 +546,7 @@ void MCTSInfo::assign(const MCTSInfo &c) {
    acc = c.acc;
    hk = c.hk;
    hss = c.hss;
+   hss_ec = c.hss_ec;
    ger = c.ger;
 
    return;
@@ -569,6 +571,7 @@ void MCTSInfo::allocate_n_alpha(int i) {
       acc.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
+      hss_ec.allocate_n_alpha(n_alpha);
       ger.allocate_n_alpha(n_alpha);
    }
 
@@ -623,10 +626,19 @@ void MCTSInfo::add(double f, double o, double cmn, double csd) {
 
 void MCTSInfo::compute_stats() {
 
-   acc.v = cts.gaccuracy();
-   hk.v  = cts.gkuiper();
-   hss.v = cts.gheidke();
-   ger.v = cts.gerrity();
+   //
+   // Define the HSS expected correct value, if needed.
+   // Default to 1 divided by the number of categories.
+   //
+   if(is_bad_data(cts.ec_value()) && cts.nrows() > 0) {
+      cts.set_ec_value(1.0/cts.nrows());
+   }
+
+   acc.v    = cts.gaccuracy();
+   hk.v     = cts.gkuiper();
+   hss.v    = cts.gheidke();
+   hss_ec.v = cts.gheidke_ec(cts.ec_value());
+   ger.v    = cts.gerrity();
 
    return;
 }

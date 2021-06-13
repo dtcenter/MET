@@ -621,6 +621,7 @@ void PointStatVxOpt::clear() {
    interp_info.clear();
    hira_info.clear();
 
+   hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
    msg_typ.clear();
@@ -650,8 +651,8 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
    //    eclv_points, cdf_info, ci_alpha
-   //    boot_info, hira_info, rank_corr_flag,
-   //    output_flag
+   //    boot_info, hira_info, hss_ec_value,
+   //    rank_corr_flag, output_flag
    //
 
    if(!(beg_ds         == v.beg_ds        ) ||
@@ -867,6 +868,9 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: hira
    hira_info = parse_conf_hira(&odict);
+
+   // Conf: hss_ec_value
+   hss_ec_value = odict.lookup_double(conf_key_hss_ec_value);
 
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);

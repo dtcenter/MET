@@ -128,7 +128,7 @@ class MCTSInfo {
       ThreshArray      fthresh;
       ThreshArray      othresh;
 
-      CIInfo acc, hk, hss, ger;
+      CIInfo acc, hk, hss, hss_ec, ger;
 
       void clear();
       void allocate_n_alpha(int);
