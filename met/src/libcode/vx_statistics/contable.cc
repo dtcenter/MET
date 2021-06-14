@@ -464,6 +464,16 @@ void ContingencyTable::set_size(int N)
 
 ContingencyTable::set_size(N, N);
 
+   //
+   //  if square, set default expected correct value
+   //
+
+if ( N > 0 )  {
+
+   ECvalue = 1.0 / N;
+
+}
+
 return;
 
 }
@@ -513,7 +523,11 @@ void ContingencyTable::set_ec_value(double v)
 
 {
 
-ECvalue = v;
+   //
+   //  do not override the default value with bad data
+   //
+
+if ( !is_bad_data(v) )  ECvalue = v;
 
 return;
 
