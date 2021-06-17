@@ -7,7 +7,7 @@ on:
       - feature_*
       - main_*
       - bugfix_*
-  paths:
+    paths:
       - met/docs/**
   pull_request:
     types: [opened, reopened, synchronize]
