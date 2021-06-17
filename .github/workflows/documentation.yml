@@ -1,4 +1,4 @@
-name: MET CI/CD Workflow
+name: Documentation
 on:
   push:
     branches:
@@ -7,6 +7,8 @@ on:
       - feature_*
       - main_*
       - bugfix_*
+  paths:
+      - met/docs/**
   pull_request:
     types: [opened, reopened, synchronize]
 
@@ -24,26 +26,14 @@ jobs:
           python -m pip install --upgrade python-dateutil requests sphinx \
           sphinx-gallery Pillow sphinx_rtd_theme
       - name: Build docs
-        continue-on-error: true
-        run: |
-          DOCS_DIR=${GITHUB_WORKSPACE}/met/docs
-          cd ${DOCS_DIR}
-          make clean html
-          cd ${GITHUB_WORKSPACE}
-          warning_file=${DOCS_DIR}/_build/warnings.log
-          mkdir -p artifact/documentation
-          cp -r ${DOCS_DIR}/_build/html/* artifact/documentation
-          if [ -s $warning_file ]; then
-            cp -r ${DOCS_DIR}/_build/warnings.log artifact/doc_warnings.log
-            cp artifact/doc_warnings.log artifact/documentation
-          else
-            rm ${warning_file}
-          fi
+        run: ./.github/jobs/build_documentation.sh
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: documentation
           path: artifact/documentation
       - uses: actions/upload-artifact@v2
+        if: failure()
         with:
           name: documentation_warnings.log
           path: artifact/doc_warnings.log
