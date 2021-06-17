@@ -109,7 +109,7 @@ class DataPlane {
 
       void replace_bad_data(const double value);
 
-      int  two_to_one(int x, int y) const;
+      int  two_to_one(int x, int y, bool to_north=true) const;
       void one_to_two(int n, int &x, int &y) const;
 
       bool s_is_on(int x, int y) const;
