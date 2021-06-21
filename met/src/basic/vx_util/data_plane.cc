@@ -410,7 +410,7 @@ return;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int DataPlane::two_to_one(int x, int y) const {
+int DataPlane::two_to_one(int x, int y, bool to_north) const {
    int n;
 
    if((x < 0) || (x >= Nx) || (y < 0) || (y >= Ny)) {
@@ -420,7 +420,7 @@ int DataPlane::two_to_one(int x, int y) const {
       exit(1);
    }
 
-   n = y*Nx + x;   //  don't change this!  lots of downstream code depends on this!
+   n = (to_north ? y : (Ny-1-y))*Nx + x;    //  don't change this!  lots of downstream code depends on this!
 
    return(n);
 }
