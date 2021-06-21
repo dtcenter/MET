@@ -1331,10 +1331,11 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       exit(1);
    }
    else {
+      bool is_to_north = !fr_grid.get_swap_to_north();
       float *from_data = new float[from_data_size];
       for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
-            int offset = fr_dp.two_to_one(xIdx,yIdx);
+            int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
             from_data[offset] = fr_dp.get(xIdx,yIdx);
          }
       }
@@ -1839,7 +1840,7 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times) {
+      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
    double x, y;
    float lat, lon;
    int idx_x, idx_y, to_offset;
@@ -1860,7 +1861,7 @@ static void get_grid_mapping_latlon(
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
-         int coord_offset = from_dp.two_to_one(yIdx, xIdx);
+         int coord_offset = from_dp.two_to_one(yIdx, xIdx, to_north);
          if( skip_times != 0 && skip_times[coord_offset] ) continue;
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
@@ -1967,7 +1968,8 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes, from_lat_count,
-                                 from_lon_count, skip_times);
+                                 from_lon_count, skip_times,
+                                 !fr_grid.get_swap_to_north());
       }
       if( latitudes )  delete [] latitudes;
       if( longitudes ) delete [] longitudes;
@@ -2178,7 +2180,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count, 0);
+                                 longitudes, from_lat_count, from_lon_count, 0,
+                                 !fr_grid.get_swap_to_north());
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
