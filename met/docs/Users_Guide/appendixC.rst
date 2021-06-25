@@ -147,7 +147,7 @@ Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
 H_RATE is defined as
 
-.. math:: \text{H_RATE } = \frac{n_{11}}{T}.
+.. math:: \text{H\_RATE } = \frac{n_{11}}{T}.
 
 
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
