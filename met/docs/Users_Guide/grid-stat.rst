@@ -90,7 +90,7 @@ Differences are computed in both of the horizontal grid directions and is not a 
 Distance Maps
 ~~~~~~~~~~~~~
 
-The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, :math:`s=(x,y)`, in the domain, :math:`D`, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas :math:`A`, from one field and observation event areas :math:`B` from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
+The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, **s=(x,y)**, in the domain, **D**, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas **A**, from one field and observation event areas **B** from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
 
 Because these methods rely on the distance map, it is helpful to understand precisely what such maps do. :numref:`grid-stat_fig1` demonstrates the path of the shortest distance to the nearest event point in the event area A marked by the gray rectangle in the diagram. Note that the arrows all point to a grid point on the boundary of the event area A as it would be a longer distance to any point in its interior. :numref:`grid-stat_fig2` demonstrates the shortest distances from every grid point inside a second event area marked by the gray circle labeled B to the same event area A as in :numref:`grid-stat_fig1`. Note that all of the distances are to points on a small subsection (indicated by the yellow stretch) of the subset A.
 
@@ -714,10 +714,10 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - S1
     - S1 score
   * - 31
-    - S1\_OG
+    - S1_OG
     - S1 score with respect to observed gradient
   * - 32
-    - FGOG\_RATIO
+    - FGOG_RATIO
     - Ratio of forecast and observed gradients
   * - 33
     - DX
@@ -760,50 +760,50 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - HAUSDORFF
     - Hausdorff Distance
   * - 31
-    - MED\_FO
+    - MED_FO
     - Mean-error Distance from observation to forecast
   * - 32
-    - MED\_OF
+    - MED_OF
     - Mean-error Distance from forecast to observation
   * - 33
-    - MED\_MIN
-    - Minimum of MED\_FO and MED\_OF
+    - MED_MIN
+    - Minimum of MED_FO and MED_OF
   * - 34
-    - MED\_MAX
-    - Maximum of MED\_FO and MED\_OF
+    - MED_MAX
+    - Maximum of MED_FO and MED_OF
   * - 35
-    - MED\_MEAN
-    - Mean of MED\_FO and MED\_OF
+    - MED_MEAN
+    - Mean of MED_FO and MED_OF
   * - 36
-    - FOM\_FO
+    - FOM_FO
     - Pratt's Figure of Merit from observation to forecast
   * - 37
-    - FOM\_OF
+    - FOM_OF
     - Pratt's Figure of Merit from forecast to observation
   * - 38
-    - FOM\_MIN
-    - Minimum of FOM\_FO and FOM\_OF
+    - FOM_MIN
+    - Minimum of FOM_FO and FOM_OF
   * - 39
-    - FOM\_MAX
-    - Maximum of FOM\_FO and FOM\_OF
+    - FOM_MAX
+    - Maximum of FOM_FO and FOM_OF
   * - 40
-    - FOM\_MEAN
-    - Mean of FOM\_FO and FOM\_OF
+    - FOM_MEAN
+    - Mean of FOM_FO and FOM_OF
   * - 41
-    - ZHU\_FO
+    - ZHU_FO
     - Zhu's Measure from observation to forecast
   * - 42
-    - ZHU\_OF
+    - ZHU_OF
     - Zhu's Measure from forecast to observation
   * - 43
-    - ZHU\_MIN
-    - Minimum of ZHU\_FO and ZHU\_OF
+    - ZHU_MIN
+    - Minimum of ZHU_FO and ZHU_OF
   * - 44
-    - ZHU\_MAX
-    - Maximum of ZHU\_FO and ZHU\_OF
+    - ZHU_MAX
+    - Maximum of ZHU_FO and ZHU_OF
   * - 45
-    - ZHU\_MEAN
-    - Mean of ZHU\_FO and ZHU\_OF
+    - ZHU_MEAN
+    - Mean of ZHU_FO and ZHU_OF
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
