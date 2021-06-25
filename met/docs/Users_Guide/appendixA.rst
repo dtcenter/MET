@@ -6,6 +6,20 @@ Appendix A FAQs & How do I ... ?
 Frequently Asked Questions
 __________________________
 
+
+.. panels::
+
+   .. dropdown:: header for text dropdown
+
+		 Content in dropdown
+   ___
+
+   .. dropdown:: :fa:`eye,mr-1` test with eye
+
+		 hidden content
+
+   ---		 
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in using the MODE tool. Due to time and budget constraints, it also makes use of a pre-existing forecast verification library that was developed at NCAR.
