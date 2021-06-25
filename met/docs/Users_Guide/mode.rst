@@ -30,7 +30,7 @@ The process used for resolving objects in a raw data field is called *convolutio
 
 In this formula, :math:`f` is the raw data field, :math:`\phi` is the filter function, and :math:`C` is the resulting convolved field. The variables :math:`(x, y)` and :math:`(u, v)` are grid coordinates. The filter function :math:`\phi` is a simple circular filter determined by a radius of influence :math:`R` , and a height :math:`H` :
 
-.. math:: \phi (x,y) = \begin{eqnarray}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
+.. math:: \phi (x,y) = \begin{align}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{align}
 
 The parameters :math:`R` and :math:`H` are not independent. They are related by the requirement that the integral of :math:`\phi` over the grid be unity: 
 
@@ -40,7 +40,7 @@ Thus, the radius of influence :math:`R` is the only tunable parameter in the con
 
 Once the convolved field :math:`C` is in hand, it is thresholded to create a mask field :math:`M` :
 
-.. math:: M(x,y) = \begin{eqnarray}\begin{cases} 1 &\text{if } C(x,y)\ge T\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
+.. math:: M(x,y) = \begin{align}\begin{cases} 1 &\text{if } C(x,y)\ge T\\ 0 &\text{otherwise.} \end{cases}\end{align}
 
 where :math:`T` is the threshold. The objects are the connected regions where :math:`M = 1` . Finally, the raw data are restored to object interiors to obtain the object field :math:`F` :
 
