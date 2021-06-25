@@ -48,8 +48,8 @@ latex_elements = {
    'releasename':"{version}",
    'fncychap': '\\usepackage{fncychap}',
    'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm}',
-   'inputenc': '\\usepackage[utf8]{inputenc}'
-   'fontenc': '\\usepackage[LGR,T1]{fontenc}'
+   'inputenc': '\\usepackage[utf8]{inputenc}',
+   'fontenc': '\\usepackage[LGR,T1]{fontenc}',
                                                      
    'figure_align':'htbp',
    'pointsize': '11pt',
