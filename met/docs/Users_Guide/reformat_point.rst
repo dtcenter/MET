@@ -61,10 +61,10 @@ The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning 
 The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
 
 4.
-The **-nmsg num_messages** option may be used for testing purposes. This argument indicates that only the first “num_messages” PrepBUFR messages should be processed rather than the whole file. This option is provided to speed up testing because running the PB2NC tool can take a few minutes for each file. Most users will not need this option.
+The **-nmsg num_messages** option may be used for testing purposes. This argument indicates that only the first "num_messages" PrepBUFR messages should be processed rather than the whole file. This option is provided to speed up testing because running the PB2NC tool can take a few minutes for each file. Most users will not need this option.
 
 5.
-The **-dump path** option may be used to dump the entire contents of the PrepBUFR file to several ASCII files written to the directory specified by “path”. The user may use this option to view a human-readable version of the input PrepBUFR file, although writing the contents to ASCII files can be slow.
+The **-dump path** option may be used to dump the entire contents of the PrepBUFR file to several ASCII files written to the directory specified by "path". The user may use this option to view a human-readable version of the input PrepBUFR file, although writing the contents to ASCII files can be slow.
 
 6.
 The **-index** option shows the available variables with valid data from the BUFR input. It collects the available variable list from BUFR input and checks the existence of valid data and directs the variable names with valid data to the screen. The NetCDF output won't be generated.
@@ -73,10 +73,10 @@ The **-index** option shows the available variables with valid data from the BUF
 The **-log** file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 8.
-The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 9.
-The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the pb2nc calling sequence is shown below:
 
@@ -99,7 +99,7 @@ When editing configuration files, environment variables may be used for setting 
 
 For example, using an environment variable to set the **message_type** (see below) parameter to use ADPUPA and ADPSFC message types might consist of the following:
 
-\* In a C-Shell: **setenv MSG_TYP ' “ADPUPA”, “ADPSFC” '**
+\* In a C-Shell: **setenv MSG_TYP ' "ADPUPA", "ADPSFC" '**
 
 \* In the configuration file: **message_type = [ ${MSG_TYP} ];**
 
@@ -128,7 +128,7 @@ ___________________
 
 .. code-block:: none		
 
-		message_type_map = [ { key = “AIRCAR”; val = “AIRCAR_PROFILES”; } ];
+		message_type_map = [ { key = "AIRCAR"; val = "AIRCAR_PROFILES"; } ];
 
 The **message_type_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of input PrepBUFR message types to output message types. This provides a method for renaming input PrepBUFR message types.
 
@@ -293,7 +293,7 @@ ___________________
 The **time_summary** dictionary enables additional processing for observations with high temporal resolution. The **flag** entry toggles the **time_summary** on (**TRUE**) and off (**FALSE**). If the **raw_data** flag is set to TRUE, then both the individual observation values and the derived time summary value will be written to the output. If FALSE, only the summary values are written. Observations may be summarized across the user specified time period defined by the **beg** and **end** entries in HHMMSS format. The **step** entry defines the time between intervals in seconds. The **width** entry specifies the summary interval in seconds. It may either be set as an integer number of seconds for a centered time interval or a dictionary with beginning and ending time offsets in seconds.
 
 
-This example listed above does a 10-minute time summary (width = 600;) every 5 minutes (step = 300;) throughout the day (beg = “000000”; end = 235959”;). The first interval will be from 23:55:00 the previous day through 00:04:59 of the current day. The second interval will be from 0:00:00 through 00:09:59. And so on.
+This example listed above does a 10-minute time summary (width = 600;) every 5 minutes (step = 300;) throughout the day (beg = "000000"; end = 235959";). The first interval will be from 23:55:00 the previous day through 00:04:59 of the current day. The second interval will be from 0:00:00 through 00:09:59. And so on.
 
 
 The two **width** settings listed above are equivalent. Both define a centered 10-minute time interval. Use the **beg** and **end** entries to define uncentered time intervals. The following example requests observations for one hour prior:
@@ -422,7 +422,7 @@ This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used t
 
 Initial versions of the ASCII2NC tool supported only a simple 11 column ASCII point observation format. It currently supports point observation data in the following formats: the default 11 column format, little_r format, `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats, the Western Wind and Solar Integration Study (WWSIS) format, and the `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format. <http://aeronet.gsfc.nasa.gov/>`_  WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
-MET version 9.0 adds support for the passing observations to ascii2nc using a Python script with the “-format python” option. An example of running ASCII2NC with Python embedding is included below.
+MET version 9.0 adds support for the passing observations to ascii2nc using a Python script with the "-format python" option. An example of running ASCII2NC with Python embedding is included below.
 
 The default ASCII point observation format consists of one row of data per observation value. Each row of data consists of 11 columns as shown in :numref:`table_reform-point_ascii2nc_format`.
 
@@ -496,14 +496,14 @@ ascii2nc has two required arguments and can take several optional ones.
 Required arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **ascii_file** argument is the ASCII point observation file(s) to be processed. If using Python embedding with “-format python” provides a quoted string containing the Python script to be run followed by any command line arguments that script takes.
+1. The **ascii_file** argument is the ASCII point observation file(s) to be processed. If using Python embedding with "-format python" provides a quoted string containing the Python script to be run followed by any command line arguments that script takes.
 
 2. The **netcdf_file** argument is the NetCDF output file to be written.
 
 Optional arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format ASCII_format** option may be set to “met_point”, “little_r”, “surfrad”, “wwsis”, “aeronet”, “aeronetv2”, “aeronetv3”, or “python”. If passing in ISIS data, use the “surfrad” format flag.
+3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
 4. The **-config file** option is the configuration file for generating time summaries.
 
@@ -511,13 +511,13 @@ Optional arguments for ascii2nc
 
 6. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
 
-7. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the “sid” entry in :numref:`config_options`.
+7. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-9. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the ascii2nc calling sequence is shown below:
 
@@ -538,7 +538,7 @@ Here is an example of processing the same set of observations but using Python e
 .. code-block:: none
 		
 		ascii2nc -format python \
-		“MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
+		"MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
 		sample_ascii_obs_python.nc
 
 Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
@@ -592,7 +592,7 @@ ascii2nc output
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-“obs_vid” variable is replaced with “obs_gc” when the GRIB code is given instead of the variable names. In this case, the global variable “use_var_id” does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
 
 
 MADIS2NC tool
@@ -662,13 +662,13 @@ Optional arguments for madis2nc
 9. The **-mask_poly file** option defines a polyline masking file for filtering the point observations spatially.
 
 
-10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the “sid” entry in  :numref:`config_options`.
+10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the "sid" entry in  :numref:`config_options`.
 
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 
-12. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+12. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 
 13. The **-compress level** option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
@@ -720,7 +720,7 @@ madis2nc output
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-“obs_vid” variable is replaced with “obs_gc” when the GRIB code is given instead of the variable names. In this case, the global variable “use_var_id” does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
 
 
 LIDAR2NC tool
@@ -762,9 +762,9 @@ Optional arguments for lidar2nc
 
 3. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-4. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+4. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-5. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+5. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 lidar2nc output
 ~~~~~~~~~~~~~~~
@@ -889,9 +889,9 @@ Optional arguments for ioda2nc
 
 8. The **-log** file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-9. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the ioda2nc calling sequence is shown below:
 
@@ -1017,7 +1017,7 @@ Required arguments for point2grid
 
 3. The **output_filename** argument is the name of the output NetCDF file to be written.
 
-4. The **-field** string argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, “AOD_Smoke” or “AOD_Dust”: getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
+4. The **-field** string argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for AOD data from GOES16/17), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, "AOD_Smoke" or "AOD_Dust": getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
 
 
 Optional arguments for point2grid
@@ -1025,9 +1025,9 @@ Optional arguments for point2grid
 
 5. The **-config** file option is the configuration file to be used.
 
-6. The **-qc** flags option specifies a comma-separated list of quality control (QC) flags, for example “0,1”. This should only be applied if grid_mapping is set to “goes_imager_projection” and the QC variable exists.
+6. The **-qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". This should only be applied if grid_mapping is set to "goes_imager_projection" and the QC variable exists.
 
-7. The **-adp adp_file_name** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD (“AOD_Dust” or “AOD_Smoke”) from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
+7. The **-adp adp_file_name** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD ("AOD_Dust" or "AOD_Smoke") from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
 
 8. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 
@@ -1043,9 +1043,9 @@ Optional arguments for point2grid
 
 14. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-15. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+15. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Only 4 interpolation methods are applied to the field variables; MIN/MAX/MEDIAN/UW_MEAN. The GAUSSIAN method is applied to the probability variable only. Unlike regrad_data_plane, MAX method is applied to the file variable and Gaussian method to the probability variable with the MAXGAUSS method. If the probability variable is not requested, MAXGAUSS method is the same as MAX method.
     
@@ -1083,13 +1083,13 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 4. The count field which represents the number of point observations that were included calculating the value of the variable at that grid cell.
 
 
-5. The mask field which is a binary field representing the presence or lack thereof of point observations at that grid cell. A value of “1” indicates that there was at least one point observation within the bounds of that grid cell and a value of “0” indicates the lack of point observations at that grid cell.
+5. The mask field which is a binary field representing the presence or lack thereof of point observations at that grid cell. A value of "1" indicates that there was at least one point observation within the bounds of that grid cell and a value of "0" indicates the lack of point observations at that grid cell.
 
 
 6. The probability field which is the probability of the event defined by the **-prob_cat_thresh** command line option. The output variable name includes the threshold used to define the probability. Ranges from 0 to 1.
 
 
-7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either “0” or “1” with “0” meaning the probability value does not exist and a value of “1” meaning that the probability value does exist.
+7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either "0" or "1" with "0" meaning the probability value does not exist and a value of "1" meaning that the probability value does exist.
 
 For MET observation input and CF complaint NetCDF input with 2D time variable: The latest observation time within the target grid is saved as the observation time. If the "valid_time" is configured at the configuration file, the valid_time from the configuration file is saved into the output file.
 

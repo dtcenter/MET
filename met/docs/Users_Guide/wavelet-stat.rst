@@ -59,14 +59,14 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     -  
     - Total
   * -  
-    - o = 1 (e.g., “Yes”)
-    - o = 0 (e.g., “No”)
+    - o = 1 (e.g., "Yes")
+    - o = 0 (e.g., "No")
     -  
-  * - f = 1 (e.g., “Yes”)
+  * - f = 1 (e.g., "Yes")
     - Hits **= a**
     - False Alarms **= b**
     - **a+b**
-  * - f = 0 (e.g., “No”)
+  * - f = 0 (e.g., "No")
     - Misses **= c**
     - Correct rejections **= d**
     - **c+d**
@@ -182,9 +182,9 @@ Optional arguments for wavelet_stat
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-6. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the wavelet_stat calling sequence is listed below:
 
@@ -217,7 +217,7 @@ _______________________
   mask_missing_flag = NONE;
   met_data_dir      = "MET_BASE";
   ps_plot_flag      = TRUE;
-  fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable”;
+  fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable";
                         plot_min = 0.0; plot_max = 0.0; }
   obs_raw_plot      = { ... }
   wvlt_plot         = { ... }
@@ -482,19 +482,19 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
     - Description
   * - FCST_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the forecast field specified by “FIELD_LEVEL”
+    - Raw values for the forecast field specified by "FIELD_LEVEL"
   * - OBS_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the observation field specified by “FIELD_LEVEL”
+    - Raw values for the observation field specified by "FIELD_LEVEL"
   * - DIFF_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the difference field (**f-o**) specified by “FIELD_LEVEL”
+    - Raw values for the difference field (**f-o**) specified by "FIELD_LEVEL"
   * - FCST_FIELD_LEVEL_THRESH
     - tile, scale, x, y
-    - Wavelet scale-decomposition of the forecast field specified by “FIELD_LEVEL_THRESH”
+    - Wavelet scale-decomposition of the forecast field specified by "FIELD_LEVEL_THRESH"
   * - OBS_FIELD_LEVEL_THRESH
     - tile, scale, x, y
-    - Wavelet scale-decomposition of the observation field specified by “FIELD_LEVEL_THRESH”
+    - Wavelet scale-decomposition of the observation field specified by "FIELD_LEVEL_THRESH"
 
 Lastly, the **Wavelet-Stat** tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 

@@ -44,7 +44,7 @@ A. Currently, very few graphics are included. The plotting tools (plot_point_obs
 
 **Q. How do I find the version of the tool I am using?**
 
-A. Type the name of the tool followed by **-version**. For example, type “pb2nc **-version**”.
+A. Type the name of the tool followed by **-version**. For example, type "pb2nc **-version**".
 
 **Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?**
 
@@ -81,11 +81,11 @@ The first place to look for help with individual commands is this user's guide o
 
 **Error while loading shared libraries**
 
-* Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive the following error: “./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot open shared object file: No such file or directory”, you should add the path to the gsl lib (for example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
+* Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive the following error: "./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot open shared object file: No such file or directory", you should add the path to the gsl lib (for example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
 
 **General troubleshooting**
 
-* For configuration files used, make certain to use empty square brackets (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty double quotation marks inside square brackets (e.g. [“”]).
+* For configuration files used, make certain to use empty square brackets (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty double quotation marks inside square brackets (e.g. [""]).
 
 * Have you designated all the required command line arguments?
 

@@ -46,7 +46,7 @@ where :math:`T` is the threshold. The objects are the connected regions where :m
 
 .. math:: F(x,y)=M(x,y)f(x,y).
 
-Thus, two parameters — the radius of influence :math:`R`, and the threshold :math:`T` — control the entire process of resolving objects in the raw data field.
+Thus, two parameters - the radius of influence :math:`R`, and the threshold :math:`T` - control the entire process of resolving objects in the raw data field.
 
 An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. It shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part (b) shows the convolved field, and part (c) shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
@@ -148,7 +148,7 @@ Optional arguments for mode
 
 7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the MODE calling sequence is listed below:
 
@@ -641,7 +641,7 @@ This first file uses the following naming convention:
 
 where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the forecast variable and vertical level being used, *OBS\_VAR\_LVL* is the observation variable and vertical level being used, *HHMMSSL* indicates the forecast lead time, *YYYYMMDD\_HHMMSSV* indicates the forecast valid time, and *HHMMSSA* indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the *ct\_stats\_flag* option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40–51 and fill data in columns 19–39.
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19-39 and fill data in columns 40-51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40-51 and fill data in columns 19-39.
 
 These object identifiers are described in :numref:`MODE_object_attribute`. 
 
