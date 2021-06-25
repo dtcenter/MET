@@ -82,9 +82,9 @@ _________________________
 
 FS_RMS and OS_RMS are the root-mean-square values of the forecast and observed wind speeds.
 
-.. math:: \text{FS RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
+.. math:: \text{FS\_RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
 
- \text{OS RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
+ \text{OS\_RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
 
 ___________________________
 
@@ -116,16 +116,16 @@ ________________________
 
 FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed wind vectors. Note that this is *not* the same as the average forecast and observed wind speeds (*ie.,* the length of an average vector :math:`\neq` the average length of the vector).
 
-.. math:: \text{FBAR SPEED } = | \mathbf{F}_a |
+.. math:: \text{FBAR\_SPEED } = | \mathbf{F}_a |
 	  
-	  \text{OBAR SPEED } = | \mathbf{O}_a |
+	  \text{OBAR\_SPEED } = | \mathbf{O}_a |
 
 ________________________
 
 
 VDIFF_SPEED is the length (*ie. speed*) of the vector difference between the average forecast and average observed wind vectors.
 
-.. math:: \text{VDIFF SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
+.. math:: \text{VDIFF\_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
 
 Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or , equivalently, that :math:`| \text{SPEED_ERR} | \leq \text{VDIFF_SPEED}`.
 
@@ -134,30 +134,30 @@ _________________________
 
 VDIFF_DIR is the direction of the vector difference of the average forecast and average observed wind vectors. Note that this is {\it not} the same as the difference in direction of the average forecast and average observed wind vectors. This latter quantity would be FDIR :math:`-` ODIR.
 
-.. math:: \text{VDIFF DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
+.. math:: \text{VDIFF\_DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
 
 _________________________
 
 
 SPEED_ERR is the difference in the lengths (speeds) of the average forecast and average observed wind vectors. (See the discussion of VDIFF_SPEED above.)
 
-.. math:: \text{SPEED ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBA\R_SPEED } - \text{ OBAR SPEED}
+.. math:: \text{SPEED_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR_SPEED } - \text{ OBAR_SPEED}
 
 ___________________________
 
 
 SPEED_ABSERR is the absolute value of SPEED_ERR. Note that we have SPEED_ABSERR :math:`\leq` VDIFF_SPEED (see the discussion of VDIFF_SPEED above).
 
-.. math:: \text{SPEED ABSERR } = | \text{SPEED ERR} |
+.. math:: \text{SPEED_ABSERR } = | \text{SPEED_ERR} |
 
 __________________________
 
 DIR_ERR is the signed angle between the directions of the average forecast and average observed wind vectors. Positive if the forecast vector is counterclockwise from the observed vector.
 
-.. math:: \text{DIR ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a) 
+.. math:: \text{DIR_ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a) 
 
 __________________________
 	  
 DIR_ABSERR is the absolute value of DIR_ERR. In other words, it's an unsigned angle rather than a signed angle.
 
-.. math:: \text{DIR ABSERR } = | \text{DIR ERR}|
+.. math:: \text{DIR_ABSERR } = | \text{DIR_ERR}|

@@ -147,7 +147,7 @@ Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
 H_RATE is defined as
 
-.. math:: \text{H RATE } = \frac{n_{11}}{T}.
+.. math:: \text{H\_RATE } = \frac{n_{11}}{T}.
 
 
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
@@ -581,11 +581,11 @@ The anomaly correlation coefficient is equivalent to the Pearson correlation coe
 
 The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
-.. math:: \text{ANOM CORR } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
+.. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
-.. math:: \text{Anomaly Correlation Raw } = \frac{ \bar{(f - c)(a - c)}}{ \sqrt{\bar{(f - c)^2} \bar{(a - c)^2}}}
+.. math:: \text{Anomaly Correlation Raw } = \frac{ \overline{(f - c)(a - c)}}{ \sqrt{\overline{(f - c)^2} \overline{(a - c)^2}}}
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
