@@ -320,7 +320,7 @@ The plots in :numref:`plotting_Gilbert_skill_score` show time series of frequenc
 
 .. _plotting_Gilbert_skill_score:
 
-.. figure:: figure/plotting_Gilbert_skill_score.png
+.. figure:: figure/plotting-Gilbert-skill-score.png
 
    Time series of forecast area bias and Gilbert Skill Score for four model configurations (different lines) stratified by time-of-day.
 
@@ -333,7 +333,7 @@ When using the MODE tool, it is possible to think of matched objects as hits and
 
 .. _plotting_verification:
 
-.. figure:: figure/plotting_verification.png
+.. figure:: figure/plotting-verification.png
 
    Traditional verification scores applied to output of the MODE tool, computed by defining matched observed objects to be hits, unmatched observed objects to be misses, and unmatched forecast objects to be false alarms; weighted by object area. Bar plots show numbers (penultimate row) and areas (bottom row) of observed and forecast objects, respectively.
 
