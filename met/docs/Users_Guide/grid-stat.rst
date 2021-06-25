@@ -714,10 +714,10 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - S1
     - S1 score
   * - 31
-    - S1_OG
+    - S1\_OG
     - S1 score with respect to observed gradient
   * - 32
-    - FGOG_RATIO
+    - FGOG\_RATIO
     - Ratio of forecast and observed gradients
   * - 33
     - DX
@@ -760,50 +760,50 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - HAUSDORFF
     - Hausdorff Distance
   * - 31
-    - MED_FO
+    - MED\_FO
     - Mean-error Distance from observation to forecast
   * - 32
-    - MED_OF
+    - MED\_OF
     - Mean-error Distance from forecast to observation
   * - 33
-    - MED_MIN
-    - Minimum of MED_FO and MED_OF
+    - MED\_MIN
+    - Minimum of MED\_FO and MED\_OF
   * - 34
-    - MED_MAX
-    - Maximum of MED_FO and MED_OF
+    - MED\_MAX
+    - Maximum of MED\_FO and MED\_OF
   * - 35
-    - MED_MEAN
-    - Mean of MED_FO and MED_OF
+    - MED\_MEAN
+    - Mean of MED\_FO and MED\_OF
   * - 36
-    - FOM_FO
+    - FOM\_FO
     - Pratt's Figure of Merit from observation to forecast
   * - 37
-    - FOM_OF
+    - FOM\_OF
     - Pratt's Figure of Merit from forecast to observation
   * - 38
-    - FOM_MIN
-    - Minimum of FOM_FO and FOM_OF
+    - FOM\_MIN
+    - Minimum of FOM\_FO and FOM\_OF
   * - 39
-    - FOM_MAX
-    - Maximum of FOM_FO and FOM_OF
+    - FOM\_MAX
+    - Maximum of FOM\_FO and FOM\_OF
   * - 40
-    - FOM_MEAN
-    - Mean of FOM_FO and FOM_OF
+    - FOM\_MEAN
+    - Mean of FOM\_FO and FOM\_OF
   * - 41
-    - ZHU_FO
+    - ZHU\_FO
     - Zhu's Measure from observation to forecast
   * - 42
-    - ZHU_OF
+    - ZHU\_OF
     - Zhu's Measure from forecast to observation
   * - 43
-    - ZHU_MIN
-    - Minimum of ZHU_FO and ZHU_OF
+    - ZHU\_MIN
+    - Minimum of ZHU\_FO and ZHU\_OF
   * - 44
-    - ZHU_MAX
-    - Maximum of ZHU_FO and ZHU_OF
+    - ZHU\_MAX
+    - Maximum of ZHU\_FO and ZHU\_OF
   * - 45
-    - ZHU_MEAN
-    - Mean of ZHU_FO and ZHU_OF
+    - ZHU\_MEAN
+    - Mean of ZHU\_FO and ZHU\_OF
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
