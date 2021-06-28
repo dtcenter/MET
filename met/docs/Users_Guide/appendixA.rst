@@ -31,12 +31,14 @@ __________________________
 		 "mask_file" rather than having to create a set of
 		 lat/lon points. 
 
-		 Here's an example of that, using data from the MET tarball: 
+		 Here's an example of that, using data from the MET tarball:
 
-		 ${MET_BUILD_BASE}/bin/gen_vx_mask \
-		 data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-		 data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
-		 mask.nc -name MY_MASK
+		 .. code-block:: ini
+
+		   ${MET_BUILD_BASE}/bin/gen_vx_mask \
+		   data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+		   data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
+		   mask.nc -name MY_MASK
  
 		 If the result contains slightly different matched pair
 		 counts (621, 619 and 617).
@@ -44,12 +46,12 @@ __________________________
 
 		 1.
 		 The polyline mask for the different grids is producing
-		    slightly different results
-		 and the differences lie along the boundary of the mask.
+		 slightly different results and the differences lie
+		 along the boundary of the mask.
 
 		 2.
 		 There are some missing data values somewhere in the
-		    forecast and observations
+		 forecast and observations
 		 causing slightly different matched pairs.
 		
 		 To investigate this, run a configuration of point_stat to
