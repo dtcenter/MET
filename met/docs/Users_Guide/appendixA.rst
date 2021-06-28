@@ -10,8 +10,7 @@ __________________________
 
 .. panels::
 
-   .. dropdown:: File_IO - How to improve the speed of MET Tools
-		 with Gen_Vx_Mask
+   .. dropdown:: File_IO - How to improve the speed of MET Tools with Gen_Vx_Mask
 
 		 The main reason to use gen_vx_mask is to make the MET
 		 statistics tools (i.e. point_stat or grid_stat) run
