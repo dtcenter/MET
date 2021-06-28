@@ -8,8 +8,6 @@ __________________________
 
 **File_IO**
 
-.. panels::
-
   .. dropdown:: File_IO - How to improve the speed of MET Tools with
  		Gen_Vx_Mask
 
