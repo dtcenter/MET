@@ -10,7 +10,8 @@ __________________________
 
 .. panels::
 
-   .. dropdown:: File_IO - How to improve the speed of MET Tools with Gen_Vx_Mask
+   .. dropdown:: File_IO - How to improve the speed of MET Tools with
+		 Gen_Vx_Mask
 
 		 The main reason to use gen_vx_mask is to make the MET
 		 statistics tools (i.e. point_stat or grid_stat) run
@@ -37,23 +38,27 @@ __________________________
 		 data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
 		 mask.nc -name MY_MASK
  
-		If the result contains slightly different matched pair counts (621, 619 and 617).
-		There could be a couple of answers.
+		 If the result contains slightly different matched pair
+		 counts (621, 619 and 617).
+		 There could be a couple of answers.
 
-		#. The polyline mask for the different grids is producing slightly different results
-		and the differences lie along the boundary of the mask.
-		#. There are some missing data values somewhere in the forecast and observations
-		causing slightly different matched pairs.
+		 1.
+		 The polyline mask for the different grids is producing
+		    slightly different results
+		 and the differences lie along the boundary of the mask.
+
+		 2.
+		 There are some missing data values somewhere in the
+		    forecast and observations
+		 causing slightly different matched pairs.
 		
-		To investigate this, run a configuration of point_stat to dump out the MPR
-		lines for those three runs. Then take a closer look at them to see where the
-		differences lie. Identifying the stations where the differences occur is the
-		first step in finding an explanation.
-
-   .. dropdown:: :fa:`eye,mr-1` test with eye
-
-		 hidden content
-	 
+		 To investigate this, run a configuration of point_stat to
+		 dump out the MPR
+		 lines for those three runs. Then take a closer look at
+		 them to see where the
+		 differences lie. Identifying the stations where the
+		 differences occur is the
+		 first step in finding an explanation.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
