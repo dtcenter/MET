@@ -66,8 +66,6 @@ __________________________
 
 A. MET relies upon the object-oriented aspects of C++, particularly in using the MODE tool. Due to time and budget constraints, it also makes use of a pre-existing forecast verification library that was developed at NCAR.
 
-.. panels::
-
   .. dropdown:: TEST
 
 		The main reason to use gen_vx_mask is to make the MET
