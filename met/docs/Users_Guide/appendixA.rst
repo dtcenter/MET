@@ -18,8 +18,7 @@ __________________________
    .. dropdown:: :fa:`eye,mr-1` test with eye
 
 		 hidden content
-
-   ---		 
+	 
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
