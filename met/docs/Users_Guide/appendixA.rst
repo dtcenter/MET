@@ -13,8 +13,6 @@ __________________________
 
 		 Content in dropdown
 
-   ___
-
    .. dropdown:: :fa:`eye,mr-1` test with eye
 
 		 hidden content
