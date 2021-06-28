@@ -68,8 +68,7 @@ A. MET relies upon the object-oriented aspects of C++, particularly in using the
 
 .. panels::
 
-  .. dropdown:: File_IO - How to improve the speed of MET Tools with
-		Gen_Vx_Mask TEST
+  .. dropdown:: TEST
 
 		The main reason to use gen_vx_mask is to make the MET
 		stati TESTING
