@@ -60,15 +60,55 @@ __________________________
 		differences occur is the
 		first step in finding an explanation.
 
+  .. dropdown:: File_IO - How to use map_data using China as an example.
+
+		This example starts with a 0.5 degree GFS and completes
+		the following steps:
+
+		Use the regrid_data_plane tool to regrid 2m temperature
+		to a smaller domain centered on China:
+
+		  .. code-block:: ini
+				  
+				  ${MET_BUILD_BASE}/bin/regrid_data_plane \ 
+				  gfs_2012040900_F012.grib \ 
+				  'latlon 160 80 15.0 60.0 0.5 0.5' \ 
+				  china_tmp_2m.nc \ 
+				  -field 'name="TMP"; level="Z2";'
+
+		Run plot_data_plane to plot with the default map background:
+
+		.. code-block:: ini
+				
+				${MET_BUILD_BASE}/bin/plot_data_plane 
+				china_tmp_2m.nc china_tmp_2m.ps \ 
+				'name="TMP_Z2"; level="(*,*)";'
+				Re-run but pointing only to the admin_China_data: 
+				${MET_BUILD_BASE}/bin/plot_data_plane 
+				china_tmp_2m.nc china_tmp_2m_admin.ps \ 
+				'name="TMP_Z2"; level="(*,*)"; 
+				map_data = { source = [ 
+				{ file_name = 
+				"${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; 
+				} 
+				]; 
+				}'
+				
+		An arbitrary number of map_data "file_name" entries
+		can be listed. However, using "country_data" doesn't
+		look very good with the "admin_China_data".
+		
+		To apply this to any MET tool runs, just cut-and-paste
+		the "map_data" section listed above into the appropriate
+		config file. That will overwrite the default settings it
+		reads from the ConfigMapData file. Alternatively, update
+		the default map data files in that ConfigMapData file.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in using the MODE tool. Due to time and budget constraints, it also makes use of a pre-existing forecast verification library that was developed at NCAR.
 
-  .. dropdown:: TEST
 
-		The main reason to use gen_vx_mask is to make the MET
-		stati TESTING
-   
 **Q. Why is PrepBUFR used?**
 
 A. The first goal of MET was to replicate the capabilities of existing verification packages and make these capabilities available to both the DTC and the public. 
