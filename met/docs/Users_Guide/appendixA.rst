@@ -240,6 +240,86 @@ A.  MET does not use the Fortran-like fixed width format in its
      It has been recommended that a configuration option be added to
      MET to disable the use of scientific notation. That enhancement
      is planned for a future release.
+
+Gen_Vx_Mask
+~~~~~~~~~~~
+
+**Q. Gen_Vx_Mask - How do I Mask Region Intersection between Stations and
+Polyline?**
+
+I have a list of stations to use for verification. I also have a poly
+region defined. If I specify both of these should the result
+be a union of them?
+ 
+A.  These settings are defined in the "mask" section of the Point-Stat
+    configuration file. You can define masking regions in one of 3 ways,
+    as a "grid", a "poly" line file, or a "sid" list of station ID's.
+    
+    If you specify one entry for "poly" and one entry for "sid", you
+    should see output for those two different masks. Note that each of
+    these settings is an array of values, as indicated by the square
+    brackets "[]" in the default config file. If you specify 5 grids,
+    3 poly's, and 2 SID lists, you'd get output for those 10 separate
+    masking regions. Point-Stat does not compute unions or intersections
+    of masking regions. Instead, they are each processed separately.
+    
+    Is it true that you really want to use a polyline to define an area
+    and then use a SID list to capture additional points outside of
+    that polyline?
+    
+    If so, your options are:
+
+    - Define one single SID list which include all the points currently
+      inside the polyline as well as the extra ones outside. 
+
+    - Continue verifying using one polyline and one SID list and
+      write partial sums and contingency table counts. 
+
+      Then aggregate the results together by running a STAT-Analysis job.
+
+**Q. Gen_Vx_Mask - What are some ways of Defining Masking Regions?**
+
+A.  Here is an example to define some new masking regions. Suppose we
+    have a sample file, POLAND.poly, but that polyline file
+    contains "^M" characters at the end of each line. Those show up in
+    files generated on Windows machines. Running this polyline file
+    through the gen_vx_mask, the "^M" causes a runtime error since
+    NetCDF doesn't like including that character in the NetCDF variable name.
+
+    One easy way to strip them off is the "dos2unix" utility: 
+
+    dos2unix POLAND.poly
+
+    Grab a sample GFS file: 
+
+      .. code-block:: ini
+		      
+		      wget 
+		      http://www.ftp.ncep.noaa.gov/data/nccf/com/gfs/prod/gfs/2016102512/gfs.t12z.pgrb2.0p50.f000
+		      
+    Use the MET regrid_data_plane tool to put some data on a
+    lat/lon grid over Europe:
+
+      .. code-block:: ini
+
+		      ${MET_BUILD_BASE}/bin/regrid_data_plane gfs.t12z.pgrb2.0p50.f000 \
+		      'latlon 100 100 25 0 0.5 0.5' gfs_euro.nc -field 'name="TMP"; level="Z2";'
+		      
+    Run the MET gen_vx_mask tool to apply your polyline to the European domain:
+
+      .. code-block:: ini
+
+		      ${MET_BUILD_BASE}/bin/gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
+
+    Run the MET plot_data_plane tool to display the resulting mask field:
+
+      .. code-block:: ini
+		      
+		      ${MET_BUILD_BASE}/bin/plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND"; level="(*,*)";'
+
+    In this example, the mask is in roughly the right spot, but there
+    are obvious problems with the latitude and longitude values used
+    to define that mask for Poland.
     
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
