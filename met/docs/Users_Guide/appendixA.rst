@@ -131,15 +131,19 @@ A.  In order to use gridded NetCDF files in MET, the files need to
 
     1.
     Dimensions should be named "lat" and "lon"
+    
     2.
     The "lat" and "lon" variable are **NOT** required
+    
     3.
-    Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions 
+    Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions
+    
     4.
     Gridded variables should include the attributes listed in the example
     (for timing info, only the init_time_ut, valid_time_ut, and
     accum_time_sec are actually used. "ut" stands for unix time,
-    the number of seconds since Jan 1, 1970). 
+    the number of seconds since Jan 1, 1970).
+    
     5.
     Global attributes should include the grid/projection information.
 
