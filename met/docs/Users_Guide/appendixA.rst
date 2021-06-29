@@ -207,6 +207,30 @@ A.  Regarding the timing information in the NetCDF variable attributes...
 
     Define the lat/lon's that needs to be included in the output.
 
+**Q. How does fixed-width output format work?**
+
+A.  MET does not use the Fortran-like fixed width format in its
+    ASCII output file. Instead, the column widths are adjusted for each
+    run to insert at least one space between adjacent columns. The header
+    columns of the MET output contain user-defined strings which may be
+    of arbitrary length. For example, columns such as MODEL, OBTYPE, and
+    DESC may be set by the user to any string value. Additionally, the
+    amount of precision written is also configurable. The
+    "output_precision" config file entry can be changed from its default
+    value of 5 decimal places... up to 12 decimal places. That too would
+    impact the column widths of the output.
+    
+    Due to these issues, it is not possible to select a reasonable fixed
+    width for each column ahead of time. The AsciiTable class in MET does
+    a lot of work to line up the output columns, making sure there's
+    at least one space between them.
+    
+    If a fixed-width format is needed, the easiest option would be
+    writing a script to post-process the MET output into the fixed-width
+    format that is needed or that the code expects.
+
+    
+    
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in
