@@ -269,10 +269,10 @@ A.  These settings are defined in the "mask" section of the Point-Stat
     
     If so, your options are:
 
-    - Define one single SID list which include all the points currently
+    * Define one single SID list which include all the points currently
       inside the polyline as well as the extra ones outside. 
 
-    - Continue verifying using one polyline and one SID list and
+    * Continue verifying using one polyline and one SID list and
       write partial sums and contingency table counts. 
 
       Then aggregate the results together by running a STAT-Analysis job.
@@ -288,7 +288,9 @@ A.  Here is an example to define some new masking regions. Suppose we
 
     One easy way to strip them off is the "dos2unix" utility: 
 
-    dos2unix POLAND.poly
+     .. code-block:: ini
+
+		     dos2unix POLAND.poly
 
     Grab a sample GFS file: 
 
