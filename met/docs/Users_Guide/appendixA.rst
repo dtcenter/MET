@@ -391,6 +391,29 @@ A. There is a way to accomplish defining intersections and unions of
    masking logic... and then pass the output mask file to Grid- Stat
    in its configuration file.
 
+**Q. Grid_Stat -  How do I set Neighborhood Methods Boundaries?**
+
+A.  When computing fractions skill score, MET uses the "vld_thresh"
+    setting in the configuration file to decide how to handle data
+    along the edge of the domain. Let us say it is computing a
+    fractional coverage field using a 5x5 neighborhood and it is at
+    the edge of the domain. 15 points contain valid data and 10 points
+    are outside the domain. Grid-Stat computes the valid data ratio
+    as 15/25 = 0.6. Then it applies the valid data threshold. Suppose
+    vld_thresh = 0.5 ... since 0.6 > 0.5 MET will compute a fractional
+    coverage value for that point using the 15 valid data points. Next
+    suppose vld_thresh = 1.0 ... since 0.6 is less than 1.0, MET
+    will just skip that point by setting it to bad data.
+
+    Setting vld_thresh = 1.0 will ensure that FSS will only be computed
+    at points where all NxN values contain valid data. Setting it to
+    0.5 only requires half of them. 
+
+    Using grid_stat to evaluate precipitation, whose minimum value
+    should be 0. If the thresholding the data greater-than-or-equal-to
+    0 (>= 0), that will always evaluate to true for precipitation.
+    Consider using strictly greater-than 0 (>0) instead.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in
