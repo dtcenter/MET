@@ -6,7 +6,8 @@ Appendix A FAQs & How do I ... ?
 Frequently Asked Questions
 __________________________
 
-**File_IO**
+File_IO
+~~~~~~~
 
 **Q. File_IO - How do I improve the speed of MET Tools using Gen_Vx_Mask?**
 
@@ -110,7 +111,7 @@ config file. That will overwrite the default settings it
 reads from the ConfigMapData file. Alternatively, update
 the default map data files in that ConfigMapData file.
 
-**Q. what is another way to understand the Number of Matched Pairs?**
+**Q. What is another way to understand the Number of Matched Pairs?**
 
 A.  In this example the dimension of the grid is 37x37. Thus, up to
     1369 matched pairs are possible. However, if the forecast or
@@ -119,6 +120,28 @@ A.  In this example the dimension of the grid is 37x37. Thus, up to
     an example netCDF file. If the forecast field contains missing data
     around the edge of the domain, then that is a reason there may be
     992 matched pairs instead of 1369.
+
+**Q.  What is required for formatting files in NetCDF?**
+
+A.  In order to use gridded NetCDF files in MET, the files need to
+    look like the output of the pcp_combine tool.
+    Listed below is the header from one of the NetCDF files from
+    pcp_combine created by the METv5.1 test scripts. Here are the
+    required parts.
+
+    1.
+    Dimensions should be named "lat" and "lon"
+    2.
+    The "lat" and "lon" variable are **NOT** required
+    3.
+    Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions 
+    4.
+    Gridded variables should include the attributes listed in the example
+    (for timing info, only the init_time_ut, valid_time_ut, and
+    accum_time_sec are actually used. "ut" stands for unix time,
+    the number of seconds since Jan 1, 1970). 
+    5.
+    Global attributes should include the grid/projection information.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
