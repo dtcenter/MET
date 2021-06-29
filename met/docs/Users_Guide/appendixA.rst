@@ -414,6 +414,33 @@ A.  When computing fractions skill score, MET uses the "vld_thresh"
     0 (>= 0), that will always evaluate to true for precipitation.
     Consider using strictly greater-than 0 (>0) instead.
 
+**Q. Grid_Stat - How do I use Neighborhood Methods to Compute Fraction
+Skill Score**
+
+A.  It is possible to compute the fractions skill score for comparing
+    forecast and observed thunderstorms. When computing FSS, first
+    threshold the fields to define events and non-events. Then look at
+    successively larger and larger areas around each grid point to see
+    how the forecast event frequency compares to the observed event
+    frequency. Applying this to thunderstorms would be reasonable.
+
+    Also, applying it to rainfall (and monsoons) would be fine. Keep in
+    mind that Grid-Stat is the tool that computes FSS. Grid-Stat will
+    need to be run once for each evaluation time. As an example,
+    evaluating once per day, run Grid-Stat 122 times for the 122 days
+    of a monsoon season. This will result in 122 FSS values. These
+    can be viewed as a time series, or the Stat-Analysis tool could
+    be used to aggregate them together into a single FSS value, like this:
+
+     .. code-block:: ini
+		     
+		     stat_analysis -job aggregate -line_type NBRCNT \
+
+		     -lookin out/grid_stat
+
+   Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
+   that capture the "events" that are of interest in studying.    
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in
