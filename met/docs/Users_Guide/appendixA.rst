@@ -111,7 +111,7 @@ config file. That will overwrite the default settings it
 reads from the ConfigMapData file. Alternatively, update
 the default map data files in that ConfigMapData file.
 
-**Q. What is another way to understand the Number of Matched Pairs?**
+**Q. FILE_IO - What is another way to understand the Number of Matched Pairs?**
 
 A.  In this example the dimension of the grid is 37x37. Thus, up to
     1369 matched pairs are possible. However, if the forecast or
@@ -121,7 +121,7 @@ A.  In this example the dimension of the grid is 37x37. Thus, up to
     around the edge of the domain, then that is a reason there may be
     992 matched pairs instead of 1369.
 
-**Q.  What is required for formatting files in NetCDF?**
+**Q.  FILE_IO - What is required for formatting files in NetCDF?**
 
 A.  In order to use gridded NetCDF files in MET, the files need to
     look like the output of the pcp_combine tool.
@@ -147,7 +147,7 @@ A.  In order to use gridded NetCDF files in MET, the files need to
     5.
     Global attributes should include the grid/projection information.
 
-**Q. How do I choose a Time Slice in a NetCDF file?**
+**Q. FILE_IO - How do I choose a Time Slice in a NetCDF file?**
 
 A.  When processing NetCDF files, the level information needs to be
     specified to tell MET which 2D slice of data to use. There is
@@ -165,6 +165,47 @@ A.  When processing NetCDF files, the level information needs to be
 
     Since these indices are 0-based, this will select the 6-th
     time slice of the APCP data and plot it.
+
+**Q. FILE_IO - How do I use the UNIX Time Conversion?**
+
+A.  Regarding the timing information in the NetCDF variable attributes...
+
+      .. code-block:: ini
+		      
+		      APCP_24:init_time_ut = 1306886400 ;
+		      
+“ut” stands for UNIX time, which is the number of seconds
+since Jan 1, 1970. It is a convenient way of storing timing
+information since it is easy to add/subtract. The UNIX date command
+can be used to convert back/forth between unix time and time strings:
+
+1.
+Convert unix time to ymd_hms date
+
+  .. code-block:: ini
+		      
+  		  date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
+ 
+2.
+Convert ymd_hms to unix date
+
+  .. code-block:: ini
+		      
+		  date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
+		  
+Regarding TRMM data, it may be easier to work with the binary data and
+use the trmmbin2nc.R script described on this page:
+http://www.dtcenter.org/met/users/downloads/observation_data.php
+
+Follow the TRMM binary links to either the 3 or 24-hour accumulations,
+save the files, and run them through that script. That is the faster
+and easier than trying to get an ASCII dump. That Rscript can also
+subset the TRMM data if needed. Look for the section of it titled: 
+
+3.
+Output domain specification 
+
+Define the lat/lon's that needs to be included in the output.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
