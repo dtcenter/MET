@@ -324,7 +324,73 @@ A.  Here is an example to define some new masking regions. Suppose we
     In this example, the mask is in roughly the right spot, but there
     are obvious problems with the latitude and longitude values used
     to define that mask for Poland.
-    
+
+Grid_Stat
+~~~~~~~~~
+
+**Q. Grid_Stat - How do I define a complex masking region?**
+
+A. There is a way to accomplish defining intersections and unions of
+   multiple fields to define masks through additional steps. Prior to
+   running Grid-Stat, run the Gen-Poly-Mask tool one or more times to
+   define a more complex masking area by thresholding multiple fields.
+   The syntax of doing so gets a little tricky.
+   
+   Here's an example. Let's say there is a forecast GRIB file (fcst.grb)
+   which contains 2 records... one for 2-m temperature and a second for
+   6-hr accumulated precip. We only want grid points that are below
+   freezing with non-zero precip. We'll run gen_vx_mask twice...
+   once to define the temperature mask and a second time to intersect
+   that with the precip mask:
+
+    .. code-block:: ini
+
+		    gen_vx_mask fcst.grb fcst.grb tmp_mask.nc \ 
+		    -type data \ 
+		    -mask_field 'name="TMP"; level="Z2"' -thresh le273
+		    gen_vx_mask tmp_mask.nc fcst.grb tmp_and_precip_mask.nc \ 
+		    -type data \ 
+		    -input_field 'name="TMP_Z2"; level="(*,*)";' \ 
+		    -mask_field 'name="APCP"; level="A6";' -thresh gt0 \ 
+		    -intersection -name "FREEZING_PRECIP"
+
+   The first one is pretty straight-forward. 
+
+   1.
+   The input field (fcst.grb) defines the domain for the mask.
+
+   2.
+   Since we're doing data masking and the data we want lives in
+   fcst.grb, we pass it in again as the mask_file.
+
+   3.
+   Lastly "-mask_field" specifies the data we want from the mask file
+   and "-thresh" specifies the event threshold.
+
+   The second call is the tricky one... it says...
+
+   1.
+   Do data masking (-type data)
+
+   2.
+   Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
+
+   3.
+   Define the mask by reading 6-hour precip from the mask file
+   (fcst.grb) and looking for values > 0 (-mask_field)
+
+   4.
+   Apply intersection logic when combining the "input" value with
+   the "mask" value (-insersection).
+
+   5.
+   Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
+   This is totally optional, but convenient.
+
+   Script up multiple calls to gen_vx_mask to apply to complex
+   masking logic... and then pass the output mask file to Grid- Stat
+   in its configuration file.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A. MET relies upon the object-oriented aspects of C++, particularly in
