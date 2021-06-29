@@ -8,101 +8,108 @@ __________________________
 
 **File_IO**
 
-  .. dropdown:: File_IO - How to improve the speed of MET Tools with
- 		Gen_Vx_Mask
+**File_IO - How do I improve the speed of MET Tools with
+ 		Gen_Vx_Mask**
 
-		The main reason to use gen_vx_mask is to make the MET
-		statistics tools (i.e. point_stat or grid_stat) run
-		faster. It can be slow to figure out which points are
-		inside/outside a polyline region if the polyline contains
-		thousands of points. In that case, run gen_vx_mask to
-		create the mask once rather than having to recreate it
-		each time a MET statistics tool is run. But if the
-		polyline only contains a small number of points,
-		running gen_vx_mask first would only save a second or two.
+A. The main reason to use gen_vx_mask is to make the MET
+statistics tools (i.e. point_stat or grid_stat) run
+faster. It can be slow to figure out which points are
+inside/outside a polyline region if the polyline contains
+thousands of points. In that case, run gen_vx_mask to
+create the mask once rather than having to recreate it
+each time a MET statistics tool is run. But if the
+polyline only contains a small number of points,
+running gen_vx_mask first would only save a second or two.
 		 
-		In the usage statement for gen_vx_mask, the "mask_file"
-		is an ASCII Lat/Lon polyline file or gridded data file
-		defining the masking region.
+In the usage statement for gen_vx_mask, the "mask_file"
+is an ASCII Lat/Lon polyline file or gridded data file
+defining the masking region.
 
-		So pass a gridded data file for the nest as the
-		"mask_file" rather than having to create a set of
-		lat/lon points. 
+So pass a gridded data file for the nest as the
+"mask_file" rather than having to create a set of
+lat/lon points. 
 
-		Here's an example of that, using data from the MET tarball:
+Here's an example of that, using data from the MET tarball:
 
-		  .. code-block:: ini
+  .. code-block:: ini
 
-		     ${MET_BUILD_BASE}/bin/gen_vx_mask \
-		     data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-		     data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
-		     mask.nc -name MY_MASK
+		  ${MET_BUILD_BASE}/bin/gen_vx_mask \
+		  data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+		  data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
+		  mask.nc -name MY_MASK
  
-		If the result contains slightly different matched pair
-		counts (621, 619 and 617).
-		There could be a couple of answers.
+If the result contains slightly different matched pair
+counts (621, 619 and 617).
+There could be a couple of answers.
 
-		1.
-		The polyline mask for the different grids is producing
-		slightly different results and the differences lie
-		along the boundary of the mask.
+1.
+The polyline mask for the different grids is producing
+slightly different results and the differences lie
+along the boundary of the mask.
 
-		2.
-		There are some missing data values somewhere in the
-		forecast and observations
-		causing slightly different matched pairs.
+2.
+There are some missing data values somewhere in the
+forecast and observations
+causing slightly different matched pairs.
 		
-		To investigate this, run a configuration of point_stat to
-		dump out the MPR
-		lines for those three runs. Then take a closer look at
-		them to see where the
-		differences lie. Identifying the stations where the
-		differences occur is the
-		first step in finding an explanation.
+To investigate this, run a configuration of point_stat to
+dump out the MPR
+lines for those three runs. Then take a closer look at
+them to see where the
+differences lie. Identifying the stations where the
+differences occur is the
+first step in finding an explanation.
 
-  .. dropdown:: File_IO - How to use map_data using China as an example.
+  **File_IO - How do I use map_data? Use China as an example.**
 
-		This example starts with a 0.5 degree GFS and completes
-		the following steps:
+This example starts with a 0.5 degree GFS and completes
+the following steps:
 
-		Use the regrid_data_plane tool to regrid 2m temperature
-		to a smaller domain centered on China:
+1.
+Use the regrid_data_plane tool to regrid 2m temperature
+to a smaller domain centered on China:
 
-		  .. code-block:: ini
+  .. code-block:: ini
 				  
-				  ${MET_BUILD_BASE}/bin/regrid_data_plane \ 
-				  gfs_2012040900_F012.grib \ 
-				  'latlon 160 80 15.0 60.0 0.5 0.5' \ 
-				  china_tmp_2m.nc \ 
-				  -field 'name="TMP"; level="Z2";'
+		  ${MET_BUILD_BASE}/bin/regrid_data_plane \ 
+		  gfs_2012040900_F012.grib \ 
+		  'latlon 160 80 15.0 60.0 0.5 0.5' \ 
+		  china_tmp_2m.nc \ 
+		  -field 'name="TMP"; level="Z2";'
 
-		Run plot_data_plane to plot with the default map background:
+2.
+Run plot_data_plane to plot with the default map background:
 
-		.. code-block:: ini
+  .. code-block:: ini
 				
-				${MET_BUILD_BASE}/bin/plot_data_plane 
-				china_tmp_2m.nc china_tmp_2m.ps \ 
-				'name="TMP_Z2"; level="(*,*)";'
-				Re-run but pointing only to the admin_China_data: 
-				${MET_BUILD_BASE}/bin/plot_data_plane 
-				china_tmp_2m.nc china_tmp_2m_admin.ps \ 
-				'name="TMP_Z2"; level="(*,*)"; 
-				map_data = { source = [ 
-				{ file_name = 
-				"${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; 
-				} 
-				]; 
-				}'
-				
-		An arbitrary number of map_data "file_name" entries
-		can be listed. However, using "country_data" doesn't
-		look very good with the "admin_China_data".
+		${MET_BUILD_BASE}/bin/plot_data_plane 
+		china_tmp_2m.nc china_tmp_2m.ps \ 
+		'name="TMP_Z2"; level="(*,*)";'
+
+3.
+Re-run but pointing only to the admin_China_data:
+
+  .. code-block:: ini
 		
-		To apply this to any MET tool runs, just cut-and-paste
-		the "map_data" section listed above into the appropriate
-		config file. That will overwrite the default settings it
-		reads from the ConfigMapData file. Alternatively, update
-		the default map data files in that ConfigMapData file.
+		${MET_BUILD_BASE}/bin/plot_data_plane 
+		china_tmp_2m.nc china_tmp_2m_admin.ps \ 
+		'name="TMP_Z2"; level="(*,*)"; 
+		map_data = { source = [ 
+		{ file_name = 
+		"${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; 
+		} 
+		]; 
+		}'
+				
+An arbitrary number of map_data "file_name" entries
+can be listed. However, using "country_data" doesn't
+look very good with the "admin_China_data".
+		
+To apply this to any MET tool runs, just cut-and-paste
+the "map_data" section listed above into the appropriate
+config file. That will overwrite the default settings it
+reads from the ConfigMapData file. Alternatively, update
+the default map data files in that ConfigMapData file.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
