@@ -229,7 +229,17 @@ A.  MET does not use the Fortran-like fixed width format in its
     writing a script to post-process the MET output into the fixed-width
     format that is needed or that the code expects.
 
-    
+ **Q. How does scientific notation work?**
+
+ A.  By default, the ascii output files created by MET make use of
+     scientific notation when appropriate. The formatting of the
+     numbers that the AsciiTable class writes is handled by a call
+     to printf. The "%g" formatting option which can result in
+     scientific notation: http://www.cplusplus.com/reference/cstdio/printf/
+
+     It has been recommended that a configuration option be added to
+     MET to disable the use of scientific notation. That enhancement
+     is planned for a future release.
     
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
