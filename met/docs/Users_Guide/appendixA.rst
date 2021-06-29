@@ -8,8 +8,7 @@ __________________________
 
 **File_IO**
 
-**File_IO - How do I improve the speed of MET Tools with
- 		Gen_Vx_Mask**
+**Q. File_IO - How do I improve the speed of MET Tools using Gen_Vx_Mask?**
 
 A. The main reason to use gen_vx_mask is to make the MET
 statistics tools (i.e. point_stat or grid_stat) run
@@ -60,9 +59,9 @@ differences lie. Identifying the stations where the
 differences occur is the
 first step in finding an explanation.
 
-  **File_IO - How do I use map_data? Use China as an example.**
+**File_IO - How do I use map_data? Use China as an example.**
 
-This example starts with a 0.5 degree GFS and completes
+A. This example starts with a 0.5 degree GFS and completes
 the following steps:
 
 1.
