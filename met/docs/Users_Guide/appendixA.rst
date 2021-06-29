@@ -234,7 +234,7 @@ A.  MET does not use the Fortran-like fixed width format in its
  A.  By default, the ascii output files created by MET make use of
      scientific notation when appropriate. The formatting of the
      numbers that the AsciiTable class writes is handled by a call
-     to printf. The "%g" formatting option which can result in
+     to printf. The "%g" formatting option can result in
      scientific notation: http://www.cplusplus.com/reference/cstdio/printf/
 
      It has been recommended that a configuration option be added to
