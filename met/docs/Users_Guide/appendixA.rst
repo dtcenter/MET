@@ -174,38 +174,38 @@ A.  Regarding the timing information in the NetCDF variable attributes...
 		      
 		      APCP_24:init_time_ut = 1306886400 ;
 		      
-“ut” stands for UNIX time, which is the number of seconds
-since Jan 1, 1970. It is a convenient way of storing timing
-information since it is easy to add/subtract. The UNIX date command
-can be used to convert back/forth between unix time and time strings:
+    “ut” stands for UNIX time, which is the number of seconds
+    since Jan 1, 1970. It is a convenient way of storing timing
+    information since it is easy to add/subtract. The UNIX date command
+    can be used to convert back/forth between unix time and time strings:
 
-1.
-Convert unix time to ymd_hms date
+    1.
+    Convert unix time to ymd_hms date
 
-  .. code-block:: ini
+      .. code-block:: ini
 		      
-  		  date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
+    		      date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
  
-2.
-Convert ymd_hms to unix date
+    2.
+    Convert ymd_hms to unix date
 
-  .. code-block:: ini
+      .. code-block:: ini
 		      
-		  date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
+		      date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
 		  
-Regarding TRMM data, it may be easier to work with the binary data and
-use the trmmbin2nc.R script described on this page:
-http://www.dtcenter.org/met/users/downloads/observation_data.php
+    Regarding TRMM data, it may be easier to work with the binary data and
+    use the trmmbin2nc.R script described on this page:
+    http://www.dtcenter.org/met/users/downloads/observation_data.php
 
-Follow the TRMM binary links to either the 3 or 24-hour accumulations,
-save the files, and run them through that script. That is the faster
-and easier than trying to get an ASCII dump. That Rscript can also
-subset the TRMM data if needed. Look for the section of it titled: 
+    Follow the TRMM binary links to either the 3 or 24-hour accumulations,
+    save the files, and run them through that script. That is the faster
+    and easier than trying to get an ASCII dump. That Rscript can also
+    subset the TRMM data if needed. Look for the section of it titled: 
 
-3.
-Output domain specification 
+    3.
+    Output domain specification 
 
-Define the lat/lon's that needs to be included in the output.
+    Define the lat/lon's that needs to be included in the output.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
