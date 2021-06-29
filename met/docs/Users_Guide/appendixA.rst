@@ -269,13 +269,15 @@ A.  These settings are defined in the "mask" section of the Point-Stat
     
     If so, your options are:
 
-    * Define one single SID list which include all the points currently
-      inside the polyline as well as the extra ones outside. 
+    1.
+    Define one single SID list which include all the points currently
+    inside the polyline as well as the extra ones outside. 
 
-    * Continue verifying using one polyline and one SID list and
-      write partial sums and contingency table counts. 
+    2.
+    Continue verifying using one polyline and one SID list and
+    write partial sums and contingency table counts. 
 
-      Then aggregate the results together by running a STAT-Analysis job.
+    Then aggregate the results together by running a STAT-Analysis job.
 
 **Q. Gen_Vx_Mask - What are some ways of Defining Masking Regions?**
 
