@@ -130,13 +130,13 @@ A.  In order to use gridded NetCDF files in MET, the files need to
     required parts.
 
     1.
-    Dimensions should be named "lat" and "lon"
+    Dimensions should be named "lat" and "lon".
     
     2.
-    The "lat" and "lon" variable are **NOT** required
+    The "lat" and "lon" variable are **NOT** required.
     
     3.
-    Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions
+    Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions.
     
     4.
     Gridded variables should include the attributes listed in the example
@@ -146,6 +146,24 @@ A.  In order to use gridded NetCDF files in MET, the files need to
     
     5.
     Global attributes should include the grid/projection information.
+
+**Q. How do I choose a Time Slice in a NetCDF file?**
+
+A.  When processing NetCDF files, the level information needs to be
+    specified to tell MET which 2D slice of data to use. There is
+    currently no way to explicitly define which time slice to use
+    other than selecting the time index.
+    
+    Let's use plot_data_plane as an example:
+
+      .. code-block:: ini
+		      ${MET_BUILD_BASE}/bin/plot_data_plane \ 
+		      MERGE_20161201_20170228.nc \ 
+		      obs.ps \ 
+		      'name="APCP"; level="(5,*,*)";'
+
+    Since these indices are 0-based, this will select the 6-th
+    time slice of the APCP data and plot it.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
