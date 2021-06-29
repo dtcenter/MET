@@ -157,6 +157,7 @@ A.  When processing NetCDF files, the level information needs to be
     Let's use plot_data_plane as an example:
 
       .. code-block:: ini
+		      
 		      ${MET_BUILD_BASE}/bin/plot_data_plane \ 
 		      MERGE_20161201_20170228.nc \ 
 		      obs.ps \ 
