@@ -110,9 +110,22 @@ config file. That will overwrite the default settings it
 reads from the ConfigMapData file. Alternatively, update
 the default map data files in that ConfigMapData file.
 
+**Q. what is another way to understand the Number of Matched Pairs?**
+
+A.  In this example the dimension of the grid is 37x37. Thus, up to
+    1369 matched pairs are possible. However, if the forecast or
+    observation contains bad data at a point, that matched pair is
+    not included in the calculations. Use the ncview tool to look at
+    an example netCDF file. If the forecast field contains missing data
+    around the edge of the domain, then that is a reason there may be
+    992 matched pairs instead of 1369.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
-A. MET relies upon the object-oriented aspects of C++, particularly in using the MODE tool. Due to time and budget constraints, it also makes use of a pre-existing forecast verification library that was developed at NCAR.
+A. MET relies upon the object-oriented aspects of C++, particularly in
+   using the MODE tool. Due to time and budget constraints, it also makes
+   use of a pre-existing forecast verification library that was developed
+   at NCAR.
 
 
 **Q. Why is PrepBUFR used?**
