@@ -467,55 +467,55 @@ A. Setting up the Grid-Stat config file to read a netcdf file
 A. There is an example of verifying probabilities in the test scripts
    included with the MET release. Take a look in: 
 
-     .. code-block:: ini
+   .. code-block:: ini
 		   
-		     ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
+		   ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
 
    The config file should look something like this...
 
-      .. code-block:: ini
+    .. code-block:: ini
 
-		      fcst = { 
+		    fcst = { 
 
-		      wind_thresh = [ NA ];
+		    wind_thresh = [ NA ];
 
-		      field = [ 
+		    field = [ 
 
-		      { 
+		    { 
 
-		      name = "LCDC"; 
+		    name = "LCDC"; 
 
-		      level = [ "L0" ]; 
+		    level = [ "L0" ]; 
 
-		      prob = TRUE; 
+		    prob = TRUE; 
 
-		      cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9];
+		    cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9];
 
-		      } 
+		    } 
 
-		      ];
+		    ];
 
-		      }; 
+		    }; 
 
-		      obs = {
+		    obs = {
 
-		      wind_thresh = [ NA ];
+		    wind_thresh = [ NA ];
 
-		      field = [ 
+		    field = [ 
 
-		      { 
+		    { 
 
-		      name = "WIND"; 
+		    name = "WIND"; 
 
-		      level = [ "Z2" ]; 
+		    level = [ "Z2" ]; 
 
-		      cat_thresh = [ >=34 ]; 
+		    cat_thresh = [ >=34 ]; 
 
-		      } 
+		    } 
 
-		      ];
+		    ];
 
-		      };
+		    };
 
    Without seeing how it's encoded in the GRIB file, it is unclear how to
    handle “name” in the forecast section. The PROB flag is set to TRUE
