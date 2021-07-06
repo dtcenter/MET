@@ -456,7 +456,7 @@ A. Setting up the Grid-Stat config file to read a netcdf file
    NetCDF variables can have an arbitrary number of dimensions.
    For example, many variables in the NetCDF output WRF have 4 dimensions...
    time, vertical level, lat, and lon. That cryptic level string
-   with *'s in it tells MET which 2D slice of lat/lon data to process.
+   with \*'s in it tells MET which 2D slice of lat/lon data to process.
    For a WRF file "(3, 5, \*, \*)"
    would say get data from the 3rd time dimension and 5th vertical level.
 
