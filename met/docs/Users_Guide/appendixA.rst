@@ -462,6 +462,37 @@ A. Setting up the Grid-Stat config file to read a netcdf file
 
    However the NetCDF files that the MET tools generate are much simpler,
    and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
+
+**Q. Grid_Stat - What would be an example of Verifying Probabilities?**
+
+A. An example of verifying a probability of precipitation field is
+   included in the test scripts distributed with the MET tarball. Please
+   take a look at
+
+
+    .. code-block:: ini
+
+		    ${MET_BUILD_BASE}/scripts/test_grid_stat.sh
+
+   The second call to grid_stat is used to evaluate probability of precip
+   using this config file: 
+
+
+    .. code-block:: ini
+
+		    ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
+
+   Note in there the following... 
+
+    .. code-block:: ini
+		    "prob = TRUE;"
+		    # tells MET to interpret this data a probability field. 
+
+		    "cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9]; "
+
+   Here the thresholds are used to fully partition the probability space
+   from 0 to 1. Note that if the probability data contains values from
+   0 to 100, MET automatically divides by 100 to rescale to the 0 to 1 range.
    
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
