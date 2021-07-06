@@ -485,8 +485,8 @@ A. An example of verifying a probability of precipitation field is
    Note in there the following... 
 
     .. code-block:: ini
-		    "prob = TRUE;"
-		    # tells MET to interpret this data a probability field. 
+		    
+		    "prob = TRUE;"  # tells MET to interpret this data a probability field. 
 
 		    "cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9]; "
 
