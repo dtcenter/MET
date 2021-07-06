@@ -462,8 +462,72 @@ A. Setting up the Grid-Stat config file to read a netcdf file
 
    However the NetCDF files that the MET tools generate are much simpler,
    and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
+**Q. Grid_Stat - What would be an example of Verifying Probabilities? Example 1**
 
-**Q. Grid_Stat - What would be an example of Verifying Probabilities?**
+A. There is an example of verifying probabilities in the test scripts
+   included with the MET release. Take a look in: 
+
+     .. code-block:: ini
+		   
+		     ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
+
+   The config file should look something like this...
+
+      .. code-block:: ini
+
+		      fcst = { 
+
+		      wind_thresh = [ NA ];
+
+		      field = [ 
+
+		      { 
+
+		      name = "LCDC"; 
+
+		      level = [ "L0" ]; 
+
+		      prob = TRUE; 
+
+		      cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9];
+
+		      } 
+
+		      ];
+
+		      }; 
+
+		      obs = {
+
+		      wind_thresh = [ NA ];
+
+		      field = [ 
+
+		      { 
+
+		      name = "WIND"; 
+
+		      level = [ "Z2" ]; 
+
+		      cat_thresh = [ >=34 ]; 
+
+		      } 
+
+		      ];
+
+		      };
+
+   Without seeing how it's encoded in the GRIB file, it is unclear how to
+   handle “name” in the forecast section. The PROB flag is set to TRUE
+   to tell grid_stat to process this as probability data. The cat_thresh
+   is set to partition the probability values between 0 and 1.
+
+   This case is evaluating a forecast probability of wind speed
+   exceeding 34kts, and likely comparing it against the wind speed values.
+   The observed cat_thresh is set to >=34 to be consistent with with the
+   forecast probability definition.
+
+**Q. Grid_Stat - What would be an example of Verifying Probabilities? Example 2**
 
 A. An example of verifying a probability of precipitation field is
    included in the test scripts distributed with the MET tarball. Please
