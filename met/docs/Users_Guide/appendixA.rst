@@ -452,16 +452,16 @@ A. Setting up the Grid-Stat config file to read a netcdf file
 
 		   { name = "HGT_P500"; level = [ "(*,*)" ]; } ]; }
 
-   Do not use numbers, such as "(181,360)", please use "(*,*)" instead.
+   Do not use numbers, such as "(181,360)", please use "(\*,\*)" instead.
    NetCDF variables can have an arbitrary number of dimensions.
    For example, many variables in the NetCDF output WRF have 4 dimensions...
    time, vertical level, lat, and lon. That cryptic level string
    with *'s in it tells MET which 2D slice of lat/lon data to process.
-   For a WRF file "(3, 5, *, *)"
+   For a WRF file "(3, 5, \*, \*)"
    would say get data from the 3rd time dimension and 5th vertical level.
 
    However the NetCDF files that the MET tools generate are much simpler,
-   and only contain 2 dimensional variables. So using "(*,*)" suffices.
+   and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
    
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
