@@ -17,14 +17,19 @@ netcdf_filename = sys.argv[1]
 ds = nc.Dataset(netcdf_filename, 'r')
 met_data = ds['met_data'][:]
 met_attrs = {}
+
+# grid is defined as a dictionary or string
 grid = {}
 for attr, attr_val in ds.__dict__.items():
-    if 'grid' in attr:
+    if 'grid.' in attr:
         grid_attr = attr.split('.')[1]
         grid[grid_attr] = attr_val
     else:
         met_attrs[attr] = attr_val
-met_attrs['grid'] = grid
+
+if grid:
+    met_attrs['grid'] = grid
+
 met_attrs['name'] = met_attrs['name_str']
 del met_attrs['name_str']
 met_info['met_data'] = met_data

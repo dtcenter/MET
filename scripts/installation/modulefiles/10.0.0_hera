@@ -1,0 +1,68 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.0.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+# The intel compiler is required to run MET
+prereq intel
+prereq anaconda/latest
+
+set base /contrib/met
+set ver  10.0.0
+set share $base/$ver/share/met
+set lib_base $base/10.0.0
+
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
+
+
+#prepend-path LD_LIBRARY_PATH $lib_base/external_libs/lib
+
+#setenv METversion $ver
+#setenv MET_ROOT $base/$ver/met-10.0.0-beta5
+#setenv MET_CONFIG $share/config
+#setenv MET_POLY $share/poly
+#setenv MET_COLORTABLES $share/colortables
+#setenv MET_PS $share/ps
+#setenv MET_TCDATA $share/tc_data
+#setenv MET_TABLES $share/table_files
+###
+#setenv CC icc
+#setenv CXX icc
+#setenv F77 ifort
+
+#module load intel/18.0.5.274
+#module load anaconda/latest
+
+#setenv libdir /contrib/met/10.0.0-beta5/external_libs/lib
+#setenv incdir /contrib/met/10.0.0-beta5/external_libs/include
+#setenv iprefix /contrib/met/10.0.0-beta5/external_libs
+#setenv basedir /contrib/met/10.0.0-beta5/met-10.0.0-beta5
+
+#setenv MET_HDF5 $iprefix
+#setenv MET_NETCDF $incdir
+#setenv MET_GRIB2CINC $incdir
+#setenv MET_GRIB2CLIB $libdir
+#setenv MET_GSLLIB $libdir
+#setenv MET_GSLINC $incdir
+#setenv MET_BUFR $libdir
+#setenv MET_HDFINC $incdir
+#setenv MET_HDFLIB $libdir
+#setenv MET_HDFEOSINC $incdir
+#setenv MET_HDFEOSLIB $libdir
+#setenv MET_PYTHON /contrib/anaconda3/latest
+#setenv MET_PYTHON_CC -I/contrib/anaconda/anaconda3/latest/include/python3.7m
+#setenv MET_PYTHON_LD -L/contrib/anaconda/anaconda3/latest/lib\ -lpython3.7m\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
+#setenv MET_FONT_DIR $basedir/fonts/
+
+# CAIRO and FREETYPE were not used
+#setenv MET_CAIROLIB $libdir
+#setenv MET_CAIROINC $incdir/cairo
+#setenv MET_FREETYPELIB $libdir
+#setenv MET_FREETYPEINC $incdir/freetype2
+
+

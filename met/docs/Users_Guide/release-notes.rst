@@ -21,8 +21,8 @@ MET Version |version| release notes (|release_date|)
    * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
    * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
    * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1788 <http://github.com/dtcenter/MET/issues/1788>`_).
-   * Update MET to compile using GCC version 10 (`#1552 https://github.com/dtcenter/MET/issues/1552`_).
-   * Update MET to compile using PGI version 20 (`#1317 https://github.com/dtcenter/MET/issues/1317`_).
+   * Update MET to compile using GCC version 10 (`#1552 <https://github.com/dtcenter/MET/issues/1552>`_).
+   * Update MET to compile using PGI version 20 (`#1317 <https://github.com/dtcenter/MET/issues/1317>`_).
      
 * Documentation:
 
