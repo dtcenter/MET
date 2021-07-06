@@ -328,7 +328,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_data_file() {
-   DataPlane fr_dp;
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    ConcatString run_cs;
@@ -1282,10 +1281,11 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       exit(1);
    }
    else {
+      bool is_to_north = !fr_grid.get_swap_to_north();
       float *from_data = new float[from_data_size];
       for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
-            int offset = fr_dp.two_to_one(xIdx,yIdx);
+            int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
             from_data[offset] = fr_dp.get(xIdx,yIdx);
          }
       }
@@ -1313,7 +1313,6 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             int offset = to_dp.two_to_one(xIdx,yIdx);
             cellArray = cellMapping[offset];
             if (0 < cellArray.n()) {
-               int valid_cnt = 0;
                dataArray.clear();
                dataArray.extend(cellArray.n());
                for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
@@ -1330,14 +1329,13 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                      if (from_min_value > data_value) from_min_value = data_value;
                      if (from_max_value < data_value) from_max_value = data_value;
                   }
-      
-                  valid_cnt++;
                }
-      
+
                if (0 < dataArray.n()) {
-                  int data_cnt = dataArray.n();
                   float to_value;
-                  if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
+                  int data_cnt = dataArray.n();
+                  if (1 == data_cnt) to_value = dataArray[0];
+                  else if (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
                   else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
                   else if (RGInfo.method == InterpMthd_Median) {
                      dataArray.sort_array();
@@ -1349,12 +1347,23 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       
                   to_dp.set(to_value, xIdx, yIdx);
                   to_cell_cnt++;
-                  mlog << Debug(9) << method_name
-                       <<   "max: " << dataArray.max()
-                       << ", min: " << dataArray.min()
-                       << ", mean: " << dataArray.sum()/data_cnt
-                       << " from " << valid_cnt << " out of "
-                       << data_cnt << " data values.\n";
+                  if(mlog.verbosity_level() >= 9) {
+                     double to_lat, to_lon;
+                     to_grid.xy_to_latlon(xIdx,yIdx, to_lat, to_lon);
+                     to_lon *= -1;
+                     if (1 == data_cnt)
+                        mlog << Debug(9) << method_name
+                             << "value: " << to_value << " to (" << to_lon << ", " << to_lat
+                             << ") from offset " << from_index << ".\n";
+                     else
+                        mlog << Debug(9) << method_name
+                             <<   "value: " << to_value
+                             << ", max: " << dataArray.max()
+                             << ", min: " << dataArray.min()
+                             << ", mean: " << dataArray.sum()/data_cnt
+                             << " from " << data_cnt << " (out of " << cellArray.n()
+                             << ") data values to (" << to_lon << ", " << to_lat << ").\n";
+                  }
                }
             }
             else {
@@ -1685,7 +1694,7 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    for (int idx=0; idx<data_size; idx++) {
       if (cnt_printed < 10 && latitudes[idx] > MISSING_LATLON
           && longitudes[idx] > MISSING_LATLON) {
-         mlog << Debug(7) << method_name << "index: " << idx <<  " lat: "
+         mlog << Debug(11) << method_name << "index: " << idx <<  " lat: "
               << latitudes[idx] << ", lon: " << longitudes[idx] << "\n";
          cnt_printed++;
       }
@@ -1790,8 +1799,9 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times) {
+      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
    double x, y;
+   double to_ll_lat, to_ll_lon;
    float lat, lon;
    int idx_x, idx_y, to_offset;
    int count_in_grid = 0;
@@ -1807,11 +1817,14 @@ static void get_grid_mapping_latlon(
    for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
    for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
 
+   to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
+   mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
+   
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
-   for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
-      for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
-         int coord_offset = from_dp.two_to_one(yIdx, xIdx);
+   for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+      for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+         int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if( skip_times != 0 && skip_times[coord_offset] ) continue;
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
@@ -1824,6 +1837,12 @@ static void get_grid_mapping_latlon(
             mapping_indices[coord_offset] = to_offset;
             to_cell_counts[to_offset] += 1;
             count_in_grid++;
+            if(mlog.verbosity_level() >= 15) {
+               double to_lat, to_lon;
+               to_grid.xy_to_latlon(idx_x, idx_y, to_lat, to_lon);
+               mlog << Debug(15) << method_name << " [" << xIdx << "," << yIdx << "] to " << coord_offset
+                    << " (" << lon << ", " << lat << ") to (" << (to_lon*-1) << ", " << to_lat << ")\n";
+            }
          }
       }
    }
@@ -1918,7 +1937,8 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes, from_lat_count,
-                                 from_lon_count, skip_times);
+                                 from_lon_count, skip_times,
+                                 !fr_grid.get_swap_to_north());
       }
       if( latitudes )  delete [] latitudes;
       if( longitudes ) delete [] longitudes;
@@ -2129,7 +2149,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count, 0);
+                                 longitudes, from_lat_count, from_lon_count, 0,
+                                 !fr_grid.get_swap_to_north());
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
