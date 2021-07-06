@@ -493,6 +493,77 @@ A. An example of verifying a probability of precipitation field is
    Here the thresholds are used to fully partition the probability space
    from 0 to 1. Note that if the probability data contains values from
    0 to 100, MET automatically divides by 100 to rescale to the 0 to 1 range.
+
+**Q. What is an example of using Grid-Stat with Regridding and Masking Turned On?**
+
+A. Run Grid-Stat using the following commands and the attached config file 
+
+   .. code-block:: ini
+
+		   mkdir out 
+
+		   ${MET_BUILD_BASE}/bin/grid_stat \ 
+
+		   gfs_4_20160220_0000_012.grb2 \ 
+
+		   ST4.2016022012.06h \ 
+
+		   GridStatConfig \ 
+
+		   -outdir out
+
+   Note the following two sections of the Grid-Stat config file: 
+
+   .. code-block:: ini
+		   regrid = { 
+
+		   to_grid = OBS; 
+
+		   vld_thresh = 0.5; 
+
+		   method = BUDGET; 
+
+		   width = 2; 
+
+		   } 
+
+   This tells Grid-Stat to do verification on the "observation" grid.
+   Grid-Stat reads the GFS and Stage4 data and then automatically regrids
+   the GFS data to the Stage4 domain using budget interpolation.
+   Use "FCST" to verify on the forecast domain. And use either a named
+   grid or a grid specification string to regrid both the forecast and
+   observation to a common grid. For example, to_grid = "G212"; will
+   regrid both to NCEP Grid 212 before comparing them.
+
+   .. code-block:: ini
+		   
+		   mask = { grid = [ "FULL" ]; 
+
+		   poly = [ "MET_BASE/poly/CONUS.poly" ]; } 
+
+   This will compute statistics over the FULL model domain as well
+   as the CONUS masking area.
+
+   To demonstrate that Grid-Stat worked as expected, run the following
+   commands to plot its NetCDF matched pairs output file:
+
+   .. code-block:: ini
+		   
+		   ${MET_BUILD_BASE}/bin/plot_data_plane \ 
+
+		   out/grid_stat_120000L_20160220_120000V_pairs.nc \ 
+
+		   out/DIFF_APCP_06_A06_APCP_06_A06_CONUS.ps \ 
+
+		   'name="DIFF_APCP_06_A06_APCP_06_A06_CONUS"; level="(*,*)";'
+
+   Examine the resulting plot of that difference field.
+
+   Lastly, there is another option for defining that masking region.
+   Rather than passing the ascii CONUS.poly file to grid_stat, run the
+   gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
+   The advantage to gen_vx_mask is that it will make grid_stat run a
+   bit faster. It can be used to construct much more complex masking areas.
    
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
