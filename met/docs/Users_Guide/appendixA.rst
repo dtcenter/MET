@@ -515,6 +515,7 @@ A. Run Grid-Stat using the following commands and the attached config file
    Note the following two sections of the Grid-Stat config file: 
 
    .. code-block:: ini
+		   
 		   regrid = { 
 
 		   to_grid = OBS; 
