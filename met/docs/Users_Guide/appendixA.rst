@@ -462,6 +462,7 @@ A. Setting up the Grid-Stat config file to read a netcdf file
 
    However the NetCDF files that the MET tools generate are much simpler,
    and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
+
 **Q. Grid_Stat - What would be an example of Verifying Probabilities? Example 1**
 
 A. There is an example of verifying probabilities in the test scripts
