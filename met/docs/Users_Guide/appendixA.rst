@@ -779,7 +779,7 @@ Here are 3 commands you could use to plot these data files:
 		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
 		${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
-**Q. Pcp_Combine - How Do I Correct a Precipitation Time Range?**
+**Q. Pcp-Combine - How Do I Correct a Precipitation Time Range?**
 
 A.
 Typically, accumulated precipitation is stored in GRIB files using an
@@ -827,7 +827,59 @@ Here is an example:
 		rmf_gra_2016040600_APCP_00_24.nc
 		
 The resulting file should have the accumulation listed at 24h rather than 0-24.
-		
+
+**Q. Pcp-Combine - What Data Formats does MET Read?**
+
+A. 
+MET can read gridded data in GRIB1, GRIB2, or 3 different flavors of NetCDF: 
+
+* The "internal" NetCDF format that looks like the output of the
+  pcp_combine tool. 
+* CF-compliant NetCDF3 files. 
+* The output of the wrf_interp utility.
+
+If there are the NetCDF output from WRF, use UPP to post-process it.
+It does not need to be "lat-lon"... it can be post-processed to whatever
+projection is needed..
+
+There is in general no easy way to convert NetCDF to GRIB. If the NetCDF
+data is self generated, make it look like the NetCDF output from
+pcp_combine, or preferably, make it CF-compliant.
+
+Looking at the accumulation interval of the precipitation data in the WRF
+output files from UPP, use the "wgrib" utility to dump out that sort
+of information:
+
+.. code-block:: ini
+
+		wgrib wrfprs_d01.02 
+		wgrib wrfprs_d01.03 
+
+\... and so on
+
+The question is whether the output actually contains 1-hourly accumulated
+precip, or does it contain runtime accumulation. Runtime accumulation
+means that the 6-hour wrf file contains 0 to 6 hours of precip; the
+7- hour file contains 0 to 7 hours of precip; and so on. The precip
+values just accumulate over the course of the entire model integration.
+
+The default for WRF-ARW is runtime accumulation. So if WRF-ARW is running
+and the output bucket interval wasn’t specifically changed, then that's
+very likely.
+
+If that is the case, you can change these values to interval accumulations.
+Use the pcp_combine "-subtract" option instead of "-sum". Suppose the
+6 hours of precip between the 6hr and 12hr forecasts is wanted. Run the
+following:
+
+.. code-block:: ini
+
+		pcp_combine -subtract wrfprs_d01.12 12 \
+		wrfprs_d01.06 06 apcp_06_to_12.nc
+
+That says... get 12 hours of precip from the first file and 6 hours
+from the second file and subtract them.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
