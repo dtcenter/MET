@@ -1122,6 +1122,20 @@ The -sum and -add options both do the same thing... it's just that
 '- sum' finds the files more quickly. This could also be accomplished
 by using a calling script.
 
+**Q. Pcp-Combine - How Do I Select a Specific GRIB Record to Use?**
+
+A.
+In this example, record 735 needs to be selected. 
+
+.. code-block:: ini
+		
+		pcp_combine -add 20160101_i12_f015_HRRR_wrfnat.grb2 \ 
+		'name="APCP"; level="R735";' \
+		-name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
+
+Instead of having the level as "L0", tell it to use "R735" to select
+grib record 735.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
