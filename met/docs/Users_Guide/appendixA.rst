@@ -945,6 +945,7 @@ accumulation intervals:
 
 .. code-block:: ini
 
+		# incorrect example:
 		pcp_combine -subtract forecast.grb 0055 \
 		forecast2.grb 0005 forecast.nc -field APCP
 
@@ -962,8 +963,66 @@ Below is the **correct example**. Add the seconds to the end of the time strings
 
 .. code-block:: ini
 
+		# correct example:
 		pcp_combine -subtract forecast.grb 005500 \
 		forecast2.grb 000500 forecast.nc -field APCP		
+
+**Q. Pcp-Combine - How do I use “-subtract”?**
+
+A.
+Run wgrib on the data files and the output is listed below:
+
+.. code-block:: ini
+
+		279:503477484:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=247:TimeU=0:sfc:1015min \
+		fcst:NAve=0 \
+		279:507900854:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=197:TimeU=0:sfc:965min \
+		fcst:NAve=0
+
+Notice the output which says "TR=10". TR means time range indicator and
+a value of 10 means that the level information contains an instantaneous
+forecast time, not an accumulation interval. 
+
+Here's a table describing the TR values:
+http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+
+The default logic for pcp_combine is to look for GRIB code 61 (i.e. APCP)
+defined with an accumulation interval (TR = 4). Since the data doesn't
+meet that criteria, the default logic of pcp_combine won't work. The
+arguments need to be more specific to tell pcp_combine exactly what to do.
+
+Try the command:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/pcp_combine -subtract \ 
+		forecast.grb 'name="APCP"; level="L0"; lead_time="165500";' \ 
+		forecast2.grb 'name="APCP"; level="L0"; lead_time="160500";' \ 
+		forecast.nc -name APCP_A005000
+
+Some things to point out here:
+
+1.
+Notice in the wgrib output that the forecast times are 1015 min and
+965 min. In HHMMSS format, that's "165500" and "160500".
+2.
+An accumulation interval can’t be specified since the data isn't stored
+that way. Instead, use a config file string to describe the data to use.
+3.
+The config file string specifies a "name" (APCP) and "level" string. APCP
+is defined at the surface, so a level value of 0 (L0) was specified.
+4.
+Technically, the "lead_time" doesn’t need to be specified at all, pcp_combine
+would find the single APCP record in each input GRIB file and use them. But
+just in case, the lead_time option was included to be extra certain to
+get exactly the data that is needed.
+5.
+The default output variable name pcp_combine would write would be "APCP_L0".
+However, to indicate that its a 50-minute "accumulation interval" use a
+different output variable name (APCP_A005000). Of course any string name is
+possible.... Maybe "Precip50Minutes" or "RAIN50". But whatever string is
+chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
+tell that tool what variable to process.
 		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
