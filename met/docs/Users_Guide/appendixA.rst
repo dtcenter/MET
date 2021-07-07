@@ -1169,6 +1169,39 @@ for ghostview:
 
 Please review a map of 0's and 1's over the USA.
 
+**Q. Plot-Data-Plane - How Do I Specify GRIB Version?**
+
+A.
+These files are in GRIB2 format, but they’ve named them using the ".grib"
+suffix. When MET reads Gridded data files, it must determine the type of
+file it's reading. The first thing it checks is the suffix of the file.
+The following are all interpreted as GRIB1: .grib, .grb, and .gb.
+While these mean GRIB2: .grib2, .grb2, and .gb2.
+
+There are 2 choices. Rename the files to use a GRIB2 suffix or keep them
+named this way and explicitly tell MET to interpret them as GRIB2 using
+the "file_type" configuration option.
+
+The examples below use the plot_data_plane tool to plot the data. Set 
+
+.. code-block:: ini
+		
+		"file_type = GRIB2;"
+
+To keep them named this way, add "file_type = GRIB2;" to all the
+MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
+
+.. code-block:: ini
+		
+		{MET_BASE}/bin/plot_data_plane \ 
+		test_2.5_prog.grib \ 
+		test_2.5_prog.ps \
+		'name="TSTM"; level="A0"; file_type=GRIB2;' \ 
+		-plot_range 0 100
+
+When trying to get MET to read a particular gridded data file, use the
+plot_data_plane tool to test it out.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
