@@ -675,22 +675,22 @@ A. You'd like to apply one mask to the forecast field and a *different*
      since I'm reading data from the same input file, I've listed
      that file twice. 
 
-     * The third argument is the output file name. 
+   * The third argument is the output file name. 
 
-     * The type of masking is "data" masking where we read a 2D field of
-       data and apply a threshold. 
+   * The type of masking is "data" masking where we read a 2D field of
+     data and apply a threshold. 
 
-     * By default, gen_vx_mask initializes each grid point to a value
-       of 0. Specifying "-input_field" tells it to initialize each grid
-       point to the value of that field (in my example 3-hour precip). 
+   * By default, gen_vx_mask initializes each grid point to a value
+     of 0. Specifying "-input_field" tells it to initialize each grid
+     point to the value of that field (in my example 3-hour precip). 
 
-     * The "-mask_field" option defines the data field that should be
-       thresholded. 
+   * The "-mask_field" option defines the data field that should be
+     thresholded. 
 
-     * The "-thresh" option defines the threshold to be applied. 
-
-     * The "-value" option tells it what "mask" value to write to the
-       output... and I've chosen 0.
+   * The "-thresh" option defines the threshold to be applied. 
+     
+   * The "-value" option tells it what "mask" value to write to the
+     output... and I've chosen 0.
 
    The example threshold is less than 290 and not -9999 (which is MET's
    internal missing data value). So any grid point where the 2 meter
