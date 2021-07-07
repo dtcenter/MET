@@ -633,47 +633,50 @@ A. Run Grid-Stat using the following commands and the attached config file
 
 **Q. How do I use different masks in MET tools using MODE as an example?**
 
-A. You'd like to apply one mask to the forecast field and a *different*
-   mask to the observation field. However, you can't define different
-   masks for the forecast and observation fields. MODE only lets you
-   define a single mask (a masking grid or polyline) and then you choose
-   whether your want to apply it to the FCST, OBS, or BOTH of them.
+A.
+You'd like to apply one mask to the forecast field and a *different*
+mask to the observation field. However, you can't define different
+masks for the forecast and observation fields. MODE only lets you
+define a single mask (a masking grid or polyline) and then you choose
+whether your want to apply it to the FCST, OBS, or BOTH of them.
 
-   Nonetheless, there is a way you can accomplish this logic using the
-   gen_vx_mask tool. You run it once to pre-process the forecast field
-   and a second time to pre-process the observation field. And then pass
-   those output files to MODE.
+Nonetheless, there is a way you can accomplish this logic using the
+gen_vx_mask tool. You run it once to pre-process the forecast field
+and a second time to pre-process the observation field. And then pass
+those output files to MODE.
 
-   Below is an example using sample data that is included with the MET
-   release tarball to illustrate... using met. This will read 3-hour
-   precip and 2-meter temperature, and resetts the precip at any grid
-   point where the temperature is less than 290 K to a value of 0:
+Below is an example using sample data that is included with the MET
+release tarball to illustrate... using met. This will read 3-hour
+precip and 2-meter temperature, and resetts the precip at any grid
+point where the temperature is less than 290 K to a value of 0:
 
-   .. code-block:: ini
-
-        {MET_BUILD_BASE}/bin/gen_vx_mask \ 
-
-	data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+.. code-block:: ini
+		
+		{MET_BUILD_BASE}/bin/gen_vx_mask \ 
+		
+		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
 	
-	data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+		
+		APCP_03_where_2m_TMPge290.nc \ 
+		
+		-type data \ 
+		
+		-input_field 'name="APCP"; level="A3";' \ 
+		
+		-mask_field 'name="TMP"; level="Z2";' \ 
+		
+		-thresh 'lt290&&ne-9999' -v 4 -value 0
+		
+So this is a bit confusing. Here's what is happening:
 
-	APCP_03_where_2m_TMPge290.nc \ 
+* The first argument is the input file which defines the grid. 
 
-	-type data \ 
-	
-	-input_field 'name="APCP"; level="A3";' \ 
-	
-	-mask_field 'name="TMP"; level="Z2";' \ 
-		   
-	-thresh 'lt290&&ne-9999' -v 4 -value 0
-		     
-   So this is a bit confusing. Here's what is happening:
+* The second argument is used to define the masking region... and
+  since I'm reading data from the same input file, I've listed
+  that file twice. 
 
-   * The first argument is the input file which defines the grid. 
-   * The second argument is used to define the masking region... and
-     since I'm reading data from the same input file, I've listed
-     that file twice. 
-   * The third argument is the output file name. 
+* The third argument is the output file name. 
 
    * The type of masking is "data" masking where we read a 2D field of
      data and apply a threshold. 
