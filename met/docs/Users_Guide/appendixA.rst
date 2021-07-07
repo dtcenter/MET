@@ -1027,7 +1027,72 @@ different output variable name (APCP_A005000). Of course any string name is
 possible.... Maybe "Precip50Minutes" or "RAIN50". But whatever string is
 chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
 tell that tool what variable to process.
+
+**Q. Pcp_Combine - How Do I Use “-sum”, “-add”, and “-subtract“ to Achieve Same Accumulation Interval?**
+
+A. 
+Here is an example of using pcp_combine to put GFS into 24- hour intervals
+for comparison against 24-hourly StageIV precipitation with GFS data
+through the pcp_combine tool. Be aware that the 24-hour StageIV data is
+defined as an accumulation from 12Z on one day to 12Z on the next day:
+http://www.emc.ncep.noaa.gov/mmb/ylin/pcpanl/stage4/
+
+Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
+12Z accumulations from the model. Alternatively, the 6- hour StageIV
+accumulations could be used to evaluate any 24 hour accumulation from
+the model. For the latter, run the 6-hour StageIV files through pcp_combine
+to generate the desired 24-hour accumulation.
+
+Here is an example. Run pcp_combine to compute 24-hour accumulations for
+GFS. In this example, process the 20150220 00Z initialization of GFS.
+
+.. code-block:: ini
 		
+		${MET_BUILD_BASE}/bin/pcp_combine \ 
+		-sum 20150220_00 06 20150221_00 24 \ 
+		gfs_APCP_24_20150220_00_F00_F24.nc \ 
+		-pcprx "gfs_4_20150220_00.*grb2" \ 
+		-pcpdir /d1/model_data/20150220
+
+pcp_combine is looking in the /d1/SBU/GFS/model_data/20150220 directory
+at files which match this regular expression "gfs_4_20150220_00.*grb2".
+That directory contains data for 00, 06, 12, and 18 hour initializations,
+but the "-pcprx" option narrows the search down to the 00 hour
+initialization which makes it run faster. It inspects all the matching
+files, looking for 6-hour APCP data to sum up to a 24-hour accumulation
+valid at 20150221_00. This results in a 24-hour accumulation between
+forecast hours 0 and 24.
+
+The following command will compute the 24-hour accumulation between forecast
+hours 12 and 36:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/pcp_combine \ 
+		-sum 20150220_00 06 20150221_12 24 \ 
+		gfs_APCP_24_20150220_00_F12_F36.nc \ 
+		-pcprx "gfs_4_20150220_00.*grb2" \ 
+		-pcpdir /d1/model_data/20150220
+
+The "-sum" command is meant to make things easier by searching the
+directory. But instead of using "-sum", another option would be the
+"- add" command. Explicitly list the 4 files that need to be extracted
+from the 6-hour APCP and add them up to 24. In the directory structure,
+the previous "-sum" job could be rewritten with "-add" like this:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/pcp_combine -add \ 
+		/d1/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 \ 
+		/d1/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 \ 
+		/d1/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 \ 
+		/d1/model_data/20150220/gfs_4_20150220_0000_036.grb2 06 \
+		gfs_APCP_24_20150220_00_F12_F36_add_option.nc
+
+This example explicitly tells pcp_combine which files to read and
+what accumulation interval (6 hours) to extract from them. The resulting
+output should be identical to the output of the "-sum" command.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
