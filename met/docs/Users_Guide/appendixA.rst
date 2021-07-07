@@ -1145,7 +1145,7 @@ A.
 The gen_vx_mask tool is successfully writing a NetCDF file, but the
 pcp_combine tool errors out when trying to write a NetCDF file: 
 
-.. code-block:: in
+.. code-block:: ini
 		
 		ERROR : write_netcdf() -> error with pcp_var->put()
 
@@ -1153,7 +1153,7 @@ The question is why? Let's check to see if the call to gen_vx_mask
 actually did create good output. Try running the following command
 from the top-level ${MET_BUILD_BASE} directory:
 
-.. code-block:: in
+.. code-block:: ini
 		
 		bin/plot_data_plane \ 
 		out/gen_vx_mask/CONUS_poly.nc \ 
