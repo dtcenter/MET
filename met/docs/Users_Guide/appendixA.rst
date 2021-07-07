@@ -917,7 +917,7 @@ appear in the output of downstream tools:
 		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
 		forecast.nc -name CompositeReflectivity
 
-**Q. Pcp_Combine - How do I use “-pcprx" to run a project faster?**
+**Q. Pcp-Combine - How do I use “-pcprx" to run a project faster?**
 
 A.
 To run a project faster, the “-pcprx” option may be used to narrow the
@@ -936,6 +936,34 @@ examples:
 		gfs_APCP_24_20160221_18_F00_F24.nc \
 		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
 		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
+
+**Q. Pcp-Combine - How Do I Enter the Time Format Correctly?**
+
+A.
+Here is an **incorrect example** of running pcp_combine with sub-hourly
+accumulation intervals: 
+
+.. code-block:: ini
+
+		pcp_combine -subtract forecast.grb 0055 \
+		forecast2.grb 0005 forecast.nc -field APCP
+
+The time signature is entered incorrectly. Let’s assume that "0055"
+meant 0 hours and 55 minutes and "0005" meant 0 hours and 5 minutes.
+
+Looking at the usage statement for pcp_combine (just type pcp_combine with
+no arguments): "accum1" indicates the accumulation interval to be used
+from in_file1 in HH[MMSS] format (required).
+
+The time format listed "HH[MMSS]" means specifying hours or
+hours/minutes/seconds. The incorrect example is using hours/minutes.
+
+Below is the **correct example**. Add the seconds to the end of the time strings, like this: 
+
+.. code-block:: ini
+
+		pcp_combine -subtract forecast.grb 005500 \
+		forecast2.grb 000500 forecast.nc -field APCP		
 		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
