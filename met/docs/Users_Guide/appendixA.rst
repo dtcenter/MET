@@ -745,6 +745,40 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
+**Pcp-Combine - How do I Combine 12-hour Accumulated Precipitation from Two Different Initialization Times?**
+
+A. 
+The "-sum" command assumes the same initialization time. Use the "-add"
+option instead.
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/pcp_combine -add \ 
+		WRFPRS_1997-06-03_APCP_A12.nc 'name="APCP_12"; level="(*,*)";' \ 
+		WRFPRS_d01_1997-06-04_00_APCP_A12.grb 12 \ 
+		Sum.nc
+
+For the first file, list the file name followed by a config string
+describing the field to use from the NetCDF file. For the second file,
+list the file name followed by the accumulation interval to use
+(12 for 12 hours).
+
+Here is a small excerpt from the pcp_combine usage statement: 
+
+Note: For “-add” and "-subtract”, the accumulation intervals may be
+substituted with config file strings. For that first file, we replaced
+the accumulation interval with a Config file string.
+
+Here are 3 commands you could use to plot these data files:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
+		WRFPRS_1997-06-03_APCP_A12.ps 'name="APCP_12"; level="(*,*)";' 
+		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
+		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
+		${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
