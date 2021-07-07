@@ -71,7 +71,7 @@ the following steps:
 Use the regrid_data_plane tool to regrid 2m temperature
 to a smaller domain centered on China:
 
-.. code-block:: ini
+.. code-block:: none
 				  
 		${MET_BUILD_BASE}/bin/regrid_data_plane \ 
 		gfs_2012040900_F012.grib \ 
