@@ -670,11 +670,9 @@ A. You'd like to apply one mask to the forecast field and a *different*
    So this is a bit confusing. Here's what is happening:
 
    * The first argument is the input file which defines the grid. 
-
    * The second argument is used to define the masking region... and
      since I'm reading data from the same input file, I've listed
      that file twice. 
-
    * The third argument is the output file name. 
 
    * The type of masking is "data" masking where we read a 2D field of
