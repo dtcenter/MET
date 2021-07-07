@@ -229,17 +229,17 @@ A.  MET does not use the Fortran-like fixed width format in its
     writing a script to post-process the MET output into the fixed-width
     format that is needed or that the code expects.
 
- **Q. How does scientific notation work?**
+**Q. How does scientific notation work?**
 
- A.  By default, the ascii output files created by MET make use of
-     scientific notation when appropriate. The formatting of the
-     numbers that the AsciiTable class writes is handled by a call
-     to printf. The "%g" formatting option can result in
-     scientific notation: http://www.cplusplus.com/reference/cstdio/printf/
-
-     It has been recommended that a configuration option be added to
-     MET to disable the use of scientific notation. That enhancement
-     is planned for a future release.
+A.  By default, the ascii output files created by MET make use of
+    scientific notation when appropriate. The formatting of the
+    numbers that the AsciiTable class writes is handled by a call
+    to printf. The "%g" formatting option can result in
+    scientific notation: http://www.cplusplus.com/reference/cstdio/printf/
+    
+    It has been recommended that a configuration option be added to
+    MET to disable the use of scientific notation. That enhancement
+    is planned for a future release.
 
 Gen_Vx_Mask
 ~~~~~~~~~~~
@@ -649,31 +649,31 @@ A. You'd like to apply one mask to the forecast field and a *different*
    precip and 2-meter temperature, and resetts the precip at any grid
    point where the temperature is less than 290 K to a value of 0:
 
-     .. code-block:: ini
+   .. code-block:: ini
 
-		     {MET_BUILD_BASE}/bin/gen_vx_mask \ 
+        {MET_BUILD_BASE}/bin/gen_vx_mask \ 
 
-		     data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+	data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+	
+	data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
 
-		     data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+	APCP_03_where_2m_TMPge290.nc \ 
 
-		     APCP_03_where_2m_TMPge290.nc \ 
-
-		     -type data \ 
-
-		     -input_field 'name="APCP"; level="A3";' \ 
-
-		     -mask_field 'name="TMP"; level="Z2";' \ 
-
-		     -thresh 'lt290&&ne-9999' -v 4 -value 0
-
+	-type data \ 
+	
+	-input_field 'name="APCP"; level="A3";' \ 
+	
+	-mask_field 'name="TMP"; level="Z2";' \ 
+		   
+	-thresh 'lt290&&ne-9999' -v 4 -value 0
+		     
    So this is a bit confusing. Here's what is happening:
 
-     * The first argument is the input file which defines the grid. 
+   * The first argument is the input file which defines the grid. 
 
-     * The second argument is used to define the masking region... and
-       since I'm reading data from the same input file, I've listed
-       that file twice. 
+   * The second argument is used to define the masking region... and
+     since I'm reading data from the same input file, I've listed
+     that file twice. 
 
    * The third argument is the output file name. 
 
@@ -700,13 +700,13 @@ A. You'd like to apply one mask to the forecast field and a *different*
    To more easily demonstrate this, I changed to using "-value 10" and ran
    the output through plot_data_plane: 
 
-    .. code-block:: ini
+   .. code-block:: ini
 		  
-		    {MET_BUILD_BASE}/bin/plot_data_plane \ 
+        {MET_BUILD_BASE}/bin/plot_data_plane \ 
 
-		    APCP_03_where_2m_TMPge290.nc APCP_03_where_2m_TMPge290.ps \ 
+	APCP_03_where_2m_TMPge290.nc APCP_03_where_2m_TMPge290.ps \ 
 
-		    'name="data_mask"; level="(*,*)";'
+	'name="data_mask"; level="(*,*)";'
 
    In the resulting plot, anywhere you see the pink value of 10, that's
    where gen_vx_mask has masked out the grid point.
