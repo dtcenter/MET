@@ -686,7 +686,10 @@ the output through plot_data_plane:
 
 In the resulting plot, anywhere you see the pink value of 10, that's
 where gen_vx_mask has masked out the grid point.
-   
+
+Pcp-Combine
+~~~~~~~~~~~
+
 **Pcp-Combine - What are some examples using "-add"?**
 
 A.
@@ -703,6 +706,44 @@ Problems configuring a good set of options for pcp_combine. Run the command in t
 		-v 5
 
 This indicates that the name is "ACPCP" and the level is "A1" or a 1- hour accumulation.
+
+**Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
+
+A.
+Run the MET pcp_combine tool to put the NAM data into 3-hourly accumulations. 
+
+0-3 hour accumulation is already in the 03UTC file. Run this file
+through pcp_combine as a pass-through to put it into NetCDF format: 
+
+.. code-block:: ini
+		
+		[MET_BUILD_BASE}/pcp_combine -add 03_file.grb 03 APCP_00_03.nc
+		3-6 hour accumulation. Subtract 0-6 and 0-3 accumulations: 
+		[MET_BUILD_BASE}/pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
+		6-9 hour accumulation. Subtract 0-9 and 0-6 accumulations: 
+		[MET_BUILD_BASE}/pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
+		9-12 hour accumulation. Subtract 0-12 and 0-9 accumulations: 
+		[MET_BUILD_BASE}/pcp_combine -subtract 12_file.grb 12 09_file.grb 09 APCP_09_12.nc
+		
+12-15 hour accumulation. Just run as a pass-through again: 
+
+.. code-block:: ini
+
+		[MET_BUILD_BASE}/pcp_combine -add 15_file.grb 03 APCP_12_15.nc
+
+15-18 hour accumulation. Subtract 12-18 and 12-15 accumulations: 
+
+.. code-block:: ini
+		
+		[MET_BUILD_BASE}/pcp_combine -subtract 18_file.grb 06 15_file.grb 03 APCP_15_18.nc
+
+And so on...
+
+Run the 0-3 and 12-15 through pcp_combine even though they already have
+the 3-hour accumulation. That way, all of the NAM files will be in the
+same file format, and can use the same configuration file settings for
+the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
+of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
