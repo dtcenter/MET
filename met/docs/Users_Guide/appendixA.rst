@@ -1005,17 +1005,21 @@ Some things to point out here:
 1.
 Notice in the wgrib output that the forecast times are 1015 min and
 965 min. In HHMMSS format, that's "165500" and "160500".
+
 2.
 An accumulation interval can’t be specified since the data isn't stored
 that way. Instead, use a config file string to describe the data to use.
+
 3.
 The config file string specifies a "name" (APCP) and "level" string. APCP
 is defined at the surface, so a level value of 0 (L0) was specified.
+
 4.
 Technically, the "lead_time" doesn’t need to be specified at all, pcp_combine
 would find the single APCP record in each input GRIB file and use them. But
 just in case, the lead_time option was included to be extra certain to
 get exactly the data that is needed.
+
 5.
 The default output variable name pcp_combine would write would be "APCP_L0".
 However, to indicate that its a 50-minute "accumulation interval" use a
