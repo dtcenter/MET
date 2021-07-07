@@ -880,6 +880,42 @@ following:
 That says... get 12 hours of precip from the first file and 6 hours
 from the second file and subtract them.
 
+**Pcp-Combine - How does pass through work?**
+A.
+The pcp_combine tool is typically used to modify the accumulation interval
+of precipitation amounts in model and/or analysis datasets. For example,
+when verifying model output in GRIB format containing runtime accumulations
+of precipitation, run the pcp_combine -subtract option every 6 hours to
+create 6-hourly precipitation amounts. In this example, it is not really
+necessary to run pcp_combine on the 6-hour GRIB forecast file since the
+model output already contains the 0 to 6 hour accumulation. However, the
+output of pcp_combine is typically passed to point_stat, grid_stat, or mode
+for verification. Having the 6-hour forecast in GRIB format and all other
+forecast hours in NetCDF format (output of pcp_combine) makes the logic
+for configuring the other MET tools messy. To make the configuration
+consistent for all forecast hours, one option is to choose to run
+pcp_combine as a pass-through to simply reformat from GRIB to NetCDF.
+Listed below is an example of passing a single record to the
+pcp_combine -add option to do the reformatting:
+
+.. code-block:: ini
+
+		$MET_BUILD/bin/pcp_combine -add forecast_F06.grb \
+		'name="APCP"; level="A6";' \
+		forecast_APCP_06_F06.nc -name APCP_06
+
+Reformatting from GRIB to NetCDF may be done for any other reason the
+user may have. For example, the -name option can be used to define the
+NetCDF output variable name. Presuming this file is then passed to
+another MET tool, the new variable name (CompositeReflectivity) will
+appear in the output of downstream tools:
+
+.. code-block:: ini
+
+		$MET_BUILD/bin/pcp_combine -add forecast.grb \
+		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
+		forecast.nc -name CompositeReflectivity
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
