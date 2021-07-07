@@ -690,7 +690,7 @@ where gen_vx_mask has masked out the grid point.
 Pcp-Combine
 ~~~~~~~~~~~
 
-**Pcp-Combine - What are some examples using "-add"?**
+**Q. Pcp-Combine - What are some examples using "-add"?**
 
 A.
 Problems configuring a good set of options for pcp_combine. Run the command in the following way:
@@ -745,7 +745,7 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
-**Pcp-Combine - How do I Combine 12-hour Accumulated Precipitation from Two Different Initialization Times?**
+**Q. Pcp-Combine - How do I Combine 12-hour Accumulated Precipitation from Two Different Initialization Times?**
 
 A. 
 The "-sum" command assumes the same initialization time. Use the "-add"
@@ -779,6 +779,55 @@ Here are 3 commands you could use to plot these data files:
 		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
 		${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
+**Q. Pcp_Combine - How Do I Correct a Precipitation Time Range?**
+
+A.
+Typically, accumulated precipitation is stored in GRIB files using an
+accumulation interval with a "time range" indicator value of 4. Here is
+a description of the different time range indicator values and
+meanings: http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+
+For example, take a look at the APCP in the GRIB files included in the
+MET tar ball:
+
+.. code-block:: ini
+
+		wgrib ${MET_BUILD_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 | grep APCP
+		1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0: \
+		P2=12:TimeU=1:sfc:0- 12hr acc:NAve=0
+		2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4: \
+		P1=9:P2=12:TimeU=1:sfc:9- 12hr acc:NAve=0
+
+The "TR=4" indicates that these records contain an accumulation
+between times P1 and P2. In the first record, the precip is accumulated
+between 0 and 12 hours. In the second record, the precip is accumulated
+between 9 and 12 hours.
+
+However, the GRIB data uses a time range indicator of 5, not 4.
+
+.. code-block:: ini
+
+		wgrib rmf_gra_2016040600.24 | grep APCP
+		291:28360360:d=16040600:APCP:kpds5=61:kpds6=1:kpds7=0: \
+		TR=5:P1=0:P2=24:TimeU=1:sfc:0-24hr diff:NAve=0
+
+pcp_combine is looking in "rmf_gra_2016040600.24" for a 24 hour
+*accumulation*, but since the time range indicator is no 4, it doesn't
+find a match.
+
+If possible switch the time range indicator to 4 on the GRIB files. If
+this is not possible, there is another workaround. Instead of telling
+pcp_combine to look for a particular accumulation interval, give it a
+more complete description of the chosen field to use from each file.
+Here is an example:
+
+.. code-block:: ini
+
+		pcp_combine -add rmf_gra_2016040600.24 'name="APCP"; level="L0-24";' \
+		rmf_gra_2016040600_APCP_00_24.nc
+		
+The resulting file should have the accumulation listed at 24h rather than 0-24.
+		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
