@@ -1093,6 +1093,35 @@ This example explicitly tells pcp_combine which files to read and
 what accumulation interval (6 hours) to extract from them. The resulting
 output should be identical to the output of the "-sum" command.
 
+**Q. Pcp-Combine - What is the difference between “-sum” vs. “-add”?**
+
+A.To run a project faster, -pcprx is an option.
+
+.. code-block:: ini
+		
+		${MET_BUILD_BASE}/bin/pcp_combine \
+		-sum 20160221_18 06 20160222_18 24 \
+		gfs_APCP_24_20160221_18_F00_F24.nc \
+		-pcpdir model_out/temp \
+		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
+
+But this only matches 2-digit forecast hours.
+
+The "-add" command could be used instead of the “-sum” command:
+
+.. code-block:: ini
+		
+		${MET_BUILD_BASE}/bin/pcp_combine -add \
+		model_out/temp/pgbq06.gfs.2016022118 06 \
+		model_out/temp/pgbq12.gfs.2016022118 06 \
+		model_out/temp/pgbq18.gfs.2016022118 06 \
+		model_out/temp/pgbq24.gfs.2016022118 06 \
+		gfs_APCP_24_20160221_18_F00_F24_ADD.nc
+
+The -sum and -add options both do the same thing... it's just that
+'- sum' finds the files more quickly. This could also be accomplished
+by using a calling script.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
