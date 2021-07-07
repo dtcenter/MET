@@ -71,7 +71,7 @@ the following steps:
 Use the regrid_data_plane tool to regrid 2m temperature
 to a smaller domain centered on China:
 
-.. code-block:: none
+.. code-block:: ini
 				  
 		${MET_BUILD_BASE}/bin/regrid_data_plane \ 
 		gfs_2012040900_F012.grib \ 
@@ -687,6 +687,23 @@ the output through plot_data_plane:
 In the resulting plot, anywhere you see the pink value of 10, that's
 where gen_vx_mask has masked out the grid point.
    
+**Pcp-Combine - What are some examples using "-add"?**
+
+A.
+Problems configuring a good set of options for pcp_combine. Run the command in the following way:
+
+.. code-block:: ini
+
+		#!/bin/sh
+		/usr/local/met/bin/pcp_combine -add \
+		rap_130_20160128_1000_003.grb2 1 \
+		rap_130_20160128_1100_003.grb2 1 \
+		rap_test_add.nc \
+		-field 'name="ACPCP"; level="A1";' \
+		-v 5
+
+This indicates that the name is "ACPCP" and the level is "A1" or a 1- hour accumulation.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
