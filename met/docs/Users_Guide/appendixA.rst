@@ -1136,6 +1136,39 @@ In this example, record 735 needs to be selected.
 Instead of having the level as "L0", tell it to use "R735" to select
 grib record 735.
 
+Plot-Data-Plane
+~~~~~~~~~~~~~~~
+
+**Q. Plot-Data-Plane - How Do I Inspect Gen_Vx_Mask Output?**
+
+A.
+The gen_vx_mask tool is successfully writing a NetCDF file, but the
+pcp_combine tool errors out when trying to write a NetCDF file: 
+
+.. code-block:: in
+		
+		ERROR : write_netcdf() -> error with pcp_var->put()
+
+The question is why? Let's check to see if the call to gen_vx_mask
+actually did create good output. Try running the following command
+from the top-level ${MET_BUILD_BASE} directory:
+
+.. code-block:: in
+		
+		bin/plot_data_plane \ 
+		out/gen_vx_mask/CONUS_poly.nc \ 
+		out/gen_vx_mask/CONUS_poly.ps \
+		'name="CONUS"; level="(*,*)";'
+
+And then view that postscript output file, using something like "gv"
+for ghostview: 
+
+.. code-block:: ini
+		
+		gv out/gen_vx_mask/CONUS_poly.ps
+
+Please review a map of 0's and 1's over the USA.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
