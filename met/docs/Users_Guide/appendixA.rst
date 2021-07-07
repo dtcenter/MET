@@ -881,6 +881,7 @@ That says... get 12 hours of precip from the first file and 6 hours
 from the second file and subtract them.
 
 **Pcp-Combine - How does pass through work?**
+
 A.
 The pcp_combine tool is typically used to modify the accumulation interval
 of precipitation amounts in model and/or analysis datasets. For example,
@@ -916,6 +917,26 @@ appear in the output of downstream tools:
 		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
 		forecast.nc -name CompositeReflectivity
 
+**Q. Pcp_Combine - How do I use “-pcprx" to run a project faster?**
+
+A.
+To run a project faster, the “-pcprx” option may be used to narrow the
+search down to whatever regular expression you provide. Here are a two
+examples:
+
+.. code-block:: ini
+		
+		# Only using Stage IV data (ST4)
+		${MET_BUILD_BASE}/bin/pcp_combine -sum 00000000_000000 06 \
+		20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
+
+		# Specify that files starting with pgbq[number][number]be used:
+		[MET_BUILD_BASE]/bin/pcp_combine \
+		-sum 20160221_18 06 20160222_18 24 \
+		gfs_APCP_24_20160221_18_F00_F24.nc \
+		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
+		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
+		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
