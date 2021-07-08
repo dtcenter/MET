@@ -6,10 +6,10 @@ Appendix A FAQs & How do I ... ?
 Frequently Asked Questions
 __________________________
 
-File_IO
+File-IO
 ~~~~~~~
 
-**Q. File_IO - How do I improve the speed of MET Tools using Gen_Vx_Mask?**
+**Q. File-IO - How do I improve the speed of MET Tools using Gen-Vx-Mask?**
 
 A.
 The main reason to use gen_vx_mask is to make the MET
@@ -61,7 +61,7 @@ differences lie. Identifying the stations where the
 differences occur is the
 first step in finding an explanation.
 
-**File_IO - How do I use map_data? Use China as an example.**
+**File-IO - How do I use map_data? Use China as an example.**
 
 A.
 This example starts with a 0.5 degree GFS and completes
@@ -110,7 +110,7 @@ config file. That will overwrite the default settings it
 reads from the ConfigMapData file. Alternatively, update
 the default map data files in that ConfigMapData file.
 
-**Q. FILE_IO - What is another way to understand the Number of Matched Pairs?**
+**Q. FILE-IO - What is another way to understand the Number of Matched Pairs?**
 
 A.
 In this example the dimension of the grid is 37x37. Thus, up to
@@ -121,7 +121,7 @@ an example netCDF file. If the forecast field contains missing data
 around the edge of the domain, then that is a reason there may be
 992 matched pairs instead of 1369.
 
-**Q.  FILE_IO - What is required for formatting files in NetCDF?**
+**Q.  FILE-IO - What is required for formatting files in NetCDF?**
 
 A.
 In order to use gridded NetCDF files in MET, the files need to
@@ -148,7 +148,7 @@ the number of seconds since Jan 1, 1970).
 5.
 Global attributes should include the grid/projection information.
 
-**Q. FILE_IO - How do I choose a Time Slice in a NetCDF file?**
+**Q. FILE-IO - How do I choose a Time Slice in a NetCDF file?**
 
 A.
 When processing NetCDF files, the level information needs to be
@@ -168,7 +168,7 @@ Let's use plot_data_plane as an example:
 Since these indices are 0-based, this will select the 6-th
 time slice of the APCP data and plot it.
 
-**Q. FILE_IO - How do I use the UNIX Time Conversion?**
+**Q. FILE-IO - How do I use the UNIX Time Conversion?**
 
 A.
 Regarding the timing information in the NetCDF variable attributes...
@@ -246,10 +246,10 @@ It has been recommended that a configuration option be added to
 MET to disable the use of scientific notation. That enhancement
 is planned for a future release.
 
-Gen_Vx_Mask
+Gen-Vx-Mask
 ~~~~~~~~~~~
 
-**Q. Gen_Vx_Mask - How do I Mask Region Intersection between Stations and
+**Q. Gen-Vx-Mask - How do I Mask Region Intersection between Stations and
 Polyline?**
 
 **I have a list of stations to use for verification. I also have a poly
@@ -285,7 +285,7 @@ write partial sums and contingency table counts.
 
 Then aggregate the results together by running a STAT-Analysis job.
 
-**Q. Gen_Vx_Mask - What are some ways of Defining Masking Regions?**
+**Q. Gen-Vx-Mask - What are some ways of Defining Masking Regions?**
 
 A.
 Here is an example to define some new masking regions. Suppose we
@@ -332,10 +332,10 @@ In this example, the mask is in roughly the right spot, but there
 are obvious problems with the latitude and longitude values used
 to define that mask for Poland.
 
-Grid_Stat
+Grid-Stat
 ~~~~~~~~~
 
-**Q. Grid_Stat - How do I define a complex masking region?**
+**Q. Grid-Stat - How do I define a complex masking region?**
 
 A.
 There is a way to accomplish defining intersections and unions of
@@ -400,7 +400,7 @@ Script up multiple calls to gen_vx_mask to apply to complex
 masking logic... and then pass the output mask file to Grid- Stat
 in its configuration file.
 
-**Q. Grid_Stat -  How do I set Neighborhood Methods Boundaries?**
+**Q. Grid-Stat -  How do I set Neighborhood Methods Boundaries?**
 
 A.
 When computing fractions skill score, MET uses the "vld_thresh"
@@ -424,7 +424,7 @@ should be 0. If the thresholding the data greater-than-or-equal-to
 0 (>= 0), that will always evaluate to true for precipitation.
 Consider using strictly greater-than 0 (>0) instead.
 
-**Q. Grid_Stat - How do I use Neighborhood Methods to Compute Fraction
+**Q. Grid-Stat - How do I use Neighborhood Methods to Compute Fraction
 Skill Score**
 
 A.
@@ -451,7 +451,7 @@ be used to aggregate them together into a single FSS value, like this:
 Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
 that capture the "events" that are of interest in studying.    
 
-**Q. Grid_Stat - How do I use Config File Setup to Read a NetCDF file**
+**Q. Grid-Stat - How do I use Config File Setup to Read a NetCDF file**
 
 A.
 Setting up the Grid-Stat config file to read a netcdf file
@@ -476,7 +476,7 @@ would say get data from the 3rd time dimension and 5th vertical level.
 However the NetCDF files that the MET tools generate are much simpler,
 and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
 
-**Q. Grid_Stat - What would be an example of Verifying Probabilities? Example 1**
+**Q. Grid-Stat - What would be an example of Verifying Probabilities? Example 1**
 
 A.
 There is an example of verifying probabilities in the test scripts
@@ -523,7 +523,7 @@ exceeding 34kts, and likely comparing it against the wind speed values.
 The observed cat_thresh is set to >=34 to be consistent with with the
 forecast probability definition.
 
-**Q. Grid_Stat - What would be an example of Verifying Probabilities? Example 2**
+**Q. Grid-Stat - What would be an example of Verifying Probabilities? Example 2**
 
 A.
 An example of verifying a probability of precipitation field is
@@ -1139,7 +1139,7 @@ grib record 735.
 Plot-Data-Plane
 ~~~~~~~~~~~~~~~
 
-**Q. Plot-Data-Plane - How Do I Inspect Gen_Vx_Mask Output?**
+**Q. Plot-Data-Plane - How Do I Inspect Gen-Vx-Mask Output?**
 
 A.
 The gen_vx_mask tool is successfully writing a NetCDF file, but the
@@ -1202,7 +1202,7 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 When trying to get MET to read a particular gridded data file, use the
 plot_data_plane tool to test it out.
 
-**Q. Plot_Data_Plane - How Do I Test the Variable Naming Convention? (Record Number Example)**
+**Q. Plot-Data-Plane - How Do I Test the Variable Naming Convention? (Record Number Example)**
 
 A.
 Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
@@ -1219,7 +1219,7 @@ Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by runni
 
 The GRIB id info has been the same between records 1 and 2.
 
-**Q. Plot_Data_Plane - How Do I Use Compute and Verify Wind Speed?**
+**Q. Plot-Data-Plane - How Do I Use Compute and Verify Wind Speed?**
 
 A.
 Here's how to compute and verify wind speed using MET. Good news, MET
@@ -1252,7 +1252,7 @@ in the RTMA file.
 Stat-Analysis
 ~~~~~~~~~~~~~
 
-**Q. Stat_Analysis - How does '-aggregate_stat' work?**
+**Q. Stat-Analysis - How does '-aggregate_stat' work?**
 
 A.
 In STAT-Analysis, there is a "- vx_mask" job filtering option. That option
@@ -1295,7 +1295,7 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
-**Q. Stat_Analysis - What is the best way to average the > FSS > scores with several days even several months using 'Aggregate to Average Scores'?**
+**Q. Stat-Analysis - What is the best way to average the > FSS > scores with several days even several months using 'Aggregate to Average Scores'?**
 
 Below is the best way to aggregate together the Neighborhood Continuous
 (NBRCNT) lines across multiple days, specifically the fractions skill
@@ -1323,7 +1323,7 @@ combination of those header column entries.
 The output is printed to the screen, or use the "-out_stat" option to
 also write the aggregated output to a file named "agg_nbrcnt.txt".
 
-**Q. Stat_Analysis - How do I use '-by' to capture unique entries?**
+**Q. Stat-Analysis - How do I use '-by' to capture unique entries?**
 
 A.
 Here is a stat-analysis job that could be used to run, read the MPR lines,
@@ -1343,7 +1343,7 @@ to run the job separately for each unique entry found in the FCST_VAR column.
 
 The output statistics are written to "out_pstd.txt".
 
-**Q. Stat_Analysis - How do I use '-filter' to refine my output?**
+**Q. Stat-Analysis - How do I use '-filter' to refine my output?**
 
 A.
 Here is an example of running a STAT-Analysis filter job to discard any
@@ -1374,7 +1374,7 @@ cases without having to modify the source code.
 This job reads find 56 CTS lines, but only keeps 36 of them where both
 the BASER and FMEAN columns are at least 0.05.
 
-**Q. Stat_Analysis - How Do I Use “-by” Flag to Stratify Results?**
+**Q. Stat-Analysis - How Do I Use “-by” Flag to Stratify Results?**
 
 A.
 Adding "-by FCST_VAR" is agreat way to how to associate a single value,
@@ -1393,7 +1393,7 @@ Run the following job on the output from Grid-Stat generated when the
 The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
-**Q. Stat_Analysis - How Do I Speed Up Run Times?**
+**Q. Stat-Analysis - How Do I Speed Up Run Times?**
 By default, STAT-Analysis has two options enabled which slow it down.
 Disabling these two options will create quicker run times:
 
@@ -1525,8 +1525,8 @@ and call convert to reformat from PostScript to PNG.
 A.
 Here is an example of NetCDF that the MET software is not expecting. Here
 is an option for accessing that same TRMM data, following links from the
-MET website
-:http://www.dtcenter.org/met/users/downloads/observation_data.php
+MET website:
+http://www.dtcenter.org/met/users/downloads/observation_data.php
 
 .. code-block:: ini
 
@@ -1574,7 +1574,7 @@ the model domain.
 **Q. Other Utilities - How do I convert a Postscript to png?**
 
 A.
-Use the linux “convert” tool to convert a Plot_Data_Plane PostScript
+Use the linux “convert” tool to convert a Plot-Data-Plane PostScript
 file to a png: 
 
 .. code-block:: ini
@@ -1629,7 +1629,7 @@ pairwise differences that are needed.
 Miscellaneous
 ~~~~~~~~~~~~~
 
-**Q. Regrid_Data_Plane - How Do I Define a Lat-Lon Grid?**
+**Q. Regrid-Data-Plane - How Do I Define a Lat-Lon Grid?**
 
 A.
 Here is an example of the NetCDF variable attributes that MET uses to
