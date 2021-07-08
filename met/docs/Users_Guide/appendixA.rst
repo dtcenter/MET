@@ -36,7 +36,7 @@ A. No - it will not. In the future, we may add options to allow additional model
 
 **Q. How do I get help if my questions are not answered in the User's Guide?**
 
-A. First, look on our `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_. If that doesn't answer your question, then create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+A. First, look on our `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_. If that doesn't answer your question, create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 **Q. Where are the graphics?**
 

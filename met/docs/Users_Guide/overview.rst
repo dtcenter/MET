@@ -87,7 +87,7 @@ We welcome comments and suggestions for improvements to MET, especially informat
 
 **-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
 
-The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_..
+The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 Fortify
 _______
