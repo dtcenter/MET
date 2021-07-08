@@ -1393,6 +1393,70 @@ Run the following job on the output from Grid-Stat generated when the
 The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
+TC-Stat
+~~~~~~~
+
+**TC-Stat - How Do I Use “-by” Flag to Stratify Results?**
+
+A.
+To perform tropical cyclone evaluations for multiple models use the
+"-by AMODEL" option with the tc_stat tool. Here is an example of using
+a verbosity level of 4 (-v 4).
+
+In this case the tc_stat job looked at the 48 hour lead time for the HWRF
+and H3HW models. Without the “-by AMODEL” option, the output would be
+all grouped together. 
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/tc_stat \ 
+		-lookin d2014_vx_20141117_reset/al/tc_pairs/tc_pairs_H3WI_* \ 
+		-lookin d2014_vx_20141117_reset/al/tc_pairs/tc_pairs_HWFI_* \ 
+		-job summary -lead 480000 -column TRACK -amodel HWFI,H3WI \
+		-by AMODEL -out sample.out
+
+This will result in all 48 hour HWFI and H3WI track forecasts to be
+aggregated (statistics and scores computed) for each model seperately.
+As with any MET trouble, try using debug level 4 (-v 4) to see if there
+are any more useful log messages.
+
+**Q. TC-Stat - How Do I Use Rapid Intensification Verification?**
+
+To get the most output, run something like this...
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/tc_stat \ 
+		-lookin path/to/tc_pairs/output \ 
+		-job rirw -dump_row test \ 
+		-out_line_type CTC,CTS,MPR
+
+By default, rapid intensification (RI) is defined as a 24-hour exact
+change exceeding 30kts. To define RI differently, modify that definition
+using the ADECK, BDECK, or both using -rirw_time, -rirw_exact,
+and -rirw_thresh options. Set -rirw_window to something larger than 0
+to enable false alarms to be considered hits when they were "close enough"
+in time.
+
+.. code-block:: ini
+
+		{MET_BASE}/bin/tc_stat \ 
+		-lookin path/to/tc_pairs/output \ 
+		-job rirw -dump_row test \
+		-rirw_time 36 -rirw_window 12 \
+		-out_line_type CTC,CTS,MPR
+
+To evaluate Rapid Weakening (RW) by setting "-rirw_thresh <=-30".
+To stratify your results by lead time, you could add "-by LEAD" option.
+
+.. code-block:: ini
+
+		{MET_BASE}/bin/tc_stat \ 
+		-lookin path/to/tc_pairs/output \ 
+		-job rirw -dump_row test \
+		-rirw_time 36 -rirw_window 12 \
+		-rirw_thresh <=-30 -by LEAD \
+		-out_line_type CTC,CTS,MPR
 
 
 Miscellaneous Questions
