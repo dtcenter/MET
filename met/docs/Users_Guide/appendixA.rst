@@ -1640,6 +1640,41 @@ feature was added for users who are testing multiple versions of a
 model on the same set of storms. They might be using the same ATCF ID
 in all their output. But this enables them to distinguish the output
 in tc_pairs.
+
+**Q. Why is my grid upside down?**
+
+A.
+The user provides a gridded data file to MET and it runs without error,
+but the data is packed upside down.
+
+Try using the "file_type" entry. The "file_type" entry specifies the
+input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
+rather than letting the code determine it itself. For valid file_type
+values, see "File types" in the data/config/ConfigConstants file. This
+entry should be defined within the "fcst" or "obs" dictionaries.
+Sometimes, directly specifying the type of file will help MET figure
+out what to properly do with the data.
+
+Another option is to use the regrid_data_plane tool. The regrid_data_plane
+tool may be run to read data from any gridded data file MET supports
+(i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
+user-specified grid, and write the field(s) out in NetCDF format. See
+Regrid_data_plane tool (Section 5.2) in the MET User's Guide for more
+detailed information. While the regrid_data_plane tool is useful as a
+stand-alone tool, the capability is also included to automatically regrid
+data in most of the MET tools that handle gridded data. This "regrid"
+entry is a dictionary containing information about how to handle input
+gridded data files. The "regird" entry specifies regridding logic and
+has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
+the path to a gridded data file defining the grid, or an explicit grid
+specification string. See the regrid entry in Configuration File
+Details (Section 3.5) in the MET User's Guide for a more detailed
+description of the configuration file entries that control automated
+regridding.
+
+A single model level can be plotted using the plot_data_plane utility.
+This tool can assist the user by showing the data to be verified to
+ensure that times and locations match up as expected.
 		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
