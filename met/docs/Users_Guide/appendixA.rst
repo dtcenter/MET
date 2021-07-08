@@ -1710,6 +1710,109 @@ on other things to check if you are having problems installing or running MET.
 * Are you using NetCDF version 3.4 or version 4? Currently, only NetCDF
   version 3.6 can be used with MET.
 
+**BUFRLIB Errors during MET installation**
+
+.. code-block:: ini
+
+		error message: /usr/bin/ld: cannot find -lbufr
+		The linker can not find the BUFRLIB library archive file it needs. 
+
+		export MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3:$MET_BUFRLIB
+
+It isn't making it's way into the configuration because BUFRLIB_v10.2.3
+isn't showing up in the output of make. This may indicate the wrong shell
+type. The .bashrc file sets the environment for the bourne shell, but
+the above error could indicate that the c- shell is being used instead.
+
+Try the following 2 things:
+
+1.
+Check to make sure this file exists: 
+
+.. code-block:: ini
+
+		ls /home/username/BUFRLIB_v10.2.3/libbufr.a
+
+2.		
+Rerun the MET configure command using the following option on the command line: 
+
+.. code-block:: ini
+		
+		MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
+
+After doing that, please try recompiling MET. If it fails,
+please send met_help@ucar.edu the following log files.
+"make_install.log" as well as "config.log".
+
+**Command Line Double Quotes**
+
+Single quotes, double quotes, and escape characters can be difficult for
+MET to parse. If there are problems, especially in Python code, try
+breaking the command up like the below example.
+
+.. code-block:: ini
+
+		['/h/WXQC/{MET_BUILD_BASE}/bin/regrid_data_plane', 
+		'/h/data/global/WXQC/data/umm/1701150006', 
+		'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
+		'\'name="HGT"; level="P500";\'', '-v', '6']
+
+**Environment Variable Settings**
+
+In the below incorrect example for many environment variables have both
+the main variable set and the INC and LIB variables set:
+
+.. code-block:: ini
+
+		export MET_GSL=$MET_LIB_DIR/gsl 
+		export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl 
+		export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
+		
+**only MET_GSL *OR *MET_GSLINC *AND *MET_GSLLIB need to be set.**
+So, for example, either set:
+
+.. code-block:: ini
+
+		export MET_GSL=$MET_LIB_DIR/gsl
+
+or set:
+
+.. code-block:: ini
+
+		export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
+
+Additionally, MET does not use MET_HDF5INC and MET_HDF5LIB.
+It only uses MET_HDF5.
+
+Our online tutorial can help figure out what should be set and what the
+value should be:
+http://www.dtcenter.org/met/users/support/online_tutorial/METv6.0/tutorial.php?name=compilation&category=configure
+
+**NetCDF install issues**
+
+This example shows a problem with NetCDF in the make_install.log file:
+
+.. code-block:: ini
+
+		/usr/bin/ld: warning: libnetcdf.so.11, 
+		needed by /home/zzheng25/metinstall//lib/libnetcdf_c++4.so, 
+		may conflict with libnetcdf.so.7
+
+Below are examples of too many MET_NETCDF options:
+
+.. code-block:: ini
+
+		MET_NETCDF='/home/username/metinstall/' 
+		MET_NETCDFINC='/home/username/local/include' 
+		MET_NETCDFLIB='/home/username/local/lib'
+
+
+**Either MET_NETCDF or MET_NETCDFINC and MET_NETCDFLIB need to be set.**
+If the NetCDF include files are in /home/username/local/include and the
+NetCDF library files are in /home/username/local/lib, unset the
+MET_NETCDF environment variable, then run "make clean", reconfigure,
+and then run "make install" and "make test" again.
+
 **Grid_stat won't run**
 
 * Are both the observational and forecast datasets on the same grid?
