@@ -1393,6 +1393,42 @@ Run the following job on the output from Grid-Stat generated when the
 The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
+**Q. Stat_Analysis - How Do I Speed Up Run Times?**
+By default, STAT-Analysis has two options enabled which slow it down.
+Disabling these two options will create quicker run times:
+
+1.
+The computation of rank correlation statistics, Spearmans Rank Correlation
+and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
+
+2.
+The computation of bootstrap confidence intervals. Disable them using
+"-n_boot_rep 0".
+
+Two more suggestions for faster run times.
+
+1.
+Instead of using "-fcst_var u", use "-by fcst_var". This will compute
+statistics separately for each unique entry found in the FCST_VAR column.
+
+2.
+Instead of using "-out" to write the output to a text file, use "-out_stat"
+which will write a full STAT output file, including all the header columns.
+This will create a long list of values in the OBTYPE column. To avoid the
+long, OBTYPE column value, manually set the output using
+"-set_hdr OBTYPE ALL_TYPES". Or set its value to whatever is needed.
+
+.. code-block:: ini
+		
+		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		-lookin diag_conv_anl.2015060100.stat \ 
+		-job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR \ 
+		-out_stat diag_conv_anl.2015060100_cnt.txt -set_hdr OBTYPE ALL_TYPES \ 
+		-n_boot_rep 0 -rank_corr_flag FALSE -v 4
+
+Adding the "-by FCST_VAR" option to compute stats for all variables and
+runs quickly.
+
 TC-Stat
 ~~~~~~~
 
