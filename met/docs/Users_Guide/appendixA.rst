@@ -1295,6 +1295,106 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
+**Q. Stat_Analysis - What is the best way to average the > FSS > scores with several days even several months using 'Aggregate to Average Scores'?**
+
+Below is the best way to aggregate together the Neighborhood Continuous
+(NBRCNT) lines across multiple days, specifically the fractions skill
+score (FSS). The STAT-Analysis tool is designed to do this. This example
+is for aggregating scores for the accumulated precipitation (APCP) field. 
+
+Run the "aggregate" job type in stat_analysis to do this:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/stat_analysis -lookin directory/file*_nbrcnt.txt \
+		-job aggregate -line_type NBRCNT -by FCST_VAR,FCST_LEAD,FCST_THRESH,INTERP_MTHD,INTERP_PNTS -out_stat agg_nbrcnt.txt
+
+This job reads all the files that are passed to it on the command line with
+the "-lookin" option. List explicit filenames to read them directly.
+Listing a top-level directory name will search that directory for files
+ending in ".stat".
+
+In this case, the job running is to "aggregate" the "NBRCNT" line type.
+
+In this case, the "-by" option is being used and lists several header
+columns. STAT-Analysis will run this job separately for each unique
+combination of those header column entries.
+
+The output is printed to the screen, or use the "-out_stat" option to
+also write the aggregated output to a file named "agg_nbrcnt.txt".
+
+**Q. Stat_Analysis - How do I use '-by' to capture unique entries?**
+
+A.
+Here is a stat-analysis job that could be used to run, read the MPR lines,
+define the probabilistic forecast thresholds, define the single observation
+threshold, and compute a PSTD output line. Using "-by FCST_VAR" tells it
+to run the job separately for each unique entry found in the FCST_VAR column.
+
+.. code-block:: ini
+		
+		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		-lookin point_stat_model2_120000L_20160501_120000V.stat \ 
+		-job aggregate_stat -line_type MPR -out_line_type PSTD \ 
+		-out_fcst_thresh ge0,ge0.1,ge0.2,ge0.3,ge0.4,ge0.5,ge0.6,ge0.7,ge0.8,ge0.9,ge1.0 \ 
+		-out_obs_thresh eq1.0 \ 
+		-by FCST_VAR \ 
+		-out_stat out_pstd.txt
+
+The output statistics are written to "out_pstd.txt".
+
+**Q. Stat_Analysis - How do I use '-filter' to refine my output?**
+
+A.
+Here is an example of running a STAT-Analysis filter job to discard any
+CNT lines (continuous statistics) where the forecast rate and observation
+rate are less than 0.05. This is an alternative way of tossing out those
+cases without having to modify the source code.
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		-lookin out/grid_stat/grid_stat_120000L_20050807_120000V.stat \ 
+		-job filter -dump_row filter_cts.txt -line_type CTS \ 
+		-column_min BASER 0.05 -column_min FMEAN 0.05
+		DEBUG 2: STAT Lines read = 436 
+		DEBUG 2: STAT Lines retained = 36 
+		DEBUG 2: 
+		DEBUG 2: Processing Job 1: -job filter -line_type CTS -column_min BASER 
+		0.05 -column_min 
+		FMEAN 0.05 -dump_row filter_cts.txt 
+		DEBUG 1: Creating 
+		STAT output file "filter_cts.txt" 
+		FILTER: -job filter -line_type 
+		CTS -column_min 
+		BASER 0.05 -column_min 
+		FMEAN 0.05 -dump_row filter_cts.txt 
+		DEBUG 2: Job 1 used 36 out of 36 STAT lines.
+
+This job reads find 56 CTS lines, but only keeps 36 of them where both
+the BASER and FMEAN columns are at least 0.05.
+
+**Q. Stat_Analysis - How Do I Use “-by” Flag to Stratify Results?
+
+A.
+Adding "-by FCST_VAR" is agreat way to how to associate a single value,
+of say RMSE, with each of the forecast variables (UGRD,VGRD and WIND).
+
+Run the following job on the output from Grid-Stat generated when the
+"make test" command is run:
+
+.. code-block:: ini
+		
+		${MET_BUILD_BASE}/bin/stat_analysis -lookin out/grid_stat \ 
+		-job aggregate_stat -line_type SL1L2 -out_line_type CNT \ 
+		-by FCST_VAR,FCST_LEV \ 
+		-out_stat cnt.txt
+
+The resulting cnt.txt file includes separate output for 6 different
+FCST_VAR values at different levels.
+
+
+
 Miscellaneous Questions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
