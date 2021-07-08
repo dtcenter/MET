@@ -144,6 +144,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    Dictionary i_fdict, i_odict;
    gsl_wavelet_type type;
 
+   SingleThresh st_NA;
+   st_NA.set_na();
+   
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
@@ -250,7 +253,21 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
               << "Forecast categorical thresholds: "    << fcat_ta[i].get_str() << "\n"
               << "Observed categorical thresholds: "    << ocat_ta[i].get_str() << "\n";
       }
-
+      
+      // If the forecast threshold array is an empty list (or NA) 
+      // Add the NA threshold type to the list for downstream iteration
+      if(fcat_ta[i].n_elements() == 0) {
+	mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA" << "\n";
+	fcat_ta[i].add(st_NA);
+      }
+      
+      // If the observation threshold array is an empty list (or NA) 
+      // Add the NA threshold type to the list for downstream iteration
+      if(ocat_ta[i].n_elements() == 0) {
+	mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA" << "\n";
+	ocat_ta[i].add(st_NA);
+      }
+      
       // Check for the same number of fcst and obs thresholds
       if(fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
 

@@ -454,7 +454,7 @@ void process_scores() {
                shc.set_fcst_thresh(conf_info.fcat_ta[i][k]);
                shc.set_obs_thresh(conf_info.ocat_ta[i][k]);
 
-               write_isc_row(shc, isc_info[j][k],
+	       write_isc_row(shc, isc_info[j][k],
                   conf_info.output_flag[i_isc],
                   stat_at, i_stat_row, isc_at, i_isc_row);
             } // end for k
@@ -939,6 +939,9 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    int i, j, k;
    ConcatString fcst_thresh_str, obs_thresh_str;
 
+   int apply_fcst_thresh = 1;
+   int apply_obs_thresh = 1;
+   
    // Check the NumArray lengths
    n = f_na.n_elements();
    if(n != o_na.n_elements()) {
@@ -992,10 +995,22 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
    // Apply each threshold
    for(i=0; i<conf_info.fcat_ta[i_vx].n_elements(); i++) {
-
+      
       fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
       obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
 
+      // If the forecast threshold is set to NA skip masking below
+      if(isc_info[i].fthresh.get_type() == thresh_na) {
+	mlog << Debug(2) << "The forecast threshold is NA (missing), skipping applying threshold" << "\n";
+	apply_fcst_thresh = 0;
+      }
+
+      // If the observation threshold is set to NA skip masking below
+      if(isc_info[i].othresh.get_type() == thresh_na) {
+	mlog << Debug(2) << "The observation threshold is NA (missing), skipping applying threshold" << "\n";
+	apply_obs_thresh = 0;
+      }
+            
       mlog << Debug(2) << "Computing Intensity-Scale decomposition for "
            << conf_info.fcst_info[i_vx]->magic_str() << " "
            << fcst_thresh_str << " versus "
@@ -1004,11 +1019,14 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Apply the threshold to each point to create 0/1 mask fields
       for(j=0; j<n; j++) {
-         f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
-         o_dat[j] = isc_info[i].othresh.check(o_na[j]);
-         diff[j]  = f_dat[j] - o_dat[j];
+	if(apply_fcst_thresh)
+	  f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
+	if(apply_obs_thresh)
+	  o_dat[j] = isc_info[i].othresh.check(o_na[j]);
+	
+	diff[j]  = f_dat[j] - o_dat[j];
       } // end for j
-
+      
       // Compute the contingency table for the binary fields
       compute_cts(f_dat, o_dat, n, isc_info[i]);
 
