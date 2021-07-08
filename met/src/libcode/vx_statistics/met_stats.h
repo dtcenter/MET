@@ -634,6 +634,9 @@ class DMAPInfo {
       // Zhu Metric
       double zhu_fo, zhu_of, zhu_min, zhu_max, zhu_mean;
 
+      // G, G-Beta, and assymetric G-Beta
+      double g, gbeta, agbeta;
+
       // Compute statistics
       double fbias() const; // fbias = fy / oy
 
@@ -646,9 +649,16 @@ class DMAPInfo {
                        const double _fom_alpha, const double _zhu_weight,
                        const double _beta_value);
 
+      // Get functions
+      double get_beta_value() const; 
+
       void clear();
       void reset_options();
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline double DMAPInfo::get_beta_value() const { return(beta_value); }
 
 ////////////////////////////////////////////////////////////////////////
 //

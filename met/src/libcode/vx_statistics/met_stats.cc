@@ -2743,6 +2743,7 @@ void DMAPInfo::clear() {
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
+   g        = gbeta  = agbeta  = beta_value = bad_data_double;
 
    return;
 }
@@ -2792,6 +2793,10 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    zhu_min  = c.zhu_min;
    zhu_max  = c.zhu_max;
    zhu_mean = c.zhu_mean;
+
+   g      = c.g;
+   gbeta  = c.gbeta;
+   agbeta = c.agbeta;
 
    baddeley_p = c.baddeley_p;
    baddeley_max_dist = c.baddeley_max_dist;
@@ -2935,15 +2940,24 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       zhu_mean = (zhu_fo + zhu_of) / 2;
    }
 
+   // G, G-Beta, and asymmetric G-Beta
+   // JHG work here!
+   g = bad_data_double;
+   gbeta = bad_data_double;
+   agbeta = bad_data_double;
+
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
         << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
-        << "\n\tmed_fo=" << med_fo << ", med_of=" << med_of
-        << ", med_min=" << med_min << ", med_max=" << med_max << ", med_mean=" << med_mean
-        << "\n\tfom_fo=" << fom_fo << ", fom_of=" << fom_of
-        << ", fom_min=" << fom_min << ", fom_max=" << fom_max << ", fom_mean=" << fom_mean
-        << "\n\tzhu_fo=" << zhu_fo << ", zhu_of=" << zhu_of
-        << ", zhu_min=" << zhu_min << ", zhu_max=" << zhu_max << ", zhu_mean=" << zhu_mean
+        << "\n\tmed_fo=" << med_fo   << ", med_of="    << med_of
+        << ", med_min="  << med_min  << ", med_max="   << med_max << ", med_mean=" << med_mean
+        << "\n\tfom_fo=" << fom_fo   << ", fom_of="    << fom_of
+        << ", fom_min="  << fom_min  << ", fom_max="   << fom_max << ", fom_mean=" << fom_mean
+        << "\n\tzhu_fo=" << zhu_fo   << ", zhu_of="    << zhu_of
+        << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean=" << zhu_mean
+        << "\n\tg="      << g        << ", gbeta="     << gbeta   << ", agbeta="   << agbeta
+        << ", beta_value=" << beta_value
         << "\n";
+
    return;
 }
 
