@@ -30,7 +30,7 @@ The method
 
 The Intensity Scale approach can be summarized in the following 5 steps:
 
-1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. :numref:`wavelet-stat_NIMROD_3h_fcst` illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold :numref:`contingency_table_counts`.
+1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. This can also be done with no thresholds indicated at all and in that case the grid-point values are all assigned to 1. :numref:`wavelet-stat_NIMROD_3h_fcst` illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold :numref:`contingency_table_counts`.
 
 2. The binary forecast and observation fields obtained from the thresholding are then decomposed into the sum of components on different scales, by using a 2D Haar wavelet filter (:numref:`wavelet-stat_NIMROD_diff`). Note that the scale components are fields, and their sum adds up to the original binary field. For a forecast defined over square domain of **2ⁿ x 2ⁿ** grid-points, the scale components are **n+1: n** mother wavelet components + the largest father wavelet (or scale-function) component. The **n** mother wavelet components have resolution equal to **1, 2, 4, ...** :math:`\mathbf{2^{n-1}}`  grid-points. The largest father wavelet component is a constant field over the **2ⁿ x 2ⁿ** grid-point domain with value equal to the field mean.
 
@@ -230,6 +230,22 @@ _______________________
 
 .. code-block:: none
 
+  fcst = {
+     field = [
+        {
+	  name       = "APCP";
+	  level      = [ "A12" ];
+	  cat_thresh = [];
+	}
+     ];
+  }
+		
+The **cat_thresh** option defines an array of thresholds for each field defined in the fcst and obs dictionaries. The number of forecast and observation categorical thresholds must match. If set to an empty list the thresholds will not be applied (no binary masking) and all the grid-point values will be set to 1 and used for statistics
+		
+_______________________
+
+.. code-block:: none
+		
   grid_decomp_flag = AUTO;
   
   tile = {
