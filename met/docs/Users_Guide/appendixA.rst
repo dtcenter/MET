@@ -1374,7 +1374,7 @@ cases without having to modify the source code.
 This job reads find 56 CTS lines, but only keeps 36 of them where both
 the BASER and FMEAN columns are at least 0.05.
 
-**Q. Stat_Analysis - How Do I Use “-by” Flag to Stratify Results?
+**Q. Stat_Analysis - How Do I Use “-by” Flag to Stratify Results?**
 
 A.
 Adding "-by FCST_VAR" is agreat way to how to associate a single value,
