@@ -1202,6 +1202,51 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 When trying to get MET to read a particular gridded data file, use the
 plot_data_plane tool to test it out.
 
+**Q. Plot_Data_Plane - How Do I Test the Variable Naming Convention? (Record Number Example)**
+
+Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
+
+"R2" tells MET to plot record number 2. Record numbers 1 and 2 both contain temperature data and 2-meters. Here's some wgrib2 output:
+
+.. code-block:: ini
+
+		1:0:d=2013051806:TMP:2 m above ground:anl:analysis/forecast error 2:3323062:d=2013051806:TMP:2 m above ground:anl:
+
+The GRIB id info has been the same between records 1 and 2.
+
+**Q. Plot_Data_Plane - How Do I Use Compute and Verify Wind Speed?**
+
+Here's how to compute and verify wind speed using MET. Good news, MET
+already includes logic for deriving wind speed on the fly. The GRIB
+abbreviation for wind speed is WIND. To request WIND from a GRIB1 or
+GRIB2 file, MET first checks to see if it already exists in the current
+file. If so, it'll use it as is. If not, it'll search for the corresponding
+U and V records and derive wind speed to use on the fly.
+
+In this example the RTMA file is named rtma.grb2 and the UPP file is
+named wrf.grb, please try running the following commands to plot wind speed:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/plot_data_plane wrf.grb wrf_wind.ps \
+		'name"WIND"; level="Z10";' -v 3 
+		${MET_BUILD_BASE}/bin/plot_data_plane rtma.grb2 rtma_wind.ps \
+		'name"WIND"; level="Z10";' -v 3
+		
+In the first call, the log message should be similar to this: 
+
+.. code-block:: ini
+
+		DEBUG 3: MetGrib1DataFile::data_plane_array() -> 
+		Attempt to derive winds from U and V components.
+
+In the second one, this won't appear since wind speed already exists
+in the RTMA file.
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
