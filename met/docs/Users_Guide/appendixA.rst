@@ -1457,6 +1457,90 @@ Then the output NetCDF file does not have this problem:
 		:lat_ll = "25.000000 degrees_north" ;
 		:lon_ll = "112.000000 degrees_east" ;
 
+**Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify Model Suffix?**
+
+A.
+Below is a command example to run:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/tc_pairs \ 
+		-adeck aep142014.h4hw.dat \ 
+		-bdeck bep142014.dat \ 
+		-config TCPairsConfig_v5.0 \ 
+		-out tc_pairs_v5.0_patch \ 
+		-log tc_pairs_v5.0_patch.log \ 
+		-v 3
+
+Below is a warning message:
+
+.. code-block:: ini
+
+		WARNING: TrackInfo::add(const ATCFLine &) -> 
+		skipping ATCFLine since the valid time is not
+		increasing (20140801_000000 < 20140806_060000):
+		WARNING: AL, 03, 2014080100, 03, H4HW, 000,
+		120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 
+		0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0,
+
+As a sanity check, the MET-TC code makes sure that the valid time of
+the track data doesn't go backwards in time. This warning states that's
+occurring. The very likely reason for this is that the data being used
+are probably passing tc_pairs duplicate track data.
+
+Using grep, notice that the same track data shows up in
+"aal032014.h4hw.dat" and "aal032014_hfip_d2014_BERTHA.dat". Try this: 
+
+.. code-block:: ini
+
+		grep H4HW aal*.dat | grep 2014080100 | grep ", 000,"
+		aal032014.h4hw.dat:AL, 03, 2014080100, 03, H4HW, 000, 
+		120N, 547W, 38, 1009, XX, 34, NEQ, 0084,
+		0000, 0000, 0083, -99, -99, 59, 0, 0, , 
+		0, , 0, 0, , , , , 0, 0, 0, 0, THERMO PARAMS, 
+		-9999, -9999, -9999, Y, 10, DT, -999 
+		aal032014_hfip_d2014_BERTHA.dat:AL, 03, 2014080100, 
+		03, H4HW, 000, 120N, 547W, 38, 1009, XX, 34, NEQ, 
+		0084, 0000, 0000, 0083, -99, -99, 59, 0, 0, , 0, , 0,
+		0, , , , , 0, 0, 0, 0, THERMOPARAMS, -9999 ,-9999 ,
+		-9999 ,Y ,10 ,DT ,-999
+
+Those 2 lines are nearly identical, except for the spelling of
+"THERMO PARAMS" with a space vs "THERMOPARAMS" with no space.
+
+Passing tc_pairs duplicate track data results in this sort of warning.
+The DTC had the same sort of problem when setting up a real-time
+verification system. The same track data was making its way into
+multiple ATCF files.
+
+If this really is duplicate track data, work on the logic for where/how
+to store the track data. However, if the H4HW data in the first file
+actually differs from that in the second file, there is another option.
+You can specify a model suffix to be used for each ADECK source, as in
+this example (suffix=_EXP):
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/tc_pairs \ 
+		-adeck aal032014.h4hw.dat suffix=_EXP \ 
+		-adeck aal032014_hfip_d2014_BERTHA.dat \ 
+		-bdeck bal032014.dat \ 
+		-config TCPairsConfig_match \ 
+		-out tc_pairs_v5.0_patch \ 
+		-log tc_pairs_v5.0_patch.log -v 3
+
+Any model names found in "aal032014.h4hw.dat" will now have _EXP tacked
+onto the end. Note that if a list of model names in the TCPairsConfig file
+needs specifying, include the _EXP variants to get them to show up in
+the output or it won’t show up.
+
+That'll get rid of the warnings because they will be storing the track
+data from the first source using a slightly different model name. This
+feature was added for users who are testing multiple versions of a
+model on the same set of storms. They might be using the same ATCF ID
+in all their output. But this enables them to distinguish the output
+in tc_pairs.
+		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
