@@ -1857,10 +1857,8 @@ model grid coordinate systems.
 
 **Q. How do I get help if my questions are not answered in the User's Guide?**
 
-A.
-First, look on our
-`MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
-If that doesn't answer your question, then email: met_help@ucar.edu.
+A. First, look on our `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_. If that doesn't answer your question, create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+
 
 **Q. Where are the graphics?**
 
@@ -2052,11 +2050,11 @@ and then run "make install" and "make test" again.
 Where to get help
 _________________
 
-If none of the above suggestions have helped solve your problem,
-help is available through: met_help@ucar.edu
+If none of the above suggestions have helped solve your problem, help is available through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+
 
 How to contribute code
 ______________________
 
-If you have code you would like to contribute, we will gladly consider
-your contribution. Please send email to: met_help@ucar.edu
+If you have code you would like to contribute, we will gladly consider your contribution. Please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+
