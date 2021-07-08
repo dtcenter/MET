@@ -1286,7 +1286,7 @@ regridding all fields, the wgrib2 utility may be more useful. Here's an
 example of using wgrib2 and pcp_combine to generate NetCDF files
 MET can read:
 
-.. code-block:: in
+.. code-block:: ini
 
 		wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 \
 		25:121:0.1 gfsrain06_regrid.grb2
@@ -1294,14 +1294,14 @@ MET can read:
 And then run that GRIB2 file through pcp_combine using the "-add" option
 with only one file provided:
 
-.. code-block:: in
+.. code-block:: ini
 
 		pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; \
 		level="A6";' gfsrain06_regrid.nc
 
 Then the output NetCDF file does not have this problem:
 
-.. code-block:: in
+.. code-block:: ini
 
 		ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
 		:lat_ll = "25.000000 degrees_north" ;
