@@ -1494,9 +1494,140 @@ To stratify your results by lead time, you could add "-by LEAD" option.
 		-rirw_thresh <=-30 -by LEAD \
 		-out_line_type CTC,CTS,MPR
 
+Utilities
+~~~~~~~~~
 
-Miscellaneous Questions
-~~~~~~~~~~~~~~~~~~~~~~~
+**Q. Utilities - What would be an Example of Scripting to Call MET?**
+
+A.
+The following is an example of how to call MET from a bash script
+including passing in variables. This shell script listed below to run
+Grid-Stat, call Plot-Data-Plane to plot the resulting difference field,
+and call convert to reformat from PostScript to PNG.
+
+.. code-block:: ini
+
+		#!/bin/sh
+		for case in `echo "FCST OBS"`; do 
+		export TO_GRID=${case} 
+		/usr/local/${MET_BUILD_BASE}/bin/grid_stat gfs.t00z.pgrb2.0p25.f000 \
+		nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig \
+		/usr/local/${MET_BUILD_BASE}/bin/plot_data_plane \
+		*TO_GRID_${case}*_pairs.nc TO_GRID_${case}.ps 'name="DIFF_TMP_P500_TMP_P500_FULL"; \
+		level="(*,*)";' 
+		convert -rotate 90 -background white -flatten TO_GRID_${case}.ps 
+		TO_GRID_${case}.png 
+		done
+
+
+**Q. Utility - How Do I Convert TRMM data files?**
+
+A.
+Here is an example of NetCDF that the MET software is not expecting. Here
+is an option for accessing that same TRMM data, following links from the
+MET website
+:http://www.dtcenter.org/met/users/downloads/observation_data.php
+
+.. code-block:: ini
+
+		# Pull binary 3-hourly TRMM data file 
+		wget 
+		ftp://disc2.nascom.nasa.gov/data/TRMM/Gridded/3B42_V7/201009/3B42.100921.00z.7.
+		precipitation.bin
+		# Pull Rscript from MET website 
+		wget http://www.dtcenter.org/met/users/downloads/Rscripts/trmmbin2nc.R
+		# Edit that Rscript by setting 
+		out_lat_ll = -50 
+		out_lon_ll = 0 
+		out_lat_ur = 50 
+		out_lon_ur = 359.75
+		# Run the Rscript 
+		Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin \
+		3B42.100921.00z.7.precipitation.nc
+		# Plot the result 
+		${MET_BUILD_BASE}/bin/plot_data_plane 3B42.100921.00z.7.precipitation.nc \
+		3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
+
+It may be possible the domain of the data is smaller. Here are some options:
+
+1.
+In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
+to specify the tile of data to be selected.
+
+2. 
+As of version 5.1, MET includes support for regridding the data it reads.
+Keep TRMM on it's native domain and use the MET tools to do the regridding.
+For example, the "regrid_data_plane" tool reads a NetCDF file, regrids
+the data, and writes a NetCDF file. Alternatively, the "regrid" section
+of the configuration files for the MET tools may be used to do the
+regridding on the fly. For example, run Grid-Stat to compare to the model
+output to TRMM and say 
+
+.. code-block:: ini
+		
+		"regrid = { field = FCST; 
+		...}"
+
+That tells Grid-Stat to automatically regrid the TRMM observations to
+the model domain.
+
+**Q. Other Utilities - How do I convert a Postscript to png?**
+
+A.
+Use the linux “convert” tool to convert a Plot_Data_Plane PostScript
+file to a png: 
+
+.. code-block:: ini
+
+		convert -rotate 90 -background white plot_dbz.ps plot_dbz.png
+
+To convert a MODE PostScript to png
+
+.. code-block:: ini
+
+		convert mode_out.ps mode_out.png
+
+Will result in all 6-7 pages in the PostScript file be written out to a
+seperate .png with the following naming convention:
+
+mode_out-0.png, mode_out-1.png, mode_out-2.png, etc...
+
+**Q. Utility - How does Pairwise Differences using plot_tcmpr.R work?**
+
+A.
+One necessary step in computing pairwise differences is "event equalizing"
+the data. This means extracting a subset of cases that are common to
+both models.
+
+While the tc_stat tool does not compute pairwise difference, it can apply
+the "event_equalization" logic to extract the cases common to two models.
+This is done using the config file "event_equal = TRUE;" option or
+setting "-event_equal true" on the command line.
+
+Most of the hurricane track analysis and plotting is done using the
+plot_tcmpr.R Rscript. It makes a call to the tc_stat tool to the track
+data down to the desired subset, compute pairwise difference if needed,
+and then plot the result. 
+
+.. code-block:: ini
+
+		setenv MET_BUILD_BASE `pwd` 
+		Rscript scripts/Rscripts/plot_tcmpr.R \
+		-lookin tc_pairs_output.tcst \
+		-filter '-amodel AHWI,GFSI' \
+		-series AMODEL AHWI,GFSI,AHWI-GFSI \
+		-plot MEAN,BOXPLOT
+
+The resulting plots include three series... one for AHWI, one for GFSI,
+and one for their pairwise difference.
+
+It's a bit cumbersome to understand all the options available, but this may
+be really useful. If nothing else, it could adapted to dump out the
+pairwise differences that are needed.
+
+
+Miscellaneous
+~~~~~~~~~~~~~
 
 **Q. Regrid_Data_Plane - How Do I Define a Lat-Lon Grid?**
 
