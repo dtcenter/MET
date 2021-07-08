@@ -606,6 +606,7 @@ class DMAPInfo {
       double baddeley_max_dist;    // Maximum distance constant
       double fom_alpha;            // FOM Alpha
       double zhu_weight;           // Zhu Weight
+      double beta_value;           // G-Beta Value
 
    public:
 
@@ -642,7 +643,8 @@ class DMAPInfo {
                const NumArray &fthr_na,  const NumArray &othr_na);
 
       void set_options(const int _baddeley_p, const double _baddeley_max_dist,
-                       const double _fom_alpha, const double _zhu_weight);
+                       const double _fom_alpha, const double _zhu_weight,
+                       const double _beta_value);
 
       void clear();
       void reset_options();

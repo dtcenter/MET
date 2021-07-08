@@ -2750,10 +2750,11 @@ void DMAPInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void DMAPInfo::reset_options() {
-   baddeley_p = 2;          // Exponent for lp-norm
-   baddeley_max_dist = 5.0; // Maximum distance constant
-   fom_alpha = 0.1;         // FOM Alpha
-   zhu_weight = 0.5;        // Zhu Weight
+   baddeley_p = 2;                      // Exponent for lp-norm
+   baddeley_max_dist = bad_data_double; // Maximum distance constant
+   fom_alpha = 0.1;                     // FOM Alpha
+   zhu_weight = 0.5;                    // Zhu Weight
+   beta_value = bad_data_double;        // G-Beta Value
 
    return;
 }
@@ -2796,6 +2797,7 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    baddeley_max_dist = c.baddeley_max_dist;
    fom_alpha  = c.fom_alpha;
    zhu_weight = c.zhu_weight;
+   beta_value = c.beta_value;
 
    return;
 }
@@ -2948,11 +2950,13 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 ////////////////////////////////////////////////////////////////////////
 
 void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dist,
-                           const double _fom_alpha, const double _zhu_weight) {
+                           const double _fom_alpha, const double _zhu_weight,
+                           const double _beta_value) {
    baddeley_p = _baddeley_p;
    baddeley_max_dist = _baddeley_max_dist;
    fom_alpha = _fom_alpha;
    zhu_weight = _zhu_weight;
+   beta_value = _beta_value;
 }
 
 ////////////////////////////////////////////////////////////////////////
