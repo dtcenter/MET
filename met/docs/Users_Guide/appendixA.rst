@@ -1204,6 +1204,7 @@ plot_data_plane tool to test it out.
 
 **Q. Plot_Data_Plane - How Do I Test the Variable Naming Convention? (Record Number Example)**
 
+A.
 Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
 
 .. code-block:: ini
@@ -1220,6 +1221,7 @@ The GRIB id info has been the same between records 1 and 2.
 
 **Q. Plot_Data_Plane - How Do I Use Compute and Verify Wind Speed?**
 
+A.
 Here's how to compute and verify wind speed using MET. Good news, MET
 already includes logic for deriving wind speed on the fly. The GRIB
 abbreviation for wind speed is WIND. To request WIND from a GRIB1 or
@@ -1247,11 +1249,58 @@ In the first call, the log message should be similar to this:
 In the second one, this won't appear since wind speed already exists
 in the RTMA file.
 
+Stat-Analysis
+~~~~~~~~~~~~~
+
+**Q. Stat_Analysis - How does '-aggregate_stat' work?**
+
+A.
+In STAT-Analysis, there is a "- vx_mask" job filtering option. That option
+reads the VX_MASK column from the input STAT lines and applies string
+matching with the values in that column. Presumably, all of the MPR lines
+will have the value of "FULL" in the VX_MASK column.
+
+STAT-Analysis has the ability to read MPR lines and recompute statistics
+from them using the same library code that the other MET tools use. The
+job command options which begin with "-out..." are used to specify settings
+to be applied to the output of that process. For example, the "-fcst_thresh"
+option filters strings from the input "FCST_THRESH" header column. The
+"-out_fcst_thresh" option defines the threshold to be applied to the output
+of STAT-Analysis. So reading MPR lines and applying a threshold to define
+contingency table statistics (CTS) would be done using the
+"-out_fcst_thresh" option.
+
+STAT-Analysis does have the ability to filter MPR lat/lon locations
+using... - the "-mask_poly" option for a lat/lon polyline - the "-mask_grid"
+option to define a retention grid.
+
+However, there is currently no "-mask_sid" option. 
+
+With met-5.2 and later versions, one option is to apply column string
+matching using the "-column_str" option to define the list of station
+ID's you would like to aggregate. That job would look something like this:
+
+.. code-block:: ini
+		
+		stat_analysis -lookin path/to/mpr/directory \
+		-job aggregate_stat -line_type MPR -out_line_type CNT \ 
+		-column_str OBS_SID SID1,SID2,SID3,...,SIDN \ 
+		-set_hdr VX_MASK SID_GROUP_NAME \ 
+		-out_stat mpr_to_cnt.stat
+
+Where SID1...SIDN is a comma-separated list of the station id's in the
+group. Notice that a value for the output VX_MASK column using the
+"-set_hdr" option has been specified. Otherwise, this would show a list
+of the unique values found in that column. Presumably, all the input
+VX_MASK columns say "FULL" so that's what the output would say. Use
+"-set_hdr" to explicitly set the output value.
+
 Miscellaneous Questions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 **Q. Regrid_Data_Plane - How Do I Define a Lat-Lon Grid?**
 
+A.
 Here is an example of the NetCDF variable attributes that MET uses to
 define a LatLon grid...
 
@@ -1280,6 +1329,7 @@ and then try again.
 
 **Q. Pre-processing - How do I use wgrib2 and pcp_combine regrid and reformat to format NetCDF files?**
 
+A.
 If you are extracting only one or two fields from a file, using MET
 regrid_data_plane can be used to generate a Lat-Lon projection. If
 regridding all fields, the wgrib2 utility may be more useful. Here's an
