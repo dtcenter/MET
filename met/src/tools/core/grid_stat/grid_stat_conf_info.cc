@@ -818,7 +818,7 @@ void GridStatVxOpt::process_config(
    }
 
    beta_value = d->lookup_double(conf_key_beta_value);
-   if(beta_value <=0) {
+   if(!is_bad_data(beta_value) && beta_value <=0) {
       mlog << Error << "\nGridStatVxOpt::process_config() -> "
            << "The \"" << conf_key_beta_value << "\" option ("
            << beta_value << ") must be set > 0.\n\n";
