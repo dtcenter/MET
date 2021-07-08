@@ -1247,6 +1247,66 @@ In the first call, the log message should be similar to this:
 In the second one, this won't appear since wind speed already exists
 in the RTMA file.
 
+Miscellaneous Questions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Q. Regrid_Data_Plane - How Do I Define a Lat-Lon Grid?**
+
+Here is an example of the NetCDF variable attributes that MET uses to
+define a LatLon grid...
+
+.. code-block:: ini
+
+		:Projection = "LatLon" ; 
+		:lat_ll = "25.063000 degrees_north" ; 
+		:lon_ll = "-124.938000 degrees_east" ;
+		:delta_lat = "0.125000 degrees" ; 
+		:delta_lon = "0.125000 degrees" ; 
+		:Nlat = "224 grid_points" ;
+		:Nlon = "464 grid_points" ;
+
+This can be created by running the "regrid_data_plane" tool to regrid
+some GFS data to a LatLon grid:
+
+.. code-block:: ini
+
+		${MET_BUILD_BASE}/bin/regrid_data_plane \ 
+		gfs_2012040900_F012.grib G110 \ 
+		gfs_g110.nc -field 'name="TMP"; level="Z2";'
+
+Use ncdump to look at the attributes. As an exercise, try defining
+these global attributes (and removing the other projection-related ones)
+and then try again.
+
+**Q. Pre-processing - How do I use wgrib2 and pcp_combine regrid and reformat to format NetCDF files?**
+
+If you are extracting only one or two fields from a file, using MET
+regrid_data_plane can be used to generate a Lat-Lon projection. If
+regridding all fields, the wgrib2 utility may be more useful. Here's an
+example of using wgrib2 and pcp_combine to generate NetCDF files
+MET can read:
+
+.. code-block:: in
+
+		wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 \
+		25:121:0.1 gfsrain06_regrid.grb2
+		
+And then run that GRIB2 file through pcp_combine using the "-add" option
+with only one file provided:
+
+.. code-block:: in
+
+		pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; \
+		level="A6";' gfsrain06_regrid.nc
+
+Then the output NetCDF file does not have this problem:
+
+.. code-block:: in
+
+		ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
+		:lat_ll = "25.000000 degrees_north" ;
+		:lon_ll = "112.000000 degrees_east" ;
+
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
 A.
