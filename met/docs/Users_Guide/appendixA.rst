@@ -1055,9 +1055,9 @@ GFS. In this example, process the 20150220 00Z initialization of GFS.
 		${MET_BUILD_BASE}/bin/pcp_combine \ 
 		-sum 20150220_00 06 20150221_00 24 \ 
 		gfs_APCP_24_20150220_00_F00_F24.nc \ 
-		-pcprx "gfs_4_20150220_00.*grb2" \ 
+		-pcprx "gfs_4_20150220_00.*grb2" \
 		-pcpdir /d1/model_data/20150220
-
+		
 pcp_combine is looking in the /d1/SBU/GFS/model_data/20150220 directory
 at files which match this regular expression "gfs_4_20150220_00.*grb2".
 That directory contains data for 00, 06, 12, and 18 hour initializations,
