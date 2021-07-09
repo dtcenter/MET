@@ -35,7 +35,8 @@
 //   010    02/25/15  Halley Gotway   Add automated regridding.
 //   011    05/15/17  Prestopnik P.   Add shape to regrid options.
 //   012    04/08/19  Halley Gotway   Add percentile thresholds.
-//   012    04/01/19  Fillmore       Add FCST and OBS units.
+//   013    04/01/19  Fillmore        Add FCST and OBS units.
+//   014    07/09/21  Linden          MET #1746 Skip thresholding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,8 +114,8 @@ static double mean_array(double *, int);
 
 static void plot_ps_raw(const DataPlane &, const DataPlane &,
                         const DataPlane &, const DataPlane &, int);
-static void plot_ps_wvlt(const double *, int, int, int, ISCInfo &,
-                         int, int);
+static void plot_ps_wvlt(const double *, const double, int, int, int,
+                         ISCInfo &, int, int);
 static double compute_percentage(double, double);
 
 static void set_plot_dims(int, int);
@@ -933,7 +934,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    double *f_dwt = (double *) 0, *o_dwt = (double *) 0; // Discrete wavelet transformations
    double *f_scl = (double *) 0, *o_scl = (double *) 0; // Binary field decomposed by scale
    double *diff = (double *) 0;                         // Difference field
-   double mse, fen, oen;
+   double mse, fen, oen, mad;
    int n, ns, n_isc;
    int bnd, row, col;
    int i, j, k;
@@ -1017,11 +1018,15 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
            << conf_info.obs_info[i_vx]->magic_str() << " "
            << obs_thresh_str << ".\n";
 
-      // Apply the threshold to each point to create 0/1 mask fields
-      for(j=0; j<n; j++) {
-         if(apply_fcst_thresh) f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
-         if(apply_obs_thresh)  o_dat[j] = isc_info[i].othresh.check(o_na[j]);
+      // Apply the threshold, if specified
+      for(j=0, mad=bad_data_double; j<n; j++) {
+         f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
+         o_dat[j] = (apply_fcst_thresh ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
          diff[j]  = f_dat[j] - o_dat[j];
+
+         // Find the maximum absolute difference
+         if(is_bad_data(mad))         mad = fabs(diff[j]);
+         else if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
       } // end for j
 
       // Compute the contingency table for the binary fields
@@ -1038,15 +1043,15 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
-      if ( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
+      if(conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
          write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_vx, i_tile, -1,
                       isc_info[i].fthresh,
                       isc_info[i].othresh);
       }
 
       // Write the thresholded binary difference field to PostScript
-      if ( ! (conf_info.nc_info.all_false()) ) {
-         plot_ps_wvlt(diff, n, i_vx, i_tile, isc_info[i], -1, ns);
+      if(!conf_info.nc_info.all_false()) {
+         plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], -1, ns);
       }
 
       // Initialize the discrete wavelet transforms
@@ -1117,7 +1122,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          isc_info[i].compute_isc(j);
 
          // Write the decomposed fields for this scale to NetCDF
-         if ( ! (conf_info.nc_info.all_false()) ) {
+         if(!conf_info.nc_info.all_false()) {
             write_nc_wav(conf_info.nc_info,
                          f_scl, o_scl, n, i_vx, i_tile, j,
                          isc_info[i].fthresh,
@@ -1129,7 +1134,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
          // Write the decomposed difference field for this scale to PostScript
          if(conf_info.ps_plot_flag) {
-            plot_ps_wvlt(diff, n, i_vx, i_tile, isc_info[i], j, ns);
+            plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], j, ns);
          }
 
       } // end for j
@@ -2280,7 +2285,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
+void plot_ps_wvlt(const double *diff, double mad,
+                  int n, int i_vx, int i_tile,
                   ISCInfo &isc_info,
                   int i_scale, int n_scale) {
    ConcatString label;
@@ -2302,12 +2308,6 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    }
 
    //
-   // The min and max plotting values should default to [-1.0, 1.0]
-   // for the decomposed wavelet difference fields.
-   //
-   wvlt_ct.rescale(-1.0, 1.0, bad_data_double);
-
-   //
    // If the wvlt_plot_min or wvlt_plot_max value is set in the
    // config file, rescale the colortable to the requested range.
    //
@@ -2316,6 +2316,15 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
       wvlt_ct.rescale(conf_info.wvlt_pi.plot_min,
                       conf_info.wvlt_pi.plot_max,
                       bad_data_double);
+   }
+   //
+   // Otherwise, rescale the colortable to [-d, d] where d is the maximum
+   // absolute difference and at least 1.0. If thresholds have been applied,
+   // the plotting range should be [-1.0, 1.0].
+   //
+   else {
+      double max_plot_val = max(1.0, mad);
+      wvlt_ct.rescale(-1.0*max_plot_val, max_plot_val, bad_data_double);
    }
 
    //
@@ -2346,10 +2355,10 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    v_tab -= 1.0*plot_text_sep;
    ps_out->write_centered_text(1, 1, h_tab_cen, v_tab, 0.5, 0.5, label.c_str());
    if(i_scale == -1)
-      label.format("Tile %i, Binary, Difference (F-0)",
+      label.format("Tile %i, Binary, Difference (F-O)",
               i_tile+1);
    else
-      label.format("Tile %i, Scale %i, Difference (F-0)",
+      label.format("Tile %i, Scale %i, Difference (F-O)",
               i_tile+1, i_scale+1);
 
    v_tab -= 2.0*plot_text_sep;
