@@ -1058,7 +1058,7 @@ GFS. In this example, process the 20150220 00Z initialization of GFS.
 		-pcprx "gfs_4_20150220_00.*grb2" \
 		-pcpdir /d1/model_data/20150220
 		
-pcp_combine is looking in the /d1/SBU/GFS/model_data/20150220 directory
+pcp_combine is looking in the */d1/SBU/GFS/model_data/20150220* directory
 at files which match this regular expression "gfs_4_20150220_00.*grb2".
 That directory contains data for 00, 06, 12, and 18 hour initializations,
 but the "-pcprx" option narrows the search down to the 00 hour
@@ -1788,7 +1788,7 @@ but the data is packed upside down.
 Try using the "file_type" entry. The "file_type" entry specifies the
 input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
 rather than letting the code determine it itself. For valid file_type
-values, see "File types" in the data/config/ConfigConstants file. This
+values, see "File types" in the *data/config/ConfigConstants* file. This
 entry should be defined within the "fcst" or "obs" dictionaries.
 Sometimes, directly specifying the type of file will help MET figure
 out what to properly do with the data.
@@ -2017,8 +2017,8 @@ Below are examples of too many MET_NETCDF options:
 
 
 Either MET_NETCDF **OR** MET_NETCDFINC **AND** MET_NETCDFLIB need to be set.
-If the NetCDF include files are in /home/username/local/include and the
-NetCDF library files are in /home/username/local/lib, unset the
+If the NetCDF include files are in */home/username/local/include* and the
+NetCDF library files are in */home/username/local/lib*, unset the
 MET_NETCDF environment variable, then run "make clean", reconfigure,
 and then run "make install" and "make test" again.
 
