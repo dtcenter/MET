@@ -1798,7 +1798,7 @@ Another option is to use the regrid_data_plane tool. The regrid_data_plane
 tool may be run to read data from any gridded data file MET supports
 (i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
 user-specified grid, and write the field(s) out in NetCDF format. See
-Regrid_data_plane tool (Section 5.2) in the MET User's Guide for more
+Regrid_data_plane tool :numref:`regrid-data-plane` (Section 5.2) in the MET User's Guide for more
 detailed information. While the regrid_data_plane tool is useful as a
 stand-alone tool, the capability is also included to automatically regrid
 data in most of the MET tools that handle gridded data. This "regrid"
@@ -1806,8 +1806,8 @@ entry is a dictionary containing information about how to handle input
 gridded data files. The "regird" entry specifies regridding logic and
 has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
 the path to a gridded data file defining the grid, or an explicit grid
-specification string. See the regrid entry in Configuration File
-Details are under :ref:`regrid<regrid>` in the MET User's Guide for a more detailed
+specification string. See the :ref:`regrid<regrid>` entry in
+the Configuration File Overview in the MET User's Guide for a more detailed
 description of the configuration file entries that control automated
 regridding.
 
