@@ -257,15 +257,15 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       // If the forecast threshold array is an empty list (or NA) 
       // Add the NA threshold type to the list for downstream iteration
       if(fcat_ta[i].n_elements() == 0) {
-	mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA" << "\n";
-	fcat_ta[i].add(st_NA);
+         mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA.\n";
+         fcat_ta[i].add(st_NA);
       }
       
       // If the observation threshold array is an empty list (or NA) 
       // Add the NA threshold type to the list for downstream iteration
       if(ocat_ta[i].n_elements() == 0) {
-	mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA" << "\n";
-	ocat_ta[i].add(st_NA);
+         mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA.\n";
+         ocat_ta[i].add(st_NA);
       }
       
       // Check for the same number of fcst and obs thresholds
