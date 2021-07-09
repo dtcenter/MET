@@ -135,7 +135,7 @@ required parts.
 Dimensions should be named "lat" and "lon".
 
 2.
-The "lat" and "lon" variable are **NOT** required.
+The "lat" and "lon" variables are **NOT** required.
 
 3.
 Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions.
@@ -202,7 +202,7 @@ use the trmmbin2nc.R script described on this page:
 http://www.dtcenter.org/met/users/downloads/observation_data.php
 
 Follow the TRMM binary links to either the 3 or 24-hour accumulations,
-save the files, and run them through that script. That is the faster
+save the files, and run them through that script. That is faster
 and easier than trying to get an ASCII dump. That Rscript can also
 subset the TRMM data if needed. Look for the section of it titled: 
 
@@ -421,7 +421,7 @@ at points where all NxN values contain valid data. Setting it to
 0.5 only requires half of them. 
 
 Using grid_stat to evaluate precipitation, whose minimum value
-should be 0. If the thresholding the data greater-than-or-equal-to
+should be 0. If the thresholding of the data greater-than-or-equal-to
 0 (>= 0), that will always evaluate to true for precipitation.
 Consider using strictly greater-than 0 (>0) instead.
 
@@ -522,7 +522,7 @@ is set to partition the probability values between 0 and 1.
 
 This case is evaluating a forecast probability of wind speed
 exceeding 34kts, and likely comparing it against the wind speed values.
-The observed cat_thresh is set to >=34 to be consistent with with the
+The observed cat_thresh is set to >=34 to be consistent with the
 forecast probability definition.
 
 **Q. Grid-Stat - What would be an example of verifying probabilities?
@@ -586,7 +586,7 @@ Note the following two sections of the Grid-Stat config file:
 This tells Grid-Stat to do verification on the "observation" grid.
 Grid-Stat reads the GFS and Stage4 data and then automatically regrids
 the GFS data to the Stage4 domain using budget interpolation.
-Use "FCST" to verify on the forecast domain. And use either a named
+Use "FCST" to verify the forecast domain. And use either a named
 grid or a grid specification string to regrid both the forecast and
 observation to a common grid. For example, to_grid = "G212"; will
 regrid both to NCEP Grid 212 before comparing them.
@@ -624,7 +624,7 @@ You'd like to apply one mask to the forecast field and a *different*
 mask to the observation field. However, you can't define different
 masks for the forecast and observation fields. MODE only lets you
 define a single mask (a masking grid or polyline) and then you choose
-whether your want to apply it to the FCST, OBS, or BOTH of them.
+whether you want to apply it to the FCST, OBS, or BOTH of them.
 
 Nonetheless, there is a way you can accomplish this logic using the
 gen_vx_mask tool. You run it once to pre-process the forecast field
@@ -632,8 +632,8 @@ and a second time to pre-process the observation field. And then pass
 those output files to MODE.
 
 Below is an example using sample data that is included with the MET
-release tarball to illustrate... using met. This will read 3-hour
-precip and 2-meter temperature, and resetts the precip at any grid
+release tarball to illustrate... using MET. This will read 3-hour
+precip and 2-meter temperature, and resets the precip at any grid
 point where the temperature is less than 290 K to a value of 0:
 
 .. code-block:: none
@@ -716,7 +716,7 @@ This indicates that the name is "ACPCP" and the level is "A1" or a 1- hour accum
 A.
 Run the MET pcp_combine tool to put the NAM data into 3-hourly accumulations. 
 
-0-3 hour accumulation is already in the 03UTC file. Run this file
+0-3 hour accumulation is already in the 03 UTC file. Run this file
 through pcp_combine as a pass-through to put it into NetCDF format: 
 
 .. code-block:: none
@@ -843,9 +843,9 @@ MET can read gridded data in GRIB1, GRIB2, or 3 different flavors of NetCDF:
 * CF-compliant NetCDF3 files. 
 * The output of the wrf_interp utility.
 
-If there are the NetCDF output from WRF, use UPP to post-process it.
+If there is NetCDF output from WRF, use UPP to post-process it.
 It does not need to be "lat-lon"... it can be post-processed to whatever
-projection is needed..
+projection is needed.
 
 There is in general no easy way to convert NetCDF to GRIB. If the NetCDF
 data is self generated, make it look like the NetCDF output from
@@ -1033,7 +1033,8 @@ possible.... Maybe "Precip50Minutes" or "RAIN50". But whatever string is
 chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
 tell that tool what variable to process.
 
-**Q. Pcp_Combine - How do I use “-sum”, “-add”, and “-subtract“ to achieve same accumulation interval?**
+**Q. Pcp_Combine - How do I use “-sum”, “-add”, and “-subtract“ to achieve
+the same accumulation interval?**
 
 A. 
 Here is an example of using pcp_combine to put GFS into 24- hour intervals
@@ -1174,7 +1175,7 @@ for ghostview:
 
 Please review a map of 0's and 1's over the USA.
 
-**Q. Plot-Data-Plane - How do I specify GRIB version?**
+**Q. Plot-Data-Plane - How do I specify the GRIB version?**
 
 A.
 These files are in GRIB2 format, but they’ve named them using the ".grib"
@@ -1224,7 +1225,7 @@ Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by runni
 
 The GRIB id info has been the same between records 1 and 2.
 
-**Q. Plot-Data-Plane - How do I use compute and verify wind speed?**
+**Q. Plot-Data-Plane - How do I compute and verify wind speed?**
 
 A.
 Here's how to compute and verify wind speed using MET. Good news, MET
@@ -1301,7 +1302,8 @@ VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
 **Q. Stat-Analysis - What is the best way to average the > FSS > scores
-with several days even several months using 'Aggregate to Average Scores'?**
+within several days or even several months using
+'Aggregate to Average Scores'?**
 
 Below is the best way to aggregate together the Neighborhood Continuous
 (NBRCNT) lines across multiple days, specifically the fractions skill
@@ -1380,10 +1382,10 @@ cases without having to modify the source code.
 This job reads find 56 CTS lines, but only keeps 36 of them where both
 the BASER and FMEAN columns are at least 0.05.
 
-**Q. Stat-Analysis - How do I use “-by” flag to stratify results?**
+**Q. Stat-Analysis - How do I use the “-by” flag to stratify results?**
 
 A.
-Adding "-by FCST_VAR" is agreat way to how to associate a single value,
+Adding "-by FCST_VAR" is a great way to associate a single value,
 of say RMSE, with each of the forecast variables (UGRD,VGRD and WIND).
 
 Run the following job on the output from Grid-Stat generated when the
@@ -1404,7 +1406,7 @@ By default, STAT-Analysis has two options enabled which slow it down.
 Disabling these two options will create quicker run times:
 
 1.
-The computation of rank correlation statistics, Spearmans Rank Correlation
+The computation of rank correlation statistics, Spearman's Rank Correlation
 and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
 
 2.
@@ -1438,7 +1440,7 @@ runs quickly.
 TC-Stat
 ~~~~~~~
 
-**TC-Stat - How do I use “-by” flag to stratify results?**
+**TC-Stat - How do I use the “-by” flag to stratify results?**
 
 A.
 To perform tropical cyclone evaluations for multiple models use the
@@ -1458,7 +1460,7 @@ all grouped together.
 		-by AMODEL -out sample.out
 
 This will result in all 48 hour HWFI and H3WI track forecasts to be
-aggregated (statistics and scores computed) for each model seperately.
+aggregated (statistics and scores computed) for each model separately.
 As with any MET trouble, try using debug level 4 (-v 4) to see if there
 are any more useful log messages.
 
@@ -1489,7 +1491,7 @@ in time.
 		-out_line_type CTC,CTS,MPR
 
 To evaluate Rapid Weakening (RW) by setting "-rirw_thresh <=-30".
-To stratify your results by lead time, you could add "-by LEAD" option.
+To stratify your results by lead time, you could add the "-by LEAD" option.
 
 .. code-block:: none
 
@@ -1507,7 +1509,7 @@ Utilities
 
 A.
 The following is an example of how to call MET from a bash script
-including passing in variables. This shell script listed below to run
+including passing in variables. This shell script is listed below to run
 Grid-Stat, call Plot-Data-Plane to plot the resulting difference field,
 and call convert to reformat from PostScript to PNG.
 
@@ -1554,7 +1556,7 @@ http://www.dtcenter.org/met/users/downloads/observation_data.php
 		${MET_BUILD_BASE}/bin/plot_data_plane 3B42.100921.00z.7.precipitation.nc \
 		3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
 
-It may be possible the domain of the data is smaller. Here are some options:
+It may be possible that the domain of the data is smaller. Here are some options:
 
 1.
 In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
@@ -1605,14 +1607,14 @@ One necessary step in computing pairwise differences is "event equalizing"
 the data. This means extracting a subset of cases that are common to
 both models.
 
-While the tc_stat tool does not compute pairwise difference, it can apply
+While the tc_stat tool does not compute pairwise differences, it can apply
 the "event_equalization" logic to extract the cases common to two models.
 This is done using the config file "event_equal = TRUE;" option or
 setting "-event_equal true" on the command line.
 
 Most of the hurricane track analysis and plotting is done using the
-plot_tcmpr.R Rscript. It makes a call to the tc_stat tool to the track
-data down to the desired subset, compute pairwise difference if needed,
+plot_tcmpr.R Rscript. It makes a call to the tc_stat tool to track
+data down to the desired subset, compute pairwise differences if needed,
 and then plot the result. 
 
 .. code-block:: none
@@ -1628,7 +1630,7 @@ The resulting plots include three series... one for AHWI, one for GFSI,
 and one for their pairwise difference.
 
 It's a bit cumbersome to understand all the options available, but this may
-be really useful. If nothing else, it could adapted to dump out the
+be really useful. If nothing else, it could be adapted to dump out the
 pairwise differences that are needed.
 
 
@@ -1723,7 +1725,8 @@ Below is a warning message:
 		0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0,
 
 As a sanity check, the MET-TC code makes sure that the valid time of
-the track data doesn't go backwards in time. This warning states that's
+the track data doesn't go backwards in time. This warning states that
+this is
 occurring. The very likely reason for this is that the data being used
 are probably passing tc_pairs duplicate track data.
 
@@ -1814,7 +1817,7 @@ regridding.
 
 A single model level can be plotted using the plot_data_plane utility.
 This tool can assist the user by showing the data to be verified to
-ensure that times and locations match up as expected.
+ensure that times and locations matchup as expected.
 		
 **Q. Why was the MET written largely in C++ instead of FORTRAN?**
 
@@ -1932,7 +1935,7 @@ on other things to check if you are having problems installing or running MET.
 
 It isn't making it's way into the configuration because BUFRLIB_v10.2.3
 isn't showing up in the output of make. This may indicate the wrong shell
-type. The .bashrc file sets the environment for the bourne shell, but
+type. The .bashrc file sets the environment for the Bourne shell, but
 the above error could indicate that the c- shell is being used instead.
 
 Try the following 2 things:
