@@ -1433,6 +1433,18 @@ bool get_nc_data(NcVar *var, float *data) {
       if (NcType::nc_FLOAT == type_id) {
          var->getVar(data);
       }
+      else if (NcType::nc_DOUBLE == type_id) {
+         int cell_count = 1;
+         for (int idx=0; idx<var->getDimCount();idx++) {
+            cell_count *= get_dim_size(var, idx);
+         }
+         double *double_data = new double[cell_count];
+         var->getVar(double_data);
+         for (int idx=0; idx<cell_count; idx++) {
+            data[idx] = (float)double_data[idx];
+         }
+         delete [] double_data;
+      }
       else {
          int cell_count = 1;
          for (int idx=0; idx<var->getDimCount();idx++) {
