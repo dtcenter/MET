@@ -476,7 +476,8 @@ would say get data from the 3rd time dimension and 5th vertical level.
 However the NetCDF files that the MET tools generate are much simpler,
 and only contain 2 dimensional variables. So using "(\*,\*)" suffices.
 
-**Q. Grid-Stat - What would be an example of Verifying Probabilities? Example 1**
+**Q. Grid-Stat - What would be an example of Verifying Probabilities?
+Example 1**
 
 A.
 There is an example of verifying probabilities in the test scripts
@@ -523,7 +524,8 @@ exceeding 34kts, and likely comparing it against the wind speed values.
 The observed cat_thresh is set to >=34 to be consistent with with the
 forecast probability definition.
 
-**Q. Grid-Stat - What would be an example of Verifying Probabilities? Example 2**
+**Q. Grid-Stat - What would be an example of Verifying Probabilities?
+Example 2**
 
 A.
 An example of verifying a probability of precipitation field is
@@ -554,7 +556,8 @@ Here the thresholds are used to fully partition the probability space
 from 0 to 1. Note that if the probability data contains values from
 0 to 100, MET automatically divides by 100 to rescale to the 0 to 1 range.
 
-**Q. What is an example of using Grid-Stat with Regridding and Masking Turned On?**
+**Q. What is an example of using Grid-Stat with Regridding and Masking
+Turned On?**
 
 A.
 Run Grid-Stat using the following commands and the attached config file 
@@ -745,7 +748,8 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
-**Q. Pcp-Combine - How do I Combine 12-hour Accumulated Precipitation from Two Different Initialization Times?**
+**Q. Pcp-Combine - How do I Combine 12-hour Accumulated Precipitation
+from Two Different Initialization Times?**
 
 A. 
 The "-sum" command assumes the same initialization time. Use the "-add"
@@ -1295,7 +1299,8 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
-**Q. Stat-Analysis - What is the best way to average the > FSS > scores with several days even several months using 'Aggregate to Average Scores'?**
+**Q. Stat-Analysis - What is the best way to average the > FSS > scores
+with several days even several months using 'Aggregate to Average Scores'?**
 
 Below is the best way to aggregate together the Neighborhood Continuous
 (NBRCNT) lines across multiple days, specifically the fractions skill
@@ -1658,7 +1663,8 @@ Use ncdump to look at the attributes. As an exercise, try defining
 these global attributes (and removing the other projection-related ones)
 and then try again.
 
-**Q. Pre-processing - How do I use wgrib2 and pcp_combine regrid and reformat to format NetCDF files?**
+**Q. Pre-processing - How do I use wgrib2 and pcp_combine regrid and
+reformat to format NetCDF files?**
 
 A.
 If you are extracting only one or two fields from a file, using MET
@@ -1688,7 +1694,8 @@ Then the output NetCDF file does not have this problem:
 		:lat_ll = "25.000000 degrees_north" ;
 		:lon_ll = "112.000000 degrees_east" ;
 
-**Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify Model Suffix?**
+**Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify
+Model Suffix?**
 
 A.
 Below is a command example to run:
@@ -1836,7 +1843,8 @@ Yes, forecast output in GRIB2 format can be read by MET. Be sure to
 compile the GRIB2 code by setting the appropriate configuration
 file options (see Chapter 2). 
 
-**Q. How does MET differ from the previously mentioned existing verification packages?**
+**Q. How does MET differ from the previously mentioned existing
+verification packages?**
 
 A.
 MET is an actively maintained, evolving software package that is being
@@ -1875,7 +1883,8 @@ A.
 Type the name of the tool followed by **-version**. For example,
 type “pb2nc **-version**”.
 
-**Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?**
+**Q. What are MET's conventions for latitude, longitude, azimuth and
+bearing angles?**
 
 A.
 MET considers north latitude and east longitude positive. Latitudes
