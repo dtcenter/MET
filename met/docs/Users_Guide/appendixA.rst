@@ -1807,7 +1807,7 @@ gridded data files. The "regird" entry specifies regridding logic and
 has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
 the path to a gridded data file defining the grid, or an explicit grid
 specification string. See the regrid entry in Configuration File
-Details :numref:`regrid <regrid>` in the MET User's Guide for a more detailed
+Details :numref:`regrid` in the MET User's Guide for a more detailed
 description of the configuration file entries that control automated
 regridding.
 
