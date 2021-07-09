@@ -2957,7 +2957,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
                       (double) total : baddeley_max_dist);
 
    double g_med_fo = (oy == 0 ? max_dist : med_fo);
-   double g_med_of = (fy == 0 ? max_dist : met_of);
+   double g_med_of = (fy == 0 ? max_dist : med_of);
    int    g_y1     = fy + oy - 2 * foy;
    double g_y2     = g_med_fo * oy + g_med_of * fy;
    double g_y      = g_y1 * g_y2;
