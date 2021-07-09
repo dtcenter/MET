@@ -1021,7 +1021,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       for(j=0; j<n; j++) {
          if(apply_fcst_thresh) f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
          if(apply_obs_thresh)  o_dat[j] = isc_info[i].othresh.check(o_na[j]);
-	      diff[j]  = f_dat[j] - o_dat[j];
+         diff[j]  = f_dat[j] - o_dat[j];
       } // end for j
 
       // Compute the contingency table for the binary fields
