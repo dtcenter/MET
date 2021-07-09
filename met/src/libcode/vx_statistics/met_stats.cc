@@ -2738,12 +2738,12 @@ void DMAPInfo::clear() {
 
    fthresh.clear();
    othresh.clear();
-   total    = fy = oy = 0;
+   total    = fy = oy = foy = 0;
    baddeley = hausdorff = bad_data_double;
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
-   g        = gbeta  = agbeta  = beta_value = bad_data_double;
+   g        = gbeta  = beta_value = bad_data_double;
 
    return;
 }
@@ -2772,6 +2772,7 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    total = c.total;
    fy    = c.fy;
    oy    = c.oy;
+   foy   = c.foy;
 
    baddeley  = c.baddeley;
    hausdorff = c.hausdorff;
@@ -2794,9 +2795,8 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    zhu_max  = c.zhu_max;
    zhu_mean = c.zhu_mean;
 
-   g      = c.g;
-   gbeta  = c.gbeta;
-   agbeta = c.agbeta;
+   g     = c.g;
+   gbeta = c.gbeta;
 
    baddeley_p = c.baddeley_p;
    baddeley_max_dist = c.baddeley_max_dist;
@@ -2819,7 +2819,7 @@ double DMAPInfo::fbias() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+   
 void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
                    const NumArray &fdmap_na, const NumArray &odmap_na,
                    const NumArray &fthr_na,  const NumArray &othr_na) {
@@ -2866,16 +2866,22 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       if (is_bad_data(fdmap_na[i]) || is_bad_data(odmap_na[i]) ||
           is_bad_data(fthr_na[i])  || is_bad_data(othr_na[i])) continue;
 
+      // Forecast event
       if (fthr_na[i] > 0) {
          fy++;
          med_of_sum += odmap_na[i];
          fom_of_sum += 1 / (1 + odmap_na[i] * odmap_na[i] * fom_alpha);
       }
+
+      // Observation
       if (othr_na[i] > 0) {
          oy++;
          med_fo_sum += fdmap_na[i];
          fom_fo_sum += 1 / (1 + fdmap_na[i] * fdmap_na[i] * fom_alpha);
       }
+
+      // Forecast and observation event
+      if (fthr_na[i] > 0 && othr_na[i] > 0) foy++;
 
       sum_event_diff += (fthr_na[i] - othr_na[i]) * (fthr_na[i] - othr_na[i]);
 
@@ -2940,22 +2946,36 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       zhu_mean = (zhu_fo + zhu_of) / 2;
    }
 
-   // G, G-Beta, and asymmetric G-Beta
-   // JHG work here!
-   g = bad_data_double;
-   gbeta = bad_data_double;
-   agbeta = bad_data_double;
+   // G and G-Beta
+   // Reference:
+   //   Gilleland, E.: Novel measures for summarizing high-resolution forecast performance,
+   //     Adv. Stat. Clim. Meteorol. Oceanogr., 7, 13–34,
+   //     https://doi.org/10.5194/ascmo-7-13-2021, 2021.
+
+   // If not set by the user, default maximum distance to the number of pairs
+   double max_dist = (is_bad_data(baddeley_max_dist) ?
+                      (double) total : baddeley_max_dist);
+
+   double g_med_fo = (oy == 0 ? max_dist : med_fo);
+   double g_med_of = (fy == 0 ? max_dist : met_of);
+   int    g_y1     = fy + oy - 2 * foy;
+   double g_y2     = g_med_fo * oy + g_med_of * fy;
+   double g_y      = g_y1 * g_y2;
+   g               = pow(g_y, 1.0 / 3.0);
+
+   // If not set by the user, default beta to the number of pairs divided by 2
+   double g_b      = (is_bad_data(beta_value) ? (double) total / 2.0 : beta_value);
+   gbeta           = max(1.0 - g_y / g_b, 0.0);
 
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
         << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
         << "\n\tmed_fo=" << med_fo   << ", med_of="    << med_of
-        << ", med_min="  << med_min  << ", med_max="   << med_max << ", med_mean=" << med_mean
+        << ", med_min="  << med_min  << ", med_max="   << med_max << ", med_mean="   << med_mean
         << "\n\tfom_fo=" << fom_fo   << ", fom_of="    << fom_of
-        << ", fom_min="  << fom_min  << ", fom_max="   << fom_max << ", fom_mean=" << fom_mean
+        << ", fom_min="  << fom_min  << ", fom_max="   << fom_max << ", fom_mean="   << fom_mean
         << "\n\tzhu_fo=" << zhu_fo   << ", zhu_of="    << zhu_of
-        << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean=" << zhu_mean
-        << "\n\tg="      << g        << ", gbeta="     << gbeta   << ", agbeta="   << agbeta
-        << ", beta_value=" << beta_value
+        << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean="   << zhu_mean
+        << "\n\tg="      << g        << ", gbeta="     << gbeta   << ", beta_value=" << beta_value
         << "\n";
 
    return;

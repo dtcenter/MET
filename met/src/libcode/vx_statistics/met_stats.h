@@ -620,7 +620,7 @@ class DMAPInfo {
       SingleThresh othresh;
 
       // Counts
-      int total, fy, oy;
+      int total, fy, oy, foy;
 
       // Distance metrics
       double baddeley, hausdorff;
@@ -634,8 +634,8 @@ class DMAPInfo {
       // Zhu Metric
       double zhu_fo, zhu_of, zhu_min, zhu_max, zhu_mean;
 
-      // G, G-Beta, and assymetric G-Beta
-      double g, gbeta, agbeta;
+      // G and G-Beta
+      double g, gbeta;
 
       // Compute statistics
       double fbias() const; // fbias = fy / oy
