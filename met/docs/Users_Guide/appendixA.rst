@@ -1130,7 +1130,7 @@ In this example, record 735 needs to be selected.
 .. code-block:: ini
 		
 		pcp_combine -add 20160101_i12_f015_HRRR_wrfnat.grb2 \ 
-		'name\="APCP"; level\="R735";' \
+		'name="APCP"; level="R735";' \
 		-name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
 
 Instead of having the level as "L0", tell it to use "R735" to select
