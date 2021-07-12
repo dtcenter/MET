@@ -1021,7 +1021,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       // Apply the threshold, if specified
       for(j=0, mad=bad_data_double; j<n; j++) {
          f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
-         o_dat[j] = (apply_fcst_thresh ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
+         o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
          diff[j]  = f_dat[j] - o_dat[j];
 
          // Find the maximum absolute difference
