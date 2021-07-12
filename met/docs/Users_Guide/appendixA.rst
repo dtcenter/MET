@@ -1215,7 +1215,7 @@ plot_data_plane tool to test it out.
 (Record number example)**
 
 A.
-Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
+Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
 
 .. code-block:: none
 
@@ -1447,7 +1447,7 @@ runs quickly.
 TC-Stat
 ~~~~~~~
 
-**TC-Stat - How do I use the “-by” flag to stratify results?**
+**Q. TC-Stat - How do I use the “-by” flag to stratify results?**
 
 A.
 To perform tropical cyclone evaluations for multiple models use the
@@ -2061,9 +2061,8 @@ and then run "make install" and "make test" again.
 
   .. code-block:: none
 
-		  “./mode_analysis: error while loading shared
-		  libraries: libgsl.so.19: cannot open shared object file: No such file or directory”
-
+		  ./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot open shared object file: No such file or directory
+		  
 You should add the path to the gsl lib (for
 example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
 
