@@ -391,7 +391,7 @@ Define the mask by reading 6-hour precip from the mask file
 
 4.
 Apply intersection logic when combining the "input" value with
-the "mask" value (-insersection).
+the "mask" value (-intersection).
 
 5.
 Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
@@ -550,7 +550,7 @@ Note in there the following...
 
 .. code-block:: none
 		    
-		"prob = TRUE;"  # tells MET to interpret this data a probability field. 
+		"prob = TRUE;"  # tells MET to interpret this data as a probability field. 
 		"cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9]; "
 
 Here the thresholds are used to fully partition the probability space
@@ -2021,7 +2021,7 @@ This example shows a problem with NetCDF in the make_install.log file:
 .. code-block:: none
 
 		/usr/bin/ld: warning: libnetcdf.so.11, 
-		needed by /home/zzheng25/metinstall//lib/libnetcdf_c++4.so, 
+		needed by /home/zzheng25/metinstall/lib/libnetcdf_c++4.so, 
 		may conflict with libnetcdf.so.7
 
 Below are examples of too many MET_NETCDF options:
@@ -2057,10 +2057,15 @@ and then run "make install" and "make test" again.
 **Error while loading shared libraries**
 
 * Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive
-  the following error: “./mode_analysis: error while loading shared
-  libraries: libgsl.so.19: cannot open shared object file: No such file
-  or directory”, you should add the path to the gsl lib (for
-  example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
+  the following error:
+
+  .. code-block:: none
+
+		  “./mode_analysis: error while loading shared
+		  libraries: libgsl.so.19: cannot open shared object file: No such file or directory”
+
+You should add the path to the gsl lib (for
+example, */home/user/MET/gsl-2.1/lib*) to your LD_LIBRARY_PATH.
 
 **General troubleshooting**
 
