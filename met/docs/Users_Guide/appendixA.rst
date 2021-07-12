@@ -110,44 +110,48 @@ config file. That will overwrite the default settings it
 reads from the ConfigMapData file. Alternatively, update
 the default map data files in that ConfigMapData file.
 
-**Q. FILE-IO - What is another way to understand the number of
+**Q. FILE-IO - How can I understand the number of
 matched pairs?**
 
 A.
-In this example the dimension of the grid is 37x37. Thus, up to
+Statistics can be computed on matched forecast/observation pairs data.
+For example, if the dimension of the grid is 37x37 up to
 1369 matched pairs are possible. However, if the forecast or
-observation contains bad data at a point, that matched pair is
-not included in the calculations. Use the ncview tool to look at
-an example netCDF file. If the forecast field contains missing data
-around the edge of the domain, then that is a reason there may be
-992 matched pairs instead of 1369.
+observation contains bad data at a point, that matched pair would
+not be included in the calculations. There are a number of reasons that
+observations could be rejected - mismatches in station id, mismatches in
+variable names, mismatches in valid times, bad values, data off the grid,
+etc.  For example, if the forecast field contains missing data around the
+edge of the domain, then that is a reason there may be 992 matched pairs
+instead of 1369. Users can use the ncview tool to look at an example
+netCDF file or run their files through plot_data_plane to help identify
+any potential issues.
 
-**Q.  FILE-IO - What is required for formatting files in NetCDF?**
+**Q.  FILE-IO - What types of NetCDF files can MET read?**
 
 A.
-In order to use gridded NetCDF files in MET, the files need to
-look like the output of the pcp_combine tool.
-Listed below is the header from one of the NetCDF files from
-pcp_combine created by the METv5.1 test scripts. Here are the
-required parts.
+There are three flavors of NetCDF that MET can read directly.
 
 1.
-Dimensions should be named "lat" and "lon".
+Gridded NetCDF output from one of the MET tools
 
 2.
-The "lat" and "lon" variables are **NOT** required.
+Output from the WRF model that has been post-processed using the wrf_interp utility
 
 3.
-Gridded variables (e.g. APCP_12) must use the "lat" and "lon" dimensions.
+NetCDF data following the `climate-forecast (CF) convention <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
+-conventions.html>`_
 
-4.
-Gridded variables should include the attributes listed in the example
-(for timing info, only the init_time_ut, valid_time_ut, and
-accum_time_sec are actually used. "ut" stands for unix time,
-the number of seconds since Jan 1, 1970).
+Lastly, users can write python scripts to pass data that's gridded to the
+MET tools in memory. If the data doesn't fall into one of those categories,
+then it's not a gridded dataset that MET can handle directly. Satellite data,
+in general, will not be gridded. Typically it contains a dense mesh of data at
+lat/lon points, but typically those lat/lon points are not evenly spaced onto
+a regular grid.
 
-5.
-Global attributes should include the grid/projection information.
+While MET's point2grid tool does support some satellite data inputs, it is
+limited. Using python embedding is another option for handling new datasets
+not supported natively by MET.
 
 **Q. FILE-IO - How do I choose a time slice in a NetCDF file?**
 
