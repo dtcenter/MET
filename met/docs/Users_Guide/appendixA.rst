@@ -1880,9 +1880,9 @@ model grid coordinate systems.
 
 A.
 First, look on our
-   `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
-   If that doesn't answer your question, create a post in the
-   `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+`MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+If that doesn't answer your question, create a post in the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 **Q. Where are the graphics?**
