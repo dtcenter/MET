@@ -257,7 +257,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       // If the forecast threshold array is an empty list (or NA) 
       // Add the NA threshold type to the list for downstream iteration
       if(fcat_ta[i].n_elements() == 0) {
-         mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA.\n";
+         mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA.\n";
          fcat_ta[i].add(st_NA);
       }
       
@@ -266,6 +266,20 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       if(ocat_ta[i].n_elements() == 0) {
          mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA.\n";
          ocat_ta[i].add(st_NA);
+      }
+      
+      // Send a warning if forecast threshold is NA but observation threshold is not
+      if( (strcmp((fcat_ta[i].get_str()).c_str(), "NA") == 0) &&
+	  (strcmp((ocat_ta[i].get_str()).c_str(), "NA") != 0) ) {
+	mlog << Warning << "The forecast threshold is set to NA but the observation threshold is " << ocat_ta[i].get_str() << "...\n";
+	mlog << Warning << "if you are getting unexpected results change the forecast threshold to a numeric threshold.\n";
+      }
+
+      // Send a warning if observation threshold is NA but forecast threshold is not
+      if( (strcmp((ocat_ta[i].get_str()).c_str(), "NA") == 0) &&
+	  (strcmp((fcat_ta[i].get_str()).c_str(), "NA") != 0) ) {
+	mlog << Warning << "The observation threshold is set to NA but the forecast threshold is " << fcat_ta[i].get_str() << "...\n";
+	mlog << Warning << "if you are getting unexpected results change the observation threshold to a numeric threshold.\n";
       }
       
       // Check for the same number of fcst and obs thresholds
