@@ -61,7 +61,7 @@ differences lie. Identifying the stations where the
 differences occur is the
 first step in finding an explanation.
 
-**File-IO - How do I use map_data? Use China as an example.**
+**Q. File-IO - How do I use map_data? Use China as an example.**
 
 A.
 This example starts with a 0.5 degree GFS and completes
@@ -426,7 +426,7 @@ should be 0. If the thresholding of the data greater-than-or-equal-to
 Consider using strictly greater-than 0 (>0) instead.
 
 **Q. Grid-Stat - How do I use neighborhood methods to compute fraction
-skill score**
+skill score?**
 
 A.
 It is possible to compute the fractions skill score for comparing
@@ -452,7 +452,7 @@ be used to aggregate them together into a single FSS value, like this:
 Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
 that capture the "events" that are of interest in studying.    
 
-**Q. Grid-Stat - How do I use config file setup to read a NetCDF file**
+**Q. Grid-Stat - How do I use config file setup to read a NetCDF file?**
 
 A.
 Setting up the Grid-Stat config file to read a netcdf file
@@ -1309,6 +1309,7 @@ VX_MASK columns say "FULL" so that's what the output would say. Use
 within several days or even several months using
 'Aggregate to Average Scores'?**
 
+A.
 Below is the best way to aggregate together the Neighborhood Continuous
 (NBRCNT) lines across multiple days, specifically the fractions skill
 score (FSS). The STAT-Analysis tool is designed to do this. This example
@@ -1406,6 +1407,8 @@ The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
 **Q. Stat-Analysis - How do I speed up run times?**
+
+A.
 By default, STAT-Analysis has two options enabled which slow it down.
 Disabling these two options will create quicker run times:
 
@@ -1470,6 +1473,7 @@ are any more useful log messages.
 
 **Q. TC-Stat - How do I use rapid intensification verification?**
 
+A.
 To get the most output, run something like this...
 
 .. code-block:: none
@@ -1874,7 +1878,8 @@ model grid coordinate systems.
 
 **Q. How do I get help if my questions are not answered in the User's Guide?**
 
-A. First, look on our
+A.
+First, look on our
    `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
    If that doesn't answer your question, create a post in the
    `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
