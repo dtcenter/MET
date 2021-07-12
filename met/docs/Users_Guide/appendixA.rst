@@ -697,7 +697,8 @@ Pcp-Combine
 **Q. Pcp-Combine - What are some examples using "-add"?**
 
 A.
-Problems configuring a good set of options for pcp_combine. Run the command in the following way:
+Problems configuring a good set of options for pcp_combine.
+Run the command in the following way:
 
 .. code-block:: none
 
@@ -709,7 +710,8 @@ Problems configuring a good set of options for pcp_combine. Run the command in t
 		-field 'name="ACPCP"; level="A1";' \
 		-v 5
 
-This indicates that the name is "ACPCP" and the level is "A1" or a 1- hour accumulation.
+This indicates that the name is "ACPCP" and the level is "A1" or a
+1- hour accumulation.
 
 **Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
 
@@ -964,7 +966,8 @@ from in_file1 in HH[MMSS] format (required).
 The time format listed "HH[MMSS]" means specifying hours or
 hours/minutes/seconds. The incorrect example is using hours/minutes.
 
-Below is the **correct example**. Add the seconds to the end of the time strings, like this: 
+Below is the **correct example**. Add the seconds to the end of the
+time strings, like this: 
 
 .. code-block:: none
 
@@ -1208,7 +1211,8 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 When trying to get MET to read a particular gridded data file, use the
 plot_data_plane tool to test it out.
 
-**Q. Plot-Data-Plane - How do I test the variable naming convention? (Record number example)**
+**Q. Plot-Data-Plane - How do I test the variable naming convention?
+(Record number example)**
 
 A.
 Making sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
@@ -1870,7 +1874,10 @@ model grid coordinate systems.
 
 **Q. How do I get help if my questions are not answered in the User's Guide?**
 
-A. First, look on our `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_. If that doesn't answer your question, create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+A. First, look on our
+   `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+   If that doesn't answer your question, create a post in the
+   `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 **Q. Where are the graphics?**
@@ -2054,7 +2061,8 @@ and then run "make install" and "make test" again.
 
 * For configuration files used, make certain to use empty square
   brackets (e.g. [ ]) to indicate no stratification is desired.
-  **Do NOT** use empty double quotation marks inside square brackets (e.g. [“”]).
+  **Do NOT** use empty double quotation marks inside square
+  brackets (e.g. [“”]).
 
 * Have you designated all the required command line arguments?
 
@@ -2064,11 +2072,15 @@ and then run "make install" and "make test" again.
 Where to get help
 _________________
 
-If none of the above suggestions have helped solve your problem, help is available through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+If none of the above suggestions have helped solve your problem, help
+is available through the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 How to contribute code
 ______________________
 
-If you have code you would like to contribute, we will gladly consider your contribution. Please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+If you have code you would like to contribute, we will gladly consider
+your contribution. Please create a post in the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
