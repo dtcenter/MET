@@ -1030,7 +1030,7 @@ char get_char_val(NcVar *var, const int index) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index,
-                    const int len, ConcatString &tmp_cs) {
+                             const int len, ConcatString &tmp_cs) {
    NcVar var = get_var(nc, var_name);
 
    return (get_string_val(&var, index, len, tmp_cs));
@@ -1039,10 +1039,22 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString* get_string_val(NcVar *var, const int index,
-                    const int len, ConcatString &tmp_cs) {
+                             const int len, ConcatString &tmp_cs) {
+   int dim_idx = 0;
    char tmp_str[len];
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_string_val() ";
+
+   int dim_size = get_dim_size(var, dim_idx);
+   if ((index+len) > dim_size) {
+      NcDim nc_dim = get_nc_dim(var, dim_idx);
+      mlog << Error << "\n" << method_name << "The requested start offset and count ("
+           << index << ", " << len << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+           << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+           << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+      exit(1);
+   }
 
    //
    // Retrieve the character array value from the NetCDF variable.
@@ -1074,9 +1086,21 @@ int get_int_var(NcVar * var, const int index) {
    int k;
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_int_var() ";
 
    k = bad_data_int;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (index > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The requested start offset ("
+              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
       var->getVar(start, count, &k);
@@ -1095,6 +1119,17 @@ double get_nc_time(NcVar * var, const int index) {
 
    k = bad_data_double;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (index > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The requested start offset ("
+              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
 
@@ -1160,9 +1195,21 @@ float get_float_var(NcVar * var, const int index) {
    float k;
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_float_var() -> ";
 
    k = bad_data_float;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (index > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The requested start offset ("
+              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
       var->getVar(start, count, &k);
@@ -1228,6 +1275,7 @@ bool get_nc_data(NcVar *var, int *data) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long *curs) ";
 
    if (IS_VALID_NC_P(var)) {
       std::vector<size_t> start;
@@ -1235,6 +1283,15 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
 
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
+         int dim_size = get_dim_size(var, idx);
+         if (curs[idx] > dim_size) {
+            NcDim nc_dim = get_nc_dim(var, idx);
+            mlog << Error << "\n" << method_name << "The requested start offset ("
+                 << curs[idx] << ") exceeds the dimension[" << idx << "]=" << dim_size << " "
+                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
          start.push_back((size_t)curs[idx]);
          count.push_back((size_t)1);
       }
@@ -1265,12 +1322,23 @@ bool get_nc_data(NcVar *var, int *data, const long *curs) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cur) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long dim, const long cur) ";
 
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
       std::vector<size_t> start;
       std::vector<size_t> count;
       start.push_back((size_t)cur);
       count.push_back((size_t)dim);
+      int dim_size = get_dim_size(var, dim_idx);
+      if ((cur+dim) > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The requested start offset and count ("
+              << cur << ", " << dim << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
 
       for (int idx1=0; idx1<dim; idx1++) {
          data[idx1] = bad_data;
@@ -1289,26 +1357,7 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cu
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
-   bool return_status = false;
-
-   if (IS_VALID_NC_P(var)) {
-      std::vector<size_t> start;
-      std::vector<size_t> count;
-      start.push_back((size_t)cur);
-      count.push_back((size_t)dim);
-
-      for (int idx1=0; idx1<dim; idx1++) {
-         data[idx1] = bad_data_int;
-      }
-
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(start, count, data);
-      return_status = true;
-   }
-   return(return_status);
+   return(_get_nc_data(var, data, bad_data_int, dim, cur));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1316,6 +1365,7 @@ bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long *dims, const long *curs) ";
 
    if (IS_VALID_NC_P(var)) {
       std::vector<size_t> start;
@@ -1324,6 +1374,17 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long 
       int data_size = 1;
       int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
+         int dim_size = get_dim_size(var, idx);
+         if ((curs[idx]+dims[idx]) > dim_size) {
+            NcDim nc_dim = get_nc_dim(var, idx);
+            mlog << Error << "\n" << method_name << "The requested start offset and count ("
+                 << curs[idx] << ", " << dims[idx] << ") exceeds the dimension["
+                 << idx << "]=" << dim_size << " "
+                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+
          start.push_back((size_t)curs[idx]);
          count.push_back((size_t)dims[idx]);
          data_size *= dims[idx];
