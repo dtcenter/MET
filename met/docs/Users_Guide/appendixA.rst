@@ -1879,7 +1879,7 @@ R is a language and environment for statistical computing and graphics.
 It's a free package that runs on most operating systems and provides nice
 plotting features and a wide array of powerful statistical analysis tools.
 There are sample scripts on the
-`MET website<http://dtcenter.org/community-code/model-evaluation-tools-met/sample-analysis-scripts>`_
+`MET website <http://dtcenter.org/community-code/model-evaluation-tools-met/sample-analysis-scripts>`_
 that you can use and modify to perform the type of analysis you need.  If
 you create your own scripts, we encourage you to submit them to us through the
 `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_
