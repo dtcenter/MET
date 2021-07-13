@@ -187,35 +187,31 @@ since Jan 1, 1970. It is a convenient way of storing timing
 information since it is easy to add/subtract. The UNIX date command
 can be used to convert back/forth between unix time and time strings:
 
-1.
-Convert unix time to ymd_hms date
+To convert unix time to ymd_hms date:
 
 .. code-block:: none
 		
     		date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
 
-2.
-Convert ymd_hms to unix date
+To convert ymd_hms to unix date:
 
 .. code-block:: none
 		      
 		date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
 		  
 Regarding TRMM data, it may be easier to work with the binary data and
-use the trmmbin2nc.R script described on this page:
-http://www.dtcenter.org/met/users/downloads/observation_data.php
+use the trmm2nc.R script described on this
+`page <http://dtcenter.org/community-code/model-evaluation-tools-met/input-data>`_
+under observation datasets.
 
 Follow the TRMM binary links to either the 3 or 24-hour accumulations,
 save the files, and run them through that script. That is faster
 and easier than trying to get an ASCII dump. That Rscript can also
-subset the TRMM data if needed. Look for the section of it titled: 
+subset the TRMM data if needed. Look for the section of it titled
+"Output domain specification" and define the lat/lon's that needs
+to be included in the output.
 
-3.
-Output domain specification 
-
-Define the lat/lon's that needs to be included in the output.
-
-**Q. How does fixed-width output format work?**
+**Q. Does MET use a fixed-width output format for its ASCII output files?**
 
 A.
 MET does not use the Fortran-like fixed width format in its
@@ -226,26 +222,27 @@ of arbitrary length. For example, columns such as MODEL, OBTYPE, and
 DESC may be set by the user to any string value. Additionally, the
 amount of precision written is also configurable. The
 "output_precision" config file entry can be changed from its default
-value of 5 decimal places... up to 12 decimal places. That too would
+value of 5 decimal places to up to 12 decimal places, which would also
 impact the column widths of the output.
 
 Due to these issues, it is not possible to select a reasonable fixed
 width for each column ahead of time. The AsciiTable class in MET does
-a lot of work to line up the output columns, making sure there's
+a lot of work to line up the output columns, to make sure there is
 at least one space between them.
 
 If a fixed-width format is needed, the easiest option would be
 writing a script to post-process the MET output into the fixed-width
 format that is needed or that the code expects.
 
-**Q. How does scientific notation work?**
+**Q. Do the ASCII output files created by MET use scientific notation?**
 
 A.
-By default, the ascii output files created by MET make use of
+By default, the ASCII output files created by MET make use of
 scientific notation when appropriate. The formatting of the
 numbers that the AsciiTable class writes is handled by a call
 to printf. The "%g" formatting option can result in
-scientific notation: http://www.cplusplus.com/reference/cstdio/printf/
+scientific notation:
+http://www.cplusplus.com/reference/cstdio/printf/
 
 It has been recommended that a configuration option be added to
 MET to disable the use of scientific notation. That enhancement
@@ -290,22 +287,9 @@ write partial sums and contingency table counts.
 
 Then aggregate the results together by running a STAT-Analysis job.
 
-**Q. Gen-Vx-Mask - What are some ways of defining masking regions?**
+**Q. Gen-Vx-Mask - How do I define a masking region with a GFS file?**
 
 A.
-Here is an example to define some new masking regions. Suppose we
-have a sample file, POLAND.poly, but that polyline file
-contains "^M" characters at the end of each line. Those show up in
-files generated on Windows machines. Running this polyline file
-through the gen_vx_mask, the "^M" causes a runtime error since
-NetCDF doesn't like including that character in the NetCDF variable name.
-
-One easy way to strip them off is the "dos2unix" utility: 
-
-.. code-block:: none
-
-		dos2unix POLAND.poly
-
 Grab a sample GFS file: 
 
 .. code-block:: none
@@ -343,18 +327,16 @@ Grid-Stat
 **Q. Grid-Stat - How do I define a complex masking region?**
 
 A.
-There is a way to accomplish defining intersections and unions of
-multiple fields to define masks through additional steps. Prior to
-running Grid-Stat, run the Gen-Poly-Mask tool one or more times to
-define a more complex masking area by thresholding multiple fields.
-The syntax of doing so gets a little tricky.
+A user can define intersections and unions of multiple fields to define masks.
+Prior to running Grid-Stat, the user can run the Gen-Poly-Mask tool one or
+more times to define a more complex masking area by thresholding multiple
+fields.
 
-Here's an example. Let's say there is a forecast GRIB file (fcst.grb)
-which contains 2 records... one for 2-m temperature and a second for
-6-hr accumulated precip. We only want grid points that are below
-freezing with non-zero precip. We'll run gen_vx_mask twice...
-once to define the temperature mask and a second time to intersect
-that with the precip mask:
+For example, using a forecast GRIB file (fcst.grb) which contains 2 records,
+one for 2-m temperature and a second for 6-hr accumulated precip. The only
+grid points that are desired are grid points below freezing with non-zero
+precip. The user should run Gen-Vx-Mask twice -  once to define the
+temperature mask and a second time to intersect that with the precip mask:
 
 .. code-block:: none
 
@@ -381,7 +363,7 @@ Lastly "-mask_field" specifies the data we want from the mask file
 and "-thresh" specifies the event threshold.
 
 
-The second call is the tricky one... it says...
+The second call is a bit tricky.
 
 1.
 Do data masking (-type data)
@@ -401,11 +383,11 @@ the "mask" value (-intersection).
 Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
 This is totally optional, but convenient.
 
-Script up multiple calls to gen_vx_mask to apply to complex
-masking logic... and then pass the output mask file to Grid- Stat
-in its configuration file.
+A user can write a script with multiple calls to Gen-Vx-Mask to
+apply complex masking logic and then pass the output mask file
+to Grid-Stat in its configuration file.
 
-**Q. Grid-Stat -  How do I set neighborhood methods boundaries?**
+**Q. Grid-Stat - How do I set neighborhood methods boundaries?**
 
 A.
 When computing fractions skill score, MET uses the "vld_thresh"
@@ -1577,7 +1559,7 @@ to specify the tile of data to be selected.
 2. 
 As of version 5.1, MET includes support for regridding the data it reads.
 Keep TRMM on it's native domain and use the MET tools to do the regridding.
-For example, the "regrid_data_plane" tool reads a NetCDF file, regrids
+For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
 the data, and writes a NetCDF file. Alternatively, the "regrid" section
 of the configuration files for the MET tools may be used to do the
 regridding on the fly. For example, run Grid-Stat to compare to the model
@@ -1665,7 +1647,7 @@ define a LatLon grid...
 		:Nlat = "224 grid_points" ;
 		:Nlon = "464 grid_points" ;
 
-This can be created by running the "regrid_data_plane" tool to regrid
+This can be created by running the Regrid-Data-Plane" tool to regrid
 some GFS data to a LatLon grid:
 
 .. code-block:: none
@@ -1682,8 +1664,8 @@ and then try again.
 reformat to format NetCDF files?**
 
 A.
-If you are extracting only one or two fields from a file, using MET
-regrid_data_plane can be used to generate a Lat-Lon projection. If
+If you are extracting only one or two fields from a file, using MET's
+Regrid-Data-Plane can be used to generate a Lat-Lon projection. If
 regridding all fields, the wgrib2 utility may be more useful. Here's an
 example of using wgrib2 and pcp_combine to generate NetCDF files
 MET can read:
@@ -1809,13 +1791,13 @@ entry should be defined within the "fcst" or "obs" dictionaries.
 Sometimes, directly specifying the type of file will help MET figure
 out what to properly do with the data.
 
-Another option is to use the regrid_data_plane tool. The regrid_data_plane
+Another option is to use the Regrid-Data-Plane tool. The Regrid-Data-Plane
 tool may be run to read data from any gridded data file MET supports
 (i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
-user-specified grid, and write the field(s) out in NetCDF format. See
-Regrid_data_plane tool :numref:`regrid-data-plane` in the MET
+user-specified grid, and write the field(s) out in NetCDF format. See the
+Regrid-Data-Plane tool :numref:`regrid-data-plane` in the MET
 User's Guide for more
-detailed information. While the regrid_data_plane tool is useful as a
+detailed information. While the Regrid-Data-Plane tool is useful as a
 stand-alone tool, the capability is also included to automatically regrid
 data in most of the MET tools that handle gridded data. This "regrid"
 entry is a dictionary containing information about how to handle input
