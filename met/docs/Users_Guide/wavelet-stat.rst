@@ -230,16 +230,18 @@ _______________________
 
 .. code-block:: none
 
-  
+  // Empty list of thresholds
   cat_thresh = [];
+
+  // Or explicitly set the NA threshold type
   cat_thresh = [>0.0, >=5.0, NA];
 
    
-The **cat_thresh** option defines an array of thresholds for each field defined in the fcst and obs dictionaries. The number of forecast and observation categorical thresholds must match. If set to an empty list the thresholds will not be applied (no binary masking) and all the raw grid-point values will be used for downstream statistics.
+The **cat_thresh** option defines an array of thresholds for each field defined in the fcst and obs dictionaries. The number of forecast and observation categorical thresholds must match. If set to an empty list, the thresholds will not be applied (no binary masking) and all the raw grid-point values will be used for downstream statistics.
 
-If the array of threhsolds is an empy list, the application will set the threshold to NA internally and skip applying the thresholds. If the threshold is set to NA explicitly in the list, the application will also set the threshold to NA internally and skip applying the thresholds.
+If the array of thresholds is an empty list, the application will set the threshold to NA internally and skip applying the thresholds. If the threshold is set to NA explicitly in the list, the application will also skip applying the threshold.
 
-Since the application has the ability to loop through multiple thresholds (for multiple fields), a user can specify a list of thresholds and include NA at the end of the list in order to produce statistics without applying any threshold for the given variable.  
+Since the application has the ability to loop through multiple thresholds (for multiple fields), a user can include NA in the list of thresholds to produce statistics for the raw data values for the given field.
 		
 _______________________
 
