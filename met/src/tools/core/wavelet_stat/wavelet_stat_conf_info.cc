@@ -135,7 +135,7 @@ void WaveletStatConfInfo::read_config(const char *default_file_name,
 
 void WaveletStatConfInfo::process_config(GrdFileType ftype,
                                          GrdFileType otype) {
-   int i, n;
+   int i, j, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *fcst_dict = (Dictionary *) 0;
@@ -267,30 +267,26 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA.\n";
          ocat_ta[i].add(st_NA);
       }
-      
-      // Send a warning if forecast threshold is NA but observation threshold is not
-      if( (strcmp((fcat_ta[i].get_str()).c_str(), "NA") == 0) &&
-	  (strcmp((ocat_ta[i].get_str()).c_str(), "NA") != 0) ) {
-	mlog << Warning << "The forecast threshold is set to NA but the observation threshold is " << ocat_ta[i].get_str() << "...\n";
-	mlog << Warning << "if you are getting unexpected results change the forecast threshold to a numeric threshold.\n";
-      }
 
-      // Send a warning if observation threshold is NA but forecast threshold is not
-      if( (strcmp((ocat_ta[i].get_str()).c_str(), "NA") == 0) &&
-	  (strcmp((fcat_ta[i].get_str()).c_str(), "NA") != 0) ) {
-	mlog << Warning << "The observation threshold is set to NA but the forecast threshold is " << fcat_ta[i].get_str() << "...\n";
-	mlog << Warning << "if you are getting unexpected results change the observation threshold to a numeric threshold.\n";
-      }
-      
       // Check for the same number of fcst and obs thresholds
       if(fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
-
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "The number of thresholds for each field in \"fcst."
               << conf_key_cat_thresh
               << "\" must match the number of thresholds for each "
               << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
          exit(1);
+      }
+
+      // Send a warning about inconsistent use of the NA threshold
+      for(j=0; j<fcat_ta[i].n(); j++) {
+         if((fcat_ta[i][j].get_type() == thresh_na) !=
+            (ocat_ta[i][j].get_type() == thresh_na)) {
+            mlog << Warning << "\nWaveletStatConfInfo::process_config() -> "
+                 << "Skipping thresholding for either the forecast ("
+                 << fcat_ta[i][j].get_str() << ") or observation (" << ocat_ta[i][j].get_str()
+                 << ") but not the other. This may produce unexpected results!\n\n";
+         }
       }
 
       // Keep track of the maximum number of thresholds
