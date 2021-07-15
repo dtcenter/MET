@@ -256,20 +256,20 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       
       // If the forecast threshold array is an empty list (or NA) 
       // Add the NA threshold type to the list for downstream iteration
-      if(fcat_ta[i].n_elements() == 0) {
+      if(fcat_ta[i].n() == 0) {
          mlog << Debug(2) << "Found empty list for forecast threshold, setting threshold type to NA.\n";
          fcat_ta[i].add(st_NA);
       }
       
       // If the observation threshold array is an empty list (or NA) 
       // Add the NA threshold type to the list for downstream iteration
-      if(ocat_ta[i].n_elements() == 0) {
+      if(ocat_ta[i].n() == 0) {
          mlog << Debug(2) << "Found empty list for observation threshold, setting threshold type to NA.\n";
          ocat_ta[i].add(st_NA);
       }
 
       // Check for the same number of fcst and obs thresholds
-      if(fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
+      if(fcat_ta[i].n() != ocat_ta[i].n()) {
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "The number of thresholds for each field in \"fcst."
               << conf_key_cat_thresh
@@ -290,7 +290,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       }
 
       // Keep track of the maximum number of thresholds
-      if(fcat_ta[i].n_elements() > max_n_thresh) max_n_thresh = fcat_ta[i].n_elements();
+      if(fcat_ta[i].n() > max_n_thresh) max_n_thresh = fcat_ta[i].n();
 
    } // end for i
 
@@ -532,7 +532,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
       case(GridDecompType_Tile):
 
          // Number of tiles based on the user-specified locations
-         n_tile = tile_xll.n_elements();
+         n_tile = tile_xll.n();
 
          msg  << "\nTiling Method: Apply " << n_tile
               << " tile(s) specified in the configuration file "
@@ -668,9 +668,9 @@ int WaveletStatConfInfo::n_isc_row() {
    // Compute the number of output lines for each verification field
    for(i=0,n=0; i<n_vx; i++) {
 
-      n += (n_scale + 2) * fcat_ta[i].n_elements() * n_tile;
+      n += (n_scale + 2) * fcat_ta[i].n() * n_tile;
 
-      if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n_elements();
+      if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n();
    }
 
    return(n);

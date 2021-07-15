@@ -420,7 +420,7 @@ void process_scores() {
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
       for(j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n_elements()];
+         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
       }
 
       // Process percentile thresholds
@@ -444,7 +444,7 @@ void process_scores() {
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            for(k=0; k<conf_info.fcat_ta[i].n_elements(); k++) {
+            for(k=0; k<conf_info.fcat_ta[i].n(); k++) {
 
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -468,7 +468,7 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.fcat_ta[i].n_elements(); j++) {
+         for(j=0; j<conf_info.fcat_ta[i].n(); j++) {
 
             // Set the forecast and observation thresholds
             shc.set_fcst_thresh(conf_info.fcat_ta[i][j]);
@@ -944,8 +944,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    int apply_obs_thresh = 1;
    
    // Check the NumArray lengths
-   n = f_na.n_elements();
-   if(n != o_na.n_elements()) {
+   n = f_na.n();
+   if(n != o_na.n()) {
       mlog << Error << "\ndo_intensity_scale() -> "
            << "the forecast and observation arrays must have equal "
            << "length.\n\n";
@@ -966,7 +966,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.fcat_ta[i_vx].n_elements();
+   n_isc = conf_info.fcat_ta[i_vx].n();
    for(i=0; i<n_isc; i++) {
       isc_info[i].clear();
       isc_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
@@ -995,7 +995,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Apply each threshold
-   for(i=0; i<conf_info.fcat_ta[i_vx].n_elements(); i++) {
+   for(i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
 
       fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
       obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
