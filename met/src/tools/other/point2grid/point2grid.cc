@@ -1930,6 +1930,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       exit(1);
    }
    else if (data_size > 0) {
+      int last_idx = data_size - 1;
       float *latitudes  = new float[data_size];
       float *longitudes = new float[data_size];
       status = get_nc_data(&var_lat, latitudes);
@@ -1939,6 +1940,14 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                                  latitudes, longitudes, from_lat_count,
                                  from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north());
+
+         if (is_eq(latitudes[0], latitudes[last_idx]) ||
+             is_eq(longitudes[0], longitudes[last_idx])) {
+            mlog << Warning << "\n" << method_name << "same latitude or longitude. lat[0]="
+                 << latitudes[0] << " lat[" << last_idx << "]=" << latitudes[last_idx]
+                 << " lon[0]=" << longitudes[0] << " lon[" << last_idx << "]="
+                 << longitudes[last_idx] << "\n\n";
+         }
       }
       if( latitudes )  delete [] latitudes;
       if( longitudes ) delete [] longitudes;

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-development})], [met_help@ucar.edu], [], [http://dtcenter.org/community-code/model-evaluation-tools-met])
+AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-development})], [https://github.com/dtcenter/METplus/discussions], [], [http://dtcenter.org/community-code/model-evaluation-tools-met])
 AC_CONFIG_SRCDIR([src/tools/tc_utils/tc_dland/tc_dland.cc])
 AC_CONFIG_HEADERS([config.h])
 

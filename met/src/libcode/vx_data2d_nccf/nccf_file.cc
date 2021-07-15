@@ -2909,6 +2909,11 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   double dlat = lat_values[1] - lat_values[0];
   double dlon = rescale_lon(lon_values[1] - lon_values[0]);
+  mlog << Debug(7) << method_name << " -> lat[0]=" << lat_values[0]
+       << " lat[" << (lat_counts-1) << "]=" << lat_values[lat_counts-1]
+       << " dlat=" << dlat << " lon[0]=" << lon_values[0]
+       << " lon[" << (lon_counts-1) << "]=" << lon_values[lon_counts-1]
+       << " dlon=" << dlon << "\n";
 
   ConcatString point_nccf;
   bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
