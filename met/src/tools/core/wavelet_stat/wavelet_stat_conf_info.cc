@@ -283,9 +283,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          if((fcat_ta[i][j].get_type() == thresh_na) !=
             (ocat_ta[i][j].get_type() == thresh_na)) {
             mlog << Warning << "\nWaveletStatConfInfo::process_config() -> "
-                 << "Skipping thresholding for either the forecast ("
-                 << fcat_ta[i][j].get_str() << ") or observation (" << ocat_ta[i][j].get_str()
-                 << ") but not the other. This may produce unexpected results!\n\n";
+                 << "Skipping thresholding for the forecast (" << fcat_ta[i][j].get_str()
+                 << ") or observation (" << ocat_ta[i][j].get_str()
+                 << ") but not the other may produce unexpected results!\n\n";
          }
       }
 

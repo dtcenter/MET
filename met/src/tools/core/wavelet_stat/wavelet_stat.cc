@@ -939,10 +939,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    int bnd, row, col;
    int i, j, k;
    ConcatString fcst_thresh_str, obs_thresh_str;
+   bool apply_fcst_thresh, apply_obs_thresh;
 
-   int apply_fcst_thresh = 1;
-   int apply_obs_thresh = 1;
-   
    // Check the NumArray lengths
    n = f_na.n();
    if(n != o_na.n()) {
@@ -997,19 +995,22 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    // Apply each threshold
    for(i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
 
+      // Initialize to true
+      apply_fcst_thresh = apply_obs_thresh = true;
+
       fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
       obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
 
       // If the forecast threshold is set to NA skip masking below
       if(isc_info[i].fthresh.get_type() == thresh_na) {
-         mlog << Debug(2) << "The forecast threshold is NA (missing), skipping applying threshold.\n";
-         apply_fcst_thresh = 0;
+         mlog << Debug(2) << "The forecast threshold is NA, skipping applying threshold.\n";
+         apply_fcst_thresh = false;
       }
 
       // If the observation threshold is set to NA skip masking below
       if(isc_info[i].othresh.get_type() == thresh_na) {
-         mlog << Debug(2) << "The observation threshold is NA (missing), skipping applying threshold.\n";
-         apply_obs_thresh = 0;
+         mlog << Debug(2) << "The observation threshold is NA, skipping applying threshold.\n";
+         apply_obs_thresh = false;
       }
             
       mlog << Debug(2) << "Computing Intensity-Scale decomposition for "
