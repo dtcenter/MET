@@ -706,9 +706,9 @@ where the weights are applied at each grid location, with values assigned accord
 .. math:: 
 ..  e_g = (| \frac{\delta}{\delta x}(f - o)| + | \frac{\delta}{\delta y}(f - o)|)
 
-.. math:: 
-  G_L = \text{max}(| \frac{\delta f}{\delta x}|,| \frac{\delta o}{\delta x}|) + \text{max}(| \frac{\delta f}{\delta y}|,| \frac{\delta o}{\delta y}|)
+..  G_L = \text{max}(| \frac{\delta f}{\delta x}|,| \frac{\delta o}{\delta x}|) + \text{max}(| \frac{\delta f}{\delta y}|,| \frac{\delta o}{\delta y}|)
 
+.. math:: 
   \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
   \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
