@@ -1940,6 +1940,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                                  latitudes, longitudes, from_lat_count,
                                  from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north());
+
          if (is_eq(latitudes[0], latitudes[last_idx]) ||
              is_eq(longitudes[0], longitudes[last_idx])) {
             mlog << Warning << "\n" << method_name << "same latitude or longitude. lat[0]="
