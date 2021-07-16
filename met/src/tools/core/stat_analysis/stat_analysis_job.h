@@ -68,9 +68,6 @@ extern void do_job_aggr_stat(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *,
                const ConcatString &, gsl_rng *);
 
-extern void do_job_go_index(const ConcatString &, LineDataFile &,
-               STATAnalysisJob &, int &, int &, ofstream *);
-
 extern void do_job_ss_index(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
 

@@ -55,7 +55,10 @@ static const char * default_config_filename =
 
 static const char * go_index_config_file =
    "MET_BASE/config/STATAnalysisConfig_GO_Index";
-   
+
+static const char * cbs_score_config_file =
+   "MET_BASE/config/STATAnalysisConfig_CBS_Score";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments

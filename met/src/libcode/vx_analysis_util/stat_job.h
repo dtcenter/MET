@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __STAT_JOB_H__
@@ -76,19 +74,21 @@ enum STATJobType {
 
    stat_job_go_index  = 4, // Compute the GO Index.
 
-   stat_job_ss_index  = 5, // Compute the Skill Score Index.
+   stat_job_cbs_score = 5, // Compute the CBS Score.
 
-   stat_job_ramp      = 6, // Time-series ramp evaluation.
+   stat_job_ss_index  = 6, // Compute the Skill Score Index.
 
-   no_stat_job_type   = 7  // Default value
+   stat_job_ramp      = 7, // Time-series ramp evaluation.
+
+   no_stat_job_type   = 8  // Default value
 };
 
-static const int n_statjobtypes = 8;
+static const int n_statjobtypes = 9;
 
 static const char * const statjobtype_str[n_statjobtypes] = {
    "filter",         "summary",  "aggregate",
-   "aggregate_stat", "go_index", "ss_index",
-   "ramp",           "NA"
+   "aggregate_stat", "go_index", "cbs_score",
+   "ss_index",       "ramp",     "NA"
 };
 
 extern const char *statjobtype_to_string(const STATJobType);

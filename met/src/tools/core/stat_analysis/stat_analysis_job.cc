@@ -226,9 +226,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
          break;
 
       case(stat_job_go_index):
-         do_job_go_index(jobstring, f, job, n_in, n_out, sa_out);
-         break;
-
+      case(stat_job_cbs_score):
       case(stat_job_ss_index):
          do_job_ss_index(jobstring, f, job, n_in, n_out, sa_out);
          break;
@@ -3934,10 +3932,21 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// The do_job_go_index() routine is used to compute the GO Index.
-// The GO Index is a special case of the Skill Score Index consisting
-// of a predefined set of variables, levels, lead times, statistics,
-// and weights.
+// The do_job_ss_index() routine is used to compute the GO Index,
+// CBS Score, or generalized Skill Score Index. This job can be
+// configured to compute a weighted average of skill scores derived
+// from a configurable set of variables, levels, lead times, and
+// statistics. The skill score index is computed using two models,
+// a forecast model and a reference model. For each statistic in
+// the index, a skill score is computed as:
+//   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+// Where S is the statistic.
+// Next, a weighted average is computed over all the skill scores.
+// Lastly, an index value is computed as:
+//   Index = sqrt(1/(1-SS[avg]))
+// Where SS[avg] is the weighted average of skill scores.
+//
+// GO Index definition:
 // For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
 // - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
 // - Dewpoint Temperature at the surface(b), 850(b), 700(b), 400(b) mB
@@ -3950,72 +3959,19 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
-                     STATAnalysisJob &job, int &n_in, int &n_out,
-                     ofstream *sa_out) {
-   double go_index;
-   AsciiTable out_at;
-
-   //
-   // Compute the GO Index as a special case of the Skill Score Index
-   //
-   go_index = compute_ss_index(jobstring, f, job, n_in, n_out);
-
-   //
-   // Check for no matching STAT lines
-   //
-   if(n_out == 0) {
-      mlog << Warning << "\ndo_job_go_index() -> "
-           << "no matching STAT lines found for job: " << jobstring
-           << "\n\n";
-      return;
-   }
-
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, 2);
-   setup_table(out_at, 1, job.get_precision());
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_go_columns, n_job_go_columns, 0, out_at, 0, 1);
-
-   //
-   // Write the data row
-   //
-   out_at.set_entry(1, 0,  "GO_INDEX:");
-   out_at.set_entry(1, 1,  go_index);
-
-   //
-   // Write the Ascii Table and the job command line
-   //
-   write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// The do_job_ss_index() routine is used to compute the generalized
-// Skill Score Index.  This job can be configured to compute a weighted
-// average of skill scores derived from a configurable set of variables,
-// levels, lead times, and statistics.  The skill score index is
-// computed using two models, a forecast model and a reference model.
-// For each statistic in the index, a skill score is computed as:
-//   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
-// Where S is the statistic.
-// Next, a weighted average is computed over all the skill scores.
-// Lastly, an index value is computed as:
-//   Index = sqrt(1/(1-SS[avg]))
-// Where SS[avg] is the weighted average of skill scores.
-//
-////////////////////////////////////////////////////////////////////////
-
 void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &job, int &n_in, int &n_out,
                      ofstream *sa_out) {
    double ss_index;
+   ConcatString cs, ss_index_cs;
    AsciiTable out_at;
+
+   //
+   // Determine the job type
+   //
+        if(job.job_type == stat_job_go_index)  ss_index_cs = "GO_INDEX";
+   else if(job.job_type == stat_job_cbs_score) ss_index_cs = "CBS_SCORE";
+   else                                        ss_index_cs = "SS_INDEX";
 
    //
    // Compute the Skill Score Index
@@ -4040,10 +3996,13 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    out_at.set_entry(0, 0,  "COL_NAME:");
    write_header_row(job_ss_columns, n_job_ss_columns, 0, out_at, 0, 1);
 
+// JHG, write stat output here!
+
    //
    // Write the data row
    //
-   out_at.set_entry(1, 0,  "SS_INDEX:");
+   cs << cs_erase << ss_index_cs << ":";
+   out_at.set_entry(1, 0,  cs);
    out_at.set_entry(1, 1,  ss_index);
 
    //
