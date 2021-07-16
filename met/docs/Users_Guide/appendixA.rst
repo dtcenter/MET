@@ -12,120 +12,106 @@ File-IO
 **Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?**
 
 A.
-The main reason to use gen_vx_mask is to make the MET
-statistics tools (i.e. point_stat or grid_stat) run
-faster. It can be slow to figure out which points are
-inside/outside a polyline region if the polyline contains
-thousands of points. In that case, run gen_vx_mask to
-create the mask once rather than having to recreate it
-each time a MET statistics tool is run. But if the
-polyline only contains a small number of points,
-running gen_vx_mask first would only save a second or two.
-		 
-In the usage statement for gen_vx_mask, the "mask_file"
-is an ASCII Lat/Lon polyline file or gridded data file
-defining the masking region.
+The main reason to run gen_vx_mask is to make the MET
+statistics tools (e.g. point_stat, grid_stat, or ensemble_stat) run
+faster. The verification masking regions in those tools can be specified
+as Lat/Lon polyline files or the NetCDF output of gen_vx_mask. However,
+determining which grid points are inside/outside a polyline region can be
+slow if the polyline contains many points or the grid is dense. Running
+gen_vx_mask once to create a binary mask is much more efficient than
+recomputing the mask when each MET statistics tool is run. If the polyline
+only contains a small number of points or the grid is sparse running
+gen_vx_mask first would only save a second or two.
 
-So pass a gridded data file for the nest as the
-"mask_file" rather than having to create a set of
-lat/lon points. 
-
-Here's an example of that, using data from the MET tarball:
-
-.. code-block:: none
-
-		${MET_BUILD_BASE}/bin/gen_vx_mask \
-		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-		data/sample_fcst/2009123112/arw-fer-gep1/d01_2009123112_02400.grib \
-		mask.nc -name MY_MASK
- 
-If the result contains slightly different matched pair
-counts (621, 619 and 617).
-There could be a couple of answers.
-
-1.
-The polyline mask for the different grids is producing
-slightly different results and the differences lie
-along the boundary of the mask.
-
-2.
-There are some missing data values somewhere in the
-forecast and observations
-causing slightly different matched pairs.
-		
-To investigate this, run a configuration of point_stat to
-dump out the MPR
-lines for those three runs. Then take a closer look at
-them to see where the
-differences lie. Identifying the stations where the
-differences occur is the
-first step in finding an explanation.
-
-**Q. File-IO - How do I use map_data? Use China as an example.**
+**Q. File-IO - How do I use map_data?**
 
 A.
-This example starts with a 0.5 degree GFS and completes
-the following steps:
-
-1.
-Use the regrid_data_plane tool to regrid 2m temperature
-to a smaller domain centered on China:
+The MET repository includes several map data files. Users can modify which
+map datasets are included in the plots created by modifying the
+configuration files for those tools. The default map datasets are defined
+by the map_data dictionary in the ConfigMapData file.
 
 .. code-block:: none
-				  
-		${MET_BUILD_BASE}/bin/regrid_data_plane \ 
-		gfs_2012040900_F012.grib \ 
-		'latlon 160 80 15.0 60.0 0.5 0.5' \ 
-		china_tmp_2m.nc \ 
-		-field 'name="TMP"; level="Z2";'
 
-2.
-Run plot_data_plane to plot with the default map background:
+   map_data = {
 
-.. code-block:: none
-				
-     ${MET_BUILD_BASE}/bin/plot_data_plane 
-     china_tmp_2m.nc china_tmp_2m.ps \ 
-     'name="TMP_Z2"; level="(*,*)";'
+      line_color = [ 25, 25, 25 ]; // rgb triple values, 0-255
+      line_width = 0.5;
+      line_dash  = "";
 
-3.
-Re-run but pointing only to the admin_China_data:
+      source = [
+         { file_name = "MET_BASE/map/country_data"; },
+         { file_name = "MET_BASE/map/usa_state_data"; },
+         { file_name = "MET_BASE/map/major_lakes_data"; }
+      ];
+   }
+
+Users can modify the ConfigMapData contents prior to running 'make install'.
+This will change the default map data for all of the MET tools which plots.
+Alternatively, users can copy/paste/modify the map_data dictionary into the
+configuration file for a MET tool. For example, you could add map_data to
+the end of the MODE configuration file to customize plots created by MODE.
+
+Here is an example of running plot_data_plane and specifying the map_data
+in the configuration string on the command line:
 
 .. code-block:: none
 		
      ${MET_BUILD_BASE}/bin/plot_data_plane 
-     china_tmp_2m.nc china_tmp_2m_admin.ps \ 
-     'name="TMP_Z2"; level="(*,*)"; \ 
+     sample.grib china_tmp_2m_admin.ps \
+     'name="TMP"; level="Z2"; \
      map_data = { source = [ { file_name = \
      "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
      ]; }'
-				
-An arbitrary number of map_data "file_name" entries
-can be listed. However, using "country_data" doesn't
-look very good with the "admin_China_data".
-		
-To apply this to any MET tool runs, just cut-and-paste
-the "map_data" section listed above into the appropriate
-config file. That will overwrite the default settings it
-reads from the ConfigMapData file. Alternatively, update
-the default map data files in that ConfigMapData file.
 
-**Q. FILE-IO - How can I understand the number of
-matched pairs?**
+**Q. FILE-IO - How can I understand the number of matched pairs?**
 
 A.
-Statistics can be computed on matched forecast/observation pairs data.
+Statistics are computed on matched forecast/observation pairs data.
 For example, if the dimension of the grid is 37x37 up to
 1369 matched pairs are possible. However, if the forecast or
 observation contains bad data at a point, that matched pair would
 not be included in the calculations. There are a number of reasons that
-observations could be rejected - mismatches in station id, mismatches in
-variable names, mismatches in valid times, bad values, data off the grid,
-etc.  For example, if the forecast field contains missing data around the
+observations could be rejected - mismatches in station id, variable names,
+valid times, bad values, data off the grid, etc.
+For example, if the forecast field contains missing data around the
 edge of the domain, then that is a reason there may be 992 matched pairs
 instead of 1369. Users can use the ncview tool to look at an example
 netCDF file or run their files through plot_data_plane to help identify
 any potential issues.
+
+One common support question is "Why am I getting 0 matched pairs from
+Point-Stat?". As mentioned above, there are many reasons why point
+observations can be excluded from your analysis. If running point_stat with
+at least verbosity level 2 (-v 2, the default value), zero matched pairs
+will result in the following type of log messages to be printed:
+
+.. code-block:: none
+
+    DEBUG 2: Processing TMP/Z2 versus TMP/Z2, for observation type ADPSFC, over region FULL, for interpolation method UW_MEAN(1), using 0 pairs.
+    DEBUG 2: Number of matched pairs   = 0
+    DEBUG 2: Observations processed    = 1166
+    DEBUG 2: Rejected: station id      = 0
+    DEBUG 2: Rejected: obs var name    = 1166
+    DEBUG 2: Rejected: valid time      = 0
+    DEBUG 2: Rejected: bad obs value   = 0
+    DEBUG 2: Rejected: off the grid    = 0
+    DEBUG 2: Rejected: topography      = 0
+    DEBUG 2: Rejected: level mismatch  = 0
+    DEBUG 2: Rejected: quality marker  = 0
+    DEBUG 2: Rejected: message type    = 0
+    DEBUG 2: Rejected: masking region  = 0
+    DEBUG 2: Rejected: bad fcst value  = 0
+    DEBUG 2: Rejected: bad climo mean  = 0
+    DEBUG 2: Rejected: bad climo stdev = 0
+    DEBUG 2: Rejected: mpr filter      = 0
+    DEBUG 2: Rejected: duplicates      = 0
+
+This list of the rejection reason counts above matches the order in
+which the filtering logic is applied in the code. In this example,
+none of the point observations match the variable name requested
+in the configuration file. So all of the 1166 observations are rejected
+for the same reason.
 
 **Q.  FILE-IO - What types of NetCDF files can MET read?**
 
@@ -191,13 +177,13 @@ To convert unix time to ymd_hms date:
 
 .. code-block:: none
 		
-    		date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
+     date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
 
 To convert ymd_hms to unix date:
 
 .. code-block:: none
 		      
-		date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
+     date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
 		  
 Regarding TRMM data, it may be easier to work with the binary data and
 use the trmm2nc.R script described on this
