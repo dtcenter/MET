@@ -2963,9 +2963,10 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    double g_y      = g_y1 * g_y2;
    g               = pow(g_y, 1.0 / 3.0);
 
-   // If not set by the user, default beta to the number of pairs divided by 2
-   double g_b      = (is_bad_data(beta_value) ? (double) total / 2.0 : beta_value);
-   gbeta           = max(1.0 - g_y / g_b, 0.0);
+   // If not set by the user, set beta_value as the number of pairs divided by 2
+   if(is_bad_data(beta_value)) beta_value = (double) total / 2.0;
+
+   gbeta           = max(1.0 - g_y / beta_value, 0.0);
 
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
         << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
