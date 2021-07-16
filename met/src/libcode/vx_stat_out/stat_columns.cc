@@ -1892,6 +1892,47 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_ssidx_row(StatHdrColumns &shc, double ss_index,
+                     STATOutputType out_type,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row) {
+   int i;
+
+   // SSIDX line type
+   shc.set_line_type(stat_ssidx_str);
+
+   // Not Applicable
+   shc.set_interp_mthd(InterpMthd_None,
+                       GridTemplateFactory::GridTemplate_None);
+   shc.set_interp_wdth(bad_data_int);
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_ssidx_cols(ss_index, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(out_type == STATOutputType_Both) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_header_cols(const StatHdrColumns &shc,
                        AsciiTable &at, int r) {
    ConcatString cs;
@@ -4100,6 +4141,22 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
          pd_ptr->relp_na[i]);
       col++;
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_ssidx_cols(double ss_index,
+                      AsciiTable &at, int r, int c) {
+
+   //
+   // Skill Score Index
+   // Dump out the SSIDX line:
+   //    SS_INDEX
+   //
+   at.set_entry(r, c+0,  // Skill Score Index
+      ss_index);
 
    return;
 }

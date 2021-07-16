@@ -120,6 +120,8 @@ extern void write_ssvar_row (StatHdrColumns &, const PairDataEnsemble *, double,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_relp_row  (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_ssidx_row (StatHdrColumns &, double, STATOutputType,
+                             AsciiTable &, int &, AsciiTable &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -188,6 +190,8 @@ extern void write_orank_cols (const PairDataEnsemble *, int,
 extern void write_ssvar_cols (const PairDataEnsemble *, int, double,
                               AsciiTable &, int, int);
 extern void write_relp_cols  (const PairDataEnsemble *,
+                              AsciiTable &, int, int);
+extern void write_ssidx_cols (double,
                               AsciiTable &, int, int);
 
 // Setup column justification for STAT AsciiTable objects
