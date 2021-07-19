@@ -330,14 +330,6 @@ static const char * job_summary_columns [] = {
    "WMO_TYPE",    "WMO_MEAN",    "WMO_WEIGHTED_MEAN"
 };
 
-static const char * job_go_columns [] = {
-   "GO_INDEX"
-};
-
-static const char * job_ss_columns [] = {
-   "SS_INDEX"
-};
-
 static const char * job_wdir_columns [] = {
    "TOTAL",
    "FBAR",        "OBAR",        "ME",           "MAE"
@@ -397,8 +389,6 @@ static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_colu
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
 static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
-static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
-static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
