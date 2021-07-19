@@ -58,7 +58,6 @@ latex_elements = {
        \usepackage{charter}
        \usepackage[defaultsans]{lato}
        \usepackage{inconsolata}
-       \usepackage{amssymb}
        \setcounter{secnumdepth}{4}
        \setcounter{tocdepth}{4}
     ''',
