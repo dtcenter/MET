@@ -708,9 +708,9 @@ where the weights are applied at each grid location, with values assigned accord
 
   G_L = \text{max }(\vert \frac{\delta f}{\delta x}\vert,\vert \frac{\delta o}{\delta x}\vert) + \text{max }(\vert \frac{\delta f}{\delta y}\vert,\vert \frac{\delta o}{\delta y}|)
 
-  \text{S1\underline{ }OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
+  \text{S1\_OG } = \frac{\text{EGBAR}}{\text{OGBAR}}
 
-  \text{FGOG\underline{ }RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
+  \text{FGOG\_RATIO } = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 MET verification measures for probabilistic forecasts
 _____________________________________________________
