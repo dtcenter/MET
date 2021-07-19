@@ -706,12 +706,12 @@ where the weights are applied at each grid location, with values assigned accord
 .. math::
   e_g = (\vert \frac{\delta}{\delta x}(f - o)\vert + \vert \frac{\delta}{\delta y}(f - o)\vert)
 
-..
   G_L = \text{max }(\vert \frac{\delta f}{\delta x}\vert,\vert \frac{\delta o}{\delta x}\vert) + \text{max }(\vert \frac{\delta f}{\delta y}\vert,\vert \frac{\delta o}{\delta y}|)
 
-.. math::
+..
   \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
+..
   \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 MET verification measures for probabilistic forecasts
