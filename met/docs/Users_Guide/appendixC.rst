@@ -704,7 +704,7 @@ These statistics are only computed by the Grid-Stat tool and require vectors. He
 where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the :math:`S1` equation are as follows: 
 
 .. math::
-  \text{e_g} = (\| \frac{$\delta}{\delta x}(f - o)\| + \| \frac{\delta}{\delta y}(f - o)\|)
+  \text{e_g} = (\vert \frac{$\delta}{\delta x}(f - o)\vert + \vert \frac{\delta}{\delta y}(f - o)\vert)
 
 ..
   G_L = \text{max }(| \frac{\delta f}{\delta x}|,| \frac{\delta o}{\delta x}|) + \text{max }(| \frac{\delta f}{\delta y}|,| \frac{\delta o}{\delta y}|)
