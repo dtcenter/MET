@@ -166,10 +166,12 @@ Note that this is *not* the same as the difference in lengths (speeds) of the av
 
 .. only:: latex
 
+..
 	.. math:: | \text{SPEED\_ERR} | \leq \text{VDIFF\_SPEED.}
 
 .. only:: html
 
+..
 	.. math:: | \text{SPEED_ERR} | \leq \text{VDIFF_SPEED.}
 
 _________________________
