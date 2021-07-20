@@ -59,7 +59,7 @@ The other interpolation parameter is **interp_width**. This specifies the width 
 		
   interp_width = 5;
 
-The value must be odd and ≥ 1. If a value of 1 is specified, then nearest neighbor interpolation will be used regardless of the value assigned to **interp_method**.
+The value must be odd and :math:`\geqq` 1. If a value of 1 is specified, then nearest neighbor interpolation will be used regardless of the value assigned to **interp_method**.
 
 The fact that an interpolation box is used has one subtle implication-the "To" grid is effectively fattened by half the width of the interpolation box. This means that even for a "To" grid that is entirely contained in one hemisphere, if it comes close to the equator, this virtual fattening may be enough to push it over the equator, and the user will then have to provide input WWMCA files for both hemispheres, even though the "To" grid doesn't cross the equator. The WWMCA-Regrid tool should detect this situation and complain to the user if not given the correct input files.
 
