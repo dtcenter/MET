@@ -147,8 +147,13 @@ Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
 H_RATE is defined as
 
-.. math:: \text{H\_RATE } = \frac{n_{11}}{T}.
+.. only:: latex
 
+  .. math::  \text{H\_RATE } = \frac{n_{11}}{T}.
+
+.. only:: html
+
+  .. math::  \text{H_RATE } = \frac{n_{11}}{T}.
 
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
 
@@ -581,7 +586,13 @@ The anomaly correlation coefficient is equivalent to the Pearson correlation coe
 
 The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
-.. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+.. only:: latex
+
+  .. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+
+.. only:: html
+
+  .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
@@ -712,6 +723,7 @@ where the weights are applied at each grid location, with values assigned accord
 .. only:: latex
 
   .. math::  
+  
     \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
     \text{FGOG\_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
