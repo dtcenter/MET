@@ -166,11 +166,11 @@ Note that this is *not* the same as the difference in lengths (speeds) of the av
 
 .. only:: latex
 
-	.. math:: \vert \text{SPEED\_ERR} \vert \leq \text{VDIFF\_SPEED.}
+	.. math:: \vert \text{SPEED\_ERR } \vert \leq \text{VDIFF\_SPEED. }
 
 .. only:: html
 
-	.. math:: \vert \text{SPEED_ERR} \vert \leq \text{VDIFF_SPEED.}
+	.. math:: \vert \text{SPEED_ERR } \vert \leq \text{VDIFF_SPEED. }
 
 _________________________
 
@@ -192,11 +192,11 @@ SPEED_ERR is the difference in the lengths (speeds) of the average forecast and 
 
 .. only:: latex
 
-	.. math:: \text{SPEED\_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR\_SPEED } - \text{ OBAR\_SPEED}
+	.. math:: \text{SPEED\_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR\_SPEED } - \text{ OBAR\_SPEED }
 
 .. only:: html
 
-	.. math:: \text{SPEED_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR_SPEED } - \text{ OBAR_SPEED}
+	.. math:: \text{SPEED_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR_SPEED } - \text{ OBAR_SPEED }
 
 
 ___________________________
@@ -206,11 +206,11 @@ SPEED_ABSERR is the absolute value of SPEED_ERR. Note that we have SPEED_ABSERR 
 
 .. only:: latex
 
-	.. math:: \text{SPEED\_ABSERR } = \vert \text{SPEED_ERR} \vert
+	.. math:: \text{SPEED\_ABSERR } = \vert \text{SPEED\_ERR } \vert
 
 .. only:: html
 
-	.. math:: \text{SPEED_ABSERR } = \vert \text{SPEED_ERR} \vert
+	.. math:: \text{SPEED_ABSERR } = \vert \text{SPEED_ERR } \vert
 
 __________________________
 
@@ -230,8 +230,8 @@ DIR_ABSERR is the absolute value of DIR_ERR. In other words, it's an unsigned an
 
 .. only:: latex
 
-	.. math:: \text{DIR\_ABSERR } = \vert \text{DIR_ERR} \vert
+	.. math:: \text{DIR\_ABSERR } = \vert \text{DIR\_ERR } \vert
 
 .. only:: html
 
-	.. math:: \text{DIR_ABSERR } = \vert \text{DIR_ERR} \vert
+	.. math:: \text{DIR_ABSERR } = \vert \text{DIR_ERR } \vert
