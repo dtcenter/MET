@@ -206,11 +206,11 @@ SPEED_ABSERR is the absolute value of SPEED_ERR. Note that we have SPEED_ABSERR 
 
 .. only:: latex
 
-	.. math:: \text{SPEED\_ABSERR } = | \text{SPEED_ERR} |
+	.. math:: \text{SPEED\_ABSERR } = \vert \text{SPEED_ERR} \vert
 
 .. only:: html
 
-	.. math:: \text{SPEED_ABSERR } = | \text{SPEED_ERR} |
+	.. math:: \text{SPEED_ABSERR } = \vert \text{SPEED_ERR} \vert
 
 __________________________
 
@@ -230,8 +230,8 @@ DIR_ABSERR is the absolute value of DIR_ERR. In other words, it's an unsigned an
 
 .. only:: latex
 
-	.. math:: \text{DIR\_ABSERR } = | \text{DIR_ERR}|
+	.. math:: \text{DIR\_ABSERR } = \vert \text{DIR_ERR} \vert
 
 .. only:: html
 
-	.. math:: \text{DIR_ABSERR } = | \text{DIR_ERR}|
+	.. math:: \text{DIR_ABSERR } = \vert \text{DIR_ERR} \vert
