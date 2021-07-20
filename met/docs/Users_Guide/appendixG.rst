@@ -162,11 +162,13 @@ VDIFF_SPEED is the length (*ie. speed*) of the vector difference between the ave
 
 	.. math:: \text{VDIFF_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
 
-Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or , equivalently, that 
 .. only:: latex
-	:math:`\vert \text{SPEED\_ERR } \vert \leq \text{VDIFF\_SPEED. }`
+
+	Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that :math:`\vert \text{SPEED\_ERR } \vert \leq \text{VDIFF\_SPEED. }`
+
 .. only:: html
-	:math:`\vert \text{SPEED_ERR } \vert \leq \text{VDIFF_SPEED. }`
+
+	Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that	:math:`\vert \text{SPEED_ERR } \vert \leq \text{VDIFF_SPEED. }`
 
 _________________________
 
