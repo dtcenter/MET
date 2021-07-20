@@ -460,11 +460,11 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
   * - NetCDF Dimension
     - Description
   * - x
-    - Dimension of the tile which equals :math:`\mathbf{2^n}
+    - Dimension of the tile which equals :math:`\mathbf{2^n}`
   * - y
-    - Dimension of the tile which equals :math:`\mathbf{2^n}
+    - Dimension of the tile which equals :math:`\mathbf{2^n}`
   * - scale
-    - Dimension for the number of scales. This is set to **n+2**, where :math:`\mathbf{2^n} is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
+    - Dimension for the number of scales. This is set to **n+2**, where :math:`\mathbf{2^n}` is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
   * - tile
     - Dimension for the number of tiles used
 
