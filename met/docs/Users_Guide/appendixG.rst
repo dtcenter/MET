@@ -219,4 +219,4 @@ DIR_ABSERR is the absolute value of DIR_ERR. In other words, it's an unsigned an
 
 .. only:: html
 
-	.. math:: \text{DIR\_ABSERR } = | \text{DIR_ERR}|
+	.. math:: \text{DIR_ABSERR } = | \text{DIR_ERR}|

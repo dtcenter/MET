@@ -257,7 +257,13 @@ where
 
 A more general format that uses percentages is provided by Ou (:ref:`Ou, 2016 <Ou-2016>`),
 
-.. math:: \text{HSS(\%) } = 100 \ast \frac{(H - E)}{(T - E)}
+.. only:: latex
+
+  .. math:: \text{HSS(\%) } = 100 \ast \frac{(H - E)}{(T - E)}
+
+.. only:: html
+
+  .. math:: \text{HSS(%) } = 100 \ast \frac{(H - E)}{(T - E)}
 
 where H is the number of forecasts in the correct category and E is the expected number of forecasts by chance.
 
@@ -723,7 +729,7 @@ where the weights are applied at each grid location, with values assigned accord
 .. only:: latex
 
   .. math::  
-  
+
     \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
     \text{FGOG\_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
