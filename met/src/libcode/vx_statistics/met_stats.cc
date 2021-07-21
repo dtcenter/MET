@@ -1029,6 +1029,7 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "RMSFA"           ) == 0) v = rmsfa.v;
    else if(strcmp(stat_name, "RMSOA"           ) == 0) v = rmsoa.v;
    else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = anom_corr_uncntr.v;
+   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
