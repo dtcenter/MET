@@ -17,9 +17,9 @@ The local Python installation must also support a minimum set of required packag
 
 In addition to the **configure** option mentioned above, two variables, **MET_PYTHON_CC** and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python header files and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
 
-• On the command line, run “**python3-config --cflags**”. Set the value of **MET_PYTHON_CC** to the output of that command.
+• On the command line, run "**python3-config --cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
-• Again on the command line, run “**python3-config --ldflags**”. Set the value of **MET_PYTHON_LD** to the output of that command.
+• Again on the command line, run "**python3-config --ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
@@ -239,7 +239,7 @@ Python Embedding for Point Observations
 _______________________________________
 
 
-The ASCII2NC tool supports the “-format python” option. With this option, point observations may be passed as input. An example of this is provided in :numref:`ascii2nc-pyembed`. That example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
+The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is provided in :numref:`ascii2nc-pyembed`. That example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
 
 The **read_ascii_point.py** sample script can be found in:
 
@@ -250,7 +250,7 @@ The **read_ascii_point.py** sample script can be found in:
 Python Embedding for MPR data
 _____________________________
 
-The Stat-Analysis tool supports the “-lookin python” option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
+The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
 
 The **read_ascii_mpr.py** sample script can be found in:
 

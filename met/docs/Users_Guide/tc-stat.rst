@@ -104,7 +104,7 @@ Optional arguments for tc_stat
 
 4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 6. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -396,13 +396,13 @@ This job produces summary statistics for the column name specified by the **-col
 "COL_NAME", followed by the summary statistics that are applied;
 
 3.
-“SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance.
+"SUMMARY", which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance.
 
 The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option. 
 
 .. _table_columnar_output_summary_tc_stat:
 
-.. list-table:: Columnar output of “summary” job output from the TC-Stat tool.
+.. list-table:: Columnar output of "summary" job output from the TC-Stat tool.
   :widths: auto
   :header-rows: 2
 

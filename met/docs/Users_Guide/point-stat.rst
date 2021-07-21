@@ -1307,58 +1307,58 @@ The first set of header columns are common to all of the output files generated 
   * - 25
     - TOTAL
     - Total number of data points
-  * - 26–28
+  * - 26-28
     - FBAR
     - Mean value of forecast wind speed
-  * - 29–31
+  * - 29-31
     - OBAR
     - Mean value of observed wind speed
-  * - 32–34
+  * - 32-34
     - FS_RMS
     - Root mean square forecast wind speed
-  * - 35–37
+  * - 35-37
     - OS_RMS
     - Root mean square observed wind speed
-  * - 38–40
+  * - 38-40
     - MSVE
     - Mean squared length of the vector difference between the forecast and observed winds
-  * - 41–43
+  * - 41-43
     - RMSVE
     - Square root of MSVE
-  * - 45–46
+  * - 45-46
     - FSTDEV
     - Standard deviation of the forecast wind speed
-  * - 47–49
+  * - 47-49
     - OSTDEV
     - Standard deviation of the observed wind field
-  * - 50–52
+  * - 50-52
     - FDIR
     - Direction of the average forecast wind vector
-  * - 53–55
+  * - 53-55
     - ODIR
     - Direction of the average observed wind vector
-  * - 56–58
+  * - 56-58
     - FBAR_SPEED
     - Length (speed) of the average forecast wind vector
-  * - 59–61
+  * - 59-61
     - OBAR_SPEED
     - Length (speed) of the average observed wind vector
-  * - 62–64
+  * - 62-64
     - VDIFF_SPEED
     - Length (speed) of the vector difference between the average forecast and average observed wind vectors
-  * - 65–67
+  * - 65-67
     - VDIFF_DIR
     - Direction of the vector difference between the average forecast and average wind vectors
-  * - 68–70
+  * - 68-70
     - SPEED_ERR
     - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O)
-  * - 71–73
+  * - 71-73
     - SPEED_ABSERR
     - Absolute value of SPEED_ERR
-  * - 74–76
+  * - 74-76
     - DIR_ERR
     - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector
-  * - 77–79
+  * - 77-79
     - DIR_ABSERR
     - Absolute value of DIR_ABSERR
 

@@ -42,11 +42,11 @@ Convolution
 
 As in MODE, MTD applies a convolution filter to the raw data as a preliminary step in resolving the field into objects. The convolution step in MTD differs in several respects from that performed in MODE, however. 
 
-First, MTD typically reads in several planes of data for each data field—one plane for each time step, and there is really no limit to the number of time steps. So MTD is convolving much more data than it would be if it were simply analyzing a 2D data field. Secondly, MTD convolves in time as well as space, which again increases the amount of data needing to be processed. The net effect of all this is to greatly increase the time needed to perform the convolution step.
+First, MTD typically reads in several planes of data for each data field-one plane for each time step, and there is really no limit to the number of time steps. So MTD is convolving much more data than it would be if it were simply analyzing a 2D data field. Secondly, MTD convolves in time as well as space, which again increases the amount of data needing to be processed. The net effect of all this is to greatly increase the time needed to perform the convolution step.
 
 Because of this, the developers decided to make several changes in the way convolution was performed in MTD. Most of the differences come from the need to make the convolution step as fast as possible.
 
-The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted :math:`R`, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is :math:`(2 R + 1) \times (2 R + 1)`, as shown in :numref:`mtd-two_r_plus_one`.
+The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall "size" of the filter is still determined by one parameter (denoted :math:`R`, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is :math:`(2 R + 1) \times (2 R + 1)`, as shown in :numref:`mtd-two_r_plus_one`.
 
 .. _mtd-two_r_plus_one:
 
@@ -73,7 +73,7 @@ The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to a 3D
 
 The spatial orientation of an object (what traditional MODE calls the **axis angle** of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
 
-:numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, *i.e.,* axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
+:numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an "A") at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, *i.e.,* axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
 
 .. _mtd-axis_3d:
 
@@ -92,9 +92,9 @@ Finally, MTD calculates several **intensity percentiles** of the raw data values
 3D Pair Attributes
 ~~~~~~~~~~~~~~~~~~
 
-The next category of spatial attributes is for pairs of objects — one of the pair coming from the collection of forecast objects, the other coming from the observation objects.
+The next category of spatial attributes is for pairs of objects - one of the pair coming from the collection of forecast objects, the other coming from the observation objects.
 
-Note: whenever a pair attribute is described below as a *delta*, that means it's a simple difference of two single-object attributes. The difference is always taken as “forecast minus observed”.
+Note: whenever a pair attribute is described below as a *delta*, that means it's a simple difference of two single-object attributes. The difference is always taken as "forecast minus observed".
 
 The **spatial centroid distance** is the purely spatial part of the centroid separation of two objects. If one centroid is at :math:`(\bar{x}_1, \bar{y}_1, \bar{t}_1)` and the other is at :math:`(\bar{x}_2, \bar{y}_2, \bar{t}_2)` then the distance is calculated as
 
@@ -184,7 +184,7 @@ MTD input
 
 The formats for two-dimensional data files used as input to MTD are the same ones supported by most of the MET tools. Generally speaking, if MODE can use a forecast or observation data file as input, then that file can also be used by MTD. The only difference is that while MODE takes only one forecast and one observed data file as input, MTD takes a series of files.
 
-As shown in the next section, filenames for each time used must be given. Thus, for example, if MTD is being used for verification over a period of 24 hours, and the data file valid times are separated by one hour, then a total of 48 filenames must be specified on the MTD command line — 24 filenames for the forecast files, and 24 for the observation files. Further, the filenames must be given in order of increasing valid time. Many users will prefer to write scripts to automate this, rather than type in a lengthy command line by hand.
+As shown in the next section, filenames for each time used must be given. Thus, for example, if MTD is being used for verification over a period of 24 hours, and the data file valid times are separated by one hour, then a total of 48 filenames must be specified on the MTD command line - 24 filenames for the forecast files, and 24 for the observation files. Further, the filenames must be given in order of increasing valid time. Many users will prefer to write scripts to automate this, rather than type in a lengthy command line by hand.
 
 MTD usage
 ~~~~~~~~~
@@ -558,7 +558,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Angle that the axis plane of an object makes with the grid x direction
   * - 33
     - VOLUME
-    - Integer count of the number of 3D “cells” in an object
+    - Integer count of the number of 3D "cells" in an object
   * - 34
     - START_TIME
     - Object start time
@@ -631,7 +631,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Difference in object ending time steps
   * - 33
     - INTERSECTION_VOLUME
-    - “Volume” of object intersection
+    - "Volume" of object intersection
   * - 34
     - DURATION_DIFF
     - Difference in the lifetimes of the two objects

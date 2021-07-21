@@ -10,17 +10,17 @@ ________________
 
 This section describes the Pcp-Combine tool which summarizes data across multiple input gridded data files and writes the results to a single NetCDF output file. It is often used to modify precipitation accumulation intervals in the forecast and/or observation datasets to make them comparable. However it can also be used to derive summary fields, such as daily min/max temperature or average precipitation rate.
 
-The Pcp-Combine tool supports four types of commands (“sum”, “add”, “subtract”, and “derive”) which may be run on any gridded data files supported by MET.
+The Pcp-Combine tool supports four types of commands ("sum", "add", "subtract", and "derive") which may be run on any gridded data files supported by MET.
 
-1. The “sum” command is the default command and therefore specifying “-sum” on the command line is optional. Using the sum arguments described below, Pcp-Combine searches the input directories (“-pcpdir” option) for data that matches the requested time stamps and accumulation intervals. Pcp-Combine only considers files from the input data directory which match the specified regular expression (“-pcprx” option). While “sum” searches for matching data, all the other commands are run on the explicit set of input files specified.
+1. The "sum" command is the default command and therefore specifying "-sum" on the command line is optional. Using the sum arguments described below, Pcp-Combine searches the input directories ("-pcpdir" option) for data that matches the requested time stamps and accumulation intervals. Pcp-Combine only considers files from the input data directory which match the specified regular expression ("-pcprx" option). While "sum" searches for matching data, all the other commands are run on the explicit set of input files specified.
 
-2. The “add” command reads the requested data from the input data files and adds them together.
+2. The "add" command reads the requested data from the input data files and adds them together.
 
-3. The “subtract” command reads the requested data from exactly two input files and computes their difference.
+3. The "subtract" command reads the requested data from exactly two input files and computes their difference.
 
-4. The “derive” command reads the requested data from the input data files and computes the requested summary fields.
+4. The "derive" command reads the requested data from the input data files and computes the requested summary fields.
 
-By default, the Pcp-Combine tool processes data for **APCP**, the GRIB string for accumulated precipitation. When requesting data using time strings (i.e. [HH]MMSS), Pcp-Combine searches for accumulated precipitation for that accumulation interval. Alternatively, use the “-field” option to process fields other than **APCP** or for non-GRIB files. The “-field” option may be used multiple times to process multiple fields in a single run. Since the Pcp-Combine tool does not support automated regridding, all input data must be on the same grid. In general the input files should have the same initialization time unless the user has indicated that it should ignore the initialization time for the “sum” command. The “subtract” command produces a warning when the input initialization times differ or the subtraction results in a negative accumulation interval.
+By default, the Pcp-Combine tool processes data for **APCP**, the GRIB string for accumulated precipitation. When requesting data using time strings (i.e. [HH]MMSS), Pcp-Combine searches for accumulated precipitation for that accumulation interval. Alternatively, use the "-field" option to process fields other than **APCP** or for non-GRIB files. The "-field" option may be used multiple times to process multiple fields in a single run. Since the Pcp-Combine tool does not support automated regridding, all input data must be on the same grid. In general the input files should have the same initialization time unless the user has indicated that it should ignore the initialization time for the "sum" command. The "subtract" command produces a warning when the input initialization times differ or the subtraction results in a negative accumulation interval.
 
 pcp_combine usage
 ~~~~~~~~~~~~~~~~~
@@ -82,9 +82,9 @@ Optional arguments for pcp_combine
 
 6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-7. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Required arguments for the pcp_combine sum command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -100,14 +100,14 @@ Required arguments for the pcp_combine sum command
 Optional arguments for pcp_combine sum command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-pcpdir path** option indicates the directories in which the input files reside. The contents of “**path**” will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
+5. The **-pcpdir path** option indicates the directories in which the input files reside. The contents of "**path**" will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
 
-6. The **-pcprx reg_exp** option indicates the regular expression to be used in matching files in the search directories specified. The contents of “reg_exp” will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
+6. The **-pcprx reg_exp** option indicates the regular expression to be used in matching files in the search directories specified. The contents of "reg_exp" will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
 
 Required arguments for the pcp_combine derive command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The “derive” run command must be followed by **stat_list** which is a comma-separated list of summary fields to be computed. The **stat_list** may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
+1. The "derive" run command must be followed by **stat_list** which is a comma-separated list of summary fields to be computed. The **stat_list** may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
 
 Input files for pcp_combine add, subtract, and derive commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -116,9 +116,9 @@ The input files for the add, subtract, and derive command can be specified in on
 
 1. Use **file_1 config_str_1 ... file_n config_str_n** to specify the full path to each input file followed by a description of the data to be read from it. The **config_str_i** argument describing the data can be a set to a time string in HH[MMSS] format for accumulated precipitation or a full configuration string. For example, use **'name="TMP"; level="P500";'** to process temperature at 500mb.
 
-2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. Rather than specifying a separate configuration string for each input file, the “-field” command line option is required to specify the data to be processed.
+2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. Rather than specifying a separate configuration string for each input file, the "-field" command line option is required to specify the data to be processed.
 
-3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the “-field” command line option is required to specify the data to be processed.
+3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the "-field" command line option is required to specify the data to be processed.
 
 An example of the pcp_combine calling sequence is presented below:
 
@@ -260,7 +260,7 @@ Optional arguments for regrid_data_plane
 
 12. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-13. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+13. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 14. The **-compress level** option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
@@ -337,9 +337,9 @@ Optional arguments for shift_data_plane
 
 9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-10. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+10. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-11. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+11. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 For more details on setting the **-method** and **-width** options, see the **regrid** entry in :numref:`config_options`. An example of the shift_data_plane calling sequence is shown below:
 
@@ -402,7 +402,7 @@ Optional arguments for modis_regrid
 
 8. The **-units text** option specifies the units string in the global attributes section of the output file.
 
-9. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+9. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the modis_regrid calling sequence is shown below:
 
@@ -462,7 +462,7 @@ Optional arguments for wwmca_plot
 
 4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-5. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 .. figure:: figure/reformat_grid_fig2.png
 	    
@@ -502,11 +502,11 @@ Optional arguments for wwmca_regrid
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-6. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-In any regridding problem, there are two grids involved: the “From” grid, which is the grid the input data are on, and the “To” grid, which is the grid the data are to be moved onto. In **WWMCA-Regrid** the “From” grid is pre-defined by the hemisphere of the WWMCA binary files being processed. The “To” grid and corresponding regridding logic are specified using the **regrid** section of the configuration file. If the “To” grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere needs to be given. If the “To” grid or the interpolation box used straddles the equator, the data files for both hemispheres need to be given. Once the “To” grid is specified in the config file, the WWMCA-Regrid tool will know which input data files it needs and will complain if it is not given the right ones.
+In any regridding problem, there are two grids involved: the "From" grid, which is the grid the input data are on, and the "To" grid, which is the grid the data are to be moved onto. In **WWMCA-Regrid** the "From" grid is pre-defined by the hemisphere of the WWMCA binary files being processed. The "To" grid and corresponding regridding logic are specified using the **regrid** section of the configuration file. If the "To" grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere needs to be given. If the "To" grid or the interpolation box used straddles the equator, the data files for both hemispheres need to be given. Once the "To" grid is specified in the config file, the WWMCA-Regrid tool will know which input data files it needs and will complain if it is not given the right ones.
 
 wwmca_regrid configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
