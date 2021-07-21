@@ -81,13 +81,13 @@ MET is an evolving verification software package. New capabilities are planned i
 Code support
 ____________
 
-MET support is provided through a MET-help email address: met_help@ucar.edu. We will endeavor to respond to requests for help in a timely fashion. In addition, information about MET and tools that can be used with MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+MET support is provided through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_. We will endeavor to respond to requests for help in a timely fashion. In addition, information about MET and tools that can be used with MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
 
 We welcome comments and suggestions for improvements to MET, especially information regarding errors. Comments may be submitted using the MET Feedback form available on the MET website. In addition, comments on this document would be greatly appreciated. While we cannot promise to incorporate all suggested changes, we will certainly take all suggestions into consideration.
 
 **-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
 
-The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please contact met_help@ucar.edu.
+The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 Fortify
 _______
