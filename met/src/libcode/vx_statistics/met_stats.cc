@@ -1019,6 +1019,7 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "MSE"             ) == 0) v = mse.v;
    else if(strcmp(stat_name, "BCMSE"           ) == 0) v = bcmse.v;
    else if(strcmp(stat_name, "RMSE"            ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
    else if(strcmp(stat_name, "E10"             ) == 0) v = e10.v;
    else if(strcmp(stat_name, "E25"             ) == 0) v = e25.v;
    else if(strcmp(stat_name, "E50"             ) == 0) v = e50.v;
@@ -1032,7 +1033,6 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "RMSFA"           ) == 0) v = rmsfa.v;
    else if(strcmp(stat_name, "RMSOA"           ) == 0) v = rmsoa.v;
    else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = anom_corr_uncntr.v;
-   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
