@@ -1204,6 +1204,9 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmse.v);
    cnt_mean.rmse.v = na.mean();
 
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].si.v);
+   cnt_mean.si.v = na.mean();
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e10.v);
    cnt_mean.e10.v = na.mean();
 
