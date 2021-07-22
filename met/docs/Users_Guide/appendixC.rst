@@ -923,10 +923,6 @@ An ROC curve shows how well the forecast discriminates between two outcomes, so 
 	    
 	    Example of ROC Curve
 
-.. raw:: pdf
-
-   PageBreak oneColumn
-
 Area Under the ROC curve (AUC)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
