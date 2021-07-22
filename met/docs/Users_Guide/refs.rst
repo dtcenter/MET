@@ -105,7 +105,7 @@ References
 |   of the American Statistical Association,* 102(477), 93-103.
 |
 
-.. _Epstein-1969
+.. _Epstein-1969:
 
 | Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
 |   *J. Appl. Meteor.*, 8, 985–987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.

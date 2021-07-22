@@ -946,12 +946,13 @@ Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
 
 While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET.  It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012<Todter-2012>`), and is a proper score (:ref:`Mason, 2008<Mason-2008>`).
 
-Let :math:`\text{J}` be the number of categories, then both the forecast, :math:`\text{f=(f_1,…,f_J)}`, and observation, :math:`\text{o=(o_1,…,o_J)`, are length-:math:`\text{J}` vectors, where the components of :math:`\text{f}` include the probabilities forecast for each category :math:`\text{1,…,J}` and :math:`\text{o}` contains 1 in the category that is realized and zero everywhere else.  The cumulative forecasts, :math:`\text{F_m}`, and observations, :math:`\text{O_m}`, are defined to be:
+Let :math:`\text{J}` be the number of categories, then both the forecast, :math:`\text{f} = (f_1,…,f_J)`, and observation, :math:`\text{o} = (o_1,…,o_J)`, are length-:math:`\text{J}` vectors, where the components of :math:`\text{f}` include the probabilities forecast for each category :math:`\text{1,…,J}` and :math:`\text{o}` contains 1 in the category that is realized and zero everywhere else. The cumulative forecasts, :math:`F_m`, and observations, :math:`O_m`, are defined to be:
 
-math:`\text{F_m} = \sum_{j=1}^m (f_j)` and math:`\text{O_m} = \sum_{j=1}^m (o_j), m = 1,…,J`.
+Then :math:`\text{F_m} = \sum_{j=1}^m (f_j)` and math:`\text{O_m} = \sum_{j=1}^m (o_j), m = 1,…,J`.
 
 
-To clarify, F_1=f_1 is the first component of F_m, F_2=f_1+f_2, etc., and F_J=1.  Similarly, if o_j=1 and i<j, then O_i=0 and when i≥j, O_i=1, and of course, O_J=1.  Finally, the RPS is defined to be:
+To clarify, :math:`\text{F_1 = f_1}` is the first component of :math:`\text{F_m}`, :math:`\text{F_2 = f_1+f_2}`, etc., and :math:`\text{F_J = 1}`.  Similarly, if :math:`\text{o_j = 1} and :math:`\text{i < j}`, then :math:`\text{O_i = 0}` and when :math:`\text{i≥j}, :math:`\text{O_i = 1}`, and of course, :math:`\text{O_J = 1}`.  Finally, the RPS is defined to be:
+
 "RPS"=∑_(m=1)^J▒(F_m-O_m )^2 =∑_(m=1)^J▒〖BS_m 〗,
 where BS_m is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012<Todter-2012>`).  Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are the line types RPS_REL, RPS_RES and RPS_UNC.
 
