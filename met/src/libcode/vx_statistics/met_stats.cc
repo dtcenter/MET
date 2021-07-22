@@ -735,6 +735,7 @@ void CNTInfo::clear() {
    msess.clear();
    bcmse.clear();
    rmse.clear();
+   si.clear();
    e10.clear();
    e25.clear();
    e50.clear();
@@ -742,7 +743,7 @@ void CNTInfo::clear() {
    e90.clear();
    eiqr.clear();
    mad.clear();
-
+   
    n_ranks = frank_ties = orank_ties = 0;
 
    return;
@@ -783,6 +784,7 @@ void CNTInfo::assign(const CNTInfo &c) {
    msess            = c.msess;
    bcmse            = c.bcmse;
    rmse             = c.rmse;
+   si               = c.si;
    e10              = c.e10;
    e25              = c.e25;
    e50              = c.e50;
@@ -833,6 +835,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       msess.allocate_n_alpha(n_alpha);
       bcmse.allocate_n_alpha(n_alpha);
       rmse.allocate_n_alpha(n_alpha);
+      si.allocate_n_alpha(n_alpha);
       e10.allocate_n_alpha(n_alpha);
       e25.allocate_n_alpha(n_alpha);
       e50.allocate_n_alpha(n_alpha);
