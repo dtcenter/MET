@@ -1266,6 +1266,18 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.rmse.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for si
+      //
+      s = cnt_info.si.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.si.v_bcl[i],
+                              cnt_info.si.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for e10
       //
       s = cnt_info.e10.v;
@@ -2273,6 +2285,17 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.alpha[i],
                                cnt_info.rmse.v_bcl[i],
                                cnt_info.rmse.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for si
+      //
+      s = cnt_info.si.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.si.v_bcl[i],
+                               cnt_info.si.v_bcu[i]);
 
       //
       // Compute bootstrap interval for e10
@@ -3879,14 +3902,14 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
    char line[max_line_len];
 
    snprintf(line, max_line_len,
-           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
            c.fbar.v,    c.fstdev.v,    c.obar.v,          c.ostdev.v,
            c.pr_corr.v, c.anom_corr.v,
            c.rmsfa.v,   c.rmsoa.v,     c.anom_corr_uncntr.v,
            c.me.v,      c.me2.v,       c.estdev.v,        c.mbias.v,
            c.mae.v,     c.mse.v,       c.msess.v,         c.bcmse.v,
            c.rmse.v,    c.e10.v,       c.e25.v,           c.e50.v,
-           c.e75.v,     c.e90.v,       c.eiqr.v,          c.mad.v);
+	   c.e75.v,     c.e90.v,       c.eiqr.v,          c.mad.v,     c.si.v);
 
    tmp_out << line << "\n";
 
