@@ -120,6 +120,9 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    // Compute root mean squared error
    cnt_info.rmse.v = sqrt(cnt_info.mse.v);
 
+   // Compute Scatter Index (SI)
+   cnt_info.si.v = cnt_info.rmse.v / cnt_info.me.v
+   
    // Compute normal confidence intervals
    cnt_info.compute_ci();
 
@@ -342,6 +345,11 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    cnt_info.rmse.v = sqrt(err_sq_bar);
 
+   //
+   // Compute Scatter Index (SI)
+   //
+   cnt_info.si.v = cnt_info.rmse.v / cnt_info.me.v
+   
    //
    // Only compute the Kendall Tau and Spearman's Rank corrleation
    // coefficients if the rank_flag is set.
