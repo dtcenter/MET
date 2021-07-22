@@ -955,7 +955,7 @@ To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
-where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012<Todter-2012>`).  Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are the columns for RPS_REL, RPS_RES and RPS_UNC in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
+where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012<Todter-2012>`).  Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
 
 CRPS
 ~~~~
