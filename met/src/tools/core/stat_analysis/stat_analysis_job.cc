@@ -226,7 +226,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
          break;
 
       case(stat_job_go_index):
-      case(stat_job_cbs_score):
+      case(stat_job_cbs_index):
       case(stat_job_ss_index):
          do_job_ss_index(jobstring, f, job, n_in, n_out, sa_out);
          break;
@@ -3933,7 +3933,7 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 ////////////////////////////////////////////////////////////////////////
 //
 // The do_job_ss_index() routine is used to compute the GO Index,
-// CBS Score, or generalized Skill Score Index. This job can be
+// CBS Index, or generalized Skill Score Index. This job can be
 // configured to compute a weighted average of skill scores derived
 // from a configurable set of variables, levels, lead times, and
 // statistics. The skill score index is computed using two models,
@@ -3970,7 +3970,7 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Determine the job type
    //
         if(job.job_type == stat_job_go_index)  ss_index_cs = "GO_INDEX";
-   else if(job.job_type == stat_job_cbs_score) ss_index_cs = "CBS_SCORE";
+   else if(job.job_type == stat_job_cbs_index) ss_index_cs = "CBS_INDEX";
    else                                        ss_index_cs = "SS_INDEX";
 
    //

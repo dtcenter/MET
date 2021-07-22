@@ -74,7 +74,7 @@ enum STATJobType {
 
    stat_job_go_index  = 4, // Compute the GO Index.
 
-   stat_job_cbs_score = 5, // Compute the CBS Score.
+   stat_job_cbs_index = 5, // Compute the CBS Index.
 
    stat_job_ss_index  = 6, // Compute the Skill Score Index.
 
@@ -87,7 +87,7 @@ static const int n_statjobtypes = 9;
 
 static const char * const statjobtype_str[n_statjobtypes] = {
    "filter",         "summary",  "aggregate",
-   "aggregate_stat", "go_index", "cbs_score",
+   "aggregate_stat", "go_index", "cbs_index",
    "ss_index",       "ramp",     "NA"
 };
 

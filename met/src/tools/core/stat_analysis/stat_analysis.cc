@@ -41,7 +41,7 @@
 //                    percentile thresholds.
 //   012    04/25/21  Halley Gotway  Replace pickle files for temporary
 //                    ascii.
-//   013    07/16/21  Halley Gotway  MET #1788 Add CBS Score.
+//   013    07/16/21  Halley Gotway  MET #1788 Add CBS Index.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -457,15 +457,15 @@ void process_search_dirs() {
    }
 
    //
-   // Apply the GO Index or CBS Score filtering criteria.
+   // Apply the GO Index or CBS Index filtering criteria.
    //
    if(default_job.job_type == stat_job_go_index ||
-      default_job.job_type == stat_job_cbs_score) {
+      default_job.job_type == stat_job_cbs_index) {
 
       ConcatString config_file =
          (default_job.job_type == stat_job_go_index ?
           replace_path(go_index_config_file) :
-          replace_path(cbs_score_config_file));
+          replace_path(cbs_index_config_file));
 
       mlog << Debug(1) << "Skill Score Index Config File: "
            << config_file << "\n";
@@ -661,15 +661,15 @@ void process_job(const char * jobstring, int n_job) {
    }
 
    //
-   // Special processing for the GO Index and CBS Score jobs.
+   // Special processing for the GO Index and CBS Index jobs.
    //
    if(default_job.job_type == stat_job_go_index ||
-      default_job.job_type == stat_job_cbs_score) {
+      default_job.job_type == stat_job_cbs_index) {
 
       ConcatString config_file =
          (default_job.job_type == stat_job_go_index ?
           replace_path(go_index_config_file) :
-          replace_path(cbs_score_config_file));
+          replace_path(cbs_index_config_file));
 
       mlog << Debug(1) << "Skill Score Index Config File: "
            << config_file << "\n";

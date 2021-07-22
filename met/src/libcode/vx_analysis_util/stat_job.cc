@@ -2893,7 +2893,7 @@ STATJobType string_to_statjobtype(const char *str) {
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
       t = stat_job_go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
-      t = stat_job_cbs_score;
+      t = stat_job_cbs_index;
    else if(strcasecmp(str, statjobtype_str[6]) == 0)
       t = stat_job_ss_index;
    else if(strcasecmp(str, statjobtype_str[7]) == 0)
