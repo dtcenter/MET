@@ -311,7 +311,7 @@ ____________________
      beta_value        = NA;
   }
 
-The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is a floating point number used to compute the **:math:`G_\Beta`** statistic. If left to its default NA value, the beta value will be set to :math:`N^2 / 2` where N is the number of matched pairs for each verification task.
+The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is a floating point number used to compute the **:math:`G_\beta`** statistic. If left to its default NA value, the beta value will be set to :math:`N^2 / 2` where N is the number of matched pairs for each verification task.
 
 _____________________
 
@@ -829,10 +829,10 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - :math:`G` distance measure
   * - 47
     - GBETA
-    - :math:`G_\Beta` distance measure
+    - :math:`G_\beta` distance measure
   * - 48
     - BETA_VALUE
-    - Beta value used to compute :math:`G_\Beta`
+    - Beta value used to compute :math:`G_\beta`
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
