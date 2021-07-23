@@ -602,6 +602,7 @@ bool MetNcPointObsOut::write_to_netcdf(StringArray obs_names, StringArray obs_un
                 << "variable names are not added because of empty names\n\n";
    }
    else mlog << Debug(7) << method_name << "use_var_id is false\n";
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
