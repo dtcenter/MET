@@ -92,7 +92,7 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **Pcp-Combine Tool**
 
-    * **Input**: Two or more gridded model or observation files (in GRIB format for “sum” command, or any gridded file for “add”, “subtract”, and “derive” commands) containing data (often accumulated precipitation) to be combined.
+    * **Input**: Two or more gridded model or observation files (in GRIB format for "sum" command, or any gridded file for "add", "subtract", and "derive" commands) containing data (often accumulated precipitation) to be combined.
 
     * **Output**: One NetCDF file containing output for the requested operation(s).
 
@@ -142,7 +142,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One gridded model file, one gridded observation file, and one configuration file.
 
-    * **Output**: One STAT file containing the “ISC” line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
+    * **Output**: One STAT file containing the "ISC" line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
 
 #. **GSID2MPR Tool**
 
@@ -160,7 +160,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
 
-    * **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the “-out” option or redirected to a STAT output file using the “-out_stat” option.
+    * **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the "-out" option or redirected to a STAT output file using the "-out_stat" option.
 
 #. **Series-Analysis Tool**
 
@@ -184,7 +184,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more MODE object statistics files from the MODE tool and, optionally, one configuration file containing specification for the analysis job(s) to be run on the object data.
 
-    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the "-out" option.
 
 #. **MODE-TD Tool**
 
@@ -208,7 +208,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more TCSTAT output files output from the TC-Pairs tool and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the TCSTAT data.
 
-    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the "-out" option.
 
 #. **TC-Gen Tool**
 

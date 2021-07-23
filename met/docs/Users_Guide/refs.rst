@@ -13,7 +13,7 @@ References
 
 
 | Barker, T. W., 1991: The relationship between spread and forecast error in
-|   extended-range forecasts. *Journal of Climate*, 4, 733–742.
+|   extended-range forecasts. *Journal of Climate*, 4, 733-742.
 |
 
 .. _Bradley-2008:
@@ -27,7 +27,7 @@ References
 
 | Brill, K. F., and F. Mesinger, 2009: Applying a general analytic method
 |   for assessing bias sensitivity to bias-adjusted threat and equitable
-|   threat scores. *Weather and Forecasting*, 24, 1748–1754.
+|   threat scores. *Weather and Forecasting*, 24, 1748-1754.
 | 
 
 .. _Brown-2007:
@@ -45,7 +45,7 @@ References
 
 | Buizza, R., 1997: Potential forecast skill of ensemble prediction and spread
 |   and skill distributions of the ECMWF ensemble prediction system. *Monthly*
-|   *Weather Review*,125, 99–119.
+|   *Weather Review*,125, 99-119.
 | 
 
 .. _Bullock-2016:
@@ -58,7 +58,7 @@ References
 
 | Candille, G., and O. Talagrand, 2008: Impact of observational error on the
 |   validation of ensemble prediction systems. *Quarterly Journal of the Royal*
-|   *Meteorological Society* 134: 959–971.
+|   *Meteorological Society* 134: 959-971.
 | 
 
 .. _Casati-2004:
@@ -103,7 +103,13 @@ References
 
 | Efron, B. 2007: Correlation and large-scale significance testing. *Journal*
 |   of the American Statistical Association,* 102(477), 93-103.
-| 
+|
+
+.. _Epstein-1969:
+
+| Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
+|   *J. Appl. Meteor.*, 8, 985–987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
+|
 
 .. _Gilleland-2010:
 
@@ -153,10 +159,17 @@ References
 
 .. _Mason-2004:
 
-| Mason, S. J., 2004: On Using “Climatology” as a Reference Strategy
+| Mason, S. J., 2004: On Using "Climatology" as a Reference Strategy
 |   in the Brier and Ranked Probability Skill Scores. *Monthly Weather Review*,
-|   132, 1891–1895.
+|   132, 1891-1895.
 | 
+
+.. _Mason-2008:
+
+| Mason, S. J., 2008: Understanding forecast verification statistics.
+|   *Meteor. Appl.*, 15, 31–40, doi: 10.1002/met.51.
+|
+
 
 .. _Mittermaier-2014:
 
@@ -166,9 +179,16 @@ References
 
 .. _Mood-1974:
 
-| Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
+| Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
 |   *Theory of Statistics*, McGraw-Hill, 299-338.
 | 
+
+.. _Murphy-1969:
+
+| Murphy, A.H., 1969: On the ranked probability score. *Journal of Applied*
+|   *Meteorology and Climatology*, 8 (6), 988 – 989,
+|   doi: 10.1175/1520-0450(1969)008<0988:OTPS>2.0.CO;2.
+|
 
 .. _Murphy-1987:
 
@@ -194,14 +214,14 @@ References
 
 | Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of
 |   observation errors on the statistics for ensemble spread and
-|   reliability. *Monthly Weather Review* 132: 1487–1501.
+|   reliability. *Monthly Weather Review* 132: 1487-1501.
 |
 
 .. _Santos-2012:
 
 | Santos C. and A. Ghelli, 2012: Observational probability method to assess
 |   ensemble precipitation forecasts. *Quarterly Journal of the Royal*
-|   *Meteorological Society* 138: 209–221.
+|   *Meteorological Society* 138: 209-221.
 | 
 
 .. _Schwartz-2017:
@@ -213,7 +233,7 @@ References
 
 .. _Stephenson-2000:
 
-| Stephenson, D.B., 2000: Use of the “Odds Ratio” for diagnosing
+| Stephenson, D.B., 2000: Use of the "Odds Ratio" for diagnosing
 |   forecast skill. *Weather and Forecasting*, 15, 221-232.
 | 
 
@@ -223,6 +243,13 @@ References
 |   dependency score: A non-vanishing measure for forecasts of rare events.
 |   *Meteorological Applications* 15, 41-50.
 | 
+
+.. _Todter-2012:
+
+| Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
+|   Continuous ranked version and its decomposition. *Mon. Wea. Rev.*,
+|   140 (6), 2005 – 2017, doi: 10.1175/MWR-D-11-00266.1.
+|
 
 .. _Weniger-2016:
 
@@ -235,7 +262,7 @@ References
 
 | Wilks, D.S. 2010: Sampling distributions of the Brier score and Brier skill
 |   score under serial dependence. *Quarterly Journal of the Royal*
-|   *Meteorological Society,*, 136, 2109–2118. doi:10.1002/qj.709
+|   *Meteorological Society,*, 136, 2109-2118. doi:10.1002/qj.709
 | 
 
 .. _Wilks-2011:
