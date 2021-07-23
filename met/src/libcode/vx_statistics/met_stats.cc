@@ -2855,12 +2855,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
    non_zero_count = 0;
 
-   mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
-        << ", baddeley_max_dist=" << baddeley_max_dist
-        << ", fom_alpha=" << fom_alpha
-        << ", zhu_weight=" << zhu_weight
-        << ", beta_value=" << beta_value << "\n";
-
    for (int i=0; i<fdmap_na.n(); i++) {
 
       // Skip bad data
@@ -2969,6 +2963,14 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
    gbeta           = max(1.0 - g_y / beta_value, 0.0);
 
+   // Dump debug distance map info
+   mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
+        << ", baddeley_max_dist=" << baddeley_max_dist
+        << ", fom_alpha=" << fom_alpha
+        << ", zhu_weight=" << zhu_weight
+        << ", beta_value=" << beta_value
+        << "\n";
+
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", nfo=" << foy << ", total=" << total
         << "\n\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
         << "\n\tmed_fo=" << med_fo   << ", med_of="    << med_of
@@ -2978,7 +2980,8 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
         << "\n\tzhu_fo=" << zhu_fo   << ", zhu_of="    << zhu_of
         << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean="   << zhu_mean
         << "\n\ty1="     << g_y1     << ", y2="        << g_y2    << ", y="          << g_y
-        << "\n\tg="      << g        << ", gbeta="     << gbeta   << "\n";
+        << "\n\tg="      << g        << ", gbeta="     << gbeta
+        << "\n";
 
    return;
 }
