@@ -234,6 +234,10 @@ The configuration options listed above are common to multiple MET tools and are 
 
 ___________________________
 
+.. _nbrhd:
+
+:ref:`nbrhd <nbrhd>`
+
 .. code-block:: none
 
   nbrhd = {
@@ -244,7 +248,7 @@ ___________________________
      cov_thresh = [ >=0.5 ];
    }
 
-	 
+
 The **nbrhd** dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** value specifies the width of the square or diameter of the circle as an odd integer.
 
 The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
@@ -255,6 +259,10 @@ The **cov_thresh** entry contains a comma separated list of thresholds to be app
 
 ___________________
 
+.. _fourier:
+
+:ref:`fourier <fourier>`
+
 .. code-block:: none
 
   fourier = {
@@ -263,24 +271,35 @@ ___________________
   }
 
 
-The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
+The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed.
 
-The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included. The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
+The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid:
+
+* The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included.
+
+* The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
 
+.. _gradient:
+
+:ref:`gradient <gradient>`
+
 .. code-block:: none
 
-  grad = {
+  gradient = {
      dx = [ 1 ];
      dy = [ 1 ];
    }
 
 
-
 The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
 
 ____________________
+
+.. _distance_map:
+
+:ref:`distance_map <distance_map>`
 
 .. code-block:: none
 
@@ -756,7 +775,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Frequency Bias
   * - 29
     - BADDELEY
-    - Baddeley's Delta Metric
+    - Baddeley's :math:`\Delta` Metric
   * - 30
     - HAUSDORFF
     - Hausdorff Distance
