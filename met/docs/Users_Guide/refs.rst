@@ -13,7 +13,7 @@ References
 
 
 | Barker, T. W., 1991: The relationship between spread and forecast error in
-|   extended-range forecasts. *Journal of Climate*, 4, 733–742.
+|   extended-range forecasts. *Journal of Climate*, 4, 733-742.
 |
 
 .. _Bradley-2008:
@@ -27,7 +27,7 @@ References
 
 | Brill, K. F., and F. Mesinger, 2009: Applying a general analytic method
 |   for assessing bias sensitivity to bias-adjusted threat and equitable
-|   threat scores. *Weather and Forecasting*, 24, 1748–1754.
+|   threat scores. *Weather and Forecasting*, 24, 1748-1754.
 | 
 
 .. _Brown-2007:
@@ -45,7 +45,7 @@ References
 
 | Buizza, R., 1997: Potential forecast skill of ensemble prediction and spread
 |   and skill distributions of the ECMWF ensemble prediction system. *Monthly*
-|   *Weather Review*,125, 99–119.
+|   *Weather Review*,125, 99-119.
 | 
 
 .. _Bullock-2016:
@@ -58,7 +58,7 @@ References
 
 | Candille, G., and O. Talagrand, 2008: Impact of observational error on the
 |   validation of ensemble prediction systems. *Quarterly Journal of the Royal*
-|   *Meteorological Society* 134: 959–971.
+|   *Meteorological Society* 134: 959-971.
 | 
 
 .. _Casati-2004:
@@ -153,9 +153,9 @@ References
 
 .. _Mason-2004:
 
-| Mason, S. J., 2004: On Using “Climatology” as a Reference Strategy
+| Mason, S. J., 2004: On Using "Climatology" as a Reference Strategy
 |   in the Brier and Ranked Probability Skill Scores. *Monthly Weather Review*,
-|   132, 1891–1895.
+|   132, 1891-1895.
 | 
 
 .. _Mittermaier-2014:
@@ -166,7 +166,7 @@ References
 
 .. _Mood-1974:
 
-| Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
+| Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
 |   *Theory of Statistics*, McGraw-Hill, 299-338.
 | 
 
@@ -194,14 +194,14 @@ References
 
 | Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of
 |   observation errors on the statistics for ensemble spread and
-|   reliability. *Monthly Weather Review* 132: 1487–1501.
+|   reliability. *Monthly Weather Review* 132: 1487-1501.
 |
 
 .. _Santos-2012:
 
 | Santos C. and A. Ghelli, 2012: Observational probability method to assess
 |   ensemble precipitation forecasts. *Quarterly Journal of the Royal*
-|   *Meteorological Society* 138: 209–221.
+|   *Meteorological Society* 138: 209-221.
 | 
 
 .. _Schwartz-2017:
@@ -213,7 +213,7 @@ References
 
 .. _Stephenson-2000:
 
-| Stephenson, D.B., 2000: Use of the “Odds Ratio” for diagnosing
+| Stephenson, D.B., 2000: Use of the "Odds Ratio" for diagnosing
 |   forecast skill. *Weather and Forecasting*, 15, 221-232.
 | 
 
@@ -235,7 +235,7 @@ References
 
 | Wilks, D.S. 2010: Sampling distributions of the Brier score and Brier skill
 |   score under serial dependence. *Quarterly Journal of the Royal*
-|   *Meteorological Society,*, 136, 2109–2118. doi:10.1002/qj.709
+|   *Meteorological Society,*, 136, 2109-2118. doi:10.1002/qj.709
 | 
 
 .. _Wilks-2011:

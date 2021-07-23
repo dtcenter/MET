@@ -147,8 +147,13 @@ Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
 H_RATE is defined as
 
-.. math:: \text{H_RATE } = \frac{n_{11}}{T}.
+.. only:: latex
 
+  .. math::  \text{H\_RATE } = \frac{n_{11}}{T}.
+
+.. only:: html
+
+  .. math::  \text{H_RATE } = \frac{n_{11}}{T}.
 
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
 
@@ -252,7 +257,13 @@ where
 
 A more general format that uses percentages is provided by Ou (:ref:`Ou, 2016 <Ou-2016>`),
 
-.. math:: \text{HSS(\%) } = 100 \ast \frac{(H - E)}{(T - E)}
+.. only:: latex
+
+  .. math:: \text{HSS(\%) } = 100 \ast \frac{(H - E)}{(T - E)}
+
+.. only:: html
+
+  .. math:: \text{HSS(%) } = 100 \ast \frac{(H - E)}{(T - E)}
 
 where H is the number of forecasts in the correct category and E is the expected number of forecasts by chance.
 
@@ -581,11 +592,17 @@ The anomaly correlation coefficient is equivalent to the Pearson correlation coe
 
 The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
-.. math:: \text{ANOM_CORR } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
+.. only:: latex
+
+  .. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+
+.. only:: html
+
+  .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
-.. math:: \text{Anomaly Correlation Raw } = \frac{ \bar{(f - c)(a - c)}}{ \sqrt{\bar{(f - c)^2} \bar{(a - c)^2}}}
+.. math:: \text{Anomaly Correlation Raw } = \frac{ \overline{(f - c)(a - c)}}{ \sqrt{\overline{(f - c)^2} \overline{(a - c)^2}}}
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
@@ -594,9 +611,9 @@ Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 
 :numref:`table_PS_format_info_SL1L2`, :numref:`table_PS_format_info_SAL1L2`, :numref:`table_PS_format_info_VL1L2`, and :numref:`table_PS_format_info_VAL1L2`
 
-The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
+The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the "city block" and "Euclidean" distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
 
-The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al., 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
+The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al., 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
@@ -607,15 +624,16 @@ Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output :numref:`ta
 
 These statistics are simply the 1st and 2nd moments of the forecasts, observations and errors:
 
-.. math:: \text{FBAR} = \text{Mean}(f) = \bar{f} = \frac{1}{n} \sum_{i=1}^n f_i
+.. math:: 
+  \text{FBAR} = \text{Mean}(f) = \bar{f} = \frac{1}{n} \sum_{i=1}^n f_i
 
- \text{OBAR} = \text{Mean}(o) = \bar{o} = \frac{1}{n} \sum_{i=1}^n o_i
+  \text{OBAR} = \text{Mean}(o) = \bar{o} = \frac{1}{n} \sum_{i=1}^n o_i
 
- \text{FOBAR} = \text{Mean}(fo) = \bar{fo} = \frac{1}{n} \sum_{i=1}^n f_i o_i
+  \text{FOBAR} = \text{Mean}(fo) = \bar{fo} = \frac{1}{n} \sum_{i=1}^n f_i o_i
 
- \text{FFBAR} = \text{Mean}(f^2) = \bar{f}^2 = \frac{1}{n} \sum_{i=1}^n f_i^2
+  \text{FFBAR} = \text{Mean}(f^2) = \bar{f}^2 = \frac{1}{n} \sum_{i=1}^n f_i^2
 
- \text{OOBAR} = \text{Mean}(o^2) = \bar{o}^2 = \frac{1}{n} \sum_{i=1}^n o_i^2
+  \text{OOBAR} = \text{Mean}(o^2) = \bar{o}^2 = \frac{1}{n} \sum_{i=1}^n o_i^2
 
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be derived from these moments.
 
@@ -626,15 +644,16 @@ Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output :numref:`
 
 Computation of these statistics requires a climatological value, c. These statistics are the 1st and 2nd moments of the scalar anomalies. The moments are defined as:
 
-.. math:: \text{FABAR} = \text{Mean}(f - c) = \bar{f - c} = \frac{1}{n} \sum_{i=1}^n (f_i - c)
+.. math:: 
+  \text{FABAR} = \text{Mean}(f - c) = \bar{f - c} = \frac{1}{n} \sum_{i=1}^n (f_i - c)
 
- \text{OABAR} = \text{Mean}(o - c) = \bar{o - c} = \frac{1}{n} \sum_{i=1}^n (o_i - c)
+  \text{OABAR} = \text{Mean}(o - c) = \bar{o - c} = \frac{1}{n} \sum_{i=1}^n (o_i - c)
 
- \text{FOABAR} = \text{Mean}[(f - c)(o - c)] = \bar{(f - c)(o - c)} = \frac{1}{n} \sum_{i=1}^n (f_i - c)(o_i - c)
+  \text{FOABAR} = \text{Mean}[(f - c)(o - c)] = \bar{(f - c)(o - c)} = \frac{1}{n} \sum_{i=1}^n (f_i - c)(o_i - c)
 
- \text{FFABAR} = \text{Mean}[(f - c)^2] = \bar{(f - c)}^2 = \frac{1}{n} \sum_{i=1}^n (f_i - c)^2
+  \text{FFABAR} = \text{Mean}[(f - c)^2] = \bar{(f - c)}^2 = \frac{1}{n} \sum_{i=1}^n (f_i - c)^2
 
- \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
+  \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
 
 Vector L1 and L2 values
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -643,19 +662,20 @@ Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR" in VL
 
 These statistics are the moments for wind vector values, where **u** is the E-W wind component and **v** is the N-S wind component ( :math:`u_f` is the forecast E-W wind component; :math:`u_o` is the observed E-W wind component; :math:`v_f` is the forecast N-S wind component; and :math:`v_o` is the observed N-S wind component). The following measures are computed:
 
-.. math:: \text{UFBAR} = \text{Mean}(u_f) = \bar{u}_f = \frac{1}{n} \sum_{i=1}^n u_{fi}
+.. math:: 
+  \text{UFBAR} = \text{Mean}(u_f) = \bar{u}_f = \frac{1}{n} \sum_{i=1}^n u_{fi}
 
- \text{VFBAR} = \text{Mean}(v_f) = \bar{v}_f = \frac{1}{n} \sum_{i=1}^n v_{fi}
+  \text{VFBAR} = \text{Mean}(v_f) = \bar{v}_f = \frac{1}{n} \sum_{i=1}^n v_{fi}
 
- \text{UOBAR} = \text{Mean}(u_o) = \bar{u}_o = \frac{1}{n} \sum_{i=1}^n u_{oi}
+  \text{UOBAR} = \text{Mean}(u_o) = \bar{u}_o = \frac{1}{n} \sum_{i=1}^n u_{oi}
 
- \text{VOBAR} = \text{Mean}(v_o) = \bar{v}_o = \frac{1}{n} \sum_{i=1}^n v_{oi}
+  \text{VOBAR} = \text{Mean}(v_o) = \bar{v}_o = \frac{1}{n} \sum_{i=1}^n v_{oi}
 
- \text{UVFOBAR} = \text{Mean}(u_f u_o + v_f v_o) = \frac{1}{n} \sum_{i=1}^n (u_{fi} u_{oi} + v_{fi} v_{oi})
+  \text{UVFOBAR} = \text{Mean}(u_f u_o + v_f v_o) = \frac{1}{n} \sum_{i=1}^n (u_{fi} u_{oi} + v_{fi} v_{oi})
 
- \text{UVFFBAR} = \text{Mean}(u_f^2 + v_f^2) = \frac{1}{n} \sum_{i=1}^n (u_{fi}^2 + v_{fi}^2)
+  \text{UVFFBAR} = \text{Mean}(u_f^2 + v_f^2) = \frac{1}{n} \sum_{i=1}^n (u_{fi}^2 + v_{fi}^2)
 
- \text{UVOOBAR} = \text{Mean}(u_o^2 + v_o^2) = \frac{1}{n} \sum_{i=1}^n (u_{oi}^2 + v_{oi}^2)
+  \text{UVOOBAR} = \text{Mean}(u_o^2 + v_o^2) = \frac{1}{n} \sum_{i=1}^n (u_{oi}^2 + v_{oi}^2)
 
 Vector anomaly L1 and L2 values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -664,20 +684,21 @@ Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR
 
 These statistics require climatological values for the wind vector components, :math:`u_c \text{ and } v_c`. The measures are defined below:
 
-.. math:: \text{UFABAR} = \text{Mean}(u_f - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c)
+.. math:: 
+  \text{UFABAR} = \text{Mean}(u_f - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c)
 
- \text{VFBAR} = \text{Mean}(v_f - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{fi} - v_c)
+  \text{VFBAR} = \text{Mean}(v_f - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{fi} - v_c)
 
- \text{UOABAR} = \text{Mean}(u_o - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{oi} - u_c)
+  \text{UOABAR} = \text{Mean}(u_o - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{oi} - u_c)
 
- \text{VOABAR} = \text{Mean}(v_o - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{oi} - v_c)
+  \text{VOABAR} = \text{Mean}(v_o - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{oi} - v_c)
 
- \text{UVFOABAR} &= \text{Mean}[(u_f - u_c)(u_o - u_c) + (v_f - v_c)(v_o - v_c)] \\
-                 &= \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c) + (u_{oi} - u_c) + (v_{fi} - v_c)(v_{oi} - v_c)
+  \text{UVFOABAR} &= \text{Mean}[(u_f - u_c)(u_o - u_c) + (v_f - v_c)(v_o - v_c)] \\
+                  &= \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c) + (u_{oi} - u_c) + (v_{fi} - v_c)(v_{oi} - v_c)
 
- \text{UVFFABAR} = \text{Mean}[(u_f - u_c)^2 + (v_f - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{fi} - u_c)^2 + (v_{fi} - v_c)^2)
+  \text{UVFFABAR} = \text{Mean}[(u_f - u_c)^2 + (v_f - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{fi} - u_c)^2 + (v_{fi} - v_c)^2)
 
- \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
+  \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
 
 Gradient values
 ~~~~~~~~~~~~~~~
@@ -686,25 +707,40 @@ Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RAT
 
 These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
-.. math:: \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
+.. math:: 
+  \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
 
- \text{OGBAR} = \text{Mean}|\nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla o_i|
+  \text{OGBAR} = \text{Mean}|\nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla o_i|
 
- \text{MGBAR} = \text{Max(FGBAR, OGBAR)}
+  \text{MGBAR} = \text{Max(FGBAR, OGBAR)}
 
- \text{EGBAR} = \text{Mean}|\nabla f - \nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i - \nabla o_i|
+  \text{EGBAR} = \text{Mean}|\nabla f - \nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i - \nabla o_i|
 
- \text{S1} = 100 \frac{\sum_{i=1}^n (w_i (e_g))}{\sum_{i=1}^n (w_i (G_L))}_i ,
+  \text{S1} = 100 \frac{\sum_{i=1}^n (w_i (e_g))}{\sum_{i=1}^n (w_i (G_L))}_i ,
 
 where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the :math:`S1` equation are as follows: 
 
-.. math:: e_g = (| \frac{\delta}{\delta x}(f - o)| + | \frac{\delta}{\delta y}(f - o)|)
+.. math::
+  e_g = (\vert \frac{\delta}{\delta x}(f - o)\vert + \vert \frac{\delta}{\delta y}(f - o)\vert)
 
- G_L = \text{max}(| \frac{\delta f}{\delta x}|,| \frac{\delta o}{\delta x}|) + \text{max}(| \frac{\delta f}{\delta y}|,| \frac{\delta o}{\delta y}|)
+  G_L = \text{max }(\vert \frac{\delta f}{\delta x}\vert,\vert \frac{\delta o}{\delta x}\vert) + \text{max }(\vert \frac{\delta f}{\delta y}\vert,\vert \frac{\delta o}{\delta y}|)
 
- \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
- \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
+.. only:: latex
+
+  .. math::  
+
+    \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
+
+    \text{FGOG\_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
+
+.. only:: html
+
+  .. math::  
+    \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
+    
+    \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
+
 
 MET verification measures for probabilistic forecasts
 _____________________________________________________
@@ -1078,23 +1114,23 @@ The results of the distance map verification approaches that are included in the
 Baddeley's :math:`\Delta` Metric and Hausdorff Distance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called “BADDELEY” and “HAUSDORFF” in the DMAP 
+Called "BADDELEY" and "HAUSDORFF" in the DMAP 
 output :numref:`table_GS_format_info_DMAP`
 
 The Baddeley's :math:`\Delta` Metric is given by
 
 .. math:: \Delta_{p,w} (A,B) = [ \frac{1}{N} \sum_{s \in D} | w(d(s,A)) - w(d(s,B))|]^{\frac{1}{P}}
 
-where :math:`d(s,\cdot)` is the distance map for the respective event area, :math:`w(\cdot)` is an optional concave function (i.e., :math:`w( t + u) \leq w(t)+w(u))` that is strictly increasing at zero with :math:`w(t)=0` if and only if :math:`t=0`, *N* is the size of the domain, and *p* is a user chosen parameter for the :math:`L_{p}` norm. The default choice of :math:`p = 2` corresponds to a Euclidean average, :math:`p = 1` is a simple average of the difference in distance maps, and the limiting case of :math:`p= \infty` gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as :math:`H(A,B)`, and is the metric that motivated the development of Baddeley’s :math:`\Delta` metric. A typical choice, and the only available with MET, for :math:`w(\cdot) \text{ is } w(t)= \min\{t,c\}`, where *c* is a user-chosen constant with :math:`c = \infty` meaning that :math:`w(\cdot)` is not applied. This choice of :math:`w(\cdot)` provides a cutoff for distances beyond the pre-specified amount given by *c*. 
+where :math:`d(s,\cdot)` is the distance map for the respective event area, :math:`w(\cdot)` is an optional concave function (i.e., :math:`w( t + u) \leq w(t)+w(u))` that is strictly increasing at zero with :math:`w(t)=0` if and only if :math:`t=0`, *N* is the size of the domain, and *p* is a user chosen parameter for the :math:`L_{p}` norm. The default choice of :math:`p = 2` corresponds to a Euclidean average, :math:`p = 1` is a simple average of the difference in distance maps, and the limiting case of :math:`p= \infty` gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as :math:`H(A,B)`, and is the metric that motivated the development of Baddeley's :math:`\Delta` metric. A typical choice, and the only available with MET, for :math:`w(\cdot) \text{ is } w(t)= \min\{t,c\}`, where *c* is a user-chosen constant with :math:`c = \infty` meaning that :math:`w(\cdot)` is not applied. This choice of :math:`w(\cdot)` provides a cutoff for distances beyond the pre-specified amount given by *c*. 
 
-In terms of distance maps, Baddeley’s :math:`\Delta` is the :math:`L_{p}` norm of the top left panel in :numref:`grid-stat_fig4` provided :math:`c= \infty`. If :math:`0<c< \infty`, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by *c* wherever they would otherwise exceed *c* before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
+In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm of the top left panel in :numref:`grid-stat_fig4` provided :math:`c= \infty`. If :math:`0<c< \infty`, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by *c* wherever they would otherwise exceed *c* before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
 Mean-error Distance
 ~~~~~~~~~~~~~~~~~~~
 
-Called “MED_FO”, “MED_OF”, “MED_MIN”, “MED_MAX”, and “MED_MEAN” in the DMAP output :numref:`table_GS_format_info_DMAP`
+Called "MED_FO", "MED_OF", "MED_MIN", "MED_MAX", and "MED_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
 The mean-error distance (MED) is given by
 
@@ -1102,7 +1138,7 @@ The mean-error distance (MED) is given by
 
 where :math:`n_{B}` is the number of non-zero grid points that fall in the event set *B*. That is, it is the average of the distance map for the event set *A* calculated only over those grid points that fall inside the event set *B*. It gives the average shortest-distance from every point in *B* to the nearest point in *A*.
 
-Unlike Baddeley’s :math:`\Delta` metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
+Unlike Baddeley's :math:`\Delta` metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
 
 .. math:: min \text{MED}(A,B) = min( \text{MED}(A,B),\text{MED}(B,A))
 
@@ -1117,9 +1153,9 @@ The range for MED is 0 to infinity, with a score of 0 indicating a perfect forec
 Pratt's Figure of Merit
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Called “FOM_FO”, “FOM_OF”, “FOM_MIN”, “FOM_MAX”, and “FOM_MEAN” in the DMAP output :numref:`table_GS_format_info_DMAP`
+Called "FOM_FO", "FOM_OF", "FOM_MIN", "FOM_MAX", and "FOM_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
-Pratt’s Figure of Merit (FOM) is given by
+Pratt's Figure of Merit (FOM) is given by
 
 .. math:: \text{FOM }(A,B) = \frac{1}{max(n_A , n_B)} \sum_{s \in B} \frac{1}{1 + \alpha d(s,A)^2 }
 
@@ -1132,7 +1168,7 @@ The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 Zhu's Measure
 ~~~~~~~~~~~~~
 
-Called “ZHU_FO”, “ZHU_OF”, “ZHU_MIN”, “ZHU_MAX”, and “ZHU_MEAN” in the DMAP output :numref:`table_GS_format_info_DMAP`
+Called "ZHU_FO", "ZHU_OF", "ZHU_MIN", "ZHU_MAX", and "ZHU_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
 Another measure incorporates the amount of actual overlap between the event sets across the fields in addition to the MED from above and was proposed by Zhu et al. (2011). Their main proposed measure was a comparative forecast performance measure of two competing forecasts against the same observation, which is not included here, but as defined is a true mathematical metric. They also proposed a similar measure of only the forecast against the observation, which is included in MET. It is simply
 
