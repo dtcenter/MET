@@ -2743,7 +2743,7 @@ void DMAPInfo::clear() {
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
-   g        = gbeta  = beta_value = bad_data_double;
+   g        = gbeta  = bad_data_double;
 
    return;
 }
@@ -2858,7 +2858,8 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
         << ", baddeley_max_dist=" << baddeley_max_dist
         << ", fom_alpha=" << fom_alpha
-        << ", zhu_weight=" << zhu_weight << "\n";
+        << ", zhu_weight=" << zhu_weight
+        << ", beta_value=" << beta_value << "\n";
 
    for (int i=0; i<fdmap_na.n(); i++) {
 
@@ -2968,16 +2969,16 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
    gbeta           = max(1.0 - g_y / beta_value, 0.0);
 
-   mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
-        << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
+   mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", nfo=" << foy << ", total=" << total
+        << "\n\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
         << "\n\tmed_fo=" << med_fo   << ", med_of="    << med_of
         << ", med_min="  << med_min  << ", med_max="   << med_max << ", med_mean="   << med_mean
         << "\n\tfom_fo=" << fom_fo   << ", fom_of="    << fom_of
         << ", fom_min="  << fom_min  << ", fom_max="   << fom_max << ", fom_mean="   << fom_mean
         << "\n\tzhu_fo=" << zhu_fo   << ", zhu_of="    << zhu_of
         << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean="   << zhu_mean
-        << "\n\tg="      << g        << ", gbeta="     << gbeta   << ", beta_value=" << beta_value
-        << "\n";
+        << "\n\ty1="     << g_y1     << ", y2="        << g_y2    << ", y="          << g_y
+        << "\n\tg="      << g        << ", gbeta="     << gbeta   << "\n";
 
    return;
 }
