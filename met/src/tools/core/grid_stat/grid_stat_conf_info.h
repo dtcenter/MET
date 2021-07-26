@@ -187,7 +187,7 @@ class GridStatVxOpt {
       double           baddeley_max_dist; // Maximum distance constant
       double           fom_alpha;         // FOM Alpha
       double           zhu_weight;        // Zhu Weight
-      double           beta_value;        // G-Beta Value
+      UserFunc_1Arg    beta_value_fx;     // G-Beta Value Function
 
       double           hss_ec_value;      // MCTS HSS expected correct value
       bool             rank_corr_flag;    // Flag for computing rank correlations

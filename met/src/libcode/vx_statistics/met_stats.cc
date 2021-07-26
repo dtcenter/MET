@@ -2835,6 +2835,14 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       exit(1);
    }
 
+   // Check that beta_value has been set
+   if(is_bad_data(beta_value) || beta_value <= 0.0) {
+      mlog << Error << "\nDMAPInfo::set() -> "
+           << "the beta_value (" << beta_value
+           << ") must be greater than 0!\n\n";
+      exit(1);
+   }
+
    // Initialize
    clear();
 
@@ -2957,10 +2965,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    double g_y2     = g_med_fo * oy + g_med_of * fy;
    double g_y      = g_y1 * g_y2;
    g               = pow(g_y, 1.0 / 3.0);
-
-   // If not set by the user, set beta_value as the total squared divided by 2
-   if(is_bad_data(beta_value)) beta_value = pow((double) total, 2.0) / 2.0;
-
    gbeta           = max(1.0 - g_y / beta_value, 0.0);
 
    // Dump debug distance map info

@@ -533,7 +533,7 @@ void GridStatVxOpt::clear() {
    baddeley_max_dist = bad_data_double;
    fom_alpha = bad_data_double;
    zhu_weight = bad_data_double;
-   beta_value = bad_data_double;
+   beta_value_fx.clear();
 
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
@@ -817,11 +817,11 @@ void GridStatVxOpt::process_config(
       exit(1);
    }
 
-   beta_value = d->lookup_double(conf_key_beta_value);
-   if(!is_bad_data(beta_value) && beta_value <=0) {
+   beta_value_fx.set(d->lookup(conf_key_beta_value));
+   if(!beta_value_fx.is_set()) {
       mlog << Error << "\nGridStatVxOpt::process_config() -> "
-           << "The \"" << conf_key_beta_value << "\" option ("
-           << beta_value << ") must be set > 0.\n\n";
+           << "The \"" << conf_key_beta_value
+           << "\" function is not set!\n\n";
       exit(1);
    }
 

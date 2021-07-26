@@ -1299,7 +1299,7 @@ void process_scores() {
                         conf_info.vx_opt[i].baddeley_max_dist,
                         conf_info.vx_opt[i].fom_alpha,
                         conf_info.vx_opt[i].zhu_weight,
-                        conf_info.vx_opt[i].beta_value);
+                        conf_info.vx_opt[i].beta_value_fx((double) (grid.nx()*grid.ny())));
 
                   // Compute DMAP statistics
                   dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
