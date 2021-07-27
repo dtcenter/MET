@@ -182,7 +182,8 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
 
 GridPoint *GridTemplate::getNext(void) const
 {
-  while (_pointInGridIterator != _offsetList.end())
+  GridPoint *next_point = (GridPoint *)NULL;
+  if (_pointInGridIterator != _offsetList.end())
   {
     GridOffset *offset = *_pointInGridIterator;
 
@@ -191,11 +192,11 @@ GridPoint *GridTemplate::getNext(void) const
     _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
     _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
-    return &_pointInGridReturn;
+    next_point = &_pointInGridReturn;
 
   }
 
-  return (GridPoint *)NULL;
+  return next_point;
 }
 
 /**********************************************************************
