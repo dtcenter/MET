@@ -98,7 +98,7 @@ void InsituNcFile::close()
 
   // Reclaim the space used for the variables
 
-  if (_aircraftId) delete [] _aircraftId;
+  delete [] _aircraftId;
   delete [] _timeObs;
   delete [] _latitude;
   delete [] _longitude;
@@ -138,7 +138,11 @@ bool InsituNcFile::open(const char * filename)
 
   if (!(IS_INVALID_NC_P(_ncFile)))
   {
-    close();
+    if (_ncFile)    // close() is called already
+    {
+      delete _ncFile;
+      _ncFile = (NcFile *)0;
+    }
     return false;
   }
 
