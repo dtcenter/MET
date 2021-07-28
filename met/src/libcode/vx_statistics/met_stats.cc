@@ -743,7 +743,7 @@ void CNTInfo::clear() {
    e90.clear();
    eiqr.clear();
    mad.clear();
-   
+
    n_ranks = frank_ties = orank_ties = 0;
 
    return;
