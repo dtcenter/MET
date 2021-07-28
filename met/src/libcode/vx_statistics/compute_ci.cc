@@ -3908,9 +3908,9 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
            c.rmsfa.v,   c.rmsoa.v,     c.anom_corr_uncntr.v,
            c.me.v,      c.me2.v,       c.estdev.v,        c.mbias.v,
            c.mae.v,     c.mse.v,       c.msess.v,         c.bcmse.v,
-           c.rmse.v,    c.e10.v,       c.e25.v,           c.e50.v,
-           c.e75.v,     c.e90.v,       c.eiqr.v,          c.mad.v,
-           c.si.v);
+           c.rmse.v,    c.si.v,        c.e10.v,           c.e25.v,
+           c.e50.v,     c.e75.v,       c.e90.v,           c.eiqr.v,
+           c.mad.v);
 
    tmp_out << line << "\n";
 
