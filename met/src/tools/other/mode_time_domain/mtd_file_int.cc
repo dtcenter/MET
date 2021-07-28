@@ -279,6 +279,7 @@ int * d = Data;
 
 for (j=0; j<n3; ++j)  *d++ = 0;
 
+Lead_Times.clear();
 Lead_Times.extend(Nt);
 
 for (j=0; j<Nt; ++j)  {
@@ -301,7 +302,7 @@ void MtdIntFile::set_radius(int r)
 
 if ( r < 0 )  {
 
-   mlog << Error << "\n\n  MtdIntFile::set_radius(int) -> bad value ... " << r << "\n\n";
+   mlog << Error << "\n  MtdIntFile::set_radius(int) -> bad value ... " << r << "\n\n";
 
    exit ( 1 );
 
@@ -324,7 +325,7 @@ void MtdIntFile::set_time_window(int beg, int end)
 
     if ( end < beg )  {
 
-   mlog << Error << "\n\n  MtdIntFile::set_time_window(int) -> bad values ... " << beg << " and " << end << "\n\n";
+   mlog << Error << "\n  MtdIntFile::set_time_window(int) -> bad values ... " << beg << " and " << end << "\n\n";
 
    exit ( 1 );
 
@@ -348,7 +349,7 @@ void MtdIntFile::set_threshold(double t)
 
 // if ( t < 0.0 )  {
 //
-//    mlog << Error << "\n\n  MtdIntFile::set_threshold(double) -> bad value ... " << t << "\n\n";
+//    mlog << Error << "\n  MtdIntFile::set_threshold(double) -> bad value ... " << t << "\n\n";
 //
 //    exit ( 1 );
 //
@@ -444,7 +445,7 @@ var = get_nc_var(&f, data_field_name);
 
 //if ( !(var->set_cur(0, 0, 0)) )  {
 //
-//   mlog << Error << "\n\n  MtdIntFile::read() -> trouble setting corner\n\n";
+//   mlog << Error << "\n  MtdIntFile::read() -> trouble setting corner\n\n";
 //
 //   exit ( 1 );
 //
@@ -454,7 +455,7 @@ var = get_nc_var(&f, data_field_name);
 //
 //if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 //
-//   mlog << Error << "\n\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
+//   mlog << Error << "\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
 //
 //   exit ( 1 );
 //
@@ -466,7 +467,7 @@ long lengths[3] = {Nt, Ny, Nx};
 //if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
+   mlog << Error << "\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
 
    exit ( 1 );
 
@@ -474,7 +475,7 @@ if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
 // const time_t t_stop = time(0);   //  for timing the data read operation
 
-// mlog << Debug(5) << "\n\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// mlog << Debug(5) << "\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -570,7 +571,7 @@ long lengths[3] = {Nt, Ny, Nx};
 
 if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::write(const char *) -> trouble getting data\n\n";
+   mlog << Error << "\n  MtdIntFile::write(const char *) -> trouble getting data\n\n";
 
    exit ( 1 );
 
@@ -578,7 +579,7 @@ if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 
 //if ( !(data_var->set_cur(0, 0, 0)) )  {
 //
-//   mlog << Error << "\n\n  MtdIntFile::write() -> trouble setting corner on data field\n\n";
+//   mlog << Error << "\n  MtdIntFile::write() -> trouble setting corner on data field\n\n";
 //
 //   exit ( 1 );
 //
@@ -588,7 +589,7 @@ if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 //
 //if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 //
-//   mlog << Error << "\n\n  MtdIntFile::write() -> trouble writing data field\n\n";
+//   mlog << Error << "\n  MtdIntFile::write() -> trouble writing data field\n\n";
 //
 //   exit ( 1 );
 //
@@ -606,7 +607,7 @@ if ( is_split )  {
 
    if ( !(put_nc_data(&volumes_var, ObjVolume, Nobjects, 0)) )  {
 
-      mlog << Error << "\n\n  MtdIntFile::write() -> trouble writing object volumes\n\n";
+      mlog << Error << "\n  MtdIntFile::write() -> trouble writing object volumes\n\n";
 
       exit ( 1 );
 
@@ -616,7 +617,7 @@ if ( is_split )  {
 
 // const time_t t_stop = time(0);   //  for timing the data write operation
 
-// mlog << Debug(5) << "\n\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// mlog << Debug(5) << "\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -638,7 +639,7 @@ NcFile f(_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(f) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
+   mlog << Error << "\n  MtdIntFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
 
    // exit ( 1 );
 
@@ -666,7 +667,7 @@ MtdIntFile MtdIntFile::const_t_slice(const int t) const
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdIntFile MtdIntFile::const_t_slice(int) const -> range check error\n\n";
+   mlog << Error << "\n  MtdIntFile MtdIntFile::const_t_slice(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -735,7 +736,7 @@ MtdIntFile MtdIntFile::const_t_mask(const int t, const int obj_num) const   //  
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdIntFile MtdIntFile::const_t_mask(int) const -> range check error\n\n";
+   mlog << Error << "\n  MtdIntFile MtdIntFile::const_t_mask(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -921,7 +922,7 @@ void MtdIntFile::zero_border(int n)
 
 if ( !Data )  {
 
-   mlog << Error << "\n\n  MtdIntFile::zero_border(int) -> no data field!\n\n";
+   mlog << Error << "\n  MtdIntFile::zero_border(int) -> no data field!\n\n";
 
    exit ( 1 );
 
@@ -929,7 +930,7 @@ if ( !Data )  {
 
 if ( 2*n >= min(Nx, Ny) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::zero_border(int) -> border size too large!\n\n";
+   mlog << Error << "\n  MtdIntFile::zero_border(int) -> border size too large!\n\n";
 
    exit ( 1 );
 
@@ -982,7 +983,7 @@ void MtdIntFile::set_to_zeroes()
 
 if ( !Data )  {
 
-   mlog << Error << "\n\n  MtdIntFile::set_to_zeroes() -> no data!\n\n";
+   mlog << Error << "\n  MtdIntFile::set_to_zeroes() -> no data!\n\n";
 
    exit ( 1 );
 
@@ -1008,7 +1009,7 @@ MtdIntFile MtdIntFile::split_const_t(int & n_shapes) const
 
 if ( Nt != 1 )  {
 
-   mlog << Error << "\n\n  split_const_t(int &) -> not const-time slice!\n\n";
+   mlog << Error << "\n  split_const_t(int &) -> not const-time slice!\n\n";
 
    exit ( 1 );
 
@@ -1244,7 +1245,7 @@ int MtdIntFile::volume(int k) const
 
 if ( !ObjVolume )  {
 
-   mlog << Error << "\n\n  MtdIntFile::volume(int) -> field not split!\n\n";
+   mlog << Error << "\n  MtdIntFile::volume(int) -> field not split!\n\n";
 
    exit ( 1 );
 
@@ -1252,7 +1253,7 @@ if ( !ObjVolume )  {
 
 if ( (k < 0) || (k >= Nobjects) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::volume(int) -> range check error!\n\n";
+   mlog << Error << "\n  MtdIntFile::volume(int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -1273,7 +1274,7 @@ int MtdIntFile::total_volume() const
 
 if ( !ObjVolume )  {
 
-   mlog << Error << "\n\n  MtdIntFile::total_volume() -> field not split!\n\n";
+   mlog << Error << "\n  MtdIntFile::total_volume() -> field not split!\n\n";
 
    exit ( 1 );
 
@@ -1343,7 +1344,7 @@ int * d = Data;
 
 // if ( n_new == 0 )  {
 //
-//    mlog << Error << "\n\n  MtdIntFile::sift_objects() -> no objects left!\n\n";
+//    mlog << Error << "\n  MtdIntFile::sift_objects() -> no objects left!\n\n";
 //
 //    exit ( 1 );
 //
@@ -1522,7 +1523,7 @@ for (x=0; x<Nx; ++x)  {
 
 if ( count == 0 )  {
 
-   mlog << Error << "\n\n  MtdIntFile::calc_3d_centroid() const -> empty object!\n\n";
+   mlog << Error << "\n  MtdIntFile::calc_3d_centroid() const -> empty object!\n\n";
 
    exit ( 1 );
 
@@ -1572,7 +1573,7 @@ for (x=0; x<Nx; ++x)  {
 
 if ( count == 0 )  {
 
-   // mlog << Error << "\n\n  MtdIntFile::calc_2d_centroid_at_t() const -> empty object!\n\n";
+   // mlog << Error << "\n  MtdIntFile::calc_2d_centroid_at_t() const -> empty object!\n\n";
 
    // exit ( 1 );
 
@@ -1624,7 +1625,7 @@ MtdIntFile MtdIntFile::select(int n) const   //  1-based
 
 if ( (n < 1) || (n > Nobjects) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::select(int) -> range check error on n ... "
+   mlog << Error << "\n  MtdIntFile::select(int) -> range check error on n ... "
         << "NObjects = " << Nobjects << " ... "
         << "n = " << n << "\n\n";
 
@@ -1676,7 +1677,7 @@ MtdIntFile MtdIntFile::select_cluster(const IntArray & a) const   //  1-based
 
 if ( (a.min() < 0) || (a.max() > Nobjects) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::select_cluster(const IntArray &) -> range check error\n\n";
+   mlog << Error << "\n  MtdIntFile::select_cluster(const IntArray &) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1737,7 +1738,7 @@ int MtdIntFile::x_left(const int y) const
 
 if ( (y < 0) || (y >= Ny) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::x_left(int) -> range check error\n\n";
+   mlog << Error << "\n  MtdIntFile::x_left(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1766,7 +1767,7 @@ int MtdIntFile::x_right(const int y) const
 
 if ( (y < 0) || (y >= Ny) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::x_right(int) -> range check error\n\n";
+   mlog << Error << "\n  MtdIntFile::x_right(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1855,7 +1856,7 @@ Mtd_2D_Moments MtdIntFile::calc_2d_moments() const
 
 if ( Nt != 1 )  {
 
-   mlog << Error << "\n\n  MtdIntFile::calc_2d_moments() const -> not a 2D object!\n\n";
+   mlog << Error << "\n  MtdIntFile::calc_2d_moments() const -> not a 2D object!\n\n";
 
    exit ( 1 );
 
@@ -1997,7 +1998,7 @@ for (t=0; t<(mask.nt()); ++t)  {
 
          if ( nc < 0 )  {
 
-            mlog << Error << "\n\n  split(const MtdIntFile &, int &) -> can't find cell!\n\n";
+            mlog << Error << "\n  split(const MtdIntFile &, int &) -> can't find cell!\n\n";
 
             exit ( 1 );
 
@@ -2031,7 +2032,7 @@ void adjust_obj_numbers(MtdIntFile & s, int delta)
 
 if ( s.nt() != 1 )  {
 
-   mlog << Error << "\n\n  adjust_obj_numbers() -> not const-time slice!\n\n";
+   mlog << Error << "\n  adjust_obj_numbers() -> not const-time slice!\n\n";
 
    exit ( 1 );
 
