@@ -2341,7 +2341,7 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    MSESS,            MSESS_BCL,            MSESS_BCU,
    //    RMSFA,            RMSFA_BCL,            RMSFA_BCU,
    //    RMSOA,            RMSOA_BCL,            RMSOA_BCU,
-   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
    //    SI,               SI_BCL,               SI_BCU
    //
 
