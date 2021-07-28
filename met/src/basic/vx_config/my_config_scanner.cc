@@ -264,7 +264,7 @@ switch ( c )  {
 
    case '+':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
-   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } }
+   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } } break;
 
    case '*':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
    case '^':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
