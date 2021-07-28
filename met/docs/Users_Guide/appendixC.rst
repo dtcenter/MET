@@ -1183,20 +1183,17 @@ The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forec
 
 Called "G" and "GBETA" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
-The :math:`G` measure is given by:
+Let :math:`y={y_1}{y_2}` where :math:`y_1=n_A+n_B-2n_{AB}`, and :math:`y_2=MED(A,B) \cdot n_B+MED(B,A) \cdot n_A`, with the mean-error distance (:math:`MED`) as described above.
 
-.. math:: \G(A,B) = y^{1/3},
-where
-.. math:: y={y_1}{y_2}
-and
-.. math:: y_1=n_A+n_B-2n_AB
-and
-.. math:: y_2=MED(A,B)*n_B+MET(B,A)*n_A
+The :math:`G` performance measure is given by:
 
-The :math:`G_\beta` measure is given by:
+.. math:: G(A,B) = y^{1/3},
 
-.. math:: G_\beta(A,B)=max{1-\frac{y}/\beta,0},
-where :math:`\beta > 0` is a user-chosen parameter and is configurable in the Grid-Stat configuration file.
+and the :math:`G_\beta` performance measure is given by:
+
+.. math:: G_\beta(A,B)=max\{1-\frac{y}{\beta},0\},
+
+where :math:`\beta > 0` is a user-chosen parameter with a default value of :math:`n^2 / 2.0` with :math:`n` equal to the number of points in the domain.
 
 Calculating Percentiles
 _______________________
