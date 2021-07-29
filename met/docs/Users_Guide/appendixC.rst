@@ -1183,7 +1183,7 @@ The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forec
 
 Called "G" and "GBETA" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
-Let :math:`y = {y_1}{y_2}` where :math:`y_1 = n_A + n_B - 2n_{AB}`, and :math:`y_2 = MED(A,B) \cdot n_B + MED(B,A) \cdot n_A`, with the mean-error distance (:math:`MED`) as described above.
+Let :math:`y = {y_1}{y_2}` where :math:`y_1 = n_A + n_B - 2n_{AB}`, and :math:`y_2 = MED(A,B) \cdot n_B + MED(B,A) \cdot n_A`, with the mean-error distance (:math:`MED`) as described above, and where :math:`n_{A}`, :math:`n_{B}`, and :math:`n_{AB}` are the number of events within event areas *A*, *B*, and the intersection of *A* and *B*, respectively.
 
 The :math:`G` performance measure is given by
 
