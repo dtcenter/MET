@@ -1040,20 +1040,27 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 
 ConcatString* get_string_val(NcVar *var, const int index,
                              const int len, ConcatString &tmp_cs) {
-   int dim_idx = 0;
    char tmp_str[len];
    std::vector<size_t> start;
    std::vector<size_t> count;
    const char *method_name = "get_string_val() ";
 
-   int dim_size = get_dim_size(var, dim_idx);
-   if ((index+len) > dim_size) {
-      NcDim nc_dim = get_nc_dim(var, dim_idx);
-      mlog << Error << "\n" << method_name << "The requested start offset and count ("
-           << index << ", " << len << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
-           << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
-           << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+   if (2 != get_dim_count(var)) {
+      mlog << Error << "\n" << method_name << GET_NC_NAME_P(var)
+           << " is not a two dimensional variablle. start offset and count: ("
+           << index << ", " << len << ").\n\n";
       exit(1);
+   }
+   else {
+      int dim_size1 = get_dim_size(var, 0);
+      int dim_size2 = get_dim_size(var, 1);
+      if ((index > dim_size1) || (len > dim_size2)) {
+         mlog << Error << "\n" << method_name << "The start offset and count ("
+              << index << ", " << len << ") exceeds the dimension size ("
+              << dim_size1 << ", " << dim_size2 << ") for the variable "
+              << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
    }
 
    //
@@ -1092,10 +1099,18 @@ int get_int_var(NcVar * var, const int index) {
    if (IS_VALID_NC_P(var)) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
-      if (index > dim_size) {
+      if (0 >= dim_size) {
+         if ((index > 0) && (0 >= dim_size)) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (index > dim_size) {
          NcDim nc_dim = get_nc_dim(var, dim_idx);
-         mlog << Error << "\n" << method_name << "The requested start offset ("
-              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
               << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
               << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
          exit(1);
@@ -1121,10 +1136,18 @@ double get_nc_time(NcVar * var, const int index) {
    if (IS_VALID_NC_P(var)) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
-      if (index > dim_size) {
+      if (0 >= dim_size) {
+         if (index > 0) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (index > dim_size) {
          NcDim nc_dim = get_nc_dim(var, dim_idx);
-         mlog << Error << "\n" << method_name << "The requested start offset ("
-              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
               << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
               << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
          exit(1);
@@ -1201,10 +1224,18 @@ float get_float_var(NcVar * var, const int index) {
    if (IS_VALID_NC_P(var)) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
-      if (index > dim_size) {
+      if (0 >= dim_size) {
+         if (index > 0) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if ((index > dim_size) && (0 < dim_size)){
          NcDim nc_dim = get_nc_dim(var, dim_idx);
-         mlog << Error << "\n" << method_name << "The requested start offset ("
-              << index << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
               << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
               << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
          exit(1);
@@ -1284,10 +1315,10 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          int dim_size = get_dim_size(var, idx);
-         if (curs[idx] > dim_size) {
+         if ((curs[idx] > dim_size) && (0 < dim_size)) {
             NcDim nc_dim = get_nc_dim(var, idx);
-            mlog << Error << "\n" << method_name << "The requested start offset ("
-                 << curs[idx] << ") exceeds the dimension[" << idx << "]=" << dim_size << " "
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << curs[idx] << ") exceeds the dimension[" << idx << "] " << dim_size << " "
                  << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
                  << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
             exit(1);
@@ -1331,10 +1362,18 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cu
       start.push_back((size_t)cur);
       count.push_back((size_t)dim);
       int dim_size = get_dim_size(var, dim_idx);
-      if ((cur+dim) > dim_size) {
+      if (0 >= dim_size) {
+         if ((cur > 0) || (dim > 1)) {
+            mlog << Error << "\n" << method_name << "The start offset and count ("
+                 << cur << ", " << dim << ") should be (0, 1) because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (((cur+dim) > dim_size) && (0 < dim_size)) {
          NcDim nc_dim = get_nc_dim(var, dim_idx);
-         mlog << Error << "\n" << method_name << "The requested start offset and count ("
-              << cur << ", " << dim << ") exceeds the dimension[" << dim_idx << "]=" << dim_size << " "
+         mlog << Error << "\n" << method_name << "The start offset and count ("
+              << cur << " + " << dim << ") exceeds the dimension " << dim_size << " "
               << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
               << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
          exit(1);
@@ -1377,9 +1416,9 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long 
          int dim_size = get_dim_size(var, idx);
          if ((curs[idx]+dims[idx]) > dim_size) {
             NcDim nc_dim = get_nc_dim(var, idx);
-            mlog << Error << "\n" << method_name << "The requested start offset and count ("
+            mlog << Error << "\n" << method_name << "The start offset and count ("
                  << curs[idx] << ", " << dims[idx] << ") exceeds the dimension["
-                 << idx << "]=" << dim_size << " "
+                 << idx << "] " << dim_size << " "
                  << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
                  << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
             exit(1);
