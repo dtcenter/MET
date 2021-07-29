@@ -501,7 +501,7 @@ Scatter Index (SI)
 
 Called "SI" in CNT output :numref:`table_PS_format_info_CNT`
 
-SI is the ratio of the root mean squared error to the mean error (overall bias), :math:`\text{SI} = \text{RMSE} / \text{ME}`.
+SI is the ratio of the root mean squared error to the average observation value, :math:`\text{SI} = \text{RMSE} / \text{OBAR}`.
 
 Smaller values of SI indicate better agreement between the model and observations (less scatter on scatter plot).
 
