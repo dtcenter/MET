@@ -852,6 +852,10 @@ The first set of header columns are common to all of the output files generated 
   * - 120-122
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
+  * - 123-125
+    - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
+    - Scatter Index including bootstrap upper and lower confidence limits
+      
 
 .. _table_PS_format_info_MCTC:
 
