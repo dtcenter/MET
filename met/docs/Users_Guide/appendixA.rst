@@ -370,48 +370,24 @@ A user can write a script with multiple calls to Gen-Vx-Mask to
 apply complex masking logic and then pass the output mask file
 to Grid-Stat in its configuration file.
 
-**Q. Grid-Stat - How do I set neighborhood methods boundaries?**
-
-A.
-When computing fractions skill score, MET uses the "vld_thresh"
-setting in the configuration file to decide how to handle data
-along the edge of the domain. Let us say it is computing a
-fractional coverage field using a 5x5 neighborhood and it is at
-the edge of the domain. 15 points contain valid data and 10 points
-are outside the domain. Grid-Stat computes the valid data ratio
-as 15/25 = 0.6. Then it applies the valid data threshold. Suppose
-vld_thresh = 0.5. Since 0.6 > 0.5 MET will compute a fractional
-coverage value for that point using the 15 valid data points. Next
-suppose vld_thresh = 1.0. Since 0.6 is less than 1.0, MET
-will just skip that point by setting it to bad data.
-
-Setting vld_thresh = 1.0 will ensure that FSS will only be computed
-at points where all NxN values contain valid data. Setting it to
-0.5 only requires half of them. 
-
-Using grid_stat to evaluate precipitation, whose minimum value
-should be 0. If the thresholding of the data greater-than-or-equal-to
-0 (>= 0), that will always evaluate to true for precipitation.
-Consider using strictly greater-than 0 (>0) instead.
 
 **Q. Grid-Stat - How do I use neighborhood methods to compute fraction
 skill score?**
 
 A.
-It is possible to compute the fractions skill score for comparing
-forecast and observed thunderstorms. When computing FSS, first
-threshold the fields to define events and non-events. Then look at
-successively larger and larger areas around each grid point to see
-how the forecast event frequency compares to the observed event
-frequency. Applying this to thunderstorms would be reasonable.
+A common application of fraction skill score (FSS) is comparing forecast
+and observed thunderstorms. When computing FSS, first threshold the fields
+to define events and non-events. Then look at successively larger and
+larger areas around each grid point to see how the forecast event frequency
+compares to the observed event frequency.
 
-Also, applying it to rainfall (and monsoons) would be fine. Keep in
-mind that Grid-Stat is the tool that computes FSS. Grid-Stat will
-need to be run once for each evaluation time. As an example,
-evaluating once per day, run Grid-Stat 122 times for the 122 days
-of a monsoon season. This will result in 122 FSS values. These
-can be viewed as a time series, or the Stat-Analysis tool could
-be used to aggregate them together into a single FSS value, like this:
+Applying this method to rainfall (and monsoons) is also reasonable.
+Keep in mind that Grid-Stat is the tool that computes FSS. Grid-Stat will
+need to be run once for each evaluation time. As an example, evaluating
+once per day, run Grid-Stat 122 times for the 122 days of a monsoon season.
+This will result in 122 FSS values. These can be viewed as a time series,
+or the Stat-Analysis tool could be used to aggregate them together into
+a single FSS value, like this:
 
 .. code-block:: none
 		     
@@ -419,7 +395,23 @@ be used to aggregate them together into a single FSS value, like this:
 		-lookin out/grid_stat
 
 Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
-that capture the "events" that are of interest in studying.    
+that capture the "events" that are of interest in studying.
+
+Also be aware that MET uses the "vld_thresh" setting in the configuration
+file to decide how to handle data along the edge of the domain. Let us say
+it is computing a fractional coverage field using a 5x5 neighborhood
+and it is at the edge of the domain. 15 points contain valid data and
+10 points are outside the domain. Grid-Stat computes the valid data ratio
+as 15/25 = 0.6. Then it applies the valid data threshold. Suppose
+vld_thresh = 0.5. Since 0.6 > 0.5 MET will compute a fractional coverage
+value for that point using the 15 valid data points. Next suppose
+vld_thresh = 1.0. Since 0.6 is less than 1.0, MET will just skip that
+point by setting it to bad data.
+
+Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
+points where all NxN values contain valid data. Setting it to 0.5 only
+requires half of them.
+
 
 **Q. Grid-Stat - How do I use config file setup to read a NetCDF file?**
 
