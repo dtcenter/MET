@@ -275,12 +275,9 @@ Nx = _nx;
 Ny = _ny;
 Nt = _nt;
 
-int * d = Data;
+for (j=0; j<n3; ++j)  Data[j] = 0;
 
-for (j=0; j<n3; ++j)  *d++ = 0;
-
-Lead_Times.clear();
-Lead_Times.extend(Nt);
+Lead_Times.extend(Nt + Lead_Times.n());
 
 for (j=0; j<Nt; ++j)  {
 
