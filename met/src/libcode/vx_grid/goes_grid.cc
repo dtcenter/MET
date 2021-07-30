@@ -522,14 +522,14 @@ void GoesImagerData::compute_lat_lon()
             }
          }
       }
+
+      mlog << Debug(4) << method_name << " lon: " << lon_min << " to " << lon_max
+           << ", lat: " << lat_min << " to " << lat_max << " at index "
+           << idx_lon_min << " & " << idx_lon_max << ", "
+           << idx_lat_min << " & " << idx_lat_max << " from "
+           << "  x: " << x_values[0] << " to " << x_values[nx-1]
+           << "  y: " << y_values[0] << " to " << y_values[ny-1] << "\n";
    }
-   
-   mlog << Debug(4) << method_name << " lon: " << lon_min << " to " << lon_max
-        << ", lat: " << lat_min << " to " << lat_max << " at index "
-        << idx_lon_min << " & " << idx_lon_max << ", "
-        << idx_lat_min << " & " << idx_lat_max << " from "
-        << "  x: " << x_values[0] << " to " << x_values[nx-1]
-        << "  y: " << y_values[0] << " to " << y_values[ny-1] << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
