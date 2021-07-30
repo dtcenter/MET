@@ -121,7 +121,7 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    cnt_info.rmse.v = sqrt(cnt_info.mse.v);
 
    // Compute Scatter Index (SI)
-   if(!is_eq(cnt_info.me.v, 0.0)) {
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
       cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
    }
    else {
@@ -353,7 +353,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Compute Scatter Index (SI)
    //
-   if(!is_eq(cnt_info.me.v, 0.0)) {
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
       cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
    }
    else {
