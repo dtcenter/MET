@@ -335,7 +335,6 @@ void process_madis_file(const char *madis_file) {
               << "MADIS type (" << my_mtype
               << ") not currently supported.\n\n";
          exit(1);
-         break;
    }
 
    // Close the input NetCDF file

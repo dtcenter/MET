@@ -1023,7 +1023,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
-         break;
    }
 
    return(n);

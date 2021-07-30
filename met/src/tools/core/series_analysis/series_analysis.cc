@@ -479,7 +479,6 @@ void get_series_data(int i_series,
               << "unexpected SeriesType value: "
               << series_type << "\n\n";
          exit(1);
-         break;
    }
 
    // Setup the verification grid
