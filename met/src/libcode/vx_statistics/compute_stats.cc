@@ -120,6 +120,14 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    // Compute root mean squared error
    cnt_info.rmse.v = sqrt(cnt_info.mse.v);
 
+   // Compute Scatter Index (SI)
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
+      cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
+   }
+   else {
+      cnt_info.si.v = bad_data_double;
+   }
+   
    // Compute normal confidence intervals
    cnt_info.compute_ci();
 
@@ -342,6 +350,17 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    cnt_info.rmse.v = sqrt(err_sq_bar);
 
+   //
+   // Compute Scatter Index (SI)
+   //
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
+      cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
+   }
+   else {
+      cnt_info.si.v = bad_data_double;
+   }
+
+   
    //
    // Only compute the Kendall Tau and Spearman's Rank corrleation
    // coefficients if the rank_flag is set.
@@ -1195,6 +1214,9 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmse.v);
    cnt_mean.rmse.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].si.v);
+   cnt_mean.si.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e10.v);
    cnt_mean.e10.v = na.mean();
