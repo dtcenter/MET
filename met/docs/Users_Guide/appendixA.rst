@@ -156,8 +156,8 @@ Let's use plot_data_plane as an example:
 		obs.ps \ 
 		'name="APCP"; level="(5,*,*)";'
 		
-Since these indices are 0-based, this will select the 6-th
-time slice of the APCP data and plot it.
+Assuming that the first array is the time, this will select the 6-th
+time slice of the APCP data and plot it since these indices are 0-based.
 
 **Q. FILE-IO - How do I use the UNIX time conversion?**
 
@@ -237,12 +237,9 @@ is planned for a future release.
 Gen-Vx-Mask
 ~~~~~~~~~~~
 
-**Q. Gen-Vx-Mask - How do I mask region intersection between stations and
-polyline?**
-
-**I have a list of stations to use for verification. I also have a poly
-region defined. If I specify both of these should the result
-be a union of them?**
+**Q. Gen-Vx-Mask - I have a list of stations to use for verification.
+I also have a poly region defined. If I specify both of these should
+the result be a union of them?**
  
 A.
 These settings are defined in the "mask" section of the Point-Stat
@@ -314,7 +311,7 @@ Grid-Stat
 
 A.
 A user can define intersections and unions of multiple fields to define masks.
-Prior to running Grid-Stat, the user can run the Gen-Poly-Mask tool one or
+Prior to running Grid-Stat, the user can run the Gen-VX-Mask tool one or
 more times to define a more complex masking area by thresholding multiple
 fields.
 
