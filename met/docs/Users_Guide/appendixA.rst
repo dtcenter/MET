@@ -714,58 +714,6 @@ Here is an example:
 		
 The resulting file should have the accumulation listed at 24h rather than 0-24.
 
-**Q. Pcp-Combine - What data formats does MET read?**
-
-A. 
-MET can read gridded data in GRIB1, GRIB2, or 3 different flavors of NetCDF: 
-
-* The "internal" NetCDF format that looks like the output of the
-  pcp_combine tool. 
-* CF-compliant NetCDF3 files. 
-* The output of the wrf_interp utility.
-
-If there is NetCDF output from WRF, use UPP to post-process it.
-It does not need to be "lat-lon". It can be post-processed to whatever
-projection is needed.
-
-There is in general no easy way to convert NetCDF to GRIB. If the NetCDF
-data is self generated, make it look like the NetCDF output from
-pcp_combine, or preferably, make it CF-compliant.
-
-Looking at the accumulation interval of the precipitation data in the WRF
-output files from UPP, use the "wgrib" utility to dump out that sort
-of information:
-
-.. code-block:: none
-
-		wgrib wrfprs_d01.02 
-		wgrib wrfprs_d01.03 
-
-and so on.
-
-The question is whether the output actually contains 1-hourly accumulated
-precip, or does it contain runtime accumulation. Runtime accumulation
-means that the 6-hour wrf file contains 0 to 6 hours of precip; the
-7- hour file contains 0 to 7 hours of precip; and so on. The precip
-values just accumulate over the course of the entire model integration.
-
-The default for WRF-ARW is runtime accumulation. So if WRF-ARW is running
-and the output bucket interval wasn’t specifically changed, then that's
-very likely.
-
-If that is the case, you can change these values to interval accumulations.
-Use the pcp_combine "-subtract" option instead of "-sum". Suppose the
-6 hours of precip between the 6hr and 12hr forecasts is wanted. Run the
-following:
-
-.. code-block:: none
-
-		pcp_combine -subtract wrfprs_d01.12 12 \
-		wrfprs_d01.06 06 apcp_06_to_12.nc
-
-This call to pcp_combine gets 12 hours of precip from the first file and 6 hours
-from the second file and subtract them.
-
 **Pcp-Combine - How do I use Pcp-Combine as a pass-through to simply reformat
 from GRIB to NetCDF or to change output variable name?**
 
@@ -985,32 +933,10 @@ output should be identical to the output of the "-sum" command.
 
 **Q. Pcp-Combine - What is the difference between “-sum” vs. “-add”?**
 
-A.To run a project faster, -pcprx is an option.
-
-.. code-block:: none
-		
-		${MET_BUILD_BASE}/bin/pcp_combine \
-		-sum 20160221_18 06 20160222_18 24 \
-		gfs_APCP_24_20160221_18_F00_F24.nc \
-		-pcpdir model_out/temp \
-		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
-
-But this only matches 2-digit forecast hours.
-
-The "-add" command could be used instead of the “-sum” command:
-
-.. code-block:: none
-		
-		${MET_BUILD_BASE}/bin/pcp_combine -add \
-		model_out/temp/pgbq06.gfs.2016022118 06 \
-		model_out/temp/pgbq12.gfs.2016022118 06 \
-		model_out/temp/pgbq18.gfs.2016022118 06 \
-		model_out/temp/pgbq24.gfs.2016022118 06 \
-		gfs_APCP_24_20160221_18_F00_F24_ADD.nc
-
+A.
 The -sum and -add options both do the same thing. It's just that
-'-sum' finds the files more quickly. This could also be accomplished
-by using a calling script.
+'-sum' could find files more quickly with the use of the -pcprx flag.
+This could also be accomplished by using a calling script.
 
 **Q. Pcp-Combine - How do I select a specific GRIB record?**
 
@@ -1032,14 +958,8 @@ Plot-Data-Plane
 **Q. Plot-Data-Plane - How do I inspect Gen-Vx-Mask output?**
 
 A.
-The Gen-Vx-Mask tool is successfully writing a NetCDF file, CONUS_poly.nc,
-but the Pcp-Combine tool errors out when trying to write a NetCDF file: 
-
-.. code-block:: none
-		
-		ERROR : write_netcdf() -> error with pcp_var->put()
-
-Check to see if the call to Gen-Vx-Mask actually did create good output.
+Check to see if the call to Gen-Vx-Mask actually did create good output
+with Plot-Data-Plane.
 Try running the following command from the top-level ${MET_BUILD_BASE}
 directory.
 
@@ -1065,14 +985,14 @@ is plotting the data correctly and in the expected location.
 **Q. Plot-Data-Plane - How do I specify the GRIB version?**
 
 A.
-These files are in GRIB2 format, but they’ve named them using the ".grib"
-suffix. When MET reads Gridded data files, it must determine the type of
+When MET reads Gridded data files, it must determine the type of
 file it's reading. The first thing it checks is the suffix of the file.
 The following are all interpreted as GRIB1: .grib, .grb, and .gb.
 While these mean GRIB2: .grib2, .grb2, and .gb2.
 
-There are 2 choices. Rename the files to use a GRIB2 suffix or keep them
-named this way and explicitly tell MET to interpret them as GRIB2 using
+There are 2 choices to control how MET interprets a grib file. Renaming
+the files to use a particular suffix, or keep them
+named and explicitly tell MET to interpret them as GRIB1 or GRIB2 using
 the "file_type" configuration option.
 
 The examples below use the plot_data_plane tool to plot the data. Set 
@@ -1081,7 +1001,7 @@ The examples below use the plot_data_plane tool to plot the data. Set
 		
 		"file_type = GRIB2;"
 
-To keep them named this way, add "file_type = GRIB2;" to all the
+To keep the files named this as they are, add "file_type = GRIB2;" to all the
 MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 
 .. code-block:: none
@@ -1092,20 +1012,20 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 		'name="TSTM"; level="A0"; file_type=GRIB2;' \ 
 		-plot_range 0 100
 
-When trying to get MET to read a particular gridded data file, use the
-plot_data_plane tool to test it out.
 
 **Q. Plot-Data-Plane - How do I test the variable naming convention?
 (Record number example)**
 
 A.
-Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file by running: 
+Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
+by running: 
 
 .. code-block:: none
 
 		${MET_BUILD_BASE}/bin/plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
 
-"R2" tells MET to plot record number 2. Record numbers 1 and 2 both contain temperature data and 2-meters. Here's some wgrib2 output:
+"R2" tells MET to plot record number 2. Record numbers 1 and 2 both
+contain temperature data and 2-meters. Here's some wgrib2 output:
 
 .. code-block:: none
 
@@ -1335,8 +1255,7 @@ TC-Stat
 
 A.
 To perform tropical cyclone evaluations for multiple models use the
-"-by AMODEL" option with the tc_stat tool. Here is an example of using
-a verbosity level of 4 (-v 4).
+"-by AMODEL" option with the tc_stat tool. Here is an example.
 
 In this case the tc_stat job looked at the 48 hour lead time for the HWRF
 and H3HW models. Without the “-by AMODEL” option, the output would be
