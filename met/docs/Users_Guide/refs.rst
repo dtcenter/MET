@@ -9,6 +9,13 @@ References
 |   Atlantic Basin. *Weather & Forecasting*,  13, 1005-1015.
 |
 
+.. _Ahijevych-2009:
+
+| Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009. Application of
+|   spatial verification methods to idealized and NWP-gridded precipitation forecasts.
+|   Weather Forecast., 24 (6), 1485 - 1497, doi: 10.1175/2009WAF2222298.1.
+|
+
 .. _Barker-1991:
 
 
@@ -115,6 +122,13 @@ References
 | Gilleland, E., 2019: Bootstrap methods for statistical inference. Part II:
 |   Extreme-value analysis. Submitted to the Journal of Atmospheric and
 |   Oceanic Technology on 2 December 2019. Re-submitted on 12 May 2020
+|
+
+.. _Gilleland-2021:
+
+| Gilleland, E., 2021. Novel measures for summarizing high-resolution forecast
+|   performance. Advances in Statistical Climatology, Meteorology and Oceanography,
+|   7 (1), 13 - 34, doi: 10.5194/ascmo-7-13-2021.
 |
 
 .. _Gneiting-2004:
