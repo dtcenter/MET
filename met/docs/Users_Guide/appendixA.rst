@@ -1271,8 +1271,6 @@ all grouped together.
 
 This will result in all 48 hour HWFI and H3WI track forecasts to be
 aggregated (statistics and scores computed) for each model separately.
-As with any MET trouble, try using debug level 4 (-v 4) to see if there
-are any more useful log messages.
 
 **Q. TC-Stat - How do I use rapid intensification verification?**
 
@@ -1638,40 +1636,12 @@ using the MODE tool. Due to time and budget constraints, it also makes
 use of a pre-existing forecast verification library that was developed
 at NCAR.
 
-
-**Q. Why is PrepBUFR used?**
-
-A.
-The first goal of MET was to replicate the capabilities of existing
-verification packages and make these capabilities available to both
-the DTC and the public. 
-
-**Q. Why is GRIB used?**
-
-A.
-Forecast data from both WRF cores can be processed into GRIB format,
-and it is a commonly accepted output format for many NWP models.
-
-**Q. Is GRIB2 supported?**
-
-A.
-Yes, forecast output in GRIB2 format can be read by MET. Be sure to
-compile the GRIB2 code by setting the appropriate configuration
-file options (see Chapter 2). 
-
 **Q. How does MET differ from the previously mentioned existing
 verification packages?**
 
 A.
 MET is an actively maintained, evolving software package that is being
 made freely available to the public through controlled version releases.
-
-**Q. How does the MODE tool differ from the Grid-Stat tool?**
-
-A.
-They offer different ways of viewing verification. The Grid-Stat tool
-provides traditional verification statistics, while MODE provides
-specialized spatial statistics.
 
 **Q. Will the MET work on data in native model coordinates?**
 
@@ -1859,21 +1829,6 @@ If the NetCDF include files are in */home/username/local/include* and the
 NetCDF library files are in */home/username/local/lib*, unset the
 MET_NETCDF environment variable, then run "make clean", reconfigure,
 and then run "make install" and "make test" again.
-
-**Grid_stat won't run**
-
-* Are both the observational and forecast datasets on the same grid?
-
-**MODE won't run**
-
-* If using precipitation, do you have the same accumulation periods
-  for both the forecast and observations? (If you aren't sure, run pcp_combine.)
-
-* Are both the observation and forecast datasets on the same grid?
-
-**Point-Stat won't run**
-
-* Have you run pb2nc first on your PrepBUFR observation data?
 
 **Error while loading shared libraries**
 
