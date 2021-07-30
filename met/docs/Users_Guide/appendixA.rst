@@ -412,7 +412,7 @@ Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
 points where all NxN values contain valid data. Setting it to 0.5 only
 requires half of them.
 
-**Q. Grid-Stat - Is an example of verifying probabilities?**
+**Q. Grid-Stat - Is an example of verifying forecast probabilities?**
 
 A.
 There is an example of verifying probabilities in the test scripts
@@ -595,32 +595,31 @@ Pcp-Combine
 **Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
 
 A.
-Run the MET pcp_combine tool to put the NAM data into 3-hourly accumulations. 
+An example of running the MET pcp_combine tool to put NAM 3-hourly
+precipitation accumulations data into user-desired 3 hour intervals is
+provided below. 
 
-0-3 hour accumulation is already in the 03 UTC file. Run this file
+If the user wanted a 0-3 hour accumulation, this is already available
+in the 03 UTC file. Run this file
 through pcp_combine as a pass-through to put it into NetCDF format: 
 
 .. code-block:: none
 		
 		[MET_BUILD_BASE}/pcp_combine -add 03_file.grb 03 APCP_00_03.nc
-		3-6 hour accumulation. Subtract 0-6 and 0-3 accumulations: 
+		
+If the user wanted the 3-6 hour accumulation, they would subtract
+0-6 and 0-3 accumulations:
+
+.. code-block:: none
+		
 		[MET_BUILD_BASE}/pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
-		6-9 hour accumulation. Subtract 0-9 and 0-6 accumulations: 
+
+Similarly, if they wanted the 6-9 hour accumulation, they would
+subtract 0-9 and 0-6 accumulations: 
+
+.. code-block:: none		
+
 		[MET_BUILD_BASE}/pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
-		9-12 hour accumulation. Subtract 0-12 and 0-9 accumulations: 
-		[MET_BUILD_BASE}/pcp_combine -subtract 12_file.grb 12 09_file.grb 09 APCP_09_12.nc
-		
-12-15 hour accumulation. Just run as a pass-through again: 
-
-.. code-block:: none
-
-		[MET_BUILD_BASE}/pcp_combine -add 15_file.grb 03 APCP_12_15.nc
-
-15-18 hour accumulation. Subtract 12-18 and 12-15 accumulations: 
-
-.. code-block:: none
-		
-		[MET_BUILD_BASE}/pcp_combine -subtract 18_file.grb 06 15_file.grb 03 APCP_15_18.nc
 
 And so on.
 
