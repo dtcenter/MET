@@ -117,11 +117,19 @@ References
 | Gilleland, E., 2010: Confidence intervals for forecast verification.
 |   *NCAR Technical Note* NCAR/TN-479+STR, 71pp.
 
-.. _Gilleland-2019:
+.. _Gilleland_PartI-2020:
 
-| Gilleland, E., 2019: Bootstrap methods for statistical inference. Part II:
-|   Extreme-value analysis. Submitted to the Journal of Atmospheric and
-|   Oceanic Technology on 2 December 2019. Re-submitted on 12 May 2020
+| Gilleland, E., 2020. Bootstrap methods for statistical inference.
+|   Part I: Comparative forecast verification for continuous variables.
+|   Journal of Atmospheric and Oceanic Technology, 37 (11), 2117 - 2134,
+|   doi: 10.1175/JTECH-D-20-0069.1.
+|
+
+.. _Gilleland_PartII-2020:
+
+| Gilleland, E., 2020. Bootstrap methods for statistical inference.
+|   Part II: Extreme-value analysis. Journal of Atmospheric and Oceanic
+|   Technology, 37 (11), 2135 - 2144, doi: 10.1175/JTECH-D-20-0070.1.
 |
 
 .. _Gilleland-2021:
