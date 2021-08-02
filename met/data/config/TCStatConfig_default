@@ -17,8 +17,7 @@
 // the analyses will be performed on their union.
 //
 // Each configuration filtering option may be overridden by a corresponding
-// job command option of the same name, as described in the MET User's Guide:
-// https://dtcenter.github.io/MET/latest/Users_Guide/tc-stat.html 
+// job command option of the same name, as described in the MET User's Guide.
 //
 
 //
