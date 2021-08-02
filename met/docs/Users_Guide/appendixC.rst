@@ -507,6 +507,15 @@ Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
 RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`. 
 
 
+Scatter Index (SI)
+~~~~~~~~~~~~~~~~~~
+
+Called "SI" in CNT output :numref:`table_PS_format_info_CNT`
+
+SI is the ratio of the root mean squared error to the average observation value, :math:`\text{SI} = \text{RMSE} / \text{OBAR}`.
+
+Smaller values of SI indicate better agreement between the model and observations (less scatter on scatter plot).
+
 Standard deviation of the error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
