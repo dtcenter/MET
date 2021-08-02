@@ -1178,10 +1178,13 @@ where MED *(A,B)* is as in the Mean-error distance, *N* is the total number of g
 
 The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
+.. _App_C-gbeta:
+
 :math:`G` and :math:`G_\beta`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "G" and "GBETA" in the DMAP output :numref:`table_GS_format_info_DMAP`
+See :numref:`grid-stat_gbeta` for a description of these statistics.
 
 Let :math:`y = {y_1}{y_2}` where :math:`y_1 = n_A + n_B - 2n_{AB}`, and :math:`y_2 = MED(A,B) \cdot n_B + MED(B,A) \cdot n_A`, with the mean-error distance (:math:`MED`) as described above, and where :math:`n_{A}`, :math:`n_{B}`, and :math:`n_{AB}` are the number of events within event areas *A*, *B*, and the intersection of *A* and *B*, respectively.
 
@@ -1193,7 +1196,9 @@ and the :math:`G_\beta` performance measure is given by
 
 .. math:: G_\beta(A,B) = max\{1-\frac{y}{\beta}, 0\}
 
-where :math:`\beta > 0` is a user-chosen parameter with a default value of :math:`n^2 / 2.0` with :math:`n` equal to the number of points in the domain.
+where :math:`\beta > 0` is a user-chosen parameter with a default value of :math:`n^2 / 2.0` with :math:`n` equal to the number of points in the domain. The square-root of :math:`G` will give units of grid points, where :math:`y^{1/3}` gives units of grid points squared.
+
+The range for :math:`G_\beta` is 0 to 1, with a score of 1 indicating a perfect forecast.
 
 Calculating Percentiles
 _______________________
