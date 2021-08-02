@@ -127,7 +127,7 @@ The statistics derived from these distance maps are described in :numref:`Append
 :math:`\beta` and :math:`G_\beta`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :numref:`App_C-gbeta` for the equations for :math:`G` and :math:`G_\beta`.
+See :numref:`App_C-gbeta` for the :math:`G` and :math:`G_\beta` equations.
 
 :math:`G_\beta` provides a summary measure of forecast quality for each user-defined threshold chosen. It falls into a range from zero to one where one is a perfect forecast and zero is considered to be a very poor forecast as determined by the user through the value of :math:`\beta`. Values of :math:`G_\beta` closer to one represent better forecasts and worse forecasts as it decreases toward zero. Although a particular value cannot be universally compared against any forecast, when applied with the same choice of :math:`\beta` for the same variable and on the same domain, it is highly effective at ranking such forecasts.
 
