@@ -116,6 +116,15 @@ References
 
 | Gilleland, E., 2010: Confidence intervals for forecast verification.
 |   *NCAR Technical Note* NCAR/TN-479+STR, 71pp.
+|
+
+.. _Gilleland-2017:
+
+| Gilleland, E., 2017. A new characterization in the spatial verification
+|   framework for false alarms, misses, and overall patterns.
+|   Weather Forecast., 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
+|
+
 
 .. _Gilleland_PartI-2020:
 
