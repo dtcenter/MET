@@ -184,7 +184,6 @@ bool MetNcFile::readFile(const int desired_grib_code,
   long lengths[2] = { 1, 1 };
   
   lengths[0] = hdr_buf_size;
-  lengths[1] = strl_count;
 
   //
   // Get the corresponding header message type

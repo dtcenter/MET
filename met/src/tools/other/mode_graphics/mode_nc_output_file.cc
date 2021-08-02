@@ -725,7 +725,6 @@ for (x=0; x<Nx; ++x)  {
          default:
             mlog << Error << "\n\n  ModeNcOutputFile::select_obj() const -> bad field\n\n";
             exit ( 1 );
-            break;
 
       }   //  switch
 

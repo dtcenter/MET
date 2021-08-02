@@ -79,7 +79,6 @@ void pblock(const char *infile, const char *outfile, Action action) {
               << "unexpected action requested!\n\n";
 
          exit(1);
-         break;
    }
 
    //

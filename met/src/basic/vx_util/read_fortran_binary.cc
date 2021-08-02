@@ -71,7 +71,6 @@ switch ( rec_pad_length )  {
       mlog << Error << "\n\n  read_fortran_binary() -> bad record pad size ... "
            << rec_pad_length << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -179,7 +178,6 @@ switch ( rec_pad_length )  {
       mlog << Error << "\n\n  read_fortran_binary() -> bad record pad size ... "
            << rec_pad_length << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -316,7 +314,6 @@ switch ( rec_pad_length )  {
    default:
       mlog << Error << "\n\n  peek_record_size() -> bad record pad length\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

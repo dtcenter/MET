@@ -64,7 +64,6 @@ switch ( info.method )  {
            << "bad interpolation method ... "
            << interpmthd_to_string(info.method) << "\n\n";
       exit(1);
-      break;
 
 }   //  switch info.method
 

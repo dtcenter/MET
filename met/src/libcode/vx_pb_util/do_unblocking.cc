@@ -99,7 +99,6 @@ switch ( padsize )  {
       mlog << Error << "\nread_pad() -> "
            << "bad pad size\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -132,7 +131,6 @@ switch ( padsize )  {
       mlog << Error << "\nread_pad() -> "
            << "bad pad size\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

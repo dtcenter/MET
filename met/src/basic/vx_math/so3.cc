@@ -780,7 +780,6 @@ switch ( k )  {
    default:
       cerr << "\n\n  SO3::operator()(int, int) const -> range check error (2)\n\n";
       exit ( 1 );
-      break;
 
 }
 

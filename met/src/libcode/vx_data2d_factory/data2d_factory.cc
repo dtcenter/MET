@@ -108,7 +108,6 @@ MetPythonDataFile * p = 0;
               << "Support for Python has not been compiled!\n"
               << "To run Python scripts, recompile with the --enable-python option.\n\n";
          exit(1);
-         break;
 
 #endif
 
@@ -118,7 +117,6 @@ MetPythonDataFile * p = 0;
               << "Support for GrdFileType = \"" << grdfiletype_to_string(type)
               << "\" not yet implemented!\n\n";
          exit(1);
-         break;
 
       case FileType_Bufr:
 
@@ -126,7 +124,6 @@ MetPythonDataFile * p = 0;
               << "cannot use this factory to read files of type \""
               << grdfiletype_to_string(type) << "\"\n\n";
          exit(1);
-         break;
 
       case FileType_None:
          // For FileType_None, silently return a NULL pointer
@@ -138,7 +135,6 @@ MetPythonDataFile * p = 0;
               << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
-         break;
 
    } // end switch
 

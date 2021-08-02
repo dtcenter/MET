@@ -144,7 +144,6 @@ switch ( shape_type )  {
            << "\n\n  " << program_name << ": shape file type \""
            << shapetype_to_string(shape_type) << "\" is not supported\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

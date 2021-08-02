@@ -643,7 +643,6 @@ switch ( k )  {
       mlog << Error << "\nget_two_to_one() -> "
            << "bad input values\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -696,7 +695,6 @@ switch ( k )  {
       mlog << Error << "\nget_one_to_two() -> "
            << "bad input values\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

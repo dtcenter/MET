@@ -431,6 +431,12 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
       const GenesisInfo *fgi = gpd.fcst_gen(i);
       const GenesisInfo *bgi = gpd.best_gen(i);
 
+      if(!fgi && !bgi) {
+         mlog << Error << "\ndo_genesis_ctc() -> "
+              << "Both the forecast and the best track are null at index " << i << ".\n\n";
+         exit(1);
+      }
+
       // Initialize
       diff.clear();
 
