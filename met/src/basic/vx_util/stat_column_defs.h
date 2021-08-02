@@ -1,4 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+/// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -308,6 +308,14 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
+static const char * relp_columns [] = {
+   "TOTAL",       "N_ENS",       "RELP_"
+};
+
+static const char * ssidx_columns [] = {
+   "NAME",        "N_TERM",      "N_VLD",        "SSINDEX"
+};
+
 static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
    "AGEN_INIT",   "AGEN_FHR",
@@ -315,10 +323,6 @@ static const char * genmpr_columns [] = {
    "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",
    "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
    "DEV_CAT",     "OPS_CAT"
-};
-
-static const char * relp_columns [] = {
-   "TOTAL",       "N_ENS",       "RELP_"
 };
 
 static const char * job_summary_columns [] = {
@@ -402,6 +406,8 @@ static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_co
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
 static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
+
+static const int n_ssidx_columns        = sizeof(ssidx_columns)/sizeof(*ssidx_columns);
 
 static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
 
