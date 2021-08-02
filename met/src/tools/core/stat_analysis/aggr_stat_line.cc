@@ -466,7 +466,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
-   if(interp_pnts.n() > 1) {
+   if(interp_pnts.n() == 0 || interp_pnts.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
            << interp_pnts.n()
@@ -502,7 +502,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // ALPHA
    css = write_css(alpha);
-   if(alpha.n() > 1) {
+   if(alpha.n() == 0 || alpha.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
            << alpha.n()

@@ -160,6 +160,11 @@ struct AggrRPSInfo {
    RPSInfo rps_info;
 };
 
+struct AggrSSIndexInfo {
+   StatHdrInfo hdr;
+   SSIndexInfo info;
+};
+
 // Define struct used to perform comparisons for SSVAR bins
 struct ssvar_bin_cmp {
   bool operator()(const ConcatString & cs1, const ConcatString & cs2) const {
