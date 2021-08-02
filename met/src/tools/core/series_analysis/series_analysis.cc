@@ -1603,6 +1603,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "RMSE")                 { v = cnt_info.rmse.v;                    }
       else if(c == "RMSE_BCL")             { v = cnt_info.rmse.v_bcl[i];             }
       else if(c == "RMSE_BCU")             { v = cnt_info.rmse.v_bcu[i];             }
+      else if(c == "SI")                   { v = cnt_info.si.v;                      }
+      else if(c == "SI_BCL")               { v = cnt_info.si.v_bcl[i];               }
+      else if(c == "SI_BCU")               { v = cnt_info.si.v_bcu[i];               }
       else if(c == "E10")                  { v = cnt_info.e10.v;                     }
       else if(c == "E10_BCL")              { v = cnt_info.e10.v_bcl[i];              }
       else if(c == "E10_BCU")              { v = cnt_info.e10.v_bcu[i];              }
