@@ -1969,6 +1969,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  c = n_orank_columns;        break;
          case stat_ssvar:  c = n_ssvar_columns;        break;
          case stat_genmpr: c = n_genmpr_columns;       break;
+         case stat_ssidx:  c = n_ssidx_columns;        break;
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
                  << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -2040,6 +2041,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
          case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
          case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+         case stat_ssidx:  write_header_row       (ssidx_columns, n_ssidx_columns, 1,       stat_at, 0, 0); break;
 
          //
          // Write only header columns for unspecified line type

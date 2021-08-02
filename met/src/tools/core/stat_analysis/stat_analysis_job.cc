@@ -3931,6 +3931,63 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void write_job_ss_index(STATAnalysisJob &job,
+                        AggrSSIndexInfo &ssidx_info,
+                        AsciiTable &at) {
+   int n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row = 2;
+   n_col = 1 + n_ssidx_columns;
+
+   //
+   // Prepare the output
+   //
+   if(job.stat_out) {
+      job.setup_stat_file(n_row, 0);
+   }
+   else {
+      write_job_aggr_hdr(job, n_row, n_col, at);
+      write_header_row(ssidx_columns, n_ssidx_columns, 0, at, 0, 1);
+   }
+
+   mlog << Debug(2) << "Computing output for 1 case(s).\n";
+
+   //
+   // Write the output STAT header columns
+   //
+   ConcatString cur_case("");
+   shc = ssidx_info.hdr.get_shc(cur_case, job.by_column,
+                                job.hdr_name, job.hdr_value, stat_ssidx);
+
+   //
+   // Initialize
+   //
+   r = 1;
+   c = 0;
+
+   //
+   // SSIDX output line
+   //
+   if(job.stat_out) {
+      write_header_cols(shc, job.stat_at, job.stat_row);
+      write_ssidx_cols(ssidx_info.info, job.stat_at,
+                       job.stat_row++, n_header_columns);
+   }
+   else {
+      at.set_entry(r, c++, "SSIDX:");
+      write_case_cols(cur_case, at, r, c);
+      write_ssidx_cols(ssidx_info.info, at, r++, c);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // The do_job_ss_index() routine is used to compute the GO Index,
 // CBS Index, or generalized Skill Score Index. This job can be
@@ -3962,21 +4019,25 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &job, int &n_in, int &n_out,
                      ofstream *sa_out) {
-   double ss_index;
-   ConcatString cs, ss_index_cs;
+   AggrSSIndexInfo ssidx_info;
    AsciiTable out_at;
+
+   //
+   // Store the output line type
+   //
+   job.out_line_type.add(stat_ssidx_str);
 
    //
    // Determine the job type
    //
-        if(job.job_type == stat_job_go_index)  ss_index_cs = "GO_INDEX";
-   else if(job.job_type == stat_job_cbs_index) ss_index_cs = "CBS_INDEX";
-   else                                        ss_index_cs = "SS_INDEX";
+        if(job.job_type == stat_job_go_index)  ssidx_info.info.name = "GO_INDEX";
+   else if(job.job_type == stat_job_cbs_index) ssidx_info.info.name = "CBS_INDEX";
+   else                                        ssidx_info.info.name = "SS_INDEX";
 
    //
    // Compute the Skill Score Index
    //
-   ss_index = compute_ss_index(jobstring, f, job, n_in, n_out);
+   compute_ss_index(f, job, ssidx_info, n_in, n_out);
 
    //
    // Check for no matching STAT lines
@@ -3989,21 +4050,9 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Get the column names
+   // Write the output
    //
-   out_at.set_size(2, 2);
-   setup_table(out_at, 1, job.get_precision());
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_ss_columns, n_job_ss_columns, 0, out_at, 0, 1);
-
-// JHG, write stat output here!
-
-   //
-   // Write the data row
-   //
-   cs << cs_erase << ss_index_cs << ":";
-   out_at.set_entry(1, 0,  cs);
-   out_at.set_entry(1, 1,  ss_index);
+   write_job_ss_index(job, ssidx_info, out_at);
 
    //
    // Write the Ascii Table and the job command line
@@ -4202,16 +4251,17 @@ void write_line(const ConcatString &str, ofstream *sa_out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
-                        STATAnalysisJob &job, int &n_in, int &n_out) {
+void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
+                      AggrSSIndexInfo &ssidx_info,
+                      int &n_in, int &n_out) {
    STATLine line;
    SL1L2Info si;
    TTContingencyTable ct;
    CNTInfo fcst_cnt, ref_cnt;
    bool keep;
-   int i, n_terms;
+   int i, n_term, n_vld;
    double fcst_stat, ref_stat, ss, ss_sum, weight_sum;
-   double ss_avg, ss_index;
+   double ss_avg;
 
    //
    // Check that the -model option has been supplied exactly 2 times.
@@ -4221,37 +4271,34 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ncompute_ss_index() -> "
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
-           << "model followed by the reference model: "
-           << jobstring << "\n\n";
+           << "model followed by the reference model.\n\n";
       throw(1);
    }
 
    //
    // Use the length of the fcst_var array to infer the number of terms.
    //
-   if((n_terms = job.fcst_var.n()) < 1) {
+   if((n_term = job.fcst_var.n()) < 1) {
       mlog << Error << "\ncompute_ss_index() -> "
            << "you must define the Skill Score Index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
-           << "\"-line_type\", \"-column\", and \"-weight\" options: "
-           << jobstring << "\n\n";
+           << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
       throw(1);
    }
 
    //
    // Check that the required elements are of the same length.
    //
-   if(n_terms != job.fcst_lev.n()  ||
-      n_terms != job.fcst_lead.n() ||
-      n_terms != job.line_type.n() ||
-      n_terms != job.column.n()    ||
-      n_terms != job.weight.n()) {
+   if(n_term != job.fcst_lev.n()  ||
+      n_term != job.fcst_lead.n() ||
+      n_term != job.line_type.n() ||
+      n_term != job.column.n()    ||
+      n_term != job.weight.n()) {
       mlog << Error << "\ncompute_ss_index() -> "
            << "all filtering parameters for defining the Skill Score "
            << "Index must be of the same length.  Check \"-fcst_var\", "
            << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
-           << "\"-column\", and \"-weight\" options: "
-           << jobstring << "\n\n";
+           << "\"-column\", and \"-weight\" options.\n\n";
       throw(1);
    }
 
@@ -4260,27 +4307,26 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Separate arrays for the forecast and reference models.
    //
    STATAnalysisJob *fcst_job = (STATAnalysisJob *) 0, *ref_job = (STATAnalysisJob *) 0;
-   fcst_job = new STATAnalysisJob [n_terms];
-   ref_job  = new STATAnalysisJob [n_terms];
+   fcst_job = new STATAnalysisJob [n_term];
+   ref_job  = new STATAnalysisJob [n_term];
 
    //
    // Define arrays of objects to store the partial sums or contingency
    // table counts for each term in the Skill Score Index.
    //
-   SL1L2Info *fcst_si = (SL1L2Info *) 0,  *ref_si = (SL1L2Info *) 0;
-   CTSInfo   *fcst_cts = (CTSInfo *) 0, *ref_cts = (CTSInfo *) 0;
-   fcst_si  = new SL1L2Info [n_terms];
-   ref_si   = new SL1L2Info [n_terms];
-   fcst_cts = new CTSInfo   [n_terms];
-   ref_cts  = new CTSInfo   [n_terms];
-
+   SL1L2Info *fcst_si  = (SL1L2Info *) 0, *ref_si  = (SL1L2Info *) 0;
+   CTSInfo   *fcst_cts = (CTSInfo *) 0,   *ref_cts = (CTSInfo *) 0;
+   fcst_si  = new SL1L2Info [n_term];
+   ref_si   = new SL1L2Info [n_term];
+   fcst_cts = new CTSInfo   [n_term];
+   ref_cts  = new CTSInfo   [n_term];
 
    //
    // Define array of line types to be aggregated for each term in the
    // Skill Score Index.
    //
    STATLineType *job_lt = (STATLineType *) 0;
-   job_lt = new STATLineType [n_terms];
+   job_lt = new STATLineType [n_term];
 
    //
    // Arrays to keep track of the number of stat lines per term
@@ -4293,7 +4339,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Set up the job for each term in the index.
    //
-   for(i=0; i<n_terms; i++) {
+   for(i=0; i<n_term; i++) {
 
       //
       // Initialize the counts
@@ -4315,7 +4361,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_lead
       //
-      if(job.fcst_lead.n() == n_terms) {
+      if(job.fcst_lead.n() == n_term) {
          fcst_job[i].fcst_lead.clear();
          fcst_job[i].fcst_lead.add(job.fcst_lead[i]);
       }
@@ -4323,7 +4369,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_lead
       //
-      if(job.obs_lead.n() == n_terms) {
+      if(job.obs_lead.n() == n_term) {
          fcst_job[i].obs_lead.clear();
          fcst_job[i].obs_lead.add(job.obs_lead[i]);
       }
@@ -4331,7 +4377,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_init_hour
       //
-      if(job.fcst_init_hour.n() == n_terms) {
+      if(job.fcst_init_hour.n() == n_term) {
          fcst_job[i].fcst_init_hour.clear();
          fcst_job[i].fcst_init_hour.add(job.fcst_init_hour[i]);
       }
@@ -4339,7 +4385,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_init_hour
       //
-      if(job.obs_init_hour.n() == n_terms) {
+      if(job.obs_init_hour.n() == n_term) {
          fcst_job[i].obs_init_hour.clear();
          fcst_job[i].obs_init_hour.add(job.obs_init_hour[i]);
       }
@@ -4347,7 +4393,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_var
       //
-      if(job.fcst_var.n() == n_terms) {
+      if(job.fcst_var.n() == n_term) {
          fcst_job[i].fcst_var.clear();
          fcst_job[i].fcst_var.add(job.fcst_var[i]);
       }
@@ -4355,7 +4401,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_var
       //
-      if(job.obs_var.n() == n_terms) {
+      if(job.obs_var.n() == n_term) {
          fcst_job[i].obs_var.clear();
          fcst_job[i].obs_var.add(job.obs_var[i]);
       }
@@ -4363,7 +4409,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_lev
       //
-      if(job.fcst_lev.n() == n_terms) {
+      if(job.fcst_lev.n() == n_term) {
          fcst_job[i].fcst_lev.clear();
          fcst_job[i].fcst_lev.add(job.fcst_lev[i]);
       }
@@ -4371,7 +4417,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_lev
       //
-      if(job.obs_lev.n() == n_terms) {
+      if(job.obs_lev.n() == n_term) {
          fcst_job[i].obs_lev.clear();
          fcst_job[i].obs_lev.add(job.obs_lev[i]);
       }
@@ -4379,7 +4425,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obtype
       //
-      if(job.obtype.n() == n_terms) {
+      if(job.obtype.n() == n_term) {
          fcst_job[i].obtype.clear();
          fcst_job[i].obtype.add(job.obtype[i]);
       }
@@ -4387,7 +4433,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // vx_mask
       //
-      if(job.vx_mask.n() == n_terms) {
+      if(job.vx_mask.n() == n_term) {
          fcst_job[i].vx_mask.clear();
          fcst_job[i].vx_mask.add(job.vx_mask[i]);
       }
@@ -4395,7 +4441,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // interp_mthd
       //
-      if(job.interp_mthd.n() == n_terms) {
+      if(job.interp_mthd.n() == n_term) {
          fcst_job[i].interp_mthd.clear();
          fcst_job[i].interp_mthd.add(job.interp_mthd[i]);
       }
@@ -4403,7 +4449,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // interp_pnts
       //
-      if(job.interp_pnts.n() == n_terms) {
+      if(job.interp_pnts.n() == n_term) {
          fcst_job[i].interp_pnts.clear();
          fcst_job[i].interp_pnts.add(job.interp_pnts[i]);
       }
@@ -4411,7 +4457,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_thresh
       //
-      if(job.fcst_thresh.n() == n_terms) {
+      if(job.fcst_thresh.n() == n_term) {
          fcst_job[i].fcst_thresh.clear();
          fcst_job[i].fcst_thresh.add(job.fcst_thresh[i]);
       }
@@ -4419,7 +4465,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_thresh
       //
-      if(job.obs_thresh.n() == n_terms) {
+      if(job.obs_thresh.n() == n_term) {
          fcst_job[i].obs_thresh.clear();
          fcst_job[i].obs_thresh.add(job.obs_thresh[i]);
       }
@@ -4427,7 +4473,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // line_type
       //
-      if(job.line_type.n() == n_terms) {
+      if(job.line_type.n() == n_term) {
          fcst_job[i].line_type.clear();
          fcst_job[i].line_type.add(job.line_type[i]);
 
@@ -4451,7 +4497,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // column
       //
-      if(job.column.n() == n_terms) {
+      if(job.column.n() == n_term) {
          fcst_job[i].column.clear();
          fcst_job[i].column.add(job.column[i]);
       }
@@ -4459,7 +4505,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // weight
       //
-      if(job.weight.n() == n_terms) {
+      if(job.weight.n() == n_term) {
          fcst_job[i].weight.clear();
          fcst_job[i].weight.add(job.weight[i]);
       }
@@ -4487,7 +4533,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       // Loop through the jobs to see if this line should be kept
       //
       keep = 0;
-      for(i=0; i<n_terms; i++) {
+      for(i=0; i<n_term; i++) {
 
          //
          // Check the forecast model job
@@ -4555,8 +4601,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Loop through the terms and compute a skill score for each.
    //
-   ss_sum = weight_sum = 0.0;
-   for(i=0; i<n_terms; i++) {
+   for(i=0, n_vld=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
 
       //
       // Compute continuous stats for the current term
@@ -4712,6 +4757,9 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
          mlog << Warning << "\ncompute_ss_index() -> "
               << "can't compute skill score for term " << i+1 << ".\n\n";
       }
+      else {
+         n_vld++;
+      }
 
    } // end for i
 
@@ -4724,12 +4772,17 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Compute the Skill Score Index value.
    //
-   if(is_bad_data(ss_avg) ||
-      is_eq(ss_avg, 1.0)) ss_index = bad_data_double;
-   else                   ss_index = sqrt(1.0/(1.0 - ss_avg));
+   ssidx_info.info.n_term = n_term;
+   ssidx_info.info.n_vld  = n_vld;
+   if(is_bad_data(ss_avg) || is_eq(ss_avg, 1.0)) {
+      ssidx_info.info.ss_index = bad_data_double;
+   }
+   else {
+      ssidx_info.info.ss_index = sqrt(1.0/(1.0 - ss_avg));
+   }
 
    mlog << Debug(3) << "Skill Score Index Weighted Average = " << ss_avg << "\n"
-        << "Skill Score Index Value = " << ss_index << "\n";
+        << "Skill Score Index Value = " << ssidx_info.info.ss_index << "\n";
 
    //
    // Clean up allocated memory.
@@ -4742,7 +4795,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    if(ref_cts)  { delete [] ref_cts;  ref_cts  = (CTSInfo *)         0; }
    if(job_lt)   { delete [] job_lt;   job_lt   = (STATLineType *)    0; }
 
-   return(ss_index);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
