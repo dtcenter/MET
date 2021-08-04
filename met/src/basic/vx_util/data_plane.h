@@ -88,6 +88,7 @@ class DataPlane {
       int      ny() const;
       bool     is_empty() const;
       bool     is_all_bad_data() const;
+      int      n_good_data() const;
 
       unixtime init() const;
       unixtime valid() const;
