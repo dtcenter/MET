@@ -11,6 +11,8 @@
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
 //
 
+//write_valid = [ "20100725_000000" ];
+
 //
 // Models
 //
@@ -50,10 +52,17 @@ init_inc = [];
 init_exc = [];
 
 //
-// Valid model time window
+// Valid model time windows to include or exclude
 //
 valid_beg = "";
 valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Valid times for which output should be written
+//
+write_valid = [];
 
 //
 // Model initialization hours
@@ -103,7 +112,7 @@ oper_baseline = [ "OCLP" ];
 // Specify if only those track points common to both the ADECK and BDECK
 // tracks be written out.
 //
-match_points = FALSE;
+match_points = TRUE;
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded

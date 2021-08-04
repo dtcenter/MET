@@ -1,0 +1,590 @@
+DEBUG 1: [Source 1 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal012010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 2 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal022010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 3 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal032010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 4 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal042010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 5 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal052010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 6 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal062010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 7 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal072010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 8 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal082010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 9 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal092010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 10 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal102010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 11 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal112010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 12 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal122010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 13 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal132010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 14 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal142010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 15 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal152010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 16 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal162010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 17 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal172010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 18 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal182010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 19 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal192010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 20 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal202010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 21 of 21] ADECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal212010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 1 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal012010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 2 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal022010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 3 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal032010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 4 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal042010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 5 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal052010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 6 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal062010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 7 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal072010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 8 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal082010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 9 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal092010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 10 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal102010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 11 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal112010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 12 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal122010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 13 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal132010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 14 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal142010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 15 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal152010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 16 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal162010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 17 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal172010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 18 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal182010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 19 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal192010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 20 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal202010.dat, Model Suffix: (nul)
+DEBUG 1: [Source 21 of 21] BDECK Source: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal212010.dat, Model Suffix: (nul)
+DEBUG 1: Config File Default: /Volumes/d1/projects/MET/MET_development/MET-develop/met/share/met/config/TCPairsConfig_default
+DEBUG 1: Config File User: /Volumes/d1/projects/MET/MET_development/MET-develop/test/config/TCPairsConfig_ALAL2010
+DEBUG 1: Distance to land file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/tc_dland/tc_dland_half_deg.nc
+DEBUG 4: 
+DEBUG 4: Latitude/Longitude Grid Data:
+DEBUG 4:      lat_ll: 0
+DEBUG 4:      lon_ll: 180
+DEBUG 4:   delta_lat: 0.5
+DEBUG 4:   delta_lon: 0.5
+DEBUG 4:        Nlat: 121
+DEBUG 4:        Nlon: 361
+DEBUG 4: 
+DEBUG 2: Processing 21 BDECK file(s).
+DEBUG 4: Updating AL012010 storm name from "INVEST" to "ONE".
+DEBUG 4: Updating AL012010 storm name from "ONE" to "ALEX".
+DEBUG 4: [File 1 of 21] Used 58 of 58 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal012010.dat"
+DEBUG 4: Updating AL022010 storm name from "INVEST" to "TWO".
+DEBUG 4: [File 2 of 21] Used 13 of 13 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal022010.dat"
+DEBUG 4: Updating AL032010 storm name from "INVEST" to "THREE".
+DEBUG 4: Updating AL032010 storm name from "THREE" to "BONNIE".
+DEBUG 4: [File 3 of 21] Used 18 of 18 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal032010.dat"
+DEBUG 4: Updating AL042010 storm name from "INVEST" to "FOUR".
+DEBUG 4: Updating AL042010 storm name from "FOUR" to "COLIN".
+DEBUG 4: [File 4 of 21] Used 27 of 27 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal042010.dat"
+DEBUG 4: Updating AL052010 storm name from "INVEST" to "FIVE".
+DEBUG 4: [File 5 of 21] Used 32 of 32 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal052010.dat"
+DEBUG 4: Updating AL062010 storm name from "INVEST" to "SIX".
+DEBUG 4: Updating AL062010 storm name from "SIX" to "DANIELLE".
+DEBUG 4: [File 6 of 21] Used 114 of 114 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal062010.dat"
+DEBUG 4: Updating AL072010 storm name from "INVEST" to "SEVEN".
+DEBUG 4: Updating AL072010 storm name from "SEVEN" to "EARL".
+DEBUG 4: [File 7 of 21] Used 115 of 115 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal072010.dat"
+DEBUG 4: Updating AL082010 storm name from "INVEST" to "FIONA".
+DEBUG 4: [File 8 of 21] Used 28 of 28 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal082010.dat"
+DEBUG 4: Updating AL092010 storm name from "INVEST" to "NINE".
+DEBUG 4: Updating AL092010 storm name from "NINE" to "GASTON".
+DEBUG 4: [File 9 of 21] Used 30 of 30 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal092010.dat"
+DEBUG 4: Updating AL102010 storm name from "INVEST" to "TEN".
+DEBUG 4: Updating AL102010 storm name from "TEN" to "HERMINE".
+DEBUG 4: [File 10 of 21] Used 27 of 27 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal102010.dat"
+DEBUG 4: Updating AL112010 storm name from "INVEST" to "IGOR".
+DEBUG 4: [File 11 of 21] Used 156 of 156 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal112010.dat"
+DEBUG 4: Updating AL122010 storm name from "INVEST" to "TWELVE".
+DEBUG 4: Updating AL122010 storm name from "TWELVE" to "JULIA".
+DEBUG 4: [File 12 of 21] Used 86 of 86 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal122010.dat"
+DEBUG 4: Updating AL132010 storm name from "INVEST" to "KARL".
+DEBUG 4: [File 13 of 21] Used 41 of 41 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal132010.dat"
+DEBUG 4: Updating AL142010 storm name from "INVEST" to "FOURTEEN".
+DEBUG 4: Updating AL142010 storm name from "FOURTEEN" to "LISA".
+DEBUG 4: [File 14 of 21] Used 48 of 48 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal142010.dat"
+DEBUG 4: Updating AL152010 storm name from "INVEST" to "MATTHEW".
+DEBUG 4: [File 15 of 21] Used 19 of 19 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal152010.dat"
+DEBUG 4: Updating AL162010 storm name from "INVEST" to "SIXTEEN".
+DEBUG 4: Updating AL162010 storm name from "SIXTEEN" to "NICOLE".
+DEBUG 4: [File 16 of 21] Used 12 of 12 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal162010.dat"
+DEBUG 4: Updating AL172010 storm name from "SEVENTEEN" to "OTTO".
+DEBUG 4: [File 17 of 21] Used 70 of 70 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal172010.dat"
+DEBUG 4: Updating AL182010 storm name from "INVEST" to "PAULA".
+DEBUG 4: [File 18 of 21] Used 45 of 45 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal182010.dat"
+DEBUG 4: Updating AL192010 storm name from "INVEST" to "NINETEEN".
+DEBUG 4: Updating AL192010 storm name from "NINETEEN" to "RICHARD".
+DEBUG 4: [File 19 of 21] Used 42 of 42 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal192010.dat"
+DEBUG 4: Updating AL202010 storm name from "INVEST" to "SHARY".
+DEBUG 4: [File 20 of 21] Used 18 of 18 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal202010.dat"
+DEBUG 4: Updating AL212010 storm name from "INVEST" to "TOMAS".
+DEBUG 4: [File 21 of 21] Used 95 of 95 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/bdeck/bal212010.dat"
+DEBUG 3: Used 1094 of 1094 lines read from 21 file(s).
+DEBUG 3: Identified 21 track(s).
+DEBUG 4: [Track 1 of 21] TrackInfo: StormId = "AL012010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "ALEX", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100624_180000, MaxValidTime = 20100702_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 58
+DEBUG 4: [Track 2 of 21] TrackInfo: StormId = "AL022010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "TWO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100707_060000, MaxValidTime = 20100710_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 13, NAlloc = 13, NTrackLines = 13
+DEBUG 4: [Track 3 of 21] TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 4: [Track 4 of 21] TrackInfo: StormId = "AL042010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "COLIN", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100802_120000, MaxValidTime = 20100808_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 25, NAlloc = 25, NTrackLines = 27
+DEBUG 4: [Track 5 of 21] TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 4: [Track 6 of 21] TrackInfo: StormId = "AL062010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "DANIELLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100821_120000, MaxValidTime = 20100903_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 114
+DEBUG 4: [Track 7 of 21] TrackInfo: StormId = "AL072010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "EARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100824_000000, MaxValidTime = 20100906_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 55, NAlloc = 55, NTrackLines = 115
+DEBUG 4: [Track 8 of 21] TrackInfo: StormId = "AL082010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "FIONA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100830_000000, MaxValidTime = 20100904_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 24, NAlloc = 24, NTrackLines = 28
+DEBUG 4: [Track 9 of 21] TrackInfo: StormId = "AL092010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "GASTON", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100901_000000, MaxValidTime = 20100908_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 30, NAlloc = 30, NTrackLines = 30
+DEBUG 4: [Track 10 of 21] TrackInfo: StormId = "AL102010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "HERMINE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100904_180000, MaxValidTime = 20100910_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 23, NAlloc = 23, NTrackLines = 27
+DEBUG 4: [Track 11 of 21] TrackInfo: StormId = "AL112010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "IGOR", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100908_060000, MaxValidTime = 20100923_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 61, NAlloc = 61, NTrackLines = 156
+DEBUG 4: [Track 12 of 21] TrackInfo: StormId = "AL122010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "JULIA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100912_060000, MaxValidTime = 20100924_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 86
+DEBUG 4: [Track 13 of 21] TrackInfo: StormId = "AL132010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "KARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100913_180000, MaxValidTime = 20100918_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 22, NAlloc = 22, NTrackLines = 41
+DEBUG 4: [Track 14 of 21] TrackInfo: StormId = "AL142010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "LISA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100920_000000, MaxValidTime = 20100929_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 38, NAlloc = 38, NTrackLines = 48
+DEBUG 4: [Track 15 of 21] TrackInfo: StormId = "AL152010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "MATTHEW", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100923_120000, MaxValidTime = 20100926_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 16, NAlloc = 16, NTrackLines = 19
+DEBUG 4: [Track 16 of 21] TrackInfo: StormId = "AL162010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "NICOLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100928_000000, MaxValidTime = 20100930_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4: [Track 17 of 21] TrackInfo: StormId = "AL172010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "OTTO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101006_060000, MaxValidTime = 20101017_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 47, NAlloc = 100, NTrackLines = 70
+DEBUG 4: [Track 18 of 21] TrackInfo: StormId = "AL182010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "PAULA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101011_000000, MaxValidTime = 20101015_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 21, NAlloc = 100, NTrackLines = 45
+DEBUG 4: [Track 19 of 21] TrackInfo: StormId = "AL192010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "RICHARD", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101019_180000, MaxValidTime = 20101026_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 29, NAlloc = 100, NTrackLines = 42
+DEBUG 4: [Track 20 of 21] TrackInfo: StormId = "AL202010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "SHARY", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101028_180000, MaxValidTime = 20101030_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 9, NAlloc = 100, NTrackLines = 18
+DEBUG 4: [Track 21 of 21] TrackInfo: StormId = "AL212010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "TOMAS", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101029_060000, MaxValidTime = 20101110_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 54, NAlloc = 100, NTrackLines = 95
+DEBUG 2: Found 21 BDECK track(s).
+DEBUG 2: Processing 21 ADECK file(s).
+DEBUG 4: [File 1 of 21] Used 17 of 17 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal012010.dat"
+DEBUG 4: [File 2 of 21] Used 5 of 5 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal022010.dat"
+DEBUG 1: When reading ATCF track data, all instances of "AVN" are automatically replaced with "GFS" (ATCF ID = AVNI).
+DEBUG 4: [File 3 of 21] Used 68 of 68 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal032010.dat"
+DEBUG 4: [File 4 of 21] Used 61 of 61 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal042010.dat"
+DEBUG 4: [File 5 of 21] Used 75 of 75 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal052010.dat"
+DEBUG 4: [File 6 of 21] Used 10 of 10 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal062010.dat"
+DEBUG 4: [File 7 of 21] Used 12 of 12 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal072010.dat"
+DEBUG 4: [File 8 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal082010.dat"
+DEBUG 4: [File 9 of 21] Used 12 of 12 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal092010.dat"
+DEBUG 4: [File 10 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal102010.dat"
+DEBUG 4: [File 11 of 21] Used 9 of 9 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal112010.dat"
+DEBUG 4: [File 12 of 21] Used 17 of 17 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal122010.dat"
+DEBUG 4: [File 13 of 21] Used 15 of 15 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal132010.dat"
+DEBUG 4: [File 14 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal142010.dat"
+DEBUG 4: [File 15 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal152010.dat"
+DEBUG 4: [File 16 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal162010.dat"
+DEBUG 4: [File 17 of 21] Used 12 of 12 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal172010.dat"
+DEBUG 4: [File 18 of 21] Used 11 of 11 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal182010.dat"
+DEBUG 4: [File 19 of 21] Used 9 of 9 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal192010.dat"
+DEBUG 4: [File 20 of 21] Used 10 of 10 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal202010.dat"
+DEBUG 4: [File 21 of 21] Used 13 of 13 lines read from file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/tc_data/adeck/aal212010.dat"
+DEBUG 3: Used 411 of 411 lines read from 21 file(s).
+DEBUG 3: Identified 42 track(s).
+DEBUG 4: [Track 1 of 42] TrackInfo: StormId = "AL012010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "(nul)", TechniqueNumber = 3, Technique = "P43I", Initials = "(nul)", InitTime = 20100629_060000, MinValidTime = 20100629_060000, MaxValidTime = 20100703_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 10, NAlloc = 10, NTrackLines = 17
+DEBUG 4: [Track 2 of 42] TrackInfo: StormId = "AL022010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "(nul)", TechniqueNumber = 3, Technique = "P43I", Initials = "(nul)", InitTime = 20100708_060000, MinValidTime = 20100708_060000, MaxValidTime = 20100710_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 3 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "SPC3", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 4 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFSI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100727_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 7
+DEBUG 4: [Track 5 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GHMI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100726_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 6 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "HWFI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 10, NAlloc = 10, NTrackLines = 10
+DEBUG 4: [Track 7 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFNI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100726_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 8 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "NGPI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100728_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 8, NAlloc = 8, NTrackLines = 8
+DEBUG 4: [Track 9 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "DSHP", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 10 of 42] TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "LGEM", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 11 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "SPC3", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100813_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 12 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFSI", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100811_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 6, NAlloc = 6, NTrackLines = 6
+DEBUG 4: [Track 13 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "GHMI", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100811_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 6, NAlloc = 6, NTrackLines = 6
+DEBUG 4: [Track 14 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "HWFI", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100811_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 6, NAlloc = 6, NTrackLines = 6
+DEBUG 4: [Track 15 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFNI", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100810_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 16 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "NGPI", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100810_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 17 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "DSHP", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100813_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 18 of 42] TrackInfo: StormId = "AL042010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "04", StormName = "(nul)", TechniqueNumber = 3, Technique = "LGEM", Initials = "(nul)", InitTime = 20100808_120000, MinValidTime = 20100808_120000, MaxValidTime = 20100813_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 19 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "SPC3", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 20 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFSI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100813_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4: [Track 21 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GHMI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4: [Track 22 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "HWFI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4: [Track 23 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFNI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4: [Track 24 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "NGPI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100811_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 1, NAlloc = 1, NTrackLines = 1
+DEBUG 4: [Track 25 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "DSHP", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 26 of 42] TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "LGEM", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 27 of 42] TrackInfo: StormId = "AL062010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100831_000000, MinValidTime = 20100831_000000, MaxValidTime = 20100902_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 6, NAlloc = 6, NTrackLines = 10
+DEBUG 4: [Track 28 of 42] TrackInfo: StormId = "AL072010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100905_000000, MinValidTime = 20100905_000000, MaxValidTime = 20100910_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 12
+DEBUG 4: [Track 29 of 42] TrackInfo: StormId = "AL082010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100904_000000, MinValidTime = 20100904_000000, MaxValidTime = 20100909_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 30 of 42] TrackInfo: StormId = "AL092010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100902_180000, MinValidTime = 20100902_180000, MaxValidTime = 20100907_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 12
+DEBUG 4: [Track 31 of 42] TrackInfo: StormId = "AL102010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100908_000000, MinValidTime = 20100908_000000, MaxValidTime = 20100913_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4: [Track 32 of 42] TrackInfo: StormId = "AL112010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100921_180000, MinValidTime = 20100921_180000, MaxValidTime = 20100923_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 4, NAlloc = 4, NTrackLines = 9
+DEBUG 4: [Track 33 of 42] TrackInfo: StormId = "AL122010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100920_120000, MinValidTime = 20100920_120000, MaxValidTime = 20100925_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 17
+DEBUG 4: [Track 34 of 42] TrackInfo: StormId = "AL132010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100917_120000, MinValidTime = 20100917_120000, MaxValidTime = 20100922_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 15
+DEBUG 4: [Track 35 of 42] TrackInfo: StormId = "AL142010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100926_180000, MinValidTime = 20100926_180000, MaxValidTime = 20101001_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 11
+DEBUG 4: [Track 36 of 42] TrackInfo: StormId = "AL152010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100926_000000, MinValidTime = 20100926_000000, MaxValidTime = 20101001_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 11
+DEBUG 4: [Track 37 of 42] TrackInfo: StormId = "AL162010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100929_180000, MinValidTime = 20100929_180000, MaxValidTime = 20101004_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 11
+DEBUG 4: [Track 38 of 42] TrackInfo: StormId = "AL172010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101010_060000, MinValidTime = 20101010_060000, MaxValidTime = 20101015_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 12
+DEBUG 4: [Track 39 of 42] TrackInfo: StormId = "AL182010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101015_000000, MinValidTime = 20101015_000000, MaxValidTime = 20101020_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 11
+DEBUG 4: [Track 40 of 42] TrackInfo: StormId = "AL192010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101025_180000, MinValidTime = 20101025_180000, MaxValidTime = 20101029_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 9, NAlloc = 100, NTrackLines = 9
+DEBUG 4: [Track 41 of 42] TrackInfo: StormId = "AL202010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101030_000000, MinValidTime = 20101030_000000, MaxValidTime = 20101102_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 10
+DEBUG 4: [Track 42 of 42] TrackInfo: StormId = "AL212010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101107_180000, MinValidTime = 20101107_180000, MaxValidTime = 20101112_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 100, NTrackLines = 13
+DEBUG 2: Deriving 0 ADECK consensus model(s).
+DEBUG 2: Added 0 ADECK consensus tracks(s).
+DEBUG 2: Deriving 0 ADECK lag model(s).
+DEBUG 2: Added 0 ADECK lag tracks(s).
+DEBUG 2: Deriving 2 CLIPER/SHIFOR baseline model(s).
+DEBUG 3: Building CLIPER/SHIFOR operational baseline forecasts using 1 method(s).
+DEBUG 3: Building CLIPER/SHIFOR BEST track baseline forecasts using 1 method(s) for 21 cases.
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL012010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "ALEX", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100629_060000, MinValidTime = 20100629_060000, MaxValidTime = 20100702_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL022010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "TWO", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100708_060000, MinValidTime = 20100708_060000, MaxValidTime = 20100711_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100727_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100814_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL062010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "DANIELLE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100831_000000, MinValidTime = 20100831_000000, MaxValidTime = 20100903_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL072010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "EARL", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100905_000000, MinValidTime = 20100905_000000, MaxValidTime = 20100908_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL082010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "FIONA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100904_000000, MinValidTime = 20100904_000000, MaxValidTime = 20100907_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL092010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "GASTON", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100902_180000, MinValidTime = 20100902_180000, MaxValidTime = 20100905_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL102010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "HERMINE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100908_000000, MinValidTime = 20100908_000000, MaxValidTime = 20100911_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL112010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "IGOR", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100921_180000, MinValidTime = 20100921_180000, MaxValidTime = 20100924_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL122010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "JULIA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100920_120000, MinValidTime = 20100920_120000, MaxValidTime = 20100923_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL132010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "KARL", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100917_120000, MinValidTime = 20100917_120000, MaxValidTime = 20100920_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL142010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "LISA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100926_180000, MinValidTime = 20100926_180000, MaxValidTime = 20100929_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL152010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "MATTHEW", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100926_000000, MinValidTime = 20100926_000000, MaxValidTime = 20100929_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL162010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "NICOLE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100929_180000, MinValidTime = 20100929_180000, MaxValidTime = 20101002_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL172010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "OTTO", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101010_060000, MinValidTime = 20101010_060000, MaxValidTime = 20101013_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL182010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "PAULA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101015_000000, MinValidTime = 20101015_000000, MaxValidTime = 20101018_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL192010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "RICHARD", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101025_180000, MinValidTime = 20101025_180000, MaxValidTime = 20101028_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL202010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "SHARY", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101030_000000, MinValidTime = 20101030_000000, MaxValidTime = 20101102_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 4: Adding CLIPER/SHIFOR track:
+DEBUG 4: TrackInfo: StormId = "AL212010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "TOMAS", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101107_180000, MinValidTime = 20101107_180000, MaxValidTime = 20101110_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 100, NTrackLines = 0
+DEBUG 2: Added 20 CLIPER/SHIFOR baseline track(s).
+DEBUG 2: Filtering 62 ADECK tracks based on config file settings.
+DEBUG 3: Total tracks read                = 62
+DEBUG 3: Total tracks kept                = 62
+DEBUG 3: Rejected for storm name          = 0
+DEBUG 3: Rejected for valid time          = 0
+DEBUG 3: Rejected for required lead times = 0
+DEBUG 3: Rejected for init mask           = 0
+DEBUG 3: Rejected for valid mask          = 0
+DEBUG 2: Matching 62 ADECK tracks to 21 BDECK tracks.
+DEBUG 4: [Track 1] ADECK track 1 matches BDECK track 1:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL012010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "(nul)", TechniqueNumber = 3, Technique = "P43I", Initials = "(nul)", InitTime = 20100629_060000, MinValidTime = 20100629_060000, MaxValidTime = 20100703_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 10, NAlloc = 10, NTrackLines = 17
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL012010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "ALEX", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100624_180000, MaxValidTime = 20100702_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 58
+DEBUG 3: Computing track errors for 37 vaild times: 20100624_180000 to 20100703_180000 by 060000 increment.
+DEBUG 4: Processing 36 unique valid times: 20100624_180000 to 20100703_180000
+DEBUG 3: [Track 1] ADECK track 1 matches 1 BDECK track(s).
+DEBUG 4: [Track 2] ADECK track 2 matches BDECK track 2:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL022010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "(nul)", TechniqueNumber = 3, Technique = "P43I", Initials = "(nul)", InitTime = 20100708_060000, MinValidTime = 20100708_060000, MaxValidTime = 20100710_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL022010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "TWO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100707_060000, MaxValidTime = 20100710_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 13, NAlloc = 13, NTrackLines = 13
+DEBUG 3: Computing track errors for 13 vaild times: 20100707_060000 to 20100710_060000 by 060000 increment.
+DEBUG 4: Processing 14 unique valid times: 20100707_060000 to 20100710_060000
+DEBUG 3: [Track 2] ADECK track 2 matches 1 BDECK track(s).
+DEBUG 4: [Track 3] ADECK track 3 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "SPC3", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 30 vaild times: 20100722_060000 to 20100729_120000 by 060000 increment.
+DEBUG 4: Processing 26 unique valid times: 20100722_060000 to 20100729_120000
+DEBUG 3: [Track 3] ADECK track 3 matches 1 BDECK track(s).
+DEBUG 4: [Track 4] ADECK track 4 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFSI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100727_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 7
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 22 vaild times: 20100722_060000 to 20100727_120000 by 060000 increment.
+DEBUG 4: Processing 22 unique valid times: 20100722_060000 to 20100727_120000
+DEBUG 3: [Track 4] ADECK track 4 matches 1 BDECK track(s).
+DEBUG 4: [Track 5] ADECK track 5 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GHMI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100726_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 18 vaild times: 20100722_060000 to 20100726_120000 by 060000 increment.
+DEBUG 4: Processing 20 unique valid times: 20100722_060000 to 20100726_120000
+DEBUG 3: [Track 5] ADECK track 5 matches 1 BDECK track(s).
+DEBUG 4: [Track 6] ADECK track 6 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "HWFI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 10, NAlloc = 10, NTrackLines = 10
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 28 vaild times: 20100722_060000 to 20100729_000000 by 060000 increment.
+DEBUG 4: Processing 25 unique valid times: 20100722_060000 to 20100729_000000
+DEBUG 3: [Track 6] ADECK track 6 matches 1 BDECK track(s).
+DEBUG 4: [Track 7] ADECK track 7 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFNI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100726_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 18 vaild times: 20100722_060000 to 20100726_120000 by 060000 increment.
+DEBUG 4: Processing 20 unique valid times: 20100722_060000 to 20100726_120000
+DEBUG 3: [Track 7] ADECK track 7 matches 1 BDECK track(s).
+DEBUG 4: [Track 8] ADECK track 8 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "NGPI", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100728_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 8, NAlloc = 8, NTrackLines = 8
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 24 vaild times: 20100722_060000 to 20100728_000000 by 060000 increment.
+DEBUG 4: Processing 23 unique valid times: 20100722_060000 to 20100728_000000
+DEBUG 3: [Track 8] ADECK track 8 matches 1 BDECK track(s).
+DEBUG 4: [Track 9] ADECK track 9 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "DSHP", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 30 vaild times: 20100722_060000 to 20100729_120000 by 060000 increment.
+DEBUG 4: Processing 26 unique valid times: 20100722_060000 to 20100729_120000
+DEBUG 3: [Track 9] ADECK track 9 matches 1 BDECK track(s).
+DEBUG 4: [Track 10] ADECK track 10 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "(nul)", TechniqueNumber = 3, Technique = "LGEM", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100729_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 30 vaild times: 20100722_060000 to 20100729_120000 by 060000 increment.
+DEBUG 4: Processing 26 unique valid times: 20100722_060000 to 20100729_120000
+DEBUG 3: [Track 10] ADECK track 10 matches 1 BDECK track(s).
+DEBUG 3: [Track 11] ADECK track 11 matches 0 BDECK track(s).
+DEBUG 3: [Track 12] ADECK track 12 matches 0 BDECK track(s).
+DEBUG 3: [Track 13] ADECK track 13 matches 0 BDECK track(s).
+DEBUG 3: [Track 14] ADECK track 14 matches 0 BDECK track(s).
+DEBUG 3: [Track 15] ADECK track 15 matches 0 BDECK track(s).
+DEBUG 3: [Track 16] ADECK track 16 matches 0 BDECK track(s).
+DEBUG 3: [Track 17] ADECK track 17 matches 0 BDECK track(s).
+DEBUG 3: [Track 18] ADECK track 18 matches 0 BDECK track(s).
+DEBUG 4: [Track 19] ADECK track 19 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "SPC3", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 19] ADECK track 19 matches 1 BDECK track(s).
+DEBUG 4: [Track 20] ADECK track 20 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFSI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100813_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 5, NAlloc = 5, NTrackLines = 5
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 20] ADECK track 20 matches 1 BDECK track(s).
+DEBUG 4: [Track 21] ADECK track 21 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GHMI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 21] ADECK track 21 matches 1 BDECK track(s).
+DEBUG 4: [Track 22] ADECK track 22 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "HWFI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 22] ADECK track 22 matches 1 BDECK track(s).
+DEBUG 4: [Track 23] ADECK track 23 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "GFNI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100817_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 23] ADECK track 23 matches 1 BDECK track(s).
+DEBUG 4: [Track 24] ADECK track 24 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "NGPI", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100811_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 1, NAlloc = 1, NTrackLines = 1
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 24] ADECK track 24 matches 1 BDECK track(s).
+DEBUG 4: [Track 25] ADECK track 25 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "DSHP", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 25] ADECK track 25 matches 1 BDECK track(s).
+DEBUG 4: [Track 26] ADECK track 26 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "(nul)", TechniqueNumber = 3, Technique = "LGEM", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100816_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 26] ADECK track 26 matches 1 BDECK track(s).
+DEBUG 4: [Track 27] ADECK track 27 matches BDECK track 6:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL062010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100831_000000, MinValidTime = 20100831_000000, MaxValidTime = 20100902_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 6, NAlloc = 6, NTrackLines = 10
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL062010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "DANIELLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100821_120000, MaxValidTime = 20100903_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 114
+DEBUG 3: Computing track errors for 51 vaild times: 20100821_120000 to 20100903_000000 by 060000 increment.
+DEBUG 4: Processing 51 unique valid times: 20100821_120000 to 20100903_000000
+DEBUG 3: [Track 27] ADECK track 27 matches 1 BDECK track(s).
+DEBUG 4: [Track 28] ADECK track 28 matches BDECK track 7:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL072010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100905_000000, MinValidTime = 20100905_000000, MaxValidTime = 20100910_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL072010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "EARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100824_000000, MaxValidTime = 20100906_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 55, NAlloc = 55, NTrackLines = 115
+DEBUG 3: Computing track errors for 69 vaild times: 20100824_000000 to 20100910_000000 by 060000 increment.
+DEBUG 4: Processing 63 unique valid times: 20100824_000000 to 20100910_000000
+DEBUG 3: [Track 28] ADECK track 28 matches 1 BDECK track(s).
+DEBUG 4: [Track 29] ADECK track 29 matches BDECK track 8:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL082010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100904_000000, MinValidTime = 20100904_000000, MaxValidTime = 20100909_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL082010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "FIONA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100830_000000, MaxValidTime = 20100904_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 24, NAlloc = 24, NTrackLines = 28
+DEBUG 3: Computing track errors for 41 vaild times: 20100830_000000 to 20100909_000000 by 060000 increment.
+DEBUG 4: Processing 33 unique valid times: 20100830_000000 to 20100909_000000
+DEBUG 3: [Track 29] ADECK track 29 matches 1 BDECK track(s).
+DEBUG 4: [Track 30] ADECK track 30 matches BDECK track 9:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL092010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100902_180000, MinValidTime = 20100902_180000, MaxValidTime = 20100907_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL092010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "GASTON", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100901_000000, MaxValidTime = 20100908_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 30, NAlloc = 30, NTrackLines = 30
+DEBUG 3: Computing track errors for 30 vaild times: 20100901_000000 to 20100908_060000 by 060000 increment.
+DEBUG 4: Processing 30 unique valid times: 20100901_000000 to 20100908_060000
+DEBUG 3: [Track 30] ADECK track 30 matches 1 BDECK track(s).
+DEBUG 4: [Track 31] ADECK track 31 matches BDECK track 10:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL102010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100908_000000, MinValidTime = 20100908_000000, MaxValidTime = 20100913_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL102010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "HERMINE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100904_180000, MaxValidTime = 20100910_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 23, NAlloc = 23, NTrackLines = 27
+DEBUG 3: Computing track errors for 34 vaild times: 20100904_180000 to 20100913_000000 by 060000 increment.
+DEBUG 4: Processing 29 unique valid times: 20100904_180000 to 20100913_000000
+DEBUG 3: [Track 31] ADECK track 31 matches 1 BDECK track(s).
+DEBUG 4: [Track 32] ADECK track 32 matches BDECK track 11:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL112010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100921_180000, MinValidTime = 20100921_180000, MaxValidTime = 20100923_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 4, NAlloc = 4, NTrackLines = 9
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL112010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "IGOR", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100908_060000, MaxValidTime = 20100923_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 61, NAlloc = 61, NTrackLines = 156
+DEBUG 3: Computing track errors for 61 vaild times: 20100908_060000 to 20100923_060000 by 060000 increment.
+DEBUG 4: Processing 62 unique valid times: 20100908_060000 to 20100923_060000
+DEBUG 3: [Track 32] ADECK track 32 matches 1 BDECK track(s).
+DEBUG 4: [Track 33] ADECK track 33 matches BDECK track 12:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL122010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100920_120000, MinValidTime = 20100920_120000, MaxValidTime = 20100925_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 17
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL122010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "JULIA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100912_060000, MaxValidTime = 20100924_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 86
+DEBUG 3: Computing track errors for 54 vaild times: 20100912_060000 to 20100925_120000 by 060000 increment.
+DEBUG 4: Processing 53 unique valid times: 20100912_060000 to 20100925_120000
+DEBUG 3: [Track 33] ADECK track 33 matches 1 BDECK track(s).
+DEBUG 4: [Track 34] ADECK track 34 matches BDECK track 13:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL132010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100917_120000, MinValidTime = 20100917_120000, MaxValidTime = 20100922_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 15
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL132010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "KARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100913_180000, MaxValidTime = 20100918_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 22, NAlloc = 22, NTrackLines = 41
+DEBUG 3: Computing track errors for 36 vaild times: 20100913_180000 to 20100922_120000 by 060000 increment.
+DEBUG 4: Processing 31 unique valid times: 20100913_180000 to 20100922_120000
+DEBUG 3: [Track 34] ADECK track 34 matches 1 BDECK track(s).
+DEBUG 4: [Track 35] ADECK track 35 matches BDECK track 14:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL142010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100926_180000, MinValidTime = 20100926_180000, MaxValidTime = 20101001_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL142010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "LISA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100920_000000, MaxValidTime = 20100929_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 38, NAlloc = 38, NTrackLines = 48
+DEBUG 3: Computing track errors for 48 vaild times: 20100920_000000 to 20101001_180000 by 060000 increment.
+DEBUG 4: Processing 44 unique valid times: 20100920_000000 to 20101001_180000
+DEBUG 3: [Track 35] ADECK track 35 matches 1 BDECK track(s).
+DEBUG 4: [Track 36] ADECK track 36 matches BDECK track 15:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL152010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100926_000000, MinValidTime = 20100926_000000, MaxValidTime = 20101001_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL152010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "MATTHEW", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100923_120000, MaxValidTime = 20100926_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 16, NAlloc = 16, NTrackLines = 19
+DEBUG 3: Computing track errors for 31 vaild times: 20100923_120000 to 20101001_000000 by 060000 increment.
+DEBUG 4: Processing 25 unique valid times: 20100923_120000 to 20101001_000000
+DEBUG 3: [Track 36] ADECK track 36 matches 1 BDECK track(s).
+DEBUG 4: [Track 37] ADECK track 37 matches BDECK track 16:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL162010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20100929_180000, MinValidTime = 20100929_180000, MaxValidTime = 20101004_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL162010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "NICOLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100928_000000, MaxValidTime = 20100930_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 3: Computing track errors for 28 vaild times: 20100928_000000 to 20101004_180000 by 060000 increment.
+DEBUG 4: Processing 21 unique valid times: 20100928_000000 to 20101004_180000
+DEBUG 3: [Track 37] ADECK track 37 matches 1 BDECK track(s).
+DEBUG 4: [Track 38] ADECK track 38 matches BDECK track 17:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL172010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101010_060000, MinValidTime = 20101010_060000, MaxValidTime = 20101015_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 12
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL172010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "OTTO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101006_060000, MaxValidTime = 20101017_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 47, NAlloc = 100, NTrackLines = 70
+DEBUG 3: Computing track errors for 47 vaild times: 20101006_060000 to 20101017_180000 by 060000 increment.
+DEBUG 4: Processing 47 unique valid times: 20101006_060000 to 20101017_180000
+DEBUG 3: [Track 38] ADECK track 38 matches 1 BDECK track(s).
+DEBUG 4: [Track 39] ADECK track 39 matches BDECK track 18:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL182010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101015_000000, MinValidTime = 20101015_000000, MaxValidTime = 20101020_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 11
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL182010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "PAULA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101011_000000, MaxValidTime = 20101015_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 21, NAlloc = 100, NTrackLines = 45
+DEBUG 3: Computing track errors for 37 vaild times: 20101011_000000 to 20101020_000000 by 060000 increment.
+DEBUG 4: Processing 30 unique valid times: 20101011_000000 to 20101020_000000
+DEBUG 3: [Track 39] ADECK track 39 matches 1 BDECK track(s).
+DEBUG 4: [Track 40] ADECK track 40 matches BDECK track 19:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL192010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101025_180000, MinValidTime = 20101025_180000, MaxValidTime = 20101029_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 9, NAlloc = 9, NTrackLines = 9
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL192010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "RICHARD", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101019_180000, MaxValidTime = 20101026_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 29, NAlloc = 100, NTrackLines = 42
+DEBUG 3: Computing track errors for 41 vaild times: 20101019_180000 to 20101029_180000 by 060000 increment.
+DEBUG 4: Processing 36 unique valid times: 20101019_180000 to 20101029_180000
+DEBUG 3: [Track 40] ADECK track 40 matches 1 BDECK track(s).
+DEBUG 4: [Track 41] ADECK track 41 matches BDECK track 20:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL202010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101030_000000, MinValidTime = 20101030_000000, MaxValidTime = 20101102_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 10
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL202010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "SHARY", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101028_180000, MaxValidTime = 20101030_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 9, NAlloc = 100, NTrackLines = 18
+DEBUG 3: Computing track errors for 18 vaild times: 20101028_180000 to 20101102_000000 by 060000 increment.
+DEBUG 4: Processing 14 unique valid times: 20101028_180000 to 20101102_000000
+DEBUG 3: [Track 41] ADECK track 41 matches 1 BDECK track(s).
+DEBUG 4: [Track 42] ADECK track 42 matches BDECK track 21:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL212010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "(nul)", TechniqueNumber = 3, Technique = "AHWI", Initials = "(nul)", InitTime = 20101107_180000, MinValidTime = 20101107_180000, MaxValidTime = 20101112_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 11, NAlloc = 11, NTrackLines = 13
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL212010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "TOMAS", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101029_060000, MaxValidTime = 20101110_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 54, NAlloc = 100, NTrackLines = 95
+DEBUG 3: Computing track errors for 59 vaild times: 20101029_060000 to 20101112_180000 by 060000 increment.
+DEBUG 4: Processing 58 unique valid times: 20101029_060000 to 20101112_180000
+DEBUG 3: [Track 42] ADECK track 42 matches 1 BDECK track(s).
+DEBUG 4: [Track 43] ADECK track 43 matches BDECK track 1:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL012010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "ALEX", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100629_060000, MinValidTime = 20100629_060000, MaxValidTime = 20100702_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL012010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "01", StormName = "ALEX", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100624_180000, MaxValidTime = 20100702_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 58
+DEBUG 3: Computing track errors for 31 vaild times: 20100624_180000 to 20100702_060000 by 060000 increment.
+DEBUG 4: Processing 33 unique valid times: 20100624_180000 to 20100702_060000
+DEBUG 3: [Track 43] ADECK track 43 matches 1 BDECK track(s).
+DEBUG 4: [Track 44] ADECK track 44 matches BDECK track 2:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL022010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "TWO", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100708_060000, MinValidTime = 20100708_060000, MaxValidTime = 20100711_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL022010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "02", StormName = "TWO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100707_060000, MaxValidTime = 20100710_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 13, NAlloc = 13, NTrackLines = 13
+DEBUG 3: Computing track errors for 17 vaild times: 20100707_060000 to 20100711_060000 by 060000 increment.
+DEBUG 4: Processing 16 unique valid times: 20100707_060000 to 20100711_060000
+DEBUG 3: [Track 44] ADECK track 44 matches 1 BDECK track(s).
+DEBUG 4: [Track 45] ADECK track 45 matches BDECK track 3:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL032010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100724_120000, MinValidTime = 20100724_120000, MaxValidTime = 20100727_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL032010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "03", StormName = "BONNIE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100722_060000, MaxValidTime = 20100725_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 18, NAlloc = 18, NTrackLines = 18
+DEBUG 3: Computing track errors for 22 vaild times: 20100722_060000 to 20100727_120000 by 060000 increment.
+DEBUG 4: Processing 22 unique valid times: 20100722_060000 to 20100727_120000
+DEBUG 3: [Track 45] ADECK track 45 matches 1 BDECK track(s).
+DEBUG 4: [Track 46] ADECK track 46 matches BDECK track 5:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL052010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100811_120000, MinValidTime = 20100811_120000, MaxValidTime = 20100814_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL052010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "05", StormName = "FIVE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100810_060000, MaxValidTime = 20100818_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 32, NAlloc = 32, NTrackLines = 32
+DEBUG 3: Computing track errors for 32 vaild times: 20100810_060000 to 20100818_000000 by 060000 increment.
+DEBUG 4: Processing 32 unique valid times: 20100810_060000 to 20100818_000000
+DEBUG 3: [Track 46] ADECK track 46 matches 1 BDECK track(s).
+DEBUG 4: [Track 47] ADECK track 47 matches BDECK track 6:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL062010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "DANIELLE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100831_000000, MinValidTime = 20100831_000000, MaxValidTime = 20100903_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL062010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "06", StormName = "DANIELLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100821_120000, MaxValidTime = 20100903_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 114
+DEBUG 3: Computing track errors for 51 vaild times: 20100821_120000 to 20100903_000000 by 060000 increment.
+DEBUG 4: Processing 51 unique valid times: 20100821_120000 to 20100903_000000
+DEBUG 3: [Track 47] ADECK track 47 matches 1 BDECK track(s).
+DEBUG 4: [Track 48] ADECK track 48 matches BDECK track 7:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL072010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "EARL", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100905_000000, MinValidTime = 20100905_000000, MaxValidTime = 20100908_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL072010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "07", StormName = "EARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100824_000000, MaxValidTime = 20100906_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 55, NAlloc = 55, NTrackLines = 115
+DEBUG 3: Computing track errors for 61 vaild times: 20100824_000000 to 20100908_000000 by 060000 increment.
+DEBUG 4: Processing 59 unique valid times: 20100824_000000 to 20100908_000000
+DEBUG 3: [Track 48] ADECK track 48 matches 1 BDECK track(s).
+DEBUG 4: [Track 49] ADECK track 49 matches BDECK track 8:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL082010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "FIONA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100904_000000, MinValidTime = 20100904_000000, MaxValidTime = 20100907_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL082010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "08", StormName = "FIONA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100830_000000, MaxValidTime = 20100904_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 24, NAlloc = 24, NTrackLines = 28
+DEBUG 3: Computing track errors for 33 vaild times: 20100830_000000 to 20100907_000000 by 060000 increment.
+DEBUG 4: Processing 29 unique valid times: 20100830_000000 to 20100907_000000
+DEBUG 3: [Track 49] ADECK track 49 matches 1 BDECK track(s).
+DEBUG 4: [Track 50] ADECK track 50 matches BDECK track 9:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL092010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "GASTON", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100902_180000, MinValidTime = 20100902_180000, MaxValidTime = 20100905_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL092010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "09", StormName = "GASTON", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100901_000000, MaxValidTime = 20100908_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 30, NAlloc = 30, NTrackLines = 30
+DEBUG 3: Computing track errors for 30 vaild times: 20100901_000000 to 20100908_060000 by 060000 increment.
+DEBUG 4: Processing 30 unique valid times: 20100901_000000 to 20100908_060000
+DEBUG 3: [Track 50] ADECK track 50 matches 1 BDECK track(s).
+DEBUG 4: [Track 51] ADECK track 51 matches BDECK track 10:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL102010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "HERMINE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100908_000000, MinValidTime = 20100908_000000, MaxValidTime = 20100911_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL102010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "10", StormName = "HERMINE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100904_180000, MaxValidTime = 20100910_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 23, NAlloc = 23, NTrackLines = 27
+DEBUG 3: Computing track errors for 26 vaild times: 20100904_180000 to 20100911_000000 by 060000 increment.
+DEBUG 4: Processing 25 unique valid times: 20100904_180000 to 20100911_000000
+DEBUG 3: [Track 51] ADECK track 51 matches 1 BDECK track(s).
+DEBUG 4: [Track 52] ADECK track 52 matches BDECK track 11:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL112010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "IGOR", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100921_180000, MinValidTime = 20100921_180000, MaxValidTime = 20100924_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL112010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "11", StormName = "IGOR", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100908_060000, MaxValidTime = 20100923_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 61, NAlloc = 61, NTrackLines = 156
+DEBUG 3: Computing track errors for 67 vaild times: 20100908_060000 to 20100924_180000 by 060000 increment.
+DEBUG 4: Processing 65 unique valid times: 20100908_060000 to 20100924_180000
+DEBUG 3: [Track 52] ADECK track 52 matches 1 BDECK track(s).
+DEBUG 4: [Track 53] ADECK track 53 matches BDECK track 12:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL122010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "JULIA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100920_120000, MinValidTime = 20100920_120000, MaxValidTime = 20100923_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL122010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "12", StormName = "JULIA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100912_060000, MaxValidTime = 20100924_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 51, NAlloc = 51, NTrackLines = 86
+DEBUG 3: Computing track errors for 51 vaild times: 20100912_060000 to 20100924_180000 by 060000 increment.
+DEBUG 4: Processing 51 unique valid times: 20100912_060000 to 20100924_180000
+DEBUG 3: [Track 53] ADECK track 53 matches 1 BDECK track(s).
+DEBUG 4: [Track 54] ADECK track 54 matches BDECK track 13:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL132010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "KARL", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100917_120000, MinValidTime = 20100917_120000, MaxValidTime = 20100920_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL132010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "13", StormName = "KARL", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100913_180000, MaxValidTime = 20100918_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 22, NAlloc = 22, NTrackLines = 41
+DEBUG 3: Computing track errors for 28 vaild times: 20100913_180000 to 20100920_120000 by 060000 increment.
+DEBUG 4: Processing 27 unique valid times: 20100913_180000 to 20100920_120000
+DEBUG 3: [Track 54] ADECK track 54 matches 1 BDECK track(s).
+DEBUG 4: [Track 55] ADECK track 55 matches BDECK track 14:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL142010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "LISA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100926_180000, MinValidTime = 20100926_180000, MaxValidTime = 20100929_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL142010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "14", StormName = "LISA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100920_000000, MaxValidTime = 20100929_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 38, NAlloc = 38, NTrackLines = 48
+DEBUG 3: Computing track errors for 40 vaild times: 20100920_000000 to 20100929_180000 by 060000 increment.
+DEBUG 4: Processing 40 unique valid times: 20100920_000000 to 20100929_180000
+DEBUG 3: [Track 55] ADECK track 55 matches 1 BDECK track(s).
+DEBUG 4: [Track 56] ADECK track 56 matches BDECK track 15:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL152010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "MATTHEW", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100926_000000, MinValidTime = 20100926_000000, MaxValidTime = 20100929_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL152010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "15", StormName = "MATTHEW", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100923_120000, MaxValidTime = 20100926_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 16, NAlloc = 16, NTrackLines = 19
+DEBUG 3: Computing track errors for 23 vaild times: 20100923_120000 to 20100929_000000 by 060000 increment.
+DEBUG 4: Processing 21 unique valid times: 20100923_120000 to 20100929_000000
+DEBUG 3: [Track 56] ADECK track 56 matches 1 BDECK track(s).
+DEBUG 4: [Track 57] ADECK track 57 matches BDECK track 16:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL162010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "NICOLE", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20100929_180000, MinValidTime = 20100929_180000, MaxValidTime = 20101002_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL162010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "16", StormName = "NICOLE", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20100928_000000, MaxValidTime = 20100930_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 12, NAlloc = 12, NTrackLines = 12
+DEBUG 3: Computing track errors for 20 vaild times: 20100928_000000 to 20101002_180000 by 060000 increment.
+DEBUG 4: Processing 17 unique valid times: 20100928_000000 to 20101002_180000
+DEBUG 3: [Track 57] ADECK track 57 matches 1 BDECK track(s).
+DEBUG 4: [Track 58] ADECK track 58 matches BDECK track 17:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL172010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "OTTO", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101010_060000, MinValidTime = 20101010_060000, MaxValidTime = 20101013_060000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL172010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "17", StormName = "OTTO", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101006_060000, MaxValidTime = 20101017_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 47, NAlloc = 100, NTrackLines = 70
+DEBUG 3: Computing track errors for 47 vaild times: 20101006_060000 to 20101017_180000 by 060000 increment.
+DEBUG 4: Processing 47 unique valid times: 20101006_060000 to 20101017_180000
+DEBUG 3: [Track 58] ADECK track 58 matches 1 BDECK track(s).
+DEBUG 4: [Track 59] ADECK track 59 matches BDECK track 18:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL182010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "PAULA", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101015_000000, MinValidTime = 20101015_000000, MaxValidTime = 20101018_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL182010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "18", StormName = "PAULA", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101011_000000, MaxValidTime = 20101015_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 21, NAlloc = 100, NTrackLines = 45
+DEBUG 3: Computing track errors for 29 vaild times: 20101011_000000 to 20101018_000000 by 060000 increment.
+DEBUG 4: Processing 26 unique valid times: 20101011_000000 to 20101018_000000
+DEBUG 3: [Track 59] ADECK track 59 matches 1 BDECK track(s).
+DEBUG 4: [Track 60] ADECK track 60 matches BDECK track 19:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL192010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "RICHARD", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101025_180000, MinValidTime = 20101025_180000, MaxValidTime = 20101028_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL192010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "19", StormName = "RICHARD", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101019_180000, MaxValidTime = 20101026_120000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 29, NAlloc = 100, NTrackLines = 42
+DEBUG 3: Computing track errors for 37 vaild times: 20101019_180000 to 20101028_180000 by 060000 increment.
+DEBUG 4: Processing 34 unique valid times: 20101019_180000 to 20101028_180000
+DEBUG 3: [Track 60] ADECK track 60 matches 1 BDECK track(s).
+DEBUG 4: [Track 61] ADECK track 61 matches BDECK track 20:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL202010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "SHARY", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101030_000000, MinValidTime = 20101030_000000, MaxValidTime = 20101102_000000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL202010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "20", StormName = "SHARY", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101028_180000, MaxValidTime = 20101030_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 9, NAlloc = 100, NTrackLines = 18
+DEBUG 3: Computing track errors for 18 vaild times: 20101028_180000 to 20101102_000000 by 060000 increment.
+DEBUG 4: Processing 14 unique valid times: 20101028_180000 to 20101102_000000
+DEBUG 3: [Track 61] ADECK track 61 matches 1 BDECK track(s).
+DEBUG 4: [Track 62] ADECK track 62 matches BDECK track 21:
+DEBUG 4:     ADeck: TrackInfo: StormId = "AL212010", IsBest = false, IsOper = false, CheckAnly = false, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "TOMAS", TechniqueNumber = -9999, Technique = "BCLP", Initials = "(nul)", InitTime = 20101107_180000, MinValidTime = 20101107_180000, MaxValidTime = 20101110_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 7, NAlloc = 7, NTrackLines = 0
+DEBUG 4:     BDeck: TrackInfo: StormId = "AL212010", IsBest = true, IsOper = false, CheckAnly = true, IsAnly = false, Basin = "AL", Cyclone = "21", StormName = "TOMAS", TechniqueNumber = -9999, Technique = "BEST", Initials = "(nul)", InitTime = NA, MinValidTime = 20101029_060000, MaxValidTime = 20101110_180000, MinWarmCore = NA, MaxWarmCore = NA, NPoints = 54, NAlloc = 100, NTrackLines = 95
+DEBUG 3: Computing track errors for 51 vaild times: 20101029_060000 to 20101110_180000 by 060000 increment.
+DEBUG 4: Processing 54 unique valid times: 20101029_060000 to 20101110_180000
+DEBUG 3: [Track 62] ADECK track 62 matches 1 BDECK track(s).
+DEBUG 1: Watch/Warning file: /Volumes/d1/projects/MET/MET_development/MET-develop/met/share/met/tc_data/wwpts_us.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/tc_pairs/alal2010.tcst
