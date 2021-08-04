@@ -160,7 +160,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
 
       // Set the description
       if(p.n_lines() > i) {
-	hdr.set_desc((string)p.line(i)->get_item("DESC", false));
+	      hdr.set_desc((string)p.line(i)->get_item("DESC", false));
       }
 
       // Write the header columns
@@ -191,7 +191,7 @@ void write_prob_rirw_row(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
 
    // Pass the description from the input line to the output
    if(p.line().n_items() > 0) {
-     hdr.set_desc((string)p.line().get_item("DESC", false));
+      hdr.set_desc((string)p.line().get_item("DESC", false));
    }
 
    // Write one line for all the probabilities
