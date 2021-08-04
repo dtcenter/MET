@@ -140,6 +140,7 @@ static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
                                     TimeArray &, NumArray &, NumArray &,
                                     NumArray &, NumArray &, NumArray &);
 static void   process_watch_warn   (TrackPairInfoArray &);
+static void   subset_write_valid   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
 static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
 static void   setup_table          (AsciiTable &);
@@ -166,7 +167,7 @@ int main(int argc, char *argv[]) {
    process_decks();
 
    // List the output files
-   for(int i=0; i<out_files.n_elements(); i++) {
+   for(int i=0; i<out_files.n(); i++) {
       mlog << Debug(1)
            << "Output file: " << out_files[i] << "\n";
    }
@@ -201,9 +202,9 @@ void process_command_line(int argc, char **argv) {
    cline.parse();
 
    // Check for the minimum number of arguments
-   if((adeck_source.n_elements() == 0 &&
-       edeck_source.n_elements() == 0) ||
-      bdeck_source.n_elements()  == 0  ||
+   if((adeck_source.n() == 0 &&
+       edeck_source.n() == 0) ||
+      bdeck_source.n()  == 0  ||
       config_file.length()       == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
@@ -215,25 +216,25 @@ void process_command_line(int argc, char **argv) {
    }
 
    // List the input ADECK track files
-   for(i=0; i<adeck_source.n_elements(); i++) {
+   for(i=0; i<adeck_source.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << adeck_source.n_elements()
+           << "[Source " << i+1 << " of " << adeck_source.n()
            << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
            << adeck_model_suffix[i] << "\n";
    }
 
    // List the input EDECK track files
-   for(i=0; i<edeck_source.n_elements(); i++) {
+   for(i=0; i<edeck_source.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << edeck_source.n_elements()
+           << "[Source " << i+1 << " of " << edeck_source.n()
            << "] EDECK Source: " << edeck_source[i] << ", Model Suffix: "
            << edeck_model_suffix[i] << "\n";
    }
 
    // List the input BDECK track files
-   for(i=0; i<bdeck_source.n_elements(); i++) {
+   for(i=0; i<bdeck_source.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << bdeck_source.n_elements()
+           << "[Source " << i+1 << " of " << bdeck_source.n()
            << "] BDECK Source: " << bdeck_source[i] << ", Model Suffix: "
            << bdeck_model_suffix[i] << "\n";
    }
@@ -266,12 +267,12 @@ void process_decks() {
    process_bdecks(bdeck_tracks);
 
    // Process ADECK files
-   if(adeck_source.n_elements() > 0) {
+   if(adeck_source.n() > 0) {
       process_adecks(bdeck_tracks);
    }
 
    // Process EDECK files
-   if(edeck_source.n_elements() > 0) {
+   if(edeck_source.n() > 0) {
       process_edecks(bdeck_tracks);
    }
 
@@ -291,7 +292,7 @@ void process_bdecks(TrackInfoArray &bdeck_tracks) {
                   files, files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << files.n_elements() << " BDECK file(s).\n";
+        << "Processing " << files.n() << " BDECK file(s).\n";
    process_track_files(files, files_model_suffix, bdeck_tracks, false,
                        (conf_info.AnlyTrack == TrackType_BDeck ||
                         conf_info.AnlyTrack == TrackType_Both));
@@ -314,7 +315,7 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
                   files, files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << files.n_elements() << " ADECK file(s).\n";
+        << "Processing " << files.n() << " ADECK file(s).\n";
    process_track_files(files, files_model_suffix, adeck_tracks, true,
                        (conf_info.AnlyTrack == TrackType_ADeck ||
                         conf_info.AnlyTrack == TrackType_Both));
@@ -340,7 +341,7 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
 
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.LagTime.n_elements()
+        << "Deriving " << conf_info.LagTime.n()
         << " ADECK lag model(s).\n";
    i = derive_lag(adeck_tracks);
    mlog << Debug(2)
@@ -348,8 +349,8 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
 
    // Derive CLIPER/SHIFOR forecasts from the ADECK/BDECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.OperBaseline.n_elements() +
-                          conf_info.BestBaseline.n_elements()
+        << "Deriving " << conf_info.OperBaseline.n() +
+                          conf_info.BestBaseline.n()
         << " CLIPER/SHIFOR baseline model(s).\n";
    i = derive_baseline(adeck_tracks, bdeck_tracks);
    mlog << Debug(2)
@@ -403,6 +404,9 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
            << pairs.serialize_r() << "\n";
    }
 
+   // Subset tracks based on requested valid output times
+   subset_write_valid(pairs);
+
    // Write out the track pairs
    write_tracks(pairs);
 
@@ -423,7 +427,7 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
                   files, files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << files.n_elements()
+        << "Processing " << files.n()
         << " EDECK file(s).\n";
    process_prob_files(files, files_model_suffix, edeck_probs);
 
@@ -498,7 +502,7 @@ void get_atcf_files(const StringArray &source,
    StringArray cur_source, cur_files;
    int i, j;
 
-   if(source.n_elements() != model_suffix.n_elements()) {
+   if(source.n() != model_suffix.n()) {
       mlog << Error
            << "\nget_atcf_files() -> "
            << "the source and suffix arrays must be equal length!\n\n";
@@ -510,12 +514,12 @@ void get_atcf_files(const StringArray &source,
    files_model_suffix.clear();
 
    // Build list of files and corresponding model suffix list
-   for(i=0; i<source.n_elements(); i++) {
+   for(i=0; i<source.n(); i++) {
       cur_source.clear();
       cur_source.add(source[i]);
       cur_files = get_filenames(cur_source, NULL, atcf_suffix);
 
-      for(j=0; j<cur_files.n_elements(); j++) {
+      for(j=0; j<cur_files.n(); j++) {
          files.add(cur_files[j]);
          files_model_suffix.add(model_suffix[i]);
       }
@@ -547,7 +551,7 @@ void process_track_files(const StringArray &files,
    line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
-   for(i=0; i<files.n_elements(); i++) {
+   for(i=0; i<files.n(); i++) {
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
@@ -583,7 +587,7 @@ void process_track_files(const StringArray &files,
 
       // Dump out the current number of lines
       mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n_elements()
+           << "[File " << i+1 << " of " << files.n()
            << "] Used " << cur_add << " of " << cur_read
            << " lines read from file \"" << files[i] << "\"\n";
 
@@ -595,7 +599,7 @@ void process_track_files(const StringArray &files,
    // Dump out the total number of lines
    mlog << Debug(3)
         << "Used " << tot_add << " of " << tot_read
-        << " lines read from " << files.n_elements() << " file(s).\n";
+        << " lines read from " << files.n() << " file(s).\n";
 
    // Dump out the track information
    mlog << Debug(3)
@@ -640,7 +644,7 @@ void process_prob_files(const StringArray &files,
    line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
-   for(i=0; i<files.n_elements(); i++) {
+   for(i=0; i<files.n(); i++) {
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
@@ -676,7 +680,7 @@ void process_prob_files(const StringArray &files,
 
       // Dump out the current number of lines
       mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n_elements()
+           << "[File " << i+1 << " of " << files.n()
            << "] Used " << cur_add << " of " << cur_read
            << " lines read from file \"" << files[i] << "\"\n";
 
@@ -688,7 +692,7 @@ void process_prob_files(const StringArray &files,
    // Dump out the total number of lines
    mlog << Debug(3)
         << "Used " << tot_add << " of " << tot_read
-        << " lines read from " << files.n_elements() << " file(s).\n";
+        << " lines read from " << files.n() << " file(s).\n";
 
    // Dump out the track information
    mlog << Debug(3)
@@ -715,7 +719,7 @@ void process_prob_files(const StringArray &files,
 //
 // Check if the ATCFLineBase should be kept.  Only check those columns
 // that remain constant across the entire track:
-//    model, storm id, basin, cyclone, and init time
+//    model, storm id, basin, cyclone, and timing information
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -727,23 +731,23 @@ bool is_keeper(const ATCFLineBase * line) {
    unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
 
    // Check model
-   if(conf_info.Model.n_elements() > 0 &&
+   if(conf_info.Model.n() > 0 &&
       !conf_info.Model.has(line->technique()))
       keep = false;
 
    // Check storm id
-   else if(conf_info.StormId.n_elements() > 0 &&
+   else if(conf_info.StormId.n() > 0 &&
            !has_storm_id(conf_info.StormId, line->basin(),
                          line->cyclone_number(), line->warning_time()))
       keep = false;
 
    // Check basin
-   else if(conf_info.Basin.n_elements() > 0 &&
+   else if(conf_info.Basin.n() > 0 &&
            !conf_info.Basin.has(line->basin()))
       keep = false;
 
    // Check cyclone
-   else if(conf_info.Cyclone.n_elements() > 0 &&
+   else if(conf_info.Cyclone.n() > 0 &&
            !conf_info.Cyclone.has(line->cyclone_number()))
       keep = false;
 
@@ -752,15 +756,22 @@ bool is_keeper(const ATCFLineBase * line) {
             conf_info.InitBeg > line->warning_time()) ||
            (conf_info.InitEnd > 0 &&
             conf_info.InitEnd < line->warning_time()) ||
-           (conf_info.InitInc.n_elements() > 0 &&
+           (conf_info.InitInc.n() > 0 &&
             !conf_info.InitInc.has(line->warning_time())) ||
-           (conf_info.InitExc.n_elements() > 0 &&
+           (conf_info.InitExc.n() > 0 &&
             conf_info.InitExc.has(line->warning_time())))
       keep = false;
 
    // Initialization hour
-   else if(conf_info.InitHour.n_elements() > 0 &&
+   else if(conf_info.InitHour.n() > 0 &&
            !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
+      keep = false;
+
+   // Valid time include/exclude
+   else if((conf_info.ValidInc.n() > 0 &&
+            !conf_info.ValidInc.has(line->valid())) ||
+           (conf_info.ValidExc.n() > 0 &&
+            conf_info.ValidExc.has(line->valid())))
       keep = false;
 
    // Return the keep status
@@ -781,11 +792,11 @@ void filter_tracks(TrackInfoArray &tracks) {
 
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
-   // basin, cyclone, initialization time, and initialization hour.
+   // basin, cyclone, and timing information.
    for(i=0; i<t.n(); i++) {
 
       // Check storm name
-      if(conf_info.StormName.n_elements() > 0 &&
+      if(conf_info.StormName.n() > 0 &&
          !conf_info.StormName.has(t[i].storm_name())) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for storm name mismatch: "
@@ -812,10 +823,10 @@ void filter_tracks(TrackInfoArray &tracks) {
       // These are used in determining whether to keep or discard a track; keep a track
       // if all the required lead times are present.  If no required lead times are
       // specified in the config file, then ignore checking and proceed as usual.
-      if(conf_info.LeadReq.n_elements() > 0) {
+      if(conf_info.LeadReq.n() > 0) {
 
          // Loop over the required lead times
-         for(j=0, status=true; j<conf_info.LeadReq.n_elements(); j++) {
+         for(j=0, status=true; j<conf_info.LeadReq.n(); j++) {
 
             // If required lead time is missing, break out
             if(t[i].lead_index(conf_info.LeadReq[j]) == -1) {
@@ -1142,11 +1153,11 @@ int derive_consensus(TrackInfoArray &tracks) {
    } // end for i
 
    mlog << Debug(3)
-        << "Building consensus track(s) for " << case_list.n_elements()
+        << "Building consensus track(s) for " << case_list.n()
         << " cases.\n";
 
    // Loop through the cases and process each consensus model
-   for(i=0; i<case_list.n_elements(); i++) {
+   for(i=0; i<case_list.n(); i++) {
 
       // Break the case back out into Basin, Cyclone, InitTime
       cur_case = case_list[i];
@@ -1162,7 +1173,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
          // Loop through the consensus members
          for(k=0, skip=false;
-             k<conf_info.Consensus[j].Members.n_elements(); k++) {
+             k<conf_info.Consensus[j].Members.n(); k++) {
 
             // Add required members to the list
             if(conf_info.Consensus[j].Required[k]) {
@@ -1262,10 +1273,10 @@ int derive_lag(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n_elements() == 0) return(0);
+   if(conf_info.LagTime.n() == 0) return(0);
 
    // Loop through the time lags to be applied
-   for(i=0; i<conf_info.LagTime.n_elements(); i++) {
+   for(i=0; i<conf_info.LagTime.n(); i++) {
 
       mlog << Debug(3)
            << "Building time-lagged track(s) for lag time \""
@@ -1335,12 +1346,12 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
    int n_add = 0;
 
    // If no baseline models are requested, nothing to do
-   if(conf_info.OperBaseline.n_elements() == 0 &&
-      conf_info.BestBaseline.n_elements() == 0) return(0);
+   if(conf_info.OperBaseline.n() == 0 &&
+      conf_info.BestBaseline.n() == 0) return(0);
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
-        << conf_info.OperBaseline.n_elements() << " method(s).\n";
+        << conf_info.OperBaseline.n() << " method(s).\n";
 
    // Loop over the ADECK tracks
    for(i=0; i<atracks.n(); i++) {
@@ -1357,7 +1368,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
       if(!atracks[i].is_oper_track()) continue;
 
       // Loop over the operational baseline methods
-      for(j=0; j<conf_info.OperBaseline.n_elements(); j++) {
+      for(j=0; j<conf_info.OperBaseline.n(); j++) {
 
          // Derive the baseline model
          derive_baseline_model(conf_info.OperBaseline[j],
@@ -1368,8 +1379,8 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR BEST track baseline forecasts using "
-        << conf_info.BestBaseline.n_elements() << " method(s) for "
-        << case_list.n_elements() << " cases.\n";
+        << conf_info.BestBaseline.n() << " method(s) for "
+        << case_list.n() << " cases.\n";
 
    // Loop over the BDECK tracks
    for(i=0; i<btracks.n(); i++) {
@@ -1389,7 +1400,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
          if(!case_list.has(cur_case)) continue;
 
          // Loop over the BEST track baseline methods
-         for(k=0; k<conf_info.BestBaseline.n_elements(); k++) {
+         for(k=0; k<conf_info.BestBaseline.n(); k++) {
 
             // Derive the baseline model
             derive_baseline_model(conf_info.BestBaseline[k],
@@ -1644,13 +1655,13 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    valid_list.sort_array();
 
    mlog << Debug(4)
-        << "Processing " << valid_list.n_elements()
+        << "Processing " << valid_list.n()
         << " unique valid times: "
         << unix_to_yyyymmdd_hhmmss(valid_list.min()) << " to "
         << unix_to_yyyymmdd_hhmmss(valid_list.max()) << "\n";
 
    // Loop through the valid times
-   for(i=0; i<valid_list.n_elements(); i++) {
+   for(i=0; i<valid_list.n(); i++) {
 
       // Get the indices for this time
       i_adeck = adeck.valid_index(valid_list[i]);
@@ -1923,6 +1934,31 @@ void process_watch_warn(TrackPairInfoArray &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void subset_write_valid(TrackPairInfoArray &p) {
+
+   // Check for no work to do
+   if(conf_info.WriteValid.n() == 0) return;
+
+   mlog << Debug(3) << "Writing output for "
+        << conf_info.WriteValid.n() << " requested valid time(s).\n";
+
+   // Check each point for requested valid times
+   int i, j, keep;
+   for(i=0; i<p.n_pairs(); i++) {
+      for(j=0; j<p[i].n_points(); j++) {
+         keep = (conf_info.WriteValid.has(p[i].valid(j)) ? 1 : 0);
+         p.set_keep(i, j, keep);
+      }
+   }
+
+   // Do the track subsetting
+   p.do_keep_subset();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_tracks(const TrackPairInfoArray &p) {
    int i_row, i;
    TcHdrColumns tchc;
@@ -2159,11 +2195,11 @@ void set_atcf_source(const StringArray & a,
    ConcatString cs, suffix;
 
    // Check for optional suffix sub-argument
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
       cs = a[i];
       if(cs.startswith("suffix")) {
          sa = cs.split("=");
-         if(sa.n_elements() != 2) {
+         if(sa.n() != 2) {
             mlog << Error
                  << "\nset_atcf_source() -> "
                  << "the model suffix must be specified as "
@@ -2177,7 +2213,7 @@ void set_atcf_source(const StringArray & a,
    }
 
    // Parse the remaining sources
-   for(i=0; i<a.n_elements(); i++) {
+   for(i=0; i<a.n(); i++) {
       cs = a[i];
       if(cs.startswith("suffix")) continue;
       source.add(a[i]);

@@ -309,6 +309,14 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
 
 void TrackPairInfo::set_keep(int i, int val) {
 
+   // Check range
+   if(i < 0 || i >= NPoints) {
+      mlog << Error
+           << "\nTrackPairInfo::set_keep(int, int) -> "
+           << "range check error for index value " << i << "\n\n";
+      exit(1);
+   }
+
    Keep.set(i, val);
 
    return;
@@ -780,13 +788,23 @@ TrackPairInfo TrackPairInfo::keep_subset() const {
    TrackPairInfo tpi;
 
    // Loop over the points
-   for(i=0; i<NLines; i++) {
+   for(i=0; i<NPoints; i++) {
 
       // Check the retention status
       if(Keep[i] == 0) continue;
 
-      // Add the current track pair point
-      tpi.add(Line[i]);
+      // Add from TC-Stat line data
+      if(NLines == NPoints) {
+         tpi.add(Line[i]);
+      }
+      // Otherwise, add from TC-Pairs track pair
+      else {
+         if(tpi.n_points() == 0) tpi.initialize(ADeck, BDeck);
+         tpi.add(ADeck[i], BDeck[i],
+                 ADeckDLand[i], BDeckDLand[i],
+                 TrackErr[i], XErr[i], YErr[i],
+                 AlongTrackErr[i], CrossTrackErr[i]);
+      }
    }
 
    return(tpi);
@@ -962,6 +980,23 @@ void TrackPairInfoArray::extend(int n, bool exact) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TrackPairInfoArray::set_keep(int i, int j, int val) {
+
+   // Check range
+   if(i < 0 || i >= NPairs) {
+      mlog << Error
+           << "\nTrackPairInfoArray::set_keep(int, int, int) -> "
+           << "range check error for index value " << i << "\n\n";
+      exit(1);
+   }
+
+   Pair[i].set_keep(j, val);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 
    // Check range
@@ -1004,6 +1039,17 @@ void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
 
    // Loop through the track pairs
    for(i=0; i<NPairs; i++) Pair[i].add_watch_warn(ww_sid, ww_type, ww_ut);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfoArray::do_keep_subset() {
+   int i;
+
+   // Loop through the track pairs
+   for(i=0; i<NPairs; i++) Pair[i] = Pair[i].keep_subset();
 
    return;
 }
