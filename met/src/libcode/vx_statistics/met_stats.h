@@ -607,6 +607,7 @@ class DMAPInfo {
       double fom_alpha;            // FOM Alpha
       double zhu_weight;           // Zhu Weight
       double beta_value;           // G-Beta Value
+      int    n_full_points;        // Number of FULL domain points
 
    public:
 
@@ -647,7 +648,7 @@ class DMAPInfo {
 
       void set_options(const int _baddeley_p, const double _baddeley_max_dist,
                        const double _fom_alpha, const double _zhu_weight,
-                       const double _beta_value);
+                       const double _beta_value, const int _n_full_points);
 
       // Get functions
       double get_beta_value() const; 

@@ -2756,6 +2756,7 @@ void DMAPInfo::reset_options() {
    fom_alpha = 0.1;                     // FOM Alpha
    zhu_weight = 0.5;                    // Zhu Weight
    beta_value = bad_data_double;        // G-Beta Value
+   n_full_points = bad_data_int;        // Number of FULL domain points
 
    return;
 }
@@ -2965,7 +2966,15 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    double g_y2     = g_med_fo * oy + g_med_of * fy;
    double g_y      = g_y1 * g_y2;
    g               = pow(g_y, 1.0 / 3.0);
-   gbeta           = max(1.0 - g_y / beta_value, 0.0);
+
+   // Only compute GBETA over the full verification domain.
+   // Report bad data for masking regions.
+   if(total == n_full_points) {
+      gbeta = max(1.0 - g_y / beta_value, 0.0);
+   }
+   else {
+      gbeta = beta_value = bad_data_double;
+   }
 
    // Dump debug distance map info
    mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
@@ -2973,6 +2982,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
         << ", fom_alpha=" << fom_alpha
         << ", zhu_weight=" << zhu_weight
         << ", beta_value=" << beta_value
+        << ", n_full_points=" << n_full_points
         << "\n";
 
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", nfo=" << foy << ", total=" << total
@@ -2994,12 +3004,13 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
 void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dist,
                            const double _fom_alpha, const double _zhu_weight,
-                           const double _beta_value) {
+                           const double _beta_value, const int _n_full_points) {
    baddeley_p = _baddeley_p;
    baddeley_max_dist = _baddeley_max_dist;
    fom_alpha = _fom_alpha;
    zhu_weight = _zhu_weight;
    beta_value = _beta_value;
+   n_full_points = _n_full_points;
 }
 
 ////////////////////////////////////////////////////////////////////////
