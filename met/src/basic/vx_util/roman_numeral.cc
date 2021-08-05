@@ -178,7 +178,6 @@ switch ( n/modulus )  {
    default:  //  shouldn't ever happen
       mlog << Error << "\nrn_add() -> can't handle integer " << n << "\n";
       exit ( 1 );
-      break;
 
 }   // switch
 

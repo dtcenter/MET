@@ -2341,7 +2341,8 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    MSESS,            MSESS_BCL,            MSESS_BCU,
    //    RMSFA,            RMSFA_BCL,            RMSFA_BCU,
    //    RMSOA,            RMSOA_BCL,            RMSOA_BCU,
-   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
+   //    SI,               SI_BCL,               SI_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2634,6 +2635,15 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
    at.set_entry(r, c+96, // Anomaly Correlation Uncentered BCU
       cnt_info.anom_corr_uncntr.v_bcu[i]);
+
+   at.set_entry(r, c+97, // Scatter Index
+      cnt_info.si.v);
+
+   at.set_entry(r, c+98, // Scatter Index BCL
+      cnt_info.si.v_bcl[i]);
+
+   at.set_entry(r, c+99, // Scatter Index BCU
+      cnt_info.si.v_bcu[i]);
 
    return;
 }

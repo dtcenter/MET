@@ -163,7 +163,6 @@ switch ( Hemisphere )  {
    default:
       mlog << Error << "\nAFDataFile::assign(const AFDataFile &) -> bad hemisphere ... " << Hemisphere << "\n\n";
       exit ( 1 );
-      break;
 
 }
 

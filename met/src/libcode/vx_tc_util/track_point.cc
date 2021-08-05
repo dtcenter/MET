@@ -270,7 +270,6 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
             << "unexpected quadrant type encountered \""
             << quadranttype_to_string(ref_quad) << "\".\n\n";
        exit(1);
-       break;
    }
 
    return;

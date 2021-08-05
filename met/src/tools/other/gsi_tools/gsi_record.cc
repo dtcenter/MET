@@ -133,9 +133,13 @@ gsi_clear();
 
 if ( !(g.Buf) )  return;
 
-extend(g.Nalloc);
+if (g.Nalloc > 0) {
 
-memcpy(Buf, g.Buf, Nalloc);
+   extend(g.Nalloc);
+
+   memcpy(Buf, g.Buf, Nalloc);
+
+}
 
 Shuffle = g.Shuffle;
 
