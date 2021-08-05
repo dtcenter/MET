@@ -152,7 +152,6 @@ switch ( type )  {
       mlog << Error
            << "sizeof_hdf_type() -> unrecognized hdf data type\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

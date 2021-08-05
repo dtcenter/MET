@@ -2855,7 +2855,6 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
          mlog << Error << "\ncopy_nc_att(NcFile, NcVar, attr_name) -> "
               << "Does not copy this type \"" << dataType << "\" global NetCDF attribute.\n\n";
          exit(1);
-         break;
       }
    }
    if(from_att) delete from_att;
@@ -2891,7 +2890,6 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
               << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
               << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
          exit(1);
-         break;
       }
    }
    if(from_att) delete from_att;
@@ -2931,7 +2929,6 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
             mlog << Error << "\ncopy_nc_atts(NcFile) -> "
                  << "Does not copy this type \"" << dataType << "\" global NetCDF attributes.\n\n";
             exit(1);
-            break;
          }
       }
    }
@@ -2983,7 +2980,6 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
                  << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
                  << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
             exit(1);
-            break;
          }
       }
    }
@@ -3083,7 +3079,6 @@ void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
            << "Does not copy this type \"" << dataType << "\" NetCDF data from \""
            << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
       exit(1);
-      break;
    }
 }
 

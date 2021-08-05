@@ -671,7 +671,6 @@ while ( pos < (v.length()) )  {
               << celltype_to_string(cell.type)
               << "\"\n\n";
          exit ( 1 );
-         break;
 
 
    }   //  switch

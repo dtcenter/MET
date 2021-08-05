@@ -664,7 +664,6 @@ void read_pds(const GribRecord &r, int &bms_flag,
               << "unexpected time unit of "
               << (int) pds->fcst_unit << ".\n\n";
          exit(1);
-         break;
    }
 
    //
@@ -735,7 +734,6 @@ void read_pds(const GribRecord &r, int &bms_flag,
               << "unexpected time range indicator of "
               << (int) pds->tri << ".\n\n";
          exit(1);
-         break;
    }
 
    return;

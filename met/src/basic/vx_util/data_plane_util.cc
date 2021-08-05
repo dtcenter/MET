@@ -155,7 +155,6 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                     << interpmthd_to_string(mthd) << "(" << mthd
                     << ")\n\n";
                exit(1);
-               break;
          }
 
          // Store the smoothed value

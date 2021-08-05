@@ -96,7 +96,6 @@ switch ( data.hemisphere )  {
       mlog << Error << "\nStereographicGrid::StereographicGrid(const StereographicData &) -> "
            << "bad hemisphere ...\"" << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

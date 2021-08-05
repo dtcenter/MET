@@ -84,7 +84,6 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
          mlog << Error << "\nTCStatJobFactory::new_tc_stat_job_type() -> "
               << "unsupported job type \"" << type_str << "\"\n\n";
          exit(1);
-         break;
    } // end switch
 
    return(job);
@@ -3614,6 +3613,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::close_dump_file() {
+   const char *method_name = "TCStatJobProbRIRW::do_job() -> ";
 
    // Close the current output dump file stream
    if(DumpOut) {
@@ -3644,7 +3644,7 @@ void TCStatJobProbRIRW::close_dump_file() {
 
    // Open the dump file back up for reading
    if(!f.open(DumpFile.c_str())) {
-      mlog << Error << "\nTCStatJobProbRIRW::close_dump_file() -> "
+      mlog << Error << "\n" << method_name
            << "can't open the dump file \"" << DumpFile
            << "\" for reading!\n\n";
       exit(1);
@@ -3666,7 +3666,10 @@ void TCStatJobProbRIRW::close_dump_file() {
    TCStatJob::open_dump_file();
 
    // Write the reformatted AsciiTable
-   *DumpOut << out_at;
+
+   if(DumpOut) *DumpOut << out_at;
+   else mlog << Warning << "\n" << method_name
+             << "can't write the reformatted AsciiTable because DumpOut is null\n\n";
 
    // Call parent to close the dump file
    TCStatJob::close_dump_file();
@@ -3954,6 +3957,48 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCLineCounts::TCLineCounts() {
+   // Read and keep counts
+   NRead = 0;
+   NKeep = 0;
+
+   // Checking entire track
+   RejTrackWatchWarn = 0;
+   RejInitThresh = 0;
+   RejInitStr = 0;
+
+   // Filtering on track attributes
+   RejRIRW = 0;
+   RejLandfall = 0;
+
+   // Checking track point attributes
+   RejAModel = 0;
+   RejBModel = 0;
+   RejDesc = 0;
+   RejStormId = 0;
+   RejBasin = 0;
+   RejCyclone = 0;
+   RejStormName = 0;
+   RejInit = 0;
+   RejInitHour = 0;
+   RejLead = 0;
+   RejValid = 0;
+   RejValidHour = 0;
+   RejInitMask = 0;
+   RejValidMask = 0;
+   RejLineType = 0;
+   RejWaterOnly = 0;
+   RejColumnThresh = 0;
+   RejColumnStr = 0;
+   RejMatchPoints = 0;
+   RejEventEqual = 0;
+   RejOutInitMask = 0;
+   RejOutValidMask = 0;
+   RejLeadReq = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

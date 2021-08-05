@@ -110,7 +110,13 @@ References
 
 | Efron, B. 2007: Correlation and large-scale significance testing. *Journal*
 |   of the American Statistical Association,* 102(477), 93-103.
-| 
+|
+
+.. _Epstein-1969:
+
+| Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
+|   *J. Appl. Meteor.*, 8, 985–987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
+|
 
 .. _Gilleland-2010:
 
@@ -189,6 +195,13 @@ References
 |   132, 1891-1895.
 | 
 
+.. _Mason-2008:
+
+| Mason, S. J., 2008: Understanding forecast verification statistics.
+|   *Meteor. Appl.*, 15, 31–40, doi: 10.1002/met.51.
+|
+
+
 .. _Mittermaier-2014:
 
 | Mittermaier, M., 2014: A strategy for verifying near-convection-resolving
@@ -200,6 +213,13 @@ References
 | Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
 |   *Theory of Statistics*, McGraw-Hill, 299-338.
 | 
+
+.. _Murphy-1969:
+
+| Murphy, A.H., 1969: On the ranked probability score. *Journal of Applied*
+|   *Meteorology and Climatology*, 8 (6), 988 – 989,
+|   doi: 10.1175/1520-0450(1969)008<0988:OTPS>2.0.CO;2.
+|
 
 .. _Murphy-1987:
 
@@ -254,6 +274,13 @@ References
 |   dependency score: A non-vanishing measure for forecasts of rare events.
 |   *Meteorological Applications* 15, 41-50.
 | 
+
+.. _Todter-2012:
+
+| Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
+|   Continuous ranked version and its decomposition. *Mon. Wea. Rev.*,
+|   140 (6), 2005 – 2017, doi: 10.1175/MWR-D-11-00266.1.
+|
 
 .. _Weniger-2016:
 

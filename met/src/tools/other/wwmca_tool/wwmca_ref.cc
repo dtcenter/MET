@@ -384,7 +384,6 @@ if ( Width > 1 )  {
               << "\n\n  WwmcaRegridder::set_config(MetConfig & wc, const char * config_filename) -> "
               << "bad interpolation method ... " << interpmthd_to_string(Method) << "\n\n";
          exit ( 1 );
-         break;
 
    }   //  switch
 
@@ -479,7 +478,6 @@ switch ( Hemi )  {
       mlog << Error << "\nWwmcaRegridder::get_interpolated_data(DataPlane &) const -> "
            << "bad hemisphere ... " << junk << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

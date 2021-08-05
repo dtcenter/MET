@@ -1320,6 +1320,12 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    StringArray sa;
    NcVar nc_var;
 
+   if (!var_info) {
+      mlog << Error << "\nwrite_nc_data() -> "
+           << "var_info is null.\n\n";
+      exit(1);
+   }
+
    //
    // Write to the -name command line argument, if specified.
    //

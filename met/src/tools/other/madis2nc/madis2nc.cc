@@ -335,7 +335,6 @@ void process_madis_file(const char *madis_file) {
               << "MADIS type (" << my_mtype
               << ") not currently supported.\n\n";
          exit(1);
-         break;
    }
 
    // Close the input NetCDF file
@@ -418,27 +417,37 @@ static bool get_filtered_nc_data(NcVar var, float *data,
                                  const long dim, const long cur,
                                  const char *var_name) {
 
-   bool status;
+   bool status = false;
    float in_fill_value;
    const char *method_name = "get_filtered_nc_data(float) ";
 
    if (IS_VALID_NC(var)) {
-      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
-      
-      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-           << in_fillValue_str <<  "=" << in_fill_value << "\n";
-      for (int idx=0; idx<dim; idx++) {
-         if(is_eq(data[idx], in_fill_value)) {
-            data[idx] = bad_data_float;
-            rej_fill++;
+      if(status = get_nc_data(&var, data, dim, cur)) {
+
+         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+              << in_fillValue_str <<  "=" << in_fill_value << "\n";
+         for (int idx=0; idx<dim; idx++) {
+            if(is_eq(data[idx], in_fill_value)) {
+               data[idx] = bad_data_float;
+               rej_fill++;
+            }
          }
+      }
+      else {
+         mlog << Warning << "\n" << method_name
+              << "Fail to read data [" << var_name << "].\n\n";
       }
    }
    else {
-      status = false;
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
+   }
+   if (!status) {
+      for (int idx=0; idx<dim; idx++) {
+         data[idx] = bad_data_float;
+         rej_fill++;
+      }
    }
    return status;
 
@@ -450,36 +459,52 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     const long *cur, const char *var_name,
                                     bool count_bad) {
 
-   bool status;
+   bool status = false;
    int in_fill_value;
    const char *method_name = "get_filtered_nc_data_2d(int)";
 
    if (IS_VALID_NC(var)) {
-      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
-      
-      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-           << in_fillValue_str <<  "=" << in_fill_value << "\n";
-      
-      int offset, offsetStart = 0;
-      for (int idx=0; idx<dim[0]; idx++) {
-         offsetStart = idx * dim[1];
-         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-            offset = offsetStart + vIdx;
-      
-            if(is_eq(data[offset], in_fill_value)) {
-               data[offset] = bad_data_int;
-               if(count_bad) {
-                  rej_fill++;
+
+      if(status = get_nc_data(&var, data, dim, cur)) {
+
+         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+              << in_fillValue_str <<  "=" << in_fill_value << "\n";
+
+         int offset, offsetStart;
+         for (int idx=0; idx<dim[0]; idx++) {
+            offsetStart = idx * dim[1];
+            for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+               offset = offsetStart + vIdx;
+
+               if(is_eq(data[offset], in_fill_value)) {
+                  data[offset] = bad_data_int;
+                  if(count_bad) {
+                     rej_fill++;
+                  }
                }
             }
          }
       }
+      else {
+         mlog << Warning << "\n" << method_name
+              << "Fail to read data [" << var_name << "].\n\n";
+      }
    }
    else {
-      status = false;
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
+   }
+   if (!status) {
+      int offset, offsetStart;
+      for (int idx=0; idx<dim[0]; idx++) {
+         offsetStart = idx * dim[1];
+         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+            offset = offsetStart + vIdx;
+            data[offset] = bad_data_int;
+            if(count_bad) rej_fill++;
+         }
+      }
    }
    return status;
 }
@@ -490,37 +515,52 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
                                     const long *cur, const char *var_name,
                                     bool count_bad) {
 
-   bool status;
+   bool status = false;
    float in_fill_value;
    const char *method_name = "get_filtered_nc_data_2d(float) ";
 
    if (IS_VALID_NC(var)) {
 
-      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
-      
-      get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-      mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-           << in_fillValue_str <<  "=" << in_fill_value << "\n";
-      
-      int offset, offsetStart = 0;
-      for (int idx=0; idx<dim[0]; idx++) {
-         offsetStart = idx * dim[1];
-         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-            offset = offsetStart + vIdx;
-      
-            if(is_eq(data[offset], in_fill_value)) {
-               data[offset] = bad_data_float;
-               if(count_bad) {
-                  rej_fill++;
+      if(status = get_nc_data(&var, data, dim, cur)) {
+
+         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
+         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
+              << in_fillValue_str <<  "=" << in_fill_value << "\n";
+
+         int offset, offsetStart = 0;
+         for (int idx=0; idx<dim[0]; idx++) {
+            offsetStart = idx * dim[1];
+            for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+               offset = offsetStart + vIdx;
+
+               if(is_eq(data[offset], in_fill_value)) {
+                  data[offset] = bad_data_float;
+                  if(count_bad) {
+                     rej_fill++;
+                  }
                }
             }
          }
       }
+      else {
+         mlog << Warning << "\n" << method_name
+              << "Fail to read data [" << var_name << "].\n\n";
+      }
    }
    else {
-      status = false;
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
+   }
+   if (!status) {
+      int offset, offsetStart;
+      for (int idx=0; idx<dim[0]; idx++) {
+         offsetStart = idx * dim[1];
+         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+            offset = offsetStart + vIdx;
+            data[offset] = bad_data_float;
+            if(count_bad) rej_fill++;
+         }
+      }
    }
    return status;
 }
@@ -1145,11 +1185,12 @@ void process_madis_metar(NcFile *&f_in) {
                               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
       }
+      processed_count += count;
 
    } // end for i_hdr
 
    print_rej_counts();
-   mlog << Debug(5) << "    Added " << count << "data\n";
+   mlog << Debug(5) << "    Added " << processed_count << "data\n";
 
    //
    // Cleanup
@@ -1447,7 +1488,11 @@ void process_madis_raob(NcFile *&f_in) {
       get_nc_data(&in_trop_var,   nlvl_mTropNum,      buf_size, i_hdr_s);
       get_nc_data(&in_maxw_var,   nlvl_mWndNum,       buf_size, i_hdr_s);
 
-      get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, buf_size, i_hdr_s);
+      if (!get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, buf_size, i_hdr_s)) {
+         for (int dIdx=0; dIdx<buf_size; dIdx++) {
+            tmp_dbl_arr[dIdx] = bad_data_double;
+         }
+      }
       get_nc_data(&in_hdr_lat_var, hdr_lat_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr, buf_size, i_hdr_s, "eleveation");
@@ -1953,6 +1998,7 @@ void process_madis_raob(NcFile *&f_in) {
          } // end for i_lvl
 
       } // end for i_hdr
+      processed_count += count;
 
    } // end for i_hdr
 
@@ -2208,6 +2254,7 @@ void process_madis_profiler(NcFile *&f_in) {
          } // end for i_lvl
 
       } // end for i_hdr
+      processed_count += count;
 
    } // end for i_hdr
 
@@ -2585,11 +2632,12 @@ void process_madis_maritime(NcFile *&f_in) {
                               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
       }
+      processed_count += count;
 
    } // end for i_hdr
 
    print_rej_counts();
-   mlog << Debug(5) << "    Added " << count << "data\n";
+   mlog << Debug(5) << "    Added " << processed_count << "data\n";
 
    //
    // Cleanup

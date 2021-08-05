@@ -1014,8 +1014,6 @@ double compute_sfc_interp(const DataPlane &dp,
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
               << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
-         exit(1);
-         break;
    }
 
    delete gt;
@@ -1187,7 +1185,6 @@ double compute_horz_interp(const DataPlane &dp,
               << "unsupported interpolation method encountered: "
               << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
          exit(1);
-         break;
    }
 
    delete gt;
@@ -1331,7 +1328,6 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
               << "unsupported interpolation method encountered: "
               << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
          exit(1);
-         break;
    }
 
    // Initialize

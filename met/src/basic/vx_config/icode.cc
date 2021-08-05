@@ -262,7 +262,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::as_double() const -> bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -289,7 +288,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::as_int() const -> bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -392,7 +390,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::dump() -> unrecognized type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

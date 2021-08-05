@@ -252,7 +252,6 @@ switch ( hdf_type )  {
            << program_name << ": hdf_type_to_nc_type() -> unrecognized hdf data type ... "
            << hdf_type << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

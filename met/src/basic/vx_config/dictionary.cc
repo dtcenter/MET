@@ -219,7 +219,6 @@ switch ( entry.Type )  {
            << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(entry.Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -300,7 +299,6 @@ switch ( Type )  {
            << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -377,7 +375,6 @@ switch ( Type )  {
          mlog << Error
               << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->get_type() << "\n";
          exit ( 1 );
-         break;
 
       }  //  switch
       if ( Thresh->get_type() != thresh_na )  out << Thresh->get_value();
@@ -402,7 +399,6 @@ switch ( Type )  {
            << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1313,7 +1309,7 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
    //  try current dictionary
    //
 
- const char * stub = scope[scope.n_elements() - 1].c_str();
+const string stub = scope[scope.n_elements() - 1].c_str();
 
 E = D->lookup_simple(stub);
 

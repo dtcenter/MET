@@ -735,6 +735,7 @@ void CNTInfo::clear() {
    msess.clear();
    bcmse.clear();
    rmse.clear();
+   si.clear();
    e10.clear();
    e25.clear();
    e50.clear();
@@ -783,6 +784,7 @@ void CNTInfo::assign(const CNTInfo &c) {
    msess            = c.msess;
    bcmse            = c.bcmse;
    rmse             = c.rmse;
+   si               = c.si;
    e10              = c.e10;
    e25              = c.e25;
    e50              = c.e50;
@@ -833,6 +835,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       msess.allocate_n_alpha(n_alpha);
       bcmse.allocate_n_alpha(n_alpha);
       rmse.allocate_n_alpha(n_alpha);
+      si.allocate_n_alpha(n_alpha);
       e10.allocate_n_alpha(n_alpha);
       e25.allocate_n_alpha(n_alpha);
       e50.allocate_n_alpha(n_alpha);
@@ -1016,6 +1019,7 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "MSE"             ) == 0) v = mse.v;
    else if(strcmp(stat_name, "BCMSE"           ) == 0) v = bcmse.v;
    else if(strcmp(stat_name, "RMSE"            ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
    else if(strcmp(stat_name, "E10"             ) == 0) v = e10.v;
    else if(strcmp(stat_name, "E25"             ) == 0) v = e25.v;
    else if(strcmp(stat_name, "E50"             ) == 0) v = e50.v;

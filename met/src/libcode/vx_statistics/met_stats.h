@@ -185,6 +185,9 @@ class CNTInfo {
       CIInfo e10, e25, e50, e75, e90, eiqr;
       CIInfo mad;
 
+      // Scatter Index
+      CIInfo si;
+      
       int n_ranks, frank_ties, orank_ties;
 
       void clear();

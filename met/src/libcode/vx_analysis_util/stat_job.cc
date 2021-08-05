@@ -1974,7 +1974,6 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
                  << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
                  << "\"!\n\n";
             exit(1);
-            break;
       }
       if(c > n_col) n_col = c;
    }
@@ -2052,7 +2051,6 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
                  << "unexpected stat line type \"" << statlinetype_to_string(out_lt)
                  << "\"!\n\n";
             exit(1);
-            break;
       }
 
       //
