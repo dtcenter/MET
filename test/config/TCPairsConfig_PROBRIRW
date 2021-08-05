@@ -60,7 +60,7 @@ valid_exc = [];
 //
 // Valid times for which output should be written
 //
-write_valid = [];
+write_valid = [ ${WRITE_VALID} ];
 
 //
 // Model initialization hours

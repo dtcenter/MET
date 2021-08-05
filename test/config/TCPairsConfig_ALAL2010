@@ -11,8 +11,6 @@
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
 //
 
-//write_valid = [ "20100725_000000" ];
-
 //
 // Models
 //
@@ -56,13 +54,13 @@ init_exc = [];
 //
 valid_beg = "";
 valid_end = "";
-valid_inc = [];
+valid_inc = [ ${VALID_INC} ];
 valid_exc = [];
 
 //
 // Valid times for which output should be written
 //
-write_valid = [];
+write_valid = [ ${WRITE_VALID} ];
 
 //
 // Model initialization hours
