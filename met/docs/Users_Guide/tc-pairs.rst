@@ -325,7 +325,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Valid time masking grid applied
   * - 13
     - LINE_TYPE
-    - Output line type (TCMPR or PROBRI)
+    - Output line type (TCMPR or PROBRIRW)
 
 .. _TCMPR Line Type:
 
@@ -472,9 +472,9 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
 
-.. _PROBRI Line Type:
+.. _PROBRIRW Line Type:
 
-.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification/Weakening) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -485,8 +485,8 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Header Column Name
     - Description
   * - 13
-    - PROBRI
-    - Probability of Rapid Intensification line type
+    - PROBRIRW
+    - Probability of Rapid Intensification/Weakening line type
   * - 14
     - ALAT
     - Latitude position of edeck model

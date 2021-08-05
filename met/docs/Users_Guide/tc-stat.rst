@@ -365,7 +365,7 @@ _________________________
         -job summary -line_type TCMPR  -column TK_ERR -dump_row ./tc_summary_job.tcst
         -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20
         -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 \
-                      -probri_thresh 30 -probri_prob_thresh ==0.25
+                      -probrirw_thresh 30 -probrirw_prob_thresh ==0.25
 
 .. _tc_stat-output:
 
@@ -459,12 +459,12 @@ The PROBRIRW job produces probabilistic contingency table counts and statistics 
 
 • The **-prob_exact bool** option is a boolean defining whether the exact or maximum BEST track intensity change over the time window should be used. If true, the values in the **BDELTA** column are used. If false, the values in the **BDELTA_MAX** column are used. The default is true.
 
-• The **-probri_bdelta_thresh** threshold option defines the BEST track intensity change event threshold. This should typically be set consistent with the probability threshold (**-prob_thresh**) chosen above. The default is greater than or equal to 30 kts.
+• The **-probrirw_bdelta_thresh** threshold option defines the BEST track intensity change event threshold. This should typically be set consistent with the probability threshold (**-prob_thresh**) chosen above. The default is greater than or equal to 30 kts.
 
-• The **-probri_prob_thresh threshold_list** option defines the probability thresholds used to create the output Nx2 contingency table. The default is probability bins of width 0.1. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
+• The **-probrirw_prob_thresh threshold_list** option defines the probability thresholds used to create the output Nx2 contingency table. The default is probability bins of width 0.1. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
 
 • The **-out_line_type** option defines the output data that should be written. This job can write PCT, PSTD, PJC, and PRC output line types. The default is PCT and PSTD.  Please see :numref:`table_PS_format_info_PCT` through :numref:`table_PS_format_info_PRC` for more details.
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since the BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or **-column_thresh RI_WINDOW ==24** option provide convenient ways avoiding this problem.
 
-Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probri_thresh option defines the probabilities of interest (e.g. **-probri_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probri_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.
+Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probrirw_thresh option defines the probabilities of interest (e.g. **-probrirw_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probrirw_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.
