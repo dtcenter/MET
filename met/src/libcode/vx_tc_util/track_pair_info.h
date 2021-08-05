@@ -201,8 +201,6 @@ class TrackPairInfoArray {
          //  set stuff
          //
 
-      void set_keep(int, int, int);
-
          //
          //  get stuff
          //
@@ -217,7 +215,7 @@ class TrackPairInfoArray {
 
       void add(const TrackPairInfo &);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
-      void do_keep_subset();
+      void subset_write_valid(const TimeArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////

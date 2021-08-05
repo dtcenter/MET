@@ -980,23 +980,6 @@ void TrackPairInfoArray::extend(int n, bool exact) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPairInfoArray::set_keep(int i, int j, int val) {
-
-   // Check range
-   if(i < 0 || i >= NPairs) {
-      mlog << Error
-           << "\nTrackPairInfoArray::set_keep(int, int, int) -> "
-           << "range check error for index value " << i << "\n\n";
-      exit(1);
-   }
-
-   Pair[i].set_keep(j, val);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 
    // Check range
@@ -1045,11 +1028,22 @@ void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPairInfoArray::do_keep_subset() {
-   int i;
+void TrackPairInfoArray::subset_write_valid(const TimeArray &ta) {
 
-   // Loop through the track pairs
-   for(i=0; i<NPairs; i++) Pair[i] = Pair[i].keep_subset();
+   // Check for no work to do
+   if(ta.n() == 0) return;
+
+   // Check each point for requested valid times
+   int i, j, keep;
+   for(i=0; i<NPairs; i++) {
+      for(j=0; j<Pair[i].n_points(); j++) {
+         keep = (ta.has(Pair[i].valid(j)) ? 1 : 0);
+         Pair[i].set_keep(j, keep);
+      }
+
+      // Subset the track
+      Pair[i] = Pair[i].keep_subset();
+   }
 
    return;
 }

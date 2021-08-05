@@ -178,6 +178,7 @@ class ProbRIRWPairInfoArray {
 
       void add(const ProbRIRWPairInfo &);
       bool add(const ProbRIRWInfo &, const TrackInfo &);
+      void subset_write_valid(const TimeArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////

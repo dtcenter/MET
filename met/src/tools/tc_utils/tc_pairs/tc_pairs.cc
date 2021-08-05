@@ -140,7 +140,6 @@ static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
                                     TimeArray &, NumArray &, NumArray &,
                                     NumArray &, NumArray &, NumArray &);
 static void   process_watch_warn   (TrackPairInfoArray &);
-static void   subset_write_valid   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
 static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
 static void   setup_table          (AsciiTable &);
@@ -404,8 +403,13 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
            << pairs.serialize_r() << "\n";
    }
 
-   // Subset tracks based on requested valid output times
-   subset_write_valid(pairs);
+   // Subset pairs based on requested valid output times
+   if(conf_info.WriteValid.n() > 0) {
+      mlog << Debug(3) << "Subsetting output for "
+           << conf_info.WriteValid.n()
+           << " requested valid time(s).\n";
+      pairs.subset_write_valid(conf_info.WriteValid);
+   }
 
    // Write out the track pairs
    write_tracks(pairs);
@@ -485,6 +489,14 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << prob_rirw_pairs.serialize_r() << "\n";
+   }
+
+   // Subset pairs based on requested valid output times
+   if(conf_info.WriteValid.n() > 0) {
+      mlog << Debug(3) << "Subsetting output for "
+           << conf_info.WriteValid.n()
+           << " requested valid time(s).\n";
+      prob_rirw_pairs.subset_write_valid(conf_info.WriteValid);
    }
 
    // Write out the ProbRIRW pairs
@@ -1934,31 +1946,6 @@ void process_watch_warn(TrackPairInfoArray &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void subset_write_valid(TrackPairInfoArray &p) {
-
-   // Check for no work to do
-   if(conf_info.WriteValid.n() == 0) return;
-
-   mlog << Debug(3) << "Writing output for "
-        << conf_info.WriteValid.n() << " requested valid time(s).\n";
-
-   // Check each point for requested valid times
-   int i, j, keep;
-   for(i=0; i<p.n_pairs(); i++) {
-      for(j=0; j<p[i].n_points(); j++) {
-         keep = (conf_info.WriteValid.has(p[i].valid(j)) ? 1 : 0);
-         p.set_keep(i, j, keep);
-      }
-   }
-
-   // Do the track subsetting
-   p.do_keep_subset();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_tracks(const TrackPairInfoArray &p) {
    int i_row, i;
    TcHdrColumns tchc;
@@ -2081,7 +2068,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       tchc.set_cyclone(p[i].prob_rirw().cyclone());
       tchc.set_storm_name(p[i].bdeck()->storm_name());
 
-      // Write the current TrackPairInfo object
+      // Write the current ProbRIRWPairInfo object
       write_prob_rirw_row(tchc, p[i], out_at, i_row);
    }
 
