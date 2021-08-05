@@ -47,11 +47,11 @@ latex_elements = {
    'papersize': 'letterpaper',
    'releasename':"{version}",
    'fncychap': '\\usepackage{fncychap}',
-   'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm}',
+   'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
    'inputenc': '\\usepackage[utf8]{inputenc}',
    'fontenc': '\\usepackage[LGR,T1]{fontenc}',
                                                      
-   'figure_align':'htbp',
+   'figure_align':'H',
    'pointsize': '11pt',
                                         
    'preamble': r'''
