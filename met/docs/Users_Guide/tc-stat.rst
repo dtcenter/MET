@@ -139,6 +139,8 @@ _________________________
   init_exc     = [];
   valid_beg    = "";
   valid_end    = "";
+  valid_inc    = [];
+  valid_exc    = [];
   init_hour    = [];
   lead_req     = [];
   init_mask    = [];
@@ -158,15 +160,6 @@ _________________________
   bmodel = [];
 
 The **amodel** and **bmodel** fields stratify by the amodel and bmodel columns based on a comma-separated list of model names used for all analysis performed. The names must be in double quotation marks (e.g.: "HWFI"). The **amodel** list specifies the model to be verified against the listed bmodel. The **bmodel** specifies the reference dataset, generally the BEST track analysis. Using the **-amodel** and **-bmodel** options within the job command lines may further refine these selections.
-
-_________________________
-
-.. code-block:: none
-
-  valid_inc = [];
-  valid_exc = [];
-
-The **valid_inc** and **valid_exc** fields stratify by valid times, based on a comma-separated list of specific valid times to include (inc) or exclude (exc). Time strings are defined by YYYYMMDD[_HH[MMSS]]. Using the **-valid_inc** and **-valid_exc** options within the job command lines may further refine these selections.
 
 _________________________
 
