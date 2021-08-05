@@ -118,7 +118,7 @@ climo_mean = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "DTC165", "DTC166" ];
+   grid = [ "FULL", "DTC165", "DTC166" ];
    poly = [ "${TEST_OUT_DIR}/gen_vx_mask/CONUS_poly.nc",
             "MET_BASE/poly/LMV.poly" ];
 }
