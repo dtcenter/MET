@@ -1749,6 +1749,23 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       } // end if ECNT
 
+      // Write out the ORANK line
+      if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
+
+	 cout << "Doing ORANK ensemble statistics" << endl; 
+	 
+         // Compute ensemble statistics
+         hira_pd.compute_pair_vals(rng_ptr);
+	 
+	 write_orank_row(shc, &hira_pd,
+	    conf_info.vx_opt[i_vx].output_flag[i_orank],
+	    stat_at, i_stat_row,
+	    txt_at[i_orank], i_txt_row[i_orank]);
+
+	 cout << "Check after write_orank_row" << endl; 
+	 
+      } // end if ORANK
+
       // Write out the RPS line
       if(conf_info.vx_opt[i_vx].output_flag[i_rps] != STATOutputType_None) {
 
