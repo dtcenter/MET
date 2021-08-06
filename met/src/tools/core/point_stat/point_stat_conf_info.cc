@@ -744,7 +744,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
-
+   
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
@@ -1193,8 +1193,9 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          break;
 
       case(i_ecnt):
+      case(i_orank):
       case(i_rps):
-         // Number of HiRA ECNT and RPS lines =
+         // Number of HiRA ECNT, ORANK and RPS lines =
          //    Message Types * Masks * Interpolations * HiRA widths *
          //    Alphas
          if(hira_info.flag) {
