@@ -110,7 +110,7 @@ oper_baseline = [ "OCLP" ];
 // Specify if only those track points common to both the ADECK and BDECK
 // tracks be written out.
 //
-match_points = TRUE;
+match_points = FALSE;
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded
