@@ -258,13 +258,11 @@ that polyline?
 
 If so, your options are:
 
-1.
-Define one single SID list which include all the points currently
-inside the polyline as well as the extra ones outside. 
+1. Define one single SID list which include all the points currently
+   inside the polyline as well as the extra ones outside. 
 
-2.
-Continue verifying using one polyline and one SID list and
-write partial sums and contingency table counts. 
+2. Continue verifying using one polyline and one SID list and
+   write partial sums and contingency table counts. 
 
 Then aggregate the results together by running a Stat-Analysis job.
 
@@ -332,37 +330,29 @@ temperature mask and a second time to intersect that with the precip mask:
 
 The first one is pretty straight-forward. 
 
-1.
-The input field (fcst.grb) defines the domain for the mask.
+1. The input field (fcst.grb) defines the domain for the mask.
 
-2.
-Since we're doing data masking and the data we want lives in
-fcst.grb, we pass it in again as the mask_file.
+2. Since we're doing data masking and the data we want lives in
+   fcst.grb, we pass it in again as the mask_file.
 
-3.
-Lastly "-mask_field" specifies the data we want from the mask file
-and "-thresh" specifies the event threshold.
+3. Lastly "-mask_field" specifies the data we want from the mask file
+   and "-thresh" specifies the event threshold.
 
 
 The second call is a bit tricky.
 
-1.
-Do data masking (-type data)
+1. Do data masking (-type data)
 
-2.
-Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
+2. Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
 
-3.
-Define the mask by reading 6-hour precip from the mask file
-(fcst.grb) and looking for values > 0 (-mask_field)
+3. Define the mask by reading 6-hour precip from the mask file
+   (fcst.grb) and looking for values > 0 (-mask_field)
 
-4.
-Apply intersection logic when combining the "input" value with
-the "mask" value (-intersection).
+4. Apply intersection logic when combining the "input" value with
+   the "mask" value (-intersection).
 
-5.
-Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
-This is totally optional, but convenient.
+5. Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
+   This is totally optional, but convenient.
 
 A user can write a script with multiple calls to Gen-Vx-Mask to
 apply complex masking logic and then pass the output mask file
@@ -837,31 +827,28 @@ Try the command:
 
 Some things to point out here:
 
-1.
-Notice in the wgrib output that the forecast times are 1015 min and
-965 min. In HHMMSS format, that's "165500" and "160500".
+1. Notice in the wgrib output that the forecast times are 1015 min and
+   965 min. In HHMMSS format, that's "165500" and "160500".
 
-2.
-An accumulation interval can’t be specified since the data isn't stored
-that way. Instead, use a config file string to describe the data to use.
+2. An accumulation interval can’t be specified since the data isn't stored
+   that way. Instead, use a config file string to describe the data to use.
 
-3.
-The config file string specifies a "name" (APCP) and "level" string. APCP
-is defined at the surface, so a level value of 0 (L0) was specified.
+3. The config file string specifies a "name" (APCP) and "level" string. APCP
+   is defined at the surface, so a level value of 0 (L0) was specified.
 
-4.
-Technically, the "lead_time" doesn’t need to be specified at all, pcp_combine
-would find the single APCP record in each input GRIB file and use them. But
-just in case, the lead_time option was included to be extra certain to
-get exactly the data that is needed.
+4. Technically, the "lead_time" doesn’t need to be specified at all,
+   pcp_combine
+   would find the single APCP record in each input GRIB file and use them.
+   But just in case, the lead_time option was included to be extra certain to
+   get exactly the data that is needed.
 
-5.
-The default output variable name pcp_combine would write would be "APCP_L0".
-However, to indicate that its a 50-minute "accumulation interval" use a
-different output variable name (APCP_A005000). Any string name is
-possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
-chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
-tell that tool what variable to process.
+5. The default output variable name pcp_combine would write would be
+   "APCP_L0". However, to indicate that its a 50-minute
+   "accumulation interval" use a
+   different output variable name (APCP_A005000). Any string name is
+   possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
+   chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
+   tell that tool what variable to process.
 
 **Q. Pcp_Combine - How do I use “-sum”, “-add”, and “-subtract“ to achieve
 the same accumulation interval?**
@@ -1214,26 +1201,22 @@ A.
 By default, Stat-Analysis has two options enabled which slow it down.
 Disabling these two options will create quicker run times:
 
-1.
-The computation of rank correlation statistics, Spearman's Rank Correlation
-and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
+1. The computation of rank correlation statistics, Spearman's Rank
+   Correlation and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
 
-2.
-The computation of bootstrap confidence intervals. Disable them using
-"-n_boot_rep 0".
+2. The computation of bootstrap confidence intervals. Disable them using
+   "-n_boot_rep 0".
 
 Two more suggestions for faster run times.
 
-1.
-Instead of using "-fcst_var u", use "-by fcst_var". This will compute
-statistics separately for each unique entry found in the FCST_VAR column.
+1. Instead of using "-fcst_var u", use "-by fcst_var". This will compute
+   statistics separately for each unique entry found in the FCST_VAR column.
 
-2.
-Instead of using "-out" to write the output to a text file, use "-out_stat"
-which will write a full STAT output file, including all the header columns.
-This will create a long list of values in the OBTYPE column. To avoid the
-long, OBTYPE column value, manually set the output using
-"-set_hdr OBTYPE ALL_TYPES". Or set its value to whatever is needed.
+2. Instead of using "-out" to write the output to a text file, use "-out_stat"
+   which will write a full STAT output file, including all the header columns.
+   This will create a long list of values in the OBTYPE column. To avoid the
+   long, OBTYPE column value, manually set the output using
+   "-set_hdr OBTYPE ALL_TYPES". Or set its value to whatever is needed.
 
 .. code-block:: none
 		
@@ -1365,18 +1348,16 @@ http://www.dtcenter.org/met/users/downloads/observation_data.php
 
 It may be possible that the domain of the data is smaller. Here are some options:
 
-1.
-In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
-to specify the tile of data to be selected.
+1. In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
+   to specify the tile of data to be selected.
 
-2. 
-As of version 5.1, MET includes support for regridding the data it reads.
-Keep TRMM on it's native domain and use the MET tools to do the regridding.
-For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
-the data, and writes a NetCDF file. Alternatively, the "regrid" section
-of the configuration files for the MET tools may be used to do the
-regridding on the fly. For example, run Grid-Stat to compare to the model
-output to TRMM and say 
+2. As of version 5.1, MET includes support for regridding the data it reads.
+   Keep TRMM on it's native domain and use the MET tools to do the regridding.
+   For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
+   the data, and writes a NetCDF file. Alternatively, the "regrid" section
+   of the configuration files for the MET tools may be used to do the
+   regridding on the fly. For example, run Grid-Stat to compare to the model
+   output to TRMM and say 
 
 .. code-block:: none
 		
@@ -1741,19 +1722,18 @@ the above error could indicate that the c- shell is being used instead.
 
 Try the following 2 things:
 
-1.
-Check to make sure this file exists: 
+1. Check to make sure this file exists: 
 
-.. code-block:: none
+  .. code-block:: none
 
-		ls /home/username/BUFRLIB_v10.2.3/libbufr.a
+  		  ls /home/username/BUFRLIB_v10.2.3/libbufr.a
 
-2.		
-Rerun the MET configure command using the following option on the command line: 
+2. Rerun the MET configure command using the following option on the
+   command line: 
 
-.. code-block:: none
+  .. code-block:: none
 		
-		MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
+		  MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
 
 After doing that, please try recompiling MET. If it fails,
 please send met_help@ucar.edu the following log files.
