@@ -649,8 +649,14 @@ Here are 3 commands you could use to plot these data files:
 
 		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
 		WRFPRS_1997-06-03_APCP_A12.ps 'name="APCP_12"; level="(*,*)";' 
+
+.. code-block:: none
+
 		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
 		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
+
+.. code-block:: none
+
 		${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
 **Q. Pcp-Combine - How do I correct a precipitation time range?**
@@ -1094,7 +1100,7 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
-**Q. Stat-Analysis - What is the best way to average the > FSS > scores
+**Q. Stat-Analysis - What is the best way to average the FSS scores
 within several days or even several months using
 'Aggregate to Average Scores'?**
 
@@ -1324,7 +1330,7 @@ A.
 Here is an example of NetCDF that the MET software is not expecting. Here
 is an option for accessing that same TRMM data, following links from the
 MET website:
-http://www.dtcenter.org/met/users/downloads/observation_data.php
+http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
 
 .. code-block:: none
 
