@@ -118,15 +118,13 @@ for the same reason.
 A.
 There are three flavors of NetCDF that MET can read directly.
 
-1.
-Gridded NetCDF output from one of the MET tools
+1. Gridded NetCDF output from one of the MET tools
 
-2.
-Output from the WRF model that has been post-processed using the wrf_interp utility
+2. Output from the WRF model that has been post-processed using the wrf_interp utility
 
-3.
-NetCDF data following the `climate-forecast (CF) convention <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
--conventions.html>`_
+3. NetCDF data following the `climate-forecast (CF) convention
+   <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
+   -conventions.html>`_
 
 Lastly, users can write python scripts to pass data that's gridded to the
 MET tools in memory. If the data doesn't fall into one of those categories,
