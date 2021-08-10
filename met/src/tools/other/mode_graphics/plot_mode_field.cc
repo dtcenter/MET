@@ -472,10 +472,9 @@ switch ( plot_field )  {
       n_obs  = mode_in.n_obs_clus_objs();
       break;
 
-      default:
+   default:
       mlog << Error << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1329,7 +1328,6 @@ switch ( plot_field )  {
    default:
       mlog << Error << "\n\n  " << program_name << ": annotate() -> bad plot field\n\n";
       exit ( 1 );
-      break;
 
 }
 

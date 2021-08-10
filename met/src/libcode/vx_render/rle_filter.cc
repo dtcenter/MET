@@ -76,7 +76,6 @@ switch ( mode )  {
    default:
       mlog << Error << "\nRunLengthEncodeFilter::eat(unsigned char) -> bad mode\n\n";
       exit ( 1 );
-      break;
 
 }
 

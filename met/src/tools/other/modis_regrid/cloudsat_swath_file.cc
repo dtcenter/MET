@@ -401,7 +401,6 @@ for (j=0; j<Nvalues; ++j)  {
               << "\n\n  SatAttribute::dump() -> bad number type ... "
               << numbertype_to_string(Numbertype) << "\n\n";
          exit ( 1 );
-         break;
 
    }   //  switch
 
@@ -573,7 +572,6 @@ switch ( Numbertype )  {
            << "\n\n  SatAttribute::set_value() -> bad numbertype ... "
            << numbertype_to_string(Numbertype) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

@@ -102,7 +102,6 @@ for (j=0; j<(info.n_filters()); ++j)  {
       default:
          mlog << Error << "\nrender()(pbm) -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
-         break;
 
    }   //  switch
 
@@ -161,7 +160,6 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
       default:
          mlog << Error << "\nrender() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
-         break;
 
    }   //  swtich
 

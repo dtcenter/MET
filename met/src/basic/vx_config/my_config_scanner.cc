@@ -253,27 +253,27 @@ switch ( c )  {
       //  single character tokens
       //
 
-   case '[':  { do_single_char_token(lexeme[0]);  is_lhs = false;  dict_stack->push_array();  return ( token(lexeme[0]) ); }  break;
-   case '{':  { do_single_char_token(lexeme[0]);  is_lhs = true;   dict_stack->push();        return ( token(lexeme[0]) ); }  break;
+   case '[':  { do_single_char_token(lexeme[0]);  is_lhs = false;  dict_stack->push_array();  return ( token(lexeme[0]) ); }
+   case '{':  { do_single_char_token(lexeme[0]);  is_lhs = true;   dict_stack->push();        return ( token(lexeme[0]) ); }
 
-   case ']':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
-   case '}':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   case ']':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case '}':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
-   case '(':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
-   case ')':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   case '(':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case ')':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
-   case '+':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   case '+':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
-   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } }  break;
+   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } } break;
 
-   case '*':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
-   case '^':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   case '*':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case '^':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
-   // case '=':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   // case '=':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
 
-   case ';':  { do_single_char_token(lexeme[0]);  is_lhs = true;  return ( token( ';' ) ); }  break;
-   case ',':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+   case ';':  { do_single_char_token(lexeme[0]);  is_lhs = true;  return ( token( ';' ) ); }
+   case ',':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
 
    case '\"': { do_quoted_string();   return ( token ( QUOTED_STRING ) ); }
 

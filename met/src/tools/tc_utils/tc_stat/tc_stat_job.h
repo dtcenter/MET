@@ -158,6 +158,8 @@ struct TCLineCounts {
    int RejOutInitMask;
    int RejOutValidMask;
    int RejLeadReq;
+
+   TCLineCounts();
 };
 
 ////////////////////////////////////////////////////////////////////////
