@@ -327,9 +327,10 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
+   int i, j, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
+   int max_orank_col, hira_width, width_max, n_ens;
    ConcatString base_name;
-
+   
    // Create output file names for the stat file and optional text files
    build_outfile_name(fcst_valid_ut, fcst_lead_sec, "", base_name);
 
@@ -343,21 +344,44 @@ void setup_txt_files() {
    n_prob = conf_info.get_max_n_fprob_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh() + 1;
    n_eclv = conf_info.get_max_n_eclv_points();
-
+   
    // Check for HiRA output
    for(i=0; i<conf_info.get_n_vx(); i++) {
       if(conf_info.vx_opt[i].hira_info.flag) {
+	 cout << "CHECK for HiRA output" << endl;
          n_prob = max(n_prob, conf_info.vx_opt[i].hira_info.cov_ta.n());
+
+	 // Get the maximum hira width
+	 for(j=0; j<conf_info.vx_opt[i].hira_info.width.n(); j++) {
+	    cout << "conf_info.vx_opt[i].hira_info.width[j] = " << conf_info.vx_opt[i].hira_info.width[j] << endl;
+	    hira_width = conf_info.vx_opt[i].hira_info.width[j]; 
+	    width_max = max(hira_width, conf_info.vx_opt[i].hira_info.width[j]);
+	 }
       }
    }
 
+   // Set “n_ens” where the number of “ensemble members” is the maximum hira width squared
+   cout << "width_max = " << width_max << endl;
+   n_ens = width_max * width_max;
+   
+   cout << "n_prob = " << n_prob << endl;
+   cout << "n_cat = " << n_cat << endl;
+   cout << "n_eclv = " << n_eclv << endl;
+   cout << "n_ens = " << n_ens << endl;
+   
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
-
+   max_orank_col = get_n_orank_columns(n_ens);
+   
+   cout << "max_orank_col = " << max_orank_col << endl;
+   
    // Determine the maximum number of data columns
    max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
    max_col = ( max_mctc_col > max_col      ? max_mctc_col : max_col );
-
+   max_col = ( max_orank_col > max_col     ? max_orank_col : max_col );
+   
+   cout << "max_col = " << max_col << endl;
+   
    // Add the header columns
    max_col += n_header_columns + 1;
 
@@ -370,6 +394,8 @@ void setup_txt_files() {
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
 
+   cout << "Before optional output text files: conf_info.n_stat_row() =" << conf_info.n_stat_row() << " max_col = " << max_col << endl; 
+   
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
    setup_table(stat_at);
@@ -429,11 +455,19 @@ void setup_txt_files() {
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
+            case(i_orank):
+               max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
+               break;
+
             default:
                max_col = n_txt_columns[i] + n_header_columns + 1;
                break;
          } // end switch
 
+	 cout << "After switch, max_col = " << max_col << endl;
+	 cout << "i = " << i << endl;
+	 cout << "After switch, conf_info.n_txt_row(i) = " << conf_info.n_txt_row(i) << endl;
+	 
          // Setup the text AsciiTable
          txt_at[i].set_size(conf_info.n_txt_row(i) + 1, max_col);
          setup_table(txt_at[i]);
@@ -463,6 +497,10 @@ void setup_txt_files() {
 
             case(i_eclv):
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
+               break;
+
+            case(i_orank):
+               write_orank_header_row(1, n_ens, txt_at[i], 0, 0);
                break;
 
             default:
