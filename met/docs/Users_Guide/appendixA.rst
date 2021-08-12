@@ -1339,7 +1339,7 @@ http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
 		ftp://disc2.nascom.nasa.gov/data/TRMM/Gridded/3B42_V7/201009/3B42.100921.00z.7.
 		precipitation.bin
 		# Pull Rscript from MET website 
-		wget http://www.dtcenter.org/met/users/downloads/Rscripts/trmmbin2nc.R
+		wget http://dtcenter.org/sites/default/files/community-code/met/r-scripts/trmmbin2nc.R
 		# Edit that Rscript by setting 
 		out_lat_ll = -50 
 		out_lon_ll = 0 
@@ -1787,7 +1787,7 @@ It only uses MET_HDF5.
 
 Our online tutorial can help figure out what should be set and what the
 value should be:
-http://www.dtcenter.org/met/users/support/online_tutorial/METv6.0/tutorial.php?name=compilation&category=configure
+https://met.readthedocs.io/en/latest/Users_Guide/installation.html
 
 **NetCDF install issues**
 
