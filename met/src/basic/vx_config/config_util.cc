@@ -1493,6 +1493,9 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
       exit(1);
    }
 
+   // Initialize
+   cdf_ta.clear();
+
    // Even number of bins cannot be centered
    if(n_bin%2 == 0 && center) {
       mlog << Warning <<  "\nClimoCDFInfo::set_cdf_ta() -> "
