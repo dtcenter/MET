@@ -765,6 +765,9 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                aggr.wgt[req_stat[i]] = empty_na;
             }
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -952,6 +955,9 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.cts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1136,6 +1142,9 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.mcts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1313,6 +1322,9 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.pct_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1538,6 +1550,9 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.nbrcnt_info = cur_nbrcnt;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
@@ -1693,6 +1708,9 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.grad_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1801,6 +1819,9 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.vl1l2_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
@@ -1926,6 +1947,9 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Otherwise, add data to existing map entry
@@ -2204,6 +2228,10 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.hdr.clear();
 
             m[key] = aggr;
+
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
@@ -2304,6 +2332,9 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
             aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2549,6 +2580,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
             aggr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2684,6 +2718,9 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.rps_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -2773,6 +2810,9 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.clear();
             for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2861,6 +2901,9 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.phist_na = cur.phist_na;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -2948,6 +2991,9 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.relp_na = cur.relp_na;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -3051,6 +3097,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
             m[key] = aggr;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -3278,6 +3327,9 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
             cur.fcst_var = line.fcst_var();
             cur.obs_var  = line.obs_var();
             m[key] = cur;
+            mlog << Debug(4) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
