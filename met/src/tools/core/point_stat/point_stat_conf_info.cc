@@ -523,6 +523,26 @@ int PointStatConfInfo::get_max_n_eclv_points() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int PointStatConfInfo::get_max_n_hira_ens() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatConfInfo::get_max_n_hira_prob() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool PointStatConfInfo::get_vflag() const {
    int i;
    bool vflag = false;
@@ -1193,13 +1213,26 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          break;
 
       case(i_ecnt):
-      case(i_orank):
       case(i_rps):
          // Number of HiRA ECNT, ORANK and RPS lines =
          //    Message Types * Masks * Interpolations * HiRA widths *
          //    Alphas
          if(hira_info.flag) {
             n = n_pd * hira_info.width.n() * get_n_ci_alpha();
+         }
+         else {
+            n = 0;
+         }
+
+         break;
+
+      case(i_orank):
+         // Number HiRA ORANK lines possible =
+         //    Number of pairs * Categorical Thresholds *
+         //    HiRA widths
+         if(hira_info.flag) {
+            n = vx_pd.get_n_pair() * get_n_cat_thresh() *
+                hira_info.width.n();
          }
          else {
             n = 0;
@@ -1280,6 +1313,19 @@ int PointStatVxOpt::get_n_fprob_thresh() const {
 int PointStatVxOpt::get_n_oprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
           0 : ocat_ta.n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_hira_ens() const {
+   int n = (hira_info.flag ? hira_info.width.max() : 0);
+   return(n*n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_hira_prob() const {
+   return(hira_info.flag ? hira_info.cov_ta.n() : 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
