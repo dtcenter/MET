@@ -82,7 +82,7 @@ static const int n_txt_columns[n_txt] = {
    n_val1l2_columns, n_pct_columns,    n_pstd_columns,
    n_pjc_columns,    n_prc_columns,    n_ecnt_columns,
    n_orank_columns,  n_rps_columns,    n_eclv_columns,
-   n_mpr_columns, n_vcnt_columns
+   n_mpr_columns,    n_vcnt_columns
 };
 
 // Text file abbreviations
