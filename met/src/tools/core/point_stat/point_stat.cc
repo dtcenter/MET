@@ -327,8 +327,9 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int i, j, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
-   int max_orank_col, hira_width, width_max, n_ens;
+   int i, j;
+   int max_col, max_prob_col, max_mctc_col, max_orank_col;
+   int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
    
    // Create output file names for the stat file and optional text files
@@ -341,47 +342,21 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_prob = max(conf_info.get_max_n_fprob_thresh(),
+                conf_info.get_max_n_hira_prob());
    n_cat  = conf_info.get_max_n_cat_thresh() + 1;
    n_eclv = conf_info.get_max_n_eclv_points();
-   
-   // Check for HiRA output
-   for(i=0; i<conf_info.get_n_vx(); i++) {
-      if(conf_info.vx_opt[i].hira_info.flag) {
-	 cout << "CHECK for HiRA output" << endl;
-         n_prob = max(n_prob, conf_info.vx_opt[i].hira_info.cov_ta.n());
+   n_ens  = conf_info.get_max_n_hira_ens();
 
-	 // Get the maximum hira width
-	 for(j=0; j<conf_info.vx_opt[i].hira_info.width.n(); j++) {
-	    cout << "conf_info.vx_opt[i].hira_info.width[j] = " << conf_info.vx_opt[i].hira_info.width[j] << endl;
-	    hira_width = conf_info.vx_opt[i].hira_info.width[j]; 
-	    width_max = max(hira_width, conf_info.vx_opt[i].hira_info.width[j]);
-	 }
-      }
-   }
-
-   // Set “n_ens” where the number of “ensemble members” is the maximum hira width squared
-   cout << "width_max = " << width_max << endl;
-   n_ens = width_max * width_max;
-   
-   cout << "n_prob = " << n_prob << endl;
-   cout << "n_cat = " << n_cat << endl;
-   cout << "n_eclv = " << n_eclv << endl;
-   cout << "n_ens = " << n_ens << endl;
-   
-   max_prob_col = get_n_pjc_columns(n_prob);
-   max_mctc_col = get_n_mctc_columns(n_cat);
+   max_prob_col  = get_n_pjc_columns(n_prob);
+   max_mctc_col  = get_n_mctc_columns(n_cat);
    max_orank_col = get_n_orank_columns(n_ens);
-   
-   cout << "max_orank_col = " << max_orank_col << endl;
-   
+
    // Determine the maximum number of data columns
-   max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
-   max_col = ( max_mctc_col > max_col      ? max_mctc_col : max_col );
-   max_col = ( max_orank_col > max_col     ? max_orank_col : max_col );
-   
-   cout << "max_col = " << max_col << endl;
-   
+   max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
+   max_col = (max_mctc_col  > max_col      ? max_mctc_col  : max_col);
+   max_col = (max_orank_col > max_col      ? max_orank_col : max_col);
+
    // Add the header columns
    max_col += n_header_columns + 1;
 
