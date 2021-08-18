@@ -115,7 +115,7 @@ References
 .. _Epstein-1969:
 
 | Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
-|   *J. Appl. Meteor.*, 8, 985–987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
+|   *J. Appl. Meteor.*, 8, 985-987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
 |
 
 .. _Gilleland-2010:
@@ -198,7 +198,7 @@ References
 .. _Mason-2008:
 
 | Mason, S. J., 2008: Understanding forecast verification statistics.
-|   *Meteor. Appl.*, 15, 31–40, doi: 10.1002/met.51.
+|   *Meteor. Appl.*, 15, 31-40, doi: 10.1002/met.51.
 |
 
 
@@ -217,7 +217,7 @@ References
 .. _Murphy-1969:
 
 | Murphy, A.H., 1969: On the ranked probability score. *Journal of Applied*
-|   *Meteorology and Climatology*, 8 (6), 988 – 989,
+|   *Meteorology and Climatology*, 8 (6), 988 - 989,
 |   doi: 10.1175/1520-0450(1969)008<0988:OTPS>2.0.CO;2.
 |
 
@@ -279,7 +279,7 @@ References
 
 | Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
 |   Continuous ranked version and its decomposition. *Mon. Wea. Rev.*,
-|   140 (6), 2005 – 2017, doi: 10.1175/MWR-D-11-00266.1.
+|   140 (6), 2005 - 2017, doi: 10.1175/MWR-D-11-00266.1.
 |
 
 .. _Weniger-2016:
