@@ -94,7 +94,6 @@ switch ( n )  {
          //
       mlog << Error << "\nordinal_suffix() -> totally confused!\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

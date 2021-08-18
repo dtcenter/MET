@@ -857,7 +857,6 @@ switch ( op )  {
       mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
            << "bad op ... " << op << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1202,7 +1201,6 @@ if ( Ptype == perc_thresh_climo_dist )  {
               << "threshold to a probability!\n\n";
 
          exit ( 1 );
-         break;
 
    }  // switch
 }

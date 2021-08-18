@@ -297,6 +297,22 @@ bool DataPlane::is_all_bad_data() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+int DataPlane::n_good_data() const {
+   int j, n;
+
+   //
+   // Count number of good data values
+   //
+
+   for(j=0,n=0; j<Nxy; ++j) {
+      if(!is_bad_data(Data[j])) n++;
+   }
+
+   return(n);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 double DataPlane::get(int x, int y) const {
    int n;
 

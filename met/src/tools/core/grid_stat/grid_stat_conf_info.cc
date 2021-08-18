@@ -529,6 +529,12 @@ void GridStatVxOpt::clear() {
    grad_dx.clear();
    grad_dy.clear();
 
+   baddeley_p = bad_data_int;
+   baddeley_max_dist = bad_data_double;
+   fom_alpha = bad_data_double;
+   zhu_weight = bad_data_double;
+   beta_value_fx.clear();
+
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
@@ -808,6 +814,14 @@ void GridStatVxOpt::process_config(
       mlog << Error << "\nGridStatVxOpt::process_config() -> "
            << "The \"" << conf_key_zhu_weight << "\" option ("
            << zhu_weight << ") must be set > 0 and <= 1.\n\n";
+      exit(1);
+   }
+
+   beta_value_fx.set(d->lookup(conf_key_beta_value));
+   if(!beta_value_fx.is_set()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_beta_value
+           << "\" function is not set!\n\n";
       exit(1);
    }
 
@@ -1108,7 +1122,6 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
-         break;
    }
 
    return(n);

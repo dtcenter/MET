@@ -413,7 +413,7 @@ e.g. model = "GFS";
 		
   model = "WRF";
 
-.._desc:
+.. _desc:
 
 :ref:`desc <desc>`
       
@@ -1615,136 +1615,6 @@ This dictionary may include the following entries:
      ];
   }
 
-.. _nbrhd:
-
-:ref:`nbrhd <nbrhd>`
-     
-The "nbrhd" entry is a dictionary that is very similar to the "interp"
-entry. It specifies information for computing neighborhood statistics in
-Grid-Stat. This dictionary may include the following entries:
-
-* The "field" entry specifies to which field(s) the computation of
-  fractional coverage should be applied. Grid-Stat processes each
-  combination of categorical threshold and neighborhood width to
-  derive the fractional coverage fields from which neighborhood
-  statistics are calculated. Users who have computed fractional
-  coverage fields outside of MET can use this option to disable
-  these computations. Instead, the raw input values will be
-  used directly to compute neighborhood statistics:
-
-  * "BOTH" to compute fractional coverage for both the forecast
-    and the observation fields (default).
-    
-  * "FCST" to only process the forecast field.
-     
-  * "OBS"  to only process the observation field.
-     
-  * "NONE" to process neither field.
-
-* The "vld_thresh" entry is described above.
-
-* The "shape" entry defines the shape of the neighborhood.
-  Valid values are "SQUARE" or "CIRCLE"
-
-* The "width" entry is as described above, and must be odd.
-
-* The "cov_thresh" entry is an array of thresholds to be used when
-  computing categorical statistics for the neighborhood fractional
-  coverage field.
-
-.. code-block:: none
-		
-  nbrhd = {
-     field      = BOTH;
-     vld_thresh = 1.0;
-     shape      = SQUARE;
-     width      = [ 1 ];
-     cov_thresh = [ >=0.5 ];
-  }
-
-.. _fourier:
-
-:ref:`fourier <fourier>`
-     
-The "fourier" entry is a dictionary which specifies the application of the
-Fourier decomposition method. It consists of two arrays of the same length
-which define the beginning and ending wave numbers to be included. If the
-arrays have length zero, no Fourier decomposition is applied. For each array
-entry, the requested Fourier decomposition is applied to the forecast and
-observation fields. The beginning and ending wave numbers are indicated in
-the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves
-0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition
-is computed along the Y-dimension only (i.e. the columns of data). It is only
-defined when each grid point contains valid data. If either input field
-contains missing data, no Fourier decomposition is computed.
-
-The available wave numbers start at 0 (the mean across each row of data)
-and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension
-of the verification grid:
-
-* The "wave_1d_beg" entry is an array of integers specifying the first
-  wave number to be included.
-
-* The "wave_1d_end" entry is an array of integers specifying the last
-  wave number to be included.
-
-.. code-block:: none
-		
-  fourier = {
-     wave_1d_beg = [ 0, 4, 10 ];
-     wave_1d_end = [ 3, 9, 20 ];
-  }
-
-.. _gradient:
-
-:ref:`gradient <gradient>`
-  
-The "gradient" entry is a dictionary which specifies the number and size of
-gradients to be computed. The "dx" and "dy" entries specify the size of the
-gradients in grid units in the X and Y dimensions, respectively. dx and dy
-are arrays of integers (positive or negative) which must have the same
-length, and the GRAD output line type will be computed separately for each
-entry. When computing gradients, the value at the (x, y) grid point is
-replaced by the value at the (x+dx, y+dy) grid point minus the value at
-(x, y).
-
-This configuration option may be set separately in each "obs.field" entry.
-
-.. code-block:: none
-		
-  gradient = {
-     dx = [ 1 ];
-     dy = [ 1 ];
-  }
-
-.. _distance_map:
-
-:ref:`distance_map <distance_map>`
-     
-The "distance_map" entry is a dictionary containing options related to the
-distance map statistics in the DMAP output line type. The "baddeley_p" entry
-is an integer specifying the exponent used in the Lp-norm when computing the
-Baddeley Delta metric. The "baddeley_max_dist" entry is a floating point
-number specifying the maximum allowable distance for each distance map. Any
-distances larger than this number will be reset to this constant. A value of
-NA indicates that no maximum distance value should be used. The "fom_alpha"
-entry is a floating point number specifying the scaling constant to be used
-when computing Pratt's Figure of Merit. The "zhu_weight" specifies a value
-between 0 and 1 to define the importance of the RMSE of the binary fields
-(i.e. amount of overlap) versus the mean-error distance (MED). The default
-value of 0.5 gives equal weighting.
-
-This configuration option may be set separately in each "obs.field" entry.
-
-.. code-block:: none
-		
-  distance_map = {
-     baddeley_p        = 2;
-     baddeley_max_dist = NA;
-     fom_alpha         = 0.1;
-     zhu_weight        = 0.5;
-  }
-  
 .. _land_mask:
 
 :ref:`land_mask <land_mask>`

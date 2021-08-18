@@ -124,7 +124,6 @@ ConcatString get_grib_level_list_str(int k, int grib_level)
                  << "unexpected value for k: " << k
                  << "\n\n";
             exit(1);
-            break;
 
       }   //  switch
 

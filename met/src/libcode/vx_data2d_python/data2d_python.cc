@@ -208,7 +208,6 @@ switch ( Type )  {   //  assumes Type is already set
            << "MetPythonDataFile::open(const char * script_filename) -> bad file type: "
            << grdfiletype_to_string(Type) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

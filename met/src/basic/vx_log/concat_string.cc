@@ -834,7 +834,6 @@ switch ( c )  {
      mlog << Error << "\noperator<<(ostream &, CSInlineCommand) -> "
           << "bad CSInlineCommand value\n\n";
      exit ( 1 );
-     break;
 
 }   //  switch
 

@@ -239,7 +239,6 @@ switch ( type )  {
       mlog << Error << "\nAfmToken::as_double() const -> bad token type!\n\n";
       dump(cerr);
       exit ( 1 );
-      break;
 
 };
 

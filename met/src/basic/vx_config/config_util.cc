@@ -1493,6 +1493,9 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
       exit(1);
    }
 
+   // Initialize
+   cdf_ta.clear();
+
    // Even number of bins cannot be centered
    if(n_bin%2 == 0 && center) {
       mlog << Warning <<  "\nClimoCDFInfo::set_cdf_ta() -> "
@@ -2450,7 +2453,6 @@ ConcatString fieldtype_to_string(FieldType type) {
          mlog << Error << "\nfieldtype_to_string() -> "
               << "Unexpected FieldType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2520,7 +2522,6 @@ ConcatString setlogic_to_string(SetLogic type) {
          mlog << Error << "\nsetlogic_to_string() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2541,7 +2542,6 @@ ConcatString setlogic_to_abbr(SetLogic type) {
          mlog << Error << "\nsetlogic_to_abbr() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2562,7 +2562,6 @@ ConcatString setlogic_to_symbol(SetLogic type) {
          mlog << Error << "\nsetlogic_to_symbol() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2642,7 +2641,6 @@ ConcatString tracktype_to_string(TrackType type) {
          mlog << Error << "\ntracktype_to_string() -> "
               << "Unexpected TrackType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2698,7 +2696,6 @@ ConcatString interp12type_to_string(Interp12Type type) {
          mlog << Error << "\ninterp12type_to_string() -> "
               << "Unexpected Interp12Type value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2738,7 +2735,6 @@ ConcatString mergetype_to_string(MergeType type) {
          mlog << Error << "\nmergetype_to_string() -> "
               << "Unexpected MergeType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2765,7 +2761,6 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
          mlog << Error << "\nobssummary_to_string() -> "
               << "Unexpected ObsSummary value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2805,7 +2800,6 @@ ConcatString matchtype_to_string(MatchType type) {
          mlog << Error << "\nmatchtype_to_string() -> "
               << "Unexpected MatchType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2873,7 +2867,6 @@ ConcatString disttype_to_string(DistType type) {
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2915,7 +2908,6 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
          mlog << Error << "\ngriddecomptype_to_string() -> "
               << "Unexpected GridDecompType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2939,7 +2931,6 @@ ConcatString wavelettype_to_string(WaveletType type) {
          mlog << Error << "\nwavlettype_to_string() -> "
               << "Unexpected WaveletType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);

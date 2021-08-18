@@ -391,7 +391,6 @@ void process_mask_file(DataPlane &dp) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "Unxpected MaskType value (" << mask_type << ")\n\n";
          exit(1);
-         break;
    }
 
    // Clean up
