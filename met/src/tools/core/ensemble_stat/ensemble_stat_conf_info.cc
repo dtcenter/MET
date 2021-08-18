@@ -691,7 +691,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    vx_pd.obs_info->set_dict(odict);
 
    // Set the GRIB code for point observations
-   if(!use_var_id) vx_pd.obs_info->add_grib_code(odict);
+   if(point_vx && !use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
