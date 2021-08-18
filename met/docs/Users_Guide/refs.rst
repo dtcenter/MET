@@ -9,6 +9,13 @@ References
 |   Atlantic Basin. *Weather & Forecasting*,  13, 1005-1015.
 |
 
+.. _Ahijevych-2009:
+
+| Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009. Application of
+|   spatial verification methods to idealized and NWP-gridded precipitation forecasts.
+|   Weather Forecast., 24 (6), 1485 - 1497, doi: 10.1175/2009WAF2222298.1.
+|
+
 .. _Barker-1991:
 
 
@@ -115,12 +122,36 @@ References
 
 | Gilleland, E., 2010: Confidence intervals for forecast verification.
 |   *NCAR Technical Note* NCAR/TN-479+STR, 71pp.
+|
 
-.. _Gilleland-2019:
+.. _Gilleland-2017:
 
-| Gilleland, E., 2019: Bootstrap methods for statistical inference. Part II:
-|   Extreme-value analysis. Submitted to the Journal of Atmospheric and
-|   Oceanic Technology on 2 December 2019. Re-submitted on 12 May 2020
+| Gilleland, E., 2017. A new characterization in the spatial verification
+|   framework for false alarms, misses, and overall patterns.
+|   Weather Forecast., 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
+|
+
+
+.. _Gilleland_PartI-2020:
+
+| Gilleland, E., 2020. Bootstrap methods for statistical inference.
+|   Part I: Comparative forecast verification for continuous variables.
+|   Journal of Atmospheric and Oceanic Technology, 37 (11), 2117 - 2134,
+|   doi: 10.1175/JTECH-D-20-0069.1.
+|
+
+.. _Gilleland_PartII-2020:
+
+| Gilleland, E., 2020. Bootstrap methods for statistical inference.
+|   Part II: Extreme-value analysis. Journal of Atmospheric and Oceanic
+|   Technology, 37 (11), 2135 - 2144, doi: 10.1175/JTECH-D-20-0070.1.
+|
+
+.. _Gilleland-2021:
+
+| Gilleland, E., 2021. Novel measures for summarizing high-resolution forecast
+|   performance. Advances in Statistical Climatology, Meteorology and Oceanography,
+|   7 (1), 13 - 34, doi: 10.5194/ascmo-7-13-2021.
 |
 
 .. _Gneiting-2004:

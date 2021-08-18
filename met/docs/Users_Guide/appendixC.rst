@@ -1134,7 +1134,7 @@ A mathematical metric, :math:`m(A,B)\geq 0`, must have the following three prope
 
 The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < m(A,B)`.
 
-It has been argued in :ref:`Gilleland (2019) <Gilleland-2019>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
+It has been argued in :ref:`Gilleland (2017) <Gilleland-2017>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
 The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's :math:`\Delta` Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 
@@ -1204,6 +1204,29 @@ Another measure incorporates the amount of actual overlap between the event sets
 where MED *(A,B)* is as in the Mean-error distance, *N* is the total number of grid squares as in Baddeley's :math:`\Delta` metric, :math:`I_{F}(s) ((I_{O}(s))` is the binary field derived from the forecast (observation), and :math:`\lambda` is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight :math:`(\lambda=\frac{1}{2})` is sufficient. In Zhu et al (2011), they actually only consider :math:`Z(F,O)` and not :math:`Z(O,F)`, but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience. 
 
 The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
+
+.. _App_C-gbeta:
+
+:math:`G` and :math:`G_\beta`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Called "G" and "GBETA" in the DMAP output :numref:`table_GS_format_info_DMAP`
+
+See :numref:`grid-stat_gbeta` for a description.
+
+Let :math:`y = {y_1}{y_2}` where :math:`y_1 = n_A + n_B - 2n_{AB}`, and :math:`y_2 = MED(A,B) \cdot n_B + MED(B,A) \cdot n_A`, with the mean-error distance (:math:`MED`) as described above, and where :math:`n_{A}`, :math:`n_{B}`, and :math:`n_{AB}` are the number of events within event areas *A*, *B*, and the intersection of *A* and *B*, respectively.
+
+The :math:`G` performance measure is given by
+
+.. math:: G(A,B) = y^{1/3}
+
+and the :math:`G_\beta` performance measure is given by
+
+.. math:: G_\beta(A,B) = max\{1-\frac{y}{\beta}, 0\}
+
+where :math:`\beta > 0` is a user-chosen parameter with a default value of :math:`n^2 / 2.0` with :math:`n` equal to the number of points in the domain. The square-root of :math:`G` will give units of grid points, where :math:`y^{1/3}` gives units of grid points squared.
+
+The range for :math:`G_\beta` is 0 to 1, with a score of 1 indicating a perfect forecast.
 
 Calculating Percentiles
 _______________________
