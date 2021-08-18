@@ -369,8 +369,6 @@ void setup_txt_files() {
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
 
-   cout << "Before optional output text files: conf_info.n_stat_row() =" << conf_info.n_stat_row() << " max_col = " << max_col << endl; 
-   
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
    setup_table(stat_at);
@@ -439,11 +437,7 @@ void setup_txt_files() {
                break;
          } // end switch
 
-	 cout << "After switch, max_col = " << max_col << endl;
-	 cout << "i = " << i << endl;
-	 cout << "After switch, conf_info.n_txt_row(i) = " << conf_info.n_txt_row(i) << endl;
-	 
-         // Setup the text AsciiTable
+	 // Setup the text AsciiTable
          txt_at[i].set_size(conf_info.n_txt_row(i) + 1, max_col);
          setup_table(txt_at[i]);
 
@@ -1747,13 +1741,11 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          if(gt) { delete gt; gt = 0; }
          continue;
       }
-
+      
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
-
-	 cout << "Doing ECNT ensemble statistics" << endl; 
 	 
-         // Compute ensemble statistics
+	 //Compute ensemble statistics
          hira_pd.compute_pair_vals(rng_ptr);
          ECNTInfo ecnt_info;
          ecnt_info.set(hira_pd);
@@ -1762,33 +1754,23 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             conf_info.vx_opt[i_vx].output_flag[i_ecnt],
             stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
-
-	 cout << "Check after write_ecnt_row" << endl; 
-	 
       } // end if ECNT
 
       // Write out the ORANK line
       if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
-
-	 cout << "Doing ORANK ensemble statistics" << endl; 
 	 
-         // Compute ensemble statistics
+	 // Compute ensemble statistics
          hira_pd.compute_pair_vals(rng_ptr);
 	 
 	 write_orank_row(shc, &hira_pd,
 	    conf_info.vx_opt[i_vx].output_flag[i_orank],
 	    stat_at, i_stat_row,
 	    txt_at[i_orank], i_txt_row[i_orank]);
-
-	 cout << "Check after write_orank_row" << endl; 
-	 
       } // end if ORANK
 
       // Write out the RPS line
       if(conf_info.vx_opt[i_vx].output_flag[i_rps] != STATOutputType_None) {
 
-         cout << "Doing RPS ensemble statistics" << endl; 
-	 
          // Store ensemble RPS thresholds
          RPSInfo rps_info;
          rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].hira_info.prob_cat_ta);
@@ -1831,9 +1813,6 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].output_flag[i_rps],
                        stat_at, i_stat_row,
                        txt_at[i_rps], i_txt_row[i_rps]);
-
-	 cout << "Check after write_rps_row" << endl; 
-	 
       } // end if RPS
 
       if(gt) { delete gt; gt = 0; }
@@ -1965,17 +1944,13 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType_None) {
-
-	    cout << "Doing MPR probability statistics" << endl;
 	    
-            write_mpr_row(shc, &hira_pd,
+	    write_mpr_row(shc, &hira_pd,
                conf_info.vx_opt[i_vx].output_flag[i_mpr],
                stat_at, i_stat_row,
                txt_at[i_mpr], i_txt_row[i_mpr], false);
 
-	    cout << "Check after write_mpr_row" << endl;
-
-            // Reset the observation valid time
+	    // Reset the observation valid time
             shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
             shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
          }
@@ -1985,7 +1960,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out PCT
          if(conf_info.vx_opt[i_vx].output_flag[i_pct] != STATOutputType_None) {
-            write_pct_row(shc, pct_info,
+
+	    write_pct_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pct],1, 1,
                stat_at, i_stat_row,
                txt_at[i_pct], i_txt_row[i_pct], false);
@@ -1994,42 +1970,29 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // Write out PSTD
          if(conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType_None) {
 
-	    cout << "Doing PSTD probability statistics" << endl;
-	    
-            write_pstd_row(shc, pct_info,
+	    write_pstd_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pstd], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_pstd], i_txt_row[i_pstd], false);
-
-	    cout << "Check after write_pstd_row" << endl;
          }
 
          // Write out PJC
          if(conf_info.vx_opt[i_vx].output_flag[i_pjc] != STATOutputType_None) {
 
-	    cout << "Doing PJC probability statistics" << endl;
-	    
-            write_pjc_row(shc, pct_info,
+	    write_pjc_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pjc], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_pjc], i_txt_row[i_pjc], false);
-
-	    cout << "Check after write_pjc_row" << endl;
-	    
          }
-
+	 
          // Write out PRC
          if(conf_info.vx_opt[i_vx].output_flag[i_prc] != STATOutputType_None) {
-
-	    cout << "Doing PRC probability statistics" << endl;
 	    
-            write_prc_row(shc, pct_info,
+	    write_prc_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_prc], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_prc], i_txt_row[i_prc], false);
-	    
-	    cout << "Check after write_prc_row" << endl;
-         }
+	 }
 
       } // end for j
    } // end for i
