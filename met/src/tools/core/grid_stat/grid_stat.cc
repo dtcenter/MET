@@ -1210,6 +1210,13 @@ void process_scores() {
             DataPlane fcst_dp_dmap, obs_dp_dmap;
             pd.extend(grid.nx()*grid.ny());
 
+            // Mask out missing data between the fields for a fair comparison
+            DataPlane fcst_dp_mm = fcst_dp;
+            DataPlane obs_dp_mm  = obs_dp;
+            mask_bad_data(fcst_dp_mm, obs_dp_mm);
+            mask_bad_data(obs_dp_mm, fcst_dp_mm);
+            int n_good_data = obs_dp_mm.n_good_data();
+
             // Loop over the categorical thresholds
             for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
@@ -1233,7 +1240,7 @@ void process_scores() {
 
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
-                                     &fcst_dp, &obs_dp,
+                                     &fcst_dp_mm, &obs_dp_mm,
                                      &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
@@ -1249,7 +1256,7 @@ void process_scores() {
                      fcst_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
 
-                     fcst_dp_thresh = fcst_dp;
+                     fcst_dp_thresh = fcst_dp_mm;
                      fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
                      fcst_dp_dmap = distance_map(fcst_dp_thresh);
 
@@ -1268,7 +1275,7 @@ void process_scores() {
                      obs_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
 
-                     obs_dp_thresh = obs_dp;
+                     obs_dp_thresh = obs_dp_mm;
                      obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
                      obs_dp_dmap = distance_map(obs_dp_thresh);
 
@@ -1298,7 +1305,9 @@ void process_scores() {
                         conf_info.vx_opt[i].baddeley_p,
                         conf_info.vx_opt[i].baddeley_max_dist,
                         conf_info.vx_opt[i].fom_alpha,
-                        conf_info.vx_opt[i].zhu_weight);
+                        conf_info.vx_opt[i].zhu_weight,
+                        conf_info.vx_opt[i].beta_value_fx((double) n_good_data),
+                        n_good_data);
 
                   // Compute DMAP statistics
                   dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
