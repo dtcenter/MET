@@ -17,6 +17,7 @@
 //   000    10/01/19  Fillmore        New
 //   001    07/28/20  Halley Gotway   Updates for #1391.
 //   002    03/04/21  Halley Gotway   Bugfix #1694.
+//   003    08/20/21  Halley Gotway   Bugfix #1886 for integer overflow.
 //
 ////////////////////////////////////////////////////////////////////////
 
