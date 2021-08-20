@@ -218,6 +218,16 @@ void process_command_line(int argc, char **argv) {
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
                         &data_grid, &data_grid);
 
+   // The regrid.to_grid option cannot be set to FCST or OBS
+   if(conf_info.data_info[0]->regrid().field == FieldType_Fcst ||
+      conf_info.data_info[0]->regrid().field == FieldType_Obs) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the \"regrid.to_grid\" configuration option cannot be set to "
+           << "FCST or OBS!\nSpecify a named grid, grid specification string, "
+           << "or the path to a gridded data file instead.\n\n";
+      exit(1);
+   }
+
    // Process masking regions
    conf_info.process_masks(grid);
 }
@@ -474,9 +484,9 @@ void setup_nc_file(void) {
 	nc_out = open_ncfile(out_file.c_str(), true);
 
 	if(IS_INVALID_NC_P(nc_out)) {
-		mlog << Error << "\nsetup_nc_file() -> "
-			<< "trouble opening output NetCDF file "
-			<< out_file << "\n\n";
+      mlog << Error << "\nsetup_nc_file() -> "
+			  << "trouble opening output NetCDF file "
+			  << out_file << "\n\n";
 		exit(1);
 	}
 
