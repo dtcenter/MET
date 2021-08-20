@@ -292,7 +292,6 @@ switch ( Ptype )  {
            << cgraphbase_plottype_to_string(Ptype) 
            << " is not yet supported.\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1035,7 +1034,6 @@ if ( render_flag )  {
             mlog << Error << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
                  << fill_flag << " is not supported\n\n";
             exit ( 1 );
-            break;
 
 
       }   //  switch
@@ -1461,7 +1459,6 @@ switch ( k )  {
    default:
       mlog << Error << "\n\n  CgraphBase::setlinecap(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1495,7 +1492,6 @@ switch ( k )  {
    default:
       mlog << Error << "\n\n  CgraphBase::setlinejoin(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

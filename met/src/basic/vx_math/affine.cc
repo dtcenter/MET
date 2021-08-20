@@ -1144,7 +1144,6 @@ switch ( g )  {
       mlog << Error << "\nConformalAffine::set() -> "
            << "bad gravity ... " << viewgravity_to_string(g) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1421,7 +1420,6 @@ switch ( g )  {
            << "\n\n  viewgravity_to_uv() -> bad gravity ... " 
            << viewgravity_to_string(g) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

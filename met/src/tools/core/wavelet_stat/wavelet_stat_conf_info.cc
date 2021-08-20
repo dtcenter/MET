@@ -342,7 +342,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
          exit(1);
-         break;
    }
 
    // Conf: wavelet.member
@@ -389,7 +388,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
          exit(1);
-         break;
    }
 
    // Initialize the requested wavelet
@@ -569,7 +567,6 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
               << "Unsupported grid decomposition type of "
               << grid_decomp_flag << ".\n\n";
          exit(1);
-         break;
    } // end switch
 
    // Compute n_scale based on tile_dim

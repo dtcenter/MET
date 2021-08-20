@@ -118,7 +118,7 @@ climo_mean = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "DTC165", "DTC166" ];
+   grid = [ "FULL", "DTC165", "DTC166" ];
    poly = [ "${TEST_OUT_DIR}/gen_vx_mask/CONUS_poly.nc",
             "MET_BASE/poly/LMV.poly" ];
 }
@@ -199,6 +199,8 @@ distance_map = {
    baddeley_p        = 2;
    baddeley_max_dist = NA;
    fom_alpha         = 0.1;
+   zhu_weight        = 0.5;
+   beta_value(n)     = n * n / 2.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

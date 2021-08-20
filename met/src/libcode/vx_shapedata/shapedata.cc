@@ -1801,7 +1801,6 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          mlog << Error << "\nboundary_step() -> "
               << "bad direction: " << direction << "\n\n";
          exit(1);
-         break;
    }
 
    //
@@ -1836,7 +1835,6 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
               << "bad step case: "
               << get_step_case(lr, ur, ul, ll) << "\n\n";
          exit(1);
-         break;
    }
 
    return;

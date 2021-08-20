@@ -1476,7 +1476,6 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
          mlog << Error << "\ncheck_fo_thresh() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(status);

@@ -290,7 +290,6 @@ switch ( Orientation )  {
       mlog << Error << "\nvoid PSfile::do_prolog() -> bad document orientation ... "
            << documentorientation_to_string(Orientation) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -303,7 +302,6 @@ switch ( Media )  {
       mlog << Error << "\nvoid PSfile::do_prolog() -> bad document media ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -708,7 +706,6 @@ switch ( fill_flag )  {
       mlog << Error << "\nPSfile::write_single_node() -> "
            << "unrecognized fill flag: \"" << fill_flag << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1154,7 +1151,6 @@ switch ( Media )  {
       mlog << Error << "\nPSfile::set_media(DocumentMedia) -> bad media size ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -1469,7 +1465,6 @@ switch ( f )  {
       mlog << Error << "\n\n  PSfile::set_family(FontFamily) -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1971,7 +1966,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_roman() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2005,7 +1999,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_italic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2039,7 +2032,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_bold() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2073,7 +2065,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_bolditalic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
