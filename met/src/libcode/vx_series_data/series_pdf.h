@@ -30,7 +30,7 @@ using namespace netCDF;
 
 void init_pdf(
     int n,
-    vector<int>& pdf);
+    vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,21 +38,21 @@ void init_pdf(
     double min,
     double max,
     double delta,
-    vector<int>& pdf);
+    vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
 void init_joint_pdf(
     int n_A,
     int n_B,
-    vector<int>& pdf);
+    vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
 void update_pdf(
     double min,
     double delta,
-    vector<int>& pdf,
+    vector<long long>& pdf,
     const DataPlane&,
     const MaskPlane&);
 
@@ -65,7 +65,7 @@ void update_joint_pdf(
     double min_B,
     double delta_A,
     double delta_B,
-    vector<int>& pdf,
+    vector<long long>& pdf,
     const DataPlane&,
     const DataPlane&,
     const MaskPlane&);
@@ -75,7 +75,7 @@ void update_joint_pdf(
 void print_pdf(
     double min,
     double delta,
-    const vector<int>& pdf);
+    const vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +84,7 @@ void write_nc_pdf(
     const VarInfo& info,
     double min,
     double delta,
-    const vector<int>& pdf);
+    const vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 

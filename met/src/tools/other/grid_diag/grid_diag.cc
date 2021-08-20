@@ -426,7 +426,7 @@ void setup_histograms(void) {
 	      << "Initializing " << data_info->magic_str_attr()
 	      << " histogram with " << n_bins << " bins from "
 	      << min << " to " << max << ".\n";
-      histograms[i_var_str] = vector<int>();
+      histograms[i_var_str] = vector<long long>();
       init_pdf(n_bins, histograms[i_var_str]);
    } // for i_var
 }
@@ -456,7 +456,7 @@ void setup_joint_histograms(void) {
               << "Initializing " << data_info->magic_str_attr() << "_"
               << joint_info->magic_str_attr() << " joint histogram with "
               << n_bins << " x " << n_joint_bins << " bins.\n";
-         joint_histograms[ij_var_str] = vector<int>();
+         joint_histograms[ij_var_str] = vector<long long>();
 
          init_joint_pdf(n_bins, n_joint_bins,
                         joint_histograms[ij_var_str]);
@@ -568,7 +568,7 @@ void setup_nc_file(void) {
       ConcatString hist_name("hist_");
       hist_name.add(var_name);
       NcDim var_dim = data_var_dims[i_var];
-      NcVar hist_var = add_var(nc_out, hist_name, ncInt, var_dim,
+      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, var_dim,
                                deflate_level);
       hist_vars.push_back(hist_var);
 
@@ -602,7 +602,7 @@ void setup_nc_file(void) {
          dims.push_back(var_dim);
          dims.push_back(joint_dim);
 
-         NcVar hist_var = add_var(nc_out, hist_name, ncInt, dims,
+         NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
                                   deflate_level);
          joint_hist_vars.push_back(hist_var);
 
@@ -620,7 +620,7 @@ void write_nc_var_int(const char *var_name, const char *long_name,
                       int n) {
 
    // Add the variable
-   NcVar var = add_var(nc_out, var_name, ncInt);
+   NcVar var = add_var(nc_out, var_name, ncInt64);
    add_att(&var, "long_name", long_name);
 
    if(!put_nc_data(&var, &n)) {
@@ -650,7 +650,7 @@ void write_histograms(void) {
       VarInfo *data_info = conf_info.data_info[i_var];
       NcVar hist_var = hist_vars[i_var];
 
-      int *hist = histograms[i_var_str].data();
+      long long *hist = histograms[i_var_str].data();
 
       hist_var.putVar(hist);
    }
@@ -676,7 +676,7 @@ void write_joint_histograms(void) {
                     << "VAR" << i_var << "_"
                     << "VAR" << j_var;
 
-         int *hist = joint_histograms[ij_var_str].data();
+         long long *hist = joint_histograms[ij_var_str].data();
 
          offsets.clear();
          counts.clear();
