@@ -1980,7 +1980,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                stat_at, i_stat_row,
                txt_at[i_pjc], i_txt_row[i_pjc], false);
          }
-	 
+
          // Write out PRC
          if(conf_info.vx_opt[i_vx].output_flag[i_prc] != STATOutputType_None) {
             write_prc_row(shc, pct_info,
