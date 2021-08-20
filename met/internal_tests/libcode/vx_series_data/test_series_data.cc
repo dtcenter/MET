@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     double delta = (max - min) / nbin;
     double width = 10;
 
-    vector<int> pdf;
+    vector<long long> pdf;
 
     init_pdf(nbin, pdf);
 
