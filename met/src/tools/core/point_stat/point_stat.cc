@@ -437,7 +437,7 @@ void setup_txt_files() {
                break;
          } // end switch
 
-	 // Setup the text AsciiTable
+         // Setup the text AsciiTable
          txt_at[i].set_size(conf_info.n_txt_row(i) + 1, max_col);
          setup_table(txt_at[i]);
 
@@ -1741,11 +1741,11 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          if(gt) { delete gt; gt = 0; }
          continue;
       }
-      
+
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
-	 
-         //Compute ensemble statistics
+
+         // Compute ensemble statistics
          hira_pd.compute_pair_vals(rng_ptr);
          ECNTInfo ecnt_info;
          ecnt_info.set(hira_pd);
@@ -1758,14 +1758,14 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Write out the ORANK line
       if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
-	 
-	 // Compute ensemble statistics
+
+         // Compute ensemble statistics
          hira_pd.compute_pair_vals(rng_ptr);
-	 
-	 write_orank_row(shc, &hira_pd,
-	    conf_info.vx_opt[i_vx].output_flag[i_orank],
-	    stat_at, i_stat_row,
-	    txt_at[i_orank], i_txt_row[i_orank]);
+
+         write_orank_row(shc, &hira_pd,
+            conf_info.vx_opt[i_vx].output_flag[i_orank],
+	         stat_at, i_stat_row,
+	         txt_at[i_orank], i_txt_row[i_orank]);
       } // end if ORANK
 
       // Write out the RPS line
@@ -1944,13 +1944,12 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType_None) {
-	    
-	    write_mpr_row(shc, &hira_pd,
+            write_mpr_row(shc, &hira_pd,
                conf_info.vx_opt[i_vx].output_flag[i_mpr],
                stat_at, i_stat_row,
                txt_at[i_mpr], i_txt_row[i_mpr], false);
 
-	    // Reset the observation valid time
+            // Reset the observation valid time
             shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
             shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
          }
@@ -1960,8 +1959,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out PCT
          if(conf_info.vx_opt[i_vx].output_flag[i_pct] != STATOutputType_None) {
-
-	    write_pct_row(shc, pct_info,
+            write_pct_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pct],1, 1,
                stat_at, i_stat_row,
                txt_at[i_pct], i_txt_row[i_pct], false);
@@ -1969,8 +1967,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out PSTD
          if(conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType_None) {
-
-	    write_pstd_row(shc, pct_info,
+            write_pstd_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pstd], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_pstd], i_txt_row[i_pstd], false);
@@ -1978,8 +1975,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Write out PJC
          if(conf_info.vx_opt[i_vx].output_flag[i_pjc] != STATOutputType_None) {
-
-	    write_pjc_row(shc, pct_info,
+            write_pjc_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_pjc], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_pjc], i_txt_row[i_pjc], false);
@@ -1987,12 +1983,11 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 	 
          // Write out PRC
          if(conf_info.vx_opt[i_vx].output_flag[i_prc] != STATOutputType_None) {
-	    
-	    write_prc_row(shc, pct_info,
+            write_prc_row(shc, pct_info,
                conf_info.vx_opt[i_vx].output_flag[i_prc], 1, 1,
                stat_at, i_stat_row,
                txt_at[i_prc], i_txt_row[i_prc], false);
-	 }
+         }
 
       } // end for j
    } // end for i
