@@ -764,7 +764,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
-   
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 

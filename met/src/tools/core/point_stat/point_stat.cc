@@ -1745,7 +1745,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
 	 
-	 //Compute ensemble statistics
+         //Compute ensemble statistics
          hira_pd.compute_pair_vals(rng_ptr);
          ECNTInfo ecnt_info;
          ecnt_info.set(hira_pd);
