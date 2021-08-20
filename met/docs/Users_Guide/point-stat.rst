@@ -453,7 +453,7 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table counts for Probabilistic forecasts
 
