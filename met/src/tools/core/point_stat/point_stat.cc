@@ -331,7 +331,7 @@ void setup_txt_files() {
    int max_col, max_prob_col, max_mctc_col, max_orank_col;
    int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
-   
+
    // Create output file names for the stat file and optional text files
    build_outfile_name(fcst_valid_ut, fcst_lead_sec, "", base_name);
 

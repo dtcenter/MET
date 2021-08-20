@@ -453,28 +453,27 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **PCT** for Contingency Table counts for Probabilistic forecasts
+11. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
 
-12. **PSTD** for contingency table Statistics for Probabilistic forecasts with Dichotomous outcomes
+12. **PCT** for Contingency Table counts for Probabilistic forecasts
 
-13. **PJC** for Joint and Conditional factorization for Probabilistic forecasts
+13. **PSTD** for contingency table Statistics for Probabilistic forecasts with Dichotomous outcomes
 
-14. **PRC** for Receiver Operating Characteristic for Probabilistic forecasts
+14. **PJC** for Joint and Conditional factorization for Probabilistic forecasts
 
-15. **ECNT** for Ensemble Continuous Statistics is only computed for the HiRA methodology
+15. **PRC** for Receiver Operating Characteristic for Probabilistic forecasts
 
-16. **ORANK** for Ensemble Matched Pair Information when point observations are supplied for the HiRA methodology
+16. **ECNT** for Ensemble Continuous Statistics is only computed for the HiRA methodology
 
-17. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
+17. **ORANK** for Ensemble Matched Pair Information when point observations are supplied for the HiRA methodology
 
-18. **ECLV** for Economic Cost/Loss Relative Value
+18. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
 
-19. **MPR** for Matched Pair data
+19. **ECLV** for Economic Cost/Loss Relative Value
 
-20. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
+20. **MPR** for Matched Pair data
 
-
-Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
+Note that the FHO and CTC line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
 
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 
