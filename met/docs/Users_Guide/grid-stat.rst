@@ -388,7 +388,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VCNT** for Vector Contingency Table Statistics
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table Counts for Probabilistic forecasts
 

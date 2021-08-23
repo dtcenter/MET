@@ -121,7 +121,7 @@ The forecast value at P is chosen as the grid point inside the interpolation are
 HiRA framework
 ~~~~~~~~~~~~~~
 
-The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (:ref:`Mittermaier, 2014 <Mittermaier-2014>`). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the **output_flag** dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
+The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (:ref:`Mittermaier, 2014 <Mittermaier-2014>`). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in three ways. First, the ensemble continuous statistics (ECNT), the observation rank statistics (ORANK) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), observation rank statistics (ORANK) or ranked probability score (RPS) line types in the **output_flag** dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated.
 
@@ -425,6 +425,7 @@ ________________________
      pjc    = BOTH;
      prc    = BOTH;
      ecnt   = BOTH;  // Only for HiRA
+     orank  = BOTH;  // Only for HiRA
      rps    = BOTH;  // Only for HiRA
      eclv   = BOTH;
      mpr    = BOTH;
@@ -450,9 +451,9 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 9. **VL1L2** for Vector L1L2 Partial Sums
 
-10. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
+10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table counts for Probabilistic forecasts
 
@@ -464,13 +465,15 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 16. **ECNT** for Ensemble Continuous Statistics is only computed for the HiRA methodology
 
-17. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
+17. **ORANK** for Ensemble Matched Pair Information when point observations are supplied for the HiRA methodology
 
-18. **ECLV** for Economic Cost/Loss Relative Value
+18. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
 
-19. **MPR** for Matched Pair data
+19. **ECLV** for Economic Cost/Loss Relative Value
 
-Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
+20. **MPR** for Matched Pair data
+
+Note that the FHO and CTC line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
 
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 
@@ -489,9 +492,9 @@ point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-
 
 The output ASCII files are named similarly:
 
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv, sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, orank, rps, eclv, sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
 
-The first set of header columns are common to all of the output files generated by the Point-Stat tool. Tables describing the contents of the header columns and the contents of the additional columns for each line type are listed in the following tables. The ECNT line type is described in :numref:`table_ES_header_info_es_out_ECNT`. The RPS line type is described in :numref:`table_ES_header_info_es_out_RPS`.
+The first set of header columns are common to all of the output files generated by the Point-Stat tool. Tables describing the contents of the header columns and the contents of the additional columns for each line type are listed in the following tables. The ECNT line type is described in :numref:`table_ES_header_info_es_out_ECNT`. The ORANK line type is described in :numref:`table_ES_header_info_es_out_ORANK`. The RPS line type is described in :numref:`table_ES_header_info_es_out_RPS`.
 
 .. _table_PS_header_info_point-stat_out:
 
