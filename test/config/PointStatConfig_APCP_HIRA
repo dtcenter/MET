@@ -123,6 +123,7 @@ output_flag = {
    pjc    = STAT;
    prc    = STAT;
    ecnt   = STAT;
+   orank  = STAT;
    rps    = STAT;
    eclv   = STAT;
    mpr    = STAT;
