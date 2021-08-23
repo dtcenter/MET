@@ -4612,10 +4612,10 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       //
       // Extract the statistic to be used in defining the skill score.
       // Continuous (only stats derived from SL1L2 lines):
-      //    PR_CORR, ME, ESTDEV, MBIAS, MSE, BCRMSE, RMSE
+      //    PR_CORR, ME, ESTDEV, MBIAS, MAE, MSE, BCRMSE, RMSE, ME2, MSESS, SI
       // Categorical:
       //    BASER, FMEAN, ACC, FBIAS, PODY, PODN, POFD, FAR, CSI, GSS,
-      //    HK, HSS, ODDS
+      //    HK, HSS, ODDS, LODDS, ORSS, EDS, SEDS, EDI, SEDI, BAGSS
       //
 
       fcst_stat = ref_stat = bad_data_double;
@@ -4636,6 +4636,10 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
          fcst_stat = fcst_cnt.mbias.v;
          ref_stat  = ref_cnt.mbias.v;
       }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MAE") == 0) {
+         fcst_stat = fcst_cnt.mae.v;
+         ref_stat  = ref_cnt.mae.v;
+      }
       else if(strcasecmp(fcst_job[i].column[0].c_str(), "MSE") == 0) {
          fcst_stat = fcst_cnt.mse.v;
          ref_stat  = ref_cnt.mse.v;
@@ -4647,6 +4651,18 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       else if(strcasecmp(fcst_job[i].column[0].c_str(), "RMSE") == 0) {
          fcst_stat = fcst_cnt.rmse.v;
          ref_stat  = ref_cnt.rmse.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ME2") == 0) {
+         fcst_stat = fcst_cnt.me2.v;
+         ref_stat  = ref_cnt.me2.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MSESS") == 0) {
+         fcst_stat = fcst_cnt.msess.v;
+         ref_stat  = ref_cnt.msess.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "SI") == 0) {
+         fcst_stat = fcst_cnt.si.v;
+         ref_stat  = ref_cnt.si.v;
       }
       else if(strcasecmp(fcst_job[i].column[0].c_str(), "BASER") == 0) {
          fcst_stat = fcst_cts[i].baser.v;
@@ -4699,6 +4715,34 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       else if(strcasecmp(fcst_job[i].column[0].c_str(), "ODDS") == 0) {
          fcst_stat = fcst_cts[i].odds.v;
          ref_stat  = ref_cts[i].odds.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "LODDS") == 0) {
+         fcst_stat = fcst_cts[i].lodds.v;
+         ref_stat  = ref_cts[i].lodds.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ORSS") == 0) {
+         fcst_stat = fcst_cts[i].orss.v;
+         ref_stat  = ref_cts[i].orss.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "EDS") == 0) {
+         fcst_stat = fcst_cts[i].eds.v;
+         ref_stat  = ref_cts[i].eds.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "SEDS") == 0) {
+         fcst_stat = fcst_cts[i].seds.v;
+         ref_stat  = ref_cts[i].seds.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "EDI") == 0) {
+         fcst_stat = fcst_cts[i].edi.v;
+         ref_stat  = ref_cts[i].edi.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "SEDI") == 0) {
+         fcst_stat = fcst_cts[i].sedi.v;
+         ref_stat  = ref_cts[i].sedi.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "BAGSS") == 0) {
+         fcst_stat = fcst_cts[i].bagss.v;
+         ref_stat  = ref_cts[i].bagss.v;
       }
 
       //
