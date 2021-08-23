@@ -124,6 +124,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = BOTH;
    mpr    = BOTH;

@@ -95,6 +95,7 @@
 //   045    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
 //   046    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
+//   047    08/23/21  Seth Linden    Add ORANK line type for HiRA.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -327,7 +328,9 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
+   int i, j;
+   int max_col, max_prob_col, max_mctc_col, max_orank_col;
+   int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -340,23 +343,20 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_prob = max(conf_info.get_max_n_fprob_thresh(),
+                conf_info.get_max_n_hira_prob());
    n_cat  = conf_info.get_max_n_cat_thresh() + 1;
    n_eclv = conf_info.get_max_n_eclv_points();
+   n_ens  = conf_info.get_max_n_hira_ens();
 
-   // Check for HiRA output
-   for(i=0; i<conf_info.get_n_vx(); i++) {
-      if(conf_info.vx_opt[i].hira_info.flag) {
-         n_prob = max(n_prob, conf_info.vx_opt[i].hira_info.cov_ta.n());
-      }
-   }
-
-   max_prob_col = get_n_pjc_columns(n_prob);
-   max_mctc_col = get_n_mctc_columns(n_cat);
+   max_prob_col  = get_n_pjc_columns(n_prob);
+   max_mctc_col  = get_n_mctc_columns(n_cat);
+   max_orank_col = get_n_orank_columns(n_ens);
 
    // Determine the maximum number of data columns
-   max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
-   max_col = ( max_mctc_col > max_col      ? max_mctc_col : max_col );
+   max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
+   max_col = (max_mctc_col  > max_col      ? max_mctc_col  : max_col);
+   max_col = (max_orank_col > max_col      ? max_orank_col : max_col);
 
    // Add the header columns
    max_col += n_header_columns + 1;
@@ -429,6 +429,10 @@ void setup_txt_files() {
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
+            case(i_orank):
+               max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
+               break;
+
             default:
                max_col = n_txt_columns[i] + n_header_columns + 1;
                break;
@@ -463,6 +467,10 @@ void setup_txt_files() {
 
             case(i_eclv):
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
+               break;
+
+            case(i_orank):
+               write_orank_header_row(1, n_ens, txt_at[i], 0, 0);
                break;
 
             default:
@@ -1748,6 +1756,22 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       } // end if ECNT
+
+      // Write out the ORANK line
+      if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
+
+         // Compute ensemble statistics
+         hira_pd.compute_pair_vals(rng_ptr);
+
+         write_orank_row(shc, &hira_pd,
+            conf_info.vx_opt[i_vx].output_flag[i_orank],
+            stat_at, i_stat_row,
+            txt_at[i_orank], i_txt_row[i_orank]);
+
+         // Reset the observation valid time
+         shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
+         shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
+      } // end if ORANK
 
       // Write out the RPS line
       if(conf_info.vx_opt[i_vx].output_flag[i_rps] != STATOutputType_None) {
