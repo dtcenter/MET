@@ -1767,10 +1767,10 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             conf_info.vx_opt[i_vx].output_flag[i_orank],
             stat_at, i_stat_row,
             txt_at[i_orank], i_txt_row[i_orank]);
-         
-	 // Reset the observation valid time
-	 shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-	 shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
+
+         // Reset the observation valid time
+         shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
+         shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
       } // end if ORANK
 
       // Write out the RPS line
