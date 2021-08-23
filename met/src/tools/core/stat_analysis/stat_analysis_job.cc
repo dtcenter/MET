@@ -4003,17 +4003,6 @@ void write_job_ss_index(STATAnalysisJob &job,
 //   Index = sqrt(1/(1-SS[avg]))
 // Where SS[avg] is the weighted average of skill scores.
 //
-// GO Index definition:
-// For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
-// - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
-// - Dewpoint Temperature at the surface(b), 850(b), 700(b), 400(b) mB
-// - Temperature at the surface(b), 400(a) mB
-// - Height at 400(a) mB
-// - Sea Level Pressure(b)
-// Where (a) means weights of 4, 3, 2, 1 for the lead times, and
-//       (b) means weights of 8, 6, 4, 2 for the lead times.
-// The RMSE values are dervied from the partial sums in the SL1L2 lines.
-//
 ////////////////////////////////////////////////////////////////////////
 
 void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
