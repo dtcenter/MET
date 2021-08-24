@@ -672,6 +672,7 @@ inline double DMAPInfo::get_beta_value() const { return(beta_value); }
 
 struct SSIndexInfo {
    ConcatString name;
+   ConcatString fcst_model, ref_model;
    int n_term, n_vld;
    double ss_index;
 };

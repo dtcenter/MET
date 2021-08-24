@@ -3965,7 +3965,16 @@ void write_job_ss_index(STATAnalysisJob &job,
    shc = ssidx_info.hdr.get_shc(cur_case, job.by_column,
                                 job.hdr_name, job.hdr_value, stat_ssidx);
 
-   // JHG, set some of the stat header columns here!
+   //
+   // Set FCST/OBS_VAR = skill score index type
+   // Set FCST/OBS_UNITS = FCST/OBS_LEV = NA
+   //
+   shc.set_fcst_var(ssidx_info.info.name);
+   shc.set_obs_var(ssidx_info.info.name);
+   shc.set_fcst_units(na_str);
+   shc.set_obs_units(na_str);
+   shc.set_fcst_lev(na_str);
+   shc.set_obs_lev(na_str);
 
    //
    // Initialize
@@ -3982,7 +3991,7 @@ void write_job_ss_index(STATAnalysisJob &job,
                        job.stat_row++, n_header_columns);
    }
    else {
-      at.set_entry(r, c++, "SSIDX:");
+      at.set_entry(r, c++, ssidx_info.info.name);
       write_case_cols(cur_case, at, r, c);
       write_ssidx_cols(ssidx_info.info, at, r++, c);
    }
@@ -4266,6 +4275,10 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << "model followed by the reference model.\n\n";
       throw(1);
    }
+   else {
+      ssidx_info.info.fcst_model = job.model[0];
+      ssidx_info.info.ref_model  = job.model[1];
+   }
 
    //
    // Use the length of the fcst_var array to infer the number of terms.
@@ -4326,8 +4339,8 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
    NumArray n_fcst_lines, n_ref_lines;
 
    mlog << Debug(3)
-        << "Forecast Model  = " << job.model[0] << "\n"
-        << "Reference Model = " << job.model[1] << "\n";
+        << "Forecast Model  = " << ssidx_info.info.fcst_model << "\n"
+        << "Reference Model = " << ssidx_info.info.ref_model  << "\n";
 
    //
    // Set up the job for each term in the index.
@@ -4348,7 +4361,7 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       //
       // Set filtering options
       //
-      fcst_job[i].model.set(job.model[0]);
+      fcst_job[i].model.set(ssidx_info.info.fcst_model);
       if(job.fcst_lead.n()      == n_term) fcst_job[i].fcst_lead.set(job.fcst_lead[i]);
       if(job.obs_lead.n()       == n_term) fcst_job[i].obs_lead.set(job.obs_lead[i]);
       if(job.fcst_init_hour.n() == n_term) fcst_job[i].fcst_init_hour.set(job.fcst_init_hour[i]);
@@ -4395,7 +4408,7 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       // job but with a different model name.
       //
       ref_job[i] = fcst_job[i];
-      ref_job[i].model.set(job.model[1]);
+      ref_job[i].model.set(ssidx_info.info.ref_model);
 
    } // end for i
 

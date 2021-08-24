@@ -4132,19 +4132,22 @@ void write_ssidx_cols(SSIndexInfo ssidx_info,
    //
    // Skill Score Index
    // Dump out the SSIDX line:
-   //    NAME,        N_TERM,      N_VLD,
-   //    SS_INDEX
+   //    FCST_MODEL,  REF_MODEL,   N_TERM,
+   //    N_VLD,       SS_INDEX
    //
-   at.set_entry(r, c+0,  // Skill score index name
-      ssidx_info.name);
+   at.set_entry(r, c+0,  // Forecast model name
+      ssidx_info.fcst_model);
 
-   at.set_entry(r, c+1,  // Number of terms
+   at.set_entry(r, c+1,  // Reference model name
+      ssidx_info.ref_model);
+
+   at.set_entry(r, c+2,  // Number of terms
       ssidx_info.n_term);
 
-   at.set_entry(r, c+2,  // Number of valid terms
+   at.set_entry(r, c+3,  // Number of valid terms
       ssidx_info.n_vld);
 
-   at.set_entry(r, c+3,  // Skill score index value
+   at.set_entry(r, c+4,  // Skill score index value
       ssidx_info.ss_index);
 
    return;
