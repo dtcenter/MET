@@ -3961,8 +3961,11 @@ void write_job_ss_index(STATAnalysisJob &job,
    // Write the output STAT header columns
    //
    ConcatString cur_case("");
+
    shc = ssidx_info.hdr.get_shc(cur_case, job.by_column,
                                 job.hdr_name, job.hdr_value, stat_ssidx);
+
+   // JHG, set some of the stat header columns here!
 
    //
    // Initialize
@@ -4244,7 +4247,7 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
                       AggrSSIndexInfo &ssidx_info,
                       int &n_in, int &n_out) {
    STATLine line;
-   SL1L2Info si;
+   SL1L2Info sl1l2;
    TTContingencyTable ct;
    CNTInfo fcst_cnt, ref_cnt;
    bool keep;
@@ -4303,12 +4306,12 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
    // Define arrays of objects to store the partial sums or contingency
    // table counts for each term in the Skill Score Index.
    //
-   SL1L2Info *fcst_si  = (SL1L2Info *) 0, *ref_si  = (SL1L2Info *) 0;
-   CTSInfo   *fcst_cts = (CTSInfo *) 0,   *ref_cts = (CTSInfo *) 0;
-   fcst_si  = new SL1L2Info [n_term];
-   ref_si   = new SL1L2Info [n_term];
-   fcst_cts = new CTSInfo   [n_term];
-   ref_cts  = new CTSInfo   [n_term];
+   SL1L2Info *fcst_sl1l2 = (SL1L2Info *) 0, *ref_sl1l2 = (SL1L2Info *) 0;
+   CTSInfo   *fcst_cts   = (CTSInfo *) 0,   *ref_cts   = (CTSInfo *) 0;
+   fcst_sl1l2  = new SL1L2Info [n_term];
+   ref_sl1l2   = new SL1L2Info [n_term];
+   fcst_cts    = new CTSInfo   [n_term];
+   ref_cts     = new CTSInfo   [n_term];
 
    //
    // Define array of line types to be aggregated for each term in the
@@ -4322,7 +4325,8 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
    //
    NumArray n_fcst_lines, n_ref_lines;
 
-   mlog << Debug(3) << "Forecast Model  = " << job.model[0] << "\n"
+   mlog << Debug(3)
+        << "Forecast Model  = " << job.model[0] << "\n"
         << "Reference Model = " << job.model[1] << "\n";
 
    //
@@ -4342,122 +4346,25 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       fcst_job[i] = job;
 
       //
-      // model
+      // Set filtering options
       //
-      fcst_job[i].model.clear();
-      fcst_job[i].model.add(job.model[0]);
-
-      //
-      // fcst_lead
-      //
-      if(job.fcst_lead.n() == n_term) {
-         fcst_job[i].fcst_lead.clear();
-         fcst_job[i].fcst_lead.add(job.fcst_lead[i]);
-      }
-
-      //
-      // obs_lead
-      //
-      if(job.obs_lead.n() == n_term) {
-         fcst_job[i].obs_lead.clear();
-         fcst_job[i].obs_lead.add(job.obs_lead[i]);
-      }
-
-      //
-      // fcst_init_hour
-      //
-      if(job.fcst_init_hour.n() == n_term) {
-         fcst_job[i].fcst_init_hour.clear();
-         fcst_job[i].fcst_init_hour.add(job.fcst_init_hour[i]);
-      }
-
-      //
-      // obs_init_hour
-      //
-      if(job.obs_init_hour.n() == n_term) {
-         fcst_job[i].obs_init_hour.clear();
-         fcst_job[i].obs_init_hour.add(job.obs_init_hour[i]);
-      }
-
-      //
-      // fcst_var
-      //
-      if(job.fcst_var.n() == n_term) {
-         fcst_job[i].fcst_var.clear();
-         fcst_job[i].fcst_var.add(job.fcst_var[i]);
-      }
-
-      //
-      // obs_var
-      //
-      if(job.obs_var.n() == n_term) {
-         fcst_job[i].obs_var.clear();
-         fcst_job[i].obs_var.add(job.obs_var[i]);
-      }
-
-      //
-      // fcst_lev
-      //
-      if(job.fcst_lev.n() == n_term) {
-         fcst_job[i].fcst_lev.clear();
-         fcst_job[i].fcst_lev.add(job.fcst_lev[i]);
-      }
-
-      //
-      // obs_lev
-      //
-      if(job.obs_lev.n() == n_term) {
-         fcst_job[i].obs_lev.clear();
-         fcst_job[i].obs_lev.add(job.obs_lev[i]);
-      }
-
-      //
-      // obtype
-      //
-      if(job.obtype.n() == n_term) {
-         fcst_job[i].obtype.clear();
-         fcst_job[i].obtype.add(job.obtype[i]);
-      }
-
-      //
-      // vx_mask
-      //
-      if(job.vx_mask.n() == n_term) {
-         fcst_job[i].vx_mask.clear();
-         fcst_job[i].vx_mask.add(job.vx_mask[i]);
-      }
-
-      //
-      // interp_mthd
-      //
-      if(job.interp_mthd.n() == n_term) {
-         fcst_job[i].interp_mthd.clear();
-         fcst_job[i].interp_mthd.add(job.interp_mthd[i]);
-      }
-
-      //
-      // interp_pnts
-      //
-      if(job.interp_pnts.n() == n_term) {
-         fcst_job[i].interp_pnts.clear();
-         fcst_job[i].interp_pnts.add(job.interp_pnts[i]);
-      }
-
-      //
-      // fcst_thresh
-      //
-      if(job.fcst_thresh.n() == n_term) {
-         fcst_job[i].fcst_thresh.clear();
-         fcst_job[i].fcst_thresh.add(job.fcst_thresh[i]);
-      }
-
-      //
-      // obs_thresh
-      //
-      if(job.obs_thresh.n() == n_term) {
-         fcst_job[i].obs_thresh.clear();
-         fcst_job[i].obs_thresh.add(job.obs_thresh[i]);
-      }
+      fcst_job[i].model.set(job.model[0]);
+      if(job.fcst_lead.n()      == n_term) fcst_job[i].fcst_lead.set(job.fcst_lead[i]);
+      if(job.obs_lead.n()       == n_term) fcst_job[i].obs_lead.set(job.obs_lead[i]);
+      if(job.fcst_init_hour.n() == n_term) fcst_job[i].fcst_init_hour.set(job.fcst_init_hour[i]);
+      if(job.obs_init_hour.n()  == n_term) fcst_job[i].obs_init_hour.set(job.obs_init_hour[i]);
+      if(job.fcst_var.n()       == n_term) fcst_job[i].fcst_var.set(job.fcst_var[i]);
+      if(job.obs_var.n()        == n_term) fcst_job[i].obs_var.set(job.obs_var[i]);
+      if(job.fcst_lev.n()       == n_term) fcst_job[i].fcst_lev.add(job.fcst_lev[i]);
+      if(job.obs_lev.n()        == n_term) fcst_job[i].obs_lev.set(job.obs_lev[i]);
+      if(job.obtype.n()         == n_term) fcst_job[i].obtype.set(job.obtype[i]);
+      if(job.vx_mask.n()        == n_term) fcst_job[i].vx_mask.set(job.vx_mask[i]);
+      if(job.interp_mthd.n()    == n_term) fcst_job[i].interp_mthd.set(job.interp_mthd[i]);
+      if(job.interp_pnts.n()    == n_term) fcst_job[i].interp_pnts.set(job.interp_pnts[i]);
+      if(job.fcst_thresh.n()    == n_term) fcst_job[i].fcst_thresh.set(job.fcst_thresh[i]);
+      if(job.obs_thresh.n()     == n_term) fcst_job[i].obs_thresh.set(job.obs_thresh[i]);
+      if(job.column.n()         == n_term) fcst_job[i].column.set(job.column[i]);
+      if(job.weight.n()         == n_term) fcst_job[i].weight.set(job.weight[i]);
 
       //
       // line_type
@@ -4468,13 +4375,13 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
 
          job_lt[i] = string_to_statlinetype(job.line_type[i].c_str());
          if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
-            if ( fcst_job )  { delete [] fcst_job;  fcst_job = 0; }
-            if ( ref_job  )  { delete [] ref_job;   ref_job  = 0; }
-            if ( fcst_si  )  { delete [] fcst_si;   fcst_si  = 0; }
-            if ( ref_si   )  { delete [] ref_si;    ref_si   = 0; }
-            if ( fcst_cts )  { delete [] fcst_cts;  fcst_cts = 0; }
-            if ( ref_cts  )  { delete [] ref_cts;   ref_cts  = 0; }
-            if ( job_lt   )  { delete [] job_lt;    job_lt   = 0; }
+            if(fcst_job  ) { delete [] fcst_job;   fcst_job   = 0; }
+            if(ref_job   ) { delete [] ref_job;    ref_job    = 0; }
+            if(fcst_sl1l2) { delete [] fcst_sl1l2; fcst_sl1l2 = 0; }
+            if(ref_sl1l2 ) { delete [] ref_sl1l2;  ref_sl1l2  = 0; }
+            if(fcst_cts  ) { delete [] fcst_cts;   fcst_cts   = 0; }
+            if(ref_cts   ) { delete [] ref_cts;    ref_cts    = 0; }
+            if(job_lt    ) { delete [] job_lt;     job_lt     = 0; }
             mlog << Error << "\ncompute_ss_index() -> "
                  << "a Skill Score Index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
@@ -4484,27 +4391,11 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       }
 
       //
-      // column
-      //
-      if(job.column.n() == n_term) {
-         fcst_job[i].column.clear();
-         fcst_job[i].column.add(job.column[i]);
-      }
-
-      //
-      // weight
-      //
-      if(job.weight.n() == n_term) {
-         fcst_job[i].weight.clear();
-         fcst_job[i].weight.add(job.weight[i]);
-      }
-
-      //
       // Set the reference model job identical to the forecast model
       // job but with a different model name.
       //
       ref_job[i] = fcst_job[i];
-      ref_job[i].model.set(0, job.model[1]);
+      ref_job[i].model.set(job.model[1]);
 
    } // end for i
 
@@ -4531,10 +4422,15 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
             keep = 1;
             n_fcst_lines.set(i, n_fcst_lines[i]+1);
 
+            //
+            // Keep track of the unique header columne entries
+            //
+            ssidx_info.hdr.add(line);
+
             if(job_lt[i] == stat_sl1l2) {
-               si.clear();
-               parse_sl1l2_line(line, si);
-               fcst_si[i] += si;
+               sl1l2.clear();
+               parse_sl1l2_line(line, sl1l2);
+               fcst_sl1l2[i] += sl1l2;
             }
             else if(job_lt[i] == stat_ctc) {
                ct.zero_out();
@@ -4557,10 +4453,15 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
             keep = 1;
             n_ref_lines.set(i, n_ref_lines[i]+1);
 
+            //
+            // Keep track of the unique header columne entries
+            //
+            ssidx_info.hdr.add(line);
+
             if(job_lt[i] == stat_sl1l2) {
-               si.clear();
-               parse_sl1l2_line(line, si);
-               ref_si[i] += si;
+               sl1l2.clear();
+               parse_sl1l2_line(line, sl1l2);
+               ref_sl1l2[i] += sl1l2;
             }
             else if(job_lt[i]== stat_ctc) {
                ct.zero_out();
@@ -4597,9 +4498,9 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       //
       if(job_lt[i] == stat_sl1l2) {
          fcst_cnt.clear();
-         compute_cntinfo(fcst_si[i], 0, fcst_cnt);
+         compute_cntinfo(fcst_sl1l2[i], 0, fcst_cnt);
          ref_cnt.clear();
-         compute_cntinfo(ref_si[i], 0, ref_cnt);
+         compute_cntinfo(ref_sl1l2[i], 0, ref_cnt);
       }
       //
       // Compute categorical stats for the current term
@@ -4612,11 +4513,18 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
       //
       // Extract the statistic to be used in defining the skill score.
       // Continuous (only stats derived from SL1L2 lines):
-      //    PR_CORR, ME, ESTDEV, MBIAS, MAE, MSE, BCRMSE, RMSE, ME2, MSESS, SI
+      //    PR_CORR, ME, ESTDEV, MBIAS, MAE, MSE, BCRMSE, RMSE, ME2,
+      //    MSESS, SI
       // Categorical:
       //    BASER, FMEAN, ACC, FBIAS, PODY, PODN, POFD, FAR, CSI, GSS,
       //    HK, HSS, ODDS, LODDS, ORSS, EDS, SEDS, EDI, SEDI, BAGSS
       //
+
+
+// JHG, can we move this code and the series_analysis code to get stats by name to a library?
+//    fcst_stat = fcst_cnt.get_stat(fcst_job[i].column[0]);
+//    ref_stat  = ref_cnt.get_stat(fcst_job[i].column[0]);
+
 
       fcst_stat = ref_stat = bad_data_double;
 
@@ -4820,13 +4728,13 @@ void compute_ss_index(LineDataFile &f, STATAnalysisJob &job,
    //
    // Clean up allocated memory.
    //
-   if(fcst_job) { delete [] fcst_job; fcst_job = (STATAnalysisJob *) 0; }
-   if(ref_job)  { delete [] ref_job;  ref_job  = (STATAnalysisJob *) 0; }
-   if(fcst_si)  { delete [] fcst_si;  fcst_si  = (SL1L2Info *)       0; }
-   if(ref_si)   { delete [] ref_si;   ref_si   = (SL1L2Info *)       0; }
-   if(fcst_cts) { delete [] fcst_cts; fcst_cts = (CTSInfo *)         0; }
-   if(ref_cts)  { delete [] ref_cts;  ref_cts  = (CTSInfo *)         0; }
-   if(job_lt)   { delete [] job_lt;   job_lt   = (STATLineType *)    0; }
+   if(fcst_job)   { delete [] fcst_job;   fcst_job = (STATAnalysisJob *) 0; }
+   if(ref_job)    { delete [] ref_job;    ref_job  = (STATAnalysisJob *) 0; }
+   if(fcst_sl1l2) { delete [] fcst_sl1l2; fcst_sl1l2  = (SL1L2Info *)    0; }
+   if(ref_sl1l2)  { delete [] ref_sl1l2;  ref_sl1l2   = (SL1L2Info *)    0; }
+   if(fcst_cts)   { delete [] fcst_cts;   fcst_cts = (CTSInfo *)         0; }
+   if(ref_cts)    { delete [] ref_cts;    ref_cts  = (CTSInfo *)         0; }
+   if(job_lt)     { delete [] job_lt;     job_lt   = (STATLineType *)    0; }
 
    return;
 }
