@@ -57,6 +57,8 @@ class ThreshArray {
       void add(const ThreshArray &);
       void add_css(const char *);
 
+      void set(const SingleThresh &);
+
       void parse_thresh_str(const char *);
 
       int n_elements() const;

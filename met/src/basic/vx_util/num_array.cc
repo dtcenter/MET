@@ -495,13 +495,47 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void NumArray::set(int k)
+
+{
+
+set((double) k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::set(double d)
+
+{
+
+erase();
+
+add(d);
+
+   //
+   // an array of length one is sorted
+   //
+
+Sorted = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::set(int i, int k)
 
 {
 
 set(i, (double) k);
-
-Sorted = false;
 
 return;
 

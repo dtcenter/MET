@@ -134,9 +134,6 @@ IgnoreCase = 0;
 
 clear();
 
-
-
-
 return;
 
 }
@@ -301,6 +298,22 @@ void StringArray::add_css(const std::string text)
   }
 
   return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::set(const std::string text)
+
+{
+
+s.clear();
+
+s.push_back(text);
+
+return;
 
 }
 
