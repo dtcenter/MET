@@ -3432,29 +3432,39 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
         << cur.job_info.ref_model  << ").\n";
 
    //
-   // Use the length of the fcst_var array to infer the number of terms.
+   // Compute the number of terms as the maximum array length
    //
-   if((n_term = job.fcst_var.n()) < 1) {
+   n_term = max(     0, job.fcst_var.n());
+   n_term = max(n_term, job.fcst_lev.n());
+   n_term = max(n_term, job.fcst_lead.n());
+   n_term = max(n_term, job.line_type.n());
+   n_term = max(n_term, job.column.n());
+   n_term = max(n_term, job.weight.n());
+
+   //
+   // Must be at least one term
+   //
+   if(n_term < 1) {
       mlog << Error << "\naggr_ss_var() -> "
-           << "you must define the Skill Score Index to be computed "
+           << "you must define the skill score index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
       throw(1);
    }
 
    //
-   // Check that the required elements are of the same length.
+   // Sanity check the array lengths
    //
-   if(n_term != job.fcst_lev.n()  ||
-      n_term != job.fcst_lead.n() ||
-      n_term != job.line_type.n() ||
-      n_term != job.column.n()    ||
-      n_term != job.weight.n()) {
+   if((job.fcst_lev.n()  != n_term && job.fcst_lev.n()  != 1) ||
+      (job.fcst_lead.n() != n_term && job.fcst_lead.n() != 1) ||
+      (job.line_type.n() != n_term && job.line_type.n() != 1) ||
+      (job.column.n()    != n_term && job.column.n()    != 1) ||
+      (job.weight.n()    != n_term && job.weight.n()    != 1)) {
       mlog << Error << "\ncompute_ss_index() -> "
-           << "all filtering parameters for defining the Skill Score "
-           << "Index must be of the same length.  Check \"-fcst_var\", "
-           << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
-           << "\"-column\", and \"-weight\" options.\n\n";
+           << "each skill score index parameter must have the same length ("
+           << n_term << ") or have length 1!\n"
+           << "Check the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
+           << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
       throw(1);
    }
 
@@ -3485,7 +3495,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
          STATLineType lt = string_to_statlinetype(job.line_type[i].c_str());
          if(lt != stat_sl1l2 && lt != stat_ctc) {
             mlog << Error << "\naggr_ss_index() -> "
-                 << "a Skill Score Index can only be computed using "
+                 << "a skill score index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
                  << "\n\n";
             throw(1);
