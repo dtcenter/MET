@@ -131,6 +131,7 @@ class STATAnalysisJob {
       void parse_job_command(const char *);
       void add_column_thresh(const char *, const char *);
 
+      void set_job_type (const STATJobType);
       int  set_job_type (const char *);
       void set_dump_row (const char *);
       void set_stat_file(const char *);
@@ -344,6 +345,8 @@ class STATAnalysisJob {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+inline void STATAnalysisJob::set_job_type  (const STATJobType t) { job_type = t; return; }
 
 inline void STATAnalysisJob::set_precision (int p)  { precision = p; return; }
 inline int  STATAnalysisJob::get_precision () const { return(precision);     }
