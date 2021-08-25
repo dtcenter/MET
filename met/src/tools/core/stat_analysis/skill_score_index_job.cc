@@ -232,8 +232,8 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    SSIDXData data;
 
    mlog << Debug(3)
-        << "Computing " << name << " over " << init_time.n()
-        << " initialization times: " << write_css(init_time) << "\n";
+        << "Computing " << name << " for " << init_time.n()
+        << " initialization time(s): " << write_css(init_time) << "\n";
 
    // Compute a skill score for each term
    for(i=0, n_vld=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
