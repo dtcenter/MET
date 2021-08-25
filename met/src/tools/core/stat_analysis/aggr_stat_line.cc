@@ -1558,7 +1558,6 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          // Increment sums in the existing map entry
          //
          else {
-
             m[key].sl1l2_info  += cur_sl1l2;
             m[key].vl1l2_info  += cur_vl1l2;
             m[key].nbrcnt_info += cur_nbrcnt;
@@ -3387,6 +3386,187 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
          // Keep track of the unique header column entries
          //
          m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
+                   const ConcatString &name,
+                   map<ConcatString, AggrSSIndexInfo> &m,
+                   int &n_in, int &n_out) {
+   STATLine line;
+   AggrSSIndexInfo cur;
+   ConcatString key;
+   int i, n_term;
+
+   //
+   // Store the index name
+   //
+   cur.job_info.name = name;
+
+   //
+   // Check that the -model option has been supplied exactly 2 times.
+   // The first is the forecast model and the second is the reference.
+   //
+   if(job.model.n() != 2) {
+      mlog << Error << "\naggr_ss_index() -> "
+           << "this job may only be called when the \"-model\" option "
+           << "has been used exactly twice to specify the forecast "
+           << "model followed by the reference model.\n\n";
+      throw(1);
+   }
+   else {
+      cur.job_info.fcst_model = job.model[0];
+      cur.job_info.ref_model  = job.model[1];
+   }
+
+   mlog << Debug(3)
+        << "Computing " << cur.job_info.name << " for forecast model ("
+        << cur.job_info.fcst_model << ") versus reference model ("
+        << cur.job_info.ref_model  << ").\n";
+
+   //
+   // Use the length of the fcst_var array to infer the number of terms.
+   //
+   if((n_term = job.fcst_var.n()) < 1) {
+      mlog << Error << "\naggr_ss_var() -> "
+           << "you must define the Skill Score Index to be computed "
+           << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
+           << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
+      throw(1);
+   }
+
+   //
+   // Check that the required elements are of the same length.
+   //
+   if(n_term != job.fcst_lev.n()  ||
+      n_term != job.fcst_lead.n() ||
+      n_term != job.line_type.n() ||
+      n_term != job.column.n()    ||
+      n_term != job.weight.n()) {
+      mlog << Error << "\ncompute_ss_index() -> "
+           << "all filtering parameters for defining the Skill Score "
+           << "Index must be of the same length.  Check \"-fcst_var\", "
+           << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
+           << "\"-column\", and \"-weight\" options.\n\n";
+      throw(1);
+   }
+
+   //
+   // Create a job for each term
+   //
+   for(i=0; i<n_term; i++) {
+
+      //
+      // Create a STATAnalysisJob for each term
+      //
+      STATAnalysisJob fcst_term;
+      STATAnalysisJob ref_term;
+
+      //
+      // Initialize to the full Skill Score Index job
+      // and set the type to aggregation
+      //
+      fcst_term = job;
+      fcst_term.set_job_type(stat_job_aggr);
+
+      //
+      // line_type
+      //
+      if(job.line_type.n() == n_term) {
+         fcst_term.line_type.set(job.line_type[i]);
+
+         STATLineType lt = string_to_statlinetype(job.line_type[i].c_str());
+         if(lt != stat_sl1l2 && lt != stat_ctc) {
+            mlog << Error << "\naggr_ss_index() -> "
+                 << "a Skill Score Index can only be computed using "
+                 << "statistics derived from SL1L2 or CTC line types."
+                 << "\n\n";
+            throw(1);
+         }
+      }
+
+      //
+      // Set filtering options
+      //
+      fcst_term.model.set(cur.job_info.fcst_model);
+      if(job.fcst_lead.n()      == n_term) fcst_term.fcst_lead.set(job.fcst_lead[i]);
+      if(job.obs_lead.n()       == n_term) fcst_term.obs_lead.set(job.obs_lead[i]);
+      if(job.fcst_init_hour.n() == n_term) fcst_term.fcst_init_hour.set(job.fcst_init_hour[i]);
+      if(job.obs_init_hour.n()  == n_term) fcst_term.obs_init_hour.set(job.obs_init_hour[i]);
+      if(job.fcst_var.n()       == n_term) fcst_term.fcst_var.set(job.fcst_var[i]);
+      if(job.obs_var.n()        == n_term) fcst_term.obs_var.set(job.obs_var[i]);
+      if(job.fcst_lev.n()       == n_term) fcst_term.fcst_lev.add(job.fcst_lev[i]);
+      if(job.obs_lev.n()        == n_term) fcst_term.obs_lev.set(job.obs_lev[i]);
+      if(job.obtype.n()         == n_term) fcst_term.obtype.set(job.obtype[i]);
+      if(job.vx_mask.n()        == n_term) fcst_term.vx_mask.set(job.vx_mask[i]);
+      if(job.interp_mthd.n()    == n_term) fcst_term.interp_mthd.set(job.interp_mthd[i]);
+      if(job.interp_pnts.n()    == n_term) fcst_term.interp_pnts.set(job.interp_pnts[i]);
+      if(job.fcst_thresh.n()    == n_term) fcst_term.fcst_thresh.set(job.fcst_thresh[i]);
+      if(job.obs_thresh.n()     == n_term) fcst_term.obs_thresh.set(job.obs_thresh[i]);
+      if(job.column.n()         == n_term) fcst_term.column.set(job.column[i]);
+      if(job.weight.n()         == n_term) fcst_term.weight.set(job.weight[i]);
+
+      //
+      // Set the reference model job identical to the forecast model
+      // job but with a different model name.
+      //
+      ref_term = fcst_term;
+      ref_term.model.set(cur.job_info.ref_model);
+
+      //
+      // Store the forecast and reference jobs for this term
+      //
+      cur.job_info.add_term(fcst_term, ref_term);
+
+   } // end for i
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(cur.job_info.is_keeper(line)) {
+
+         //
+         // Build the map key for the current line
+         //
+         key = job.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            m[key] = cur;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
+         }
+
+         //
+         // Add the current line to the map entry
+         //
+         m[key].job_info.add(line);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         //
+         // Write line to dump file
+         //
+         job.dump_stat_line(line);
 
          n_out++;
       }
