@@ -14,7 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    07/28/21  Halley Gotway   New
+//   000    08/25/21  Halley Gotway   New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -230,6 +230,10 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    double ss, ss_sum, weight_sum, ss_avg;
    CNTInfo fcst_cnt, ref_cnt;
    SSIDXData data;
+
+   mlog << Debug(3)
+        << "Computing " << name << " over " << init_time.n()
+        << " initialization times: " << write_css(init_time) << "\n";
 
    // Compute a skill score for each term
    for(i=0, n_vld=0, ss_sum=weight_sum=0.0; i<n_term; i++) {

@@ -105,7 +105,6 @@ extern ThreshArray  process_perc_thresh_bins (const ThreshArray &);
 extern ThreshArray  process_rps_cdp_thresh   (const ThreshArray &);
 extern ConcatString write_css                (const ThreshArray &);
 
-
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __THRESH_ARRAY_H__  */
