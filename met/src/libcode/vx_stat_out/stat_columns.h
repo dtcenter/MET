@@ -189,7 +189,7 @@ extern void write_ssvar_cols (const PairDataEnsemble *, int, double,
                               AsciiTable &, int, int);
 extern void write_relp_cols  (const PairDataEnsemble *,
                               AsciiTable &, int, int);
-extern void write_ssidx_cols (const SSIndexInfo,
+extern void write_ssidx_cols (const SSIDXData &,
                               AsciiTable &, int, int);
 
 // Setup column justification for STAT AsciiTable objects

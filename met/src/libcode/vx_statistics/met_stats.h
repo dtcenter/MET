@@ -666,14 +666,26 @@ inline double DMAPInfo::get_beta_value() const { return(beta_value); }
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Structure to store the Skill Score Index
+// Structure to store the Skill Score Index output
 //
 ////////////////////////////////////////////////////////////////////////
 
-struct SSIndexInfo {
+struct SSIDXData {
+
+   // Index name
    ConcatString name;
-   ConcatString fcst_model, ref_model;
+
+   // Forecast and reference model names
+   ConcatString fcst_model;
+   ConcatString ref_model;
+
+   // List of unique initialization times
+   TimeArray init_time;
+
+   // Number of terms and number valid
    int n_term, n_vld;
+
+   // Skill score index value
    double ss_index;
 };
 

@@ -314,8 +314,8 @@ static const char * relp_columns [] = {
 };
 
 static const char * ssidx_columns [] = {
-   "FCST_MODEL",  "REF_MODEL",   "N_TERM",
-   "N_VLD",       "SS_INDEX"
+   "FCST_MODEL",  "REF_MODEL",   "N_INIT",
+   "N_TERM",      "N_VLD",       "SS_INDEX"
 };
 
 static const char * genmpr_columns [] = {
