@@ -780,7 +780,8 @@ This job is similar to the "**aggregate**" job listed above, however the format 
   * - MPR
     - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
     
-**Job: ss_index, go_index, cbs_index**
+Job: ss_index, go_index, cbs_index
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 While the inputs for the "ss_index", "go_index", and "cbs_index" jobs may vary, the output is the same. By default, the job output is written to the screen or to a "-out" file, if specified. If the "-out_stat" job command option is specified, a STAT output file is written containing the skill score index (SSIDX) output line type.
 
@@ -844,7 +845,8 @@ The SSIDX line type consists of the common STAT header columns described in :num
     - SS_INDEX
     - Skill score index value
 
-**Job: ramp**
+Job: ramp
+^^^^^^^^^
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 
