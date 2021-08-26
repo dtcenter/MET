@@ -791,6 +791,7 @@ static const char conf_key_vif_flag[]          = "vif_flag";
 static const char conf_key_wmo_sqrt_stats[]    = "wmo_sqrt_stats";
 static const char conf_key_wmo_fisher_stats[]  = "wmo_fisher_stats";
 static const char conf_key_jobs[]              = "jobs";
+static const char conf_key_ss_index_name[]     = "ss_index_name";
 
 //
 // MODE specific parameter key names
@@ -1068,7 +1069,10 @@ static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
 
-// TC-Gen config options
+//
+// TC-Gen specific parameter key names
+//
+
 static const char conf_key_init_freq[]                       = "init_freq";
 static const char conf_key_valid_freq[]                      = "valid_freq";
 static const char conf_key_fcst_hr_window[]                  = "fcst_hr_window";
@@ -1102,6 +1106,7 @@ static const char conf_key_nc_pairs_grid[]                   = "nc_pairs_grid";
 //
 // TC-RMW specific parameter key names
 //
+
 static const char conf_key_n_range[]     = "n_range";
 static const char conf_key_n_azimuth[]   = "n_azimuth";
 static const char conf_key_max_range[]   = "max_range_km";
@@ -1206,7 +1211,6 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
-
 
 ////////////////////////////////////////////////////////////////////////
 

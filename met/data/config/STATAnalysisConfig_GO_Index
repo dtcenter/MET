@@ -129,6 +129,7 @@ boot = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ss_index_name  = "GO_INDEX";
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
