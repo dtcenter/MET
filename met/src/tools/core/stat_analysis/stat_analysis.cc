@@ -479,6 +479,7 @@ void process_search_dirs() {
       //
       // Parse the Skill Score Index config file into the search job.
       //
+      ss_index_job.set_job_type(default_job.job_type);
       set_job_from_config(ss_index_conf, ss_index_job);
 
       //
@@ -635,9 +636,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 void process_job(const char * jobstring, int n_job) {
-   STATAnalysisJob job, ss_index_job;
+   STATAnalysisJob job;
    ConcatString full_jobstring;
-   MetConfig ss_index_conf;
 
    mlog << Debug(4) << "process_job(jobstring): "
         << jobstring << "\n";
@@ -651,58 +651,12 @@ void process_job(const char * jobstring, int n_job) {
    job = default_job;
 
    //
-   // Parse the job command line options
+   // Override with any command line options
    //
-   if(jobstring != command_line_job_options) {
-      mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with options: \""
-           << jobstring << "\"\n";
-      job.parse_job_command(jobstring);
-   }
-
-   //
-   // Special processing for the GO Index and CBS Index jobs.
-   //
-   if(default_job.job_type == stat_job_go_index ||
-      default_job.job_type == stat_job_cbs_index) {
-
-      ConcatString config_file =
-         (default_job.job_type == stat_job_go_index ?
-          replace_path(go_index_config_file) :
-          replace_path(cbs_index_config_file));
-
-      mlog << Debug(1) << "Skill Score Index Config File: "
-           << config_file << "\n";
-
-      //
-      // Read the config files for the constants and the skill score index.
-      //
-      ss_index_conf.read(replace_path(config_const_filename).c_str());
-      ss_index_conf.read(config_file.c_str());
-
-      //
-      // Parse the Skill Score Index config file into the search job.
-      //
-      set_job_from_config(ss_index_conf, ss_index_job);
-
-      //
-      // Amend the current job with Skill Score Index filtering criteria.
-      //
-      mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with Skill Score Index configuration file: "
-           << config_file << "\n";
-      job.parse_job_command(ss_index_job.get_jobstring().c_str());
-   }
-
-   //
-   // Amend the current job using any command line options
-   //
-   if(jobstring != command_line_job_options) {
-      mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with command line options: \""
-           << command_line_job_options << "\"\n";
-      job.parse_job_command(command_line_job_options.c_str());
-   }
+   mlog << Debug(4)
+        << "\nAmending Job " << n_job << " with command line options: \""
+        << command_line_job_options << "\"\n";
+   job.parse_job_command(command_line_job_options.c_str());
 
    //
    // Get the full jobstring

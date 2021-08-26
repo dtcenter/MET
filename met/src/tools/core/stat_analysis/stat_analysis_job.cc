@@ -121,6 +121,7 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
    job.set_boot_rng(boot_info.rng.c_str());
    job.set_boot_seed(boot_info.seed.c_str());
 
+   job.ss_index_name   = c.lookup_string(conf_key_ss_index_name);
    job.hss_ec_value    = c.lookup_double(conf_key_hss_ec_value);
    job.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    job.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
@@ -3979,8 +3980,8 @@ void write_job_ss_index(STATAnalysisJob &job,
       // Set FCST/OBS_VAR = skill score index type
       // Set FCST/OBS_UNITS = FCST/OBS_LEV = NA
       //
-      shc.set_fcst_var(it->second.job_info.name);
-      shc.set_obs_var(it->second.job_info.name);
+      shc.set_fcst_var(it->second.job_info.ss_index_name);
+      shc.set_obs_var(it->second.job_info.ss_index_name);
       shc.set_fcst_units(na_str);
       shc.set_obs_units(na_str);
       shc.set_fcst_lev(na_str);
@@ -4010,7 +4011,7 @@ void write_job_ss_index(STATAnalysisJob &job,
                           job.stat_row++, n_header_columns);
       }
       else {
-         at.set_entry(r, c++, ssidx_data.name);
+         at.set_entry(r, c++, it->second.job_info.ss_index_name);
          write_case_cols(it->first, at, r, c);
          write_ssidx_cols(ssidx_data, at, r++, c);
       }
@@ -4041,7 +4042,6 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &job, int &n_in, int &n_out,
                      ofstream *sa_out) {
    map<ConcatString, AggrSSIndexInfo> ssidx_map;
-   ConcatString name;
    AsciiTable out_at;
 
    //
@@ -4050,16 +4050,9 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    job.out_line_type.add(stat_ssidx_str);
 
    //
-   // Determine the job type
-   //
-        if(job.job_type == stat_job_go_index)  name = "GO_INDEX";
-   else if(job.job_type == stat_job_cbs_index) name = "CBS_INDEX";
-   else                                        name = "SS_INDEX";
-
-   //
    // Compute the Skill Score Index
    //
-   aggr_ss_index(f, job, name, ssidx_map, n_in, n_out);
+   aggr_ss_index(f, job, ssidx_map, n_in, n_out);
 
    //
    // Write the output
