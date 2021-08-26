@@ -434,8 +434,6 @@ void set_out_file(const char *path) {
 
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
-   MetConfig ss_index_conf;
-   STATAnalysisJob ss_index_job;
 
    //
    // Initialize
@@ -461,6 +459,9 @@ void process_search_dirs() {
    //
    if(default_job.job_type == stat_job_go_index ||
       default_job.job_type == stat_job_cbs_index) {
+
+      MetConfig ss_index_conf;
+      STATAnalysisJob ss_index_job;
 
       ConcatString config_file =
          (default_job.job_type == stat_job_go_index ?
