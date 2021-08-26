@@ -274,7 +274,10 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
       }
 
       // Format log message strings
-      ConcatString fcst_cs, ref_cs, ss_cs;
+      ConcatString term_cs, fcst_cs, ref_cs, ss_cs;
+      term_cs << fcst_job[i].fcst_var[0] << "/"
+              << fcst_job[i].fcst_lev[0] << " at "
+              << sec_to_hhmmss(fcst_job[i].fcst_lead[0]) << " lead";
       if(is_bad_data(fcst_stat)) fcst_cs << na_str;
       else                       fcst_cs << fcst_stat;
       if(is_bad_data(ref_stat))  ref_cs  << na_str;
@@ -284,9 +287,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
 
       // Print debug info for each term
       mlog << Debug(3) << name << " Term " << i+1
-           << ": " << fcst_job[i].fcst_var[0] << "/"
-           << fcst_job[i].fcst_lev[0] << " at "
-           << sec_to_hhmmss(fcst_job[i].fcst_lead[0]) << " lead, "
+           << ": " << term_cs << ", "
            << n_fcst_lines[i] << " fcst "
            << fcst_job[i].line_type[0] << "->"
            << fcst_job[i].column[0] << " = " << fcst_cs << ", "
@@ -301,12 +302,13 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
          mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
               << "the number of aggregated forecast and reference lines "
               << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
-              << ") for term " << i+1 << ".\n\n";
+              << ") for term " << i+1 << " (" << term_cs << ").\n\n";
       }
 
       if(is_bad_data(ss)) {
          mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
-              << "can't compute the skill score for term " << i+1 << ".\n\n";
+              << "can't compute the skill score for term " << i+1
+              << " (" << term_cs << ").\n\n";
       }
       else {
          n_vld++;
