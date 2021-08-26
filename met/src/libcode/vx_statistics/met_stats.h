@@ -672,8 +672,8 @@ inline double DMAPInfo::get_beta_value() const { return(beta_value); }
 
 struct SSIDXData {
 
-   // Index name
-   ConcatString name;
+   // Skill score index name
+   ConcatString ss_index_name;
 
    // Forecast and reference model names
    ConcatString fcst_model;

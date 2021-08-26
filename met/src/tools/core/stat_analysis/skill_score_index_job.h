@@ -60,7 +60,7 @@ class SSIndexJobInfo {
       SSIndexJobInfo & operator=(const SSIndexJobInfo &);
 
       // Index name
-      ConcatString name;
+      ConcatString ss_index_name;
 
       // Forecast and reference model names
       ConcatString fcst_model, ref_model;

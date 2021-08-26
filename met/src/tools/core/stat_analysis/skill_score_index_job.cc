@@ -82,7 +82,7 @@ void SSIndexJobInfo::init_from_scratch() {
 void SSIndexJobInfo::clear() {
 
    // Initialize
-   name.clear();
+   ss_index_name.clear();
    fcst_model.clear();
    ref_model.clear();
    n_term = 0;
@@ -103,7 +103,7 @@ void SSIndexJobInfo::clear() {
 
 void SSIndexJobInfo::assign(const SSIndexJobInfo &c) {
 
-   name = c.name;
+   ss_index_name = c.ss_index_name;
    fcst_model = c.fcst_model;
    ref_model = c.ref_model;
    n_term = c.n_term;
@@ -232,7 +232,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    SSIDXData data;
 
    mlog << Debug(3)
-        << "Computing " << name << " for " << init_time.n()
+        << "Computing " << ss_index_name << " for " << init_time.n()
         << " initialization time(s): " << write_css(init_time) << "\n";
 
    // Compute a skill score for each term
@@ -286,7 +286,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
       else                       ss_cs   << ss;
 
       // Print debug info for each term
-      mlog << Debug(3) << name << " Term " << i+1
+      mlog << Debug(3) << ss_index_name << " Term " << i+1
            << ": " << term_cs << ", "
            << n_fcst_lines[i] << " fcst "
            << fcst_job[i].line_type[0] << "->"
@@ -321,12 +321,12 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    else                       ss_avg = ss_sum/weight_sum;
 
    // Store the output data
-   data.name       = name;
-   data.fcst_model = fcst_model;
-   data.ref_model  = ref_model;
-   data.init_time  = init_time;
-   data.n_term     = n_term;
-   data.n_vld      = n_vld;
+   data.ss_index_name = ss_index_name;
+   data.fcst_model    = fcst_model;
+   data.ref_model     = ref_model;
+   data.init_time     = init_time;
+   data.n_term        = n_term;
+   data.n_vld         = n_vld;
    if(is_bad_data(ss_avg) || is_eq(ss_avg, 1.0)) {
       data.ss_index = bad_data_double;
    }
@@ -335,8 +335,8 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    }
 
    mlog << Debug(3)
-        << name << " Weighted Average = " << ss_avg << "\n"
-        << name << " Skill Score Value = " << data.ss_index << "\n";
+        << ss_index_name << " Weighted Average = " << ss_avg << "\n"
+        << ss_index_name << " Skill Score Value = " << data.ss_index << "\n";
 
    return(data);
 }
