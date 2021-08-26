@@ -3397,7 +3397,6 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
-                   const ConcatString &name,
                    map<ConcatString, AggrSSIndexInfo> &m,
                    int &n_in, int &n_out) {
    STATLine line;
@@ -3408,7 +3407,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
    //
    // Store the index name
    //
-   cur.job_info.name = name;
+   cur.job_info.ss_index_name = job.ss_index_name;
 
    //
    // Check that the -model option has been supplied exactly 2 times.
@@ -3427,7 +3426,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
    }
 
    mlog << Debug(3)
-        << "Computing " << cur.job_info.name << " for forecast model ("
+        << "Computing " << cur.job_info.ss_index_name << " for forecast model ("
         << cur.job_info.fcst_model << ") versus reference model ("
         << cur.job_info.ref_model  << ").\n";
 
