@@ -742,7 +742,6 @@ This job produces summary statistics for the column name and line type specified
   * - 22
     - WMO Weighted Mean value
 
-
 Job: aggregate
 ^^^^^^^^^^^^^^
 
