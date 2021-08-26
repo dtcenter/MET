@@ -52,10 +52,49 @@ When aggregating the matched pair line type (MPR) and computing an output contin
 
 .. _StA_Skill-Score-Index:
 
-Skill Score Index, including GO Index
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Skill Score Index
+~~~~~~~~~~~~~~~~~
 
-The Stat-Analysis "ss_index" and "go_index" jobs calculate the skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. The GO Index is a special case of the Skill Score index for which a specific configuration file is provided. The GO index is a weighted average of the RMSE values for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in :numref:`compute_GO_Index` and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index. For a general skill score index, the user can specify the weights and variables to use in the calculations in a Stat-Analysis configuration file and run the ss_index job type.
+The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. Pre-defined configuration files are provided for the GO Index and CBS Index which are special cases of the highly configurable skill score index job.
+
+In general, a skill score index is computed over several terms and the number and definition of those terms is configurable. It is computed by aggregating the output from earlier runs of the Point-Stat and/or Grid-Stat tools over one or more cases. When configuring a skill score index job, the following requirements apply:
+
+1. Exactly two models names must be chosen. The first is interpreted as the forecast model and the second is the reference model, against which the performance of the forecast should be measured. Specify this with the "model" configuration file entry or using the "-model" job command option.
+
+2. The forecast variable name, level, lead time, line type, column, and weight options must be specified. If the value remains contant for all the terms, set its to an array of length one. If the value changes for at least one term, specify an array entry for each term. Specify these with the "fcst_var", "fcst_lev", "lead_time", "line_type", "column", and "weight" configuration file entries, respectively, or use the corresponding job command options.
+
+3. While these line types are required, additional options may be provided for each term, including the observation type ("obtype"), verification region ("vx_mask"), and interpolation method ("interp_mthd"). Specify each as single value or provide a value for each term.
+
+4. Only the SL1L2 and CTC input line types are supported, and the input Point-Stat and/or Grid-Stat output must contain these line types.
+
+5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
+
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (.e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+
+For each term, all matching SL1L2 (or CTC) input lines are aggregated separtely for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
+
+.. math:: ss = 1.0 - \frac{s_{fcst}^2}{s_{ref}^2}
+
+Where :math:`s_{fcst}` and :math:`s_{ref}` are the aggregated forecast and reference statistics, respectively. Next, a weighted average is computed from the skill scores for each term:
+
+ .. math:: ss_{avg} = \frac{1}{n} \sum_{i=1}^{n} w_i * ss_i
+
+Where, :math:`w_i` and :math:`ss_i` are the weight and skill score for each term and :math:`n` is the number of terms. Finally, the skill score index is computed as:
+
+.. math:: index = \sqrt{\frac{1.0}{1.0-ss_{avg}}}
+
+A value greater than 1.0 indicates that the forecast model outperforms the reference, while a value less than 1.0 indicates that the reference outperforms the forecast.
+
+The default skill score index name (SS_INDEX) can be overridden using the "ss_index_name" option in the configuration file. The pre-defined configuration files for the GO Index and CBS Index use "GO_INDEX" and "CBS_INDEX", respectively.
+
+When running a skill score index job using the "-out_stat" job command option, a .stat output file is written containing the skill score index (SSIDX) output line type. If the "-by" job command option is specified, the skill score index will be computed separately for each unique combination of values found in the column(s) specified. For example, "-by FCST_INIT_BEG,VX_MASK" runs the job separately for each combination of model initialization time and verification region found in the input. Note that increasing the Stat-Analysis verbosity level (-v 3) on the command line prints detailed information about each skill score index term.
+
+.. _StA_Go-Index:
+
+GO Index
+~~~~~~~~
+
+The "go_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The GO Index is a weighted average of 48 skill scores of RMSE statistics for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in :numref:`compute_GO_Index` and are defined by the default STATAnalysisConfig_GO_Index configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index.
 
 .. _compute_GO_Index:
 
@@ -148,6 +187,50 @@ The Stat-Analysis "ss_index" and "go_index" jobs calculate the skill score indic
     - 4
     - 2
 
+.. _StA_CBS-Index:
+
+CBS Index
+~~~~~~~~~
+
+The "cbs_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The CBS Index is a weighted average of 40 skill scores of RMSE statistics for mean sea level pressure, height, and wind speed at multiple levels computed over the northern hemisphere, southern hemisphere and the tropics. The variables, levels, lead times, and regions included in the index are shown in :numref:`compute_CBS_Index` and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables for each level, lead time, and masking region must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_CBS_Index` to compute values for the CBS Index.
+
+.. _compute_CBS_Index:
+
+.. list-table:: Variables, levels, and weights used to compute the CBS Index for 24, 48, 72, 96 and 120 hour lead times.
+  :widths: auto
+  :header-rows: 2
+
+  * - Variable
+    - Level
+    - Weights by Region
+    -
+    -
+  * -
+    -
+    - North Hem
+    - Tropics
+    - South Hem
+  * - Pressure
+    - Mean sea level
+    - 6.4
+    - x
+    - 3.2
+  * - Height
+    - 500 hPa
+    - 2.4
+    - x
+    - 1.2
+  * - Wind speed
+    - 250 hPa
+    - 2.4
+    - 1.2
+    - 1.2
+  * -
+    - 850 hPa
+    - x
+    - 2.0
+    - x
+
 Ramp Events
 ~~~~~~~~~~~
 
@@ -156,7 +239,7 @@ The Stat-Analysis "ramp" job identifies ramp events (large increases or decrease
 Wind Direction Statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold. 
+The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold.
 
 The first step in verifying wind direction is running the Grid-Stat and/or Point-Stat tools to verify each forecast of interest and generate the VL1L2 or MPR line(s). When running these tools, please note:
 
@@ -476,7 +559,10 @@ All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_a
     - Calculates a user-defined Skill Score index as described in section :numref:`StA_Skill-Score-Index`.
     - \-model forecast :raw-html:`<br />`  \-model reference
   * - go_index
-    - Calculates the GO Index as described in section :numref:`StA_Skill-Score-Index`.
+    - Calculates the GO Index as described in section :numref:`StA_GO-Index`.
+    - \-model forecast :raw-html:`<br />`   \-model reference
+  * - cbs_index
+    - Calculates the CBS Index as described in section :numref:`StA_CBS-Index`.
     - \-model forecast :raw-html:`<br />`   \-model reference
   * - ramp
     - Defines a ramp event on a time-series of forecast and observed values. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
@@ -694,13 +780,69 @@ This job is similar to the "**aggregate**" job listed above, however the format 
   * - MPR
     - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
     
-**Job: ss_index**
+**Job: ss_index, go_index, cbs_index**
 
-The output from this job consists of three lines, the first two of which contain "**JOB_LIST**" and "**COL_NAME**", as described above. The third line contains "**SS_INDEX**" followed by a colon and then the value computed for the user-defined Skill Score Index. 
+While the inputs for the "ss_index", "go_index", and "cbs_index" jobs may vary, the output is the same. By default, the job output is written to the screen or to a "-out" file, if specified. If the "-out_stat" job command option is specified, a STAT output file is written containing the skill score index (SSIDX) output line type.
 
-**Job: go_index**
+The SSIDX line type consists of the common STAT header columns described in :numref:`table_PS_header_info_point-stat_out` followed by the columns described below. In general, when multiple input header strings are encountered, the output is reported as a comma-separated list of the unique values. The "-set_hdr" job command option can be used to override any of the output header strings (e.g. "-set_hdr VX_MASK MANY" sets the output VX_MASK column to "MANY"). Special logic applied to some of the STAT header columns are also described below.
 
-The output from this job consists of three lines, the first two of which contain "**JOB_LIST**" and"**COL_NAME**", as described above. The third line contains "**GO_INDEX**" followed by a colon and then the value computed for the GO Index. 
+..  _table_SA_format_info_SSIDX:
+
+.. list-table:: Format information for the SSIDX (Skill Score Index) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SSIDX OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SSIDX Column Name
+    - Description
+  * - 4
+    - FCST_LEAD
+    - Maximum input forecast lead time
+  * - 5
+    - FCST_VALID_BEG
+    - Minimum input forecast valid start time
+  * - 6
+    - FCST_VALID_END
+    - Maximum input forecast valid end time
+  * - 7
+    - OBS_LEAD
+    - Maximum input observation lead time
+  * - 8
+    - OBS_VALID_BEG
+    - Minimum input observation valid start time
+  * - 9
+    - OBS_VALID_END
+    - Maximum input observation valid end time
+  * - 10
+    - FCST_VAR
+    - Skill score index name from the "ss_index_name" option
+  * - 11
+    - OBS_VAR
+    - Skill score index name from the "ss_index_name" option
+  * - 24
+    - SSIDX
+    - Skill score index line type
+  * - 25
+    - FCST_MODEL
+    - Forecast model name
+  * - 26
+    - REF_MODEL
+    - Reference model name
+  * - 27
+    - N_INIT
+    - Number of unique input model initialization times
+  * - 28
+    - N_TERM
+    - Number of skill score index terms
+  * - 29
+    - N_VLD
+    - Number of terms for which a valid skill score was computed
+  * - 30
+    - SS_INDEX
+    - Skill score index value
 
 **Job: ramp**
 
