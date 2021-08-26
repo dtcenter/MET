@@ -11,18 +11,14 @@
 //
 model = [];
 
-fcst_lead = [ "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48",
-              "12",    "24",    "36",    "48"
+fcst_lead = [ "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120",
+              "24", "48", "72", "96", "120"
             ];
 obs_lead  = [];
 
@@ -50,39 +46,39 @@ obs_init_inc    = [];
 obs_init_exc    = [];
 obs_init_hour   = [];
 
-fcst_var = [ "WIND",  "WIND",  "WIND",  "WIND",
-             "WIND",  "WIND",  "WIND",  "WIND",
-             "WIND",  "WIND",  "WIND",  "WIND",
-             "WIND",  "WIND",  "WIND",  "WIND",
-             "DPT",   "DPT",   "DPT",   "DPT",
-             "DPT",   "DPT",   "DPT",   "DPT",
-             "DPT",   "DPT",   "DPT",   "DPT",
-             "DPT",   "DPT",   "DPT",   "DPT",
-             "TMP",   "TMP",   "TMP",   "TMP",
-             "TMP",   "TMP",   "TMP",   "TMP",
-             "HGT",   "HGT",   "HGT",   "HGT",
-             "PRMSL", "PRMSL", "PRMSL", "PRMSL"
+fcst_var = [ "PRMSL", "PRMSL", "PRMSL", "PRMSL", "PRMSL",
+             "HGT",   "HGT",   "HGT",   "HGT",   "HGT",
+             "WIND",  "WIND",  "WIND",  "WIND",  "WIND",
+             "WIND",  "WIND",  "WIND",  "WIND",  "WIND",
+             "WIND",  "WIND",  "WIND",  "WIND",  "WIND",
+             "PRMSL", "PRMSL", "PRMSL", "PRMSL", "PRMSL",
+             "HGT",   "HGT",   "HGT",   "HGT",   "HGT",
+             "WIND",  "WIND",  "WIND",  "WIND",  "WIND"
            ];
 obs_var  = [];
 
-fcst_lev = [ "P250",  "P250",  "P250",  "P250",
-             "P400",  "P400",  "P400",  "P400",
-             "P850",  "P850",  "P850",  "P850",
-             "Z10",   "Z10",   "Z10",   "Z10",
-             "P400",  "P400",  "P400",  "P400",
-             "P700",  "P700",  "P700",  "P700",
-             "P850",  "P850",  "P850",  "P850",
-             "Z2",    "Z2",    "Z2",    "Z2",
-             "P400",  "P400",  "P400",  "P400",
-             "Z2",    "Z2",    "Z2",    "Z2",
-             "P400",  "P400",  "P400",  "P400",
-             "Z0",    "Z0",    "Z0",    "Z0"
+fcst_lev = [ "Z0",    "Z0",    "Z0",    "Z0",    "Z0",
+             "P500",  "P500",  "P500",  "P500",  "P500",
+             "P250",  "P250",  "P250",  "P250",  "P250",
+             "P850",  "P850",  "P850",  "P850",  "P850",
+             "P250",  "P250",  "P250",  "P250",  "P250",
+             "Z0",    "Z0",    "Z0",    "Z0",    "Z0",
+             "P500",  "P500",  "P500",  "P500",  "P500",
+             "P250",  "P250",  "P250",  "P250",  "P250"
            ];
 obs_lev  = [];
 
 obtype = [];
 
-vx_mask = [];
+vx_mask = [ "NH",   "NH",   "NH",   "NH",
+            "NH",   "NH",   "NH",   "NH",
+            "NH",   "NH",   "NH",   "NH",
+            "TROP", "TROP", "TROP", "TROP",
+            "TROP", "TROP", "TROP", "TROP",
+            "SH",   "SH",   "SH",   "SH",
+            "SH",   "SH",   "SH",   "SH",
+            "SH",   "SH",   "SH",   "SH"
+          ];
 
 interp_mthd = [];
 
@@ -94,46 +90,18 @@ cov_thresh  = [];
 
 alpha = [];
 
-line_type = [ "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2",
-              "SL1L2", "SL1L2", "SL1L2", "SL1L2"
-            ];
+line_type = [ "SL1L2" ];
 
-column    = [ "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE",
-              "RMSE",  "RMSE",  "RMSE",  "RMSE"
-            ];
+column    = [ "RMSE" ];
             
-weight    = [ 4.0,     3.0,     2.0,     1.0,
-              4.0,     3.0,     2.0,     1.0,
-              4.0,     3.0,     2.0,     1.0,
-              8.0,     6.0,     4.0,     2.0,
-              8.0,     6.0,     4.0,     2.0,
-              8.0,     6.0,     4.0,     2.0,
-              8.0,     6.0,     4.0,     2.0,
-              8.0,     6.0,     4.0,     2.0,
-              4.0,     3.0,     2.0,     1.0,
-              8.0,     6.0,     4.0,     2.0,
-              4.0,     3.0,     2.0,     1.0,
-              8.0,     6.0,     4.0,     2.0
+weight    = [ 6.4,     6.4,     6.4,     6.4,
+              2.4,     2.4,     2.4,     2.4,
+              2.4,     2.4,     2.4,     2.4,
+              2.0,     2.0,     2.0,     2.0,
+              1.2,     1.2,     1.2,     1.2,
+              3.2,     3.2,     3.2,     3.2,
+              1.2,     1.2,     1.2,     1.2,
+              1.2,     1.2,     1.2,     1.2
             ];
 
 ////////////////////////////////////////////////////////////////////////////////
