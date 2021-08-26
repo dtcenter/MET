@@ -651,6 +651,16 @@ void process_job(const char * jobstring, int n_job) {
    job = default_job;
 
    //
+   // Parse the job command line options
+   //
+   if(jobstring != command_line_job_options) {
+      mlog << Debug(4)
+           << "\nAmending Job " << n_job << " with options: \""
+           << jobstring << "\"\n";
+      job.parse_job_command(jobstring);
+   }
+
+   //
    // Override with any command line options
    //
    mlog << Debug(4)
