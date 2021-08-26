@@ -325,6 +325,11 @@ class STATAnalysisJob {
       char *boot_seed;
 
       //
+      // Name of the skill score index being computed
+      //
+      ConcatString ss_index_name;
+
+      //
       // MCTS HSS Expected Correct rate
       //
       double hss_ec_value;
