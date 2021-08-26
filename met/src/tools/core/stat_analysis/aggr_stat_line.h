@@ -295,6 +295,7 @@ extern void aggr_time_series_lines(
 
 extern void aggr_ss_index(
                LineDataFile &, STATAnalysisJob &,
+               const ConcatString &,
                map<ConcatString, AggrSSIndexInfo> &,
                int &, int &);
 
