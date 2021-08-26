@@ -273,6 +273,15 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
          weight_sum += fcst_job[i].weight[0];
       }
 
+      // Format log message strings
+      ConcatString fcst_cs, ref_cs, ss_cs;
+      if(is_bad_data(fcst_stat)) fcst_cs << na_str;
+      else                       fcst_cs << fcst_stat;
+      if(is_bad_data(ref_stat))  ref_cs  << na_str;
+      else                       ref_cs  << ref_stat;
+      if(is_bad_data(ss))        ss_cs   << na_str;
+      else                       ss_cs   << ss;
+
       // Print debug info for each term
       mlog << Debug(3) << name << " Term " << i+1
            << ": " << fcst_job[i].fcst_var[0] << "/"
@@ -280,11 +289,11 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
            << sec_to_hhmmss(fcst_job[i].fcst_lead[0]) << " lead, "
            << n_fcst_lines[i] << " fcst "
            << fcst_job[i].line_type[0] << "->"
-           << fcst_job[i].column[0] << " = " << fcst_stat << ", "
+           << fcst_job[i].column[0] << " = " << fcst_cs << ", "
            << n_ref_lines[i] << " ref "
            << fcst_job[i].line_type[0] << "->"
-           << fcst_job[i].column[0] << " = " << ref_stat
-           << ", skill = " << ss
+           << fcst_job[i].column[0] << " = " << ref_cs
+           << ", skill = " << ss_cs
            << ", weight = " << fcst_job[i].weight[0] << "\n";
 
       // Check if the number of aggregated lines differ
