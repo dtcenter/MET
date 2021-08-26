@@ -3992,6 +3992,11 @@ void write_job_ss_index(STATAnalysisJob &job,
       ssidx_data = it->second.job_info.compute_ss_index();
 
       //
+      // Skip empty output
+      //
+      if(ssidx_data.n_vld == 0) continue;
+
+      //
       // Initialize
       //
       c = 0;
