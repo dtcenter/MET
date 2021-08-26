@@ -661,6 +661,41 @@ void process_job(const char * jobstring, int n_job) {
    }
 
    //
+   // Special processing for the GO Index and CBS Index jobs.
+   //
+   if(job.job_type == stat_job_go_index ||
+      job.job_type == stat_job_cbs_index) {
+
+      MetConfig ss_index_conf;
+      STATAnalysisJob ss_index_job;
+
+      ConcatString config_file =
+         (job.job_type == stat_job_go_index ?
+          replace_path(go_index_config_file) :
+          replace_path(cbs_index_config_file));
+
+      //
+      // Read the config files for the constants and the skill score index.
+      //
+      ss_index_conf.read(replace_path(config_const_filename).c_str());
+      ss_index_conf.read(config_file.c_str());
+
+      //
+      // Parse the Skill Score Index config file into the search job.
+      //
+      ss_index_job.set_job_type(job.job_type);
+      set_job_from_config(ss_index_conf, ss_index_job);
+
+      //
+      // Amend the current job with Skill Score Index filtering criteria.
+      //
+      mlog << Debug(4)
+           << "\nAmending Job " << n_job << " with Skill Score Index configuration file: "
+           << config_file << "\n";
+      job.parse_job_command(ss_index_job.get_jobstring().c_str());
+   }
+
+   //
    // Override with any command line options
    //
    mlog << Debug(4)
