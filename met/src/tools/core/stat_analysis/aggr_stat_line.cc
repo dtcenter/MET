@@ -3459,7 +3459,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
       (job.line_type.n() != n_term && job.line_type.n() != 1) ||
       (job.column.n()    != n_term && job.column.n()    != 1) ||
       (job.weight.n()    != n_term && job.weight.n()    != 1)) {
-      mlog << Error << "\ncompute_ss_index() -> "
+      mlog << Error << "\naggr_ss_var() -> "
            << "each skill score index parameter must have the same length ("
            << n_term << ") or have length 1!\n"
            << "Check the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
