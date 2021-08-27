@@ -71,7 +71,7 @@ In general, a skill score index is computed over several terms and the number an
 
 6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (.e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
 
-For each term, all matching SL1L2 (or CTC) input lines are aggregated separtely for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
+For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
 
 .. math:: ss = 1.0 - \frac{s_{fcst}^2}{s_{ref}^2}
 
