@@ -3481,7 +3481,8 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
    //    FBIAS,       BADDELEY,    HAUSDORFF,
    //    MED_FO,      MED_OF,      MED_MIN,      MED_MAX,      MED_MEAN,
    //    FOM_FO,      FOM_OF,      FOM_MIN,      FOM_MAX,      FOM_MEAN,
-   //    ZHU_FO,      ZHU_OF,      ZHU_MIN,      ZHU_MAX,      ZHU_MEAN
+   //    ZHU_FO,      ZHU_OF,      ZHU_MIN,      ZHU_MAX,      ZHU_MEAN,
+   //    G,           GBETA,       BETA_VALUE
    //
    at.set_entry(r, c+0,  // TOTAL
       dmap_info.total);
@@ -3545,6 +3546,15 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
 
    at.set_entry(r, c+20, // ZHU_MEAN
       dmap_info.zhu_mean);
+
+   at.set_entry(r, c+21, // G
+      dmap_info.g);
+
+   at.set_entry(r, c+22, // GBETA
+      dmap_info.gbeta);
+
+   at.set_entry(r, c+23, // BETA_VALUE 
+      dmap_info.get_beta_value());
 
    return;
 }

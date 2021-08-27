@@ -120,7 +120,30 @@ While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illus
 
    The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
-The statistics derived from these distance maps are described in :numref:`Appendix C, Section %s <App_C-distance_maps>`. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+The statistics derived from these distance maps are described in :numref:`Appendix C, Section %s <App_C-distance_maps>`. To make fair comparisons, any grid point containing bad data in either the forecast or observation field is set to bad data in both fields. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+
+.. _grid-stat_gbeta:
+
+:math:`\beta` and :math:`G_\beta`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See :numref:`App_C-gbeta` for the :math:`G` and :math:`G_\beta` equations.
+
+:math:`G_\beta` provides a summary measure of forecast quality for each user-defined threshold chosen. It falls into a range from zero to one where one is a perfect forecast and zero is considered to be a very poor forecast as determined by the user through the value of :math:`\beta`. Values of :math:`G_\beta` closer to one represent better forecasts and worse forecasts as it decreases toward zero. Although a particular value cannot be universally compared against any forecast, when applied with the same choice of :math:`\beta` for the same variable and on the same domain, it is highly effective at ranking such forecasts.
+
+:math:`G_\beta` is sensitive to the choice of :math:`\beta`, which depends on the (i) specific domain, (ii) variable, and (iii) user’s needs. Smaller values make :math:`G_\beta` more stringent and larger values make it more lenient. :numref:`grid-stat_fig6` shows an example of applying :math:`G_\beta` over a range of :math:`\beta` values to a precipitation verification set where the binary fields are created by applying a threshold of :math:`2.1 mmh^{-1}`. Color choice and human bias can make it difficult to determine the quality of the forecast for a human observer looking at the raw images in the top row of the figure (:ref:`Ahijevych et al., 2009 <Ahijevych-2009>`). The bottom left panel of the figure displays the differences in their binary fields, which highlights that the forecast captured the overall shapes of the observed rain areas but suffers from a spatial displacement error (perhaps really a timing error).
+
+Whether or not the forecast from :numref:`grid-stat_fig6` is “good” or not depends on the specific user. Is it sufficient that the forecast came as close as it did to the observation field? If the answer is yes for the user, then a higher choice of :math:`\beta`, such as :math:`N/2`, with :math:`N` equal to the number of points in the domain, will correctly inform this user that it is a “good” forecast as it will lead to a :math:`G_\beta` value near one. If the user requires the forecast to be much better aligned spatially with the observation field, then a lower choice, perhaps :math:`\beta = N`, will correctly inform that the forecast suffers from spatial displacement errors that are too large for this user to be pleased. If the goal is to rank a series of ensemble forecasts, for example, then a choice of :math:`\beta` that falls in the steep part of the curve shown in the lower right panel of the figure should be preferred, say somewhere between :math:`\beta = N` and :math:`\beta = N^2/2`. Such a choice will ensure that each member is differentiated by the measure.
+
+.. _grid-stat_fig6:
+
+.. figure:: figure/grid-stat_fig6.png
+
+   Top left is an example of an  accumulated precipitation (mm/h)  forecast with the corresponding observed field on the top right. Bottom left shows the difference in binary fields, where the binary fields are created by setting all values in the original fields that fall above :math:`2.1 mmh^{-1}` to one and the rest to zero. Bottom right shows the results for :math:`G_\beta` calculated on the binary fields using the threshold of :math:`2.1 mmh^{-1}` over a range of choices for :math:`\beta`.
+
+In some cases, a user may be interested in a much higher threshold than :math:`2.1 mmh^{-1}` of the above example. :ref:`Gilleland, 2021 (Fig. 4) <Gilleland-2021>`, for example, shows this same forecast using a threshold of :math:`40 mmh^{-1}`. Only a small area in Mississippi has such extreme rain predicted at this valid time; yet none was observed. Small spatial areas of extreme rain in the observed field, however, did occur in a location far away from Mississippi that was not predicted. Generally, for this type of verification, the Hausdorff metric is a good choice of measure. However, a small choice of :math:`\beta` will provide similar results as the Hausdorff distance (:ref:`Gilleland, 2021 <Gilleland-2021>`). The user should think about the average size of storm areas and multiply this value by the displacement distance  they are comfortable with in order to get a good initial choice for :math:`\beta`, and may have to increase or decrease its value by trial-and-error using one or two example cases from their verification set.
+
+Since :math:`G_\beta` is so sensitive to the choice of :math:`\beta`, which is defined relative to the number of points in the verification domain, :math:`G_\beta` is only computed for the full verification domain. :math:`G_\beta` is reported as a bad data value for any masking region subsets of the full verification domain.
 
 Practical information
 _____________________
@@ -234,6 +257,10 @@ The configuration options listed above are common to multiple MET tools and are 
 
 ___________________________
 
+.. _nbrhd:
+
+:ref:`nbrhd <nbrhd>`
+
 .. code-block:: none
 
   nbrhd = {
@@ -244,7 +271,7 @@ ___________________________
      cov_thresh = [ >=0.5 ];
    }
 
-	 
+
 The **nbrhd** dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** value specifies the width of the square or diameter of the circle as an odd integer.
 
 The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
@@ -255,6 +282,10 @@ The **cov_thresh** entry contains a comma separated list of thresholds to be app
 
 ___________________
 
+.. _fourier:
+
+:ref:`fourier <fourier>`
+
 .. code-block:: none
 
   fourier = {
@@ -263,24 +294,35 @@ ___________________
   }
 
 
-The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
+The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed.
 
-The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included. The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
+The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid:
+
+* The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included.
+
+* The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
 
+.. _gradient:
+
+:ref:`gradient <gradient>`
+
 .. code-block:: none
 
-  grad = {
+  gradient = {
      dx = [ 1 ];
      dy = [ 1 ];
    }
 
 
-
 The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
 
 ____________________
+
+.. _distance_map:
+
+:ref:`distance_map <distance_map>`
 
 .. code-block:: none
 
@@ -289,9 +331,10 @@ ____________________
      baddeley_max_dist = NA;
      fom_alpha         = 0.1;
      zhu_weight        = 0.5;
+     beta_value(n)     = n * n / 2.0;
   }
 
-The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley Delta metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry.
+The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is defined as a function of n, where n is the total number of grid points in the full verification domain containing valid data in both the forecast and observation fields. The resulting beta_value is used to compute the :math:`G_\beta` statistic. The default function, :math:`N^2 / 2`, is recommended in :ref:`Gilleland, 2021 <Gilleland-2021>` but can be modified as needed.
 
 _____________________
 
@@ -345,7 +388,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VCNT** for Vector Contingency Table Statistics
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table Counts for Probabilistic forecasts
 
@@ -755,7 +798,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Frequency Bias
   * - 29
     - BADDELEY
-    - Baddeley's Delta Metric
+    - Baddeley's :math:`\Delta` Metric
   * - 30
     - HAUSDORFF
     - Hausdorff Distance
@@ -804,6 +847,15 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 45
     - ZHU_MEAN
     - Mean of ZHU_FO and ZHU_OF
+  * - 46
+    - G
+    - :math:`G` distance measure
+  * - 47
+    - GBETA
+    - :math:`G_\beta` distance measure
+  * - 48
+    - BETA_VALUE
+    - Beta value used to compute :math:`G_\beta`
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
