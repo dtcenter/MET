@@ -3511,7 +3511,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
       if(job.obs_init_hour.n()  == n_term) fcst_term.obs_init_hour.set(job.obs_init_hour[i]);
       if(job.fcst_var.n()       == n_term) fcst_term.fcst_var.set(job.fcst_var[i]);
       if(job.obs_var.n()        == n_term) fcst_term.obs_var.set(job.obs_var[i]);
-      if(job.fcst_lev.n()       == n_term) fcst_term.fcst_lev.add(job.fcst_lev[i]);
+      if(job.fcst_lev.n()       == n_term) fcst_term.fcst_lev.set(job.fcst_lev[i]);
       if(job.obs_lev.n()        == n_term) fcst_term.obs_lev.set(job.obs_lev[i]);
       if(job.obtype.n()         == n_term) fcst_term.obtype.set(job.obtype[i]);
       if(job.vx_mask.n()        == n_term) fcst_term.vx_mask.set(job.vx_mask[i]);
@@ -3519,6 +3519,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
       if(job.interp_pnts.n()    == n_term) fcst_term.interp_pnts.set(job.interp_pnts[i]);
       if(job.fcst_thresh.n()    == n_term) fcst_term.fcst_thresh.set(job.fcst_thresh[i]);
       if(job.obs_thresh.n()     == n_term) fcst_term.obs_thresh.set(job.obs_thresh[i]);
+      if(job.line_type.n()      == n_term) fcst_term.line_type.set(job.line_type[i]);
       if(job.column.n()         == n_term) fcst_term.column.set(job.column[i]);
       if(job.weight.n()         == n_term) fcst_term.weight.set(job.weight[i]);
 
