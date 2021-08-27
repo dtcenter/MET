@@ -197,7 +197,7 @@ bool SSIndexJobInfo::add(STATLine &line) {
       }
 
       // Check the reference model job
-      if(ref_job[i].is_keeper(line)) {
+      if(!keep && ref_job[i].is_keeper(line)) {
          keep = true;
          n_ref_lines.inc(i, 1);
 
@@ -212,6 +212,9 @@ bool SSIndexJobInfo::add(STATLine &line) {
             ref_cts[i].cts += ctc;
          }
       }
+
+      // Break out of the loop after the first job match
+      if(keep) break;
    }
 
    // Track the unique intialization times
