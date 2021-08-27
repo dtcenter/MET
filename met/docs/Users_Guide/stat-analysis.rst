@@ -61,7 +61,7 @@ In general, a skill score index is computed over several terms and the number an
 
 1. Exactly two models names must be chosen. The first is interpreted as the forecast model and the second is the reference model, against which the performance of the forecast should be measured. Specify this with the "model" configuration file entry or using the "-model" job command option.
 
-2. The forecast variable name, level, lead time, line type, column, and weight options must be specified. If the value remains contant for all the terms, set its to an array of length one. If the value changes for at least one term, specify an array entry for each term. Specify these with the "fcst_var", "fcst_lev", "lead_time", "line_type", "column", and "weight" configuration file entries, respectively, or use the corresponding job command options.
+2. The forecast variable name, level, lead time, line type, column, and weight options must be specified. If the value remains constant for all the terms, set it to an array of length one. If the value changes for at least one term, specify an array entry for each term. Specify these with the "fcst_var", "fcst_lev", "lead_time", "line_type", "column", and "weight" configuration file entries, respectively, or use the corresponding job command options.
 
 3. While these line types are required, additional options may be provided for each term, including the observation type ("obtype"), verification region ("vx_mask"), and interpolation method ("interp_mthd"). Specify each as single value or provide a value for each term.
 
@@ -69,9 +69,9 @@ In general, a skill score index is computed over several terms and the number an
 
 5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
 
-6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (.e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
 
-For each term, all matching SL1L2 (or CTC) input lines are aggregated separtely for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
+For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
 
 .. math:: ss = 1.0 - \frac{s_{fcst}^2}{s_{ref}^2}
 
