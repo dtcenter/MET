@@ -69,7 +69,7 @@ In general, a skill score index is computed over several terms and the number an
 
 5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
 
-6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (.e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
 
 For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
 
