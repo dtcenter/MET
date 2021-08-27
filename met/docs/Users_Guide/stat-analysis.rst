@@ -512,10 +512,11 @@ ___________________
 
 .. code-block:: none
 
-  column = [];
-  weight = [];
+  column        = [];
+  weight        = [];
+  ss_index_name = "SS_INDEX";
 
-The column and weight fields are used to define a skill score index. The computation of a single value will be computed from each column and weight value specified. The GO Index is a specific example of a skill score index. 
+The column, weight, and ss_index_name entries are used to define a skill score index. The column and weight arrays can either be set to a constant value of length one or specify a separate value for each term of the index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration.
 
 ___________________
 
