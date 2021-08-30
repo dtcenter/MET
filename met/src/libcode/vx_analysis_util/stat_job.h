@@ -330,6 +330,11 @@ class STATAnalysisJob {
       ConcatString ss_index_name;
 
       //
+      // Required ratio of valid skill score index terms
+      //
+      double ss_index_vld_thresh;
+
+      //
       // MCTS HSS Expected Correct rate
       //
       double hss_ec_value;

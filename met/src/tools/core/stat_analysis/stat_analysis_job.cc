@@ -121,7 +121,18 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
    job.set_boot_rng(boot_info.rng.c_str());
    job.set_boot_seed(boot_info.seed.c_str());
 
-   job.ss_index_name   = c.lookup_string(conf_key_ss_index_name);
+   job.ss_index_name       = c.lookup_string(conf_key_ss_index_name);
+   job.ss_index_vld_thresh = c.lookup_double(conf_key_ss_index_vld_thresh);
+
+   // Check that ss_index_vld_thresh is in [0, 1].
+   if(job.ss_index_vld_thresh < 0.0 ||
+      job.ss_index_vld_thresh > 1.0) {
+      mlog << Error << "\nset_job_from_config() -> "
+           << "\"" << conf_key_ss_index_vld_thresh << "\" ("
+           << job.ss_index_vld_thresh << ") must be set between 0 and 1.\n\n";
+      throw(1);
+   }
+
    job.hss_ec_value    = c.lookup_double(conf_key_hss_ec_value);
    job.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    job.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
