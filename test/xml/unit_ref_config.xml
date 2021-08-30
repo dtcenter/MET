@@ -964,7 +964,7 @@
       -lookin &OUTPUT_DIR;/ref_config/point_stat/AFWAv3.4_Noahv2.7.1/ \
       -job go_index \
       -by FCST_INIT_BEG,VX_MASK,OBTYPE -set_hdr DESC Noahv3.3_vs_v2.7.1 \
-      -model AFWAv3.4_Noahv3.3,AFWAv3.4_Noahv2.7.1 \
+      -model AFWAv3.4_Noahv3.3,AFWAv3.4_Noahv2.7.1 -ss_index_vld_thresh 0.5 \
       -out_stat &OUTPUT_DIR;/ref_config/stat_analysis/go_index_by_option.stat
     </param>
     <output>
