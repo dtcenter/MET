@@ -55,7 +55,7 @@ When aggregating the matched pair line type (MPR) and computing an output contin
 Skill Score Index
 ~~~~~~~~~~~~~~~~~
 
-The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. Pre-defined configuration files are provided for the GO Index and CBS Index which are special cases of the highly configurable skill score index job.
+The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill score indices by weighting scores for meteorological fields at different levels and lead times. Pre-defined configuration files are provided for the GO Index and CBS Index which are special cases of the highly configurable skill score index job.
 
 In general, a skill score index is computed over several terms and the number and definition of those terms is configurable. It is computed by aggregating the output from earlier runs of the Point-Stat and/or Grid-Stat tools over one or more cases. When configuring a skill score index job, the following requirements apply:
 
@@ -94,7 +94,7 @@ When running a skill score index job using the "-out_stat" job command option, a
 GO Index
 ~~~~~~~~
 
-The "go_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The GO Index is a weighted average of 48 skill scores of RMSE statistics for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in :numref:`compute_GO_Index` and are defined by the default STATAnalysisConfig_GO_Index configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index.
+The "go_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The GO Index is a weighted average of 48 skill scores of RMSE statistics for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are listed in :numref:`compute_GO_Index` and are defined by the default "STATAnalysisConfig_GO_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index.
 
 .. _compute_GO_Index:
 
@@ -192,7 +192,7 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
 CBS Index
 ~~~~~~~~~
 
-The "cbs_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The CBS Index is a weighted average of 40 skill scores of RMSE statistics for mean sea level pressure, height, and wind speed at multiple levels computed over the northern hemisphere, southern hemisphere and the tropics. The variables, levels, lead times, and regions included in the index are shown in :numref:`compute_CBS_Index` and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables for each level, lead time, and masking region must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_CBS_Index` to compute values for the CBS Index.
+The "cbs_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The CBS Index is a weighted average of 40 skill scores of RMSE statistics for mean sea level pressure, height, and wind speed at multiple levels computed over the northern hemisphere, southern hemisphere and the tropics. The variables, levels, lead times, and regions included in the index are listed in :numref:`compute_CBS_Index` and are defined by the default "STATAnalysisConfig_CBS_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables for each level, lead time, and masking region must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_CBS_Index` to compute values for the CBS Index.
 
 .. _compute_CBS_Index:
 
