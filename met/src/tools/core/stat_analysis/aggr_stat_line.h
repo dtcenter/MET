@@ -53,6 +53,7 @@ using namespace std;
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
 #include "ens_stats.h"
+#include "skill_score_index_job.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -158,6 +159,11 @@ struct AggrENSInfo {
 struct AggrRPSInfo {
    StatHdrInfo hdr;
    RPSInfo rps_info;
+};
+
+struct AggrSSIndexInfo {
+   StatHdrInfo hdr;
+   SSIndexJobInfo job_info;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -285,6 +291,11 @@ extern void aggr_ssvar_lines(
 extern void aggr_time_series_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrTimeSeriesInfo> &,
+               int &, int &);
+
+extern void aggr_ss_index(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrSSIndexInfo> &,
                int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
