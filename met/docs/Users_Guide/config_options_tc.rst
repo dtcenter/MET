@@ -92,6 +92,8 @@ or exclude (exc). Tracks whose initial time meets the specified
 criteria will be used. An empty string indicates that all times
 should be used.
 
+In TC-Stat, the **-init_beg**, **-init_end**, **init_inc** and **-int_exc** job command options can be used to further refine these selections.
+
 For example:
 
 | init_beg = "20100101";
@@ -107,26 +109,34 @@ For example:
   init_inc = [];
   init_exc = [];
 
+.. _valid_beg end inc exc_1:
 
-.. _valid_beg, valid_end_1:
+ ref:`valid_beg, valid_end, valid_inc, valid_exc <valid_beg end inc exc_1>`
+  
+Specify a model valid time window YYYYMMDD[_HH[MMSS]] format or provide a
+list of specific valid times to include (inc) or exclude (exc). If a time
+window is specified, only tracks for which all points are contained within
+the window will be used. If valid times to include or exclude are specified,
+tracks will be subset down to the points which meet that criteria. Empty
+begin/end time strings and empty include/exclude lists indicate that all
+valid times should be used.
 
-:ref:`valid_beg, valid_end <valid_beg, valid_end_1>`
-
-Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
-Tracks for which all valid times fall within the time window will be used.
-An empty string indicates that all times should be used.
-
+In TC-Stat, the **-valid_beg**, **-valid_end**, **valid_inc** and **-valid_exc** job command options can be used to further refine these selections.
 
 For example:
-		
+
 | valid_beg = "20100101";
-| valid_end = "20101231";
-| 
+| valid_end = "20101231_12";
+| valid_inc = [ "20101231_06" ];
+| valid_exc = [ "20101231_00" ];
+|
 
 .. code-block:: none
-		
+
   valid_beg = "";
   valid_end = "";
+  valid_inc = [];
+  valid_exc = [];
 
 .. _init_hour_1:
 
@@ -422,7 +432,6 @@ by basin or sub-basin. Note that if your model data and best track do not
 use the same basin identifier conventions, using an empty list for this
 parameter will result in missed matches.
 
-
 .. code-block:: none
 
   basin_map = [
@@ -481,9 +490,9 @@ For example:
   valid_inc = [];
   valid_exc = [];
 
-.. _ini valid_hour lead req:
+.. _init valid_hour lead req:
 
-:ref:`ini_hour, valid_hour, lead, lead_req <ini valid_hour lead req>`
+:ref:`init_hour, valid_hour, lead, lead_req <init valid_hour lead req>`
 
 Stratify by the initialization and valid hours and lead time.
 Specify a comma-separated list of initialization hours,

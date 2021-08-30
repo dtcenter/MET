@@ -99,6 +99,8 @@ ____________________
   init_exc     = [];
   valid_beg    = "";
   valid_end    = "";
+  valid_inc    = [];
+  valid_exc    = [];
   init_hour    = [];
   init_mask    = [];
   lead_req     = [];
@@ -115,6 +117,14 @@ ____________________
   model = [ "DSHP", "LGEM", "HWRF" ];
 
 The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed. Note that when reading ATCF track data, all instances of the string AVN are automatically replaced with GFS.
+
+____________________
+
+.. code-block:: none
+
+  write_valid = [ "20101231_06" ];
+
+The **write_valid** entry specifies a comma-separated list of valid time strings in YYYYMMDD[_HH[MMSS]] format for which output should be written. An empty list indicates that data for all valid times should be written. This option may be useful when verifying track forecasts in realtime. If evaluating performance for a single valid time, this option can limit the output to that time and skip output for earlier track points.
 
 ____________________
 
@@ -315,7 +325,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Valid time masking grid applied
   * - 13
     - LINE_TYPE
-    - Output line type (TCMPR or PROBRI)
+    - Output line type (TCMPR or PROBRIRW)
 
 .. _TCMPR Line Type:
 
@@ -462,9 +472,9 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
 
-.. _PROBRI Line Type:
+.. _PROBRIRW Line Type:
 
-.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification/Weakening) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -475,8 +485,8 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Header Column Name
     - Description
   * - 13
-    - PROBRI
-    - Probability of Rapid Intensification line type
+    - PROBRIRW
+    - Probability of Rapid Intensification/Weakening line type
   * - 14
     - ALAT
     - Latitude position of edeck model
