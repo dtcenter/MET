@@ -62,6 +62,9 @@ class SSIndexJobInfo {
       // Index name
       ConcatString ss_index_name;
 
+      // Valid data threshold
+      double ss_index_vld_thresh;
+
       // Forecast and reference model names
       ConcatString fcst_model, ref_model;
 

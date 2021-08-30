@@ -3405,9 +3405,10 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
    int i, n_term;
 
    //
-   // Store the index name
+   // Store the index name and valid data threshold
    //
-   cur.job_info.ss_index_name = job.ss_index_name;
+   cur.job_info.ss_index_name       = job.ss_index_name;
+   cur.job_info.ss_index_vld_thresh = job.ss_index_vld_thresh;
 
    //
    // Check that the -model option has been supplied exactly 2 times.

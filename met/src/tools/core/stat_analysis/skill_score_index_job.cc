@@ -83,6 +83,7 @@ void SSIndexJobInfo::clear() {
 
    // Initialize
    ss_index_name.clear();
+   ss_index_vld_thresh = 0.0;
    fcst_model.clear();
    ref_model.clear();
    n_term = 0;
@@ -104,6 +105,7 @@ void SSIndexJobInfo::clear() {
 void SSIndexJobInfo::assign(const SSIndexJobInfo &c) {
 
    ss_index_name = c.ss_index_name;
+   ss_index_vld_thresh = c.ss_index_vld_thresh;
    fcst_model = c.fcst_model;
    ref_model = c.ref_model;
    n_term = c.n_term;
@@ -318,6 +320,16 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
       }
 
    } // end for i
+
+   // Check the required ratio of valid terms
+   if(((double) n_vld / n_term) < ss_index_vld_thresh) {
+      mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
+           << "skipping " << ss_index_name
+           << " since the ratio of valid terms " << n_vld << "/"
+           << n_term << " < " << ss_index_vld_thresh << "!\n\n";
+      data.n_vld = 0;
+      return(data);
+   }
 
    // Compute the weighted average of the skill scores
    if(is_eq(weight_sum, 0.0)) ss_avg = bad_data_double;

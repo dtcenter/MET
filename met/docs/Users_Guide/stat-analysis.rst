@@ -512,11 +512,19 @@ ___________________
 
 .. code-block:: none
 
-  column        = [];
-  weight        = [];
-  ss_index_name = "SS_INDEX";
+  column = [];
+  weight = [];
 
-The column, weight, and ss_index_name entries are used to define a skill score index. The column and weight arrays can either be set to a constant value of length one or specify a separate value for each term of the index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration.
+The column and weight entries are used to define a skill score index. They can either be set to a constant value of length one or specify a separate value for each term of the index.
+
+___________________
+
+.. code-block:: none
+
+  ss_index_name       = "SS_INDEX";
+  ss_index_vld_thresh = 1.0;
+
+The ss_index_name and ss_index_vld_thresh options are used to define a skill score index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration. The ss_index_vld_thresh entry is a number between 0.0 and 1.0 that defines the required ratio of valid terms. If the ratio of valid skill score index terms to the total is less than than this number, no output is written for that case. The default value of 1.0 indicates that all terms are required.
 
 ___________________
 
