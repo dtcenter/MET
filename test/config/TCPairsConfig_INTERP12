@@ -50,10 +50,17 @@ init_inc = [];
 init_exc = [];
 
 //
-// Valid model time window
+// Valid model time windows to include or exclude
 //
 valid_beg = "";
 valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Valid times for which output should be written
+//
+write_valid = [];
 
 //
 // Model initialization hours
