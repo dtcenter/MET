@@ -1781,37 +1781,41 @@ if ( j < 0 )  {
 
 AfmCharMetrics & cm = afm.cm[j];
 
-   //
-   //  ligature?
-   //
+if (strlen(c) > 1) {
 
-LigatureInfo lig;
-
-if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
-
-   handle_ligature(lig, afm, cur);
-
-   c += 2;
-
-   return;
-
-}
-
-   //
-   //  is it the start of a kern pair?
-   //
-
-KPX kp;
-
-if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
-
-   cur->add_char(cm);
-
-   handle_kern_pair(kp, afm, cur);
-
-   ++c;
-
-   return;
+      //
+      //  ligature?
+      //
+   
+   LigatureInfo lig;
+   
+   if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
+   
+      handle_ligature(lig, afm, cur);
+   
+      c += 2;
+   
+      return;
+   
+   }
+   
+      //
+      //  is it the start of a kern pair?
+      //
+   
+   KPX kp;
+   
+   if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
+   
+      cur->add_char(cm);
+   
+      handle_kern_pair(kp, afm, cur);
+   
+      ++c;
+   
+      return;
+   
+   }
 
 }
 
