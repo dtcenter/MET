@@ -18,6 +18,7 @@ using namespace std;
 #include "thresh_array.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "string_fxns.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -257,23 +258,23 @@ void ThreshArray::add_css(const char *text) {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::parse_thresh_str(const char *thresh_str) {
-   char *line = (char *) 0;
    char *c    = (char *) 0;
    char *lp   = (char *) 0;
    const char delim [] = " ";
-   const int n = strlen(thresh_str);
+   const char *method_name = "ThreshArray::parse_thresh_str()";
 
-   line = new char [n + 1];
-   memset(line, 0, n + 1);
-   strcpy(line, thresh_str);
+   char *line = m_strcpy2(thresh_str, method_name);
+   if (line) {
 
-   lp = line;
+      lp = line;
+      
+      while((c = strtok(lp, delim)) != NULL ) {
+      
+         add(c);
+      
+         lp = (char *) 0;
+      }
 
-   while((c = strtok(lp, delim)) != NULL ) {
-
-      add(c);
-
-      lp = (char *) 0;
    }
 
    if(line) { delete [] line; line = (char *) 0; }

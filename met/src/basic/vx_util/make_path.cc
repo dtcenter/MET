@@ -26,6 +26,7 @@ using namespace std;
 
 #include "make_path.h"
 #include "vx_log.h"
+#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,40 +47,40 @@ if ( path_exists(path) )  return ( 1 );
 
 int j;
 int status;
-char subpath[PATH_MAX];
+const char *method_name = "make_path() ";
 
-
-memset(subpath, 0, sizeof(subpath));
 
    //
    //  make subpath
    //
 
-strcpy(subpath, path);
+char *subpath = m_strcpy2(path, method_name);
 
-j = strlen(subpath) - 1;
+if (subpath) {
+   j = strlen(subpath) - 1;
 
-while ( (j >= 0) && (subpath[j] != '/') )  subpath[j--] = (char) 0;
+   while ( (j >= 0) && (subpath[j] != '/') )  subpath[j--] = (char) 0;
 
-if ( j >= 0 )   subpath[j] = (char) 0;
+   if ( j >= 0 ) subpath[j] = (char) 0;
 
-mlog << Debug(1) << "\n\n  subpath = \"" << subpath << "\"\n\n";
+   mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
-if ( strlen(subpath) == 0 )   return ( 0 );
+   if ( strlen(subpath) == 0 ) {
+      if (subpath) { delete [] subpath; subpath = (char *) 0; }
+      return ( 0 );
+   }
 
-
-
-if ( !(path_exists(subpath)) )  {
-
-   make_path(subpath, mode);
+   if ( !(path_exists(subpath)) )  {
+      make_path(subpath, mode);
+   }
 
 }
 
-
 status = mkdir(path, mode);
 
-if ( status < 0 )   return ( 0 );
+if (subpath) { delete [] subpath; subpath = (char *) 0; }
 
+if ( status < 0 )   return ( 0 );
 
 return ( 1 );
 

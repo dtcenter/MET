@@ -1060,6 +1060,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    StringArray col_value;
    ConcatString thresh_cs;
    int i, n;
+   const char *method_name = "STATAnalysisJob::parse_job_command()";
 
    // If jobstring is null, simply return;
    if(jobstring) n = strlen(jobstring);
@@ -1071,11 +1072,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Create a temporary copy of the jobstring for use in parsing
    //
-   const int line_size = n + 1;
-   line = new char [line_size];
-   memset(line, 0, line_size);
-   strncpy(line, jobstring, line_size);
-   line[line_size - 1] = (char) 0;
+
+   line = m_strcpy2(jobstring, method_name);
+   if (!line) return;
 
    lp = line;
 
@@ -1681,9 +1680,9 @@ void STATAnalysisJob::set_dump_row(const char *c) {
 
    if(!c) return;
 
-   dump_row = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_dump_row()";
 
-   strcpy(dump_row, c);
+   dump_row = m_strcpy2(c, method_name, "dump_row");
 
    return;
 }
@@ -1696,9 +1695,9 @@ void STATAnalysisJob::set_stat_file(const char *c) {
 
    if(!c) return;
 
-   stat_file = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_stat_file()";
 
-   strcpy(stat_file, c);
+   stat_file = m_strcpy2(c, method_name, "stat_file");
 
    return;
 }
@@ -1792,9 +1791,9 @@ void STATAnalysisJob::set_boot_rng(const char *c) {
 
    if(!c) return;
 
-   boot_rng = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   strcpy(boot_rng, c);
+   boot_rng = m_strcpy2(c, method_name, "boot_rng");
 
    return;
 }
@@ -1807,9 +1806,9 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
 
    if(!c) return;
 
-   boot_seed = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   strcpy(boot_seed, c);
+   boot_seed = m_strcpy2(c, method_name, "boot_seed");
 
    return;
 }
