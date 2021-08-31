@@ -57,7 +57,7 @@ const char *method_name = "make_path() ";
 char *subpath = m_strcpy2(path, method_name);
 
 if (subpath) {
-   j = strlen(subpath) - 1;
+   j = m_strlen(subpath) - 1;
 
    while ( (j >= 0) && (subpath[j] != '/') )  subpath[j--] = (char) 0;
 
@@ -65,7 +65,7 @@ if (subpath) {
 
    mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
-   if ( strlen(subpath) == 0 ) {
+   if ( m_strlen(subpath) == 0 ) {
       if (subpath) { delete [] subpath; subpath = (char *) 0; }
       return ( 0 );
    }
