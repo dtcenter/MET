@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "string_fxns.h"
 #include "ps_text.h"
 
 
@@ -288,6 +289,7 @@ if ( n < Nalloc )  return;
 
 int k;
 char * u = (char *) 0;
+const char *method_name = "VxpsTextNode::extend";
 
    //
    //  round n up to the next multiple of vx_pstextnode_alloc_inc
@@ -321,7 +323,7 @@ Nalloc = n;
    //  copy the old values, if any
    //
 
-if ( Text )   strncpy(u, Text, Nchars);
+if ( Text ) m_strcpy(u, Text, method_name, "Text");
 
    //
    //  toss old, grab new
@@ -349,15 +351,14 @@ void VxpsTextNode::set_text(const char * s)
 
 {
 
-if ( Text )  { delete [] Text;  Text = (char *) 0; }
+const char *method_name = "VxpsTextNode::set_text";
+if ( Text )  { delete [] Text;  Text = (char *) 0; Nalloc = 0; }
 
 Nchars = strlen(s);
 
 extend(Nchars + 2);
 
-memset(Text, 0, Nalloc);
-
-strcpy(Text, s);
+if (Text) m_strcpy(Text, s, method_name, "Text");
 
 return;
 
