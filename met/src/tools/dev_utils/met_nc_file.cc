@@ -278,19 +278,19 @@ bool MetNcFile::readFile(const int desired_grib_code,
     char station_id_buffer[max_str_len];
     char hdr_vld_buffer[max_str_len];
     // Read the corresponding header type for this observation
-    str_length = strlen(hdr_typ_str_full[hdr_index]);
+    str_length = m_strlen(hdr_typ_str_full[hdr_index]);
     if (str_length > typ_len) str_length = typ_len;
     strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length);
     message_type_buffer[str_length] = bad_data_char;
 
     // Read the corresponding header Station ID for this observation
-    str_length = strlen(hdr_sid_str_full[hdr_index]);
+    str_length = m_strlen(hdr_sid_str_full[hdr_index]);
     if (str_length > sid_len) str_length = sid_len;
     strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length);
     station_id_buffer[str_length] = bad_data_char;
 
     // Read the corresponding valid time for this observation
-    str_length = strlen(hdr_vld_str_full[hdr_index]);
+    str_length = m_strlen(hdr_vld_str_full[hdr_index]);
     if (str_length > vld_len) str_length = vld_len;
     strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length);
     hdr_vld_buffer[str_length] = bad_data_char;

@@ -607,7 +607,7 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 bool TrackInfo::is_interp() const {
    const char *s = Technique.c_str();
 
-   s += (strlen(Technique.c_str()) - 1);
+   s += (m_strlen(Technique.c_str()) - 1);
 
    // Return true if the last character of the model name is 'I'
    return(*s == 'I');

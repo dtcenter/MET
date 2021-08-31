@@ -68,7 +68,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int na_len = strlen(na_str);
+static const int na_len = m_strlen(na_str);
 
 static IntArray    valid_times;
 
@@ -400,7 +400,7 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
+   m_strcpy(cbuf + j*HEADER_STR_LEN, na_str);
 
 }
 

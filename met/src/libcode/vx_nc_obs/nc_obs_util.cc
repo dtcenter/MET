@@ -997,10 +997,10 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData &hdr_data) {
    int *hdr_irpt_typ_block = new int[buf_size];
    int *hdr_inst_typ_block = new int[buf_size];
    for(int i_start=0; i_start<pb_hdr_count; i_start+=buf_size) {
-      buf_size = pb_hdr_count - i_start;
-      if (buf_size > NC_BUFFER_SIZE_32K) buf_size = NC_BUFFER_SIZE_32K;
+      int buf_size2 = pb_hdr_count - i_start;
+      if (buf_size2 > NC_BUFFER_SIZE_32K) buf_size2 = NC_BUFFER_SIZE_32K;
       offsets[0] = i_start;
-      lengths[0] = buf_size;
+      lengths[0] = buf_size2;
 
       if (has_hdr_prpt_typ_var) {
          // Get the corresponding header PB message type (string)
@@ -1032,7 +1032,7 @@ void NetcdfObsVars::read_pb_hdr_data(NcHeaderData &hdr_data) {
          }
       }
 
-      for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+      for (int hIndex = 0; hIndex < buf_size2; hIndex++) {
          hdr_data.prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
          hdr_data.irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
          hdr_data.inst_typ_array.add(hdr_inst_typ_block[hIndex]);
@@ -1389,17 +1389,16 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    int buf_index = 0;
    int processed_count = 0;
    for (int index=0; index<data_count; index++) {
-      int len, len2;
+      int len_n, len_p;
       const string string_data= strArray[index];
 
       processed_count++;
-      len  = string_data.length();
-      len2 = strnlen(data_buf[buf_index], str_len);
-      if (len2 < len) len2 = len;
-      strncpy(data_buf[buf_index], string_data.c_str(), len);
-      if (len < str_len) data_buf[buf_index][len] = 0;
-      for (int idx=len; idx<len2; idx++)
-         data_buf[buf_index][idx] = bad_data_char;
+      len_n = string_data.length();
+      len_p = strnlen(data_buf[buf_index], str_len);
+      if (len_n > str_len) len_n = str_len;
+      strncpy(data_buf[buf_index], string_data.c_str(), len_n);
+      for (int idx=len_n; idx<len_p; idx++)
+         data_buf[buf_index][idx] = 0;  // erase previous data
 
       buf_index++;
       if (buf_index >= buf_size) {

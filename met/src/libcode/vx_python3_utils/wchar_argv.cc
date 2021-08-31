@@ -25,6 +25,7 @@ using namespace std;
 
 #include "wchar_argv.h"
 #include "concat_string.h"
+#include "string_fxns.h"
 
 #include "vx_log.h"
 
@@ -219,8 +220,8 @@ argv_len = 0;
 
 for (j=0; j<_argc; ++j)  {
 
-   len[j] = strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call strlen more than 
+   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
+                                //  we don't want to call m_strlen more than 
                                 //  once on each argv value
 
    argv_len += len[j];

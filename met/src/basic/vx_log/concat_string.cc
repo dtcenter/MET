@@ -236,6 +236,7 @@ void ConcatString::assign(const ConcatString & c)
 
    memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
    Precision = c.Precision;
+   AllocInc = c.AllocInc;
 }
 
 

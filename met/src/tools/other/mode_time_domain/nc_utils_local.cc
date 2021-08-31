@@ -22,6 +22,7 @@ using namespace std;
 
 #include "nc_utils.h"
 #include "nc_utils_local.h"
+#include "string_fxns.h"
 #include "vx_log.h"
 
 
@@ -129,7 +130,7 @@ unixtime parse_start_time(const char * text)
 int k;
 int month, day, year, hour, minute, second;
 unixtime t;
-const int n = strlen(text);
+const int n = m_strlen(text);
 
 if ( n != 15 )  {
 

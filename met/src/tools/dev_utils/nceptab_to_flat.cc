@@ -278,7 +278,7 @@ cout << '\"' << c << "\" ";
 c = strtok(s, ",\"");
 c = strtok(s, ",\"[");
 
-k = strlen(c) - 1;
+k = m_strlen(c) - 1;
 
 if ( c[k] == ' ' )  c[k] = (char) 0;
 

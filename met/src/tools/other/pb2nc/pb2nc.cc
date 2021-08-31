@@ -636,7 +636,7 @@ void get_variable_info(const char* tbl_filename) {
 
    FILE * fp;
    char * line = NULL;
-   size_t len = 0;
+   size_t len = 1024;
    ssize_t read;
 
    event_names.clear();
@@ -655,6 +655,12 @@ void get_variable_info(const char* tbl_filename) {
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
 
+      line = (char *)malloc(len * sizeof(char));
+      if( line == NULL) {
+         mlog << Error << "\n" << method_name << " -> "
+              << "Unable to allocate buffer\n\n";
+         exit(1);
+      }
       // Processing section 1
       int var_count1 = 0;
       while ((read = getline(&line, &len, fp)) != -1) {
@@ -672,7 +678,7 @@ void get_variable_info(const char* tbl_filename) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
-         if (0 == strlen(var_name)) continue;
+         if (0 == m_strlen(var_name)) continue;
 
          var_count1++;
          strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
@@ -998,8 +1004,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      strncpy(prev_hdr_typ, not_assigned, strlen(not_assigned));
-      strncpy(prev_hdr_sid, not_assigned, strlen(not_assigned));
+      strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned));
+      strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned));
    }
 
    IMM = JMM =1;
@@ -1314,7 +1320,6 @@ void process_pbfile(int i_pb) {
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
-
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
@@ -1688,7 +1693,7 @@ void process_pbfile(int i_pb) {
                  bufr_obs_extra[index1][index2] = bad_data_double;
               }
             }
-            tmp_len = strlen(airnow_aux_vars);
+            tmp_len = m_strlen(airnow_aux_vars);
             readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
                        (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
          }
@@ -1746,7 +1751,6 @@ void process_pbfile(int i_pb) {
                  << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
             for(lv=0; lv<buf_nlev; lv++) {
-
                // If the observation vertical level is not within the
                // specified valid range, continue to the next vertical level
                if((lv+1) < conf_info.beg_level) continue;
@@ -1838,8 +1842,8 @@ void process_pbfile(int i_pb) {
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
          prev_hdr_elv = hdr_elv;
-         strncpy(prev_hdr_typ, hdr_typ, strlen(not_assigned));
-         strncpy(prev_hdr_sid, hdr_sid.c_str(), strlen(not_assigned));
+         strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned));
+         strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned));
       }
 
       // If the number of observations for this header is non-zero,
@@ -1993,7 +1997,7 @@ void process_pbfile_metadata(int i_pb) {
    int lv, var_index;
    int debug_threshold = 10;
 
-   int tmp_nlev_max_req = (mxr8lv_small / 64);
+   int tmp_nlev_max_req = mxr8lv_small;
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
@@ -2122,7 +2126,7 @@ void process_pbfile_metadata(int i_pb) {
          ConcatString hdr_name_str;
 
          strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
-         length = strlen(tmp_str);
+         length = m_strlen(tmp_str);
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
@@ -2145,7 +2149,7 @@ void process_pbfile_metadata(int i_pb) {
          else {
             var_name = default_sid_name;
             strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
-            length = strlen(tmp_str);
+            length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
@@ -2162,7 +2166,7 @@ void process_pbfile_metadata(int i_pb) {
             hdr_name_str.add(var_name);
 
             strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str));
-            length = strlen(tmp_str);
+            length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
@@ -2267,7 +2271,7 @@ void process_pbfile_metadata(int i_pb) {
          }
          else {
             for (index=0; index<bufr_target_variables.n_elements(); index++) {
-               const char *bufr_var_name = bufr_target_variables[index].c_str();
+               const string bufr_var_name = bufr_target_variables[index].c_str();
                if (!tableB_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
                   mlog << Error << "\n" << method_name << " -> variable \""
                        << bufr_var_name <<"\" does not exist at BUFR file\n\n";
@@ -2293,28 +2297,17 @@ void process_pbfile_metadata(int i_pb) {
          readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &tmp_nlev_max_req);
          if (0 >= nlev2) continue;
          
-         // Search through the vertical levels
-         buf_nlev = nlev2;
-         if (nlev2 > mxr8lv) buf_nlev = mxr8lv;
-         has_valid_data = false;
-         int count = 0;
-         for(lv=0; lv<buf_nlev; lv++) {
-            if (bufr_obs[lv][0] < r8bfms) {
-               has_valid_data = true;
-               if (do_all_vars) {
-                  if (0 == count) {
-                     mlog << Debug(5) << " found valid data: " << var_name
-                          << " (" << bufr_obs[lv][0] << ") at level index "
-                          << lv << "\n";
-                  }
-                  count++;
-                  if (COUNT_THRESHOLD < count) break;
-               }
-            }
-            break;
-         }  //end for lv
-         
+         // Checks the first level intread of searching through the vertical levels
+         lv = 0;
+         has_valid_data = (bufr_obs[lv][0] < r8bfms);
+
          if (has_valid_data) {
+            if (do_all_vars) {
+               mlog << Debug(5) << " found valid data: " << var_name
+                    << " (" << bufr_obs[lv][0] << ") at level index "
+                    << lv << " from message " << i_read << "-th message (levels="
+                    << buf_nlev << ")\n";
+            }
             if (!tmp_bufr_obs_name_arr.has(var_name, false)
                 && !bufr_hdr_name_arr.has(var_name, false)) {
                tmp_bufr_obs_name_arr.add(var_name);
@@ -2479,7 +2472,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    }
 
    int var_index = obs_arr[1];
-   //assert(var_index >= 0 && strlen("Variable index can't be negative"));
+   //assert(var_index >= 0 && m_strlen("Variable index can't be negative"));
    string var_name = bufr_obs_name_arr[var_index];
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),
@@ -2979,100 +2972,106 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
            << " from TQ (" << tq_count << ") and UV (" << uv_count
            << ")\n";
 
-      // Order all observations by pressure from bottom to top
-      index = pbl_level - 1;
-      hgt_cnt = spfh_cnt = 0;
-      for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
-         if (index < 0) {
-            mlog << Error << "\n" <<  method_name  << "negative index: " << index << "\n\n";
-            break;
-         }
-
-         if (index < MAX_PBL_LEVEL) {
-            float *pqtzuv = it->second;
-            pbl_data_pres[index] = pqtzuv[0];
-            pbl_data_spfh[index] = pqtzuv[1];
-            pbl_data_temp[index] = pqtzuv[2];
-            pbl_data_hgt[index]  = pqtzuv[3];
-            pbl_data_ugrd[index] = pqtzuv[4];
-            pbl_data_vgrd[index] = pqtzuv[5];
-            if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
-            if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
-            selected_levels.add(nint(it->first));
-         }
-
-         index--;
+      if (pbl_level <= 0) {
+         mlog << Warning << "\n" <<  method_name
+              << "Skip CALPBL because an empty list after combining TQZ and UV\n\n";
       }
-      if (index != -1) {
-         mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n";
-      }
-
-      if (pbl_level > MAX_PBL_LEVEL) {
-         it = pqtzuv_map_tq.begin();
-         // Find vertical levels with both data
-         float highest_pressure = bad_data_float;
-         for (; it!=pqtzuv_map_tq.end(); ++it) {
-            if (pqtzuv_map_uv.count(it->first) > 0) {
-               highest_pressure = it->first;
+      else {
+         // Order all observations by pressure from bottom to top
+         index = pbl_level - 1;
+         hgt_cnt = spfh_cnt = 0;
+         for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
+            if (index < 0) {
+               mlog << Error << "\n" <<  method_name  << "negative index: " << index << "\n\n";
                break;
             }
-         }
-         if (!is_eq(highest_pressure, bad_data_float)) {
-            index = MAX_PBL_LEVEL - 1;
-            for (; it!=pqtzuv_map_tq.end(); ++it) {
-               int pres_level = nint(it->first);
-               if (selected_levels.has(pres_level)) break;
-               
-               float *pqtzuv = pqtzuv_map_merged[it->first];
+
+            if (index < MAX_PBL_LEVEL) {
+               float *pqtzuv = it->second;
                pbl_data_pres[index] = pqtzuv[0];
                pbl_data_spfh[index] = pqtzuv[1];
                pbl_data_temp[index] = pqtzuv[2];
                pbl_data_hgt[index]  = pqtzuv[3];
                pbl_data_ugrd[index] = pqtzuv[4];
                pbl_data_vgrd[index] = pqtzuv[5];
-               mlog << Debug(5) << method_name << "Force to add "
-                    << pres_level << " into " << index << "\n";
-               index--;
+               if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
+               if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
+               selected_levels.add(nint(it->first));
+            }
+
+            index--;
+         }
+         if (index != -1) {
+            mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n";
+         }
+
+         if (pbl_level > MAX_PBL_LEVEL) {
+            it = pqtzuv_map_tq.begin();
+            // Find vertical levels with both data
+            float highest_pressure = bad_data_float;
+            for (; it!=pqtzuv_map_tq.end(); ++it) {
+               if (pqtzuv_map_uv.count(it->first) > 0) {
+                  highest_pressure = it->first;
+                  break;
+               }
+            }
+            if (!is_eq(highest_pressure, bad_data_float)) {
+               index = MAX_PBL_LEVEL - 1;
+               for (; it!=pqtzuv_map_tq.end(); ++it) {
+                  int pres_level = nint(it->first);
+                  if (selected_levels.has(pres_level)) break;
+
+                  float *pqtzuv = pqtzuv_map_merged[it->first];
+                  pbl_data_pres[index] = pqtzuv[0];
+                  pbl_data_spfh[index] = pqtzuv[1];
+                  pbl_data_temp[index] = pqtzuv[2];
+                  pbl_data_hgt[index]  = pqtzuv[3];
+                  pbl_data_ugrd[index] = pqtzuv[4];
+                  pbl_data_vgrd[index] = pqtzuv[5];
+                  mlog << Debug(5) << method_name << "Force to add "
+                       << pres_level << " into " << index << "\n";
+                  index--;
+               }
             }
          }
-      }
-      else {
-         // Clear buffer
-         for (int idx=pbl_level; idx<MAX_PBL_LEVEL; idx++) {
-            pbl_data_pres[idx] = bad_data_float;
-            pbl_data_temp[idx] = bad_data_float;
-            pbl_data_spfh[idx] = bad_data_float;
-             pbl_data_hgt[idx] = bad_data_float;
-            pbl_data_ugrd[idx] = bad_data_float;
-            pbl_data_vgrd[idx] = bad_data_float;
-         }
-      }
-
-      if (hgt_cnt < pbl_level) {
-         hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
-         mlog << Debug(4) << method_name << "interpolate Z (HGT)\n";
-      }
-      if (spfh_cnt < pbl_level) {
-         spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
-         mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
-      }
-
-      if ((spfh_cnt>0) && (pbl_level>0)) {
-         mzbl = pbl_level;
-         mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "mzbl: " << mzbl
-              << "  missing count: Q: " << (pbl_level - spfh_cnt)
-              << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
-         if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-            log_pbl_input(pbl_level, method_name);
+         else {
+            // Clear buffer
+            for (int idx=pbl_level; idx<MAX_PBL_LEVEL; idx++) {
+               pbl_data_pres[idx] = bad_data_float;
+               pbl_data_temp[idx] = bad_data_float;
+               pbl_data_spfh[idx] = bad_data_float;
+                pbl_data_hgt[idx] = bad_data_float;
+               pbl_data_ugrd[idx] = bad_data_float;
+               pbl_data_vgrd[idx] = bad_data_float;
+            }
          }
 
-         //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
-         calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
-                 pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
-         if (is_eq(hpbl, bad_data_float))
-            mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
-                 << tq_count << " UV records: " << uv_count << " merged records: "
-                 << pqtzuv_map_merged.size() << "\n";
+         if (hgt_cnt < pbl_level) {
+            hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
+            mlog << Debug(4) << method_name << "interpolate Z (HGT)\n";
+         }
+         if (spfh_cnt < pbl_level) {
+            spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
+            mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
+         }
+
+         if ((spfh_cnt>0) && (pbl_level>0)) {
+            mzbl = pbl_level;
+            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "mzbl: " << mzbl
+                 << "  missing count: Q: " << (pbl_level - spfh_cnt)
+                 << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
+            if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
+               log_pbl_input(pbl_level, method_name);
+            }
+
+            //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
+            calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
+                    pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
+            if (is_eq(hpbl, bad_data_float))
+               mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
+                    << tq_count << " UV records: " << uv_count << " merged records: "
+                    << pqtzuv_map_merged.size() << "\n";
+         }
       }
    }
    return hpbl;
