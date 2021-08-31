@@ -1290,7 +1290,8 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    //  attempt to read the record
    gribfield *gfld;
    g2int numfields;
-   float v, v_miss[2];
+   const int max_miss = 2;
+   float v, v_miss[max_miss];
    int n_miss, i;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
                                numfields) ){
@@ -1321,6 +1322,12 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
    //  get the missing data value(s), if specified
    g2_miss(gfld, v_miss, &n_miss);
+   int miss_count = n_miss;
+   if(miss_count > max_miss) {
+      miss_count = max_miss;
+      mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
+           << "Ignored " << (n_miss-max_miss) << " v_miss.\n\n";
+   }
 
    //  copy the data into the data plane buffer
    for(int x=0; x < n_x; x++){
@@ -1351,7 +1358,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
               (float)gfld->fld[idx_data] : bad_data_float);
 
          //  check missing data values, if specified
-         for(i=0; i < n_miss; i++) {
+         for(i=0; i < miss_count; i++) {
             if(is_eq(v, v_miss[i])) { v = bad_data_float; break; }
          }
 
@@ -1378,7 +1385,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
         << "      lead time: " << sec_to_hhmmss(rec->LeadTime)  << "\n"
         << "      init time: " << unix_to_yyyymmdd_hhmmss(rec->InitTime)  << "\n"
         << "    bitmap flag: " << gfld->ibmap << "\n";
-   for(i=0; i < n_miss; i++) {
+   for(i=0; i < miss_count; i++) {
       mlog << Debug(4)
            << " missing val(" << i+1 << "): " << v_miss[i] << "\n";
    }
