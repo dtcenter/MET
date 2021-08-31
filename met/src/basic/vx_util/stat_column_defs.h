@@ -309,6 +309,15 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
+static const char * relp_columns [] = {
+   "TOTAL",       "N_ENS",       "RELP_"
+};
+
+static const char * ssidx_columns [] = {
+   "FCST_MODEL",  "REF_MODEL",   "N_INIT",
+   "N_TERM",      "N_VLD",       "SS_INDEX"
+};
+
 static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
    "AGEN_INIT",   "AGEN_FHR",
@@ -316,10 +325,6 @@ static const char * genmpr_columns [] = {
    "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",
    "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
    "DEV_CAT",     "OPS_CAT"
-};
-
-static const char * relp_columns [] = {
-   "TOTAL",       "N_ENS",       "RELP_"
 };
 
 static const char * job_summary_columns [] = {
@@ -330,14 +335,6 @@ static const char * job_summary_columns [] = {
    "P10",         "P25",         "P50",          "P75",         "P90",
    "MAX",         "IQR",         "RANGE",
    "WMO_TYPE",    "WMO_MEAN",    "WMO_WEIGHTED_MEAN"
-};
-
-static const char * job_go_columns [] = {
-   "GO_INDEX"
-};
-
-static const char * job_ss_columns [] = {
-   "SS_INDEX"
 };
 
 static const char * job_wdir_columns [] = {
@@ -399,8 +396,6 @@ static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_colu
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
 static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
-static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
-static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
@@ -413,6 +408,8 @@ static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_co
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
 static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
+
+static const int n_ssidx_columns        = sizeof(ssidx_columns)/sizeof(*ssidx_columns);
 
 static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
 

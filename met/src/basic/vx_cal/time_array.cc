@@ -568,3 +568,23 @@ return ( 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+ConcatString write_css(const TimeArray &ta)
+
+{
+
+ConcatString css;
+
+for ( int i=0; i<ta.n(); ++i )  {
+
+   css << (i == 0 ? "" : ",") << unix_to_yyyymmdd_hhmmss(ta[i]);
+
+}
+
+return(css);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
