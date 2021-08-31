@@ -18,6 +18,7 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_util.h"
+#include "string_fxns.h"
 
 #include "GridTemplate.h"
 
@@ -2343,8 +2344,9 @@ const char * statlinetype_to_string(const STATLineType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void statlinetype_to_string(const STATLineType t, char *out) {
+   const char *method_name = "statlinetype_to_string() -> ";
 
-   strcpy(out, statlinetype_to_string(t));
+   m_strcpy(out, statlinetype_to_string(t), method_name);
 
    return;
 }

@@ -1692,6 +1692,8 @@ void base_8_string(int k, char * out)
 
 {
 
+const char *method_name = "base_8_string() -> ";
+
 if ( k < 0 )  k += 256;
 
 char junk[256];
@@ -1710,7 +1712,7 @@ while ( k )  {
 }
 
 
-strcpy(out, junk + pos);
+m_strcpy(out, junk + pos, method_name);
 
 return;
 
@@ -1781,7 +1783,7 @@ if ( j < 0 )  {
 
 AfmCharMetrics & cm = afm.cm[j];
 
-if (strlen(c) > 1) {
+if (m_strlen(c) > 1) {
 
       //
       //  ligature?

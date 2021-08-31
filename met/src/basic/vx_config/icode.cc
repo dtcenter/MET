@@ -29,6 +29,7 @@ using namespace std;
 #include "indent.h"
 #include "icode.h"
 #include "dictionary.h"
+#include "string_fxns.h"
 
 #include "celltype_to_string.h"
 
@@ -162,6 +163,8 @@ void IcodeCell::assign(const IcodeCell & icc)
 
 {
 
+const char *method_name = "IcodeCell::assign() -> ";
+
 i = icc.i;
 
 d = icc.d;
@@ -170,17 +173,17 @@ type = icc.type;
 
 if ( type == identifier )  {
 
-   name = new char [1 + strlen(icc.name)];
+   name = new char [1 + m_strlen(icc.name)];
 
-   strcpy(name, icc.name);
+   m_strcpy(name, icc.name, method_name, "name");
 
 }
 
 if ( type == character_string )  {
 
-   text = new char [1 + strlen(icc.text)];
+   text = new char [1 + m_strlen(icc.text)];
 
-   strcpy(text, icc.text);
+   m_strcpy(text, icc.text, method_name, "text");
 
 }
 
@@ -413,13 +416,15 @@ void IcodeCell::set_identifier(const char * Text)
 
 {
 
+const char *method_name = "IcodeCell::set_identifier() -> ";
+
 clear();
 
 type = identifier;
 
-name = new char [1 + strlen(Text)];
+name = new char [1 + m_strlen(Text)];
 
-strcpy(name, Text);
+m_strcpy(name, Text, method_name);
 
 
 return;
@@ -434,15 +439,17 @@ void IcodeCell::set_string(const char * Text)
 
 {
 
+const char *method_name = "IcodeCell::set_string() -> ";
+
 clear();
 
-const int n = strlen(Text);
+const int n = m_strlen(Text);
 
 type = character_string;
 
 text = new char [1 + n];
 
-strcpy(text, Text);
+m_strcpy(text, Text, method_name);
 
 text[n] = 0;
 

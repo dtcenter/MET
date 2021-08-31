@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "ordinal.h"
+#include "string_fxns.h"
 #include "vx_log.h"
 
 
@@ -40,6 +41,8 @@ void ordinal_suffix(int n, char * out)
 
 {
 
+const char *method_name = "ordinal_suffix() -> ";
+
    //
    //  suffix rule is the same for both
    //   negative numbers and positive numbers
@@ -57,13 +60,13 @@ n %= 100;
    //  handle zero as a special case
    //
 
-if ( n == 0 )   { strcpy(out, th);  return; }
+if ( n == 0 )   { m_strcpy(out, th, method_name, "out1");  return; }
 
    //
    //  "teen" numbers are an exception
    //
 
-if ( (n >= 10) && (n <= 20) )   { strcpy(out, th);  return; }
+if ( (n >= 10) && (n <= 20) )   { m_strcpy(out, th, method_name, "out1");  return; }
 
    //
    //  if we get to this point, we only need to look
@@ -92,13 +95,13 @@ switch ( n )  {
          //
          //  should never happen
          //
-      mlog << Error << "\nordinal_suffix() -> totally confused!\n\n";
+      mlog << Error << "\n" << method_name << "totally confused!\n\n";
       exit ( 1 );
 
 }   //  switch
 
 
-strcpy(out, ans);
+m_strcpy(out, ans, method_name, "out3");
 
 
    //
