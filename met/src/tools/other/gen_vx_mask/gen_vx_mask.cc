@@ -24,7 +24,8 @@
 //   006    07/09/18  Bullock         Add shapefile masking type.
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //   008    04/06/20  Halley Gotway   Generalize input_grid option.
-//   009    06/01/21  Seth Linden     Change -type from optional to required
+//   009    06/01/21  Seth Linden     Change -type from optional to required.
+//   010    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -102,7 +103,7 @@ void process_command_line(int argc, char **argv) {
    if(argc == 1) usage();
 
    // Initialize the configuration object
-   config.read(replace_path(config_const_filename).c_str());
+   global_config.read(replace_path(config_const_filename).c_str());
 
    // Parse the command line into tokens
    cline.set(argc, argv);
@@ -161,15 +162,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_input_grid(DataPlane &dp) {
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
-   GrdFileType ftype = FileType_None;
-
-   // Get the gridded file type from the data config string, if present
-   if(input_field_str.length() > 0) {
-      config.read_string(input_field_str.c_str());
-      ftype = parse_conf_file_type(&config);
-   }
 
    // Parse info.name as a white-space separated string
    StringArray sa;
@@ -193,28 +185,12 @@ void process_input_grid(DataPlane &dp) {
            << "Use the grid defined by file \"" << input_gridname
            << "\".\n";
 
-      // Attempt to open the data file
-      mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_gridname.c_str(), ftype);
-      if(!mtddf_ptr) {
-         mlog << Error << "\nprocess_input_grid() -> "
-              << "can't open input file \"" << input_gridname << "\"\n\n";
-         exit(1);
-      }
-
-      // Read the input data plane, if requested
-      if(input_field_str.length() > 0) {
-         get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
-      }
-      // Check for the output of a previous call to this tool
-      else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
-      }
-
-      // Extract the grid
-      grid = mtddf_ptr->grid();
+      // Read the input grid and data plane, if requested
+      get_data_plane(input_gridname, input_field_str, true, dp, grid);
    }
 
    // If not yet set, fill the input data plane with zeros
-    if(dp.is_empty()) {
+   if(dp.is_empty()) {
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
@@ -223,18 +199,12 @@ void process_input_grid(DataPlane &dp) {
         << "Parsed Input Grid:\t" << grid.name()
         << " (" << grid.nx() << " x " << grid.ny() << ")\n";
 
-   // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) 0; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void process_mask_file(DataPlane &dp) {
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
-   GrdFileType ftype = FileType_None;
 
    // Initialize
    solar_ut = (unixtime) 0;
@@ -282,26 +252,10 @@ void process_mask_file(DataPlane &dp) {
    // Otherwise, process the mask file as a gridded data file
    else {
 
-      // Get the gridded file type from the mask config string, if present
-      if(mask_field_str.length() > 0) {
-         config.read_string(mask_field_str.c_str());
-         ftype = parse_conf_file_type(&config);
-      }
-
-      mtddf_ptr = mtddf_factory.new_met_2d_data_file(mask_filename.c_str(), ftype);
-      if(!mtddf_ptr) {
-         mlog << Error << "\nprocess_mask_file() -> "
-              << "can't open gridded mask data file \"" << mask_filename << "\"\n\n";
-         exit(1);
-      }
-
-      // Read mask_field, if specified
-      if(mask_field_str.length() > 0) {
-         get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
-      }
-
-      // Extract the grid
-      grid_mask = mtddf_ptr->grid();
+      // Read the mask grid and data plane, if requested
+      get_data_plane(mask_filename, mask_field_str,
+                     mask_type == MaskType_Data,
+                     dp, grid_mask);
 
       mlog << Debug(2)
            << "Parsed Mask Grid:\t" << grid_mask.name()
@@ -393,6 +347,86 @@ void process_mask_file(DataPlane &dp) {
          exit(1);
    }
 
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_data_plane(const ConcatString &file_name,
+                    const ConcatString &config_str,
+                    bool read_gen_vx_mask_output,
+                    DataPlane &dp, Grid &dp_grid) {
+   ConcatString local_cs = config_str;
+   GrdFileType ftype = FileType_None;
+
+   // Initialize to the global configuration
+   MetConfig local_config = global_config;
+
+   // Parse non-empty config strings
+   if(local_cs.length() > 0) {
+      local_config.read_string(local_cs.c_str());
+      ftype = parse_conf_file_type(&local_config);
+   }
+
+   // Attempt to open the data file
+   Met2dDataFileFactory mtddf_factory;
+   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
+   mtddf_ptr = mtddf_factory.new_met_2d_data_file(file_name.c_str(), ftype);
+   if(!mtddf_ptr) {
+      mlog << Error << "\nget_data_plane() -> "
+           << "can't open input file \"" << file_name << "\"\n\n";
+      exit(1);
+   }
+
+   // Read gen_vx_mask output from a previous run
+   if(read_gen_vx_mask_output &&
+      local_cs.length()      == 0 &&
+      mtddf_ptr->file_type() == FileType_NcMet) {
+      if(get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
+         local_config.read_string(local_cs.c_str());
+      }
+   }
+
+   // Read data plane, if requested
+   if(local_cs.length() > 0) {
+
+      // Allocate new VarInfo object
+      VarInfoFactory vi_factory;
+      VarInfo *vi_ptr = (VarInfo *) 0;
+      vi_ptr = vi_factory.new_var_info(mtddf_ptr->file_type());
+      if(!vi_ptr) {
+         mlog << Error << "\nget_data_plane() -> "
+              << "can't allocate new VarInfo pointer.\n\n";
+         exit(1);
+      }
+
+      // Read config into the VarInfo object
+      vi_ptr->set_dict(local_config);
+
+      // Get data plane from the file for this VarInfo object
+      if(!mtddf_ptr->data_plane(*vi_ptr, dp)) {
+         mlog << Error << "\nget_data_plane() -> "
+              << "trouble reading field \"" << local_cs
+              << "\" from file \"" << mtddf_ptr->filename() << "\"\n\n";
+         exit(1);
+      }
+
+      // Dump the range of data values read
+      double dmin, dmax;
+      dp.data_range(dmin, dmax);
+      mlog << Debug(3)
+           << "Read field \"" << vi_ptr->magic_str() << "\" from \""
+           << mtddf_ptr->filename() << "\" with data ranging from "
+           << dmin << " to " << dmax << ".\n";
+
+      // Clean up
+      if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) 0; }
+
+   } // end if
+
+   // Extract the grid
+   dp_grid = mtddf_ptr->grid();
+
    // Clean up
    if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) 0; }
 
@@ -401,62 +435,17 @@ void process_mask_file(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_data_plane(Met2dDataFile *mtddf_ptr,
-                    const char *config_str, DataPlane &dp) {
-   VarInfoFactory vi_factory;
-   VarInfo *vi_ptr = (VarInfo *) 0;
-   double dmin, dmax;
-
-   // Parse the config string
-   config.read_string(config_str);
-
-   // Allocate new VarInfo object
-   vi_ptr = vi_factory.new_var_info(mtddf_ptr->file_type());
-   if(!vi_ptr) {
-      mlog << Error << "\nget_data_plane() -> "
-           << "can't allocate new VarInfo pointer.\n\n";
-      exit(1);
-   }
-
-   // Read config into the VarInfo object
-   vi_ptr->set_dict(config);
-
-   // Get data plane from the file for this VarInfo object
-   if(!mtddf_ptr->data_plane(*vi_ptr, dp)) {
-      mlog << Error << "\nget_data_plane() -> "
-           << "trouble reading field \"" << config_str
-           << "\" from file \"" << mtddf_ptr->filename() << "\"\n\n";
-      exit(1);
-   }
-
-   // Dump the range of data values read
-   dp.data_range(dmin, dmax);
-   mlog << Debug(3)
-        << "Read field \"" << vi_ptr->magic_str() << "\" from \""
-        << mtddf_ptr->filename() << "\" with data ranging from "
-        << dmin << " to " << dmax << ".\n";
-
-   // Clean up
-   if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) 0; }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
+bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
+                                ConcatString &config_str) {
    bool status = false;
-   ConcatString tool, config_str;
+   ConcatString tool;
    int i;
 
-   // Must be MET NetCDF format
-   if(mtddf_ptr->file_type() != FileType_NcMet) return(status);
-
-   // Cast pointer of correct type
-   MetNcMetDataFile *mnmdf_ptr = (MetNcMetDataFile *) mtddf_ptr;
+   // Check for null pointer
+   if(!mnmdf_ptr) return(status);
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string)"MET_tool", tool)) return(status);
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return(status);
 
    // Check for gen_vx_mask output
    if(tool != program_name) return(status);
@@ -469,8 +458,9 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
          mnmdf_ptr->MetNc->Var[i].name == "lon") continue;
 
       // Read the first non-lat/lon variable
-      config_str << "'name=\"" << mnmdf_ptr->MetNc->Var[i].name << "\"; level=\"(*,*)\";'";
-      get_data_plane(mtddf_ptr, config_str.c_str(), dp);
+      config_str << cs_erase
+                 << "'name=\"" << mnmdf_ptr->MetNc->Var[i].name
+                 << "\"; level=\"(*,*)\";'";
       status = true;
       break;
    }
@@ -1231,7 +1221,7 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = config.nc_compression();
+   if (deflate_level < 0) deflate_level = global_config.nc_compression();
 
    // Define Variables
    mask_var = add_var(f_out, string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
@@ -1444,7 +1434,7 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of "
-        << "NetCDF variable (" << config.nc_compression()
+        << "NetCDF variable (" << global_config.nc_compression()
         << ") (optional).\n\n"
 
         << flush;
