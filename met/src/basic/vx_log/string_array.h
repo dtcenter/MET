@@ -66,6 +66,8 @@ class StringArray {
 
       void add_css(const std::string);
 
+      void set(const std::string);
+
       void set(int i, const std::string);
 
       void insert(int i, const char *);

@@ -104,6 +104,7 @@ boot = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ss_index_name  = "SS_INDEX";
 hss_ec_value   = NA;
 rank_corr_flag = TRUE;
 vif_flag       = FALSE;

@@ -1,18 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// STAT-Analysis configuration file.
-//
-// For additional information, please see the MET User's Guide.
+// STAT-Analysis configuration file used to compute a Custom Skill Score Index.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Filtering input STAT lines by the contents of each column
 //
-model = [];
-desc  = [];
+model = [ "AFWAv3.4_Noahv3.3", "AFWAv3.4_Noahv2.7.1" ];
 
-fcst_lead = [];
+fcst_lead = [ "12", "24", "36", "48",
+              "12", "24", "36", "48",
+              "12", "24", "36", "48",
+              "12", "24", "36", "48"
+            ];
 obs_lead  = [];
 
 fcst_valid_beg  = "";
@@ -39,13 +40,18 @@ obs_init_inc    = [];
 obs_init_exc    = [];
 obs_init_hour   = [];
 
-fcst_var = [];
+fcst_var = [ "WIND",  "WIND",  "WIND",  "WIND",
+             "DPT",   "DPT",   "DPT",   "DPT",
+             "TMP",   "TMP",   "TMP",   "TMP",
+             "PRMSL", "PRMSL", "PRMSL", "PRMSL"
+           ];
 obs_var  = [];
 
-fcst_units = [];
-obs_units  = [];
-
-fcst_lev = [];
+fcst_lev = [ "Z10", "Z10", "Z10", "Z10",
+             "Z2",  "Z2",  "Z2",  "Z2",
+             "Z2",  "Z2",  "Z2",  "Z2",
+             "Z0",  "Z0",  "Z0",  "Z0"
+           ];
 obs_lev  = [];
 
 obtype = [];
@@ -62,20 +68,15 @@ cov_thresh  = [];
 
 alpha = [];
 
-line_type = [];
+line_type = [ "SL1L2" ];
 
-column = [];
-
-weight = [];
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Array of STAT-Analysis jobs to be performed on the filtered data
-//
-jobs = [
-   "-job filter -dump_row ./filter_job.stat"
-];
+column    = [ "RMSE" ];
+            
+weight    = [ 4.0, 3.0, 2.0, 1.0,
+              4.0, 3.0, 2.0, 1.0,
+              4.0, 3.0, 2.0, 1.0,
+              4.0, 3.0, 2.0, 1.0
+            ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -91,20 +92,6 @@ boot = {
    rng      = "mt19937";
    seed     = "";
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// WMO mean computation logic
-//
-wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
-                     "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
-                     "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
-                     "VCNT:FSTDEV", "VCNT:OSTDEV" ];
-
-wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
-                     "CNT:KT_CORR", "CNT:ANOM_CORR",
-                     "CNT:ANOM_CORR_UNCNTR" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

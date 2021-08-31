@@ -431,6 +431,7 @@ void CTSInfo::compute_ci() {
 double CTSInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
+   // Find the statistic by name
         if(strcmp(stat_name, "TOTAL") == 0) v = cts.n();
    else if(strcmp(stat_name, "BASER") == 0) v = cts.baser();
    else if(strcmp(stat_name, "FMEAN") == 0) v = cts.fmean();
@@ -457,6 +458,11 @@ double CTSInfo::get_stat(const char *stat_name) {
            << "unknown categorical statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
+   }
+ 
+   // Return bad data for 0 pairs 
+   if(cts.n() == 0 && strcmp(stat_name, "TOTAL") != 0) {
+      v = bad_data_double;
    }
 
    return(v);
@@ -1001,6 +1007,7 @@ void CNTInfo::compute_ci() {
 double CNTInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
+   // Find the statistic by name
         if(strcmp(stat_name, "TOTAL"           ) == 0) v = n;
    else if(strcmp(stat_name, "FBAR"            ) == 0) v = fbar.v;
    else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = fstdev.v;
@@ -1038,6 +1045,11 @@ double CNTInfo::get_stat(const char *stat_name) {
            << "unknown continuous statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
+   }
+
+   // Return bad data for 0 pairs 
+   if(n == 0 && strcmp(stat_name, "TOTAL") != 0) {
+      v = bad_data_double;
    }
 
    return(v);

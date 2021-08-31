@@ -257,6 +257,16 @@ void ThreshArray::add_css(const char *text) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ThreshArray::set(const SingleThresh &st) {
+
+   clear();
+
+   add(st);
+
+   return;
+}
+////////////////////////////////////////////////////////////////////////
+
 void ThreshArray::parse_thresh_str(const char *thresh_str) {
    char *c    = (char *) 0;
    char *lp   = (char *) 0;

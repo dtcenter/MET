@@ -202,6 +202,10 @@ void STATAnalysisJob::clear() {
    boot_interval  = bad_data_int;
    boot_rep_prop  = bad_data_double;
    n_boot_rep     = bad_data_int;
+
+   ss_index_name.clear();
+   ss_index_vld_thresh = bad_data_double;
+
    hss_ec_value   = bad_data_double;
    rank_corr_flag = false;
    vif_flag       = false;
@@ -344,6 +348,9 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    boot_interval        = aj.boot_interval;
    boot_rep_prop        = aj.boot_rep_prop;
    n_boot_rep           = aj.n_boot_rep;
+
+   ss_index_name        = aj.ss_index_name;
+   ss_index_vld_thresh  = aj.ss_index_vld_thresh;
 
    hss_ec_value         = aj.hss_ec_value;
    rank_corr_flag       = aj.rank_corr_flag;
@@ -627,6 +634,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "boot_seed = "
        << boot_seed << "\n";
+
+   out << prefix << "ss_index_name = "
+       << ss_index_name << "\n";
+
+   out << prefix << "ss_index_vld_thresh = "
+       << ss_index_vld_thresh << "\n";
 
    out << prefix << "hss_ec_value = "
        << hss_ec_value << "\n";
@@ -1605,6 +1618,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          set_boot_seed(jc_array[i+1].c_str());
          i++;
       }
+      else if(jc_array[i] == "-ss_index_name") {
+         ss_index_name = jc_array[i+1].c_str();
+         i++;
+      }
+      else if(jc_array[i] == "-ss_index_vld_thresh") {
+         ss_index_vld_thresh = atof(jc_array[i+1].c_str());
+         i++;
+      }
       else if(jc_array[i] == "-hss_ec_value") {
          hss_ec_value = atof(jc_array[i+1].c_str());
          i++;
@@ -1968,6 +1989,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  c = n_orank_columns;        break;
          case stat_ssvar:  c = n_ssvar_columns;        break;
          case stat_genmpr: c = n_genmpr_columns;       break;
+         case stat_ssidx:  c = n_ssidx_columns;        break;
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
                  << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -2038,6 +2060,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
          case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
          case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+         case stat_ssidx:  write_header_row       (ssidx_columns, n_ssidx_columns, 1,       stat_at, 0, 0); break;
 
          //
          // Write only header columns for unspecified line type
@@ -2773,6 +2796,18 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
+   // Jobs which compute the skill score index
+   if(job_type == stat_job_go_index  ||
+      job_type == stat_job_cbs_index ||
+      job_type == stat_job_ss_index) {
+
+      // ss_index_name
+      js << "-ss_index_name " << ss_index_name << " ";
+
+      // ss_index_vld_thresh
+      js << "-ss_index_vld_thresh " << ss_index_vld_thresh << " ";
+   }
+
    // Jobs which write MCTC or MCTS output
    if(!is_bad_data(hss_ec_value) &&
       (out_line_type.has(stat_mctc_str) ||
@@ -2890,8 +2925,10 @@ STATJobType string_to_statjobtype(const char *str) {
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
       t = stat_job_go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
-      t = stat_job_ss_index;
+      t = stat_job_cbs_index;
    else if(strcasecmp(str, statjobtype_str[6]) == 0)
+      t = stat_job_ss_index;
+   else if(strcasecmp(str, statjobtype_str[7]) == 0)
       t = stat_job_ramp;
    else
       t = no_stat_job_type;

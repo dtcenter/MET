@@ -498,7 +498,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_header_info_point-stat_out:
 
-.. list-table:: Header information for each file point-stat outputs.
+.. list-table:: Common STAT header columns.
   :widths: auto
   :header-rows: 2
 

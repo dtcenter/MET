@@ -1700,27 +1700,29 @@ void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString check_hdr_str(const ConcatString s, bool space_to_underscore) {
-   ConcatString s_tmp = s;
+ConcatString check_hdr_str(const ConcatString &col_name,
+                           const ConcatString &col_value,
+                           bool space_to_underscore) {
+   ConcatString cs_tmp = col_value;
 
-   if(space_to_underscore) s_tmp.replace(" ", "_", false);
+   if(space_to_underscore) cs_tmp.replace(" ", "_", false);
 
    // Check for empty string
-   if(s_tmp.length() == 0) {
+   if(cs_tmp.length() == 0) {
       mlog << Warning << "\ncheck_hdr_str() -> "
-           << "null string!\n\n";
+           << "output header column " << to_upper(col_name) << " is empty!\n\n";
       return(na_string);
    }
 
    // Check for embedded whitespace
-   if(check_reg_exp(ws_reg_exp, s_tmp.c_str())) {
+   if(check_reg_exp(ws_reg_exp, cs_tmp.c_str())) {
       mlog << Error << "\ncheck_hdr_str() -> "
-           << "output header column value (\"" << s_tmp
-           << "\") should contain no embedded whitespace!\n\n";
+           << "output header column " << to_upper(col_name) << " value (\""
+           << cs_tmp << "\") should contain no embedded whitespace!\n\n";
       exit(1);
    }
 
-   return(s_tmp);
+   return(cs_tmp);
 }
 
 
