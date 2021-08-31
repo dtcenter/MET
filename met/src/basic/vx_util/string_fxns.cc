@@ -31,6 +31,8 @@ using namespace std;
 #include "vx_log.h"
 
 
+const bool ENHANCE_STR_APIS = false;
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -112,21 +114,20 @@ const char * get_short_name(const char * path)
 
 {
 
-if ( !path )  return ( (const char *) 0 );
-
-int j;
 const char * short_name = (const char *) 0;
 
+if ( path ) {
+   int j;
 
-j = strlen(path) - 1;
+   j = strlen(path) - 1;
 
-while ( (j >= 0) && (path[j] != '/') )  --j;
+   while ( (j >= 0) && (path[j] != '/') )  --j;
 
-++j;
+   ++j;
 
-short_name = path + j;
+   short_name = path + j;
 
-
+}
 
 return ( short_name );
 
@@ -190,39 +191,41 @@ int num_tokens(const char *test_str, const char *separator)
    int n;
    char *temp_str = (char *) 0;
    char *c = (char *) 0;
+   const char *method_name = "num_tokens() -> ";
 
    //
    // Check for an empty string
    //
-   if(strlen(test_str) <= 0) return(0);
+   if(!test_str) return(0);
+   
+   int buf_len = strlen(test_str);
+   if(buf_len <= 0) return(0);
 
    //
    // Initialize the temp string for use in tokenizing
    //
-   temp_str = new char[strlen(test_str) + 1];
+   temp_str = m_strcpy2(test_str, method_name);
+   if (temp_str) {
 
-   if(!temp_str) {
-      mlog << Error << "\nnum_tokens() -> "
-           << "memory allocation error\n\n";
-      exit(1);
+      //
+      // Compute the number of tokens in the string
+      //
+      //c = strtok(temp_str1.c_str(), separator);
+      c = strtok(temp_str, separator);
+
+      //
+      // Check for an empty string
+      //
+      if(!c) { delete [] temp_str;  temp_str = 0;  return(0); }
+      else   n = 1;
+
+      //
+      // Parse remaining tokens
+      //
+      //
+      while((c = strtok(0, separator)) != NULL) n++;
+
    }
-   strcpy(temp_str, test_str);
-
-   //
-   // Compute the number of tokens in the string
-   //
-   c = strtok(temp_str, separator);
-
-   //
-   // Check for an empty string
-   //
-   if(!c) { delete [] temp_str;  temp_str = 0;  return(0); }
-   else   n = 1;
-
-   //
-   // Parse remaining tokens
-   //
-   while((c = strtok(0, separator)) != NULL) n++;
 
    if(temp_str) { delete [] temp_str; temp_str = (char *) 0; }
 
@@ -260,6 +263,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 
 int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 {
+   const char *method_name = "regex_apply() ";
    //  compile the regex pattern
    int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
    regex_t *re = new regex_t;
@@ -267,7 +271,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    if(0 != (rc = regcomp(re, pat, REG_EXTENDED))){
       regfree(re);
       if( re ) { delete re; re = 0; }
-      mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
+      mlog << Error << "\n" << method_name << "- regcomp() error: " << rc << "\n\n";
       exit(1);
    }
 
@@ -294,7 +298,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
          for(int i=0; i < num_act; i++){
             int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
             mat[i] = new char[mat_len + 1];
-            strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data());
+            m_strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
+                     method_name, "mat[i]");
          }
          mat[num_act] = NULL;
 
@@ -391,5 +396,100 @@ int parse_thresh_index(const char *col_name) {
 
    return(i);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+int m_strlen(const char *str) {
+   int str_len = 0;
+   if (str) str_len = strlen(str);  // or use sizeof str;
+
+   return str_len;
+}
+
+////////////////////////////////////////////////////////////////////////
+// to_string is allocated.
+
+void m_strcpy(char *to_str, const char *from_str, const char *method_name,
+              const char *extra_msg) {
+
+   if (ENHANCE_STR_APIS) {
+      int str_len = sizeof to_str;
+      m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
+   }
+   else strcpy(to_str, from_str);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+// to_string is not allocated. Allocate to_string and return the to_string after copying
+
+char *m_strcpy2(const char *from_str, const char *method_name, const char *extra_msg) {
+   char *to_str = (char *) 0;
+   if (from_str) {
+      int str_len = m_strlen(from_str);
+
+      to_str = new char[str_len + 1];
+
+      if(!to_str) {
+         mlog << Error << "\n" << method_name
+              << "memory allocation error (m_strcpy)"
+              << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+         exit(1);
+      }
+
+      m_strcpy(to_str, from_str, method_name, extra_msg);
+   }
+   else {
+      mlog << Error << "\n" << method_name 
+           << " Do not copy the string because a from_string is NULL. " 
+           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+   }
+
+   return to_str;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void m_strncpy(char *to_str, const char *from_str, const int buf_len,
+               const char *method_name, const char *extra_msg) {
+   if (!from_str){
+      mlog << Warning << "\n" << method_name 
+           << " Do not copy the string because a from_string is NULL. " 
+           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+   }
+   else if (!to_str){
+      mlog << Warning << "\n" << method_name 
+           << " Do not copy the string because a to_string is NULL. " 
+           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+   }
+   else {   // (from_str && to_str)
+      int str_len = m_strlen(from_str);
+      if (str_len > buf_len) str_len = buf_len;
+
+      memset(to_str, 0, str_len);
+      if (ENHANCE_STR_APIS) {
+         string temp_str = from_str;
+         temp_str.copy(to_str, str_len);
+         to_str[str_len] = 0;
+
+         // Kludge: The sizeof from_str is 8 when the filenames come from a python script
+         if (strcmp(from_str, to_str)) {
+            str_len = strlen(from_str);
+            if (str_len > buf_len) str_len = buf_len;
+            temp_str.copy(to_str, str_len);
+            to_str[str_len] = 0;
+         }
+      }
+      else strncpy(to_str, from_str, str_len);
+
+      if (strcmp(from_str, to_str)) {
+         mlog << Warning << "\n" << method_name
+              << " truncated a string " << (extra_msg == 0 ? "" : extra_msg)
+              << " from \"" << from_str << "\" to \"" << to_str << "\"\n\n";
+      }
+   }
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
