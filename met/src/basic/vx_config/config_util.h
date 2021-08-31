@@ -40,6 +40,7 @@ extern StringArray     parse_conf_sid_list(Dictionary *dict, const char *);
 extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
 extern vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
+extern StringArray     parse_conf_obs_qty(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_exc(Dictionary *dict);
 extern NumArray        parse_conf_ci_alpha(Dictionary *dict);

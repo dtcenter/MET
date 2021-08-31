@@ -766,6 +766,16 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+StringArray parse_conf_obs_qty(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_qty() -> ";
+
+   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_qty_inc() -> ";
 
