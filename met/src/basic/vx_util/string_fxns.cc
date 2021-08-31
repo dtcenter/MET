@@ -119,7 +119,7 @@ const char * short_name = (const char *) 0;
 if ( path ) {
    int j;
 
-   j = strlen(path) - 1;
+   j = m_strlen(path) - 1;
 
    while ( (j >= 0) && (path[j] != '/') )  --j;
 
@@ -146,7 +146,7 @@ void append_char(char *str, const char c)
    // If the specified characater does not already exist at the
    // end of the string, add one.
    //
-   ptr = str + strlen(str) - 1;
+   ptr = str + m_strlen(str) - 1;
 
    if(*ptr != c) {
       *(++ptr) = c;
@@ -172,7 +172,7 @@ void strip_char(char *str, const char c)
    // If the specified character exists at the end of the string,
    // remove it.
    //
-   ptr = str + strlen(str) - 1;
+   ptr = str + m_strlen(str) - 1;
 
    if(*ptr == c) {
       *(ptr) = 0;
@@ -198,7 +198,7 @@ int num_tokens(const char *test_str, const char *separator)
    //
    if(!test_str) return(0);
    
-   int buf_len = strlen(test_str);
+   int buf_len = m_strlen(test_str);
    if(buf_len <= 0) return(0);
 
    //
@@ -250,7 +250,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
    // case-insensitive matching.
    //
    for(i=0; i<n_prefix; i++) {
-      if(strncasecmp(str, prefix_list[i], strlen(prefix_list[i])) == 0) {
+      if(strncasecmp(str, prefix_list[i], m_strlen(prefix_list[i])) == 0) {
          status = true;
          break;
       }
@@ -332,7 +332,7 @@ ConcatString str_replace(const char* data, const char* old, const char* repl){
    string str = data;
    size_t pos = str.find( old );
    if( string::npos == pos ) return ret;
-   str.replace(pos, strlen(old), repl);
+   str.replace(pos, m_strlen(old), repl);
 
    ret = str;
    return ret;
@@ -412,11 +412,7 @@ int m_strlen(const char *str) {
 void m_strcpy(char *to_str, const char *from_str, const char *method_name,
               const char *extra_msg) {
 
-   if (ENHANCE_STR_APIS) {
-      int str_len = sizeof to_str;
-      m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
-   }
-   else strcpy(to_str, from_str);
+   strcpy(to_str, from_str);
 
 }
 
@@ -467,20 +463,7 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
       if (str_len > buf_len) str_len = buf_len;
 
       memset(to_str, 0, str_len);
-      if (ENHANCE_STR_APIS) {
-         string temp_str = from_str;
-         temp_str.copy(to_str, str_len);
-         to_str[str_len] = 0;
-
-         // Kludge: The sizeof from_str is 8 when the filenames come from a python script
-         if (strcmp(from_str, to_str)) {
-            str_len = strlen(from_str);
-            if (str_len > buf_len) str_len = buf_len;
-            temp_str.copy(to_str, str_len);
-            to_str[str_len] = 0;
-         }
-      }
-      else strncpy(to_str, from_str, str_len);
+      strncpy(to_str, from_str, str_len);
 
       if (strcmp(from_str, to_str)) {
          mlog << Warning << "\n" << method_name
