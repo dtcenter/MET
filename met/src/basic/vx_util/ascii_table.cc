@@ -1319,6 +1319,13 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
    exit ( 1 );
 }
 
+   //
+   // Line up the decimals in the data starting in row 2.
+   // For two or fewer rows, there is no work to do.
+   //
+
+if ( Nrows <= 2 )  return;
+
 int left[Nrows];
 int right[Nrows];
 
@@ -1327,23 +1334,24 @@ int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
+
+for (r=0; r<r_start; ++r)  {
+
+   left[r] = right[r] = 0;
+
+}
+
 for (c=0; c<Ncols; ++c)  {
 
       //  get the pad size for that column
+
+   max_left = max_right = -5;  // negative value as the minimum offset of the text
 
    for (r=r_start; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
       n_figures(e[n], left[r], right[r]);
-
-   }
-
-   max_left  = left  [r_start];
-   max_right = right [r_start];
-
-   for (r=r_start+1; r<Nrows; ++r)  {
-
       if ( left  [r] > max_left  )  max_left  =  left[r];
       if ( right [r] > max_right )  max_right = right[r];
 
