@@ -92,8 +92,9 @@ const char s_delim [] = ",\"";
 const char * c = (const char *) 0;
 char line2[512];
 char * s = line2;
+const char *method_name = "parse_line() -> ";
 
-strncpy(line2, line, sizeof(line2));
+m_strncpy(line2, line, sizeof(line2), method_name);
 
    //
    //  get first 6 integers

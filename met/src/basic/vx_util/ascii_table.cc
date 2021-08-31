@@ -981,6 +981,7 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 {
 
 ConcatString str;
+const char *method_name = "AsciiTable::set_entry() -> ";
 
 if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
 else  {
@@ -994,7 +995,7 @@ fix_float(str);
 
 if ( DoCommaString )  {
    char junk[256];
-   strncpy(junk, str.c_str(), str.length());
+   m_strncpy(junk, str.c_str(), str.length(), method_name);
    char * p = (char *) 0;
    long X;
    ConcatString s;

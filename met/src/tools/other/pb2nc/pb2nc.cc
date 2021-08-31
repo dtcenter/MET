@@ -672,7 +672,7 @@ void get_variable_info(const char* tbl_filename) {
          }
          if ('0' != line[BUFR_NUMBER_START]) continue;
 
-         strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name");
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -681,7 +681,7 @@ void get_variable_info(const char* tbl_filename) {
          if (0 == m_strlen(var_name)) continue;
 
          var_count1++;
-         strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
+         m_strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN, method_name, "var_desc");
          var_desc[BUFR_DESCRIPTION_LEN] = '\0';
          for (int idx=(BUFR_DESCRIPTION_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
@@ -700,7 +700,7 @@ void get_variable_info(const char* tbl_filename) {
          if (NULL != strstr(line,"MNEMONIC")) break;
          if (NULL == strstr(line,"EVENT")) continue;
 
-         strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name2");
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -708,7 +708,7 @@ void get_variable_info(const char* tbl_filename) {
          }
          //if (NULL == strstr(var_name,"EVENT")) continue;
 
-         strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN);
+         m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN, method_name, "var_desc2");
          var_desc[BUFR_SEQUENCE_LEN] = '\0';
          for (int idx=(BUFR_SEQUENCE_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
@@ -728,7 +728,7 @@ void get_variable_info(const char* tbl_filename) {
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
-         strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name3");
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -737,10 +737,10 @@ void get_variable_info(const char* tbl_filename) {
 
          if (NULL != strstr(line,"CCITT IA5")) {
             ascii_vars.add(var_name);
-            strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str));
+            m_strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str), method_name, "var_unit_str1");
          }
          else {
-            strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN);
+            m_strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN, method_name, "var_unit_str2");
             var_unit_str[BUFR_UNIT_LEN] = '\0';
             for (int idx=(BUFR_UNIT_LEN-1); idx>=0; idx--) {
                if (' ' != var_unit_str[idx] && '|' != var_unit_str[idx]) {
@@ -1004,8 +1004,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned));
-      strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned));
+      m_strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned), method_name, "prev_hdr_typ");
+      m_strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned), method_name, "prev_hdr_sid");
    }
 
    IMM = JMM =1;
@@ -1281,10 +1281,10 @@ void process_pbfile(int i_pb) {
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
          if (mappedMessageType.length() > HEADER_STR_LEN) max_buf = HEADER_STR_LEN;
-         strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf);
+         m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf, method_name, "modified_hdr_typ1");
       }
       else {
-         strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ));
+         m_strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ), method_name, "modified_hdr_typ2");
       }
       if (max_buf >= max_str_len) max_buf--;
       modified_hdr_typ[max_buf] = '\0';
@@ -1842,8 +1842,8 @@ void process_pbfile(int i_pb) {
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
          prev_hdr_elv = hdr_elv;
-         strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned));
-         strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned));
+         m_strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned), method_name, "prev_hdr_typ");
+         m_strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned), method_name, "prev_hdr_sid");
       }
 
       // If the number of observations for this header is non-zero,
@@ -2125,7 +2125,7 @@ void process_pbfile_metadata(int i_pb) {
          ConcatString var_name;
          ConcatString hdr_name_str;
 
-         strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
+         m_strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str), method_name, "tmp_str1");
          length = m_strlen(tmp_str);
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
          is_prepbufr_hdr = (0 < nlev);
@@ -2148,7 +2148,7 @@ void process_pbfile_metadata(int i_pb) {
          }
          else {
             var_name = default_sid_name;
-            strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
+            m_strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str), method_name, "tmp_str2");
             length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
@@ -2165,7 +2165,7 @@ void process_pbfile_metadata(int i_pb) {
             if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
             hdr_name_str.add(var_name);
 
-            strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str));
+            m_strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str), method_name, "tmp_str3");
             length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {

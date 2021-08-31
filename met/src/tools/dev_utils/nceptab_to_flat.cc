@@ -238,8 +238,9 @@ int n, k;
 char line2[1024];
 char * s = line2;
 char * c = (char *) 0;
+const char *method_name = "parse_line() -> ";
 
-strncpy(line2, line, sizeof(line2));
+m_strncpy(line2, line, sizeof(line2), method_name);
 
    //
    // check to make sure it's got a double quote in it

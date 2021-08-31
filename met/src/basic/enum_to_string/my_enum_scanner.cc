@@ -432,8 +432,6 @@ int do_id()
 
 {
 
-// column += m_strlen(yytext);
-
 if ( enum_mode || last_was_enum || last_was_class )  {
 
    strncpy(yylval.name, yytext, sizeof(yylval.name));
@@ -455,8 +453,6 @@ return ( 0 );
 int do_int()
 
 {
-
-// column += m_strlen(yytext);
 
 if ( !enum_mode )  return ( 0 );
 

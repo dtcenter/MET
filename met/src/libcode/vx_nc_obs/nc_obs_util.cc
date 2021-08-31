@@ -1396,7 +1396,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
       len_n = string_data.length();
       len_p = strnlen(data_buf[buf_index], str_len);
       if (len_n > str_len) len_n = str_len;
-      strncpy(data_buf[buf_index], string_data.c_str(), len_n);
+      m_strncpy(data_buf[buf_index], string_data.c_str(), len_n, method_name.c_str());
       for (int idx=len_n; idx<len_p; idx++)
          data_buf[buf_index][idx] = 0;  // erase previous data
 

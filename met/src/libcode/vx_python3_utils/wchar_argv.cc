@@ -144,6 +144,7 @@ int len;
 char * s = 0;
 char ** av = 0;
 ConcatString c;
+const char *method_name = "Wchar_Argv::set() -> ";
 
 
 len = 0;
@@ -172,7 +173,7 @@ for (j=0; j<(a.n()); ++j)  {
 
    len = c.length();
 
-   strncpy(s + k, c.text(), len);
+   m_strncpy(s + k, c.text(), len, method_name);
 
    k += (len + 1);
 
