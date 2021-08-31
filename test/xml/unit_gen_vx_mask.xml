@@ -438,4 +438,26 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- DATA: For MET issue #1891, use GRIB1 and GRIB2 inputs to replace -->
+  <!--       2-m temperature over water with bad data.                  -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_DATA_TWO_FILE_TYPES">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_TWO_FILE_TYPES.nc \
+      -type data \
+      -input_field 'name="TMP";  level="Z2"; file_type=GRIB1;' \
+      -mask_field  'name="LAND"; level="L0";' \
+      -name TMP_2M_LAND \
+      -thresh lt0.5 -value -9999 -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_TWO_FILE_TYPES.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

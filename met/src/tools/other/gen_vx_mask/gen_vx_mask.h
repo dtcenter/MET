@@ -17,7 +17,8 @@
 //   000    12/09/14  Halley Gotway   New
 //   001    06/02/16  Halley Gotway   Add box masking type.
 //   002    11/15/16  Halley Gotway   Add solar masking types.
-//   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None  
+//   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None.
+//   004    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +33,7 @@ using namespace std;
 #include "vx_cal.h"
 #include "mask_poly.h"
 #include "vx_grid.h"
+#include "data2d_nc_met.h"
 #include "data_plane.h"
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
@@ -112,7 +114,7 @@ static MaskPoly poly_mask;
 static Grid grid, grid_mask;
 
 // Configuration object for reading config strings
-static MetConfig config;
+static MetConfig global_config;
 static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
@@ -120,10 +122,11 @@ static int compress_level = -1;
 static void      process_command_line(int, char **);
 static void      process_input_grid(DataPlane &dp);
 static void      process_mask_file(DataPlane &dp);
-static void      get_data_plane(Met2dDataFile *mtddf_ptr,
-                                const char *config_str, DataPlane &dp);
-static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
-                                      DataPlane &dp);
+static void      get_data_plane(const ConcatString &file_name,
+                    const ConcatString &config_str, bool,
+                    DataPlane &dp, Grid &dp_grid);
+static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
+                    ConcatString &);
 static void      get_shapefile_outline(ShpPolyRecord &shape);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
@@ -135,7 +138,7 @@ static void      apply_data_mask(DataPlane &dp);
 static void      apply_solar_mask(DataPlane &dp);
 static void      apply_lat_lon_mask(DataPlane &dp);
 static DataPlane combine(const DataPlane &dp_data,
-                         const DataPlane &dp_mask, SetLogic);
+                    const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
 static void      set_type(const StringArray &);
