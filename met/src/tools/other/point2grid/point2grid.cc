@@ -714,14 +714,15 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
             }
             else {
-               char grib_code[128];
+               const int TMP_BUF_LEN = 128;
+               char grib_code[TMP_BUF_LEN + 1];
                var_idx_or_gc = atoi(vname.c_str());
-               sprintf(grib_code, "%d", var_idx_or_gc);
+               snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
                if (vname != grib_code) {
                   ConcatString var_id = conf_info.get_var_id(vname);
                   if( var_id.nonempty() ) {
                      var_idx_or_gc = atoi(var_id.c_str());
-                     sprintf(grib_code, "%d", var_idx_or_gc);
+                     snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
                   }
                   else {
                      exit_by_field_name_error = true;
