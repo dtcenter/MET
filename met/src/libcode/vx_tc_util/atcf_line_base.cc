@@ -402,16 +402,19 @@ double parse_lat(const char *s) {
    v = parse_int(s);
 
    // Convert tenths of a degree to degrees
-   switch(s[strlen(s) - 1]) {
-      case 'N': v *=  0.1; break;
-      case 'S': v *= -0.1; break; // Degrees south is negative
-      default:
-         mlog << Warning
-              << "\nint parse_lat(const char *) -> "
-              << "bad latitude ... \"" << s
-              << "\"\n\n";
-         v = bad_data_double;
-         break;
+   int buf_len = strlen(s);
+   if (buf_len > 0) {
+      switch(s[buf_len - 1]) {
+         case 'N': v *=  0.1; break;
+         case 'S': v *= -0.1; break; // Degrees south is negative
+         default:
+            mlog << Warning
+                 << "\nint parse_lat(const char *) -> "
+                 << "bad latitude ... \"" << s
+                 << "\"\n\n";
+            v = bad_data_double;
+            break;
+      }
    }
 
    // Range check
@@ -428,16 +431,19 @@ double parse_lon(const char *s) {
    v = parse_int(s);
 
    // Convert tenths of a degree to degrees
-   switch(s[strlen(s) - 1]) {
-      case 'E': v *=  0.1; break;
-      case 'W': v *= -0.1; break; // Degrees west is negative
-      default:
-         mlog << Warning
-              << "\nint parse_lon(const char *) -> "
-              << "bad longitude ... \"" << s
-              << "\"\n\n";
-         v = bad_data_double;
-         break;
+   int buf_len = strlen(s);
+   if (buf_len > 0) {
+      switch(s[buf_len - 1]) {
+         case 'E': v *=  0.1; break;
+         case 'W': v *= -0.1; break; // Degrees west is negative
+         default:
+            mlog << Warning
+                 << "\nint parse_lon(const char *) -> "
+                 << "bad longitude ... \"" << s
+                 << "\"\n\n";
+            v = bad_data_double;
+            break;
+      }
    }
 
    // Range check
