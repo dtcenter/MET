@@ -27,6 +27,7 @@ using namespace std;
 
 #include "is_bufr_file.h"
 #include "vx_log.h"
+#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,7 +35,7 @@ using namespace std;
 
 static const char bufr_magic [] = "BUFR";
 
-static const int bufr_magic_len = strlen(bufr_magic);
+static const int bufr_magic_len = m_strlen(bufr_magic);
 
 static const int buf_size = 8;
 

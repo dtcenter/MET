@@ -92,7 +92,7 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_3d_single_cols; ++j)  {
 
-   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", m_strlen("INTENSITY_USER")) == 0 )  {
 
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
@@ -208,7 +208,7 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_3d_single_cols; ++j)  {
     
-   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", m_strlen("INTENSITY_USER")) == 0 )  {
 
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
@@ -451,7 +451,7 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_2d_cols; ++j)  {
     
-   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", m_strlen("INTENSITY_USER")) == 0 )  {
 
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
@@ -649,7 +649,7 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_2d_cols; ++j)  {
 
-   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", m_strlen("INTENSITY_USER")) == 0 )  {
 
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);

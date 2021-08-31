@@ -902,7 +902,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the GRIB code for the observation matches
    // the specified code
-   if((var_name != 0) && (0 < strlen(var_name))) {
+   if((var_name != 0) && (0 < m_strlen(var_name))) {
       if(var_name != obs_info->name()) {
          rej_var++;
          return;
@@ -1802,7 +1802,7 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
                                  const char *var_name) {
    ConcatString obs_cs, name;
 
-   if((var_name != 0) && (0 < strlen(var_name))) name = var_name;
+   if((var_name != 0) && (0 < m_strlen(var_name))) name = var_name;
    else                                          name = obs_arr[1];
 
    //

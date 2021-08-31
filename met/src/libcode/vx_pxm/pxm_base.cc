@@ -219,7 +219,7 @@ if ( !Name )  return ( (const char *) 0 );
 
 int j;
 
-j = strlen(Name) - 1;
+j = m_strlen(Name) - 1;
 
 while ( (j >= 0) && (Name[j] != '/') )  --j;
 

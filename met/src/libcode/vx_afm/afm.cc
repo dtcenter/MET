@@ -2284,7 +2284,7 @@ if ( s )  { delete [] s;  s = (char *) 0; }
 
 if ( !text )  return;
 
-int buf_len = strlen(text);
+int buf_len = m_strlen(text);
 s = new char [1 + buf_len];
 const char *method_name = "set_string()";
 

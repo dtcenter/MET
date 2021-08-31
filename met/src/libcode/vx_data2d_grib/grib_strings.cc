@@ -321,7 +321,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
    pthresh_lo = pthresh_hi = bad_data_double;
 
    // Count the number of '<' or '>' characters
-   for(i=0, n_lt=0, n_gt=0; i<(int)strlen(c); i++) {
+   for(i=0, n_lt=0, n_gt=0; i<(int)m_strlen(c); i++) {
       if(c[i] == '<') n_lt++;
       if(c[i] == '>') n_gt++;
    }

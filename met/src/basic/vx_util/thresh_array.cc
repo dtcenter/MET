@@ -563,7 +563,7 @@ ThreshArray string_to_prob_thresh(const char *s) {
       // Determine input precision
       ConcatString cs;
       const char *ptr = strchr(s, '.');
-      int prec = ( ptr ? strlen(++ptr) : 0 );
+      int prec = ( ptr ? m_strlen(++ptr) : 0 );
       cs.set_precision(prec);
 
       // Construct list of probability thresholds using the input precision

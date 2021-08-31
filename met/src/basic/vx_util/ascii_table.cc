@@ -26,6 +26,7 @@ using namespace std;
 #include "ascii_table.h"
 #include "comma_string.h"
 #include "fix_float.h"
+#include "string_fxns.h"
 #include "util_constants.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -1533,7 +1534,7 @@ out[field_width] = (char) 0;   //  end-of-string marker
 
 if ( !text )  return;
 
-len = strlen(text);
+len = m_strlen(text);
 
 if ( len == 0 )  return;
 

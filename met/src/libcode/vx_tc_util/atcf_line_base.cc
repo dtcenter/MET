@@ -402,7 +402,7 @@ double parse_lat(const char *s) {
    v = parse_int(s);
 
    // Convert tenths of a degree to degrees
-   int buf_len = strlen(s);
+   int buf_len = m_strlen(s);
    if (buf_len > 0) {
       switch(s[buf_len - 1]) {
          case 'N': v *=  0.1; break;
@@ -431,7 +431,7 @@ double parse_lon(const char *s) {
    v = parse_int(s);
 
    // Convert tenths of a degree to degrees
-   int buf_len = strlen(s);
+   int buf_len = m_strlen(s);
    if (buf_len > 0) {
       switch(s[buf_len - 1]) {
          case 'E': v *=  0.1; break;
@@ -457,7 +457,7 @@ double parse_lon(const char *s) {
 int parse_int(const char *s, const int bad_data) {
    int v;
 
-   if(strlen(s) > 0) v = atoi(s);
+   if(m_strlen(s) > 0) v = atoi(s);
    else              v = bad_data_int;
 
    // Check bad data value
@@ -485,7 +485,7 @@ ATCFLineType string_to_atcflinetype(const char *s) {
    // YYYYMMDDHH in the 4th column for Genesis Tracks
    else if(is_yyyymmddhh(s))         t = ATCFLineType_GenTrack;
    else if(is_number(s))             t = ATCFLineType_Track;  // ADECK
-   else if(strlen(s) == 0)           t = ATCFLineType_Track;  // BDECK
+   else if(m_strlen(s) == 0)         t = ATCFLineType_Track;  // BDECK
    else if(strcasecmp(s, "TR") == 0) t = ATCFLineType_ProbTR;
    else if(strcasecmp(s, "IN") == 0) t = ATCFLineType_ProbIN;
    else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRI;

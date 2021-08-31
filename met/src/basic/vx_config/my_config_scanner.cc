@@ -26,6 +26,7 @@ using namespace std;
 #include "math_constants.h"
 #include "util_constants.h"
 #include "is_number.h"
+#include "string_fxns.h"
 
 #include "dictionary.h"
 #include "builtin.h"
@@ -527,7 +528,7 @@ int do_id()
 
 int j, k;
 
-Column += strlen(configtext);
+Column += m_strlen(configtext);
 
 if ( is_lhs )  { strncpy(configlval.text, configtext, max_id_length);  return ( IDENTIFIER );  }
 
@@ -657,7 +658,7 @@ int do_int()
 
 {
 
-// Column += strlen(configtext);
+// Column += m_strlen(configtext);
 
 configlval.nval.i = atoi(configtext);
 
@@ -678,7 +679,7 @@ bool do_float()
 
 {
 
-// Column += strlen(configtext);
+// Column += m_strlen(configtext);
 
 configlval.nval.d = atof(configtext);
 
@@ -1113,7 +1114,7 @@ int do_comp()
 
 int return_value = 0;
 
-Column += strlen(configtext);
+Column += m_strlen(configtext);
 
      if ( strcmp(configtext, "<" ) == 0 )  { configlval.cval = thresh_lt;  return_value = COMPARISON; }
 else if ( strcmp(configtext, ">" ) == 0 )  { configlval.cval = thresh_gt;  return_value = COMPARISON; }

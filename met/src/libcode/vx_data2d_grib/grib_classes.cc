@@ -703,7 +703,7 @@ rep->referenceCount = 1;
    //  Strip off leading path component
    //
 
-j = strlen(filename) - 1;
+j = m_strlen(filename) - 1;
 
 while ( (j >= 0) && (filename[j] != '/') )   --j;
 

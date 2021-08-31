@@ -678,7 +678,7 @@ void get_variable_info(const char* tbl_filename) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
-         if (0 == strlen(var_name)) continue;
+         if (0 == m_strlen(var_name)) continue;
 
          var_count1++;
          strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
@@ -1004,8 +1004,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      strncpy(prev_hdr_typ, not_assigned, strlen(not_assigned));
-      strncpy(prev_hdr_sid, not_assigned, strlen(not_assigned));
+      strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned));
+      strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned));
    }
 
    IMM = JMM =1;
@@ -1693,7 +1693,7 @@ void process_pbfile(int i_pb) {
                  bufr_obs_extra[index1][index2] = bad_data_double;
               }
             }
-            tmp_len = strlen(airnow_aux_vars);
+            tmp_len = m_strlen(airnow_aux_vars);
             readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
                        (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
          }
@@ -1842,8 +1842,8 @@ void process_pbfile(int i_pb) {
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
          prev_hdr_elv = hdr_elv;
-         strncpy(prev_hdr_typ, hdr_typ, strlen(not_assigned));
-         strncpy(prev_hdr_sid, hdr_sid.c_str(), strlen(not_assigned));
+         strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned));
+         strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned));
       }
 
       // If the number of observations for this header is non-zero,
@@ -2126,7 +2126,7 @@ void process_pbfile_metadata(int i_pb) {
          ConcatString hdr_name_str;
 
          strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
-         length = strlen(tmp_str);
+         length = m_strlen(tmp_str);
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
@@ -2149,7 +2149,7 @@ void process_pbfile_metadata(int i_pb) {
          else {
             var_name = default_sid_name;
             strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
-            length = strlen(tmp_str);
+            length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
@@ -2166,7 +2166,7 @@ void process_pbfile_metadata(int i_pb) {
             hdr_name_str.add(var_name);
 
             strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str));
-            length = strlen(tmp_str);
+            length = m_strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
@@ -2472,7 +2472,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    }
 
    int var_index = obs_arr[1];
-   //assert(var_index >= 0 && strlen("Variable index can't be negative"));
+   //assert(var_index >= 0 && m_strlen("Variable index can't be negative"));
    string var_name = bufr_obs_name_arr[var_index];
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),

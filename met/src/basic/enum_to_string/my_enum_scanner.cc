@@ -432,7 +432,7 @@ int do_id()
 
 {
 
-// column += strlen(yytext);
+// column += m_strlen(yytext);
 
 if ( enum_mode || last_was_enum || last_was_class )  {
 
@@ -456,7 +456,7 @@ int do_int()
 
 {
 
-// column += strlen(yytext);
+// column += m_strlen(yytext);
 
 if ( !enum_mode )  return ( 0 );
 

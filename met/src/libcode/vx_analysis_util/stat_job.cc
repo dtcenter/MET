@@ -1076,7 +1076,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    const char *method_name = "STATAnalysisJob::parse_job_command()";
 
    // If jobstring is null, simply return;
-   if(jobstring) n = strlen(jobstring);
+   if(jobstring) n = m_strlen(jobstring);
    else          return;
 
    // Job Command Line Array
@@ -2786,7 +2786,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
          if(boot_seed) {
-            if(strlen(boot_seed) == 0) {
+            if(m_strlen(boot_seed) == 0) {
                js << "-boot_seed '' ";
             }
             else {
@@ -2903,8 +2903,9 @@ const char * statjobtype_to_string(const STATJobType t) {
 ////////////////////////////////////////////////////////////////////////
 
 void statjobtype_to_string(const STATJobType t, char *out) {
+   const char *method_name = "statjobtype_to_string() -> ";
 
-   strcpy(out, statjobtype_to_string(t));
+   m_strcpy(out, statjobtype_to_string(t), method_name);
 
    return;
 }

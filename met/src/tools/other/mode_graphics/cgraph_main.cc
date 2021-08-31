@@ -824,7 +824,7 @@ Wct_Info * info = wct_info;
 if ( DoLigatures )  remap_string(face, s, new_string);
 else                new_string = s;
 
-const int N = strlen(new_string);
+const int N = m_strlen(new_string);
 
 if ( N >= max_wct_infos )  {
 
@@ -2113,7 +2113,7 @@ if ( empty(in) )  {
 
 int j, k;
 char c0, c1;
-const int N = strlen(in);
+const int N = m_strlen(in);
 char * s = (char *) 0;
 FT_UInt fi_glyph_index = 0;
 FT_UInt fl_glyph_index = 0;

@@ -354,7 +354,7 @@ void VxpsTextNode::set_text(const char * s)
 const char *method_name = "VxpsTextNode::set_text";
 if ( Text )  { delete [] Text;  Text = (char *) 0; Nalloc = 0; }
 
-Nchars = strlen(s);
+Nchars = m_strlen(s);
 
 extend(Nchars + 2);
 
@@ -616,9 +616,11 @@ void base_8_string(int k, char * out)
 
 {
 
+const char *method_name = "base_8_string() -> ";
+
 if ( (k < 0) || (k > 255) )  {
 
-   mlog << Error << "\nbase_8_string() -> bad value ... " << k << "\n\n";
+   mlog << Error << "\n" << method_name << "bad value ... " << k << "\n\n";
 
    exit ( 1 );
 
@@ -647,7 +649,7 @@ for (j=0; j<3; ++j)  {
    //  done
    //
 
-strcpy(out, c);
+m_strcpy(out, c, method_name);
 
 return;
 
