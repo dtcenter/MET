@@ -5,7 +5,33 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version 10.1.0-beta1 release notes (|release_date|)
+MET Version 10.1.0-beta2 release notes (|release_date|)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Fix the findings from SonarQube (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
+* Fix gen_vx_mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
+* Enhance Stat-Analysis to write the GO Index and CBS Index into a new STAT line type (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
+* Enhance MET to compute the CBS Index (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
+* Fix integer overflow in Grid-Diag (`#1886 <https://github.com/dtcenter/MET/issues/1886>`_).
+* Fix failure of Ensemble-Stat when verifying against gridded ECMWF GRIB1 files (`#1879 <https://github.com/dtcenter/MET/issues/1879>`_).
+* Fix consumption of too much memory by Stat-Analysis (`#1875 <https://github.com/dtcenter/MET/issues/1875>`_).
+* Fix failure in plot_tcmpr.R script when a directory is passed in with -lookin (`#1872 <https://github.com/dtcenter/MET/issues/1872>`_).
+* Enable TC-Pairs to only write output for a configurable list of valid times (`#1870 <https://github.com/dtcenter/MET/issues/1870>`_).
+* Add check for the start offset and data count are valid before calling NetCDF API (`#1852 <https://github.com/dtcenter/MET/issues/1852>`_).
+* Add new column, Scatter Index, for CNT line type (`#1843 <https://github.com/dtcenter/MET/issues/1843>`_).
+* Enable point2grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
+* Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
+* Fix the output of point2grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
+* Add ORANK line type to the HiRA output from Point-Stat (`#1764 <https://github.com/dtcenter/MET/issues/1764>`_).
+* Make the specification of a binary threshold in Wavelet-Stat optional (`#1746 <https://github.com/dtcenter/MET/issues/1746>`_).
+* Document the statistics from the RPS line type in Appendix C (`#1853 <https://github.com/dtcenter/MET/issues/1853>`_).
+* Fix broken URLs in default MET config files (`#1864 <https://github.com/dtcenter/MET/issues/1864>`_).
+* Add G and G-Beta to the DMAP line type from Grid-Stat (`#1673 <https://github.com/dtcenter/MET/issues/1673>`_).
+* Create and publish a PDF of the MET User's Guide (`#1453 <https://github.com/dtcenter/MET/issues/1453>`_).
+* Update documentation to reference GitHub Discussions instead of MET Help (`#1833 <https://github.com/dtcenter/MET/issues/1833>`_).
+* Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).  
+  
+
+MET Version 10.1.0-beta1 release notes (20210613)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Add the HSS_EC statistic to the MCTS line type and a configurable option for its computation (`#1749 <http://github.com/dtcenter/MET/issues/1749>`_).
@@ -31,7 +57,7 @@ MET Version 10.0.0 release notes (20210510)
    * Run the nightly build as the shared met_test user (`#1116 <http://github.com/dtcenter/MET/issues/1116>`_).
    * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
    * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
-   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1788 <http://github.com/dtcenter/MET/issues/1788>`_).
+   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1778 <http://github.com/dtcenter/MET/issues/1778>`_).
    * Update MET to compile using GCC version 10 (`#1552 <https://github.com/dtcenter/MET/issues/1552>`_).
    * Update MET to compile using PGI version 20 (`#1317 <https://github.com/dtcenter/MET/issues/1317>`_).
      
