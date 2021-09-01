@@ -480,7 +480,10 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
             to_str[str_len] = 0;
          }
       }
-      else strncpy(to_str, from_str, str_len);
+      else {
+         strncpy(to_str, from_str, str_len);
+         to_str[str_len] = 0;
+      }
 
       if (strcmp(from_str, to_str)) {
          mlog << Warning << "\n" << method_name
