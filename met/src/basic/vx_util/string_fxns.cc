@@ -31,7 +31,7 @@ using namespace std;
 #include "vx_log.h"
 
 
-const bool ENHANCE_STR_APIS = false;
+const bool ENHANCE_STR_APIS = true;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -412,7 +412,11 @@ int m_strlen(const char *str) {
 void m_strcpy(char *to_str, const char *from_str, const char *method_name,
               const char *extra_msg) {
 
-   strcpy(to_str, from_str);
+   if (ENHANCE_STR_APIS) {
+      int str_len = sizeof to_str;
+      m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
+   }
+   else strcpy(to_str, from_str);
 
 }
 
@@ -463,7 +467,20 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
       if (str_len > buf_len) str_len = buf_len;
 
       memset(to_str, 0, str_len);
-      strncpy(to_str, from_str, str_len);
+      if (ENHANCE_STR_APIS) {
+         string temp_str = from_str;
+         temp_str.copy(to_str, str_len);
+         to_str[str_len] = 0;
+
+         // Kludge: The sizeof from_str is 8 when the filenames come from a python script
+         if (strcmp(from_str, to_str)) {
+            str_len = m_strlen(from_str);
+            if (str_len > buf_len) str_len = buf_len;
+            temp_str.copy(to_str, str_len);
+            to_str[str_len] = 0;
+         }
+      }
+      else strncpy(to_str, from_str, str_len);
 
       if (strcmp(from_str, to_str)) {
          mlog << Warning << "\n" << method_name

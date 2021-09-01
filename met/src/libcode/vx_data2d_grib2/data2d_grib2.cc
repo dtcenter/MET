@@ -27,6 +27,7 @@ using namespace std;
 
 #include "data2d_grib2.h"
 #include "grib_strings.h"
+#include "string_fxns.h"
 #include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"
@@ -363,6 +364,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                                             vector<Grib2Record*> &listMatchRange
                                           ){
 
+   const char *method_name = "MetGrib2DataFile::find_record_matches() -> ";
+
    //  clear the contents of the result vectors
    listMatchExact.clear();
    listMatchRange.clear();
@@ -389,7 +392,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
             vinfo_ens_type = 2;
          }
          char* ens_number_str  = new char[vinfo_ens.length()  ];
-         strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length());
+         m_strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          //  if the  string is numeric

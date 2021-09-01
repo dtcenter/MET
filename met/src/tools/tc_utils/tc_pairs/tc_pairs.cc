@@ -1440,11 +1440,12 @@ void derive_baseline_model(const ConcatString &model,
    float bl_lat[nvtx], bl_lon[nvtx], bl_vmax[nvtx];
    TrackInfo  new_track;
    TrackPoint new_point;
+   const char *method_name = "derive_baseline_model() -> ";
 
    // Check bounds
    if(i_start < 0 || i_start >= ti.n_points()) {
        mlog << Error
-            << "\nderive_baseline_model() -> "
+            << "\n" << method_name
             << "range check error for i_start = " << i_start << "\n\n";
        exit(1);
    }
@@ -1504,7 +1505,7 @@ void derive_baseline_model(const ConcatString &model,
    }
 
    // Store the basin name
-   strncpy(basin, ti.basin().c_str(), 2);
+   m_strncpy(basin, ti.basin().c_str(), 2, method_name);
 
    // Store the valid time of the starting point
    unix_to_mdyhms(ti[i_start].valid(),
@@ -1561,7 +1562,7 @@ void derive_baseline_model(const ConcatString &model,
    }
    else {
        mlog << Error
-            << "\nderive_baseline_model() -> "
+            << "\n" << method_name
             << "unsupported baseline model type \"" << model
             << "\".\n\n";
        exit(1);
