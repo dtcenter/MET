@@ -6,7 +6,7 @@ describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
 MET Version 10.1.0-beta2 release notes (|release_date|)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Fix the findings from SonarQube (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
 * Fix gen_vx_mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
 * Enhance Stat-Analysis to write the GO Index and CBS Index into a new STAT line type (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
