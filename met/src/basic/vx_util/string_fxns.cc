@@ -31,7 +31,7 @@ using namespace std;
 #include "vx_log.h"
 
 
-const bool ENHANCE_STR_APIS = true;
+const bool ENHANCE_STR_APIS = false;
 
 ////////////////////////////////////////////////////////////////////////
 
