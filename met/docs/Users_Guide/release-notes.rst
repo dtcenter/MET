@@ -28,7 +28,7 @@ MET Version 10.1.0-beta2 release notes (|release_date|)
 * Add G and G-Beta to the DMAP line type from Grid-Stat (`#1673 <https://github.com/dtcenter/MET/issues/1673>`_).
 * Create and publish a PDF of the MET User's Guide (`#1453 <https://github.com/dtcenter/MET/issues/1453>`_).
 * Update documentation to reference GitHub Discussions instead of MET Help (`#1833 <https://github.com/dtcenter/MET/issues/1833>`_).
-* Update FAQ in User's Guide with info from webpage FAQ (`#1843 <https://github.com/dtcenter/MET/issues/1834>`_).  
+* Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).  
   
 
 MET Version 10.1.0-beta1 release notes (20210613)
@@ -57,7 +57,7 @@ MET Version 10.0.0 release notes (20210510)
    * Run the nightly build as the shared met_test user (`#1116 <http://github.com/dtcenter/MET/issues/1116>`_).
    * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
    * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
-   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1788 <http://github.com/dtcenter/MET/issues/1788>`_).
+   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1778 <http://github.com/dtcenter/MET/issues/1778>`_).
    * Update MET to compile using GCC version 10 (`#1552 <https://github.com/dtcenter/MET/issues/1552>`_).
    * Update MET to compile using PGI version 20 (`#1317 <https://github.com/dtcenter/MET/issues/1317>`_).
      
