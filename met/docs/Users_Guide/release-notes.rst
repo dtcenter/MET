@@ -10,7 +10,7 @@ MET Version 10.1.0-beta2 release notes (|release_date|)
 * Fix the findings from SonarQube (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
 * Fix gen_vx_mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
 * Enhance Stat-Analysis to write the GO Index and CBS Index into a new STAT line type (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
-* Enhance MET to compute the CBS score (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
+* Enhance MET to compute the CBS Index (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
 * Fix integer overflow in Grid-Diag (`#1886 <https://github.com/dtcenter/MET/issues/1886>`_).
 * Fix failure of Ensemble-Stat when verifying against gridded ECMWF GRIB1 files (`#1879 <https://github.com/dtcenter/MET/issues/1879>`_).
 * Fix consumption of too much memory by Stat-Analysis (`#1875 <https://github.com/dtcenter/MET/issues/1875>`_).
