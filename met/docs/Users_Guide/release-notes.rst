@@ -21,7 +21,6 @@ MET Version 10.1.0-beta2 release notes (|release_date|)
 * Enable point2grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
 * Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
 * Fix the output of point2grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
-* Update versions of software on Cheyenne and Casper for beta 2 release installation (`#1807 <https://github.com/dtcenter/MET/issues/1807>`_).
 * Add ORANK line type to the HiRA output from Point-Stat (`#1764 <https://github.com/dtcenter/MET/issues/1764>`_).
 * Make the specification of a binary threshold in Wavelet-Stat optional (`#1746 <https://github.com/dtcenter/MET/issues/1746>`_).
 * Document the statistics from the RPS line type in Appendix C (`#1853 <https://github.com/dtcenter/MET/issues/1853>`_).
