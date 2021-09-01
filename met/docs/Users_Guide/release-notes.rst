@@ -18,7 +18,7 @@ MET Version 10.1.0-beta2 release notes (|release_date|)
 * Enable TC-Pairs to only write output for a configurable list of valid times (`#1870 <https://github.com/dtcenter/MET/issues/1870>`_).
 * Add check for the start offset and data count are valid before calling NetCDF API (`#1852 <https://github.com/dtcenter/MET/issues/1852>`_).
 * Add new column, Scatter Index, for CNT line type (`#1843 <https://github.com/dtcenter/MET/issues/1843>`_).
-* Enable point2grid to support double type latitude/longitude variables(`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
+* Enable point2grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
 * Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
 * Fix the output of point2grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
 * Update versions of software on Cheyenne and Casper for beta 2 release installation (`#1807 <https://github.com/dtcenter/MET/issues/1807>`_).
