@@ -1,48 +1,24 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1990 - 2021
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
-// ** Boulder, Colorado, USA
-// ** BSD licence applies - redistribution and use in source and binary
-// ** forms, with or without modification, are permitted provided that
-// ** the following conditions are met:
-// ** 1) If the software is modified to produce derivative works,
-// ** such modified software should be clearly marked, so as not
-// ** to confuse it with the version available from UCAR.
-// ** 2) Redistributions of source code must retain the above copyright
-// ** notice, this list of conditions and the following disclaimer.
-// ** 3) Redistributions in binary form must reproduce the above copyright
-// ** notice, this list of conditions and the following disclaimer in the
-// ** documentation and/or other materials provided with the distribution.
-// ** 4) Neither the name of UCAR nor the names of its contributors,
-// ** if any, may be used to endorse or promote products derived from
-// ** this software without specific prior written permission.
-// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
-// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-// RCS info
-//   $Author: dixon $
-//   $Locker:  $
-//   $Date: 2016/03/03 18:19:27 $
-//   $Id: RectangularTemplate.cc,v 1.4 2016/03/03 18:19:27 dixon Exp $
-//   $Revision: 1.4 $
-//   $State: Exp $
-
-/**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**/
-/*********************************************************************
- * RectangularTemplate.cc: class implementing a Rectangular template
- *                      to be applied on gridded data.
- *
- * RAP, NCAR, Boulder CO
- *
- * January 2007
- *
- * Dan Megenhardt
- *
- *********************************************************************/
+///////////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   RectangularTemplate.cc
+//
+//   Description:
+//      Class implementing a Rectangular template to be
+//      applied on gridded data.
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//   000    01-01-07  Megenhardt      Initial version.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 
@@ -52,11 +28,10 @@
 #include <RectangularTemplate.h>
 #include <GridOffset.h>
 #include <GridTemplate.h>
+
 using namespace std;
 
-/**********************************************************************
- * Constructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 RectangularTemplate::RectangularTemplate(int height, int width) :
   GridTemplate(),
@@ -99,21 +74,14 @@ RectangularTemplate::RectangularTemplate(int height, int width) :
   _setEdgeOffsets();
 }
 
-
-/**********************************************************************
- * Destructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 RectangularTemplate::~RectangularTemplate(void)
 {
   // Do nothing
 }
 
-
-/**********************************************************************
- * printOffsetList() - Print the offset list to the given stream.  This
- *                     is used for debugging.
- */
+///////////////////////////////////////////////////////////////////////////////
 
 void RectangularTemplate::printOffsetList(FILE *stream)
 {
@@ -127,7 +95,4 @@ void RectangularTemplate::printOffsetList(FILE *stream)
   GridTemplate::printOffsetList(stream);
 }
 
-
-/**********************************************************************
- *              Private Member Functions                              *
- **********************************************************************/
+///////////////////////////////////////////////////////////////////////////////
