@@ -95,7 +95,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const GaussianInfo &gaussian) {
+                  bool is_global, double t, const GaussianInfo &gaussian) {
    double v = 0.0;
    int x, y;
 
@@ -107,7 +107,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    // build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);
+   GridTemplate* gt = gtf.buildGT(shape, width, is_global);
 
    mlog << Debug(3)
         << "Smoothing field using the " << interpmthd_to_string(mthd)
@@ -185,10 +185,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double t, const GaussianInfo &gaussian) {
+                       bool is_global, double t, const GaussianInfo &gaussian) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian);
+   smooth_field(dp, smooth_dp, mthd, width, shape, is_global, t, gaussian);
 
    return(smooth_dp);
 }
@@ -202,7 +202,7 @@ DataPlane smooth_field(const DataPlane &dp,
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
-        SingleThresh t, double vld_t) {
+        bool is_global, SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
    int x, y;
    int n_vld = 0;
@@ -218,7 +218,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
    // Build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);
+   GridTemplate* gt = gtf.buildGT(shape, width, is_global);
 
    mlog << Debug(3)
         << "Computing fractional coverage field using the "

@@ -33,66 +33,57 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RectangularTemplate::RectangularTemplate(int height, int width) :
-  GridTemplate(),
-  _height(height),
-  _width(width)
-{
+RectangularTemplate::RectangularTemplate(int height, int width, bool is_global) :
+   GridTemplate(), _height(height), _width(width), _isGlobal(is_global) {
 
-  /*
-    CONVENTION:
-    If width is even, we push the center to the lower left corner
-    and have the "extra" in the right & above.
-  */
+   //
+   // CONVENTION:
+   // If width is even, we push the center to the lower left corner
+   // and have the "extra" in the right & above.
+   //
 
-  bool evenWidth = ((width % 2) == 0);
-  bool evenHeight = ((height % 2) == 0);
+   bool evenWidth = ((width % 2) == 0);
+   bool evenHeight = ((height % 2) == 0);
 
-  // equivalent of w/2 for even & (w-1)/2 for odd
-  int halfwidth = width / 2;
-  int halfheight = height / 2;
+   // equivalent of w/2 for even & (w-1)/2 for odd
+   int halfwidth = width / 2;
+   int halfheight = height / 2;
 
-  int xmin = halfwidth;
-  int ymin = halfheight;
+   int xmin = halfwidth;
+   int ymin = halfheight;
 
-  if (evenWidth){
-    xmin--;
-  }
-  if (evenHeight){
-    ymin--;
-  }
+   if(evenWidth)  xmin--;
+   if(evenHeight) ymin--;
 
-  // Create the offsets list
-  for (int y = -ymin; y <= halfheight; y++)
-  {
-    for (int x = -xmin; x <= halfheight; x++)
-    {
-      _addOffset(x, y);
-    } /* endfor x = 0 */
-  } /* endfor y = 0*/
+   // Create the offsets list
+   for(int y = -ymin; y <= halfheight; y++) {
+      for(int x = -xmin; x <= halfheight; x++) {
+         _addOffset(x, y);
+      } // end for x
+   } // end for y
 
-  _setEdgeOffsets();
+   _setEdgeOffsets();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RectangularTemplate::~RectangularTemplate(void)
-{
-  // Do nothing
+RectangularTemplate::~RectangularTemplate(void) {
+   // Do nothing
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void RectangularTemplate::printOffsetList(FILE *stream)
-{
-  fprintf(stream, "\n\n");
-  fprintf(stream, "Rectangular template:");
-  fprintf(stream, "    height = %d\n", _height);
-  fprintf(stream, "    width = %d\n", _width);
+void RectangularTemplate::printOffsetList(FILE *stream) {
+   fprintf(stream, "\n\n");
+   fprintf(stream, "Rectangular template:");
+   fprintf(stream, "    height = %d\n", _height);
+   fprintf(stream, "    width = %d\n", _width);
+   fprintf(stream, "    is_global = %d\n", _isGlobal);
 
-  fprintf(stream, " grid points:\n");
+   fprintf(stream, " grid points:\n");
 
-  GridTemplate::printOffsetList(stream);
+   GridTemplate::printOffsetList(stream);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

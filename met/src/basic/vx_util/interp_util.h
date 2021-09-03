@@ -102,6 +102,7 @@ extern double compute_sfc_interp(const DataPlane &dp,
                                  double obs_elv, double obs_v,
                                  const InterpMthd mthd, const int width,
                                  const GridTemplateFactory::GridTemplates shape,
+                                 bool is_global,
                                  double interp_thresh, const SurfaceInfo &sfc_info,
                                  bool is_land_obs);
 
@@ -113,6 +114,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
+                                  bool is_global,
                                   double interp_thresh, const SingleThresh *cat_thresh = 0);
 
 extern double compute_horz_interp(const DataPlane &dp,
@@ -120,6 +122,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_v, double cmn, double csd,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
+                                  bool is_global,
                                   double interp_thresh, const SingleThresh *cat_thresh = 0);
 
 extern double compute_vert_pinterp(double, double, double, double, double);

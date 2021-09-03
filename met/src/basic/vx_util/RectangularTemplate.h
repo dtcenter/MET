@@ -35,50 +35,43 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RectangularTemplate : public GridTemplate
-{
- public:
+class RectangularTemplate : public GridTemplate {
 
-  // Constructor
-  RectangularTemplate(int height, int width);
+   public:
 
-  // Destructor
+      RectangularTemplate(int height, int width, bool is_global);
+      virtual ~RectangularTemplate(void);
 
-  virtual ~RectangularTemplate(void);
+      void printOffsetList(FILE *stream);
 
-  // Print the offset list to the given stream.  This is used for debugging.
+      // Access methods
 
-  void printOffsetList(FILE *stream);
+      int getHeight(void) const {
+         return _height;
+      }
 
-  // Access methods
+      int getWidth(void) const {
+         return _width;
+      }
 
-  int getHeight(void) const
-  {
-    return _height;
-  }
+      int getIsGlobal(void) const {
+         return _isGlobal;
+      }
 
-  int getWidth(void) const
-  {
-    return _width;
-  }
+      const char* getClassName(void) const {
+         return RectangularTemplate::_className();
+      }
 
-  const char* getClassName(void) const{
-    return RectangularTemplate::_className();
-  }
+   private:
 
- private:
+      int  _height;
+      int  _width;
+      bool _isGlobal;
 
-  // The box dimensions
-
-  int _height;
-  int _width;
-
-  // Return the class name for error messages.
-  static const char* _className(void)
-  {
-    return("RectangularTemplate");
-  }
-
+      // Return the class name for error messages.
+      static const char* _className(void) {
+         return("RectangularTemplate");
+      }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

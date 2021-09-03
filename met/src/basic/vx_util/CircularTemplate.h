@@ -35,44 +35,38 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class CircularTemplate : public GridTemplate
-{
- public:
+class CircularTemplate : public GridTemplate {
 
-  // Constructor
+   public:
 
-  CircularTemplate(int width = 0); 
-  
-  // Destructor
+      CircularTemplate(int width, bool is_global);
+      virtual ~CircularTemplate(void);
 
-  virtual ~CircularTemplate(void);
+      void printOffsetList(FILE *stream);
   
-  // Print the offset list to the given stream.  This is used for debugging.
+      // Access methods
 
-  void printOffsetList(FILE *stream);
-  
-  // Access methods
+      int getWidth(void) const {
+	      return _width;
+      }
 
-  int getWidth(void) const
-  {
-	  return _width;
-  }
-  
-  
-  virtual const char* getClassName(void) const{
-	  return _className();
-  }
+      bool getIsGlobal(void) const {
+         return _isGlobal;
+      }
 
- private:
+      virtual const char* getClassName(void) const {
+         return _className();
+      }
 
-  int _width;
+   private:
+
+      int  _width;
+      bool _isGlobal;
   
-  // Return the class name for error messages.
-  static const char* _className(void)
-  {
-    return("CircleTemplate");
-  }
-  
+      // Return the class name for error messages.
+      static const char* _className(void) {
+         return("CircleTemplate");
+      }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

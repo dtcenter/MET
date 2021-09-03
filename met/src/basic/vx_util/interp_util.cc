@@ -932,6 +932,7 @@ double compute_sfc_interp(const DataPlane &dp,
                           double obs_elv, double obs_v,
                           const InterpMthd mthd, const int width,
                           const GridTemplateFactory::GridTemplates shape,
+                          bool is_global,
                           double interp_thresh, const SurfaceInfo &sfc_info,
                           bool is_land_obs) {
    double v = bad_data_double;
@@ -945,7 +946,7 @@ double compute_sfc_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape,width);
+   const GridTemplate* gt = gtf.buildGT(shape, width, is_global);
 
    MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
 
@@ -1088,9 +1089,11 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
+                           bool is_global,
                            double interp_thresh, const SingleThresh *cat_thresh) {
    return(compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
-             bad_data_double, mthd, width, shape, interp_thresh, cat_thresh));
+             bad_data_double, mthd, width, shape, is_global,
+             interp_thresh, cat_thresh));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1100,6 +1103,7 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_v, double cmn, double csd,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
+                           bool is_global,
                            double interp_thresh, const SingleThresh *cat_thresh) {
    double v = bad_data_double;
    int x = nint(obs_x);
@@ -1112,7 +1116,7 @@ double compute_horz_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape,width);
+   const GridTemplate* gt = gtf.buildGT(shape, width, is_global);
 
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
