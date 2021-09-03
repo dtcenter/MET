@@ -36,9 +36,7 @@
 
 using namespace std;
 
-/**********************************************************************
- * Constructors
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridTemplate::GridTemplate(void)
 {
@@ -59,9 +57,7 @@ GridTemplate::GridTemplate(const GridTemplate& rhs)
    _pointInGridReturn = rhs._pointInGridReturn;
 }
 
-/**********************************************************************
- * Destructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridTemplate::~GridTemplate(void)
 {
@@ -76,13 +72,14 @@ GridTemplate::~GridTemplate(void)
 
 }
 
-/**********************************************************************
- * getFirstInGrid() - Get the first template grid point within the given
- *                    grid.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point within the given grid.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirstInGrid(
                             const int &base_x, const int &base_y,
@@ -97,14 +94,15 @@ GridPoint *GridTemplate::getFirstInGrid(
   return getNextInGrid();
 }
 
-/**********************************************************************
- * getNextInGrid() - Get the next template grid point within the grid.
- *                   Returns NULL when there are no more points in the
- *                   grid.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point within the grid.
+// Returns NULL when there are no more points in the grid.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNextInGrid(void) const
 {
@@ -130,13 +128,15 @@ GridPoint *GridTemplate::getNextInGrid(void) const
   return (GridPoint *)NULL;
 }
 
-/**********************************************************************
- * getFirst() - Get the first template grid point without checking
- *              the grid bounds.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point without checking the grid
+// bounds.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
                                   const int &nx, const int &ny) const
@@ -148,13 +148,15 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
   return getNext();
 }
 
-/**********************************************************************
- * getNext() - Get the next template grid point without checking the
- *             grid bounds. Returns NULL when there are no more points.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point without checking the grid bounds.
+// Returns NULL when there are no more points.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNext(void) const
 {
@@ -175,13 +177,14 @@ GridPoint *GridTemplate::getNext(void) const
   return next_point;
 }
 
-/**********************************************************************
- * getFirstInLftEdge() - Get the first template grid point in the left
- *                       column.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point in the left column.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirstInLftEdge(void) const
 {
@@ -192,14 +195,15 @@ GridPoint *GridTemplate::getFirstInLftEdge(void) const
   return getNextInLftEdge();
 }
 
-/**********************************************************************
- * getNextInLftEdge() - Get the next template grid point in the first
- *                      column. Returns NULL when there are no more
- *                      points in the first column.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point in the first column.
+// Returns NULL when there are no more points in the first column.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNextInLftEdge(void) const
 {
@@ -225,13 +229,14 @@ GridPoint *GridTemplate::getNextInLftEdge(void) const
   return (GridPoint *)NULL;
 }
 
-/**********************************************************************
- * getFirstInTopEdge() - Get the first template grid point in the
- *                       top row.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point in the top row.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirstInTopEdge(void) const
 {
@@ -242,14 +247,15 @@ GridPoint *GridTemplate::getFirstInTopEdge(void) const
   return getNextInTopEdge();
 }
 
-/**********************************************************************
- * getNextInTopEdge() - Get the next template grid point in the top
- *                      row. Returns NULL when there are no more
- *                      points in the top row.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point in the top row.
+// Returns NULL when there are no more points in the top row.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNextInTopEdge(void) const
 {
@@ -275,13 +281,14 @@ GridPoint *GridTemplate::getNextInTopEdge(void) const
   return (GridPoint *)NULL;
 }
 
-/**********************************************************************
- * getFirstInRgtEdge() - Get the first template grid point in the
- *                       right column.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point in the right column.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirstInRgtEdge(void) const
 {
@@ -292,14 +299,15 @@ GridPoint *GridTemplate::getFirstInRgtEdge(void) const
   return getNextInRgtEdge();
 }
 
-/**********************************************************************
- * getNextInRgtEdge() - Get the next template grid point in the right
- *                      column. Returns NULL when there are no more
- *                      points in the right column.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point in the right column.
+// Returns NULL when there are no more points in the right column.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNextInRgtEdge(void) const
 {
@@ -325,13 +333,14 @@ GridPoint *GridTemplate::getNextInRgtEdge(void) const
   return (GridPoint *)NULL;
 }
 
-/**********************************************************************
- * getFirstInBotEdge() - Get the first template grid point in the
- *                       bottom row.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the first template grid point in the bottom row.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getFirstInBotEdge(void) const
 {
@@ -342,14 +351,16 @@ GridPoint *GridTemplate::getFirstInBotEdge(void) const
   return getNextInBotEdge();
 }
 
-/**********************************************************************
- * getNextInBotEdge() - Get the next template grid point in the bottom
- *                      row. Returns NULL when there are no more points
- *                      in the bottom row.
- *
- * Returns a pointer to a static object which must NOT be deleted by the
- * calling routine.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Get the next template grid point in the bottom row.
+// Returns NULL when there are no more points in the bottom row.
+// Initialize the grid dimensions and base location.
+//
+// Returns a pointer to a static object which must NOT be deleted
+// by the calling routine.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint *GridTemplate::getNextInBotEdge(void) const
 {
@@ -375,10 +386,11 @@ GridPoint *GridTemplate::getNextInBotEdge(void) const
   return (GridPoint *)NULL;
 }
 
-/**********************************************************************
- * setGrid() - Initialize the grid dimensions and base location.
- *
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Initialize the grid dimensions and base location.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::setGrid(const int &base_x, const int &base_y,
                            const int &nx, const int &ny) const
@@ -401,10 +413,11 @@ void GridTemplate::setGrid(const int &base_x, const int &base_y,
   return;
 }
 
-/**********************************************************************
- * incBaseX() - Increment the base_x location and reset the offset
- *              iterators.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Increment the base_x location and reset the offset iterators.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::incBaseX(const int &x_inc) const
 {
@@ -422,10 +435,11 @@ void GridTemplate::incBaseX(const int &x_inc) const
   return;
 }
 
-/**********************************************************************
- * incBaseY() - Increment the base_y location and reset the offset
- *              iterators.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Increment the base_y location and reset the offset iterators.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::incBaseY(const int &y_inc) const
 {
@@ -443,10 +457,12 @@ void GridTemplate::incBaseY(const int &y_inc) const
   return;
 }
 
-/**********************************************************************
- * printOffsetList() - Print the offset list to the given stream.  This
- *                     is used for debugging.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Print the offset list to the given stream.
+// This is used for debugging.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::printOffsetList(FILE *stream)
 {
@@ -470,13 +486,11 @@ void GridTemplate::printOffsetList(FILE *stream)
 
 }
 
-/**********************************************************************
- *              Private Member Functions                              *
- **********************************************************************/
-
-/**********************************************************************
- * _addOffset() - Add the given offset to the offset list.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Add the given offset to the offset list.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::_addOffset(int x_offset, int y_offset)
 {
@@ -487,10 +501,11 @@ void GridTemplate::_addOffset(int x_offset, int y_offset)
   return;
 }
 
-/**********************************************************************
- * _setEdgeOffsets() - Process the current offset list and find the
- *                     edges.
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+// Process the current offset list and find the edges.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::_setEdgeOffsets()
 {
@@ -567,9 +582,12 @@ void GridTemplate::_setEdgeOffsets()
   return;
 }
 
-////////////////////////////////////////////////////////////////
-//   GridTemplateFactory
-////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class GridTemplateFactory.
+//
+///////////////////////////////////////////////////////////////////////////////
+
 GridTemplateFactory::GridTemplateFactory() {
    enum_to_string.resize(GridTemplate_NUM_TEMPLATES);
 
@@ -583,8 +601,12 @@ GridTemplateFactory::~GridTemplateFactory() {
    enum_to_string.clear();
 }
 
-/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
 // log & exit on failure
+//
+///////////////////////////////////////////////////////////////////////////////
+
 GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string target) {
 
    for (unsigned int ix = 0; ix < GridTemplate_NUM_TEMPLATES; ix++){
@@ -597,9 +619,12 @@ GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string targe
    exit(1);
 }
 
-
-/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
 // log & exit on failure
+//
+///////////////////////////////////////////////////////////////////////////////
+
 string GridTemplateFactory::enum2String(GridTemplates target) {
 
    if( static_cast<int>(target) > enum_to_string.size() - 1){
@@ -613,26 +638,36 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
    return enum_to_string[static_cast<int>(target)];
 }
 
-/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
 // Caller assumes ownership of the returned pointer.
+//
+///////////////////////////////////////////////////////////////////////////////
+
 GridTemplate* GridTemplateFactory::buildGT(string gt, int width) {
    return buildGT(string2Enum(gt), width);
 }
 
-/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
 // Caller assumes ownership of the returned pointer.
+//
+///////////////////////////////////////////////////////////////////////////////
+
 GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width) {
 
    switch (gt) {
       case(GridTemplate_Square):
-         return new RectangularTemplate(width,width);
+         return new RectangularTemplate(width, width);
 
       case(GridTemplate_Circle):
          return new CircularTemplate(width);
 
       default:
          mlog << Error << "\nbuildGT() -> "
-              << "Unexpected gt value of " << gt << ".\n\n";
+              << "Unexpected GridTemplates value (" << gt << ").\n\n";
          exit(1);
       }
 }
+
+///////////////////////////////////////////////////////////////////////////////

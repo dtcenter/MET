@@ -28,42 +28,39 @@
 #include <GridPoint.h>
 using namespace std;
 
-/**********************************************************************
- * Constructors
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(int cur_x, int cur_y)
 {
   setPoint(cur_x, cur_y);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(GridPoint *point)
 {
   setPoint(point);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(GridPoint *point, GridOffset *offset)
 {
   setPoint(point, offset);
 }
 
-
-/**********************************************************************
- * Destructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::~GridPoint(void)
 {
 }
 
-
-/**********************************************************************
- * rotate() - Rotate the point about the origin by the given angle.
- *            The angle value must be given in degrees.
- */
-
+///////////////////////////////////////////////////////////////////////////////
+//
+// Rotate the point about the origin by the given angle.
+// The angle value must be given in degrees.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridPoint::rotate(const double angle)
 {
@@ -79,7 +76,4 @@ void GridPoint::rotate(const double angle)
   y = (int)(new_y + 0.5);
 }
 
-
-/**********************************************************************
- *              Private Member Functions                              *
- **********************************************************************/
+///////////////////////////////////////////////////////////////////////////////

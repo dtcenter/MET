@@ -29,9 +29,7 @@
 
 using namespace std;
 
-/**********************************************************************
- * Constructors
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridOffset::GridOffset(int cur_x_offset, int cur_y_offset)
 {
@@ -39,6 +37,7 @@ GridOffset::GridOffset(int cur_x_offset, int cur_y_offset)
   this->y_offset = cur_y_offset;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridOffset::GridOffset(const GridOffset& rhs)
 {
@@ -46,6 +45,7 @@ GridOffset::GridOffset(const GridOffset& rhs)
   y_offset = rhs.y_offset;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridOffset::GridOffset(const GridOffset* rhs)
 {
@@ -53,16 +53,10 @@ GridOffset::GridOffset(const GridOffset* rhs)
   y_offset = rhs->y_offset;
 }
 
-
-/**********************************************************************
- * Destructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridOffset::~GridOffset(void)
 {
 }
 
-
-/**********************************************************************
- *              Private Member Functions                              *
- **********************************************************************/
+///////////////////////////////////////////////////////////////////////////////
