@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -104,19 +105,25 @@ class GridTemplate {
          return _offsetList.size();
       }
 
+      int getIsGlobal(void) const {
+         return _isGlobal;
+      }
+
       virtual const char* getClassName(void) const = 0;
 
       virtual int getWidth() const = 0;
 
    protected:
 
+      bool _isGlobal;
+
       // The offsets that make up the circle
       vector<GridOffset*> _offsetList;
 
       // The offsets that define the first and last rows and columns
-      vector<GridOffset*> _offsetLftEdge;   // not allocated
-      vector<GridOffset*> _offsetRgtEdge;  // not allocated
-      vector<GridOffset*> _offsetTopEdge;    // not allocated
+      vector<GridOffset*> _offsetLftEdge; // not allocated
+      vector<GridOffset*> _offsetRgtEdge; // not allocated
+      vector<GridOffset*> _offsetTopEdge; // not allocated
       vector<GridOffset*> _offsetBotEdge; // not allocated
 
       // Iterator for finding points within a grid
@@ -136,7 +143,6 @@ class GridTemplate {
 
       // Determine the offsets for the First/Last Row/Column
       void _setEdgeOffsets();
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////

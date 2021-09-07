@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -38,13 +39,16 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate::GridTemplate(void) {
+GridTemplate::GridTemplate(void) :
+   _isGlobal(false) {
    // Do nothing
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplate::GridTemplate(const GridTemplate& rhs) {
+   _isGlobal = rhs._isGlobal;
+
    vector<GridOffset*>::const_iterator offset_iter;
 
    for (offset_iter = rhs._offsetList.begin();

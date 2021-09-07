@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +37,9 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 CircularTemplate::CircularTemplate(const int width, bool is_global) :
-	GridTemplate(), _width(width), _isGlobal(is_global) {
+	GridTemplate(), _width(width) {
+
+   _isGlobal = is_global;
 
 	// width of 2 is not supported
 	if (width == 2) {

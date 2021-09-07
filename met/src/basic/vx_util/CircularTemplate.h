@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -50,10 +51,6 @@ class CircularTemplate : public GridTemplate {
 	      return _width;
       }
 
-      bool getIsGlobal(void) const {
-         return _isGlobal;
-      }
-
       virtual const char* getClassName(void) const {
          return _className();
       }
@@ -61,7 +58,6 @@ class CircularTemplate : public GridTemplate {
    private:
 
       int  _width;
-      bool _isGlobal;
   
       // Return the class name for error messages.
       static const char* _className(void) {

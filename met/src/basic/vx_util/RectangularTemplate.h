@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-07  Megenhardt      Initial version.
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -54,19 +55,14 @@ class RectangularTemplate : public GridTemplate {
          return _width;
       }
 
-      int getIsGlobal(void) const {
-         return _isGlobal;
-      }
-
       const char* getClassName(void) const {
          return RectangularTemplate::_className();
       }
 
    private:
 
-      int  _height;
-      int  _width;
-      bool _isGlobal;
+      int _height;
+      int _width;
 
       // Return the class name for error messages.
       static const char* _className(void) {
