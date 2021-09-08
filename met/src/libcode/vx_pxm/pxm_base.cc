@@ -23,7 +23,6 @@ using namespace std;
 #include "pxm_base.h"
 
 #include "vx_log.h"
-#include "string_fxns.h"
 #include "check_endian.h"
 
 

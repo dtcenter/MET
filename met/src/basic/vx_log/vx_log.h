@@ -24,7 +24,7 @@ using namespace std;
 #include "string_array.h"
 #include "file_fxns.h"
 #include "logger.h"
-
+#include "str_wrappers.h"
 
 ////////////////////////////////////////////////////////////////////////
 

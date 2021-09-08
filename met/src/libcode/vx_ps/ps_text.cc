@@ -20,7 +20,6 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
-#include "string_fxns.h"
 #include "ps_text.h"
 
 

@@ -14,7 +14,6 @@ using namespace std;
 
 #include "vx_log.h"
 #include "empty_string.h"
-#include "string_fxns.h"
 
 #include "python3_util.h"
 #include "python3_script.h"

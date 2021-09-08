@@ -29,7 +29,6 @@ using namespace std;
 #include "indent.h"
 #include "icode.h"
 #include "dictionary.h"
-#include "string_fxns.h"
 
 #include "celltype_to_string.h"
 

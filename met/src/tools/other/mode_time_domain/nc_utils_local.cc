@@ -22,7 +22,6 @@ using namespace std;
 
 #include "nc_utils.h"
 #include "nc_utils_local.h"
-#include "string_fxns.h"
 #include "vx_log.h"
 
 

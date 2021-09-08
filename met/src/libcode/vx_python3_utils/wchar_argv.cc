@@ -1,5 +1,3 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -25,7 +23,6 @@ using namespace std;
 
 #include "wchar_argv.h"
 #include "concat_string.h"
-#include "string_fxns.h"
 
 #include "vx_log.h"
 
