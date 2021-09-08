@@ -133,6 +133,7 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
+
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -144,14 +145,14 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
       xf = nint(x_from);
       yf = nint(y_from);
 
-      if ( (xf < 0) || (xf >= from_grid.nx()) || (yf < 0) || (yf >= from_grid.ny()) )  {
-
+      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.is_global() ) ||
+              yf < 0 || yf >= from_grid.ny() )  {
          value = bad_data_float;
-
-      } else {
-         value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
-                                     info.method, info.width, info.shape, info.vld_thresh);
-
+      }
+      else  {
+         value = compute_horz_interp(from_data, x_from, y_from,
+                    bad_data_double, info.method, info.width,
+                    info.shape, from_grid.is_global(), info.vld_thresh);
       }
 
       to_data.put(value, xt, yt);
@@ -327,6 +328,7 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
+
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -338,15 +340,14 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
       xf = nint(x_from);
       yf = nint(y_from);
 
-      if ( (xf < 0) || (xf >= from_grid.nx()) ||
-           (yf < 0) || (yf >= from_grid.ny()) )  {
-
+      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.is_global() ) ||
+              yf < 0 || yf >= from_grid.ny() )  {
          value = bad_data_float;
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from,
                     bad_data_double, InterpMthd_Max, info.width,
-                    info.shape, info.vld_thresh);
+                    info.shape, from_grid.is_global(), info.vld_thresh);
       }
 
       to_data.put(value, xt, yt);

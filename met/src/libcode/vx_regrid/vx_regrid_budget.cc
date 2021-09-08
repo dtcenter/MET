@@ -77,7 +77,7 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
 
             from_grid.latlon_to_xy(lat, lon, dxf, dyf);
 
-            value = interp_bilin(from_data, dxf, dyf);
+            value = interp_bilin(from_data, from_grid.is_global(), dxf, dyf);
 
             if ( value != bad_data_double )  { sum += value;  ++count; }
 
