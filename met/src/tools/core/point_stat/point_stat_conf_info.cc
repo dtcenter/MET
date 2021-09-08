@@ -931,16 +931,15 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
           << "\" is deprecated "
           << "use \"" << conf_key_obs_qty_inc << "\" instead.\n\n";
      
-     vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
+     vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty(&odict));
      
    } else {
      cout << "Using " << conf_key_obs_qty_inc << "\n";
-     vx_pd.set_obs_qty_filt(parse_conf_obs_qty_inc(&odict));
+     vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty_inc(&odict));
    }
-
-
-   // Conf: obs_qty_exc
    
+   // Conf: obs_qty_exc
+   vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
    
    return;
 }
