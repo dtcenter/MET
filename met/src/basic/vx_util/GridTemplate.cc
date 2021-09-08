@@ -72,7 +72,6 @@ GridTemplate::~GridTemplate(void) {
       delete *list_iter;
 
    _offsetList.erase(_offsetList.begin(), _offsetList.end());
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,8 +87,8 @@ GridPoint *GridTemplate::getFirstInGrid(
               const int &base_x, const int &base_y,
               const int &nx, const int &ny) const {
 
-   // Set the grid information
-   setGrid(base_x, base_y, nx, ny);
+   // Set the grid information, applying the global wrap logic
+   setGrid((_isGlobal ? base_x % nx : base_x), base_y, nx, ny);
 
    // Send back the first point
 
@@ -116,6 +115,11 @@ GridPoint *GridTemplate::getNextInGrid(void) const {
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
+
       if(_pointInGridReturn.x >= 0 &&
          _pointInGridReturn.x < _pointInGridNumX &&
          _pointInGridReturn.y >= 0 &&
@@ -139,8 +143,9 @@ GridPoint *GridTemplate::getNextInGrid(void) const {
 
 GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
                                   const int &nx, const int &ny) const {
-   // Set the grid information
-   setGrid(base_x, base_y, nx, ny);
+
+   // Set the grid information, applying the global wrap logic
+   setGrid((_isGlobal ? base_x % nx : base_x), base_y, nx, ny);
 
    // Send back the first point
    return getNext();
@@ -166,6 +171,11 @@ GridPoint *GridTemplate::getNext(void) const {
 
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
+
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
 
       next_point = &_pointInGridReturn;
    }
@@ -210,6 +220,11 @@ GridPoint *GridTemplate::getNextInLftEdge(void) const {
 
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
+
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
          _pointInGridReturn.x < _pointInGridNumX &&
@@ -259,6 +274,11 @@ GridPoint *GridTemplate::getNextInTopEdge(void) const {
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
+
       if(_pointInGridReturn.x >= 0 &&
          _pointInGridReturn.x < _pointInGridNumX &&
          _pointInGridReturn.y >= 0 &&
@@ -306,6 +326,11 @@ GridPoint *GridTemplate::getNextInRgtEdge(void) const {
 
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
+
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
          _pointInGridReturn.x < _pointInGridNumX &&
@@ -356,6 +381,11 @@ GridPoint *GridTemplate::getNextInBotEdge(void) const {
       _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
+      // Apply global wrap logic
+      _pointInGridReturn.x = (_isGlobal ?
+                              _pointInGridReturn.x % _pointInGridNumX :
+                              _pointInGridReturn.x);
+
       if(_pointInGridReturn.x >= 0 &&
          _pointInGridReturn.x < _pointInGridNumX &&
          _pointInGridReturn.y >= 0 &&
@@ -402,6 +432,11 @@ void GridTemplate::setGrid(const int &base_x, const int &base_y,
 void GridTemplate::incBaseX(const int &x_inc) const {
 
    _pointInGridBase.x += x_inc;
+
+   // Apply global wrap logic
+   _pointInGridBase.x = (_isGlobal ?
+                         _pointInGridBase.x % _pointInGridNumX :
+                         _pointInGridBase.x);
 
    if(_pointInGridBase.x < 0 ||
       _pointInGridBase.x >= _pointInGridNumX ) {
