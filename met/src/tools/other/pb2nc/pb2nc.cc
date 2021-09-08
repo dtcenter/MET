@@ -672,7 +672,8 @@ void get_variable_info(const char* tbl_filename) {
          }
          if ('0' != line[BUFR_NUMBER_START]) continue;
 
-         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name");
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN,
+                   method_name, "var_name", true);
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -681,7 +682,8 @@ void get_variable_info(const char* tbl_filename) {
          if (0 == m_strlen(var_name)) continue;
 
          var_count1++;
-         m_strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN, method_name, "var_desc");
+         m_strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN,
+                   method_name, "var_desc", true);
          var_desc[BUFR_DESCRIPTION_LEN] = '\0';
          for (int idx=(BUFR_DESCRIPTION_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
@@ -700,7 +702,8 @@ void get_variable_info(const char* tbl_filename) {
          if (NULL != strstr(line,"MNEMONIC")) break;
          if (NULL == strstr(line,"EVENT")) continue;
 
-         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name2");
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN,
+                   method_name, "var_name2", true);
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -708,7 +711,8 @@ void get_variable_info(const char* tbl_filename) {
          }
          //if (NULL == strstr(var_name,"EVENT")) continue;
 
-         m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN, method_name, "var_desc2");
+         m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN,
+                   method_name, "var_desc2", true);
          var_desc[BUFR_SEQUENCE_LEN] = '\0';
          for (int idx=(BUFR_SEQUENCE_LEN-1); idx>=0; idx--) {
             if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
@@ -728,7 +732,8 @@ void get_variable_info(const char* tbl_filename) {
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
-         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN, method_name, "var_name3");
+         m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN,
+                   method_name, "var_name3", true);
          var_name[BUFR_NAME_LEN] = '\0';
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
@@ -737,10 +742,12 @@ void get_variable_info(const char* tbl_filename) {
 
          if (NULL != strstr(line,"CCITT IA5")) {
             ascii_vars.add(var_name);
-            m_strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str), method_name, "var_unit_str1");
+            m_strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str),
+                      method_name, "var_unit_str1", true);
          }
          else {
-            m_strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN, method_name, "var_unit_str2");
+            m_strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN,
+                      method_name, "var_unit_str2", true);
             var_unit_str[BUFR_UNIT_LEN] = '\0';
             for (int idx=(BUFR_UNIT_LEN-1); idx>=0; idx--) {
                if (' ' != var_unit_str[idx] && '|' != var_unit_str[idx]) {
