@@ -1048,7 +1048,7 @@ if ( render_flag )  {
    //  done
    //
 
-if ( DoLigatures )  { delete [] new_string;  new_string = (char *) 0; }
+if ( DoLigatures && new_string != NULL )  { delete [] new_string;  new_string = (char *) 0; }
 
 return;
 
