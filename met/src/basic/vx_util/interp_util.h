@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11-17-08  Halley Gotway
+//   001    09-07-21  Halley Gotway   Add is_global.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -84,8 +85,8 @@ extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, dou
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
                                 double cmn, double csd, const MaskPlane *mp = 0);
-extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y, const MaskPlane *mp = 0);
-extern double   interp_xy      (const DataPlane &, int x, int y, const MaskPlane *mp = 0);
+extern double   interp_bilin   (const DataPlane &, bool is_global, double obs_x, double obs_y, const MaskPlane *mp = 0);
+extern double   interp_xy      (const DataPlane &, bool is_global, int x, int y, const MaskPlane *mp = 0);
 
 extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t, const MaskPlane *mp = 0);
 
