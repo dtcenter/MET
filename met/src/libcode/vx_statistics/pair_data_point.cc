@@ -1235,8 +1235,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                mlog << Debug(4)
                     << "For " << fcst_info->magic_str() << " versus "
                     << obs_info->magic_str()
-                    << ", skipping observation due to bad data in the interpolated "
-                    << "forecast value:\n"
+                    << ", skipping observation due to bad data in the "
+                    << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
+                    << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
+                    << ") interpolated forecast value:\n"
                     << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
                     << "\n";
