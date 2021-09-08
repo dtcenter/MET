@@ -372,7 +372,8 @@ void VxPairDataPoint::clear() {
    climo_sd_dpa.clear();
    sid_inc_filt.clear();
    sid_exc_filt.clear();
-   obs_qty_filt.clear();
+   obs_qty_inc_filt.clear();
+   obs_qty_exc_filt.clear();
    mpr_column.clear();
    mpr_thresh.clear();
 
@@ -433,7 +434,8 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    sid_inc_filt = vx_pd.sid_inc_filt;
    sid_exc_filt = vx_pd.sid_exc_filt;
-   obs_qty_filt = vx_pd.obs_qty_filt;
+   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
+   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
 
    mpr_column = vx_pd.mpr_column;
    mpr_thresh = vx_pd.mpr_thresh;
@@ -629,9 +631,18 @@ void VxPairDataPoint::set_sid_exc_filt(const StringArray &sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_obs_qty_filt(const StringArray &sa) {
+void VxPairDataPoint::set_obs_qty_inc_filt(const StringArray &sa) {
 
-   obs_qty_filt = sa;
+   obs_qty_inc_filt = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_obs_qty_exc_filt(const StringArray &sa) {
+
+   obs_qty_exc_filt = sa;
 
    return;
 }
@@ -914,10 +925,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // Check if the observation quality flag is included in the list
-   if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
+   if(obs_qty_inc_filt.n() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++) {
-         if(obs_qty == obs_qty_filt[i]) qty_match = true;
+      for(i=0; i<obs_qty_inc_filt.n() && !qty_match; i++) {
+         if(obs_qty == obs_qty_inc_filt[i]) qty_match = true;
       }
       if(!qty_match) {
          rej_qty++;
