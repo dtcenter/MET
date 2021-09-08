@@ -1121,7 +1121,7 @@ int process_point_ens(int i_ens, int &n_miss) {
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
 
       // Compute forecast values for this ensemble member
-      conf_info.vx_opt[i].vx_pd.add_ens(i_ens-n_miss, is_ens_mean);
+      conf_info.vx_opt[i].vx_pd.add_ens(i_ens-n_miss, is_ens_mean, grid);
 
    } // end for i
 
@@ -1586,13 +1586,13 @@ void process_grid_vx() {
          // Smooth the ensemble mean field, if requested
          if(ens_mean_flag &&
             (field == FieldType_Fcst || field == FieldType_Both)) {
-            emn_dp = smooth_field(emn_dp, mthd, wdth, shape,
+            emn_dp = smooth_field(emn_dp, mthd, wdth, shape, grid.is_global(),
                                   vld_thresh, gaussian);
          }
 
          // Smooth the observation field, if requested
          if(field == FieldType_Obs || field == FieldType_Both) {
-            obs_dp = smooth_field(obs_dp, mthd, wdth, shape,
+            obs_dp = smooth_field(obs_dp, mthd, wdth, shape, grid.is_global(),
                                   vld_thresh, gaussian);
          }
 
@@ -1615,7 +1615,7 @@ void process_grid_vx() {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
-               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape,
+               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape, grid.is_global(),
                                          vld_thresh, gaussian);
             }
 
@@ -2058,7 +2058,8 @@ void track_counts(int i_vx, const DataPlane &dp) {
             fractional_coverage(dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
-               ThreshBuf[i], conf_info.nbrhd_prob.vld_thresh);
+               grid.is_global(), ThreshBuf[i],
+               conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
             const double *Frac = frac_dp.data();
@@ -2494,6 +2495,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                smooth_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
                               conf_info.nbrhd_prob.width[j],
                               conf_info.nbrhd_prob.shape,
+                              grid.is_global(),
                               conf_info.nbrhd_prob.vld_thresh, info);
 
                for(k=0; k<count_na.n(); k++) {
@@ -2548,6 +2550,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                               string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
                               conf_info.nmep_smooth.width[k],
                               conf_info.nmep_smooth.shape,
+                              grid.is_global(),
                               conf_info.nmep_smooth.vld_thresh,
                               conf_info.nmep_smooth.gaussian);
 

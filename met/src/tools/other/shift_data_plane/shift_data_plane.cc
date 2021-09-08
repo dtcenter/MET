@@ -258,7 +258,7 @@ void process_data_file() {
    for(x=0; x<dp_shift.nx(); x++) {
       for(y=0; y<dp_shift.ny(); y++) {
          v = compute_horz_interp(dp_in, x - dx, y - dy, bad_data_double,
-                                 Method, Width, Shape, 1.0);
+                                 Method, Width, Shape, grid.is_global(), 1.0);
          dp_shift.set(v, x, y);
       } // end for y
    } // end for x
