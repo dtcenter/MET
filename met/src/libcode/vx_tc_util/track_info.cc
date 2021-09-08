@@ -609,7 +609,7 @@ bool TrackInfo::is_interp() const {
    int offset = (m_strlen(Technique.c_str()) - 1);
 
    // Return true if the last character of the model name is 'I'
-   if offset < 0) return false;
+   if (offset < 0) return false;
    else return(s[offset] == 'I');
 
 }
