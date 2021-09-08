@@ -28,6 +28,7 @@
 #include <cstdio>
 
 #include "vx_log.h"
+#include "nint.h"
 
 #include "GridTemplate.h"
 #include "GridOffset.h"
@@ -117,7 +118,7 @@ GridPoint *GridTemplate::getNextInGrid(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
@@ -145,7 +146,7 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
                                   const int &nx, const int &ny) const {
 
    // Set the grid information, applying the global wrap logic
-   setGrid((_isGlobal ? base_x % nx : base_x), base_y, nx, ny);
+   setGrid((_isGlobal ? positive_modulo(base_x, nx) : base_x), base_y, nx, ny);
 
    // Send back the first point
    return getNext();
@@ -174,7 +175,7 @@ GridPoint *GridTemplate::getNext(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       next_point = &_pointInGridReturn;
@@ -223,7 +224,7 @@ GridPoint *GridTemplate::getNextInLftEdge(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
@@ -276,7 +277,7 @@ GridPoint *GridTemplate::getNextInTopEdge(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
@@ -329,7 +330,7 @@ GridPoint *GridTemplate::getNextInRgtEdge(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
@@ -383,7 +384,7 @@ GridPoint *GridTemplate::getNextInBotEdge(void) const {
 
       // Apply global wrap logic
       _pointInGridReturn.x = (_isGlobal ?
-                              _pointInGridReturn.x % _pointInGridNumX :
+                              positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
       if(_pointInGridReturn.x >= 0 &&
@@ -435,7 +436,7 @@ void GridTemplate::incBaseX(const int &x_inc) const {
 
    // Apply global wrap logic
    _pointInGridBase.x = (_isGlobal ?
-                         _pointInGridBase.x % _pointInGridNumX :
+                         positive_modulo(_pointInGridBase.x, _pointInGridNumX) :
                          _pointInGridBase.x);
 
    if(_pointInGridBase.x < 0 ||

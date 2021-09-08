@@ -110,7 +110,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    GridTemplate* gt = gtf.buildGT(shape, width, is_global);
 
    mlog << Debug(3)
-        << "Smoothing field using the " << interpmthd_to_string(mthd)
+        << "Smoothing " << (is_global ? "global" : "non-global")
+        << " field using the " << interpmthd_to_string(mthd)
         << "(" << gt->size() << ") " << gt->getClassName()
         << " interpolation method.\n";
 

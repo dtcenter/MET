@@ -748,8 +748,8 @@ double interp_bilin(const DataPlane &dp, bool is_global, double obs_x, double ob
    y = nint(floor(obs_y));
 
    // Apply global wrap logic to x and x+1
-   x   = (is_global ? x     % dp.nx() : x);
-   xp1 = (is_global ? (x+1) % dp.nx() : x+1);
+   x   = (is_global ? positive_modulo(x,   dp.nx()) : x);
+   xp1 = (is_global ? positive_modulo(x+1, dp.nx()) : x+1);
 
    // Check the optional mask
    if(mp) {
@@ -845,7 +845,7 @@ double interp_xy(const DataPlane &dp, bool is_global, int x, int y,
    double v;
 
    // Apply global wrap logic
-   x = (is_global ? x % dp.nx() : x);
+   x = (is_global ? positive_modulo(x, dp.nx()) : x);
 
    // Check the optional mask
    if(mp) {
