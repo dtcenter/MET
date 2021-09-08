@@ -19,6 +19,7 @@ using namespace std;
 #include <ctype.h>
 #include <cmath>
 
+#include "str_wrappers.h"
 #include "string_fxns.h"
 #include "filename_suffix.h"
 #include "concat_string.h"

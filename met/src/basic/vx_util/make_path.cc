@@ -26,7 +26,6 @@ using namespace std;
 
 #include "make_path.h"
 #include "vx_log.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
