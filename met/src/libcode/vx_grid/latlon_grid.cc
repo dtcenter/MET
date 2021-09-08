@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,6 +73,8 @@ lat_ll = lon_ll = 0.0;
 
 delta_lat = delta_lon = 0.0;
 
+isGlobal = false;
+
 memset(&Data, 0, sizeof(Data));
 
 return;
@@ -120,6 +118,9 @@ Name = data.name;
 
 Data = data;
 
+const double lon_range = fabs((Nx + 1)*delta_lon);
+
+isGlobal = (lon_range >= 360.0);
 
 
 return;
@@ -249,6 +250,8 @@ out << prefix << "lon_ll       = " << lon_ll << "\n";
 out << prefix << "delta_lat_ll = " << delta_lat << "\n";
 out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
+out << prefix << "isGlobal     = " << bool_to_string(isGlobal) << "\n";
+
    //
    //  done
    //
@@ -281,6 +284,8 @@ snprintf(junk, sizeof(junk), " lon_ll: %.3f", lon_ll);   a << junk;
 
 snprintf(junk, sizeof(junk), " delta_lat: %.3f", delta_lat);   a << junk;
 snprintf(junk, sizeof(junk), " delta_lon: %.3f", delta_lon);   a << junk;
+
+snprintf(junk, sizeof(junk), " isGlobal: %s", bool_to_string(isGlobal));   a << junk;
 
    //
    //  done
@@ -328,33 +333,13 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LatLonGrid::is_global() const
-
-{
-
-const double lon_range = fabs((Nx + 1)*delta_lon);
-const double lat_range = fabs((Ny + 1)*delta_lat);
-
-const bool full_range_lat = (lat_range >= 180.0);
-const bool full_range_lon = (lon_range >= 360.0);
-
-const bool answer = full_range_lat && full_range_lon;
-
-return ( answer );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LatLonGrid::shift_right(int N)
 
 {
 
 if ( N == 0 )  return;
 
-if ( ! is_global() ) {
+if ( ! isGlobal ) {
 
    mlog << Error
         << "\n\n  LatLonGrid::shift_right(int) -> "
@@ -450,5 +435,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

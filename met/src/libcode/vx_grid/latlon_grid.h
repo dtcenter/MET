@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -45,6 +41,8 @@ class LatLonGrid : public GridRep {
 
       int Nx;
       int Ny;
+
+      bool isGlobal;
 
       ConcatString Name;
 
@@ -91,7 +89,8 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
+inline double LatLonGrid::scale_km()  const { return ( -1.0 );     }
+inline bool   LatLonGrid::is_global() const { return ( isGlobal ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -101,6 +100,3 @@ inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
