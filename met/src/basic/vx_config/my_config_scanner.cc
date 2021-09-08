@@ -26,7 +26,6 @@ using namespace std;
 #include "math_constants.h"
 #include "util_constants.h"
 #include "is_number.h"
-#include "string_fxns.h"
 
 #include "dictionary.h"
 #include "builtin.h"
@@ -1028,7 +1027,11 @@ if ( c == '$' )  {
 
    memset(env_name, 0, sizeof(env_name));
 
-   while ( (env_pos < max_id_length) && ((c = fgetc(configin)) != R_curly) )  env_name[env_pos++] = (char) c;
+   // SonarQube: to avoid side effect by || operator
+   while (env_pos < max_id_length) {
+      if ((c = fgetc(configin)) == R_curly) break;
+      env_name[env_pos++] = (char) c;
+   }
 
    e = getenv ( env_name );
 
