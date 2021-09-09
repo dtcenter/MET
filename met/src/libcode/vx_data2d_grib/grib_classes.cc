@@ -1358,9 +1358,13 @@ void GribFile::close()
 
 {
 
-if ( rep && (--rep->referenceCount == 0) )  delete rep;
+if ( rep ) {
 
-rep = (GribFileRep *) 0;
+   if (--rep->referenceCount == 0) delete rep;
+
+   rep = (GribFileRep *) NULL;
+
+}
 
 return;
 
