@@ -1793,7 +1793,7 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
 
 double compute_crps_emp(double obs, const NumArray &ens_na) {
    int i;
-   double fcst;
+   double fcst = 0.0;
    NumArray evals;
 
    // Store valid ensemble member values
