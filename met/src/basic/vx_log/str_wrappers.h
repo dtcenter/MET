@@ -17,7 +17,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int m_strlen(const char *str, bool buf_size=false);
+extern int m_strlen(const char *str);
 
 extern void m_strcpy(char *to_str, const char *from_str, const char *method_name,
                      const char *extra_msg=(char *)0);

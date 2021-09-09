@@ -19,9 +19,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-int m_strlen(const char *str, bool buf_size) {
+int m_strlen(const char *str) {
    int str_len = -1;
-   if (str) str_len = buf_size ? sizeof str : strlen(str);
+   if (str) str_len = strlen(str);
 
    return str_len;
 }
@@ -32,7 +32,7 @@ int m_strlen(const char *str, bool buf_size) {
 void m_strcpy(char *to_str, const char *from_str, const char *method_name,
               const char *extra_msg) {
 
-   int str_len = m_strlen(to_str, true);
+   int str_len = m_strlen(to_str);
    m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
 
 }
@@ -90,7 +90,7 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
 
       if (!truncate && strcmp(from_str, to_str)) {
          mlog << Warning << "\n" << method_name
-              << " truncated a string " << (extra_msg == 0 ? "" : extra_msg)
+              << " truncated a string " << (extra_msg == 0 ? " " : extra_msg)
               << " from \"" << from_str << "\" to \"" << to_str << "\"\n\n";
       }
    }
