@@ -697,9 +697,7 @@ void process_obs_file(int i_nc) {
    StringArray obs_qty_array = nc_point_obs.get_qty_data();
    if( use_var_id ) var_names = nc_point_obs.get_var_names();
 
-
    int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
-
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
