@@ -22,6 +22,7 @@ using namespace std;
 
 #include "nc_utils.h"
 #include "nc_utils_local.h"
+#include "string_fxns.h"
 #include "vx_log.h"
 
 
@@ -40,11 +41,13 @@ const char * string_att(const NcFile & Nc, const char * name)
 
 {
 
+const char *method_name = "string_att() -> ";
 NcGroupAtt *att = get_nc_att(&Nc, (string)name);
 
 if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR )  {
 
-   mlog << Error << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
+   mlog << Error << "\n" << method_name << "attribute \"" << name
+        << "\" is not a character string!\n\n";
 
    exit ( 1 );
 
@@ -52,8 +55,7 @@ if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR )  {
 
 ConcatString value;
 get_att_value_chars(att, value);
-// strncpy(cbuf, value.c_str(), value.length());
-strncpy(cbuf, value.c_str(), cbuf_size - 1);
+m_strncpy(cbuf, value.c_str(), cbuf_size - 1, method_name);
 
 cbuf[cbuf_size - 1] = (char) 0;
 
@@ -129,7 +131,7 @@ unixtime parse_start_time(const char * text)
 int k;
 int month, day, year, hour, minute, second;
 unixtime t;
-const int n = strlen(text);
+const int n = m_strlen(text);
 
 if ( n != 15 )  {
 

@@ -497,7 +497,7 @@ double ShapeData::get_attr(const ConcatString &attr_name,
    else if(strcasecmp(attr_name.c_str(), "COMPLEXITY") == 0) {
       attr_val = complexity();
    }
-   else if(strncasecmp(attr_name.c_str(), "INTENSITY_", strlen("INTENSITY_")) == 0) {
+   else if(strncasecmp(attr_name.c_str(), "INTENSITY_", m_strlen("INTENSITY_")) == 0) {
       StringArray sa = attr_name.split("_");
       attr_val = intensity_percentile(raw_ptr, atoi(sa[1].c_str()), precip_flag);
    }

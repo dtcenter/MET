@@ -18,6 +18,7 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_util.h"
+#include "string_fxns.h"
 
 #include "GridTemplate.h"
 
@@ -2350,10 +2351,11 @@ const char * statlinetype_to_string(const STATLineType t) {
 
       case(stat_relp):         s = stat_relp_str;    break;
       case(stat_genmpr):       s = stat_genmpr_str;  break;
+      case(stat_ssidx):        s = stat_ssidx_str;   break;
       case(stat_header):       s = stat_header_str;  break;
-      case(no_stat_line_type): s = stat_na_str;      break;
 
-      default:                 s = (const char *) 0; break;
+      case(no_stat_line_type):
+      default:                 s = stat_na_str;      break;
    }
 
    return(s);
@@ -2362,8 +2364,9 @@ const char * statlinetype_to_string(const STATLineType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void statlinetype_to_string(const STATLineType t, char *out) {
+   const char *method_name = "statlinetype_to_string() -> ";
 
-   strcpy(out, statlinetype_to_string(t));
+   m_strcpy(out, statlinetype_to_string(t), method_name);
 
    return;
 }
@@ -2411,6 +2414,7 @@ STATLineType string_to_statlinetype(const char *s) {
 
    else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
    else if(strcasecmp(s, stat_genmpr_str) == 0) t = stat_genmpr;
+   else if(strcasecmp(s, stat_ssidx_str)  == 0) t = stat_ssidx;
    else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
 
    else                                         t = no_stat_line_type;

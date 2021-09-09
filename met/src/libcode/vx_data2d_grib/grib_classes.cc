@@ -685,12 +685,13 @@ bool GribFile::open(const char *filename)
 {
 
 int j;
+const char *method_name = "GribFile::open(char *) -> ";
 
 close();
 
 if ( !(rep = new GribFileRep) )  {
 
-   mlog << Error << "\nGribFile::open(char *) -> memory allocation error\n\n";
+   mlog << Error << "\n" << method_name << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -702,21 +703,13 @@ rep->referenceCount = 1;
    //  Strip off leading path component
    //
 
-j = strlen(filename) - 1;
+j = m_strlen(filename) - 1;
 
 while ( (j >= 0) && (filename[j] != '/') )   --j;
 
 ++j;
 
-if ( !(rep->name = new char [1 + strlen(filename + j)]) )  {
-
-   mlog << Error << "\nGribFile::open(const char *) -> memory allocation error 1\n\n";
-
-   exit ( 1 );
-
-}
-
-strcpy(rep->name, filename + j);
+rep->name = m_strcpy2(filename + j,  method_name, "rep->name");
 
 rep->issue = rep->lead = 0;
 

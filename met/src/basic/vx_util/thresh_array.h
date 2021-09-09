@@ -57,6 +57,8 @@ class ThreshArray {
       void add(const ThreshArray &);
       void add_css(const char *);
 
+      void set(const SingleThresh &);
+
       void parse_thresh_str(const char *);
 
       int n_elements() const;
@@ -102,7 +104,6 @@ extern bool         check_prob_thresh        (const ThreshArray &, bool error_ou
 extern ThreshArray  process_perc_thresh_bins (const ThreshArray &);
 extern ThreshArray  process_rps_cdp_thresh   (const ThreshArray &);
 extern ConcatString write_css                (const ThreshArray &);
-
 
 ////////////////////////////////////////////////////////////////////////
 

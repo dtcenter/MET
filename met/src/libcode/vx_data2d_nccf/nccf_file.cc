@@ -2577,7 +2577,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   ConcatString scene_id;
   if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
     char* scene_id_str = new char[scene_id.length()+1];
-    strncpy(scene_id_str, scene_id.text(), scene_id.length());
+    m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
     scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
   }

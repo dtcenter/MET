@@ -68,9 +68,6 @@ extern void do_job_aggr_stat(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *,
                const ConcatString &, gsl_rng *);
 
-extern void do_job_go_index(const ConcatString &, LineDataFile &,
-               STATAnalysisJob &, int &, int &, ofstream *);
-
 extern void do_job_ss_index(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
 
@@ -143,6 +140,9 @@ extern void write_job_ramp(STATAnalysisJob &,
 extern void write_job_ramp_cols(const STATAnalysisJob &, AsciiTable &,
                int &, int &);
 
+extern void write_job_ss_index(STATAnalysisJob &,
+               AggrSSIndexInfo &, AsciiTable &);
+
 ////////////////////////////////////////////////////////////////////////
 
 extern void setup_table    (AsciiTable &, int, int);
@@ -152,11 +152,11 @@ extern void write_line     (const ConcatString &, ofstream *);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern double compute_ss_index(const ConcatString &, LineDataFile &,
-                 STATAnalysisJob &, int &, int &);
+extern void compute_ss_index(LineDataFile &, STATAnalysisJob &,
+               AggrSSIndexInfo &, int &, int &);
 
 extern void write_case_cols(const ConcatString &, AsciiTable &,
-                 int &, int &);
+               int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 

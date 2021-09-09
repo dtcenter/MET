@@ -278,7 +278,7 @@ else            phi_2 = phi_1;
 
 c          = grid_strings[j++].c_str();
 
-if ( strlen(c) != 1 )  {
+if ( m_strlen(c) != 1 )  {
 
    mlog << Error << "\nparse_lambert_grid() -> "
         << "bad hemisphere in grid spec\n\n";
@@ -399,7 +399,7 @@ lat_scale  = atof(grid_strings[j++].c_str());
 
 c          = grid_strings[j++].c_str();
 
-if ( strlen(c) != 1 )  {
+if ( m_strlen(c) != 1 )  {
 
    mlog << Error << "\nparse_stereographic_grid() -> "
         << "bad hemisphere in grid spec\n\n";

@@ -25,6 +25,7 @@ using namespace std;
 
 #include "wchar_argv.h"
 #include "concat_string.h"
+#include "string_fxns.h"
 
 #include "vx_log.h"
 
@@ -143,6 +144,7 @@ int len;
 char * s = 0;
 char ** av = 0;
 ConcatString c;
+const char *method_name = "Wchar_Argv::set() -> ";
 
 
 len = 0;
@@ -171,7 +173,7 @@ for (j=0; j<(a.n()); ++j)  {
 
    len = c.length();
 
-   strncpy(s + k, c.text(), len);
+   m_strncpy(s + k, c.text(), len, method_name);
 
    k += (len + 1);
 
@@ -219,8 +221,8 @@ argv_len = 0;
 
 for (j=0; j<_argc; ++j)  {
 
-   len[j] = strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call strlen more than 
+   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
+                                //  we don't want to call m_strlen more than 
                                 //  once on each argv value
 
    argv_len += len[j];

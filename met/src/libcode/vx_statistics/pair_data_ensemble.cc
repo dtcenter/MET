@@ -1360,7 +1360,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) return;
 
    // Check whether the observation variable name matches (rej_var)
-   if ((var_name != 0) && (0 < strlen(var_name))) {
+   if ((var_name != 0) && (0 < m_strlen(var_name))) {
       if ( var_name != obs_info->name() ) {
          return;
       }

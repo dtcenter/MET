@@ -231,7 +231,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
            // Collect variable names
            var_name = curr_obs->getVarName().c_str();
-           if (0 < strlen(var_name) && !summary_vnames.has(var_name)) {
+           if (0 < m_strlen(var_name) && !summary_vnames.has(var_name)) {
               summary_vnames.add(var_name);
            }
            // If this is a new key, create a new NumArray

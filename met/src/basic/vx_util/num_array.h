@@ -79,6 +79,8 @@ class NumArray {
       void add_css(const char *);
       void add_css_sec(const char *);
 
+      void set(int);
+      void set(double);
       void set(int, int);
       void set(int, double);
 

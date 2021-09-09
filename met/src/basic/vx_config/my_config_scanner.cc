@@ -26,6 +26,7 @@ using namespace std;
 #include "math_constants.h"
 #include "util_constants.h"
 #include "is_number.h"
+#include "string_fxns.h"
 
 #include "dictionary.h"
 #include "builtin.h"
@@ -526,10 +527,14 @@ int do_id()
 {
 
 int j, k;
+const char *method_name = "do_id() -> ";
 
-Column += strlen(configtext);
+Column += m_strlen(configtext);
 
-if ( is_lhs )  { strncpy(configlval.text, configtext, max_id_length);  return ( IDENTIFIER );  }
+if ( is_lhs )  {
+   m_strncpy(configlval.text, configtext, max_id_length, method_name, "configlval.text1");
+   return ( IDENTIFIER );
+}
 
    //
    //  print?
@@ -641,7 +646,8 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
    //  nope
    //
 
-strncpy(configlval.text, configtext, sizeof(configlval.text) - 1);
+m_strncpy(configlval.text, configtext, sizeof(configlval.text) - 1,
+          method_name, "configlval.text2");
 
 need_number = false;
 
@@ -656,8 +662,6 @@ return ( IDENTIFIER );
 int do_int()
 
 {
-
-// Column += strlen(configtext);
 
 configlval.nval.i = atoi(configtext);
 
@@ -677,8 +681,6 @@ return ( 1 );
 bool do_float()
 
 {
-
-// Column += strlen(configtext);
 
 configlval.nval.d = atof(configtext);
 
@@ -723,6 +725,7 @@ clear_lexeme();
 int n;
 int c;
 char * line = (char *) lexeme;
+const char *method_name = "do_quoted_string() -> ";
 
 clear_lexeme();
 
@@ -764,7 +767,7 @@ while ( n < max_id_length )  {
 
    if ( (n + 1) >= max_id_length )  {
 
-      mlog << Error << "\ndo_quoted_string() -> "
+      mlog << Error << "\n" << method_name
            << "string too long! ... c = \"" << c << "\"\n\n";
 
       exit ( 1 );
@@ -786,7 +789,7 @@ while ( replace_env(s) )  {
 
 if ( s.length() >= max_id_length )  {
 
-   mlog << Error << "\ndo_quoted_string() -> "
+   mlog << Error << "\n" << method_name
         << "string \"" << s << "\" too long!\n\n";
 
    exit ( 1 );
@@ -797,9 +800,9 @@ clear_lexeme();
 
 if ( s.nonempty() )  {
 
-   strncpy((char *) lexeme, s.c_str(), max_id_length);
+   m_strncpy((char *) lexeme, s.c_str(), max_id_length, method_name, "lexeme");
 
-   strncpy(configlval.text, line, max_id_length);
+   m_strncpy(configlval.text, line, max_id_length, method_name, "configlval.text");
 
 } else {
 
@@ -1113,7 +1116,7 @@ int do_comp()
 
 int return_value = 0;
 
-Column += strlen(configtext);
+Column += m_strlen(configtext);
 
      if ( strcmp(configtext, "<" ) == 0 )  { configlval.cval = thresh_lt;  return_value = COMPARISON; }
 else if ( strcmp(configtext, ">" ) == 0 )  { configlval.cval = thresh_gt;  return_value = COMPARISON; }
@@ -1149,7 +1152,8 @@ int do_fort_thresh()
 
 {
 
-strncpy(configlval.text, configtext, sizeof(configlval.text));
+const char *method_name = "do_fort_thresh() -> ";
+m_strncpy(configlval.text, configtext, sizeof(configlval.text), method_name);
 
 return ( FORTRAN_THRESHOLD );
 

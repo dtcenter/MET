@@ -4126,6 +4126,38 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_ssidx_cols(const SSIDXData &ssidx_data,
+                      AsciiTable &at, int r, int c) {
+
+   //
+   // Skill Score Index
+   // Dump out the SSIDX line:
+   //    FCST_MODEL,  REF_MODEL,   N_INIT,
+   //    N_TERM,      N_VLD,       SS_INDEX
+   //
+   at.set_entry(r, c+0,  // Forecast model name
+      ssidx_data.fcst_model);
+
+   at.set_entry(r, c+1,  // Reference model name
+      ssidx_data.ref_model);
+
+   at.set_entry(r, c+2,  // Number of initializations
+      ssidx_data.init_time.n());
+
+   at.set_entry(r, c+3,  // Number of terms
+      ssidx_data.n_term);
+
+   at.set_entry(r, c+4,  // Number of valid terms
+      ssidx_data.n_vld);
+
+   at.set_entry(r, c+5,  // Skill score index value
+      ssidx_data.ss_index);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void justify_stat_cols(AsciiTable &at) {
 
    justify_met_at(at, n_header_columns);
