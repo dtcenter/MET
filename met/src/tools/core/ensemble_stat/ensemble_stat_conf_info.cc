@@ -829,9 +829,24 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: sid_exc
    vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
 
-   // Conf: obs_qty
-   vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
+   // Conf: obs_qty_inc
+   // Check for old "obs_quality" field
+   StringArray obs_qty_sa = odict.lookup_string_array(conf_key_obs_qty);
+   // Send warning if "obs_quality" is still being used
+   // Use it instead of "obs_quality_inc" if it is in config file
+   if(obs_qty_sa.n() > 0){
+      mlog << Warning << "\nPointStatVxOpt::process_config() -> "
+           << "The field \""
+           << conf_key_obs_qty
+           << "\" is deprecated "
+           << "use \"" << conf_key_obs_qty_inc << "\" instead.\n\n";
+      vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty(&odict));
+   } else
+      vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty_inc(&odict));
 
+   // Conf: obs_qty_exc
+   vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
+   
    return;
 }
 
