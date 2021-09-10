@@ -913,8 +913,9 @@ void VxPairDataEnsemble::clear() {
 
    sid_inc_filt.clear();
    sid_exc_filt.clear();
-   obs_qty_filt.clear();
-
+   obs_qty_inc_filt.clear();
+   obs_qty_exc_filt.clear();
+   
    obs_error_info = (ObsErrorInfo *) 0;
 
    fcst_ut = (unixtime) 0;
@@ -954,7 +955,8 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    end_ut         = vx_pd.end_ut;
    sid_inc_filt   = vx_pd.sid_inc_filt;
    sid_exc_filt   = vx_pd.sid_exc_filt;
-   obs_qty_filt   = vx_pd.obs_qty_filt;
+   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
+   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
    obs_error_info = vx_pd.obs_error_info;
 
    interp_thresh  = vx_pd.interp_thresh;
@@ -1132,9 +1134,18 @@ void VxPairDataEnsemble::set_sid_exc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_obs_qty_filt(const StringArray q) {
+void VxPairDataEnsemble::set_obs_qty_inc_filt(const StringArray q) {
 
-   obs_qty_filt = q;
+   obs_qty_inc_filt = q;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_obs_qty_exc_filt(const StringArray q) {
+
+   obs_qty_exc_filt = q;
 
    return;
 }
@@ -1369,13 +1380,22 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       return;
    }
 
-   // Check if the observation quality flag is included in the list
-   if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
+   // Check if the observation quality include flag is in the list
+   if(obs_qty_inc_filt.n() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_filt[i]) qty_match = true;
+      for(i=0; i<obs_qty_inc_filt.n() && !qty_match; i++)
+         if( obs_qty == obs_qty_inc_filt[i]) qty_match = true;
 
       if(!qty_match) return;
+   }
+   
+   // Check if the observation quality exclude flag is in the list
+   if(obs_qty_exc_filt.n() && strcmp(obs_qty, "")) {
+      bool qty_match = false;
+      for(i=0; i<obs_qty_exc_filt.n() && !qty_match; i++)
+         if( obs_qty == obs_qty_exc_filt[i]) qty_match = true;
+
+      if(qty_match) return;
    }
 
    // Check whether the observation time falls within the valid time
