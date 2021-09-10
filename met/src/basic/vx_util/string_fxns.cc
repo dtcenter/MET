@@ -297,8 +297,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
          for(int i=0; i < num_act; i++){
             int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
             mat[i] = new char[mat_len + 1];
-            m_strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
-                     method_name, "mat[i]");
+            m_strncpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
+                      mat_len, method_name, "mat[i]");
          }
          mat[num_act] = NULL;
 

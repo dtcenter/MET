@@ -413,12 +413,12 @@ text_y -= 2.0*TextSep;
    // Accumulation time
    //
 
-m_strcpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str(),
-         method_name, "fcst_raw->data.accum()");
+m_strncpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str(),
+          buf_len, method_name, "fcst_raw->data.accum()");
 t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
 
-m_strcpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str(),
-         method_name, "obs_raw->data.accum()");
+m_strncpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str(),
+          buf_len, method_name, "obs_raw->data.accum()");
 t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 
