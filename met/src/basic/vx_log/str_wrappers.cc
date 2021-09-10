@@ -32,7 +32,7 @@ int m_strlen(const char *str) {
 void m_strcpy(char *to_str, const char *from_str, const char *method_name,
               const char *extra_msg) {
 
-   int str_len = m_strlen(to_str);
+   int str_len = sizeof(to_str);
    m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
 
 }
