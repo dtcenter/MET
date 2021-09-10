@@ -1379,25 +1379,13 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    else if(obs_info_grib->code() != nint(obs_arr[1])) {
       return;
    }
-
-   // Check if the observation quality include flag is in the list
-   if(obs_qty_inc_filt.n() && strcmp(obs_qty, "")) {
-      bool qty_match = false;
-      for(i=0; i<obs_qty_inc_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_inc_filt[i]) qty_match = true;
-
-      if(!qty_match) return;
+   
+   // Check the observation quality include and exclude options
+   if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
+      (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
+      return;
    }
    
-   // Check if the observation quality exclude flag is in the list
-   if(obs_qty_exc_filt.n() && strcmp(obs_qty, "")) {
-      bool qty_match = false;
-      for(i=0; i<obs_qty_exc_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_exc_filt[i]) qty_match = true;
-
-      if(qty_match) return;
-   }
-
    // Check whether the observation time falls within the valid time
    // window
    if(hdr_ut < beg_ut || hdr_ut > end_ut) return;
