@@ -488,7 +488,7 @@ Ensemble Matched Pair information
 
 The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described below.
 
-.. _table_ES_header_info_es_out:
+.. _table_GEP_header_info_gep_out:
 
 .. list-table:: Header information for each file gen-ens-prod outputs
   :widths: auto
@@ -571,9 +571,9 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - Error percent value used in confidence intervals
   * - 24
     - LINE_TYPE
-    - Output line types are listed in :numref:`table_ES_header_info_es_out_RHIST` through :numref:`table_ES_header_info_es_out_SSVAR`.
+    - Output line types are listed in :numref:`table_GEP_header_info_gep_out_RHIST` through :numref:`table_GEP_header_info_gep_out_SSVAR`.
 
-.. _table_ES_header_info_es_out_ECNT:
+.. _table_GEP_header_info_gep_out_ECNT:
 
 .. list-table:: Format information for ECNT (Ensemble Continuous Statistics) output line type.
   :widths: auto
@@ -637,7 +637,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - CRPSS_EMP
     - The Continuous Ranked Probability Skill Score (empirical distribution)
 
-.. _table_ES_header_info_es_out_RPS:
+.. _table_GEP_header_info_gep_out_RPS:
       
 .. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
@@ -677,7 +677,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - RPSS_SMPL
     - Ranked Probability Skill Score relative to sample climatology
 
-.. _table_ES_header_info_es_out_RHIST:
+.. _table_GEP_header_info_gep_out_RHIST:
       
 .. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
@@ -702,7 +702,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - RANK_i
     - Count of observations with the i-th rank (repeated)
 
-.. _table_ES_header_info_es_out_PHIST:
+.. _table_GEP_header_info_gep_out_PHIST:
       
 .. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
@@ -730,7 +730,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - BIN_i
     - Count of observations in the ith probability bin (repeated)
 
-.. _table_ES_header_info_es_out_RELP:
+.. _table_GEP_header_info_gep_out_RELP:
 
 .. list-table:: Format information for RELP (Relative Position) output line type.
   :widths: auto
@@ -755,7 +755,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
     - RELP_i
     - Number of times the i-th ensemble member's value was closest to the observation (repeated). When n members tie, 1/n is assigned to each member.
 
-.. _table_ES_header_info_es_out_ORANK:
+.. _table_GEP_header_info_gep_out_ORANK:
       
 .. list-table:: Format information for ORANK (Observation Rank) output line type.
   :widths: auto
@@ -837,7 +837,7 @@ The format of the STAT and ASCII output of the Gen-Ens-Prod tool are described b
 .. role:: raw-html(raw)
     :format: html
 
-.. _table_ES_header_info_es_out_SSVAR:	     
+.. _table_GEP_header_info_gep_out_SSVAR:	     
 
 .. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
