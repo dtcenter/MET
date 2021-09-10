@@ -1,5 +1,3 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -172,17 +170,13 @@ type = icc.type;
 
 if ( type == identifier )  {
 
-   name = new char [1 + m_strlen(icc.name)];
-
-   m_strcpy(name, icc.name, method_name, "name");
+   name = m_strcpy2(icc.name, method_name, "name");
 
 }
 
 if ( type == character_string )  {
 
-   text = new char [1 + m_strlen(icc.text)];
-
-   m_strcpy(text, icc.text, method_name, "text");
+   text = m_strcpy2(icc.text, method_name, "text");
 
 }
 
@@ -421,9 +415,7 @@ clear();
 
 type = identifier;
 
-name = new char [1 + m_strlen(Text)];
-
-m_strcpy(name, Text, method_name);
+name = m_strcpy2(Text, method_name);
 
 
 return;
@@ -442,15 +434,9 @@ const char *method_name = "IcodeCell::set_string() -> ";
 
 clear();
 
-const int n = m_strlen(Text);
-
 type = character_string;
 
-text = new char [1 + n];
-
-m_strcpy(text, Text, method_name);
-
-text[n] = 0;
+text = m_strcpy2(Text, method_name);
 
 
 return;
