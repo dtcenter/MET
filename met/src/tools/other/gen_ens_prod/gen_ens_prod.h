@@ -61,7 +61,7 @@ static const char * program_name = "gen_ens_prod";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/config/EnsembleStatConfig_default";
+   "MET_BASE/config/GenEnsProdConfig_default";
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
@@ -116,7 +116,7 @@ static GrdFileType  otype   = FileType_None;
 static int          vx_flag = 0;
 
 // Input Config file
-static EnsembleStatConfInfo conf_info;
+static GenEnsProdConfInfo conf_info;
 static ConcatString         config_file;
 static ConcatString         out_file;
 

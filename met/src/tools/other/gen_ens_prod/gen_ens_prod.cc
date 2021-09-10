@@ -114,10 +114,10 @@ static void process_grid_scores   (int,
                const DataPlane &, const MaskPlane &,
                ObsErrorEntry *,   PairDataEnsemble &);
 
-static void do_ecnt              (const EnsembleStatVxOpt &,
+static void do_ecnt              (const GenEnsProdVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
-static void do_rps               (const EnsembleStatVxOpt &,
+static void do_rps               (const GenEnsProdVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
 
@@ -1888,7 +1888,7 @@ void process_grid_scores(int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_ecnt(const EnsembleStatVxOpt &vx_opt,
+void do_ecnt(const GenEnsProdVxOpt &vx_opt,
              const SingleThresh &othresh,
              const PairDataEnsemble *pd_ptr) {
    ECNTInfo ecnt_info;
@@ -1915,7 +1915,7 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_rps(const EnsembleStatVxOpt &vx_opt,
+void do_rps(const GenEnsProdVxOpt &vx_opt,
             const SingleThresh &othresh,
             const PairDataEnsemble *pd_ptr) {
    RPSInfo rps_info;
@@ -3009,7 +3009,7 @@ void usage() {
         << "\t\t\"ens_file_list\" is an ASCII file containing a list "
         << "of ensemble member file names (required).\n"
 
-        << "\t\t\"config_file\" is an EnsembleStatConfig file "
+        << "\t\t\"config_file\" is an GenEnsProdConfig file "
         << "containing the desired configuration settings (required).\n"
 
         << "\t\t\"-grid_obs file\" specifies a gridded observation file. "

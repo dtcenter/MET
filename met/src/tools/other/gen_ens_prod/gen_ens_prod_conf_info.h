@@ -44,7 +44,7 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct EnsembleStatNcOutInfo {
+struct GenEnsProdNcOutInfo {
 
    bool do_latlon;
    bool do_mean;
@@ -63,7 +63,7 @@ struct EnsembleStatNcOutInfo {
 
       //////////////////////////////////////////////////////////////////
 
-   EnsembleStatNcOutInfo();
+   GenEnsProdNcOutInfo();
 
    void clear();   //  sets everything to true
 
@@ -75,11 +75,11 @@ struct EnsembleStatNcOutInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-class EnsembleStatConfInfo; // forward reference
+class GenEnsProdConfInfo; // forward reference
 
 ////////////////////////////////////////////////////////////////////////
 
-class EnsembleStatVxOpt {
+class GenEnsProdVxOpt {
 
    private:
 
@@ -87,8 +87,8 @@ class EnsembleStatVxOpt {
 
    public:
 
-      EnsembleStatVxOpt();
-     ~EnsembleStatVxOpt();
+      GenEnsProdVxOpt();
+     ~GenEnsProdVxOpt();
 
       //////////////////////////////////////////////////////////////////
 
@@ -139,7 +139,7 @@ class EnsembleStatVxOpt {
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
                           gsl_rng *, bool, bool, bool);
-      void set_vx_pd(EnsembleStatConfInfo *);
+      void set_vx_pd(GenEnsProdConfInfo *);
 
       void set_perc_thresh(const PairDataEnsemble *);
 
@@ -158,17 +158,17 @@ class EnsembleStatVxOpt {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
-inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
-inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());        }
-inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
-inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
-inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
-inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
+inline int GenEnsProdVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
+inline int GenEnsProdVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
+inline int GenEnsProdVxOpt::get_n_mask()      const { return(mask_name.n());        }
+inline int GenEnsProdVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
+inline int GenEnsProdVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
+inline int GenEnsProdVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
+inline int GenEnsProdVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
 
 ////////////////////////////////////////////////////////////////////////
 
-class EnsembleStatConfInfo {
+class GenEnsProdConfInfo {
 
    private:
 
@@ -183,8 +183,8 @@ class EnsembleStatConfInfo {
 
    public:
 
-      EnsembleStatConfInfo();
-     ~EnsembleStatConfInfo();
+      GenEnsProdConfInfo();
+     ~GenEnsProdConfInfo();
 
       //////////////////////////////////////////////////////////////////
 
@@ -203,7 +203,7 @@ class EnsembleStatConfInfo {
       int                 n_nbrhd;          // Number of neighborhood sizes
       InterpInfo          nmep_smooth;      // Neighborhood maximum smoothing information
 
-      EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
+      GenEnsProdVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
 
       double              vld_ens_thresh;   // Required ratio of valid input files
       double              vld_data_thresh;  // Required ratio of valid data for each point
@@ -227,7 +227,7 @@ class EnsembleStatConfInfo {
 
       STATOutputType output_flag[n_txt];    // Summary of output_flag options
 
-      EnsembleStatNcOutInfo nc_info;        // Output NetCDF file contents
+      GenEnsProdNcOutInfo nc_info;        // Output NetCDF file contents
 
       //////////////////////////////////////////////////////////////////
 
@@ -255,11 +255,11 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
-inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
-inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
+inline int GenEnsProdConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
+inline int GenEnsProdConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
+inline int GenEnsProdConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
+inline int GenEnsProdConfInfo::get_n_vx()         const { return(n_vx);                  }
+inline int GenEnsProdConfInfo::get_compression_level()  { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
 

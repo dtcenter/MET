@@ -29,30 +29,30 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class EnsembleStatConfInfo
+//  Code for class GenEnsProdConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-EnsembleStatConfInfo::EnsembleStatConfInfo() {
+GenEnsProdConfInfo::GenEnsProdConfInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-EnsembleStatConfInfo::~EnsembleStatConfInfo() {
+GenEnsProdConfInfo::~GenEnsProdConfInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::init_from_scratch() {
+void GenEnsProdConfInfo::init_from_scratch() {
 
    // Initialize pointers
    ens_info = (VarInfo **)          0;
    ens_ta   = (ThreshArray *)       0;
-   vx_opt   = (EnsembleStatVxOpt *) 0;
+   vx_opt   = (GenEnsProdVxOpt *) 0;
    rng_ptr  = (gsl_rng *)           0;
 
    clear();
@@ -62,7 +62,7 @@ void EnsembleStatConfInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::clear() {
+void GenEnsProdConfInfo::clear() {
    int i;
 
    // Initialize values
@@ -90,7 +90,7 @@ void EnsembleStatConfInfo::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (GenEnsProdVxOpt *) 0; }
 
    if(ens_info) {
       for(i=0; i<n_ens_var; i++) {
@@ -110,7 +110,7 @@ void EnsembleStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
+void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
                                        const ConcatString user_file_name) {
 
    // Read the config file constants
@@ -127,7 +127,7 @@ void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_config(GrdFileType etype,
+void GenEnsProdConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
                                           bool grid_vx, bool point_vx,
                                           bool use_var_id) {
@@ -174,7 +174,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: message_type_group_map(SURFACE)
    if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
            << "\"" << conf_key_message_type_group_map
            << "\" must contain an entry for \""
            << surface_msg_typ_group_str << "\".\n\n";
@@ -250,7 +250,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check that the valid ensemble threshold is between 0 and 1.
    if(vld_ens_thresh < 0.0 || vld_ens_thresh > 1.0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
            << "The \"" << conf_key_ens_ens_thresh << "\" parameter ("
            << vld_ens_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -261,7 +261,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check that the valid data threshold is between 0 and 1.
    if(vld_data_thresh < 0.0 || vld_data_thresh > 1.0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
            << "The \"" << conf_key_ens_vld_thresh << "\" parameter ("
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -283,7 +283,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       if(mthd == InterpMthd_DW_Mean ||
          mthd == InterpMthd_LS_Fit  ||
          mthd == InterpMthd_Bilin) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
               << "Neighborhood probability smoothing methods DW_MEAN, "
               << "LS_FIT, and BILIN are not supported for \""
               << conf_key_nmep_smooth << "\".\n\n";
@@ -292,7 +292,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Check for valid neighborhood probability interpolation widths
       if(nmep_smooth.width[i] < 1 || nmep_smooth.width[i]%2 == 0) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
               << "Neighborhood probability smoothing widths must be set "
               << "to odd values greater than or equal to 1 ("
               << nmep_smooth.width[i] << ") for \""
@@ -310,7 +310,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check for a valid number of verification tasks
    if(parse_conf_n_vx(odict) != n_vx) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
            << "The number of verification tasks in \""
            << conf_key_obs_field
            << "\" must match the number in \""
@@ -321,14 +321,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    if(n_vx > 0) {
 
       // Allocate memory for the verification task options
-      vx_opt = new EnsembleStatVxOpt [n_vx];
+      vx_opt = new GenEnsProdVxOpt [n_vx];
 
       // Check climatology fields
       check_climo_n_vx(&conf, n_vx);
 
       // Check to make sure the observation file type is defined
       if(otype == FileType_None) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
               << "When \"fcst.field\" is non-empty, you must use "
               << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
               << "verifying observations.\n\n";
@@ -363,14 +363,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::parse_nc_info() {
+void GenEnsProdConfInfo::parse_nc_info() {
    const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
    e = conf.lookup(conf_key_ensemble_flag);
 
    if(!e) {
       mlog << Error
-           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
+           << "\nGenEnsProdConfInfo::parse_nc_info() -> "
            << "lookup failed for key \"" << conf_key_ensemble_flag
            << "\"\n\n";
       exit(1);
@@ -389,7 +389,7 @@ void EnsembleStatConfInfo::parse_nc_info() {
    // It should be a dictionary
    if(type != DictionaryType) {
       mlog << Error
-           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
+           << "\nGenEnsProdConfInfo::parse_nc_info() -> "
            << "bad type (" << configobjecttype_to_string(type)
            << ") for key \"" << conf_key_ensemble_flag << "\"\n\n";
       exit(1);
@@ -418,7 +418,7 @@ void EnsembleStatConfInfo::parse_nc_info() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_flags() {
+void GenEnsProdConfInfo::process_flags() {
    int i, j;
    bool output_ascii_flag = false;
 
@@ -454,7 +454,7 @@ void EnsembleStatConfInfo::process_flags() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_masks(const Grid &grid) {
+void GenEnsProdConfInfo::process_masks(const Grid &grid) {
    int i, j;
    MaskPlane mp;
    StringArray sid;
@@ -554,7 +554,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
       // Check that at least one verification masking region is provided
       if(vx_opt[i].mask_name.n_elements() == 0) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
+         mlog << Error << "\nGenEnsProdConfInfo::process_masks() -> "
               << "At least one grid, polyline or station ID masking "
               << "region must be provided for verification task number "
               << i+1 << ".\n\n";
@@ -568,7 +568,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
+int GenEnsProdConfInfo::n_txt_row(int i_txt_row) const {
    int i, n;
 
    // Loop over the tasks and sum the line counts for this line type
@@ -579,7 +579,7 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_stat_row() const {
+int GenEnsProdConfInfo::n_stat_row() const {
    int i, n;
 
    // Loop over the line types and sum the line counts
@@ -590,7 +590,7 @@ int EnsembleStatConfInfo::n_stat_row() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
+void GenEnsProdConfInfo::set_vx_pd(const IntArray &ens_size) {
 
    // This should be called after process_masks()
    for(int i=0; i<n_vx; i++) {
@@ -607,25 +607,25 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class EnsembleStatVxOpt
+//  Code for class GenEnsProdVxOpt
 //
 ////////////////////////////////////////////////////////////////////////
 
-EnsembleStatVxOpt::EnsembleStatVxOpt() {
+GenEnsProdVxOpt::GenEnsProdVxOpt() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-EnsembleStatVxOpt::~EnsembleStatVxOpt() {
+GenEnsProdVxOpt::~GenEnsProdVxOpt() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::init_from_scratch() {
+void GenEnsProdVxOpt::init_from_scratch() {
 
    clear();
 
@@ -634,7 +634,7 @@ void EnsembleStatVxOpt::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::clear() {
+void GenEnsProdVxOpt::clear() {
    int i;
 
    // Initialize values
@@ -670,7 +670,7 @@ void EnsembleStatVxOpt::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
+void GenEnsProdVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
                                        gsl_rng *rng_ptr, bool grid_vx,
                                        bool point_vx, bool use_var_id) {
@@ -713,7 +713,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
        vx_pd.obs_info->level().upper() > vx_pd.fcst_info->level().upper())) {
 
       mlog << Warning
-           << "\nEnsembleStatVxOpt::process_config() -> "
+           << "\nGenEnsProdVxOpt::process_config() -> "
            << "The range of requested observation pressure levels "
            << "is not contained within the range of requested "
            << "forecast pressure levels.  No vertical interpolation "
@@ -725,14 +725,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // No support for wind direction
    if(vx_pd.fcst_info->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
-      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+      mlog << Error << "\nGenEnsProdVxOpt::process_config() -> "
            << "wind direction may not be verified using grid_stat.\n\n";
       exit(1);
    }
 
    // Check that the observation field does not contain probabilities
    if(vx_pd.obs_info->is_prob()) {
-      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+      mlog << Error << "\nGenEnsProdVxOpt::process_config() -> "
            << "the observation field cannot contain probabilities.\n\n";
       exit(1);
    }
@@ -837,7 +837,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
+void GenEnsProdVxOpt::set_vx_pd(GenEnsProdConfInfo *conf_info) {
    int i, n;
    int n_msg_typ = msg_typ.n_elements();
    int n_mask    = mask_name.n_elements();
@@ -849,7 +849,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
    // Check for at least one message type
    if(n_msg_typ == 0) {
-      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+      mlog << Error << "\nGenEnsProdVxOpt::set_vx_pd() -> "
            << "At least one output message type must be requested in \""
            << conf_key_message_type << "\".\n\n";
       exit(1);
@@ -857,7 +857,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
    // Check for at least one masking region
    if(n_mask == 0) {
-      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+      mlog << Error << "\nGenEnsProdVxOpt::set_vx_pd() -> "
            << "At least one output masking region must be requested in \""
            << conf_key_mask_grid  << "\", \""
            << conf_key_mask_poly  << "\", \""
@@ -868,7 +868,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
    // Check for at least one interpolation method
    if(n_interp == 0) {
-      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+      mlog << Error << "\nGenEnsProdVxOpt::set_vx_pd() -> "
            << "At least one interpolation method must be requested in \""
            << conf_key_interp << "\".\n\n";
       exit(1);
@@ -939,7 +939,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
+void GenEnsProdVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 
    if(!othr_ta.need_perc()) return;
 
@@ -965,12 +965,12 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
+int GenEnsProdVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
-      mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "
+      mlog << Error << "\nGenEnsProdVxOpt::n_txt_row(int) -> "
            << "range check error for " << i_txt_row << "\n\n";
       exit(1);
    }
@@ -1019,7 +1019,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          break;
 
       default:
-         mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "
+         mlog << Error << "\nGenEnsProdVxOpt::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
@@ -1030,17 +1030,17 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for struct EnsembleStatNcOutInfo
+//  Code for struct GenEnsProdNcOutInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-EnsembleStatNcOutInfo::EnsembleStatNcOutInfo() {
+GenEnsProdNcOutInfo::GenEnsProdNcOutInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatNcOutInfo::clear() {
+void GenEnsProdNcOutInfo::clear() {
 
    set_all_true();
 
@@ -1049,7 +1049,7 @@ void EnsembleStatNcOutInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool EnsembleStatNcOutInfo::all_false() const {
+bool GenEnsProdNcOutInfo::all_false() const {
 
    bool status = do_latlon || do_mean || do_stdev || do_minus ||
                  do_plus   || do_min  || do_max   || do_range ||
@@ -1061,7 +1061,7 @@ bool EnsembleStatNcOutInfo::all_false() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatNcOutInfo::set_all_false() {
+void GenEnsProdNcOutInfo::set_all_false() {
 
    do_latlon = false;
    do_mean   = false;
@@ -1084,7 +1084,7 @@ void EnsembleStatNcOutInfo::set_all_false() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatNcOutInfo::set_all_true() {
+void GenEnsProdNcOutInfo::set_all_true() {
 
    do_latlon = true;
    do_mean   = true;
