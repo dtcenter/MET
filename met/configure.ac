@@ -485,6 +485,27 @@ else
     AC_MSG_NOTICE([ensemble_stat will not be compiled])
 fi
 
+# gen_ens_prod
+
+AC_ARG_ENABLE(gen_ens_prod,
+          [AS_HELP_STRING([--disable-gen_ens_prod], [Disable compilation of gen_ens_prod])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GEN_ENS_PROD="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_ens_prod) ;;
+   esac],
+  [ENABLE_GEN_ENS_PROD="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_GEN_ENS_PROD], [test "x$ENABLE_GEN_ENS_PROD" = "xyes"])
+
+if test "x$ENABLE_GEN_ENS_PROD" = "xyes"; then
+    AC_DEFINE([ENABLE_GEN_ENS_PROD], [], ["build gen_ens_prod"])
+    AC_MSG_NOTICE([gen_ens_prod will be compiled])
+else
+    AC_MSG_NOTICE([gen_ens_prod will not be compiled])
+fi
+
+
 # gen_vx_mask
 
 AC_ARG_ENABLE(gen_vx_mask,
@@ -1226,6 +1247,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
                  src/tools/other/lidar2nc/Makefile
+                 src/tools/other/gen_ens_prod/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/gis_utils/Makefile
                  src/tools/other/ioda2nc/Makefile
