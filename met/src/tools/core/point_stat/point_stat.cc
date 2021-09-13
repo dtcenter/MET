@@ -96,6 +96,8 @@
 //                    filtering options.
 //   046    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   047    08/23/21  Seth Linden    Add ORANK line type for HiRA.
+//   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
+//                    Added code for obs_qty_exc.
 //
 ////////////////////////////////////////////////////////////////////////
 
