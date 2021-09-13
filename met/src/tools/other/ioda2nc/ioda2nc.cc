@@ -913,7 +913,7 @@ void write_netcdf_hdr_data() {
    // Check for no messages retained
    if(hdr_cnt <= 0) {
       mlog << Error << method_name << " -> "
-           << "No IODA reocrds retained.  Nothing to write.\n\n";
+           << "No IODA records retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
       exit(1);
