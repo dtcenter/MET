@@ -16,7 +16,7 @@ enum_to_string_SOURCES = enum_parser.yy \
               code.cc code.h \
               scope.cc scope.h \
               my_enum_scanner.cc  \
-              enum_to_string.cc
+              enum_to_string.cc enum_to_string.h
 enum_to_string_CPPFLAGS = -DCOPYRIGHT_DIR="\"${abs_top_srcdir}/data\"" ${MET_CPPFLAGS}
 enum_to_string_LDFLAGS = ${MET_LDFLAGS}
 enum_to_string_LDADD = -lvx_cal \

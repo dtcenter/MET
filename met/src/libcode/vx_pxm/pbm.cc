@@ -25,7 +25,6 @@ using namespace std;
 #include <fcntl.h>
 
 #include "vx_log.h"
-#include "string_fxns.h"
 #include "pbm.h"
 #include "pxm_utils.h"
 

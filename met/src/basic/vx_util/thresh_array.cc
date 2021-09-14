@@ -18,7 +18,6 @@ using namespace std;
 #include "thresh_array.h"
 #include "vx_math.h"
 #include "vx_log.h"
-#include "string_fxns.h"
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -26,7 +26,6 @@ using namespace std;
 #include "ascii_table.h"
 #include "comma_string.h"
 #include "fix_float.h"
-#include "string_fxns.h"
 #include "util_constants.h"
 
 ////////////////////////////////////////////////////////////////////////

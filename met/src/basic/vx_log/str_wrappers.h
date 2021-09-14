@@ -11,25 +11,26 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_LOG_H__
-#define  __VX_LOG_H__
+#ifndef  __STR_WRAPPERS_H__
+#define  __STR_WRAPPERS_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
+extern int m_strlen(const char *str);
 
-#include "concat_string.h"
-#include "indent.h"
-#include "string_array.h"
-#include "file_fxns.h"
-#include "logger.h"
-#include "str_wrappers.h"
+extern void m_strcpy(char *to_str, const char *from_str, const char *method_name,
+                     const char *extra_msg=(char *)0);
+extern char *m_strcpy2(const char *from_str, const char *method_name,
+                       const char *extra_msg=(char *)0);
+extern void m_strncpy(char *to_str, const char *from_str, const int buf_len,
+                      const char *method_name, const char *extra_msg=(char *)0,
+                      bool truncate=false);
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __VX_LOG_H__
+#endif   //  __STR_WRAPPERS_H__
 
 
 ////////////////////////////////////////////////////////////////////////

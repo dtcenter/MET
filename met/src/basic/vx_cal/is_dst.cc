@@ -36,7 +36,7 @@ struct DstInfo {
 };
 
 
-static DstInfo dst_info[] = {
+const static DstInfo dst_info[] = {
 
   { 4, 2, 10, 29 },    //   0
   { 4, 1, 10, 28 },    //   1
