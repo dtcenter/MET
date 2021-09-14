@@ -167,7 +167,7 @@ static float static_dummy_200[MAX_CAPE_LEVEL];
 static float static_dummy_201[MAX_CAPE_LEVEL+1];
 
 #define ROG             287.04
-#define MAX_PBL         5000
+#define MAX_PBL         10000
 #define MAX_PBL_LEVEL   256
 #define PBL_DEBUG_LEVEL 8
 static bool IGNORE_Q_PBL = true;
@@ -375,6 +375,7 @@ static void   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_co
                          const ConcatString &hdr_typ, const ConcatString &hdr_sid);
 static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
+static bool   is_valid_pb_data(float pb_value);
 static void   log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
                                 map<float, float*> pqtzuv_map_uv,
                                 map<float, float*> &pqtzuv_map_merged,
@@ -1556,35 +1557,36 @@ void process_pbfile(int i_pb) {
          if (cal_cape) {
             if (cape_member_cnt >= 3) cape_level++;
          }
-         if (do_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
 
-            // Allocated memory is deleted after all observations are processed
-            float *tmp_pqtzuv = new float [mxr8vt];
+         if (do_pbl) {
+            bool excluded = true;
+            // Excludes a record if the pressure value is not valid
+            if (is_valid_pb_data(pqtzuv[0]) && pqtzuv[0] > 0) {
+               bool has_uv = is_valid_pb_data(pqtzuv[4]) && is_valid_pb_data(pqtzuv[5]);
+               bool has_tq = is_valid_pb_data(pqtzuv[2]) &&
+                            (IGNORE_Q_PBL || is_valid_pb_data(pqtzuv[1])) &&
+                            (IGNORE_Z_PBL || is_valid_pb_data(pqtzuv[3]));
+               if (has_tq || has_uv) {
+                  // Allocated memory is deleted after all observations are processed
+                  float *tmp_pqtzuv = new float [mxr8vt];
 
-            for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
+                  for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
-            bool has_tq = false;
-            bool has_uv = false;
-            if (!is_eq(tmp_pqtzuv[4],bad_data_float) &&
-                !is_eq(tmp_pqtzuv[5],bad_data_float)) {
-               has_uv = true;
-               pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
+                  if (has_uv) pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
+                  if (has_tq) pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
+                  pqtzuv_list.push_back(tmp_pqtzuv);
+                  excluded = false;
+               }
             }
-            if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
-                     (!is_eq(tmp_pqtzuv[1],bad_data_float) || IGNORE_Q_PBL) &&
-                     (!is_eq(tmp_pqtzuv[3],bad_data_float) || IGNORE_Z_PBL)) {
-               has_tq = true;
-               pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
-            }
-            if (!(has_tq || has_uv)) {
-               mlog << Debug(5) << method_name << " PBL: excluded " << lv
-                    << "-th level record:" << " T=" << tmp_pqtzuv[2]
-                    << ", U=" << tmp_pqtzuv[4] << ", V=" << tmp_pqtzuv[5]
-                    << ", Q=" << tmp_pqtzuv[0] << ", Z=" << tmp_pqtzuv[3]
+            if (excluded) {
+               mlog << Debug(5) << method_name
+                    << " PBL: excluded " << lv << "-th level record:"
+                    << " P=" << pqtzuv[0] << " T=" << pqtzuv[2]
+                    << ", U=" << pqtzuv[4] << ", V=" << pqtzuv[5]
+                    << ", Q=" << pqtzuv[1] << ", Z=" << pqtzuv[3]
                     << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
                     << " " << hdr_typ << " " << hdr_sid << "\n";
             }
-            pqtzuv_list.push_back(tmp_pqtzuv);
          }
       } // end for lv
 
@@ -3088,7 +3090,7 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
    if (is_eq(pbl_value, bad_data_float)) {
-      mlog << Warning << "\nFailed to compute PBL " << hdr_info << "\n\n";
+      mlog << Warning << "\nFailed to compute PBL (" << hdr_info << ")\n\n";
    }
    else if (pbl_value < hdr_elv) {
       mlog << Warning << "\nNot saved because the computed PBL (" << pbl_value
@@ -3105,14 +3107,12 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
            << "   lat: " << hdr_lat << ", lon: " << hdr_lon
            << ", elv: " << hdr_elv << " " << hdr_info << "\n\n";
       if (obs_arr[4] > MAX_PBL) {
-         mlog << Warning << "\nComputed PBL (" << obs_arr[4] << " from "
-              << pbl_value << ") is too high, Reset to " << MAX_PBL
-              << "  " << hdr_info<< "\n\n";
-         obs_arr[4] = MAX_PBL;
+         mlog << Warning << "\nNot saved the computed PBL (" << obs_arr[4] << " from "
+              << pbl_value << ") because of the MAX PBL " << MAX_PBL
+              << "  (" << hdr_info<< ")\n\n";
       }
-
-      addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                     hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
+      else addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                          hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
    }
 }
 
@@ -3207,6 +3207,12 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
       mlog << Debug(9) << method_name << " pressure level [" << cur_pqtzuv[0]
           << "] between " << prev_pqtzuv[0] << " and " << next_pqtzuv[0] << "\n";
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool is_valid_pb_data(float pb_value) {
+   return (!is_eq(pb_value,bad_data_float) && pb_value < r8bfms);
 }
 
 ////////////////////////////////////////////////////////////////////////
