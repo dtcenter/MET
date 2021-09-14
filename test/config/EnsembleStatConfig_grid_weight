@@ -83,6 +83,8 @@ fcst = {
    message_type = [ "APDSFC" ];
    sid_inc      = [];
    sid_exc      = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
    field        = tmp_field;
 }
 obs = fcst;

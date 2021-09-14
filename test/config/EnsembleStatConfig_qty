@@ -92,7 +92,8 @@ fcst = {
       {
          name        = "TMP";
          level       = [ "Z2" ];
-         obs_quality = [ ${OBS_QUALITY} ];
+         obs_quality_inc = [ ${OBS_QUALITY} ];
+         obs_quality_exc  = [];
       }
    ];
 }
