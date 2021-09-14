@@ -767,21 +767,22 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_obs_qty(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_qty() -> ";
-
-   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
-
-   return(sa);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_qty_inc() -> ";
-
-   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
-
+   
+   // Check for old "obs_quality" entry and print a warning message
+   StringArray sa = dict->lookup_string_array(conf_key_obs_qty);
+   
+   if(dict->last_lookup_status()) {
+      mlog << Warning << "\nparse_conf_obs_qty_inc() -> "
+           << "The configuration option \"" << conf_key_obs_qty
+           << "\" is deprecated. Use \"" << conf_key_obs_qty_inc
+           << "\" instead.\n\n";
+   }
+   else {
+      sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
+   }
+   
    return(sa);
 }
 
