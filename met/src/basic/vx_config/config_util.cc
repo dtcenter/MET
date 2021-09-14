@@ -792,13 +792,9 @@ StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_obs_qty_exc(Dictionary *dict) {
-   StringArray sa;
    const char *method_name = "parse_conf_obs_qty_exc() -> ";
    
-   // Check if we have "obs_quality_exc"
-   StringArray obs_qty_exc_sa = dict->lookup_string_array(conf_key_obs_qty_exc);
-   if(obs_qty_exc_sa.n() > 0)
-      sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
+   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
    
    return(sa);
 }
