@@ -30,7 +30,6 @@ using namespace std;
 
 #include "parse_file_list.h"
 #include "data2d_factory_utils.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////

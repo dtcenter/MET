@@ -29,7 +29,6 @@ StringArray parse_line(const char * line)
 
 {
 
-int n;
 StringArray a;
 const char * delim = " ";
 char * c  = (char *) 0;
@@ -40,13 +39,7 @@ const char *method_name = "parse_line() -> ";
    //  copy the line
    //
 
-n = m_strlen(line);
-
-L = new char [1 + n];
-
-memset(L, 0, 1 + n);
-
-m_strcpy(L, line, method_name);
+L = m_strcpy2(line, method_name);
 
    //
    //  tokenize the line

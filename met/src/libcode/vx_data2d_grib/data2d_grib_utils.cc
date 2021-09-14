@@ -21,7 +21,6 @@ using namespace std;
 #include "data2d_grib_utils.h"
 #include "angles.h"
 #include "is_bad_data.h"
-#include "string_fxns.h"
 #include "vx_log.h"
 #include "vx_math.h"
 

@@ -461,7 +461,12 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
 
    bool status = false;
    int in_fill_value;
+   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(int)";
+
+   for (int offset=0; offset<data_len; offset++) {
+      data[offset] = bad_data_int;
+   }
 
    if (IS_VALID_NC(var)) {
 
@@ -471,18 +476,10 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
          mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
               << in_fillValue_str <<  "=" << in_fill_value << "\n";
 
-         int offset, offsetStart;
-         for (int idx=0; idx<dim[0]; idx++) {
-            offsetStart = idx * dim[1];
-            for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-               offset = offsetStart + vIdx;
-
-               if(is_eq(data[offset], in_fill_value)) {
-                  data[offset] = bad_data_int;
-                  if(count_bad) {
-                     rej_fill++;
-                  }
-               }
+         for (int offset=0; offset<data_len; offset++) {
+            if(is_eq(data[offset], in_fill_value)) {
+               data[offset] = bad_data_int;
+               if(count_bad) rej_fill++;
             }
          }
       }
@@ -495,17 +492,7 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
-   if (!status) {
-      int offset, offsetStart;
-      for (int idx=0; idx<dim[0]; idx++) {
-         offsetStart = idx * dim[1];
-         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-            offset = offsetStart + vIdx;
-            data[offset] = bad_data_int;
-            if(count_bad) rej_fill++;
-         }
-      }
-   }
+   if (!status && count_bad) rej_fill = data_len;
    return status;
 }
 
@@ -517,7 +504,12 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
    bool status = false;
    float in_fill_value;
+   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(float) ";
+
+   for (int offset=0; offset<data_len; offset++) {
+      data[offset] = bad_data_float;
+   }
 
    if (IS_VALID_NC(var)) {
 
@@ -527,18 +519,10 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
          mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
               << in_fillValue_str <<  "=" << in_fill_value << "\n";
 
-         int offset, offsetStart = 0;
-         for (int idx=0; idx<dim[0]; idx++) {
-            offsetStart = idx * dim[1];
-            for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-               offset = offsetStart + vIdx;
-
-               if(is_eq(data[offset], in_fill_value)) {
-                  data[offset] = bad_data_float;
-                  if(count_bad) {
-                     rej_fill++;
-                  }
-               }
+         for (int offset=0; offset<data_len; offset++) {
+            if(is_eq(data[offset], in_fill_value)) {
+               data[offset] = bad_data_float;
+               if(count_bad) rej_fill++;
             }
          }
       }
@@ -551,17 +535,7 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
-   if (!status) {
-      int offset, offsetStart;
-      for (int idx=0; idx<dim[0]; idx++) {
-         offsetStart = idx * dim[1];
-         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-            offset = offsetStart + vIdx;
-            data[offset] = bad_data_float;
-            if(count_bad) rej_fill++;
-         }
-      }
-   }
+   if (!status && count_bad) rej_fill = data_len;
    return status;
 }
 

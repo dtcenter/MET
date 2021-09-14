@@ -18,7 +18,6 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_util.h"
-#include "string_fxns.h"
 
 #include "GridTemplate.h"
 

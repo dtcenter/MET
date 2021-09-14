@@ -26,7 +26,6 @@ using namespace std;
 #include "afm_token.h"
 
 #include "vx_log.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -2284,11 +2283,10 @@ if ( s )  { delete [] s;  s = (char *) 0; }
 
 if ( !text )  return;
 
-int buf_len = m_strlen(text);
-s = new char [1 + buf_len];
-const char *method_name = "set_string()";
+const char *method_name = "afm set_string()";
 
-m_strcpy(s, text, method_name);
+s = m_strcpy2(text, method_name);
+
 
 return;
 
