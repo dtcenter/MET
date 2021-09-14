@@ -49,7 +49,8 @@ fcst = {
         level        = [ "Z2" ];
         cat_thresh   = [ <=273, >273 ];
         message_type = [ "ADPSFC" ];
-        obs_quality  = [ ${OBS_QUALITY_SFC} ];
+        obs_quality_inc  = [ ${OBS_QUALITY_INC_SFC} ];
+        obs_quality_exc  = [];
       },
 
       {
@@ -57,7 +58,8 @@ fcst = {
         level        = [ "P500" ];
         cat_thresh   = [ <=273, >273 ];
         message_type = [ "ADPUPA" ];
-        obs_quality  = [ ${OBS_QUALITY_UPA} ];
+        obs_quality_inc  = [ ${OBS_QUALITY_INC_UPA} ];
+        obs_quality_exc  = [];
       }
    ];
 
