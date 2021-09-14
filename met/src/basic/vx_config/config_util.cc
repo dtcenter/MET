@@ -768,16 +768,19 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
+   StringArray sa;
    const char *method_name = "parse_conf_obs_qty_inc() -> ";
    
    // Check for old "obs_quality" entry and print a warning message
-   StringArray sa = dict->lookup_string_array(conf_key_obs_qty);
+   StringArray obs_qty_sa = dict->lookup_string_array(conf_key_obs_qty);
    
-   if(dict->last_lookup_status()) {
+   if(obs_qty_sa.n() > 0){
       mlog << Warning << "\nparse_conf_obs_qty_inc() -> "
            << "The configuration option \"" << conf_key_obs_qty
            << "\" is deprecated. Use \"" << conf_key_obs_qty_inc
            << "\" instead.\n\n";
+
+      sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
    }
    else {
       sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
@@ -789,10 +792,14 @@ StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_obs_qty_exc(Dictionary *dict) {
+   StringArray sa;
    const char *method_name = "parse_conf_obs_qty_exc() -> ";
-
-   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
-
+   
+   // Check if we have "obs_quality_exc"
+   StringArray obs_qty_exc_sa = dict->lookup_string_array(conf_key_obs_qty_exc);
+   if(obs_qty_exc_sa.n() > 0)
+      sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
+   
    return(sa);
 }
 
