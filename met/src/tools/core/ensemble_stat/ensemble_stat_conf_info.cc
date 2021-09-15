@@ -835,7 +835,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: obs_qty_exc
    vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
    
-   
    return;
 }
 
