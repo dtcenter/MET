@@ -779,9 +779,9 @@ StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
       mlog << Warning << "\nparse_conf_obs_qty_inc() -> "
            << "Set the \"" << conf_key_obs_qty_inc << "\" value ("
            << write_css(sa) << ") from the deprecated \""
-           << conf_key_obs_qty << "\" configuration entry. "
+           << conf_key_obs_qty << "\" configuration entry.\n"
            << "Replace \"" << conf_key_obs_qty << "\" with \""
-           << conf_key_obs_qty_inc << "\".\n\n";
+           << conf_key_obs_qty_inc << "\"!\n\n";
    }
    else {
       sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
