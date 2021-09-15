@@ -54,11 +54,11 @@ fcst = {
 }
 
 obs = {
-   message_type = [ "AERONET_AOD_MEAN_010000" ];
-   sid_inc      = [];
-   sid_exc      = [];
-   obs_quality_inc  = [];
-   obs_quality_exc  = [];
+   message_type    = [ "AERONET_AOD_MEAN_010000" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
    
    field = [
       {
@@ -203,7 +203,6 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
