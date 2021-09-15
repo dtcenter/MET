@@ -2466,7 +2466,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    // Write the quality flag to the netCDF file
    ConcatString obs_qty;
    int quality_code = nint(quality_mark);
-   if (quality_code == bad_data_int || quality_mark > r8bfms) {
+   if (is_bad_data(quality_code) || quality_mark > r8bfms) {
       obs_qty.add("NA");
    }
    else {
@@ -2822,7 +2822,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
 void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
    int start_idx = (copy_all ? 0 : 1);
    for (int index = start_idx; index < mxr8vt; index++) {
-      if (copy_all || !is_eq(from_pqtzuv[index], bad_data_float))
+      if (copy_all || !is_bad_data(from_pqtzuv[index]))
          to_pqtzuv[index] = from_pqtzuv[index];
    }
 }
@@ -2996,8 +2996,8 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                pbl_data_hgt[index]  = pqtzuv[3];
                pbl_data_ugrd[index] = pqtzuv[4];
                pbl_data_vgrd[index] = pqtzuv[5];
-               if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
-               if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
+               if (is_valid_pb_data(pbl_data_spfh[index])) spfh_cnt++;
+               if (is_valid_pb_data(pbl_data_hgt[index])) hgt_cnt++;
                selected_levels.add(nint(it->first));
             }
 
@@ -3017,7 +3017,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                   break;
                }
             }
-            if (!is_eq(highest_pressure, bad_data_float)) {
+            if (!is_bad_data(highest_pressure)) {
                index = MAX_PBL_LEVEL - 1;
                for (; it!=pqtzuv_map_tq.end(); ++it) {
                   int pres_level = nint(it->first);
@@ -3069,7 +3069,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
             calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
                     pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
-            if (is_eq(hpbl, bad_data_float))
+            if (!is_valid_pb_data(hpbl))
                mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
                     << tq_count << " UV records: " << uv_count << " merged records: "
                     << pqtzuv_map_merged.size() << "\n";
@@ -3089,7 +3089,7 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    ConcatString hdr_info;
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
-   if (is_eq(pbl_value, bad_data_float)) {
+   if (is_bad_data(pbl_value)) {
       mlog << Warning << "\nFailed to compute PBL (" << hdr_info << ")\n\n";
    }
    else if (pbl_value < hdr_elv) {
@@ -3129,7 +3129,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
    skip_missing = false;
    count_interpolated = 0;
    for (idx=0; idx<length; idx++) {
-      if (is_eq(var_data[idx], bad_data_float)) {
+      if (is_valid_pb_data(var_data[idx])) {
          skip_missing = true;
       }
       else {
@@ -3187,15 +3187,15 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
             / (log(next_pqtzuv[0]) - log(prev_pqtzuv[0]));
       float ratio_pres = USE_LOG_INTERPOLATION ? p_ratio_log : p_ratio;
       for (int index=1; index < mxr8vt; index++) {
-         if (is_eq(cur_pqtzuv[index], bad_data_float)) {
+         if (is_bad_data(cur_pqtzuv[index])) {
             float prev_value = prev_pqtzuv[index];
             float next_value = next_pqtzuv[index];
-            if (is_eq(prev_value, bad_data_float) || is_eq(next_value, bad_data_float)) {
+            if (is_bad_data(prev_value) || is_bad_data(next_value)) {
                if ((!IGNORE_Q_PBL && index==1) || (!IGNORE_Z_PBL && index==3)) {
                   mlog << Warning << method_name << "   Missing value for "
-                       << (is_eq(prev_value, bad_data_float) ? "previous" : "next")
+                       << (is_bad_data(prev_value) ? "previous" : "next")
                        << " data for index " << index << " at pressure "
-                       << (is_eq(prev_value, bad_data_float) ? prev_pqtzuv[0] : next_pqtzuv[0])
+                       << (is_bad_data(prev_value) ? prev_pqtzuv[0] : next_pqtzuv[0])
                        << "\n";
                }
             }
@@ -3212,7 +3212,7 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
 ////////////////////////////////////////////////////////////////////////
 
 static bool is_valid_pb_data(float pb_value) {
-   return (!is_eq(pb_value,bad_data_float) && pb_value < r8bfms);
+   return (!is_bad_data(pb_value) && pb_value < r8bfms);
 }
 
 ////////////////////////////////////////////////////////////////////////
