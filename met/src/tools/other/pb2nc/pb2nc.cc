@@ -3090,7 +3090,7 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
    if (is_bad_data(pbl_value)) {
-      mlog << Warning << "\nFailed to compute PBL (" << hdr_info << ")\n\n";
+      mlog << Warning << "\nFailed to compute PBL " << pbl_value << " (" << hdr_info << ")\n\n";
    }
    else if (pbl_value < hdr_elv) {
       mlog << Warning << "\nNot saved because the computed PBL (" << pbl_value
@@ -3129,7 +3129,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
    skip_missing = false;
    count_interpolated = 0;
    for (idx=0; idx<length; idx++) {
-      if (is_valid_pb_data(var_data[idx])) {
+      if (is_bad_data(var_data[idx])) {
          skip_missing = true;
       }
       else {
