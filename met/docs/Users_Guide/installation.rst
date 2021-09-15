@@ -250,7 +250,7 @@ The configure script has command line options to specify where to install MET an
 
 .. code-block:: none
 		
-  \--prefix=PREFIX
+  --prefix=PREFIX
 
 By default, MET will install all the files in "*/usr/local/bin*". You can specify an installation prefix other than "*/usr/local*" using "--prefix", for instance "--prefix=$HOME" or "--prefix=`pwd`".
 
