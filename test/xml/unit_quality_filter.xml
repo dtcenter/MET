@@ -20,7 +20,7 @@
   <!--  NOTE: assumes that the madis2nc and pb2nc unit tests have run  -->
   <!--                                                                 -->
 
-  <test name="point_stat_QTY_INC_EXC_PB_ON">
+  <test name="point_stat_QTY_INC_EXC_PB">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_QUALITY_INC_SFC</name> <value>"8"</value></pair>
