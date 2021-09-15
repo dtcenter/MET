@@ -40,14 +40,32 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_inc = [];
-   sid_exc = [];
+   sid_inc    = [];
+   sid_exc    = [];
+   cat_thresh = [ <=273, >273 ];
 
    field = [
       {
         name            = "TMP";
         level           = [ "Z2" ];
-        cat_thresh      = [ <=273, >273 ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [];
+        desc            = "ALL_QTY";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "P500" ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [];
+        desc            = "ALL_QTY";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "Z2" ];
         message_type    = [ "ADPSFC" ];
         obs_quality_inc = [ ${OBS_QUALITY_INC_SFC} ];
         obs_quality_exc = [];
@@ -57,7 +75,6 @@ fcst = {
       {
         name            = "TMP";
         level           = [ "P500" ];
-        cat_thresh      = [ <=273, >273 ];
         message_type    = [ "ADPUPA" ];
         obs_quality_inc = [ ${OBS_QUALITY_INC_UPA} ];
         obs_quality_exc = [];
@@ -67,7 +84,6 @@ fcst = {
       {
         name            = "TMP";
         level           = [ "Z2" ];
-        cat_thresh      = [ <=273, >273 ];
         message_type    = [ "ADPSFC" ];
         obs_quality_inc = [];
         obs_quality_exc = [ ${OBS_QUALITY_EXC_SFC} ];
@@ -77,7 +93,6 @@ fcst = {
       {
         name            = "TMP";
         level           = [ "P500" ];
-        cat_thresh      = [ <=273, >273 ];
         message_type    = [ "ADPUPA" ];
         obs_quality_inc = [];
         obs_quality_exc = [ ${OBS_QUALITY_EXC_UPA} ];
@@ -161,12 +176,12 @@ hira = {
 // Statistical output types
 //
 output_flag = {
-   fho    = BOTH;
+   fho    = NONE;
    ctc    = BOTH;
-   cts    = BOTH;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
+   cnt    = NONE;
    sl1l2  = BOTH;
    sal1l2 = NONE;
    vl1l2  = NONE;
@@ -179,7 +194,7 @@ output_flag = {
    ecnt   = NONE;
    orank  = NONE;
    rps    = NONE;
-   eclv   = BOTH;
+   eclv   = NONE;
    mpr    = BOTH;
 }
 

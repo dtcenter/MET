@@ -23,11 +23,11 @@
   <test name="point_stat_QTY_INC_EXC_PB_ON">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>OBS_QUALITY_INC_SFC</name>  <value>"8"</value></pair>
-      <pair><name>OBS_QUALITY_INC_UPA</name>  <value>"2"</value></pair>
-      <pair><name>OBS_QUALITY_EXC_SFC</name>  <value>"9"</value></pair>
-      <pair><name>OBS_QUALITY_EXC_UPA</name>  <value>"9"</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>        <value>QTY_INC_EXC_PB</value></pair>
+      <pair><name>OBS_QUALITY_INC_SFC</name> <value>"8"</value></pair>
+      <pair><name>OBS_QUALITY_INC_UPA</name> <value>"2"</value></pair>
+      <pair><name>OBS_QUALITY_EXC_SFC</name> <value>"9"</value></pair>
+      <pair><name>OBS_QUALITY_EXC_UPA</name> <value>"9"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>       <value>QTY_INC_EXC_PB</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
@@ -37,47 +37,18 @@
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_fho.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
-  <test name="point_stat_QTY_PB_OFF">
-    <exec>&MET_BIN;/point_stat</exec>
-    <env>
-      <pair><name>OBS_QUALITY_INC_SFC</name>  <value></value></pair>
-      <pair><name>OBS_QUALITY_INC_UPA</name>  <value></value></pair>
-      <pair><name>OBS_QUALITY_EXC_SFC</name>  <value></value></pair>
-      <pair><name>OBS_QUALITY_EXC_UPA</name>  <value></value></pair>
-      <pair><name>OUTPUT_PREFIX</name>        <value>QTY_PB</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
-      &CONFIG_DIR;/PointStatConfig_qty_inc_exc \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
-    </param>   
-    <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_fho.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_PB_120000L_20120409_120000V_mpr.txt</stat>
-    </output>
-  </test>
-  
   <test name="ensemble_stat_QTY_INC_EXC_MADIS_VGS">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>OBS_QUALITY_INC</name>    <value>"V", "G", "S"</value></pair>
-      <pair><name>OBS_QUALITY_EXC</name>    <value>"C"</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>      <value>QTY_INC_EXC_MADIS_VGS</value></pair>
+      <pair><name>OBS_QUALITY_INC</name> <value>"V", "G", "S"</value></pair>
+      <pair><name>OBS_QUALITY_EXC</name> <value>"C"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>QTY_INC_EXC_MADIS_VGS</value></pair>
     </env>
     <param> \
       3 \
@@ -92,7 +63,6 @@
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_rhist.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_orank.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ens.nc</grid_nc>
     </output>
