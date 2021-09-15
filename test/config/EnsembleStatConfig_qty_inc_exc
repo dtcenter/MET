@@ -90,10 +90,19 @@ fcst = {
 
    field = [
       {
-         name        = "TMP";
-         level       = [ "Z2" ];
-         obs_quality_inc = [ ${OBS_QUALITY} ];
-         obs_quality_exc  = [];
+         name            = "TMP";
+         level           = [ "Z2" ];
+         obs_quality_inc = [ ${OBS_QUALITY_INC} ];
+         obs_quality_exc = [];
+         desc            = "QTY_INC";
+      },
+      
+      {
+         name            = "TMP";
+         level           = [ "Z2" ];
+         obs_quality_inc = [];
+         obs_quality_exc = [ ${OBS_QUALITY_EXC} ];
+         desc            = "QTY_EXC";
       }
    ];
 }

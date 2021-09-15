@@ -45,21 +45,43 @@ fcst = {
 
    field = [
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        cat_thresh   = [ <=273, >273 ];
-        message_type = [ "ADPSFC" ];
-        obs_quality_inc  = [ ${OBS_QUALITY_INC_SFC} ];
-        obs_quality_exc  = [];
+        name            = "TMP";
+        level           = [ "Z2" ];
+        cat_thresh      = [ <=273, >273 ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [ ${OBS_QUALITY_INC_SFC} ];
+        obs_quality_exc = [];
+        desc            = "QTY_INC_SFC";
       },
 
       {
-        name         = "TMP";
-        level        = [ "P500" ];
-        cat_thresh   = [ <=273, >273 ];
-        message_type = [ "ADPUPA" ];
-        obs_quality_inc  = [ ${OBS_QUALITY_INC_UPA} ];
-        obs_quality_exc  = [];
+        name            = "TMP";
+        level           = [ "P500" ];
+        cat_thresh      = [ <=273, >273 ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [ ${OBS_QUALITY_INC_UPA} ];
+        obs_quality_exc = [];
+        desc            = "QTY_INC_UPA";
+      },
+      
+      {
+        name            = "TMP";
+        level           = [ "Z2" ];
+        cat_thresh      = [ <=273, >273 ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [ ${OBS_QUALITY_EXC_SFC} ];
+        desc            = "QTY_EXC_SFC";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "P500" ];
+        cat_thresh      = [ <=273, >273 ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [ ${OBS_QUALITY_EXC_UPA} ];
+        desc            = "QTY_EXC_UPA";
       }
    ];
 
