@@ -342,7 +342,8 @@ ________________________
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;
-  obs_quality    = [];
+  obs_quality_inc  = [];
+  obs_quality_exc  = [];
   obs_summary    = NONE;
   obs_perc_value = 50;
   message_type_group_map = [...];

@@ -59,6 +59,8 @@
 //   029    01/21/20  Halley Gotway  Add RPS output line type.
 //   030    02/19/21  Halley Gotway  MET #1450, #1451 Overhaul CRPS
 //                    statistics in the ECNT line type.
+//   031    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
+//                    Added code for obs_qty_exc.
 //
 ////////////////////////////////////////////////////////////////////////
 

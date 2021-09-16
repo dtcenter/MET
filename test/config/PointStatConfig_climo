@@ -44,10 +44,12 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_inc    = [];
-   sid_exc    = [];
-   cat_thresh = [];
-   message_type = [ "ADPSFC" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+   cat_thresh      = [];
+   message_type    = [ "ADPSFC" ];
 
    field = [
       {
@@ -270,7 +272,6 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
