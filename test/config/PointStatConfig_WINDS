@@ -55,6 +55,8 @@ message_type_group_map = [
 fcst = {
    sid_inc = [];
    sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
 
    message_type = [ "ADPSFC", "SFCSHP", "USERSF" ];
    wind_thresh  = [ NA, >=3, >=5 ];

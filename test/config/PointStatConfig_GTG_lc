@@ -65,6 +65,8 @@ obs = {
    message_type = [ "MEDEDR", "MAXEDR" ];
    sid_inc      = [];
    sid_exc      = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
 
    field = [
       {
