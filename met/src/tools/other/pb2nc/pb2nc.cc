@@ -130,8 +130,7 @@ static const int mxr8vt         = 6;
 static const int mxr8nm         = 8;
 // Maximum number of BUFR variable types
 
-// Length of the "YYYYMMDD_HHMMSS" string
-static const int COUNT_THRESHOLD = 5;
+static const int COUNT_THRESHOLD = 16;
 
 // File unit number for opening the PrepBufr file
 static const int file_unit      = 11;
@@ -2004,7 +2003,7 @@ void process_pbfile_metadata(int i_pb) {
    int lv, var_index;
    int debug_threshold = 10;
 
-   int tmp_nlev_max_req = mxr8lv_small;
+   int nlev_max_req;
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
@@ -2110,6 +2109,8 @@ void process_pbfile_metadata(int i_pb) {
    int length;
    bool is_prepbufr_hdr = false;
    bool showed_progress = false;
+
+   nlev_max_req = (mxr8lv_small > COUNT_THRESHOLD) ? COUNT_THRESHOLD : mxr8lv_small;
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
@@ -2296,24 +2297,29 @@ void process_pbfile_metadata(int i_pb) {
 
       int var_count = unchecked_var_list.n_elements();
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
-         int nlev2, buf_nlev;
+         int nlev2, count;
          bool has_valid_data;
          ConcatString var_name = unchecked_var_list[vIdx];
          int var_name_len = var_name.length();
 
-         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &tmp_nlev_max_req);
+         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
          if (0 >= nlev2) continue;
          
-         // Checks the first level intread of searching through the vertical levels
-         lv = 0;
-         has_valid_data = (bufr_obs[lv][0] < r8bfms);
+         // Search through the vertical levels
+         has_valid_data = false;
+         for(lv=0; lv<nlev2; lv++) {
+            if (bufr_obs[lv][0] < r8bfms) {
+               has_valid_data = true;
+               break;
+            }
+         }  //end for lv
 
          if (has_valid_data) {
             if (do_all_vars) {
                mlog << Debug(5) << " found valid data: " << var_name
                     << " (" << bufr_obs[lv][0] << ") at level index "
                     << lv << " from message " << i_read << "-th message (levels="
-                    << buf_nlev << ")\n";
+                    << nlev2 << ")\n";
             }
             if (!tmp_bufr_obs_name_arr.has(var_name, false)
                 && !bufr_hdr_name_arr.has(var_name, false)) {
