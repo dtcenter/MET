@@ -152,7 +152,6 @@ static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static void cleanup_hdr_buf(char *hdr_buf, int buf_len);
 static bool check_core_data(const bool, const bool, StringArray &, StringArray &);
 static bool check_missing_thresh(float value);
 static ConcatString find_meta_name(StringArray, StringArray);
@@ -664,8 +663,7 @@ void process_ioda_file(int i_pb) {
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
          m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name, "hdr_typ");
-         // Null terminate the message type string
-         cleanup_hdr_buf(hdr_typ, nstring);
+         m_rstrip(hdr_typ, nstring);
 
          // If the message type is not listed in the configuration
          // file and it is not the case that all message types should be
@@ -693,7 +691,7 @@ void process_ioda_file(int i_pb) {
       if(has_station_id) {
          char tmp_sid[nstring+1];
          m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name, "tmp_sid");
-         cleanup_hdr_buf(tmp_sid, nstring);
+         m_rstrip(tmp_sid, nstring);
          hdr_sid = tmp_sid;
       }
       else hdr_sid.clear();
@@ -982,22 +980,6 @@ void clean_up() {
    }
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void cleanup_hdr_buf(char *hdr_buf, int buf_len) {
-   int i;
-   hdr_buf[buf_len] = '\0';
-   // Change the trailing blank space to a null
-   int str_len = m_strlen(hdr_buf);
-   if (buf_len <= str_len) str_len = buf_len;
-   for(i=str_len-1; i>=0; i--) {
-      if(' ' == hdr_buf[i]) {
-         hdr_buf[i] = '\0';
-         if(i > 0 && ' ' != hdr_buf[i-1]) break;
-      }
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////
