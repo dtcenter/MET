@@ -279,7 +279,7 @@ if ( !in )  {
    //  copy filename
    //
 
-Name = new char [1 + strlen(filename)];
+Name = new char [1 + m_strlen(filename)];
 
 if ( !Name )  {
 
@@ -291,7 +291,7 @@ if ( !Name )  {
 
 }
 
-memcpy(Name, filename, 1 + strlen(filename));
+memcpy(Name, filename, 1 + m_strlen(filename));
 
    //
    //  read magic cookie

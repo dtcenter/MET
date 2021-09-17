@@ -207,15 +207,22 @@ void MetNcPointObsOut::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
 
 void MetNcPointObsOut::init_buffer() {
 
+   const char *method_name = "MetNcPointObsOut::init_buffer()";
+   const char *not_defined = "NotDefined";
+
    data_buffer.obs_data_idx    = 0;
    data_buffer.obs_data_offset = 0;
    data_buffer.hdr_data_idx    = 0;
    data_buffer.hdr_data_offset = 0;
    data_buffer.pb_hdr_data_offset = 0;
 
-   strcpy(data_buffer.prev_hdr_typ_buf, "NotDefined");
-   strcpy(data_buffer.prev_hdr_sid_buf, "NotDefined");
-   strcpy(data_buffer.prev_hdr_vld_buf, "NotDefined");
+   m_strncpy(data_buffer.prev_hdr_typ_buf, not_defined,
+             HEADER_STR_LEN2, method_name, "data_buffer.prev_hdr_typ_buf");
+   m_strncpy(data_buffer.prev_hdr_sid_buf, not_defined,
+             HEADER_STR_LEN2, method_name, "data_buffer.prev_hdr_sid_buf");
+   m_strncpy(data_buffer.prev_hdr_vld_buf, not_defined,
+             HEADER_STR_LEN, method_name, "data_buffer.prev_hdr_vld_buf");
+
    for (int index=0; index<HDR_ARRAY_LEN; index++)
       data_buffer.prev_hdr_arr_buf[index] = 0.0;
 

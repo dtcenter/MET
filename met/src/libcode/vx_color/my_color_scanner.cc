@@ -16,6 +16,8 @@ using namespace std;
 #include <cmath>
 
 
+#include "str_wrappers.h"
+
 #include "color_parser.h"   //  this must be included before color_parser_yacc.h
 #include "color.h"
 
@@ -516,6 +518,8 @@ int do_id()
 
 {
 
+const char *method_name = "is_id() -> ";
+
 if ( strcmp(colortext, "blend"    ) == 0 )  return ( BLEND     );
 if ( strcmp(colortext, "hsv"      ) == 0 )  return ( HSV       );
 if ( strcmp(colortext, "cmyk"     ) == 0 )  return ( CMYK      );
@@ -532,7 +536,7 @@ if ( clist.has_name(colortext, index) )  {
 
 }
 
-strncpy(colorlval.text, colortext, sizeof(colorlval.text) - 1);
+m_strncpy(colorlval.text, colortext, sizeof(colorlval.text) - 1, method_name);
 
 
 
@@ -681,6 +685,7 @@ void do_quoted_string()
 int n;
 char c;
 char line[max_lexeme_size + 1];
+const char *method_name = "do_quoted_string() -> ";
 
 memset(line, 0, sizeof(line));
 
@@ -728,7 +733,7 @@ while ( n < max_lexeme_size )  {
 
 line[n] = (char) 0;
 
-strncpy(colorlval.text, line, sizeof(colorlval.text));
+m_strncpy(colorlval.text, line, sizeof(colorlval.text), method_name);
 
 colorlval.text[ sizeof(colorlval.text) - 1 ] = (char) 0;
 

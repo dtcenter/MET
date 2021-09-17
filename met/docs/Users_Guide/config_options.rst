@@ -1997,20 +1997,37 @@ Percentile value to use when obs_summary = PERC
   obs_perc_value = 50;
 
   
-.. _obs_quality:
+.. _obs_quality_inc:
 
-:ref:`obs_quality <obs_quality>`
+:ref:`obs_quality_inc <obs_quality_inc>`
 		
-The "obs_quality" entry specifies the quality flag values that are to be
+The "obs_quality_inc" entry specifies the quality flag values that are to be
 retained and used for verification. An empty list signifies that all
 point observations should be used, regardless of their quality flag value.
 The quality flag values will vary depending on the original source of the
 observations. The quality flag values to retain should be specified as
 an array of strings, even if the values themselves are numeric.
+Note "obs_quality_inc" replaces the older option "obs_quality".
 
 .. code-block:: none
 		
-  obs_quality = [ "1", "2", "3", "9" ];
+  obs_quality_inc = [ "1", "2", "3", "9" ];
+
+  
+.. _obs_quality_exc:
+
+:ref:`obs_quality_exc <obs_quality_exc>`
+		
+The "obs_quality_exc" entry specifies the quality flag values that are to be
+ignored and not used for verification. An empty list signifies that all
+point observations should be used, regardless of their quality flag value.
+The quality flag values will vary depending on the original source of the
+observations. The quality flag values to ignore should be specified as
+an array of strings, even if the values themselves are numeric.
+
+.. code-block:: none
+		
+  obs_quality_exc = [ "1", "2", "3", "9" ];
 
   
 .. _met_data_dir:

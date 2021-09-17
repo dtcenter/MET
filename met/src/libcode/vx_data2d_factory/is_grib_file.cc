@@ -35,7 +35,7 @@ using namespace std;
 
 static const char grib_magic [] = "GRIB";
 
-static const int grib_magic_len = strlen(grib_magic);
+static const int grib_magic_len = m_strlen(grib_magic);
 
 static const int buf_size = 256;
 

@@ -353,6 +353,7 @@ double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
 bool operator>>(istream & in, TCPoly & p) {
    int i, n;
    double x, y;
+   const char *method_name = "TCPolyArray::operator>> -> ";
 
    p.clear();
 
@@ -370,7 +371,7 @@ bool operator>>(istream & in, TCPoly & p) {
    // NNN is the 3-digit number of points
    // AAAAAAAA is the 8-character name of the region
    n = atoi(a[0].c_str());
-   strncpy(name, line.c_str()+4, 8);
+   m_strncpy(name, line.c_str()+4, 8, method_name, "name", true);
    name[8] = '\0';
    name_cs = name;
    name_cs.ws_strip();

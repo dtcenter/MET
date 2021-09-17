@@ -354,13 +354,20 @@ for (c=1; c<Ncols; ++c)  {
 
    for (k=0; k<c; ++k)  c_table += 2*hpad + col_width[k] + 1;
 
-   for (r_table=1; r_table<(h - 1); ++r_table)  {
+   if (c_table < w) {
 
-      n = table_rc_to_n(r_table, c_table, w, h);
+      for (r_table=1; r_table<(h - 1); ++r_table)  {
 
-      table[n] = v_sep;
+         n = table_rc_to_n(r_table, c_table, w, h);
 
+         table[n] = v_sep;
 
+      }
+
+   }
+   else {
+      mlog << Warning << "\nContingencyTable::dump() -> "
+           << "c_table (" << c_table << ") is greater then w (" << w << ")\n\n";
    }
 
 }
@@ -1745,7 +1752,8 @@ return ( t );
 
 
 ////////////////////////////////////////////////////////////////////////
-
+// r_table < h
+// c_table < w
 
 int table_rc_to_n(int r_table, int c_table, int w, int h)
 

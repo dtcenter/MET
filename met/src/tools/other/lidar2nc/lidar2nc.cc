@@ -68,7 +68,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int na_len = strlen(na_str);
+static const int na_len = m_strlen(na_str);
 
 static IntArray    valid_times;
 
@@ -395,17 +395,6 @@ nc_point_obs.add_header_strings(hdr_typ_string, na_str);
    //
    //  populate the obs_qty variable
    //
-/*
-memset(buf, 0, buf_size);
-
-for (j=0; j<n_data; ++j)  {
-
-   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
-
-}
-
-obs_qty_var.putVar(cbuf);
-*/
    //
    //  populate the hdr_arr variable
    //

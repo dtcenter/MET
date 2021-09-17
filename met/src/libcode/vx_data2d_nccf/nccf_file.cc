@@ -740,7 +740,7 @@ void NcCfFile::dump(ostream & out, int depth) const
   if (AccumTime > 0) {
     unix_to_mdyhms(AccumTime, month, day, year, hour, minute, second);
     snprintf(junk, sizeof(junk), "%2d:%02d:%02d (%d seconds)",
-             hour, minute, second, AccumTime);
+             hour, minute, second, (int)AccumTime);
     out << prefix << "Accum Time = ";
     out << junk << "\n";
     out << prefix << "\n";
@@ -1124,7 +1124,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
            << " bad type [" << GET_NC_TYPE_NAME_P(v)
            << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
       exit ( 1 );
-      break;
   
   }   //  switch
 
@@ -2577,7 +2576,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   ConcatString scene_id;
   if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
     char* scene_id_str = new char[scene_id.length()+1];
-    strncpy(scene_id_str, scene_id.text(), scene_id.length());
+    m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
     scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
   }

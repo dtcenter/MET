@@ -29,24 +29,17 @@ StringArray parse_line(const char * line)
 
 {
 
-int n;
 StringArray a;
 const char * delim = " ";
 char * c  = (char *) 0;
 char * lp = (char *) 0;
 char * L  = (char *) 0;
-
+const char *method_name = "parse_line() -> ";
    //
    //  copy the line
    //
 
-n = strlen(line);
-
-L = new char [1 + n];
-
-memset(L, 0, 1 + n);
-
-strcpy(L, line);
+L = m_strcpy2(line, method_name);
 
    //
    //  tokenize the line
@@ -87,7 +80,7 @@ int all_digits(const char * line)
 
 int j, n;
 
-n = strlen(line);
+n = m_strlen(line);
 
 for (j=0; j<n; ++j)  {
 

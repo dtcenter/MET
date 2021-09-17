@@ -610,7 +610,8 @@ void process_ioda_file(int i_pb) {
       }
 
       char valid_time[ndatetime+1];
-      strncpy(valid_time, (const char *)(hdr_vld_block + (i_read * ndatetime)), ndatetime);
+      m_strncpy(valid_time, (const char *)(hdr_vld_block + (i_read * ndatetime)),
+                ndatetime, method_name, "valid_time");
       valid_time[ndatetime] = 0;
       msg_ut = yyyymmddThhmmss_to_unix(valid_time);
 
@@ -660,7 +661,7 @@ void process_ioda_file(int i_pb) {
 
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
-         strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring);
+         m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name, "hdr_typ");
          hdr_typ[nstring] = 0;
          // Null terminate the message type string
          cleanup_hdr_buf(hdr_typ, nstring);
@@ -679,17 +680,18 @@ void process_ioda_file(int i_pb) {
                  << "Switching report type \"" << hdr_typ
                  << "\" to message type \"" << mappedMessageType << "\".\n";
             if(mappedMessageType.length() < HEADER_STR_LEN) buf_len = HEADER_STR_LEN;
-            strncpy(modified_hdr_typ, mappedMessageType.c_str(), buf_len);
+            m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), buf_len,
+                      method_name, "modified_hdr_typ");
          }
          else {
-            strncpy(modified_hdr_typ, hdr_typ, buf_len);
+            m_strncpy(modified_hdr_typ, hdr_typ, buf_len, method_name, "modified_hdr_typ2");
          }
          modified_hdr_typ[buf_len-1] = 0;
       }
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
-         strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring);
+         m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name, "tmp_sid");
          tmp_sid[nstring] = 0;
          cleanup_hdr_buf(tmp_sid, nstring);
          hdr_sid = tmp_sid;
@@ -911,7 +913,7 @@ void write_netcdf_hdr_data() {
    // Check for no messages retained
    if(hdr_cnt <= 0) {
       mlog << Error << method_name << " -> "
-           << "No IODA reocrds retained.  Nothing to write.\n\n";
+           << "No IODA records retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
       exit(1);

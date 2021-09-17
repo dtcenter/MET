@@ -248,35 +248,49 @@ NOTE: Several compilation warnings may occur which are expected. If any errors o
 
 The configure script has command line options to specify where to install MET and which MET utilities to install. Include any of the following options that apply to your system:
 
-**-\\-prefix=PREFIX**
+.. code-block:: none
+		
+  --prefix=PREFIX
 
 By default, MET will install all the files in "*/usr/local/bin*". You can specify an installation prefix other than "*/usr/local*" using "--prefix", for instance "--prefix=$HOME" or "--prefix=`pwd`".
 
-**-\\-enable-grib2**
+.. code-block:: none
+
+  --enable-grib2
 
 Enable compilation of utilities using GRIB2. Requires $MET_GRIB2C.
 
-**-\\-enable-python**
+.. code-block:: none
+
+  --enable-python
 
 Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
 
-**-\\-enable-lidar2nc**
+.. code-block:: none
 
+  --enable-lidar2nc
+  
 Enable compilation of utilities using the LIDAR2NC tool.
 
-**-\\-enable-modis**
+.. code-block:: none
+
+  --enable-modis
 
 Enable compilation of the Modis-Regrid tool. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
 
-**-\\-enable-mode_graphics**
+.. code-block:: none
+		
+  --enable-mode_graphics
 
 Enable compilation of the MODE-Graphics tool. Requires $MET_CAIRO and $MET_FREETYPE.
 
-**-\\-disable-block4**
+.. code-block:: none
+
+  --disable-block4
 
 Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBUFR files.
 
-Run the configure script with the **--help** argument to see the full list of configuration options.
+Run the configure script with the **-help** argument to see the full list of configuration options.
 
 Make Targets
 ~~~~~~~~~~~~

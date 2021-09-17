@@ -766,11 +766,36 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_obs_qty(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_qty() -> ";
+StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
+   StringArray sa;
+   const char *method_name = "parse_conf_obs_qty_inc() -> ";
 
-   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
+   // Check for old "obs_quality" entry
+   sa = dict->lookup_string_array(conf_key_obs_qty, false);
 
+   // Print a warning if the deprecated option was used
+   if(dict->last_lookup_status()) {
+      mlog << Warning << "\nparse_conf_obs_qty_inc() -> "
+           << "Set the \"" << conf_key_obs_qty_inc << "\" value ("
+           << write_css(sa) << ") from the deprecated \""
+           << conf_key_obs_qty << "\" configuration entry.\n"
+           << "Replace \"" << conf_key_obs_qty << "\" with \""
+           << conf_key_obs_qty_inc << "\"!\n\n";
+   }
+   else {
+      sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
+   }
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_obs_qty_exc(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_qty_exc() -> ";
+   
+   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
+   
    return(sa);
 }
 
@@ -2343,8 +2368,9 @@ const char * statlinetype_to_string(const STATLineType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void statlinetype_to_string(const STATLineType t, char *out) {
+   const char *method_name = "statlinetype_to_string() -> ";
 
-   strcpy(out, statlinetype_to_string(t));
+   m_strcpy(out, statlinetype_to_string(t), method_name);
 
    return;
 }

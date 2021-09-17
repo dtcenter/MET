@@ -2283,9 +2283,9 @@ if ( s )  { delete [] s;  s = (char *) 0; }
 
 if ( !text )  return;
 
-s = new char [1 + strlen(text)];
+const char *method_name = "afm set_string()";
 
-strcpy(s, text);
+s = m_strcpy2(text, method_name);
 
 
 return;

@@ -59,7 +59,6 @@ extern ConcatString str_trim(const ConcatString str);
 
 extern int parse_thresh_index(const char *str);
 
-
 ////////////////////////////////////////////////////////////////////////
 
 

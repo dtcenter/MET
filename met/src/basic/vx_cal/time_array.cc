@@ -98,7 +98,7 @@ void TimeArray::init_from_scratch()
 
 {
 
-e = (unixtime*) 0;
+e = (unixtime*) NULL;
 
 clear();
 
@@ -114,7 +114,7 @@ void TimeArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (unixtime *) 0; }
+if ( e )  { delete [] e;  e = (unixtime *) NULL; }
 
 Nelements = Nalloc = 0;
 
@@ -194,7 +194,7 @@ if ( ! exact )  {
 
 }
 
-unixtime * u = (unixtime *) 0;
+unixtime * u = (unixtime *) NULL;
 
 u = new unixtime [n];
 
@@ -219,11 +219,11 @@ if ( e )  {
 
    }
 
-   delete [] e;  e = (unixtime *) 0;
+   delete [] e;  e = (unixtime *) NULL;
 
 }
 
-e = u; u = (unixtime *) 0;
+e = u; u = (unixtime *) NULL;
 
 Nalloc = n;
 

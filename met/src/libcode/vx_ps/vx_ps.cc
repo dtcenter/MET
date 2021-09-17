@@ -1692,6 +1692,8 @@ void base_8_string(int k, char * out)
 
 {
 
+const char *method_name = "base_8_string() -> ";
+
 if ( k < 0 )  k += 256;
 
 char junk[256];
@@ -1710,7 +1712,7 @@ while ( k )  {
 }
 
 
-strcpy(out, junk + pos);
+m_strcpy(out, junk + pos, method_name);
 
 return;
 
@@ -1781,37 +1783,41 @@ if ( j < 0 )  {
 
 AfmCharMetrics & cm = afm.cm[j];
 
-   //
-   //  ligature?
-   //
+if (m_strlen(c) > 1) {
 
-LigatureInfo lig;
+      //
+      //  ligature?
+      //
 
-if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
+   LigatureInfo lig;
 
-   handle_ligature(lig, afm, cur);
+   if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
+   
+      handle_ligature(lig, afm, cur);
 
-   c += 2;
+      c += 2;
 
-   return;
+      return;
 
-}
+   }
 
-   //
-   //  is it the start of a kern pair?
-   //
+      //
+      //  is it the start of a kern pair?
+      //
 
-KPX kp;
+   KPX kp;
 
-if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
+   if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
 
-   cur->add_char(cm);
+      cur->add_char(cm);
 
-   handle_kern_pair(kp, afm, cur);
+      handle_kern_pair(kp, afm, cur);
 
-   ++c;
+      ++c;
 
-   return;
+      return;
+
+   }
 
 }
 

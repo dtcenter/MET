@@ -3036,9 +3036,10 @@ void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dis
 ////////////////////////////////////////////////////////////////////////
 
 int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len + 1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_message_type() ";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(msg_typ_str, " ");
@@ -3050,18 +3051,18 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
    msg_typ_arr = new char * [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, msg_typ_str);
+   m_strncpy(tmp_str, msg_typ_str, max_str_len, method_name);
 
    // Tokenize the string and store the double values
    c = strtok(tmp_str, " ");
-   msg_typ_arr[0] = new char [strlen(c)+1];
-   strcpy(msg_typ_arr[0], c);
+   msg_typ_arr[0] = m_strcpy2(c, method_name, "msg_typ_arr[0]");
 
+   char a_var_name[512+1];
    // Parse remaining tokens
    for(i=1; i<n; i++) {
       c = strtok(0, " ");
-      msg_typ_arr[i] = new char [strlen(c)+1];
-      strcpy(msg_typ_arr[i], c);
+      snprintf(a_var_name, 512, "msg_typ_arr[%d]", i);
+      msg_typ_arr[i] = m_strcpy2(c, method_name, a_var_name);
    }
 
    return(n);
@@ -3070,9 +3071,10 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
 ////////////////////////////////////////////////////////////////////////
 
 int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len+1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_dbl_list()";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(dbl_str, " ");
@@ -3084,7 +3086,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    dbl_arr = new double [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, dbl_str);
+   m_strcpy(tmp_str, dbl_str, method_name);
 
    // Tokenize the string and store the double values
    c = strtok(tmp_str, " ");
@@ -3099,9 +3101,10 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
 ////////////////////////////////////////////////////////////////////////
 
 int parse_int_list(const char *int_str, int *&int_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len+1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_int_list()";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(int_str, " ");
@@ -3113,7 +3116,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    int_arr = new int [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, int_str);
+   m_strcpy(tmp_str, int_str, method_name);
 
    // Tokenize the string and store the integer values
    c = strtok(tmp_str, " ");

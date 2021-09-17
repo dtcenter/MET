@@ -5,12 +5,49 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version 10.1.0-beta1 release notes (|release_date|)
+MET Version 10.1.0-beta2 release notes (|release_date|)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* New output:
+
+   * **Enhance MET to compute the CBS Index** (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
+   * **Enhance Stat-Analysis to write the GO Index and CBS Index into a new SSIDX STAT line type** (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
+   * **Add Scatter Index to the CNT line type** (`#1843 <https://github.com/dtcenter/MET/issues/1843>`_).
+   * **Add ORANK line type to the HiRA output from Point-Stat** (`#1764 <https://github.com/dtcenter/MET/issues/1764>`_).
+   * **Add G and G-Beta to the DMAP line type from Grid-Stat** (`#1673 <https://github.com/dtcenter/MET/issues/1673>`_).
+
+* Configuration:
+
+   * **Make the specification of a binary threshold in Wavelet-Stat optional** (`#1746 <https://github.com/dtcenter/MET/issues/1746>`_).
+   * **Enable TC-Pairs to only write output for a configurable list of valid times** (`#1870 <https://github.com/dtcenter/MET/issues/1870>`_).
+   * Fix broken URLs in default MET config files (`#1864 <https://github.com/dtcenter/MET/issues/1864>`_).
+
+* Bugfixes:
+
+   * **Fix the findings from SonarQube** (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
+   * Fix integer overflow in Grid-Diag (`#1886 <https://github.com/dtcenter/MET/issues/1886>`_).
+   * Fix Gen-Vx-Mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
+   * Enable Point2Grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
+   * Fix the output of Point2Grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
+   * Fix failure of Ensemble-Stat when verifying against gridded ECMWF GRIB1 files (`#1879 <https://github.com/dtcenter/MET/issues/1879>`_).
+   * Fix consumption of too much memory by Stat-Analysis (`#1875 <https://github.com/dtcenter/MET/issues/1875>`_).
+   * Add check for the start offset and data count are valid before calling NetCDF API (`#1852 <https://github.com/dtcenter/MET/issues/1852>`_).
+   * Fix failure in plot_tcmpr.R script when a directory is passed in with -lookin (`#1872 <https://github.com/dtcenter/MET/issues/1872>`_).
+
+* Documentation:
+
+   * **Create and publish a PDF of the MET User's Guide** (`#1453 <https://github.com/dtcenter/MET/issues/1453>`_).
+   * Document the statistics from the RPS line type in Appendix C (`#1853 <https://github.com/dtcenter/MET/issues/1853>`_).
+   * Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
+   * Update documentation to reference GitHub Discussions instead of MET Help (`#1833 <https://github.com/dtcenter/MET/issues/1833>`_).
+   * Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).
+
+MET Version 10.1.0-beta1 release notes (20210613)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Add the HSS_EC statistic to the MCTS line type and a configurable option for its computation (`#1749 <http://github.com/dtcenter/MET/issues/1749>`_).
 * Implement a common API for reading and writing the common NetCDF point observation file format (`#1402 <http://github.com/dtcenter/MET/issues/1402>`_ and `#1581 <http://github.com/dtcenter/MET/issues/1581>`_).
-* Change -type for gen_vx_mask from an optional argument to a required one (`#1792 <http://github.com/dtcenter/MET/issues/1792>`_).
+* Change -type for Gen-Vx-Mask from an optional argument to a required one (`#1792 <http://github.com/dtcenter/MET/issues/1792>`_).
 * Fix python embedding when using a named grid with MET_PYTHON_EXE set (`#1798 <http://github.com/dtcenter/MET/issues/1798>`_).
 * Fix Fortify High finding for src/libcode/vx_data2d_nccf/nccf_file.cc (`#1795 <http://github.com/dtcenter/MET/issues/1795>`_).
 * Modify plot_tcmpr.R script to support plotting of extra-tropical cyclone tracks not verified against BEST tracks (`#1801 <http://github.com/dtcenter/MET/issues/1801>`_).
@@ -31,7 +68,7 @@ MET Version 10.0.0 release notes (20210510)
    * Run the nightly build as the shared met_test user (`#1116 <http://github.com/dtcenter/MET/issues/1116>`_).
    * Correct the time offset for tests in unit_plot_data_plane.xml (`#1677 <http://github.com/dtcenter/MET/issues/1677>`_).
    * Enhance the sample plotting R-script to read output from different versions of MET (`#1653 <http://github.com/dtcenter/MET/issues/1653>`_).
-   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1788 <http://github.com/dtcenter/MET/issues/1788>`_).
+   * Update the default configuration options to compile the development code with the debug (-g) option and the production code without it (`#1778 <http://github.com/dtcenter/MET/issues/1778>`_).
    * Update MET to compile using GCC version 10 (`#1552 <https://github.com/dtcenter/MET/issues/1552>`_).
    * Update MET to compile using PGI version 20 (`#1317 <https://github.com/dtcenter/MET/issues/1317>`_).
      
@@ -122,7 +159,7 @@ MET Version 10.0.0 release notes (20210510)
       * **Support additional NetCDF point observation data sources** (`#1345 <http://github.com/dtcenter/MET/issues/1345>`_, `#1509 <http://github.com/dtcenter/MET/issues/1509>`_, and `#1511 <http://github.com/dtcenter/MET/issues/1511>`_).
       * Support the 2-dimensional time variable in Himawari data files (`#1580 <http://github.com/dtcenter/MET/issues/1580>`_).
       * Create empty output files for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
-      * Improve the point2grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
+      * Improve the Point2Grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
       * Process point observations by variable name instead of GRIB code (`#1408 <http://github.com/dtcenter/MET/issues/1408>`_).
 
    * GIS Tools:
