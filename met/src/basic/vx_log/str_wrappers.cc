@@ -86,6 +86,14 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
       if (str_len > buf_len) str_len = buf_len;
 
       memset(to_str, 0, str_len);
+      // Kludge: there were cases that sizeof returns 8 instead of the real size.
+      // Use sizeof only if it's not 8.
+      int to_buf_size = sizeof(to_str);
+      if (to_buf_size != 8) {
+         if (str_len < to_buf_size) memset(to_str, str_len, to_buf_size);
+         if (str_len > to_buf_size) str_len = to_buf_size;  // truncate
+      }
+
       string temp_str = from_str;
       temp_str.copy(to_str, str_len);
       to_str[str_len] = 0;
@@ -99,4 +107,25 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
 
 }
 
+////////////////////////////////////////////////////////////////////////
 
+void m_rstrip(char *str_buf, int buf_len) {
+   // Make sure it's NULL terminated
+   if (buf_len >= 0) str_buf[buf_len] = '\0';
+   // Change the trailing blank space to a null
+   int str_len = m_strlen(str_buf);
+   for(int idx=str_len-1; idx>=0; idx--) {
+      if(is_whitespaces(str_buf[idx])) {
+         str_buf[idx] = '\0';
+         if((idx > 0) && !is_whitespaces(str_buf[idx-1])) break;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_whitespaces(char cur_char) {
+   return (' ' == cur_char || '\t' == cur_char || '\n' == cur_char || '\r' == cur_char);
+}
+
+////////////////////////////////////////////////////////////////////////
