@@ -243,7 +243,7 @@ if ( has_var(Nc, times_var_name) ) {
    for (j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
       get_string_val(&v, j, str_len, tmp_time_str);
-      m_strncpy ( time_str, tmp_time_str.c_str(), str_len, method_name );
+      m_strncpy( time_str, tmp_time_str.c_str(), str_len, method_name, "time_str", true);
       time_str[str_len] = '\0';
 
       // Check for leading blank
