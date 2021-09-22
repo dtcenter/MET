@@ -17,11 +17,6 @@ model = "WRF";
 //
 desc = "NA";
 
-//
-// Output observation type to be written
-//
-obtype = "ANALYS";
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -47,7 +42,7 @@ cat_thresh    = [];
 nc_var_str    = "";
 
 //
-// Ensemble product fields to be processed
+// Ensemble fields to be processed
 //
 ens = {
    ens_thresh = 1.0;
@@ -92,75 +87,6 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Forecast and observation fields to be verified
-//
-fcst = {
-   field = [
-      {
-         name  = "APCP";
-         level = [ "A03" ];
-      }
-   ];
-}
-obs = fcst;
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Point observation filtering options
-// May be set separately in each "obs.field" entry
-//
-message_type   = [ "ADPUPA" ];
-sid_inc        = [];
-sid_exc        = [];
-obs_thresh     = [ NA ];
-obs_quality    = [];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
-skip_const     = FALSE;
-
-//
-// Observation error options
-// Set dist_type to NONE to use the observation error table instead
-// May be set separately in each "obs.field" entry
-//
-obs_error = {
-   flag             = FALSE;   // TRUE or FALSE
-   dist_type        = NONE;    // Distribution type
-   dist_parm        = [];      // Distribution parameters
-   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
-   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
-   min              = NA;      // Valid range of data
-   max              = NA;
-}
-
-//
-// Mapping of message type group name to comma-separated list of values
-//
-message_type_group_map = [
-   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
-   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
-   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
-];
-
-//
-// Ensemble bin sizes
-// May be set separately in each "obs.field" entry
-//
-ens_ssvar_bin_size = 1.0;
-ens_phist_bin_size = 0.05;
-
-//
-// Categorical thresholds to define ensemble probabilities
-// May be set separately in each "fcst.field" entry
-//
-prob_cat_thresh = [];
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
 // Climatology data
 //
 climo_mean = {
@@ -185,80 +111,11 @@ climo_stdev = {
    file_name = [];
 }
 
-//
-// May be set separately in each "obs.field" entry
-//
-climo_cdf = {
-   cdf_bins    = 10;
-   center_bins = FALSE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Point observation time window
-//
-obs_window = {
-   beg = -5400;
-   end =  5400;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Verification masking regions
-//
-mask = {
-   grid  = [ "FULL" ];
-   poly  = [];
-   sid   = [];
-   llpnt = [];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Confidence interval settings
-//
-ci_alpha  = [ 0.05 ];
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Interpolation methods
-//
-interp = {
-   field      = BOTH;
-   vld_thresh = 1.0;
-   shape  = SQUARE;
-
-   type = [
-      {
-         method = NEAREST;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Statistical output types
-//
-output_flag = {
-   ecnt  = NONE;
-   rps   = NONE;
-   rhist = NONE;
-   phist = NONE;
-   orank = NONE;
-   ssvar = NONE;
-   relp  = NONE;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Ensemble product output types
+// May be set separately in each "ens.field" entry
 //
 ensemble_flag = {
    latlon    = TRUE;
@@ -273,8 +130,6 @@ ensemble_flag = {
    frequency = TRUE;
    nep       = FALSE;
    nmep      = FALSE;
-   rank      = TRUE;
-   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +144,6 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-grid_weight_flag = NONE;
-output_prefix    = "";
-version          = "V10.1.0";
+version = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
