@@ -6,7 +6,7 @@ Gen-Ens-Prod Tool
 Introduction
 ____________
 
-The Gen-Ens-Prod tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. Climatological mean and standard deviation data may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in :numref:`Appendix C, Section %s <App_C-ensemble>`.
+The Gen-Ens-Prod tool may be run to derive simple ensemble products (mean, spread, probability, etc) from a set of several forecast model files. It processes ensemble member inputs, but it does not compare them to observations or compute statistics. However, the output products can be passed as input to the MET statistics tools for comparison against observations. Climatological mean and standard deviation data may also be provided to define thresholds based on the climatological distribution at each grid point.
 
 Scientific and statistical aspects
 __________________________________
@@ -22,39 +22,15 @@ The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble pr
 
 The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
-Ensemble statistics
-~~~~~~~~~~~~~~~~~~~
-
-Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (:ref:`Hamill, 2001 <Hamill-2001>`). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
-
-Often, the goal of ensemble forecasting is to reproduce the distribution of observations using a set of many forecasts. In other words, the ensemble members represent the set of all possible outcomes. When this is true, the spread of the ensemble is identical to the error in the mean forecast. Though this rarely occurs in practice, the spread / skill relationship is still typically assessed for ensemble forecasts (:ref:`Barker, 1991 <Barker-1991>`; :ref:`Buizza,1997 <Buizza-1997>`). MET calculates the spread and skill in user defined categories according to :ref:`Eckel et al. (2012) <Eckel-2012>`.
-
-The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
-
-The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
-
 Climatology data
 ~~~~~~~~~~~~~~~~
 
-The Gen-Ens-Prod output includes at least three statistics computed relative to external climatology data. The climatology is defined by mean and standard deviation fields, and typically both are required in the computation of ensemble skill score statistics. MET assumes that the climatology follows a normal distribution, defined by the mean and standard deviation at each point.
-
-When computing the CRPS skill score for (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) the reference CRPS statistic is computed using the climatological mean and standard deviation directly. When computing the CRPS skill score for (:ref:`Hersbach, 2000 <Hersbach-2000>`) the reference CRPS statistic is computed by selecting equal-area-spaced values from the assumed normal climatological distribution. The number of points selected is determined by the *cdf_bins* setting in the *climo_cdf* dictionary. The reference CRPS is computed empirically from this ensemble of climatology values. If the number bins is set to 1, the climatological CRPS is computed using only the climatological mean value. In this way, the empirical CRPSS may be computed relative to a single model rather than a climatological distribution.
-
-The climatological distribution is also used for the RPSS. The forecast RPS statistic is computed from a probabilistic contingency table in which the probabilities are derived from the ensemble member values. In a simliar fashion, the climatogical probability for each observed value is derived from the climatological distribution. The area of the distribution to the left of the observed value is interpreted as the climatological probability. These climatological probabilities are also evaluated using a probabilistic contingency table from which the reference RPS score is computed. The skill scores are derived by comparing the forecast statistic to the reference climatology statistic.
-
-Ensemble observation error
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>`. can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
-
-Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
-
-Observation errors differ according to instrument, temporal and spatial representation, and variable type. Unfortunately, many observation errors have not been examined or documented in the literature. Those that have usually lack information regarding their distributions and approximate parameters. Instead, a range or typical value of observation error is often reported and these are often used as an estimate of the standard deviation of some distribution. Where possible, it is recommended to use the appropriate type and size of perturbation for the observation to prevent spurious results.
+The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g. >0) or can be defined relative to the climatological distribution at each grid point (e.g. >CDP90, for exceeding the 90-th percentile of climatology). When using climatological distribution percentile (CDP) thresholds, the climatological mean and standard deviation must be provided in the configuration file.
 
 Practical Information
 _____________________
 
-This section contains information about configuring and running the Gen-Ens-Prod tool. The Gen-Ens-Prod tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology data files must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`.
+This section contains information about configuring and running the Gen-Ens-Prod tool. The Gen-Ens-Prod tool writes a NetCDF output file containing the requested ensemble product fields for each input field specified. If provided, the climatology data files must be gridded. All input gridded model and climatology datasets must be on the same grid. However, users may leverage the automated regridding feature in MET if the desired output grid is specified in the configuration file.
 
 gen_ens_prod usage
 ~~~~~~~~~~~~~~~~~~~
@@ -64,69 +40,52 @@ The usage statement for the Ensemble Stat tool is shown below:
 .. code-block:: none
 
   Usage: gen_ens_prod
-         n_ens ens_file_1 ... ens_file_n | ens_file_list
-         config_file
-         [-grid_obs file]
-         [-point_obs file]
-         [-ens_mean file]
-         [-obs_valid_beg time]
-         [-obs_valid_end time]
-         [-outdir path]
+         -ens file_1 ... file_n | ens_file_list
+         -out file
+         -config file
+         [-ctrl file]
          [-log file]
          [-v level]
-         [-compress level]
 
 gen_ens_prod has three required arguments and accepts several optional ones.
 
 Required arguments gen_ens_prod
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **n_ens ens_file_1 ... ens_file_n** is the number of ensemble members followed by a list of ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
+1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
 
-2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
+2. The **ens_file_list** option is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
 
-3. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
+3. The **-out file** option specifies the NetCDF output file name to be written.
+
+4. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
 
 Optional arguments for gen_ens_prod
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. To produce ensemble statistics using gridded observations, use the **-grid_obs file** option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
+4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread.
 
+5. The **-log** file outputs log messages to the specified file.
 
-5. To produce ensemble statistics using point observations, use the **-point_obs file** to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files.
-
-
-6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** from earlier versions of MET.
-
-7. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
-
-8. As above, use **-obs_valid_end time** in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation time window.
-
-9. Specify the **-outdir path** option to override the default output directory (./).
-
-10. The **-log** file outputs log messages to the specified file.
-
-11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
-
-12. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the gen_ens_prod calling sequence is shown below:
 
 .. code-block:: none
 
      gen_ens_prod \
-     6 sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
-     config/EnsembleStatConfig \
-     -grid_obs sample_obs/ST4/ST4.2010010112.24h \
-     -point_obs out/ascii2nc/precip24_2010010112.nc \
-     -outdir out/gen_ens_prod -v 2
+     -ens sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+     -out out/gen_ens_prod/config/EnsembleStatConfig \
+     -config config/GenEnsProdConfig -v 2
 
-In this example, the Gen-Ens-Prod tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
+In this example, the Gen-Ens-Prod tool will derive products from input ensemble members listed on the command line.
 
 gen_ens_prod configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Gen-Ens-Prod tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
+TODO: Continue review and edits here!
+
+The default configuration file for the Gen-Ens-Prod tool named **GenEnsProdConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
