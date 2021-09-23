@@ -70,8 +70,7 @@ static const char * default_config_filename =
 static StringArray        ens_files;
 static IntArray           ens_file_vld;
 static GrdFileType        etype = FileType_None;
-static int                n_ens;     // Number of members
-static IntArray           n_ens_vld; // Number of members with valid data for each field
+static int                n_ens;
 static GenEnsProdConfInfo conf_info;
 static ConcatString       config_file;
 static ConcatString       out_file;

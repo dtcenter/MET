@@ -241,11 +241,6 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
       }
    } // end for i
 
-// JHG work here to parse the climo_mean and climo_stdev info!
-/*
-      // Check climatology fields
-      check_climo_n_vx(&conf, n_vx);
-*/
    return;
 }
 

@@ -78,7 +78,7 @@ class GenEnsProdConfInfo {
       ConcatString         model;           // Model name
       ConcatString         desc;            // Description
 
-      vector<VarInfo *>    ens_info;        // Array of var info pointers (allocated)
+      vector<VarInfo *>    ens_info;        // Array of VarInfo pointers (allocated)
       vector<ClimoCDFInfo> cdf_info;        // Array of climo CDF info objects
       vector<ThreshArray>  ens_cat_ta;      // Array for ensemble categorical thresholds
       StringArray          ens_var_str;     // Array of ensemble variable name strings
