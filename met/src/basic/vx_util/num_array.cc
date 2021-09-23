@@ -192,31 +192,13 @@ void NumArray::extend(int len, bool exact)
       
    }
 
-   /*
-   double * u = (double *) 0;
-
-   u = new double [len];
-
-   if ( !u )  {
-
-      mlog << Error << "\nvoid NumArray::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-
-      exit ( 1 );
-
-   }
-   */
-
-
    vector<double> u;
    u.reserve(len);
    
    int j;
 
-   //memset(u, 0, len*sizeof(double));
    fill(u.begin(), u.end(), 0);
 
-   //if ( e )  {
    if ( e.size() > 0 )  {
 
       for (j=0; j<Nelements; ++j)  {
@@ -225,17 +207,14 @@ void NumArray::extend(int len, bool exact)
 
       }
 
-      //delete [] e;  e = (double *) 0;
       e.clear();
       
    }
 
    e = u;
-   //u = (double *) 0;
    u.clear();
    
    Nalloc = len;
-
 
    return;
 
