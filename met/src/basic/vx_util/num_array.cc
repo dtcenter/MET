@@ -96,11 +96,8 @@ NumArray & NumArray::operator=(const NumArray & a)
 void NumArray::init_from_scratch()
 
 {
-
-   e = (double *) 0;
-
-   clear();
-
+   e.clear();
+   
    return;
 
 }
@@ -112,9 +109,10 @@ void NumArray::init_from_scratch()
 void NumArray::clear()
 
 {
-
-   if ( e )  { delete [] e;  e = (double *) 0; }
-
+   if ( e.size() >0 ) {
+      e.clear();
+   }
+   
    Nelements = Nalloc = 0;
 
    Sorted = false;
@@ -564,8 +562,10 @@ void NumArray::sort_array()
 
 {
 
-   if(!Sorted) sort(e, Nelements);
-
+   if(!Sorted) {
+      sort(e.begin(), e.end());
+   }
+   
    Sorted = true;
 
    return;
@@ -697,8 +697,9 @@ double NumArray::percentile_array(double t)
    //
    if ( !Sorted ) sort_array();
 
-   v = percentile(e, Nelements, t);
-
+   //v = percentile(e, Nelements, t);
+   v = percentile(e.data(), Nelements, t);
+   
    return ( v );
 
 }
