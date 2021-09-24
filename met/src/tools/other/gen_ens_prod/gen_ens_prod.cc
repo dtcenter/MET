@@ -52,10 +52,10 @@ static void process_ensemble();
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
-static void track_counts(int, const DataPlane &,
+static void track_counts(int, const DataPlane &, bool,
                          const DataPlane &, const DataPlane &);
 
-static void setup_nc_file(unixtime, const char *);
+static void setup_nc_file();
 static void write_ens_nc(int, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
 static void write_ens_var_float(int, float *, const DataPlane &,
@@ -197,12 +197,16 @@ void process_command_line(int argc, char **argv) {
       mlog << "   " << ens_files[i]  << "\n";
    }
 
+   // List the control member file
+   mlog << Debug(1) << "Ensemble Control: "
+        << (ctrl_file.empty() ? "NONE" : ctrl_file.c_str()) << "\n";
+
    // Check for missing non-python ensemble files
    for(i=0; i<ens_files.n(); i++) {
       if(!file_exists(ens_files[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
          mlog << Warning << "\nprocess_command_line() -> "
-              << "can't open input ensemble file: "
+              << "cannot open input ensemble file: "
               << ens_files[i] << "\n\n";
          ens_file_vld.add(0);
       }
@@ -260,6 +264,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       // Setup the verification grid, if necessary
       if(nxy == 0) process_grid(mtddf->grid());
 
+      // Create the output file, if necessary
+      if(nc_out == (NcFile *) 0) setup_nc_file();
+
       // Regrid, if requested and necessary
       if(!(mtddf->grid() == grid)) {
          mlog << Debug(1)
@@ -294,7 +301,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 void process_ensemble() {
    int i_var, i_file, n_ens_vld;
    bool need_reset;
-   DataPlane ens_dp, cmn_dp, csd_dp;
+   DataPlane ens_dp, ctrl_dp, cmn_dp, csd_dp;
    unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
@@ -304,8 +311,11 @@ void process_ensemble() {
            << "Processing ensemble field: "
            << conf_info.ens_info[i_var]->magic_str() << "\n";
 
-      // Loop through each of the input forecast files
-      for(i_file=0, n_ens_vld=0, need_reset=true; i_file<ens_files.n(); i_file++) {
+      // Need to reinitialize counts and sums for each ensemble field
+      need_reset = true;
+
+      // Loop through the ensemble member files
+      for(i_file=0, n_ens_vld=0; i_file<ens_files.n(); i_file++) {
 
          // Skip bad data files
          if(!ens_file_vld[i_file]) continue;
@@ -316,14 +326,10 @@ void process_ensemble() {
             mlog << Warning << "\nprocess_ensemble() -> "
                  << "ensemble field \"" << conf_info.ens_info[i_var]->magic_str()
                  << "\" not found in file \"" << ens_files[i_file] << "\"\n\n";
+            continue;
          }
          else {
             n_ens_vld++;
-         }
-
-         // Create a NetCDF file to store the ensemble output
-         if(nc_out == (NcFile *) 0) {
-            setup_nc_file(ens_dp.valid(), "_ens.nc");
          }
 
          // Reinitialize for the current variable
@@ -334,7 +340,25 @@ void process_ensemble() {
             // Reset the running sums and counts
             clear_counts();
 
-            // Read climatology data for this variable
+            // Read ensemble control member data, if provided
+            if(ctrl_file.nonempty()) {
+
+               // Error out if missing
+               if(!get_data_plane(ctrl_file.c_str(), etype,
+                                  conf_info.ens_info[i_var], ctrl_dp)) {
+                  mlog << Error << "\nprocess_ensemble() -> "
+                       << "control member ensemble field \""
+                       << conf_info.ens_info[i_var]->magic_str()
+                       << "\" not found in file \"" << ctrl_file << "\"\n\n";
+                  exit(1);
+               }
+
+               // Apply current data to the running sums and counts
+               track_counts(i_var, ctrl_dp, true, cmn_dp, csd_dp);
+
+            } // end if ctrl_file
+
+            // Read climatology data for this field
             cmn_dp = read_climo_data_plane(
                         conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                         i_var, ens_valid_ut, grid);
@@ -344,14 +368,16 @@ void process_ensemble() {
                         i_var, ens_valid_ut, grid);
 
             mlog << Debug(3)
-                 << "Found " << (cmn_dp.is_empty() ? 0 : 1)
-                 << " climatology mean field(s) and " << (csd_dp.is_empty() ? 0 : 1)
+                 << "Found " << (ctrl_dp.is_empty() ? 0 : 1)
+                 << " control member, " << (cmn_dp.is_empty() ? 0 : 1)
+                 << " climatology mean, and " << (csd_dp.is_empty() ? 0 : 1)
                  << " climatology standard deviation field(s) for \""
                  << conf_info.ens_info[i_var]->magic_str() << "\".\n";
-         }
+
+         } // end if need_reset
 
          // Apply current data to the running sums and counts
-         track_counts(i_var, ens_dp, cmn_dp, csd_dp);
+         track_counts(i_var, ens_dp, false, cmn_dp, csd_dp);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
@@ -383,46 +409,18 @@ void process_ensemble() {
 ////////////////////////////////////////////////////////////////////////
 
 void clear_counts() {
-   int i, j, k;
+   int i, j;
 
-   // Allocate memory in one big chunk based on grid size, if needed
-   cnt_na.extend(nxy);
-   min_na.extend(nxy);
-   max_na.extend(nxy);
-   sum_na.extend(nxy);
-   ssq_na.extend(nxy);
+   cnt_na.set_const(0.0, nxy);
+   min_na.set_const(bad_data_double, nxy);
+   max_na.set_const(bad_data_double, nxy);
+   sum_na.set_const(0.0, nxy);
+   ssq_na.set_const(0.0, nxy);
+   stdev_cnt_na.set_const(0.0, nxy);
    for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
-      thresh_cnt_na[i].extend(nxy);
+      thresh_cnt_na[i].set_const(0.0, nxy);
       for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-         thresh_nbrhd_cnt_na[i][j].extend(nxy);
-      }
-   }
-
-   // Erase existing values
-   cnt_na.erase();
-   min_na.erase();
-   max_na.erase();
-   sum_na.erase();
-   ssq_na.erase();
-   for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
-      thresh_cnt_na[i].erase();
-      for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-         thresh_nbrhd_cnt_na[i][j].erase();
-      }
-   }
-
-   // Initialize arrays
-   for(i=0; i<nxy; i++) {
-      cnt_na.add(0);
-      min_na.add(bad_data_double);
-      max_na.add(bad_data_double);
-      sum_na.add(0.0);
-      ssq_na.add(0.0);
-      for(j=0; j<conf_info.get_max_n_cat_ta(); j++) {
-         thresh_cnt_na[j].add(0);
-         for(k=0; k<conf_info.get_n_nbrhd(); k++) {
-            thresh_nbrhd_cnt_na[j][k].add(0);
-         }
+         thresh_nbrhd_cnt_na[i][j].set_const(0.0, nxy);
       }
    }
 
@@ -431,23 +429,10 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(int i_var,
-                  const DataPlane &ens_dp,
-                  const DataPlane &cmn_dp,
-                  const DataPlane &csd_dp) {
+void track_counts(int i_var, const DataPlane &ens_dp, bool is_ctrl,
+                  const DataPlane &cmn_dp, const DataPlane &csd_dp) {
    int i, j, k;
    double ens, cmn, csd;
-
-   // Pointers to data buffers for faster access
-   const double *ens_data = ens_dp.data();
-   const double *cmn_data = (cmn_dp.is_empty() ? (double *) 0 : cmn_dp.data());
-   const double *csd_data = (csd_dp.is_empty() ? (double *) 0 : csd_dp.data());
-
-   double *cnt_buf = cnt_na.buf();
-   double *min_buf = min_na.buf();
-   double *max_buf = max_na.buf();
-   double *sum_buf = sum_na.buf();
-   double *ssq_buf = ssq_na.buf();
 
    // Ensemble thresholds
    const int n_thr = conf_info.ens_cat_ta[i_var].n();
@@ -457,9 +442,9 @@ void track_counts(int i_var,
    for(i=0; i<nxy; i++) {
 
       // Get current values
-      ens = *ens_data++;
-      cmn = (cmn_data ? *cmn_data++ : bad_data_double);
-      csd = (csd_data ? *csd_data++ : bad_data_double);
+      ens = ens_dp.data()[i];
+      cmn = (cmn_dp.is_empty() ? bad_data_double : cmn_dp.data()[i]);
+      csd = (csd_dp.is_empty() ? bad_data_double : csd_dp.data()[i]);
 
       // Skip bad data values
       if(is_bad_data(ens)) continue;
@@ -468,15 +453,18 @@ void track_counts(int i_var,
       else {
 
          // Valid data count
-         cnt_buf[i] += 1;
+         cnt_na.buf()[i] += 1;
 
          // Ensemble min and max
-         if(ens <= min_buf[i] || is_bad_data(min_buf[i])) min_buf[i] = ens;
-         if(ens >= max_buf[i] || is_bad_data(max_buf[i])) max_buf[i] = ens;
+         if(ens <= min_na.buf()[i] || is_bad_data(min_na.buf()[i])) min_na.buf()[i] = ens;
+         if(ens >= max_na.buf()[i] || is_bad_data(max_na.buf()[i])) max_na.buf()[i] = ens;
 
-         // Sum and sum of squares
-         sum_buf[i] += ens;
-         ssq_buf[i] += ens*ens;
+         // Standard deviation sum, sum of squares, and count, excluding control member
+         if(!is_ctrl) {
+            sum_na.buf()[i]       += ens;
+            ssq_na.buf()[i]       += ens*ens;
+            stdev_cnt_na.buf()[i] += 1;
+         }
 
          // Event frequency
          for(j=0; j<n_thr; j++) {
@@ -515,7 +503,7 @@ void track_counts(int i_var,
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(unixtime valid_ut, const char *suffix) {
+void setup_nc_file() {
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -590,14 +578,13 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
          // Compute ensemble summary
          ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
-         ens_stdev[i] = (float) compute_stdev(sum_na[i], ssq_na[i], ens_vld[i]);
+         ens_stdev[i] = (float) compute_stdev(sum_na[i], ssq_na[i], nint(stdev_cnt_na[i]));
          ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
          ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
          ens_min[i]   = (float) min_na[i];
          ens_max[i]   = (float) max_na[i];
          ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
-                         0.0 :
-                         (float) max_na[i] - min_na[i]);
+                         0.0 : (float) max_na[i] - min_na[i]);
       }
    } // end for i
 
