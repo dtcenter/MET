@@ -343,8 +343,8 @@ void NumArray::add(double d)
 
    extend(Nelements + 1, false);
 
-   e[Nelements++] = d;
-
+   e.push_back(d);
+   
    Sorted = false;
 
    return;
@@ -365,7 +365,7 @@ void NumArray::add(const NumArray & a)
 
    for (j=0; j<(a.Nelements); ++j)  {
 
-      e[Nelements++] = a.e[j];
+      e.push_back(a.e[j]);
 
    }
 
@@ -389,7 +389,7 @@ void NumArray::add_const(double v, int n)
 
    for (j=0; j<n; ++j)  {
 
-      e[Nelements++] = v;
+      e.push_back(v);
 
    }
 
@@ -413,7 +413,7 @@ void NumArray::add_seq(int beg, int end)
 
    for (j=beg; j<=end; ++j)  {
 
-      e[Nelements++] = j;
+      e.push_back(j);
 
    }
 
