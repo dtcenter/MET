@@ -105,9 +105,9 @@ static int nxy = 0;
 static Met2dDataFileFactory mtddf_factory;
 
 // Arrays to store running sums and counts
-static NumArray count_na, min_na, max_na, sum_na, sum_sq_na;
-static NumArray *thresh_count_na = (NumArray *) 0; // [n_thresh]
-static NumArray **thresh_nbrhd_count_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
+static NumArray cnt_na, min_na, max_na, sum_na, ssq_na;
+static NumArray *thresh_cnt_na = (NumArray *) 0; // [n_thresh]
+static NumArray **thresh_nbrhd_cnt_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 
