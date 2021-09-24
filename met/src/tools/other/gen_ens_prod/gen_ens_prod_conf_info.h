@@ -39,13 +39,14 @@ struct GenEnsProdNcOutInfo {
    bool do_freq;
    bool do_nep;
    bool do_nmep;
+   bool do_climo;
+   bool do_climo_cdp;
 
    GenEnsProdNcOutInfo();
 
    void clear();
 
    bool all_false() const;
-   bool need_cat_thresh() const;
 
    void set_all_false();
    void set_all_true();

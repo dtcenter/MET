@@ -279,18 +279,20 @@ GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
       // Parse the various entries
       Dictionary * d = e->dict_value();
 
-      cur.do_latlon = d->lookup_bool(conf_key_latlon_flag);
-      cur.do_mean   = d->lookup_bool(conf_key_mean_flag);
-      cur.do_stdev  = d->lookup_bool(conf_key_stdev_flag);
-      cur.do_minus  = d->lookup_bool(conf_key_minus_flag);
-      cur.do_plus   = d->lookup_bool(conf_key_plus_flag);
-      cur.do_min    = d->lookup_bool(conf_key_min_flag);
-      cur.do_max    = d->lookup_bool(conf_key_max_flag);
-      cur.do_range  = d->lookup_bool(conf_key_range_flag);
-      cur.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
-      cur.do_freq   = d->lookup_bool(conf_key_frequency_flag);
-      cur.do_nep    = d->lookup_bool(conf_key_nep_flag);
-      cur.do_nmep   = d->lookup_bool(conf_key_nmep_flag);
+      cur.do_latlon    = d->lookup_bool(conf_key_latlon_flag);
+      cur.do_mean      = d->lookup_bool(conf_key_mean_flag);
+      cur.do_stdev     = d->lookup_bool(conf_key_stdev_flag);
+      cur.do_minus     = d->lookup_bool(conf_key_minus_flag);
+      cur.do_plus      = d->lookup_bool(conf_key_plus_flag);
+      cur.do_min       = d->lookup_bool(conf_key_min_flag);
+      cur.do_max       = d->lookup_bool(conf_key_max_flag);
+      cur.do_range     = d->lookup_bool(conf_key_range_flag);
+      cur.do_vld       = d->lookup_bool(conf_key_vld_count_flag);
+      cur.do_freq      = d->lookup_bool(conf_key_frequency_flag);
+      cur.do_nep       = d->lookup_bool(conf_key_nep_flag);
+      cur.do_nmep      = d->lookup_bool(conf_key_nmep_flag);
+      cur.do_climo     = d->lookup_bool(conf_key_climo_flag);
+      cur.do_climo_cdp = d->lookup_bool(conf_key_climo_cdp_flag);
    }
 
    return(cur);
@@ -321,33 +323,30 @@ bool GenEnsProdNcOutInfo::all_false() const {
 
    bool status = do_latlon || do_mean || do_stdev || do_minus ||
                  do_plus   || do_min  || do_max   || do_range ||
-                 do_vld    || do_freq || do_nep   || do_nmep;
+                 do_vld    || do_freq || do_nep   || do_nmep  ||
+                 do_climo  || do_climo_cdp;
 
    return(!status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenEnsProdNcOutInfo::need_cat_thresh() const {
-   return(do_freq || do_nep || do_nmep);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void GenEnsProdNcOutInfo::set_all_false() {
 
-   do_latlon = false;
-   do_mean   = false;
-   do_stdev  = false;
-   do_minus  = false;
-   do_plus   = false;
-   do_min    = false;
-   do_max    = false;
-   do_range  = false;
-   do_vld    = false;
-   do_freq   = false;
-   do_nep    = false;
-   do_nmep   = false;
+   do_latlon    = false;
+   do_mean      = false;
+   do_stdev     = false;
+   do_minus     = false;
+   do_plus      = false;
+   do_min       = false;
+   do_max       = false;
+   do_range     = false;
+   do_vld       = false;
+   do_freq      = false;
+   do_nep       = false;
+   do_nmep      = false;
+   do_climo     = false;
+   do_climo_cdp = false;
 
    return;
 }
@@ -356,18 +355,20 @@ void GenEnsProdNcOutInfo::set_all_false() {
 
 void GenEnsProdNcOutInfo::set_all_true() {
 
-   do_latlon = true;
-   do_mean   = true;
-   do_stdev  = true;
-   do_minus  = true;
-   do_plus   = true;
-   do_min    = true;
-   do_max    = true;
-   do_range  = true;
-   do_vld    = true;
-   do_freq   = true;
-   do_nep    = true;
-   do_nmep   = true;
+   do_latlon    = true;
+   do_mean      = true;
+   do_stdev     = true;
+   do_minus     = true;
+   do_plus      = true;
+   do_min       = true;
+   do_max       = true;
+   do_range     = true;
+   do_vld       = true;
+   do_freq      = true;
+   do_nep       = true;
+   do_nmep      = true;
+   do_climo     = true;
+   do_climo_cdp = true;
 
    return;
 }

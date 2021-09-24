@@ -130,6 +130,8 @@ ensemble_flag = {
    frequency = TRUE;
    nep       = FALSE;
    nmep      = FALSE;
+   climo     = FALSE;
+   climo_cdp = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
