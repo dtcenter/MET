@@ -1393,6 +1393,7 @@ void process_scores() {
                         fractional_coverage(fcst_dp, fcst_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             conf_info.vx_opt[i].fcat_ta[k],
+                                            &cmn_dp, &csd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field
@@ -1431,6 +1432,7 @@ void process_scores() {
                         fractional_coverage(obs_dp, obs_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             conf_info.vx_opt[i].ocat_ta[k],
+                                            &cmn_dp, &csd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field

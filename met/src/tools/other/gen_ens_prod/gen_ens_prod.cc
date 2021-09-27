@@ -487,7 +487,8 @@ void track_counts(int i_var, const DataPlane &ens_dp, bool is_ctrl,
             fractional_coverage(ens_dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
-               thr_buf[i], conf_info.nbrhd_prob.vld_thresh);
+               thr_buf[i], &cmn_dp, &csd_dp,
+               conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
             for(k=0; k<nxy; k++) {

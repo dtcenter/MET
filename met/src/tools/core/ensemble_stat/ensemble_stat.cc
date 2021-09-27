@@ -2058,7 +2058,8 @@ void track_counts(int i_vx, const DataPlane &dp) {
             fractional_coverage(dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
-               ThreshBuf[i], conf_info.nbrhd_prob.vld_thresh);
+               ThreshBuf[i], (const DataPlane *) 0, (const DataPlane *) 0,
+               conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
             const double *Frac = frac_dp.data();
