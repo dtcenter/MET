@@ -202,18 +202,51 @@ DataPlane smooth_field(const DataPlane &dp,
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
-        SingleThresh t, double vld_t) {
+        SingleThresh t, const DataPlane *cmn, const DataPlane *csd,
+        double vld_t) {
    GridPoint *gp = NULL;
    int x, y;
    int n_vld = 0;
    int n_thr = 0;
    double v;
+   double bad = bad_data_double;
+   bool use_climo = false;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
-           << "Grid must have at least one point in it. \n\n";
+           << "grid must have at least one point in it. \n\n";
       exit(1);
+   }
+
+   // Check climatology data, if needed
+   if(t.get_ptype() == perc_thresh_climo_dist) {
+
+      // Flag for using the climatology data
+      use_climo = true;
+
+      if(!cmn || !csd) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology mean or standard deviation data missing for threshold \""
+           << t.get_str() << "\"!\n\n";
+         exit(1);
+      }
+      else if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology mean dimension ("
+           << cmn->nx() << ", " << cmn->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+      else if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology standard deviation dimension ("
+           << csd->nx() << ", " << csd->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
    }
 
    // Build the grid template
@@ -246,7 +279,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInGrid()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
-               if(t.check(v)) n_thr++;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
             }
          }
          // Subtract off the bottom edge, shift up, and add the top.
@@ -258,7 +293,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInBotEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld--;
-               if(t.check(v)) n_thr--;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
             }
 
             // Increment Y
@@ -270,7 +307,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInTopEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
-               if(t.check(v)) n_thr++;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
             }
          }
 
@@ -289,161 +328,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    delete gt;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Convert the DataPlane field to the corresponding fractional coverage
-// using the threshold critea specified.
-//
-////////////////////////////////////////////////////////////////////////
-
-void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
-        int width, SingleThresh t, double vld_t) {
-   int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
-   double v;
-   int count_vld = 0;
-   int count_thr = 0;
-   NumArray box_na;
-
-   mlog << Debug(3)
-        << "Computing fractional coverage field using the "
-        << t.get_str() << " threshold and the "
-        << interpmthd_to_string(InterpMthd_Nbrhd)
-        << "(" << width*width << ") interpolation method.\n";
-
-   // Check that width is set to 1 or greater
-   if(width < 1) {
-      mlog << Error << "\nfractional_coverage_square() -> "
-           << "width must be set to a value of 1 or greater.\n\n";
-      exit(1);
-   }
-
-   // Initialize the fractional coverage field
-   frac_dp = dp;
-   frac_dp.set_constant(bad_data_double);
-
-   // Compute the box half-width
-   half_width = (width - 1)/2;
-
-   // Initialize the box
-   for(i=0; i<width*width; i++) box_na.add(bad_data_int);
-
-   // Compute the fractional coverage meeting the threshold criteria
-   for(x=0; x<dp.nx(); x++) {
-
-      // Find the lower-left x-coordinate of the neighborhood
-      x_ll = x - half_width;
-
-      for(y=0; y<dp.ny(); y++) {
-
-         // Find the lower-left y-coordinate of the neighborhood
-         y_ll = y - half_width;
-         y_ur = y + half_width;
-
-         // Initialize the box for this new column
-         if(y == 0) {
-
-            // Initialize counts
-            count_vld = count_thr = 0;
-
-            for(i=0; i<width; i++) {
-
-               xx = x_ll + i;
-
-               for(j=0; j<width; j++) {
-
-                  yy = y_ll + j;
-
-                  n = DefaultTO.two_to_one(width, width, i, j);
-
-                  // Check for being off the grid
-                  if(xx < 0 || xx >= dp.nx() ||
-                     yy < 0 || yy >= dp.ny()) {
-                     k = bad_data_int;
-                  }
-                  // Check v to see if it meets the threshold criteria
-                  else {
-                     v = dp.get(xx, yy);
-                     if(is_bad_data(v))  k = bad_data_int;
-                     else if(t.check(v)) k = 1;
-                     else                k = 0;
-                  }
-                  box_na.set(n, k);
-
-                  // Increment the counts
-                  if(!is_bad_data(k)) {
-                     count_vld += 1;
-                     count_thr += k;
-                  }
-
-               } // end for j
-            } // end for i
-         } // end if
-
-         // Otherwise, update one row of the box
-         else {
-
-            // Compute the row of the neighborhood box to be updated
-            j = (y - 1) % width;
-
-            for(i=0; i<width; i++) {
-
-               // Index into the box
-               n = DefaultTO.two_to_one(width, width, i, j);
-
-               // Get x and y values to be checked
-               xx = x_ll + i;
-               yy = y_ur;
-
-               // Decrement counts for data to be replaced
-               k = nint(box_na[n]);
-               if(!is_bad_data(k)) {
-                  count_vld -= 1;
-                  count_thr -= k;
-               }
-
-               // Check for being off the grid
-               if(xx < 0 || xx >= dp.nx() ||
-                  yy < 0 || yy >= dp.ny()) {
-                  k = bad_data_int;
-               }
-               // Check v to see if it meets the threshold criteria
-               else {
-                  v = dp.get(xx, yy);
-                  if(is_bad_data(v))  k = bad_data_int;
-                  else if(t.check(v)) k = 1;
-                  else                k = 0;
-               }
-               box_na.set(n, k);
-
-               // Increment the counts
-               if(!is_bad_data(k)) {
-                  count_vld += 1;
-                  count_thr += k;
-               }
-
-            } // end for i
-         } // end else
-
-         // Check whether enough valid grid points were found
-         if((double) count_vld/(width*width) < vld_t ||
-            count_vld == 0) {
-            v = bad_data_double;
-         }
-         // Compute the fractional coverage
-         else {
-            v = (double) count_thr/count_vld;
-         }
-
-         // Store the fractional coverage value
-         frac_dp.set(v, x, y);
-
-      } // end for y
-   } // end for x
-
-   return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
