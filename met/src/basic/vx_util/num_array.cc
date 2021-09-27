@@ -96,8 +96,9 @@ NumArray & NumArray::operator=(const NumArray & a)
 void NumArray::init_from_scratch()
 
 {
-   e.clear();
-   
+
+   clear();
+ 
    return;
 
 }
@@ -109,10 +110,9 @@ void NumArray::init_from_scratch()
 void NumArray::clear()
 
 {
-   if ( e.size() >0 ) {
-      e.clear();
-   }
-   
+
+   e.clear();
+ 
    Nelements = Nalloc = 0;
 
    Sorted = false;
