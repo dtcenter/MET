@@ -199,7 +199,7 @@ void process_command_line(int argc, char **argv) {
 
    // List the control member file
    mlog << Debug(1) << "Ensemble Control: "
-        << (ctrl_file.empty() ? "NONE" : ctrl_file.c_str()) << "\n";
+        << (ctrl_file.empty() ? "None" : ctrl_file.c_str()) << "\n";
 
    // Check for missing non-python ensemble files
    for(i=0; i<ens_files.n(); i++) {
@@ -387,7 +387,7 @@ void process_ensemble() {
       } // end for i_file
 
       // Check for too much missing data
-      if((double) (n_ens_vld/n_ens) < conf_info.vld_ens_thresh) {
+      if(((double) n_ens_vld/n_ens) < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_ensemble() -> "
               << n_ens - n_ens_vld << " of " << n_ens
               << " missing fields for \"" << conf_info.ens_info[i_var]->magic_str()

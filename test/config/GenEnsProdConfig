@@ -45,31 +45,26 @@ nc_var_str    = "";
 // Ensemble fields to be processed
 //
 ens = {
-   ens_thresh = 1.0;
+   ens_thresh = 0.80;
    vld_thresh = 1.0;
 
    field = [
-      {
-         name       = "APCP";
-         level      = [ "A24" ];
-         cat_thresh = [ >0.0, >=10.0 ];
-         ensemble_flag = TRUE;
-      },
       {
          name       = "REFC";
          level      = [ "L0" ];
          cat_thresh = [ >=35.0 ];
          GRIB1_ptv  = 129;
+         ensemble_flag = TRUE;
       },
       {
          name       = "UGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ >=5.0 ];
+         cat_thresh = [ >=5.0, >CDP75 ];
       },
       {
          name       = "VGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ >=5.0 ];
+         cat_thresh = [ >=5.0, <CDP25 ];
       },
       {
          name       = "WIND";
@@ -85,7 +80,7 @@ ens = {
 // Neighborhood ensemble probabilities
 //
 nbrhd_prob = {
-   width      = [ 5 ];
+   width      = [ 5, 9 ];
    shape      = CIRCLE;
    vld_thresh = 0.0;
 }
@@ -111,10 +106,10 @@ nmep_smooth = {
 //
 // Climatology data
 //
+climo_mean = ens;
 climo_mean = {
 
-   file_name = [];
-   field     = [];
+   file_name = [ "${CLIMO_MEAN_FILE}" ];
 
    regrid = {
       method     = NEAREST;
@@ -124,13 +119,13 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   day_interval       = 31;
+   day_interval       = 1;
    hour_interval      = 6;
 }
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [];
+   file_name = [ "${CLIMO_STDEV_FILE}" ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +135,7 @@ climo_stdev = {
 // May be set separately in each "ens.field" entry
 //
 ensemble_flag = {
-   latlon    = TRUE;
+   latlon    = FALSE;
    mean      = TRUE;
    stdev     = TRUE;
    minus     = FALSE;
@@ -150,10 +145,10 @@ ensemble_flag = {
    range     = FALSE;
    vld_count = FALSE;
    frequency = TRUE;
-   nep       = FALSE;
-   nmep      = FALSE;
-   climo     = FALSE;
-   climo_cdp = FALSE;
+   nep       = TRUE;
+   nmep      = TRUE;
+   climo     = TRUE;
+   climo_cdp = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
