@@ -50,26 +50,26 @@ ens = {
 
    field = [
       {
-         name       = "REFC";
-         level      = [ "L0" ];
-         cat_thresh = [ >=35.0 ];
-         GRIB1_ptv  = 129;
+         name          = "REFC";
+         level         = [ "L0" ];
+         cat_thresh    = [ >=35.0 ];
+         GRIB1_ptv     = 129;
          ensemble_flag = TRUE;
       },
       {
          name       = "UGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ >=5.0, >CDP75 ];
+         cat_thresh = [ <CDP25 ];
       },
       {
          name       = "VGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ >=5.0, <CDP25 ];
+         cat_thresh = [ >CDP75 ];
       },
       {
          name       = "WIND";
          level      = [ "Z10" ];
-         cat_thresh = [ >=5.0 ];
+         cat_thresh = [ >=CDP25&&<=CDP75 ];
       }
    ];
 }
@@ -80,7 +80,7 @@ ens = {
 // Neighborhood ensemble probabilities
 //
 nbrhd_prob = {
-   width      = [ 5, 9 ];
+   width      = [ 5 ];
    shape      = CIRCLE;
    vld_thresh = 0.0;
 }
@@ -135,7 +135,7 @@ climo_stdev = {
 // May be set separately in each "ens.field" entry
 //
 ensemble_flag = {
-   latlon    = FALSE;
+   latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
    minus     = FALSE;

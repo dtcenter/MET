@@ -220,18 +220,15 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    }
 
    // Check climatology data, if needed
-   if(t.get_ptype() == perc_thresh_climo_dist) {
+   if(cmn && csd) {
+      if(!cmn->is_empty() && !csd->is_empty()) use_climo = true;
+   }
 
-      // Flag for using the climatology data
-      use_climo = true;
+   // Check climatology dimensions
+   if(use_climo) {
 
-      if(!cmn || !csd) {
-         mlog << Error << "\nfractional_coverage() -> "
-           << "climatology mean or standard deviation data missing for threshold \""
-           << t.get_str() << "\"!\n\n";
-         exit(1);
-      }
-      else if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
+      // Check dimensions
+      if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
          mlog << Error << "\nfractional_coverage() -> "
            << "climatology mean dimension ("
            << cmn->nx() << ", " << cmn->ny()
@@ -239,7 +236,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
-      else if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
+      if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
          mlog << Error << "\nfractional_coverage() -> "
            << "climatology standard deviation dimension ("
            << csd->nx() << ", " << csd->ny()

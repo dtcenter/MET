@@ -340,6 +340,15 @@ void process_ensemble() {
             // Reset the running sums and counts
             clear_counts();
 
+            // Read climatology data for this field
+            cmn_dp = read_climo_data_plane(
+                        conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                        i_var, ens_valid_ut, grid);
+
+            csd_dp = read_climo_data_plane(
+                        conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                        i_var, ens_valid_ut, grid);
+
             // Read ensemble control member data, if provided
             if(ctrl_file.nonempty()) {
 
@@ -357,15 +366,6 @@ void process_ensemble() {
                track_counts(i_var, ctrl_dp, true, cmn_dp, csd_dp);
 
             } // end if ctrl_file
-
-            // Read climatology data for this field
-            cmn_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                        i_var, ens_valid_ut, grid);
-
-            csd_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                        i_var, ens_valid_ut, grid);
 
             mlog << Debug(3)
                  << "Found " << (ctrl_dp.is_empty() ? 0 : 1)
@@ -1009,7 +1009,7 @@ void usage() {
         << "containing the desired configuration settings (required).\n"
 
         << "\t\t\"-ctrl file\" is the gridded ensemble control data file "
-        << "included in mean but excluded from the spread (optional).\n"
+        << "included in the mean but excluded from the spread (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
