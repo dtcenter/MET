@@ -47,9 +47,6 @@ GenEnsProdConfInfo::~GenEnsProdConfInfo() {
 
 void GenEnsProdConfInfo::init_from_scratch() {
 
-   // Initialize pointers
-   rng_ptr  = (gsl_rng *) 0;
-
    clear();
 
    return;
@@ -68,14 +65,13 @@ void GenEnsProdConfInfo::clear() {
    }
    ens_info.clear();
    cdf_info.clear();
-   ens_cat_ta.clear();
-   ens_var_str.clear();
+   cat_ta.clear();
+   nc_var_str.clear();
    nbrhd_prob.clear();
    nmep_smooth.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
    nc_info.clear();
-   tmp_dir.clear();
    version.clear();
 
    // Reset counts
@@ -127,14 +123,6 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
    // Conf: desc
    desc = parse_conf_string(&conf, conf_key_desc);
 
-   // Conf: rng_type and rng_seed
-   ConcatString rng_type, rng_seed;
-   rng_type = conf.lookup_string(conf_key_rng_type);
-   rng_seed = conf.lookup_string(conf_key_rng_seed);
-
-   // Set the random number generator and seed value
-   rng_set(rng_ptr, rng_type.c_str(), rng_seed.c_str());
-
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);
 
@@ -165,21 +153,21 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
          ens_info[i]->dump(cout);
       }
 
-      // Conf: ens_nc_var_str
-      ens_var_str.add(parse_conf_string(&i_edict, conf_key_nc_var_str, false));
+      // Conf: nc_var_str
+      nc_var_str.add(parse_conf_string(&i_edict, conf_key_nc_var_str, false));
 
       // Conf: cat_thresh
-      ens_cat_ta.push_back(i_edict.lookup_thresh_array(conf_key_cat_thresh));
+      cat_ta.push_back(i_edict.lookup_thresh_array(conf_key_cat_thresh));
 
       // Dump the contents of the current thresholds
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
               << "Parsed thresholds for ensemble field number " << i+1 << ":\n";
-         ens_cat_ta[i].dump(cout);
+         cat_ta[i].dump(cout);
       }
 
       // Keep track of the maximum number of thresholds
-      if(ens_cat_ta[i].n() > max_n_cat_ta) max_n_cat_ta = ens_cat_ta[i].n();
+      if(cat_ta[i].n() > max_n_cat_ta) max_n_cat_ta = cat_ta[i].n();
 
       // Conf: ensemble_flag
       nc_info.push_back(parse_nc_info(&i_edict));

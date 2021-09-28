@@ -81,8 +81,8 @@ class GenEnsProdConfInfo {
 
       vector<VarInfo *>    ens_info;        // Array of VarInfo pointers (allocated)
       vector<ClimoCDFInfo> cdf_info;        // Array of climo CDF info objects
-      vector<ThreshArray>  ens_cat_ta;      // Array for ensemble categorical thresholds
-      StringArray          ens_var_str;     // Array of ensemble variable name strings
+      vector<ThreshArray>  cat_ta;          // Array for ensemble categorical thresholds
+      StringArray          nc_var_str;      // Array of ensemble variable name strings
       vector<GenEnsProdNcOutInfo> nc_info;  // Array of ensemble product outputs
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
@@ -91,9 +91,6 @@ class GenEnsProdConfInfo {
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point
 
-      gsl_rng *            rng_ptr;         // GSL random number generator (allocated)
-
-      ConcatString         tmp_dir;         // Directory for temporary files
       ConcatString         version;         // Config file version
 
       //////////////////////////////////////////////////////////////////

@@ -800,8 +800,8 @@ void write_ens_var_float(int i_var, float *ens_data, const DataPlane &dp,
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append nc_pairs_var_str config file entry
-   cs = conf_info.ens_var_str[i_var];
+   // Append nc_var_str config file entry
+   cs = conf_info.nc_var_str[i_var];
    if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
@@ -856,8 +856,8 @@ void write_ens_var_int(int i_var, int *ens_data, const DataPlane &dp,
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append nc_pairs_var_str config file entry
-   cs = conf_info.ens_var_str[i_var];
+   // Append nc_var_str config file entry
+   cs = conf_info.nc_var_str[i_var];
    if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
