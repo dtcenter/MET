@@ -60,9 +60,8 @@ class GenEnsProdConfInfo {
       void init_from_scratch();
 
       // Ensemble processing
-      int n_ens_var;    // Number of ensemble fields to be processed
-      int max_n_cat_ta; // Maximum number of ensemble thresholds
-      int n_nbrhd;      // Number of neighborhood sizes
+      int n_var;     // Number of ensemble fields to be processed
+      int max_n_cat; // Maximum number of ensemble thresholds
 
    public:
 
@@ -102,18 +101,18 @@ class GenEnsProdConfInfo {
       GenEnsProdNcOutInfo parse_nc_info(Dictionary *);
 
       // Accessor functions
-      int get_n_ens_var()         const;
-      int get_max_n_cat_ta()      const;
-      int get_n_nbrhd()           const;
+      int get_n_var()     const;
+      int get_max_n_cat() const;
+      int get_n_nbrhd()   const;
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GenEnsProdConfInfo::get_n_ens_var()         const { return(n_ens_var);             }
-inline int GenEnsProdConfInfo::get_max_n_cat_ta()      const { return(max_n_cat_ta);          }
-inline int GenEnsProdConfInfo::get_n_nbrhd()           const { return(n_nbrhd);               }
-inline int GenEnsProdConfInfo::get_compression_level()       { return(conf.nc_compression()); }
+inline int GenEnsProdConfInfo::get_n_var()       const { return(n_var);                 }
+inline int GenEnsProdConfInfo::get_max_n_cat()   const { return(max_n_cat);             }
+inline int GenEnsProdConfInfo::get_n_nbrhd()     const { return(nbrhd_prob.width.n());  }
+inline int GenEnsProdConfInfo::get_compression_level() { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
 

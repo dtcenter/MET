@@ -75,9 +75,8 @@ void GenEnsProdConfInfo::clear() {
    version.clear();
 
    // Reset counts
-   n_ens_var    = 0;
-   max_n_cat_ta = 0;
-   n_nbrhd      = 0;
+   n_var     = 0;
+   max_n_cat = 0;
 
    return;
 }
@@ -127,7 +126,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
    edict = conf.lookup_array(conf_key_ens_field);
 
    // Determine the number of ensemble fields to be processed
-   if((n_ens_var = parse_conf_n_vx(edict)) == 0) {
+   if((n_var = parse_conf_n_vx(edict)) == 0) {
       mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
            << "At least one field must be specified in the \""
            << conf_key_ens_field << "\" dictionary!\n\n";
@@ -135,7 +134,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
    }
 
    // Parse the ensemble field information
-   for(i=0,max_n_cat_ta=0; i<n_ens_var; i++) {
+   for(i=0,max_n_cat=0; i<n_var; i++) {
 
       // Allocate new VarInfo object
       ens_info.push_back(info_factory.new_var_info(etype));
@@ -167,7 +166,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
       }
 
       // Keep track of the maximum number of thresholds
-      if(cat_ta[i].n() > max_n_cat_ta) max_n_cat_ta = cat_ta[i].n();
+      if(cat_ta[i].n() > max_n_cat) max_n_cat = cat_ta[i].n();
 
       // Conf: ensemble_flag
       nc_info.push_back(parse_nc_info(&i_edict));
@@ -197,7 +196,6 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
 
    // Conf: nbrhd_prob
    nbrhd_prob = parse_conf_nbrhd(edict, conf_key_nbrhd_prob);
-   n_nbrhd    = nbrhd_prob.width.n();
 
    // Conf: nmep_smooth 
    nmep_smooth = parse_conf_interp(edict, conf_key_nmep_smooth);

@@ -183,10 +183,10 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(etype);
 
    // Allocate arrays to store threshold counts
-   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat_ta()];
-   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat_ta()];
+   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
+   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat()];
 
-   for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
+   for(i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
    }
 
@@ -228,7 +228,7 @@ void process_grid(const Grid &fcst_grid) {
 
    // Parse regridding logic
    RegridInfo ri;
-   if(conf_info.get_n_ens_var() > 0) {
+   if(conf_info.get_n_var() > 0) {
       ri = conf_info.ens_info[0]->regrid();
    }
    else {
@@ -305,7 +305,7 @@ void process_ensemble() {
    unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
-   for(i_var=0; i_var<conf_info.get_n_ens_var(); i_var++) {
+   for(i_var=0; i_var<conf_info.get_n_var(); i_var++) {
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing ensemble field: "
@@ -417,7 +417,7 @@ void clear_counts() {
    sum_na.set_const(0.0, nxy);
    ssq_na.set_const(0.0, nxy);
    stdev_cnt_na.set_const(0.0, nxy);
-   for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
+   for(i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_cnt_na[i].set_const(0.0, nxy);
       for(j=0; j<conf_info.get_n_nbrhd(); j++) {
          thresh_nbrhd_cnt_na[i][j].set_const(0.0, nxy);
@@ -960,14 +960,14 @@ void clean_up() {
 
    // Deallocate threshold count arrays
    if(thresh_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
+      for(i=0; i<conf_info.get_max_n_cat(); i++) {
          thresh_cnt_na[i].clear();
       }
       delete [] thresh_cnt_na;
       thresh_cnt_na = (NumArray *) 0;
    }
    if(thresh_nbrhd_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat_ta(); i++) {
+      for(i=0; i<conf_info.get_max_n_cat(); i++) {
          for(j=0; j<conf_info.get_n_nbrhd(); j++) {
             thresh_nbrhd_cnt_na[i][j].clear();
          }
