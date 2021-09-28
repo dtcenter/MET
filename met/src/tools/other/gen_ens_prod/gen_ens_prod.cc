@@ -435,8 +435,8 @@ void track_counts(int i_var, const DataPlane &ens_dp, bool is_ctrl,
    double ens, cmn, csd;
 
    // Ensemble thresholds
-   const int n_thr = conf_info.ens_cat_ta[i_var].n();
-   SingleThresh *thr_buf = conf_info.ens_cat_ta[i_var].buf();
+   const int n_thr = conf_info.cat_ta[i_var].n();
+   SingleThresh *thr_buf = conf_info.cat_ta[i_var].buf();
 
    // Increment counts for each grid point
    for(i=0; i<nxy; i++) {
@@ -652,7 +652,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_cat_ta[i_var].n(); i++) {
+      for(i=0; i<conf_info.cat_ta[i_var].n(); i++) {
 
          // Initialize
          prob_dp.erase();
@@ -667,7 +667,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
          // Write ensemble relative frequency
          if(conf_info.nc_info[i_var].do_freq) {
             snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
-                     conf_info.ens_cat_ta[i_var][i].get_abbr_str().contents().c_str());
+                     conf_info.cat_ta[i_var][i].get_abbr_str().contents().c_str());
             write_ens_data_plane(i_var, prob_dp, ens_dp, type_str,
                                  "Ensemble Relative Frequency");
          }
@@ -686,7 +686,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
                // Write neighborhood ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
-                        conf_info.ens_cat_ta[i_var][i].get_abbr_str().contents().c_str(),
+                        conf_info.cat_ta[i_var][i].get_abbr_str().contents().c_str(),
                         interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
                write_ens_data_plane(i_var, nbrhd_dp, ens_dp, type_str,
@@ -702,7 +702,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_cat_ta[i_var].n(); i++) {
+      for(i=0; i<conf_info.cat_ta[i_var].n(); i++) {
 
          // Loop through each neigbhorhood size
          for(j=0; j<conf_info.get_n_nbrhd(); j++) {
@@ -729,7 +729,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
                // Write neighborhood maximum ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
-                        conf_info.ens_cat_ta[i_var][i].get_abbr_str().contents().c_str(),
+                        conf_info.cat_ta[i_var][i].get_abbr_str().contents().c_str(),
                         interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
@@ -761,7 +761,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
       DataPlane cdp_dp;
       vector<Simple_Node> simp;
-      conf_info.ens_cat_ta[i_var].get_simple_nodes(simp);
+      conf_info.cat_ta[i_var].get_simple_nodes(simp);
 
       // Process all CDP thresholds except 0 and 100
       for(vector<Simple_Node>::iterator it = simp.begin();

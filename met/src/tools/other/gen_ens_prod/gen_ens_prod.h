@@ -47,7 +47,6 @@ using namespace netCDF;
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_stat_out.h"
-#include "vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

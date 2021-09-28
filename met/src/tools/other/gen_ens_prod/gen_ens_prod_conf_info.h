@@ -21,7 +21,6 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
-#include "vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 
