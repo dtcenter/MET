@@ -20,6 +20,7 @@ using namespace std;
 
 #include "scope.h"
 
+#include "str_wrappers.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -431,10 +432,11 @@ return;
 int do_id()
 
 {
+const char *method_name = "do_id()";
 
 if ( enum_mode || last_was_enum || last_was_class )  {
 
-   strncpy(yylval.name, yytext, sizeof(yylval.name));
+   m_strncpy(yylval.name, yytext, sizeof(yylval.name), method_name);
 
    return ( 1 );
 

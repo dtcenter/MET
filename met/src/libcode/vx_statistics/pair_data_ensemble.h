@@ -205,8 +205,9 @@ class VxPairDataEnsemble {
 
       StringArray sid_inc_filt;  // Station ID inclusion list
       StringArray sid_exc_filt;  // Station ID exclusion list
-      StringArray obs_qty_filt;  // Observation quality markers
-
+      StringArray obs_qty_inc_filt;  // Observation quality include markers
+      StringArray obs_qty_exc_filt;  // Observation quality exclude markers
+      
       //////////////////////////////////////////////////////////////////
 
       ObsErrorInfo *obs_error_info; // Pointer for observation error
@@ -249,8 +250,9 @@ class VxPairDataEnsemble {
 
       void set_sid_inc_filt(const StringArray);
       void set_sid_exc_filt(const StringArray);
-      void set_obs_qty_filt(const StringArray);
-
+      void set_obs_qty_inc_filt(const StringArray);
+      void set_obs_qty_exc_filt(const StringArray);
+      
       // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
 

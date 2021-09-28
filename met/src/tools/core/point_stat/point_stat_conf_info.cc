@@ -915,10 +915,13 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: sid_exc
    vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
-
-   // Conf: obs_qty
-   vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
-
+   
+   // Conf: obs_qty_inc
+   vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty_inc(&odict));
+   
+   // Conf: obs_qty_exc
+   vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
+   
    return;
 }
 

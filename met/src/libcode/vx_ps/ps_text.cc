@@ -20,7 +20,6 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
-#include "string_fxns.h"
 #include "ps_text.h"
 
 
@@ -323,7 +322,7 @@ Nalloc = n;
    //  copy the old values, if any
    //
 
-if ( Text ) m_strcpy(u, Text, method_name, "Text");
+if ( Text ) m_strncpy(u, Text, (n-1), method_name, "Text");
 
    //
    //  toss old, grab new
@@ -358,7 +357,7 @@ Nchars = m_strlen(s);
 
 extend(Nchars + 2);
 
-if (Text) m_strcpy(Text, s, method_name, "Text");
+if (Text) m_strncpy(Text, s, Nalloc, method_name, "Text");
 
 return;
 

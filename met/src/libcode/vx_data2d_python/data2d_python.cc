@@ -180,7 +180,7 @@ if ( file_argc > 0 )  {
    for ( i=0; i<sa.n_elements(); i++ )  {
       int buf_len = sa[i].length();
       snprintf(a_var_name, 512, "file_argv[%d]", i);
-      file_argv[i] = m_strcpy2(sa[i].c_str(), a_var_name, method_name);
+      file_argv[i] = m_strcpy2(sa[i].c_str(), method_name, a_var_name);
    }
 }
 

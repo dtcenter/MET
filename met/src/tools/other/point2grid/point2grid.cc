@@ -787,8 +787,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          requested_valid_time = valid_time;
          if (0 < valid_time) {
             valid_beg_ut = valid_end_ut = valid_time;
-            if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-            if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+            if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+            if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
             for(idx=0; idx<hdr_valid_times.n(); idx++) {
                obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
                if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
@@ -906,7 +906,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
                         data_value = obs_data.get_obs_val(from_index);
-                        if (is_eq(data_value, bad_data_float)) continue;
+                        if (is_bad_data(data_value)) continue;
 
                         if(mlog.verbosity_level() >= 4) {
                            if (from_min_value > data_value) from_min_value = data_value;
@@ -1134,8 +1134,8 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
             unixtime ref_ut = (unixtime) 0;
             unixtime tmp_time;
             if( conf_info.valid_time > 0 ) {
-               if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-               if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+               if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+               if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
                ref_ut = get_reference_unixtime(&time_var, sec_per_unit, no_leap_year);
             }
             for (int i=0; i<from_size; i++) {
@@ -1212,7 +1212,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
                float value = to_dp.get(x, y);
-               if (!is_eq(value, bad_data_float) &&
+               if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
                   prob_dp.set(1, x, y);
@@ -1319,7 +1319,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                   from_index = cellArray[dIdx];
                   data_value = from_data[from_index];
-                  if (is_eq(data_value, bad_data_float)) {
+                  if (is_bad_data(data_value)) {
                      missing_cnt++;
                      continue;
                   }
@@ -1631,7 +1631,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
                float value = to_dp.get(x, y);
-               if (!is_eq(value, bad_data_float) &&
+               if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
                   prob_dp.set(1, x, y);
@@ -1877,7 +1877,7 @@ static void get_grid_mapping_latlon(
    // Build cell mapping
    for (int xIdx=0; xIdx<data_size; xIdx++) {
       to_offset = mapping_indices[xIdx];
-      if( to_offset == bad_data_int ) continue;
+      if( is_bad_data(to_offset) ) continue;
       if( to_offset < 0 || to_offset >= to_size ) {
          mlog << Error << "\n" << method_name
               << "the mapped cell is out of range: "
@@ -1978,7 +1978,7 @@ static unixtime find_valid_time(NcVar time_var) {
       }
    }
 
-   if (valid_time == bad_data_int) {
+   if (is_bad_data(valid_time)) {
       mlog << Error << "\n" << method_name
            << "trouble finding time variable from \""
            << InputFilename << "\"\n\n";
@@ -2401,7 +2401,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
                data_value = from_data[from_index];
-               if (is_eq(data_value, bad_data_float)) {
+               if (is_bad_data(data_value)) {
                   missing_count++;
                   continue;
                }

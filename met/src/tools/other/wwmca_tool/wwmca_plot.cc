@@ -400,7 +400,7 @@ void set_pixel_time_filename(const char * cp_name, char * pt_name)
 
    // now create the new pixel time filename which consists of the pt_name_start and the
    // rest of the cp_name after removing its start (WWMCA_TOTAL_CLOUD_PCT)
-   m_strcpy(pt_name + i, pt_name_start, method_name);
+   m_strncpy((char *)(pt_name + i), pt_name_start, m_strlen(pt_name_start), method_name);
 
    for (j = i + m_strlen(pt_name_start); j < cp_length; j++)
       pt_name[j] = cp_name[j];

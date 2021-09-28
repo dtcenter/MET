@@ -59,6 +59,8 @@ static const char * DEF_CONFIG_NAME = "MET_BASE/config/IODA2NCConfig_default";
 
 static const char *program_name = "ioda2nc";
 
+static const int REJECT_DEBUG_LEVEL = 9;
+
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -150,7 +152,6 @@ static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static void cleanup_hdr_buf(char *hdr_buf, int buf_len);
 static bool check_core_data(const bool, const bool, StringArray &, StringArray &);
 static bool check_missing_thresh(float value);
 static ConcatString find_meta_name(StringArray, StringArray);
@@ -662,9 +663,7 @@ void process_ioda_file(int i_pb) {
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
          m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name, "hdr_typ");
-         hdr_typ[nstring] = 0;
-         // Null terminate the message type string
-         cleanup_hdr_buf(hdr_typ, nstring);
+         m_rstrip(hdr_typ, nstring);
 
          // If the message type is not listed in the configuration
          // file and it is not the case that all message types should be
@@ -692,8 +691,7 @@ void process_ioda_file(int i_pb) {
       if(has_station_id) {
          char tmp_sid[nstring+1];
          m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name, "tmp_sid");
-         tmp_sid[nstring] = 0;
-         cleanup_hdr_buf(tmp_sid, nstring);
+         m_rstrip(tmp_sid, nstring);
          hdr_sid = tmp_sid;
       }
       else hdr_sid.clear();
@@ -913,7 +911,7 @@ void write_netcdf_hdr_data() {
    // Check for no messages retained
    if(hdr_cnt <= 0) {
       mlog << Error << method_name << " -> "
-           << "No IODA reocrds retained.  Nothing to write.\n\n";
+           << "No IODA records retained.  Nothing to write.\n\n";
       // Delete the NetCDF file
       remove_temp_file(ncfile);
       exit(1);
@@ -986,25 +984,13 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void cleanup_hdr_buf(char *hdr_buf, int buf_len) {
-   int i;
-   hdr_buf[buf_len] = '\0';
-   // Change the trailing blank space to a null
-   for(i=buf_len-1; i>=0; i--) {
-      if(' ' == hdr_buf[i]) {
-         hdr_buf[i] = '\0';
-         if(i > 0 && ' ' != hdr_buf[i-1]) break;
-      }
-   }
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool keep_message_type(const char *mt_str) {
-   bool keep = false;
+   bool keep = conf_info.message_type.n_elements() == 0 ||
+               conf_info.message_type.has(mt_str, false);
 
-   keep = conf_info.message_type.n_elements() == 0 ||
-          conf_info.message_type.has(mt_str, false);
+   if(!keep && mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      mlog << Debug(REJECT_DEBUG_LEVEL) << "The message type [" << mt_str << "] is rejected\n";
+   }
 
    return(keep);
 }
@@ -1013,8 +999,14 @@ bool keep_message_type(const char *mt_str) {
 
 bool keep_station_id(const char *sid_str) {
 
-   return(conf_info.station_id.n_elements() == 0 ||
-          conf_info.station_id.has(sid_str, false));
+   bool keep = (conf_info.station_id.n_elements() == 0 ||
+                conf_info.station_id.has(sid_str, false));
+
+   if(!keep && mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      mlog << Debug(REJECT_DEBUG_LEVEL) << "The station ID [" << sid_str << "] is rejected\n";
+   }
+
+   return(keep);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1034,6 +1026,11 @@ bool keep_valid_time(const unixtime ut,
    // If only max_ut set, check the upper bound
    else if(min_ut == (unixtime) 0 && max_ut != (unixtime) 0) {
       if(ut > max_ut) keep = false;
+   }
+
+   if(!keep && mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      mlog << Debug(REJECT_DEBUG_LEVEL) << "The valid_time [" << ut << ", "
+           << unix_to_yyyymmdd_hhmmss(ut) << "] is rejected\n";
    }
 
    return(keep);

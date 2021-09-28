@@ -7,33 +7,49 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_LOG_H__
-#define  __VX_LOG_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
-#include "concat_string.h"
-#include "indent.h"
-#include "string_array.h"
-#include "file_fxns.h"
-#include "logger.h"
-#include "str_wrappers.h"
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   //  __VX_LOG_H__
+#ifndef  __ENUM_TO_STRING_H__
+#define  __ENUM_TO_STRING_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "vx_cal.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern bool do_prefix;
+
+extern const char * header_suffix;
+
+extern bool do_angle_brackets;
+
+extern bool do_array;
+
+extern bool do_reverse;
+
+extern bool do_concat_string;
+
+extern bool verbose;
+
+extern unixtime generation_gmt;
+
+extern const char * header_filename;
+
+extern const char * program_name;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __ENUM_TO_STRING_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
 
 

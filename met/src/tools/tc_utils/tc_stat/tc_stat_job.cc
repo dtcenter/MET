@@ -4034,6 +4034,7 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
                            const StringArray &case_cols) {
    int i;
    int lead = 0;
+   bool not_converted;
    ConcatString key, cur;
 
    // Initialize the map key with prefix
@@ -4042,7 +4043,7 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    // Build case information for the map key
    for(i=0; i<case_cols.n(); i++) {
 
-     cur = l.get(case_cols[i].c_str());
+      cur = l.get(case_cols[i].c_str());
 
       // For bad data, use the NA string
       if(is_bad_data(atoi(cur.c_str()))) cur = na_string;
@@ -4050,18 +4051,17 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
       // Special handling for lead time:
       // Switch 2-digit hours to 3-digit hours so that the
       // summary job output is sorted nicely.
-      if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 &&
-         cur != na_str &&
-         abs(lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
-
-         // Handle positive and negative lead times
-         key << (lead < 0 ? ":-0" : ":0")
-             << sec_to_hhmmss(abs(lead));
+      not_converted = true;
+      if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 && cur != na_str) {
+         if(lead = timestring_to_sec(cur.c_str()) < 100*sec_per_hour) {
+            not_converted = false;
+            // Handle positive and negative lead times
+            key << (lead < 0 ? ":-0" : ":0")
+                << sec_to_hhmmss(abs(lead));
+         }
       }
       // Otherwise, just append the current case info
-      else {
-         key << ":" << cur;
-      }
+      if (not_converted) key << ":" << cur;
    } // end for i
 
    return(key);
