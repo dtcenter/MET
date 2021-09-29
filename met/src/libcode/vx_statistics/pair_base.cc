@@ -876,7 +876,7 @@ double compute_interp(const DataPlaneArray &dpa,
                       const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
-                      const bool is_global,
+                      const bool wrap_lon,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
@@ -887,7 +887,7 @@ double compute_interp(const DataPlaneArray &dpa,
    if(dpa.n_planes() == 0) return(bad_data_double);
 
    v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
-                               method, width, shape, is_global,
+                               method, width, shape, wrap_lon,
                                thresh, cat_thresh);
 
    if(i_blw == i_abv) {
@@ -895,7 +895,7 @@ double compute_interp(const DataPlaneArray &dpa,
    }
    else {
       v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
-                                  method, width, shape, is_global,
+                                  method, width, shape, wrap_lon,
                                   thresh, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
@@ -935,7 +935,7 @@ void get_interp_points(const DataPlaneArray &dpa,
                        const double obs_x, const double obs_y,
                        const InterpMthd method, const int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       const bool is_global,
+                       const bool wrap_lon,
                        const double thresh, const bool spfh_flag,
                        const LevelType lvl_typ, const double to_lvl,
                        const int i_blw, const int i_abv,
@@ -951,7 +951,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, is_global);
+   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Get interpolation points below the observation
    pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);

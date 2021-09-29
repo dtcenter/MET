@@ -1408,7 +1408,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    y = nint(obs_y);
 
    // Check if the observation's lat/lon is on the grid
-   if(((x < 0 || x >= gr.nx()) && !gr.is_global()) ||
+   if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
         y < 0 || y >= gr.ny()) return;
 
    // For pressure levels, check if the observation pressure level
@@ -1556,7 +1556,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
                        bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape, gr.is_global(),
+                       pd[0][0][k].interp_shape, gr.wrap_lon(),
                        interp_thresh, spfh_flag,
                        fcst_info->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
@@ -1583,7 +1583,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
                         bad_data_double, bad_data_double,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.is_global(),
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
@@ -1654,7 +1654,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                            pd[0][0][k].interp_mthd,
                            pd[0][0][k].interp_wdth,
                            pd[0][0][k].interp_shape,
-                           gr.is_global(),
+                           gr.wrap_lon(),
                            interp_thresh, spfh_flag,
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);

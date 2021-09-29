@@ -73,7 +73,7 @@ lat_ll = lon_ll = 0.0;
 
 delta_lat = delta_lon = 0.0;
 
-isGlobal = false;
+wrapLon = false;
 
 memset(&Data, 0, sizeof(Data));
 
@@ -120,7 +120,7 @@ Data = data;
 
 const double lon_range = fabs((Nx + 1)*delta_lon);
 
-isGlobal = (lon_range >= 360.0);
+wrapLon = (lon_range >= 360.0);
 
 
 return;
@@ -250,7 +250,7 @@ out << prefix << "lon_ll       = " << lon_ll << "\n";
 out << prefix << "delta_lat_ll = " << delta_lat << "\n";
 out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
-out << prefix << "isGlobal     = " << bool_to_string(isGlobal) << "\n";
+out << prefix << "wrapLon     = " << bool_to_string(wrapLon) << "\n";
 
    //
    //  done
@@ -285,7 +285,7 @@ snprintf(junk, sizeof(junk), " lon_ll: %.3f", lon_ll);   a << junk;
 snprintf(junk, sizeof(junk), " delta_lat: %.3f", delta_lat);   a << junk;
 snprintf(junk, sizeof(junk), " delta_lon: %.3f", delta_lon);   a << junk;
 
-snprintf(junk, sizeof(junk), " isGlobal: %s", bool_to_string(isGlobal));   a << junk;
+snprintf(junk, sizeof(junk), " wrapLon: %s", bool_to_string(wrapLon));   a << junk;
 
    //
    //  done
@@ -339,7 +339,7 @@ void LatLonGrid::shift_right(int N)
 
 if ( N == 0 )  return;
 
-if ( ! isGlobal ) {
+if ( ! wrapLon ) {
 
    mlog << Error
         << "\n\n  LatLonGrid::shift_right(int) -> "

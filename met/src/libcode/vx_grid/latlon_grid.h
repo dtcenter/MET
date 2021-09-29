@@ -42,7 +42,7 @@ class LatLonGrid : public GridRep {
       int Nx;
       int Ny;
 
-      bool isGlobal;
+      bool wrapLon;
 
       ConcatString Name;
 
@@ -77,7 +77,7 @@ class LatLonGrid : public GridRep {
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 
@@ -89,8 +89,8 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km()  const { return ( -1.0 );     }
-inline bool   LatLonGrid::is_global() const { return ( isGlobal ); }
+inline double LatLonGrid::scale_km() const { return ( -1.0 );    }
+inline bool   LatLonGrid::wrap_lon() const { return ( wrapLon ); }
 
 
 ////////////////////////////////////////////////////////////////////////

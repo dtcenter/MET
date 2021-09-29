@@ -758,7 +758,7 @@ void process_scores() {
 
          // Create grid template to find the number of points
          GridTemplateFactory gtf;
-         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j], grid.is_global());
+         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
 
          shc.set_interp_mthd(interp_mthd, interp->shape);
          int interp_pnts = gt->size();
@@ -769,7 +769,7 @@ void process_scores() {
          if(interp->field == FieldType_Fcst ||
             interp->field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.is_global(),
+                         interp->width[j], interp->shape, grid.wrap_lon(),
                          interp->vld_thresh, interp->gaussian);
          }
          // Do not smooth the forecast field
@@ -781,7 +781,7 @@ void process_scores() {
          if(interp->field == FieldType_Obs ||
             interp->field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.is_global(),
+                         interp->width[j], interp->shape, grid.wrap_lon(),
                          interp->vld_thresh, interp->gaussian);
          }
          // Do not smooth the observation field
@@ -970,7 +970,7 @@ void process_scores() {
                if(interp->field == FieldType_Fcst ||
                   interp->field == FieldType_Both) {
                   smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
-                               interp->width[j], interp->shape, grid.is_global(),
+                               interp->width[j], interp->shape, grid.wrap_lon(),
                                interp->vld_thresh, interp->gaussian);
                }
                // Do not smooth the forecast field
@@ -984,7 +984,7 @@ void process_scores() {
                   interp->field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
-                               interp->shape,  grid.is_global(),
+                               interp->shape,  grid.wrap_lon(),
                                interp->vld_thresh, interp->gaussian);
                }
                // Do not smooth the observation field
@@ -1392,7 +1392,7 @@ void process_scores() {
                         // Compute fractional coverage
                         fractional_coverage(fcst_dp, fcst_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
-                                            grid.is_global(),
+                                            grid.wrap_lon(),
                                             conf_info.vx_opt[i].fcat_ta[k],
                                             nbrhd->vld_thresh);
 
@@ -1431,7 +1431,7 @@ void process_scores() {
                         // Compute fractional coverage
                         fractional_coverage(obs_dp, obs_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
-                                            grid.is_global(),
+                                            grid.wrap_lon(),
                                             conf_info.vx_opt[i].ocat_ta[k],
                                             nbrhd->vld_thresh);
 

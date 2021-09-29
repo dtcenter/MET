@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -36,10 +36,10 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CircularTemplate::CircularTemplate(const int width, bool is_global) :
-	GridTemplate(), _width(width) {
+CircularTemplate::CircularTemplate(const int width, bool wrap_lon) :
+   GridTemplate(), _width(width) {
 
-   _isGlobal = is_global;
+   _wrapLon = wrap_lon;
 
 	// width of 2 is not supported
 	if (width == 2) {
@@ -47,18 +47,17 @@ CircularTemplate::CircularTemplate(const int width, bool is_global) :
            << "unsupported width of " << width << " for circles.\n\n";
 		exit(1);
 	}
-	
-   bool evenWidth = ((width % 2) == 0);
-	// if the width is even, that means we are dealing with a point interpolation
-	// because grid interpolation has to be odd.
 
-	// for an ODD WIDTH the reference point is the same as the center point and is the nearest grid point
-	
-	// for an EVEN WIDTH, we move the "reference" point, to the lower left grid point,
-	// this means offsets are stored relative to the lower left corner of the true center.
-	// but we find distances based on the the true center location when determining if an
-	// offset is within the circle.
-	
+   bool evenWidth = ((width % 2) == 0);
+
+   // if the width is even, that means we are dealing with a point interpolation
+   // because grid interpolation has to be odd.
+   // for an ODD WIDTH the reference point is the same as the center point and is the nearest grid point
+   // for an EVEN WIDTH, we move the "reference" point, to the lower left grid point,
+   // this means offsets are stored relative to the lower left corner of the true center.
+   // but we find distances based on the the true center location when determining if an
+   // offset is within the circle.
+
    double radius = (width-1)/2.0;
 	
    // Create the offsets list.
@@ -117,7 +116,7 @@ void CircularTemplate::printOffsetList(FILE *stream) {
    fprintf(stream, "\n\n");
    fprintf(stream, "Circular template:");
    fprintf(stream, "    width = %d\n", _width);
-   fprintf(stream, "    is_global = %d\n", _isGlobal);
+   fprintf(stream, "    wrap_lon = %d\n", _wrapLon);
    fprintf(stream, " grid points:\n");
 
    GridTemplate::printOffsetList(stream);

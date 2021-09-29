@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-07  Megenhardt      Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,10 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RectangularTemplate::RectangularTemplate(int height, int width, bool is_global) :
+RectangularTemplate::RectangularTemplate(int height, int width, bool wrap_lon) :
    GridTemplate(), _height(height), _width(width) {
 
-   _isGlobal = is_global;
+   _wrapLon = wrap_lon;
 
    //
    // CONVENTION:
@@ -82,7 +82,7 @@ void RectangularTemplate::printOffsetList(FILE *stream) {
    fprintf(stream, "Rectangular template:");
    fprintf(stream, "    height = %d\n", _height);
    fprintf(stream, "    width = %d\n", _width);
-   fprintf(stream, "    is_global = %d\n", _isGlobal);
+   fprintf(stream, "    wrap_lon = %d\n", _wrapLon);
    fprintf(stream, " grid points:\n");
 
    GridTemplate::printOffsetList(stream);

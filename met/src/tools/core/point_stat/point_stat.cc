@@ -1677,7 +1677,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       GridTemplateFactory gtf;
       GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
                                      conf_info.vx_opt[i_vx].hira_info.width[i],
-                                     grid.is_global());
+                                     grid.wrap_lon());
 
       // Initialize
       hira_pd.clear();
@@ -1697,7 +1697,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
             pd_ptr->x_na[j], pd_ptr->y_na[j],
             InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
-            conf_info.vx_opt[i_vx].hira_info.shape, grid.is_global(),
+            conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
             pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens);
@@ -1874,7 +1874,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                        pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                        InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                       conf_info.vx_opt[i_vx].hira_info.shape, grid.is_global(),
+                       conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                        conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
                        pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
@@ -1893,7 +1893,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                             pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                             InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                            conf_info.vx_opt[i_vx].hira_info.shape, grid.is_global(),
+                            conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);

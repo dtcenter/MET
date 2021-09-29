@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -41,14 +41,14 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplate::GridTemplate(void) :
-   _isGlobal(false) {
+   _wrapLon(false) {
    // Do nothing
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplate::GridTemplate(const GridTemplate& rhs) {
-   _isGlobal = rhs._isGlobal;
+   _wrapLon = rhs._wrapLon;
 
    vector<GridOffset*>::const_iterator offset_iter;
 
@@ -89,7 +89,7 @@ GridPoint *GridTemplate::getFirstInGrid(
               const int &nx, const int &ny) const {
 
    // Set the grid information, applying the global wrap logic
-   setGrid((_isGlobal ? base_x % nx : base_x), base_y, nx, ny);
+   setGrid((_wrapLon ? base_x % nx : base_x), base_y, nx, ny);
 
    // Send back the first point
 
@@ -117,7 +117,7 @@ GridPoint *GridTemplate::getNextInGrid(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -146,7 +146,7 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
                                   const int &nx, const int &ny) const {
 
    // Set the grid information, applying the global wrap logic
-   setGrid((_isGlobal ? positive_modulo(base_x, nx) : base_x), base_y, nx, ny);
+   setGrid((_wrapLon ? positive_modulo(base_x, nx) : base_x), base_y, nx, ny);
 
    // Send back the first point
    return getNext();
@@ -174,7 +174,7 @@ GridPoint *GridTemplate::getNext(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -223,7 +223,7 @@ GridPoint *GridTemplate::getNextInLftEdge(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -276,7 +276,7 @@ GridPoint *GridTemplate::getNextInTopEdge(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -329,7 +329,7 @@ GridPoint *GridTemplate::getNextInRgtEdge(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -383,7 +383,7 @@ GridPoint *GridTemplate::getNextInBotEdge(void) const {
       _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
 
       // Apply global wrap logic
-      _pointInGridReturn.x = (_isGlobal ?
+      _pointInGridReturn.x = (_wrapLon ?
                               positive_modulo(_pointInGridReturn.x, _pointInGridNumX) :
                               _pointInGridReturn.x);
 
@@ -435,7 +435,7 @@ void GridTemplate::incBaseX(const int &x_inc) const {
    _pointInGridBase.x += x_inc;
 
    // Apply global wrap logic
-   _pointInGridBase.x = (_isGlobal ?
+   _pointInGridBase.x = (_wrapLon ?
                          positive_modulo(_pointInGridBase.x, _pointInGridNumX) :
                          _pointInGridBase.x);
 
@@ -646,8 +646,8 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool is_global) {
-   return buildGT(string2Enum(gt), width, is_global);
+GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) {
+   return buildGT(string2Enum(gt), width, wrap_lon);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -656,14 +656,14 @@ GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool is_global)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool is_global) {
+GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
 
    switch (gt) {
       case(GridTemplate_Square):
-         return new RectangularTemplate(width, width, is_global);
+         return new RectangularTemplate(width, width, wrap_lon);
 
       case(GridTemplate_Circle):
-         return new CircularTemplate(width, is_global);
+         return new CircularTemplate(width, wrap_lon);
 
       default:
          mlog << Error << "\nbuildGT() -> "

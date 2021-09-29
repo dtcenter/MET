@@ -319,7 +319,7 @@ snprintf(junk, sizeof(junk), " rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk
 snprintf(junk, sizeof(junk), " delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk;
 snprintf(junk, sizeof(junk), " delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk;
 
-snprintf(junk, sizeof(junk), " isGlobal: %s", bool_to_string(isGlobal));   a << junk;
+snprintf(junk, sizeof(junk), " wrapLon: %s", bool_to_string(wrapLon));   a << junk;
 
 snprintf(junk, sizeof(junk), " true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk;
 snprintf(junk, sizeof(junk), " true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk;

@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-07  Megenhardt      Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,7 @@ class RectangularTemplate : public GridTemplate {
 
    public:
 
-      RectangularTemplate(int height, int width, bool is_global);
+      RectangularTemplate(int height, int width, bool wrap_lon);
       virtual ~RectangularTemplate(void);
 
       void printOffsetList(FILE *stream);

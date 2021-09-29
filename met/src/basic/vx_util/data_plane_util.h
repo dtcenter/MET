@@ -43,16 +43,16 @@ extern void rescale_probability(DataPlane &);
 extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                InterpMthd mthd, int width,
                const GridTemplateFactory::GridTemplates shape,
-               bool is_global, double t, const GaussianInfo &gaussian);
+               bool wrap_lon, double t, const GaussianInfo &gaussian);
 
 extern DataPlane smooth_field(const DataPlane &dp,
                     InterpMthd mthd, int width,
                     const GridTemplateFactory::GridTemplates shape,
-                    bool is_global, double t, const GaussianInfo &gaussian);
+                    bool wrap_lon, double t, const GaussianInfo &gaussian);
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,
-               bool is_global, SingleThresh t, double vld_t);
+               bool wrap_lon, SingleThresh t, double vld_t);
 
 extern void apply_mask(const DataPlane &, const MaskPlane &, NumArray &);
 extern void apply_mask(DataPlane &, const MaskPlane &);

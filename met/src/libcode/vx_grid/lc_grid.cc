@@ -638,7 +638,7 @@ return ( angle );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LambertGrid::is_global() const
+bool LambertGrid::wrap_lon() const
 
 {
 

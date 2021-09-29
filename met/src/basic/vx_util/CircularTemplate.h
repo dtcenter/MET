@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,7 @@ class CircularTemplate : public GridTemplate {
 
    public:
 
-      CircularTemplate(int width, bool is_global);
+      CircularTemplate(int width, bool wrap_lon);
       virtual ~CircularTemplate(void);
 
       void printOffsetList(FILE *stream);

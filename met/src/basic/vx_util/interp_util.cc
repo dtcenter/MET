@@ -738,8 +738,8 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
 //
 ////////////////////////////////////////////////////////////////////////
 
-double interp_bilin(const DataPlane &dp, bool is_global, double obs_x, double obs_y,
-                    const MaskPlane *mp) {
+double interp_bilin(const DataPlane &dp, bool wrap_lon,
+                    double obs_x, double obs_y, const MaskPlane *mp) {
    int x, xp1, y;
    double bilin_v, dx, dy;
    double wtsw, wtse, wtnw, wtne;
@@ -748,8 +748,8 @@ double interp_bilin(const DataPlane &dp, bool is_global, double obs_x, double ob
    y = nint(floor(obs_y));
 
    // Apply global wrap logic to x and x+1
-   x   = (is_global ? positive_modulo(x,   dp.nx()) : x);
-   xp1 = (is_global ? positive_modulo(x+1, dp.nx()) : x+1);
+   x   = (wrap_lon ? positive_modulo(x,   dp.nx()) : x);
+   xp1 = (wrap_lon ? positive_modulo(x+1, dp.nx()) : x+1);
 
    // Check the optional mask
    if(mp) {
@@ -840,12 +840,12 @@ double interp_bilin(const DataPlane &dp, bool is_global, double obs_x, double ob
 //
 ////////////////////////////////////////////////////////////////////////
 
-double interp_xy(const DataPlane &dp, bool is_global, int x, int y,
+double interp_xy(const DataPlane &dp, bool wrap_lon, int x, int y,
                  const MaskPlane *mp) {
    double v;
 
    // Apply global wrap logic
-   x = (is_global ? positive_modulo(x, dp.nx()) : x);
+   x = (wrap_lon ? positive_modulo(x, dp.nx()) : x);
 
    // Check the optional mask
    if(mp) {
@@ -938,9 +938,8 @@ double compute_sfc_interp(const DataPlane &dp,
                           double obs_elv, double obs_v,
                           const InterpMthd mthd, const int width,
                           const GridTemplateFactory::GridTemplates shape,
-                          bool is_global,
-                          double interp_thresh, const SurfaceInfo &sfc_info,
-                          bool is_land_obs) {
+                          bool wrap_lon, double interp_thresh,
+                          const SurfaceInfo &sfc_info, bool is_land_obs) {
    double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
@@ -952,7 +951,7 @@ double compute_sfc_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, is_global);
+   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
 
@@ -986,11 +985,11 @@ double compute_sfc_interp(const DataPlane &dp,
          break;
 
       case(InterpMthd_Bilin):       // Bilinear interpolation
-         v = interp_bilin(dp, is_global, obs_x, obs_y, &sfc_mask);
+         v = interp_bilin(dp, wrap_lon, obs_x, obs_y, &sfc_mask);
          break;
 
       case(InterpMthd_Nearest):     // Nearest Neighbor
-         v = interp_xy(dp, is_global, x, y, &sfc_mask);
+         v = interp_xy(dp, wrap_lon, x, y, &sfc_mask);
          break;
 
       case(InterpMthd_Best):        // Best Match
@@ -998,19 +997,19 @@ double compute_sfc_interp(const DataPlane &dp,
          break;
 
       case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
-         v = interp_xy(dp, is_global, floor(obs_x), ceil(obs_y), &sfc_mask);
+         v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
       case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
-         v = interp_xy(dp, is_global, ceil(obs_x), ceil(obs_y), &sfc_mask);
+         v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
       case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
-         v = interp_xy(dp, is_global, ceil(obs_x), floor(obs_y), &sfc_mask);
+         v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y), &sfc_mask);
          break;
 
       case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
-         v = interp_xy(dp, is_global, floor(obs_x), floor(obs_y), &sfc_mask);
+         v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y), &sfc_mask);
          break;
 
       case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
@@ -1095,10 +1094,10 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
-                           bool is_global,
-                           double interp_thresh, const SingleThresh *cat_thresh) {
+                           bool wrap_lon, double interp_thresh,
+                           const SingleThresh *cat_thresh) {
    return(compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
-             bad_data_double, mthd, width, shape, is_global,
+             bad_data_double, mthd, width, shape, wrap_lon,
              interp_thresh, cat_thresh));
 }
 
@@ -1109,8 +1108,8 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_v, double cmn, double csd,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
-                           bool is_global,
-                           double interp_thresh, const SingleThresh *cat_thresh) {
+                           bool wrap_lon, double interp_thresh,
+                           const SingleThresh *cat_thresh) {
    double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
@@ -1122,7 +1121,7 @@ double compute_horz_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, is_global);
+   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
@@ -1159,11 +1158,11 @@ double compute_horz_interp(const DataPlane &dp,
          break;
 
       case(InterpMthd_Bilin):       // Bilinear interpolation
-         v = interp_bilin(dp, is_global, obs_x, obs_y);
+         v = interp_bilin(dp, wrap_lon, obs_x, obs_y);
          break;
 
       case(InterpMthd_Nearest):     // Nearest Neighbor
-         v = interp_xy(dp, is_global, x, y);
+         v = interp_xy(dp, wrap_lon, x, y);
          break;
 
       case(InterpMthd_Best):        // Best Match
@@ -1171,19 +1170,19 @@ double compute_horz_interp(const DataPlane &dp,
          break;
 
       case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
-         v = interp_xy(dp, is_global, floor(obs_x), ceil(obs_y));
+         v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y));
          break;
 
       case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
-         v = interp_xy(dp, is_global, ceil(obs_x), ceil(obs_y));
+         v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y));
          break;
 
       case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
-         v = interp_xy(dp, is_global, ceil(obs_x), floor(obs_y));
+         v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y));
          break;
 
       case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
-         v = interp_xy(dp, is_global, floor(obs_x), floor(obs_y));
+         v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y));
          break;
 
       case(InterpMthd_Geog_Match):  // Geography Match for surface point verification

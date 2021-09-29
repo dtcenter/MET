@@ -95,7 +95,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  bool is_global, double t, const GaussianInfo &gaussian) {
+                  bool wrap_lon, double t, const GaussianInfo &gaussian) {
    double v = 0.0;
    int x, y;
 
@@ -107,10 +107,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    // build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width, is_global);
+   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    mlog << Debug(3)
-        << "Smoothing " << (is_global ? "global" : "non-global")
+        << "Smoothing " << (wrap_lon ? "global" : "non-global")
         << " field using the " << interpmthd_to_string(mthd)
         << "(" << gt->size() << ") " << gt->getClassName()
         << " interpolation method.\n";
@@ -186,10 +186,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       bool is_global, double t, const GaussianInfo &gaussian) {
+                       bool wrap_lon, double t, const GaussianInfo &gaussian) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, is_global, t, gaussian);
+   smooth_field(dp, smooth_dp, mthd, width, shape, wrap_lon, t, gaussian);
 
    return(smooth_dp);
 }
@@ -203,7 +203,7 @@ DataPlane smooth_field(const DataPlane &dp,
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
-        bool is_global, SingleThresh t, double vld_t) {
+        bool wrap_lon, SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
    int x, y;
    int n_vld = 0;
@@ -219,7 +219,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
    // Build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width, is_global);
+   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    mlog << Debug(3)
         << "Computing fractional coverage field using the "

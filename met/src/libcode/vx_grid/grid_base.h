@@ -136,7 +136,7 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual double rot_grid_to_earth(int x, int y) const = 0;
 
-      virtual bool is_global() const = 0;
+      virtual bool wrap_lon() const = 0;
 
       virtual void shift_right(int) = 0;
 
@@ -168,7 +168,7 @@ class GridRep : public GridInterface {
 
       virtual double rot_grid_to_earth(int x, int y) const = 0;
 
-      virtual bool is_global() const = 0;
+      virtual bool wrap_lon() const = 0;
 
       virtual void shift_right(int) = 0;
 
@@ -246,7 +246,7 @@ class Grid : public GridInterface {
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 

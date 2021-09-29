@@ -1588,13 +1588,13 @@ void process_grid_vx() {
          // Smooth the ensemble mean field, if requested
          if(ens_mean_flag &&
             (field == FieldType_Fcst || field == FieldType_Both)) {
-            emn_dp = smooth_field(emn_dp, mthd, wdth, shape, grid.is_global(),
+            emn_dp = smooth_field(emn_dp, mthd, wdth, shape, grid.wrap_lon(),
                                   vld_thresh, gaussian);
          }
 
          // Smooth the observation field, if requested
          if(field == FieldType_Obs || field == FieldType_Both) {
-            obs_dp = smooth_field(obs_dp, mthd, wdth, shape, grid.is_global(),
+            obs_dp = smooth_field(obs_dp, mthd, wdth, shape, grid.wrap_lon(),
                                   vld_thresh, gaussian);
          }
 
@@ -1617,7 +1617,7 @@ void process_grid_vx() {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
-               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape, grid.is_global(),
+               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape, grid.wrap_lon(),
                                          vld_thresh, gaussian);
             }
 
@@ -2060,7 +2060,7 @@ void track_counts(int i_vx, const DataPlane &dp) {
             fractional_coverage(dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
-               grid.is_global(), ThreshBuf[i],
+               grid.wrap_lon(), ThreshBuf[i],
                conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
@@ -2497,7 +2497,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                smooth_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
                               conf_info.nbrhd_prob.width[j],
                               conf_info.nbrhd_prob.shape,
-                              grid.is_global(),
+                              grid.wrap_lon(),
                               conf_info.nbrhd_prob.vld_thresh, info);
 
                for(k=0; k<count_na.n(); k++) {
@@ -2552,7 +2552,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                               string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
                               conf_info.nmep_smooth.width[k],
                               conf_info.nmep_smooth.shape,
-                              grid.is_global(),
+                              grid.wrap_lon(),
                               conf_info.nmep_smooth.vld_thresh,
                               conf_info.nmep_smooth.gaussian);
 

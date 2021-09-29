@@ -17,7 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
-//   001    09-07-21  Halley Gotway   Add is_global.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -105,8 +105,8 @@ class GridTemplate {
          return _offsetList.size();
       }
 
-      int getIsGlobal(void) const {
-         return _isGlobal;
+      int getWrapLon(void) const {
+         return _wrapLon;
       }
 
       virtual const char* getClassName(void) const = 0;
@@ -115,7 +115,7 @@ class GridTemplate {
 
    protected:
 
-      bool _isGlobal;
+      bool _wrapLon;
 
       // The offsets that make up the circle
       vector<GridOffset*> _offsetList;
@@ -173,8 +173,8 @@ class GridTemplateFactory {
       GridTemplates string2Enum(string target);
       string enum2String(GridTemplates gt);
 
-      GridTemplate* buildGT(string gt, int width, bool is_global);
-      GridTemplate* buildGT(GridTemplates gt, int width, bool is_global);
+      GridTemplate* buildGT(string gt, int width, bool wrap_lon);
+      GridTemplate* buildGT(GridTemplates gt, int width, bool wrap_lon);
 
 };
 
