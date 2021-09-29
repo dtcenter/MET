@@ -59,15 +59,6 @@ extern ConcatString str_trim(const ConcatString str);
 
 extern int parse_thresh_index(const char *str);
 
-extern int m_strlen(const char *str);
-
-extern void m_strcpy(char *to_str, const char *from_str, const char *method_name,
-                     const char *extra_msg=(char *)0);
-extern char *m_strcpy2(const char *from_str, const char *method_name,
-                       const char *extra_msg=(char *)0);
-extern void m_strncpy(char *to_str, const char *from_str, const int buf_len,
-                      const char *method_name, const char *extra_msg=(char *)0);
-
 ////////////////////////////////////////////////////////////////////////
 
 

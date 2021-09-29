@@ -3051,7 +3051,7 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
    msg_typ_arr = new char * [n];
 
    // Initialize the temp string for use in tokenizing
-   m_strcpy(tmp_str, msg_typ_str, method_name);
+   m_strncpy(tmp_str, msg_typ_str, max_str_len, method_name);
 
    // Tokenize the string and store the double values
    c = strtok(tmp_str, " ");

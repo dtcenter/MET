@@ -22,6 +22,7 @@ using namespace std;
 
 #include "concat_string.h"
 #include "logger.h"
+#include "str_wrappers.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,7 +77,7 @@ ConcatString::~ConcatString()
 {
 
 clear();
-delete s;
+if (s) delete s;
 
 }
 
@@ -333,7 +334,7 @@ void ConcatString::chomp(const char c)
 
 void ConcatString::chomp(const char * suffix)
 {
-   size_t limit = length() - strlen(suffix);
+   size_t limit = length() - m_strlen(suffix);
    size_t pos = s->find(suffix, limit);
    if (pos != string::npos) s->erase(pos);
 }
@@ -400,7 +401,7 @@ void ConcatString::elim_trailing_whitespace()
 
 bool ConcatString::startswith(const char * Text) const
 {
-   size_t pos = s->rfind(Text, strlen(Text));
+   size_t pos = s->rfind(Text, m_strlen(Text));
    return (pos != string::npos);
 }
 
@@ -410,7 +411,7 @@ bool ConcatString::startswith(const char * Text) const
 
 bool ConcatString::endswith(const char * Text) const
 {
-   size_t pos = s->find(Text, s->length() - strlen(Text));
+   size_t pos = s->find(Text, s->length() - m_strlen(Text));
    return (pos != string::npos);
 }
 
@@ -539,7 +540,7 @@ int ConcatString::format(const char *fmt, ...)
 {
    va_list vl;
    int status = -1;
-   char *tmp;
+   char *tmp = NULL;
 
    va_start(vl, fmt);
    status = vasprintf(&tmp, fmt, vl);
@@ -587,7 +588,7 @@ void ConcatString::replace(const char * target, const char * replacement,
 
    size_t pos;
    while ((pos = s->find(target)) != string::npos) {
-      s->replace(pos, strlen(target), replacement);
+      s->replace(pos, m_strlen(target), replacement);
    }
 }
 
@@ -1189,7 +1190,7 @@ bool is_empty(const char * text)
 
 {
 
-return ( (text == NULL) || (*text == 0) || (strlen(text) == 0));
+return ( (text == NULL) || (*text == 0) || (m_strlen(text) == 0));
 
 }
 
@@ -1208,10 +1209,9 @@ static const char *method_name = "get_env() ";
 // Initialize
 env_value.clear();
 
-if (str.find('/') != string::npos ||
-   (ptr = getenv(env_name)) == NULL) {
-   return(false);
-}
+// SonarQube: two ifs to avoid the side effect by the logical || operator
+if (str.find('/') != string::npos) return(false);
+if ((ptr = getenv(env_name)) == NULL) return(false);
 
 env_value = ptr;
 str = env_value;

@@ -16,7 +16,7 @@ using namespace std;
 #include <cmath>
 
 
-#include "string_fxns.h"
+#include "str_wrappers.h"
 
 #include "color_parser.h"   //  this must be included before color_parser_yacc.h
 #include "color.h"

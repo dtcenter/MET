@@ -42,6 +42,8 @@ wind_logic    = UNION;
 eclv_points   = 0.05;
 sid_inc       = [];
 sid_exc       = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 
 fcst = {
 

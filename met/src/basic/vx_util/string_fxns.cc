@@ -31,8 +31,6 @@ using namespace std;
 #include "vx_log.h"
 
 
-const bool ENHANCE_STR_APIS = false;
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -114,7 +112,7 @@ const char * get_short_name(const char * path)
 
 {
 
-const char * short_name = (const char *) 0;
+const char * short_name = (const char *) NULL;
 
 if ( path ) {
    int j;
@@ -140,7 +138,7 @@ return ( short_name );
 void append_char(char *str, const char c)
 
 {
-   char *ptr = (char *) 0;
+   char *ptr = (char *) NULL;
 
    //
    // If the specified characater does not already exist at the
@@ -166,7 +164,7 @@ void append_char(char *str, const char c)
 void strip_char(char *str, const char c)
 
 {
-   char *ptr = (char *) 0;
+   char *ptr = (char *) NULL;
 
    //
    // If the specified character exists at the end of the string,
@@ -188,9 +186,9 @@ void strip_char(char *str, const char c)
 int num_tokens(const char *test_str, const char *separator)
 
 {
-   int n;
-   char *temp_str = (char *) 0;
-   char *c = (char *) 0;
+   int n = 0;
+   char *temp_str = (char *) NULL;
+   char *c = (char *) NULL;
    const char *method_name = "num_tokens() -> ";
 
    //
@@ -216,18 +214,19 @@ int num_tokens(const char *test_str, const char *separator)
       //
       // Check for an empty string
       //
-      if(!c) { delete [] temp_str;  temp_str = 0;  return(0); }
-      else   n = 1;
+      if(c) {
+         n = 1;
 
-      //
-      // Parse remaining tokens
-      //
-      //
-      while((c = strtok(0, separator)) != NULL) n++;
+         //
+         // Parse remaining tokens
+         //
+         //
+         while((c = strtok(0, separator)) != NULL) n++;
+      }
 
    }
 
-   if(temp_str) { delete [] temp_str; temp_str = (char *) 0; }
+   if(temp_str) { delete [] temp_str; temp_str = (char *) NULL; }
 
    return(n);
 }
@@ -298,8 +297,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
          for(int i=0; i < num_act; i++){
             int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
             mat[i] = new char[mat_len + 1];
-            m_strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
-                     method_name, "mat[i]");
+            m_strncpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
+                      mat_len, method_name, "mat[i]");
          }
          mat[num_act] = NULL;
 
@@ -309,7 +308,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    }
 
    regfree(re);
-   if( re ) { delete re; re = 0; }
+   if( re ) { delete re; re = NULL; }
    return num_act;
 }
 
@@ -384,7 +383,7 @@ ConcatString str_trim(const ConcatString str){
 
 int parse_thresh_index(const char *col_name) {
    int i = 0;
-   const char *ptr = (const char *) 0;
+   const char *ptr = (const char *) NULL;
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
    else {
@@ -396,103 +395,5 @@ int parse_thresh_index(const char *col_name) {
 
    return(i);
 }
-
-////////////////////////////////////////////////////////////////////////
-
-int m_strlen(const char *str) {
-   int str_len = 0;
-   if (str) str_len = strlen(str);  // or use sizeof str;
-
-   return str_len;
-}
-
-////////////////////////////////////////////////////////////////////////
-// to_string is allocated.
-
-void m_strcpy(char *to_str, const char *from_str, const char *method_name,
-              const char *extra_msg) {
-
-   if (ENHANCE_STR_APIS) {
-      int str_len = sizeof to_str;
-      m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
-   }
-   else strcpy(to_str, from_str);
-
-}
-
-////////////////////////////////////////////////////////////////////////
-// to_string is not allocated. Allocate to_string and return the to_string after copying
-
-char *m_strcpy2(const char *from_str, const char *method_name, const char *extra_msg) {
-   char *to_str = (char *) 0;
-   if (from_str) {
-      int str_len = m_strlen(from_str);
-
-      to_str = new char[str_len + 1];
-
-      if(!to_str) {
-         mlog << Error << "\n" << method_name
-              << "memory allocation error (m_strcpy)"
-              << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-         exit(1);
-      }
-
-      m_strcpy(to_str, from_str, method_name, extra_msg);
-   }
-   else {
-      mlog << Error << "\n" << method_name 
-           << " Do not copy the string because a from_string is NULL. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-   }
-
-   return to_str;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void m_strncpy(char *to_str, const char *from_str, const int buf_len,
-               const char *method_name, const char *extra_msg) {
-   if (!from_str){
-      mlog << Warning << "\n" << method_name 
-           << " Do not copy the string because a from_string is NULL. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-   }
-   else if (!to_str){
-      mlog << Warning << "\n" << method_name 
-           << " Do not copy the string because a to_string is NULL. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-   }
-   else {   // (from_str && to_str)
-      int str_len = m_strlen(from_str);
-      if (str_len > buf_len) str_len = buf_len;
-
-      memset(to_str, 0, str_len);
-      if (ENHANCE_STR_APIS) {
-         string temp_str = from_str;
-         temp_str.copy(to_str, str_len);
-         to_str[str_len] = 0;
-
-         // Kludge: The sizeof from_str is 8 when the filenames come from a python script
-         if (strcmp(from_str, to_str)) {
-            str_len = m_strlen(from_str);
-            if (str_len > buf_len) str_len = buf_len;
-            temp_str.copy(to_str, str_len);
-            to_str[str_len] = 0;
-         }
-      }
-      else {
-         strncpy(to_str, from_str, str_len);
-         to_str[str_len] = 0;
-      }
-
-      if (strcmp(from_str, to_str)) {
-         mlog << Warning << "\n" << method_name
-              << " truncated a string " << (extra_msg == 0 ? "" : extra_msg)
-              << " from \"" << from_str << "\" to \"" << to_str << "\"\n\n";
-      }
-   }
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "is_number.h"
-#include "string_fxns.h"
+#include "str_wrappers.h"
 #include "substring.h"
 
 

@@ -275,7 +275,7 @@ int str_to_grib_code(const char *c, int &pcode,
    //    PROB(string>lo)
    //    PROB(string<hi)
 
-   m_strcpy(tmp_str, c, method_name);
+   m_strncpy(tmp_str, c, buf_len, method_name);
 
    // Retrieve the first token containing the GRIB code info
    if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
@@ -325,7 +325,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
       if(c[i] == '<') n_lt++;
       if(c[i] == '>') n_gt++;
    }
-   m_strcpy(tmp_str, c, method_name);
+   m_strncpy(tmp_str, c, buf_len, method_name);
 
    // Single inequality
    if(n_lt + n_gt == 1) {
