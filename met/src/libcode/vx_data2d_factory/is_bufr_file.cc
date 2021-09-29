@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -27,7 +25,6 @@ using namespace std;
 
 #include "is_bufr_file.h"
 #include "vx_log.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////

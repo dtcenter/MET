@@ -21,7 +21,6 @@ using namespace std;
 #include <cmath>
 
 #include "ordinal.h"
-#include "string_fxns.h"
 #include "vx_log.h"
 
 

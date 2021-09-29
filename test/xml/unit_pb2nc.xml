@@ -153,7 +153,7 @@
   <test name="pb2nc_NDAS_var_all">
     <exec>&MET_BIN;/pb2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>          <value>"72364","72265","72274","72426","72489"</value></pair>
+      <pair><name>STATION_ID</name>          <value>"72364","72265","72274","72426","72489","14008"</value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
       <pair><name>MASK_POLY</name>           <value></value></pair>
       <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>

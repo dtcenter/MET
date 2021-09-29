@@ -454,7 +454,9 @@ void dhsv_to_drgb(double h, double s, double v, double & r, double & g, double &
 
 {
 
-if ( is_eq(s, 0.0) )  { r = g = b = v;  return; };
+r = g = b = v;  // initialze, default is missing at switch statement below
+
+if ( is_eq(s, 0.0) ) return;
 
 int i;
 double f, p, q, t;

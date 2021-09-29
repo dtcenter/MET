@@ -86,9 +86,11 @@ nmep_smooth = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type = [ "ADPSFC" ];
-   sid_inc      = [];
-   sid_exc      = [];
+   message_type    = [ "ADPSFC" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
 
    field = [
       {
@@ -108,7 +110,6 @@ obs = fcst;
 // May be set separately in each "obs.field" entry
 //
 obs_thresh     = [ NA ];
-obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;

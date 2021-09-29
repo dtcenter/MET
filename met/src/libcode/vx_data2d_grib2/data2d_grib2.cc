@@ -27,7 +27,6 @@ using namespace std;
 
 #include "data2d_grib2.h"
 #include "grib_strings.h"
-#include "string_fxns.h"
 #include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"

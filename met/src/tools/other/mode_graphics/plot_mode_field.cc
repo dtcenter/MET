@@ -536,7 +536,7 @@ if ( do_anno )   fill_box(whole_box, anno_bg_color, plot);
 
 get_data_ppm(mode_in, image);
 
-plot.import(image, map_box.left(), map_box.bottom(), 0.0, 0.0, 1.0);
+plot.import_image(image, map_box.left(), map_box.bottom(), 0.0, 0.0, 1.0);
 
    //
    //  draw the map

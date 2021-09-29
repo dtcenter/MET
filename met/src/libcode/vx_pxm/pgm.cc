@@ -28,7 +28,6 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_math.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
