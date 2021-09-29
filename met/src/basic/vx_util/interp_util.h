@@ -103,7 +103,7 @@ extern double compute_sfc_interp(const DataPlane &dp,
                                  double obs_elv, double obs_v,
                                  const InterpMthd mthd, const int width,
                                  const GridTemplateFactory::GridTemplates shape,
-                                 bool wrap_lon, double interp_thresh
+                                 bool wrap_lon, double interp_thresh,
                                  const SurfaceInfo &sfc_info, bool is_land_obs);
 
 extern MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
