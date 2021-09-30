@@ -4,8 +4,8 @@
 # (Model Evaluation Tools)
 #================================================
 #
-# The compile_MET_all.sh script will compile and install
-# MET and its external library dependencies, if needed.
+# The compile_MET_all.sh script will compile and install MET and its
+# external library dependencies, if needed.
 #
 # Turn on compilation of GSL, HDF, HDFEOS, CAIRO, and
 # FREETYPE below using the COMPILE_<SOFTWARE> flags below.
@@ -33,7 +33,8 @@
 
 
 if [ -z $1 ]; then
-    echo "No environment file provided. Starting compilation with current environment."
+    echo
+    echo "No environment configuration file provided (e.g. install_met_env.<machine_name>). Starting compilation with current environment."
 else
     if [ ! -f "$1" ]; then
 	echo "The file \"$1\" does not exist!"
@@ -100,9 +101,9 @@ else
 fi
 
 if [[ -z ${MET_HDF} ]] && [[ -z ${MET_HDFEOS} ]]; then
-    # Only turn on if you want to compile and enable MODIS-Regrid (not widely used)
-    COMPILE_HDF=1
-    COMPILE_HDFEOS=1
+    # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you want to compile and enable MODIS-Regrid (not widely used)
+    COMPILE_HDF=0
+    COMPILE_HDFEOS=0
     if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
       export MET_HDF=${LIB_DIR}
       export MET_HDFEOS=${LIB_DIR}
@@ -128,8 +129,8 @@ fi
 
 if [[ -z ${MET_FREETYPEINC} && -z ${MET_FREETYPELIB} && -z ${MET_CAIROINC} && -z ${MET_CAIROLIB} ]]; then
     # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you want to compile and enable MODE Graphics (not widely used)
-    COMPILE_FREETYPE=1
-    COMPILE_CAIRO=1
+    COMPILE_FREETYPE=0
+    COMPILE_CAIRO=0
     if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
       export MET_CAIROINC=${LIB_DIR}/include/cairo
       export MET_CAIROLIB=${LIB_DIR}/lib
@@ -771,9 +772,6 @@ if [ $COMPILE_MET -eq 1 ]; then
   if [ -z ${MET_BUFRLIB} ]; then
       export MET_BUFRLIB=${LIB_DIR}/lib
       export BUFRLIB_NAME=-lbufr
-  #else
-  #    export MET_BUFRLIB=${MET_BUFRLIB}
-  #    export BUFRLIB_NAME=${BUFRLIB_NAME}
   fi
 
   if [ -z ${MET_GRIB2CLIB} ]; then
@@ -783,29 +781,17 @@ if [ $COMPILE_MET -eq 1 ]; then
       export LIB_LIBPNG=${LIB_DIR}/lib
       export LIB_Z=${LIB_DIR}/lib
       export GRIB2CLIB_NAME=-lgrib2c
-  #else
-  #    export MET_GRIB2CLIB=${MET_GRIB2CLIB}
-  #    export MET_GRIB2CINC=${MET_GRIB2CINC}
-  #    export GRIB2CLIB_NAME=${GRIB2CLIB_NAME}
   fi
   
   if [ -z ${MET_NETCDF} ]; then
       export MET_NETCDF=${LIB_DIR}
       export MET_HDF5=${LIB_DIR}
-  #else
-  #    export MET_NETCDF=${MET_NETCDF}
-  #    export MET_HDF5=${MET_HDF5}
   fi
  
   if [ -z ${MET_GSL} ]; then
       export MET_GSL=${LIB_DIR}
-  #else
-  #    export MET_GSL=${MET_GSL}
-  #    export LD_LIBRARY_PATH=${MET_GSL}/lib:${LD_LIBRARY_PATH}
   fi
 
-  #export MET_HDF=${LIB_DIR}
-  #export MET_HDFEOS=${LIB_DIR}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
@@ -823,13 +809,6 @@ if [ $COMPILE_MET -eq 1 ]; then
       export CXXFLAGS="-D__64BIT__"
   fi
 
-  #if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-  #    export MET_CAIROINC=${LIB_DIR}/include/cairo
-  #    export MET_CAIROLIB=${LIB_DIR}/lib
-  #    export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
-  #    export MET_FREETYPELIB=${LIB_DIR}/lib
-  #fi
-      
   echo "MET Configuration settings..."
   printenv | egrep "^MET_" | sed -r 's/^/export /g'
   echo "LDFLAGS = ${LDFLAGS}"
