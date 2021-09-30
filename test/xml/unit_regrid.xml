@@ -360,10 +360,11 @@
   <test name="regrid_data_plane_WRAP_LON">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
-      &DATA_DIR_MODEL;/nccf/prods_op_gl-mn_20210305_00_000.nc \
-      "latlon 360 91 -45.0 -180.0 1.0 1.0" \
+      &DATA_DIR_MODEL;/nccf/GloTEC_TEC_2015_03_17.nc \
+      "latlon 360 91 -45.0 0 1.0 1.0" \
       &OUTPUT_DIR;/regrid/regrid_data_plane_WRAP_LON.nc \
-      -field 'name="air_temperature"; level="(*,*)";'
+      -field 'name="TEC"; level="(0,*,*)"; file_type=NETCDF_NCCF;' \
+      -method MAX -width 5 -shape CIRCLE
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_WRAP_LON.nc</grid_nc>
