@@ -136,9 +136,9 @@ wrapLon = (lon_rng_flag && lon_div_flag);
 
 if ( lon_rng_flag && !lon_div_flag )  {
 
-   mlog << Debug(3) << "Cannot wrap longitudes when 360 is not divisible "
-        << "by delta_lon (" << delta_lon << "):\n"
-        << serialize() << "\n";
+   mlog << Debug(3) << "Cannot wrap longitudes since 360 is not "
+        << "evenly divisible by the delta_lon value of "
+        << delta_lon << ".\n";
 
 }
 
