@@ -118,10 +118,29 @@ Name = data.name;
 
 Data = data;
 
-const double lon_range = fabs((Nx + 1)*delta_lon);
+   //
+   //  wrap longitudes when:
+   //    - all 360 degrees are included
+   //    - 360 is divisible by delta_lon
+   //
 
-wrapLon = (lon_range >= 360.0);
+bool   lon_rng_flag = fabs((Nx + 1)*delta_lon) >= 360.0;
+double lon_div      = 360.0 / delta_lon;
+bool   lon_div_flag = is_eq(lon_div, floor(lon_div));
 
+wrapLon = (lon_rng_flag && lon_div_flag);
+
+   //
+   //  inform users about unexpected delta longitudes
+   //
+
+if ( lon_rng_flag && !lon_div_flag )  {
+
+   mlog << Debug(3) << "Cannot wrap longitudes when 360 is not divisible "
+        << "by delta_lon (" << delta_lon << "):\n"
+        << serialize() << "\n";
+
+}
 
 return;
 
@@ -134,6 +153,7 @@ return;
 void LatLonGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const
 
 {
+
 double n;
 
 y = (lat - lat_ll)/delta_lat;
@@ -250,7 +270,7 @@ out << prefix << "lon_ll       = " << lon_ll << "\n";
 out << prefix << "delta_lat_ll = " << delta_lat << "\n";
 out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
-out << prefix << "wrapLon     = " << bool_to_string(wrapLon) << "\n";
+out << prefix << "wrapLon      = " << bool_to_string(wrapLon) << "\n";
 
    //
    //  done
