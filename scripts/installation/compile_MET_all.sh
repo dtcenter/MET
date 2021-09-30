@@ -43,6 +43,7 @@ else
     fi
 fi
 
+echo
 echo "TEST_BASE = ${TEST_BASE? "ERROR: TEST_BASE must be set"}"
 echo "COMPILER  = ${COMPILER?  "ERROR: COMPILER must be set"}"
 echo "MET_SUBDIR = ${MET_SUBDIR? "ERROR: MET_SUBDIR must be set"}"
@@ -64,7 +65,7 @@ if [ ! -e $TAR_DIR ]; then
 fi
 
 # Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_JASPER}${LIB_Z:+$LIB_Z}${MET_GSL:+:$MET_GSL/lib}:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_JASPER}${LIB_Z:+$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # Constants
@@ -79,11 +80,13 @@ else
     COMPILE_JASPER=0
     COMPILE_G2CLIB=0
 fi
+
 if [ -z ${MET_BUFRLIB} ]; then    
     COMPILE_BUFRLIB=1
 else
     COMPILE_BUFRLIB=0
 fi
+
 if [ -z ${MET_NETCDF} ]; then
     COMPILE_NETCDF=1
 else
@@ -96,10 +99,51 @@ else
     COMPILE_GSL=0
 fi
 
-COMPILE_HDF=0
-COMPILE_HDFEOS=0
-COMPILE_FREETYPE=0
-COMPILE_CAIRO=0
+if [[ -z ${MET_HDF} ]] && [[ -z ${MET_HDFEOS} ]]; then
+    # Only turn on if you want to compile and enable MODIS-Regrid (not widely used)
+    COMPILE_HDF=1
+    COMPILE_HDFEOS=1
+    if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+      export MET_HDF=${LIB_DIR}
+      export MET_HDFEOS=${LIB_DIR}
+    fi
+else
+    # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you have already compiled HDF4 and HDFEOS,
+    # have set MET_HDF and MET_HDFEOS in your configuration file, and want to enable
+    # MODIS-Regrid (not widely used)
+    COMPILE_HDF=0
+    COMPILE_HDFEOS=0
+fi
+
+if [[ ! -z ${MET_FREETYPE} ]]; then
+   echo "ERROR: MET_FREETYPEINC and MET_FREETYPELIB must be set instead of MET_FREETYPE"
+   exit 1
+fi
+
+if [[ ! -z ${MET_CAIRO} ]]; then
+   echo	"ERROR: MET_CAIROINC and MET_CAIROLIB must be set instead of MET_CAIRO"
+   exit 1
+fi
+
+
+if [[ -z ${MET_FREETYPEINC} && -z ${MET_FREETYPELIB} && -z ${MET_CAIROINC} && -z ${MET_CAIROLIB} ]]; then
+    # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you want to compile and enable MODE Graphics (not widely used)
+    COMPILE_FREETYPE=1
+    COMPILE_CAIRO=1
+    if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
+      export MET_CAIROINC=${LIB_DIR}/include/cairo
+      export MET_CAIROLIB=${LIB_DIR}/lib
+      export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
+      export MET_FREETYPELIB=${LIB_DIR}/lib
+    fi
+else
+    # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you have compiled FREETYPE and CAIRO,
+    # have set MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC, and MET_CAIROLIB in your
+    # configuration file, and want to enable MODE Graphics (not widely used)
+    COMPILE_FREETYPE=0    
+    COMPILE_CAIRO=0
+fi
+
 COMPILE_MET=1
 
 if [ -z ${BIN_DIR_PATH} ]; then
@@ -125,8 +169,11 @@ fi
 # Load compiler version
 COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
 COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
+COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
 
+echo
 echo "USE_MODULES = ${USE_MODULES}"
+echo
 
 if [ ${USE_MODULES} = "TRUE" ]; then 
     echo "module load ${COMPILER_FAMILY}/${COMPILER_VERSION}"
@@ -221,7 +268,7 @@ echo "export CXX=${CXX}"
 echo "export  FC=${FC}"
 echo "export F77=${F77}"
 echo "export F90=${F90}"
-
+echo
 
 # Load Python module
 
@@ -235,9 +282,11 @@ if [ ${USE_MODULES} = "TRUE" ]; then
     fi
 fi
 
-echo "Using python version: "
-python --version
-
+if [[ ${MET_PYTHON}/bin/python3 ]]; then
+  echo "Using python version: "
+  ${MET_PYTHON}/bin/python3 --version
+fi
+  
 # Compile GSL
 if [ $COMPILE_GSL -eq 1 ]; then
 
@@ -295,8 +344,12 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
   # For GNU and Intel follow BUFRLIB11 instructions                                                                                                                                                    
   if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
-    ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
-  elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
+    if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
+      ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+    elif [[ ${COMPILER_MAJOR_VERSION} -lt 10 ]]; then
+      ${FC} -c -fno-second-underscore -Wno-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+    fi	
+  elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
     ${FC} -c `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
   elif [[ ${COMPILER_FAMILY} == "pgi" ]]; then
     ${FC} -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
@@ -304,7 +357,6 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
   ar crv libbufr.a *.o >> make.log 2>&1
   cp *.a ${LIB_DIR}/lib/.
-  export BUFRLIB_NAME=-lbufr
 fi
 
 
@@ -436,7 +488,6 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   fi
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
-  export GRIB2CLIB_NAME=-lgrib2c
 fi
 
 # Compile HDF
@@ -464,9 +515,15 @@ if [ $COMPILE_HDF -eq 1 ]; then
     sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
     > Makefile_new
   mv Makefile_new mfhdf/hdiff/Makefile
-  cat hdf/src/Makefile | \
-    sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
-    > Makefile_new
+  if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
+    cat hdf/src/Makefile | \
+      sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
+      > Makefile_new
+  elif [[ ${COMPILER_MAJOR_VERSION} -lt 10 ]]; then
+    cat hdf/src/Makefile | \
+      sed 's/FFLAGS =  -O2/FFLAGS = -w -Wno-argument-mismatch -O2/g' \
+      > Makefile_new
+  fi
   mv Makefile_new hdf/src/Makefile
   echo "make > make.log 2>&1"
   make > make.log 2>&1
@@ -516,7 +573,7 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
      echo "make install returned with non-zero ($ret) status"
      exit 1
   fi
-  cp include/*.h ${LIB_DIR}/include/.
+  cp include/*.h ${LIB_DIR}/include/
 fi
 
 # Compile NetCDF
@@ -713,8 +770,10 @@ if [ $COMPILE_MET -eq 1 ]; then
 
   if [ -z ${MET_BUFRLIB} ]; then
       export MET_BUFRLIB=${LIB_DIR}/lib
-  else
-      export MET_BUFRLIB=${MET_BUFRLIB}
+      export BUFRLIB_NAME=-lbufr
+  #else
+  #    export MET_BUFRLIB=${MET_BUFRLIB}
+  #    export BUFRLIB_NAME=${BUFRLIB_NAME}
   fi
 
   if [ -z ${MET_GRIB2CLIB} ]; then
@@ -723,28 +782,30 @@ if [ $COMPILE_MET -eq 1 ]; then
       export LIB_JASPER=${LIB_DIR}/lib
       export LIB_LIBPNG=${LIB_DIR}/lib
       export LIB_Z=${LIB_DIR}/lib
-  else
-      export MET_GRIB2CLIB=${MET_GRIB2CLIB}
-      export MET_GRIB2CINC=${MET_GRIB2CINC}
+      export GRIB2CLIB_NAME=-lgrib2c
+  #else
+  #    export MET_GRIB2CLIB=${MET_GRIB2CLIB}
+  #    export MET_GRIB2CINC=${MET_GRIB2CINC}
+  #    export GRIB2CLIB_NAME=${GRIB2CLIB_NAME}
   fi
   
   if [ -z ${MET_NETCDF} ]; then
       export MET_NETCDF=${LIB_DIR}
       export MET_HDF5=${LIB_DIR}
-  else
-      export MET_NETCDF=${MET_NETCDF}
-      export MET_HDF5=${MET_HDF5}
+  #else
+  #    export MET_NETCDF=${MET_NETCDF}
+  #    export MET_HDF5=${MET_HDF5}
   fi
  
   if [ -z ${MET_GSL} ]; then
       export MET_GSL=${LIB_DIR}
-  else
-      export MET_GSL=${MET_GSL}
-      export LD_LIBRARY_PATH=${MET_GSL}/lib:${LD_LIBRARY_PATH}
+  #else
+  #    export MET_GSL=${MET_GSL}
+  #    export LD_LIBRARY_PATH=${MET_GSL}/lib:${LD_LIBRARY_PATH}
   fi
 
-  export MET_HDF=${LIB_DIR}
-  export MET_HDFEOS=${LIB_DIR}
+  #export MET_HDF=${LIB_DIR}
+  #export MET_HDFEOS=${LIB_DIR}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
@@ -757,17 +818,17 @@ if [ $COMPILE_MET -eq 1 ]; then
   export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
-  if [ ${SET_D64BIT} = "TRUE" ]; then
+  if [ "${SET_D64BIT}" = "TRUE" ]; then
       export CFLAGS="-D__64BIT__"
       export CXXFLAGS="-D__64BIT__"
   fi
 
-  if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-      export MET_CAIROINC=${LIB_DIR}/include/cairo
-      export MET_CAIROLIB=${LIB_DIR}/lib
-      export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
-      export MET_FREETYPELIB=${LIB_DIR}/lib
-  fi
+  #if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
+  #    export MET_CAIROINC=${LIB_DIR}/include/cairo
+  #    export MET_CAIROLIB=${LIB_DIR}/lib
+  #    export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
+  #    export MET_FREETYPELIB=${LIB_DIR}/lib
+  #fi
       
   echo "MET Configuration settings..."
   printenv | egrep "^MET_" | sed -r 's/^/export /g'
@@ -779,8 +840,8 @@ if [ $COMPILE_MET -eq 1 ]; then
 
   echo "cd `pwd`"
   if [[ -z ${MET_PYTHON_CC} && -z ${MET_PYTHON_LD} ]]; then
-      if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-	  if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+      if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+	  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
 	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
 	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
 	  else
@@ -788,7 +849,7 @@ if [ $COMPILE_MET -eq 1 ]; then
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1
 	  fi
       else
-          if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+          if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
 	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
 	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
 	  else
@@ -798,8 +859,8 @@ g 2>&1"
 	  fi
       fi
   else
-      if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-	  if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+      if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+	  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
               echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
@@ -809,7 +870,7 @@ g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
           fi
       else
-          if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+          if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
               echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
