@@ -185,7 +185,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
    //
    // Check to make sure that we're not using the full domain
    //
-   if( full_domain_str != mask_grid_str) {
+   if(full_domain_str != mask_grid_str) {
 
       //
       // Search for the grid name in the predefined grids
