@@ -492,7 +492,7 @@ void track_counts(int i_var, const DataPlane &ens_dp, bool is_ctrl,
             // Compute fractional coverage
             fractional_coverage(ens_dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
-               conf_info.nbrhd_prob.shape,
+               conf_info.nbrhd_prob.shape, grid.wrap_lon(),
                thr_buf[i], &cmn_dp, &csd_dp,
                conf_info.nbrhd_prob.vld_thresh);
 
@@ -687,7 +687,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
                nbrhd_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
                              conf_info.nbrhd_prob.width[j],
-                             conf_info.nbrhd_prob.shape,
+                             conf_info.nbrhd_prob.shape, grid.wrap_lon(),
                              conf_info.nbrhd_prob.vld_thresh, info);
 
                // Write neighborhood ensemble probability
@@ -729,7 +729,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
                nbrhd_dp = smooth_field(prob_dp,
                              string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
                              conf_info.nmep_smooth.width[k],
-                             conf_info.nmep_smooth.shape,
+                             conf_info.nmep_smooth.shape, grid.wrap_lon(),
                              conf_info.nmep_smooth.vld_thresh,
                              conf_info.nmep_smooth.gaussian);
 
