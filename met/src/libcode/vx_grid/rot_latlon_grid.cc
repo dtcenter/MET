@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -321,6 +319,8 @@ snprintf(junk, sizeof(junk), " rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk
 snprintf(junk, sizeof(junk), " delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk;
 snprintf(junk, sizeof(junk), " delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk;
 
+snprintf(junk, sizeof(junk), " wrapLon: %s", bool_to_string(wrapLon));   a << junk;
+
 snprintf(junk, sizeof(junk), " true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk;
 snprintf(junk, sizeof(junk), " true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk;
 
@@ -365,26 +365,6 @@ double RotatedLatLonGrid::rot_grid_to_earth(int x, int y) const
 //
 
 return ( 0.0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool RotatedLatLonGrid::is_global() const
-
-{
-
-const double lon_range = fabs((Nx + 1)*delta_lon);
-const double lat_range = fabs((Ny + 1)*delta_lat);
-
-const bool full_range_lat = (lat_range >= 180.0);
-const bool full_range_lon = (lon_range >= 360.0);
-
-const bool answer = full_range_lat && full_range_lon;
-
-return ( answer );
 
 }
 
@@ -472,5 +452,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
