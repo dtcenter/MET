@@ -1,33 +1,61 @@
 #!/bin/bash 
 #
-# Compile and install MET
-# (Model Evaluation Tools)
-#================================================
+# Compile and install MET                                                                                                                                                        
+# (Model Evaluation Tools)                                                                                                                                                       
+#================================================                                                                                                                                
+#                                                                                                                                                                                
+# This compile_MET_all.sh script expects certain environment
+# variables to be set: 
+# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL, 
+# and USE_MODULES.
 #
-# The compile_MET_all.sh script will compile and install MET and its
-# external library dependencies, if needed.
+# If compiling support for Python embedding, users will need to 
+# set MET_PYTHON, MET_PYTHON_CC, and 
+# MET_PYTHON_LD.
 #
-# Turn on compilation of GSL, HDF, HDFEOS, CAIRO, and
-# FREETYPE below using the COMPILE_<SOFTWARE> flags below.
-# e.g. use COMPILE_GSL = 1 to compile GSL, use
-#      COMPILE_GSL = 0 if compilation is not needed
-#
-# If you don't need to install GRIB2C, BUFR, and NETCDF
-# please supply values for the following environment
-# variables in the input file (install_met_env.<machine_name>:
-# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB,
-# BUFRLIB_NAME, MET_NETCDF
-#
-# Required environment variables to set are:
-# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL, USE_MODULES
-#
-# Other variables that may be set:
-# SET_D64BIT, MET_PYTHON, MET_PYTHON_CC,
-# MET_PYTHON_LD, MET_HDF5, MET_NETCDF
-# And, if using modules: LIB_JASPER, LIB_LIBPNG,
-# LIB_Z, PYTHON_MODULES
+# For a description of these and other variables, visit the MET
+# downloads page under "Sample Script For Compiling External
+# Libraries And MET":
+# https://dtcenter.org/community-code/model-evaluation-tools-met/download
 # 
-# Usage: compile_MET_all.sh install_met_env.<machine_name>
+# An easy way to set these necessary environment variables is
+# in an environment configuration file (for example, 
+# install_met_env.<machine_name>).  This script and example
+# environment config files for various machines can be found in
+# the MET GitHub repository in the scripts/installation directory:
+# https://github.com/dtcenter/MET
+# 
+# USAGE: compile_MET_all.sh install_met_env.<machine_name>
+#
+# The compile_MET_all.sh script will compile and install MET and its                                                                                                             
+# external library dependencies, if needed, including:
+# GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
+# HDF5, NETCDF (C and CXX), HDF4 (optional for MODIS-Regrid
+# and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc), 
+# FREETYPE (optional for MODE Graphics), and CAIRO (optional
+# for MODE Graphics). 
+# 
+# If these libraries have already been installed and don't need to be
+# reinstalled or if you are compiling on a machine that uses modulefiles
+# and you'd like to make use of the existing dependent libraries on
+# your machine, there are more environment variables that you will
+# need to set to let MET know where the library and header files are.
+# Please supply values for the following environment variables                                                                                                                    # in the input environment configuration file (install_met_env.<machine_name>: 
+# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,                                                                                                               
+# MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF, 
+# MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.  
+# 
+# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO 
+# used for the following, not widely used tools, MODIS-Regrid, 
+# lidar2nc, and MODE Graphics.  To enable building of these libraries,
+# directly modify this script changing the value of the compile flags
+# for the library (e.g. COMPILE_HDF, COMPILE_HDFEOS) in the code
+# below as directed by the comments.  If these libraries have already
+# been installed and don't need to be reinstalled, please 
+# supply values for the following environment variables in the input
+# environment configuration file (install_met_env.<machine_name>): 
+# MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
+# MET_CAIROINC, MET_CAIROLIB.
 #
 #================================================
 
