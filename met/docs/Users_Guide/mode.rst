@@ -479,6 +479,8 @@ _____________________
 
 Each component of the pairs information in the NetCDF file can be turned on or off. The old syntax is still supported: **TRUE** means accept the defaults, **FALSE** means no NetCDF output is generated. NetCDF output can also be turned off by setting all the individual dictionary flags to false.
 
+The nc_pairs_flag is described in :numref:`grid_stat-configuration-file`
+
 
 _____________________
 
