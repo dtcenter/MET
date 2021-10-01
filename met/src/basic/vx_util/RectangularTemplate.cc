@@ -60,7 +60,7 @@ RectangularTemplate::RectangularTemplate(int height, int width, bool wrap_lon) :
 
    // Create the offsets list
    for(int y = -ymin; y <= halfheight; y++) {
-      for(int x = -xmin; x <= halfheight; x++) {
+      for(int x = -xmin; x <= halfwidth; x++) {
          _addOffset(x, y);
       } // end for x
    } // end for y
