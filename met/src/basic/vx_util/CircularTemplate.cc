@@ -91,7 +91,7 @@ CircularTemplate::CircularTemplate(const int width, bool wrap_lon) :
 		      // actually (.5,-.5) from the center.
 		   
             double_x -= 0.5;
-		      double_y -= 0.5;
+            double_y -= 0.5;
          }
          double distance= sqrt((double_x * double_x) + (double_y * double_y));
 
