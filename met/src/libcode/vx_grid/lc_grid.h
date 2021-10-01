@@ -118,7 +118,7 @@ class LambertGrid : public GridRep {
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 

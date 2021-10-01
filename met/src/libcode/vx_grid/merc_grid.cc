@@ -572,7 +572,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MercatorGrid::is_global() const
+bool MercatorGrid::wrap_lon() const
 
 {
 
