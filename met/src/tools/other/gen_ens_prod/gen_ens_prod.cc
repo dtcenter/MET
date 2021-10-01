@@ -415,8 +415,11 @@ void clear_counts() {
    min_na.set_const(bad_data_double, nxy);
    max_na.set_const(bad_data_double, nxy);
    sum_na.set_const(0.0, nxy);
-   ssq_na.set_const(0.0, nxy);
+
    stdev_cnt_na.set_const(0.0, nxy);
+   stdev_sum_na.set_const(0.0, nxy);
+   stdev_ssq_na.set_const(0.0, nxy);
+
    for(i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_cnt_na[i].set_const(0.0, nxy);
       for(j=0; j<conf_info.get_n_nbrhd(); j++) {
@@ -455,14 +458,17 @@ void track_counts(int i_var, const DataPlane &ens_dp, bool is_ctrl,
          // Valid data count
          cnt_na.buf()[i] += 1;
 
+         // Ensemble sum
+         sum_na.buf()[i] += ens;
+
          // Ensemble min and max
          if(ens <= min_na.buf()[i] || is_bad_data(min_na.buf()[i])) min_na.buf()[i] = ens;
          if(ens >= max_na.buf()[i] || is_bad_data(max_na.buf()[i])) max_na.buf()[i] = ens;
 
          // Standard deviation sum, sum of squares, and count, excluding control member
          if(!is_ctrl) {
-            sum_na.buf()[i]       += ens;
-            ssq_na.buf()[i]       += ens*ens;
+            stdev_sum_na.buf()[i] += ens;
+            stdev_ssq_na.buf()[i] += ens*ens;
             stdev_cnt_na.buf()[i] += 1;
          }
 
@@ -579,7 +585,7 @@ void write_ens_nc(int i_var, int n_ens_vld,
 
          // Compute ensemble summary
          ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
-         ens_stdev[i] = (float) compute_stdev(sum_na[i], ssq_na[i], nint(stdev_cnt_na[i]));
+         ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i], nint(stdev_cnt_na[i]));
          ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
          ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
          ens_min[i]   = (float) min_na[i];
