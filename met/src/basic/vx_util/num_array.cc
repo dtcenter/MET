@@ -313,6 +313,8 @@ int NumArray::has(double d, bool forward) const
       }
    }
 
+   cout << "found = " << found << endl;
+   
    return ( found );
 
 }
@@ -341,8 +343,12 @@ void NumArray::add(double d)
 
 {
 
+   //cout << "In num_array.cc add(double), CHECK" << endl;
+   
    extend(Nelements + 1, false);
 
+   cout << "d = " << d << endl;
+   
    e.push_back(d);
    
    Sorted = false;
@@ -359,6 +365,8 @@ void NumArray::add(const NumArray & a)
 
 {
 
+   //cout << "In num_array.cc add(NumArray), CHECK" << endl;
+   
    extend(Nelements + a.Nelements);
 
    int j;
