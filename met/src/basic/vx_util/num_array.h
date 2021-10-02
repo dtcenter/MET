@@ -83,6 +83,7 @@ class NumArray {
       void set(double);
       void set(int, int);
       void set(int, double);
+      void set_const(double, int);
 
       // Increment value
       void inc(int, int);

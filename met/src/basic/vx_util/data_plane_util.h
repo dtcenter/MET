@@ -52,7 +52,8 @@ extern DataPlane smooth_field(const DataPlane &dp,
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,
-               bool wrap_lon, SingleThresh t, double vld_t);
+               bool wrap_lon, SingleThresh t,
+               const DataPlane *cmn, const DataPlane *csd, double vld_t);
 
 extern void apply_mask(const DataPlane &, const MaskPlane &, NumArray &);
 extern void apply_mask(DataPlane &, const MaskPlane &);

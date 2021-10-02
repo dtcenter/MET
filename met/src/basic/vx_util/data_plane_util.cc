@@ -203,18 +203,48 @@ DataPlane smooth_field(const DataPlane &dp,
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
-        bool wrap_lon, SingleThresh t, double vld_t) {
+        bool wrap_lon, SingleThresh t,
+        const DataPlane *cmn, const DataPlane *csd, double vld_t) {
    GridPoint *gp = NULL;
    int x, y;
    int n_vld = 0;
    int n_thr = 0;
    double v;
+   double bad = bad_data_double;
+   bool use_climo = false;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
-           << "Grid must have at least one point in it. \n\n";
+           << "grid must have at least one point in it. \n\n";
       exit(1);
+   }
+
+   // Check climatology data, if needed
+   if(cmn && csd) {
+      if(!cmn->is_empty() && !csd->is_empty()) use_climo = true;
+   }
+
+   // Check climatology dimensions
+   if(use_climo) {
+
+      // Check dimensions
+      if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology mean dimension ("
+           << cmn->nx() << ", " << cmn->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+      if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology standard deviation dimension ("
+           << csd->nx() << ", " << csd->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
    }
 
    // Build the grid template
@@ -247,7 +277,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInGrid()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
-               if(t.check(v)) n_thr++;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
             }
          }
          // Subtract off the bottom edge, shift up, and add the top.
@@ -259,7 +291,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInBotEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld--;
-               if(t.check(v)) n_thr--;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
             }
 
             // Increment Y
@@ -271,7 +305,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                 gp  = gt->getNextInTopEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
-               if(t.check(v)) n_thr++;
+               if(t.check(v,
+                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
             }
          }
 

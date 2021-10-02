@@ -2061,6 +2061,7 @@ void track_counts(int i_vx, const DataPlane &dp) {
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
                grid.wrap_lon(), ThreshBuf[i],
+               (const DataPlane *) 0, (const DataPlane *) 0,
                conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
