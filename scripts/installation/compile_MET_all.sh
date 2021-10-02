@@ -1,59 +1,60 @@
-#!/bin/bash 
+#!/bin/bash
 #
-# Compile and install MET                                                                                                                                                        
-# (Model Evaluation Tools)                                                                                                                                                       
-#================================================                                                                                                                                
-#                                                                                                                                                                                
+# Compile and install MET
+# (Model Evaluation Tools)
+#================================================
+#
 # This compile_MET_all.sh script expects certain environment
-# variables to be set: 
-# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL, 
+# variables to be set:
+# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL,
 # and USE_MODULES.
 #
-# If compiling support for Python embedding, users will need to 
-# set MET_PYTHON, MET_PYTHON_CC, and 
+# If compiling support for Python embedding, users will need to
+# set MET_PYTHON, MET_PYTHON_CC, and
 # MET_PYTHON_LD.
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
 # Libraries And MET":
 # https://dtcenter.org/community-code/model-evaluation-tools-met/download
-# 
+#
 # An easy way to set these necessary environment variables is
-# in an environment configuration file (for example, 
+# in an environment configuration file (for example,
 # install_met_env.<machine_name>).  This script and example
 # environment config files for various machines can be found in
 # the MET GitHub repository in the scripts/installation directory:
 # https://github.com/dtcenter/MET
-# 
+#
 # USAGE: compile_MET_all.sh install_met_env.<machine_name>
 #
-# The compile_MET_all.sh script will compile and install MET and its                                                                                                             
+# The compile_MET_all.sh script will compile and install MET and its
 # external library dependencies, if needed, including:
 # GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
 # HDF5, NETCDF (C and CXX), HDF4 (optional for MODIS-Regrid
-# and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc), 
+# and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc),
 # FREETYPE (optional for MODE Graphics), and CAIRO (optional
-# for MODE Graphics). 
-# 
+# for MODE Graphics).
+#
 # If these libraries have already been installed and don't need to be
 # reinstalled or if you are compiling on a machine that uses modulefiles
 # and you'd like to make use of the existing dependent libraries on
 # your machine, there are more environment variables that you will
 # need to set to let MET know where the library and header files are.
-# Please supply values for the following environment variables                                                                                                                    # in the input environment configuration file (install_met_env.<machine_name>: 
-# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,                                                                                                               
-# MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF, 
-# MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.  
-# 
-# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO 
-# used for the following, not widely used tools, MODIS-Regrid, 
+# Please supply values for the following environment variables
+# in the input environment configuration file (install_met_env.<machine_name>:
+# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,
+# MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF,
+# MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
+#
+# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO
+# used for the following, not widely used tools, MODIS-Regrid,
 # lidar2nc, and MODE Graphics.  To enable building of these libraries,
 # directly modify this script changing the value of the compile flags
 # for the library (e.g. COMPILE_HDF, COMPILE_HDFEOS) in the code
 # below as directed by the comments.  If these libraries have already
-# been installed and don't need to be reinstalled, please 
+# been installed and don't need to be reinstalled, please
 # supply values for the following environment variables in the input
-# environment configuration file (install_met_env.<machine_name>): 
+# environment configuration file (install_met_env.<machine_name>):
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
 # MET_CAIROINC, MET_CAIROLIB.
 #
@@ -110,7 +111,7 @@ else
     COMPILE_G2CLIB=0
 fi
 
-if [ -z ${MET_BUFRLIB} ]; then    
+if [ -z ${MET_BUFRLIB} ]; then
     COMPILE_BUFRLIB=1
 else
     COMPILE_BUFRLIB=0
@@ -169,7 +170,7 @@ else
     # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you have compiled FREETYPE and CAIRO,
     # have set MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC, and MET_CAIROLIB in your
     # configuration file, and want to enable MODE Graphics (not widely used)
-    COMPILE_FREETYPE=0    
+    COMPILE_FREETYPE=0
     COMPILE_CAIRO=0
 fi
 
@@ -181,7 +182,7 @@ else
     BIN_DIR_PATH=${BIN_DIR_PATH}
 fi
 
-if [ -z ${USE_MET_TAR_FILE} ]; then    
+if [ -z ${USE_MET_TAR_FILE} ]; then
     export USE_MET_TAR_FILE=TRUE
 fi
 
@@ -204,7 +205,7 @@ echo
 echo "USE_MODULES = ${USE_MODULES}"
 echo
 
-if [ ${USE_MODULES} = "TRUE" ]; then 
+if [ ${USE_MODULES} = "TRUE" ]; then
     echo "module load ${COMPILER_FAMILY}/${COMPILER_VERSION}"
     echo ${COMPILER_FAMILY}/${COMPILER_VERSION}
 
@@ -306,7 +307,7 @@ if [ ${USE_MODULES} = "TRUE" ]; then
 	PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
 	PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
 	echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
-	echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM} 
+	echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
 	module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
     fi
 fi
@@ -315,7 +316,7 @@ if [[ ${MET_PYTHON}/bin/python3 ]]; then
   echo "Using python version: "
   ${MET_PYTHON}/bin/python3 --version
 fi
-  
+
 # Compile GSL
 if [ $COMPILE_GSL -eq 1 ]; then
 
@@ -334,7 +335,7 @@ if [ $COMPILE_GSL -eq 1 ]; then
   cd gsl*
   echo "cd `pwd`"
   echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} > configure.log 2>&1 
+  ./configure --prefix=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
      echo "configure returned with non-zero ($ret) status"
@@ -371,7 +372,7 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
   ${CC} -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log 2>&1
 
-  # For GNU and Intel follow BUFRLIB11 instructions                                                                                                                                                    
+  # For GNU and Intel follow BUFRLIB11 instructions
   if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
     if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
       ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
@@ -421,7 +422,7 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
      exit 1
   fi
   echo "rm ${LIB_DIR}/lib/zlib.a"
-  rm ${LIB_DIR}/lib/libz.a  
+  rm ${LIB_DIR}/lib/libz.a
 fi
 
 # Compile LIBPNG
@@ -715,7 +716,7 @@ fi
 # Compile CAIRO
 if [ $COMPILE_CAIRO -eq 1 ]; then
 
-    # If on Cray, compile PIXMAN                                                                                                                                                                                                
+    # If on Cray, compile PIXMAN
     if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
 	echo
 	echo "Compiling pixman at `date`"
@@ -810,12 +811,12 @@ if [ $COMPILE_MET -eq 1 ]; then
       export LIB_Z=${LIB_DIR}/lib
       export GRIB2CLIB_NAME=-lgrib2c
   fi
-  
+
   if [ -z ${MET_NETCDF} ]; then
       export MET_NETCDF=${LIB_DIR}
       export MET_HDF5=${LIB_DIR}
   fi
- 
+
   if [ -z ${MET_GSL} ]; then
       export MET_GSL=${LIB_DIR}
   fi
@@ -862,7 +863,7 @@ if [ $COMPILE_MET -eq 1 ]; then
 	  else
               echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.lo\
 g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1      
+              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1
 	  fi
       fi
   else
@@ -871,8 +872,8 @@ g 2>&1"
               echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-	  else  
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\               
+	  else
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
           fi
@@ -881,8 +882,8 @@ g 2>&1"
               echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-	  else  
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\               
+	  else
+              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
               ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.log 2>&1
           fi
