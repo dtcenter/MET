@@ -46,7 +46,7 @@
 # MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF,
 # MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
 #
-# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO
+# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
 # lidar2nc, and MODE Graphics.  To enable building of these libraries,
 # directly modify this script changing the value of the compile flags
@@ -62,15 +62,15 @@
 
 
 if [ -z $1 ]; then
-    echo
-    echo "No environment configuration file provided (e.g. install_met_env.<machine_name>). Starting compilation with current environment."
+  echo
+  echo "No environment configuration file provided (e.g. install_met_env.<machine_name>). Starting compilation with current environment."
 else
-    if [ ! -f "$1" ]; then
-	echo "The file \"$1\" does not exist!"
-	exit 1
-    else
-	source $1
-    fi
+  if [ ! -f "$1" ]; then
+    echo "The file \"$1\" does not exist!"
+    exit 1
+  else
+    source $1
+  fi
 fi
 
 echo
@@ -100,90 +100,89 @@ echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # Constants
 if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
-    COMPILE_ZLIB=1
-    COMPILE_LIBPNG=1
-    COMPILE_JASPER=1
-    COMPILE_G2CLIB=1
+  COMPILE_ZLIB=1
+  COMPILE_LIBPNG=1
+  COMPILE_JASPER=1
+  COMPILE_G2CLIB=1
 else
-    COMPILE_ZLIB=0
-    COMPILE_LIBPNG=0
-    COMPILE_JASPER=0
-    COMPILE_G2CLIB=0
+  COMPILE_ZLIB=0
+  COMPILE_LIBPNG=0
+  COMPILE_JASPER=0
+  COMPILE_G2CLIB=0
 fi
 
 if [ -z ${MET_BUFRLIB} ]; then
-    COMPILE_BUFRLIB=1
+  COMPILE_BUFRLIB=1
 else
-    COMPILE_BUFRLIB=0
+  COMPILE_BUFRLIB=0
 fi
 
 if [ -z ${MET_NETCDF} ]; then
-    COMPILE_NETCDF=1
+  COMPILE_NETCDF=1
 else
-    COMPILE_NETCDF=0
+  COMPILE_NETCDF=0
 fi
 
 if [ -z ${MET_GSL} ]; then
-    COMPILE_GSL=1
+  COMPILE_GSL=1
 else
-    COMPILE_GSL=0
+  COMPILE_GSL=0
 fi
 
 if [[ -z ${MET_HDF} ]] && [[ -z ${MET_HDFEOS} ]]; then
-    # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you want to compile and enable MODIS-Regrid (not widely used)
-    COMPILE_HDF=0
-    COMPILE_HDFEOS=0
-    if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
-      export MET_HDF=${LIB_DIR}
-      export MET_HDFEOS=${LIB_DIR}
-    fi
+  # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you want to compile and enable MODIS-Regrid (not widely used)
+  COMPILE_HDF=0
+  COMPILE_HDFEOS=0
+  if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
+    export MET_HDF=${LIB_DIR}
+    export MET_HDFEOS=${LIB_DIR}
+  fi
 else
-    # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you have already compiled HDF4 and HDFEOS,
-    # have set MET_HDF and MET_HDFEOS in your configuration file, and want to enable
-    # MODIS-Regrid (not widely used)
-    COMPILE_HDF=0
-    COMPILE_HDFEOS=0
+  # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you have already compiled HDF4 and HDFEOS,
+  # have set MET_HDF and MET_HDFEOS in your configuration file, and want to enable
+  # MODIS-Regrid (not widely used)
+  COMPILE_HDF=0
+  COMPILE_HDFEOS=0
 fi
 
 if [[ ! -z ${MET_FREETYPE} ]]; then
-   echo "ERROR: MET_FREETYPEINC and MET_FREETYPELIB must be set instead of MET_FREETYPE"
-   exit 1
+  echo "ERROR: MET_FREETYPEINC and MET_FREETYPELIB must be set instead of MET_FREETYPE"
+  exit 1
 fi
 
 if [[ ! -z ${MET_CAIRO} ]]; then
-   echo	"ERROR: MET_CAIROINC and MET_CAIROLIB must be set instead of MET_CAIRO"
-   exit 1
+  echo	"ERROR: MET_CAIROINC and MET_CAIROLIB must be set instead of MET_CAIRO"
+  exit 1
 fi
 
-
 if [[ -z ${MET_FREETYPEINC} && -z ${MET_FREETYPELIB} && -z ${MET_CAIROINC} && -z ${MET_CAIROLIB} ]]; then
-    # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you want to compile and enable MODE Graphics (not widely used)
-    COMPILE_FREETYPE=0
-    COMPILE_CAIRO=0
-    if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
-      export MET_CAIROINC=${LIB_DIR}/include/cairo
-      export MET_CAIROLIB=${LIB_DIR}/lib
-      export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
-      export MET_FREETYPELIB=${LIB_DIR}/lib
-    fi
+  # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you want to compile and enable MODE Graphics (not widely used)
+  COMPILE_FREETYPE=0
+  COMPILE_CAIRO=0
+  if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
+    export MET_CAIROINC=${LIB_DIR}/include/cairo
+    export MET_CAIROLIB=${LIB_DIR}/lib
+    export MET_FREETYPEINC=${LIB_DIR}/include/freetype2
+    export MET_FREETYPELIB=${LIB_DIR}/lib
+  fi
 else
-    # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you have compiled FREETYPE and CAIRO,
-    # have set MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC, and MET_CAIROLIB in your
-    # configuration file, and want to enable MODE Graphics (not widely used)
-    COMPILE_FREETYPE=0
-    COMPILE_CAIRO=0
+  # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you have compiled FREETYPE and CAIRO,
+  # have set MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC, and MET_CAIROLIB in your
+  # configuration file, and want to enable MODE Graphics (not widely used)
+  COMPILE_FREETYPE=0
+  COMPILE_CAIRO=0
 fi
 
 COMPILE_MET=1
 
 if [ -z ${BIN_DIR_PATH} ]; then
-    BIN_DIR_PATH=${TEST_BASE}/bin
+  BIN_DIR_PATH=${TEST_BASE}/bin
 else
-    BIN_DIR_PATH=${BIN_DIR_PATH}
+  BIN_DIR_PATH=${BIN_DIR_PATH}
 fi
 
 if [ -z ${USE_MET_TAR_FILE} ]; then
-    export USE_MET_TAR_FILE=TRUE
+  export USE_MET_TAR_FILE=TRUE
 fi
 
 echo
@@ -192,6 +191,7 @@ echo "Compiling libraries into: ${LIB_DIR}"
 if [ ! -e ${LIB_DIR}/include ]; then
   mkdir ${LIB_DIR}/include
 fi
+
 if [ ! -e ${LIB_DIR}/lib ]; then
   mkdir ${LIB_DIR}/lib
 fi
@@ -206,88 +206,88 @@ echo "USE_MODULES = ${USE_MODULES}"
 echo
 
 if [ ${USE_MODULES} = "TRUE" ]; then
-    echo "module load ${COMPILER_FAMILY}/${COMPILER_VERSION}"
-    echo ${COMPILER_FAMILY}/${COMPILER_VERSION}
+  echo "module load ${COMPILER_FAMILY}/${COMPILER_VERSION}"
+  echo ${COMPILER_FAMILY}/${COMPILER_VERSION}
 
-    module load ${COMPILER_FAMILY}/${COMPILER_VERSION}
-    if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
-	module load craype
-	module switch craype craype-sandybridge
-    fi
+  module load ${COMPILER_FAMILY}/${COMPILER_VERSION}
+  if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
+    module load craype
+    module switch craype craype-sandybridge
+  fi
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
-    if [ -z ${CC} ]; then
-	export CC=`which gcc`
-    else
-	export CC=${CC}
-    fi
-    if [ -z ${CXX} ]; then
-	export CXX=`which g++`
-    else
-	export CXX=${CXX}
-    fi
-    if [ -z ${FC} ]; then
-	export FC=`which gfortran`
-    else
-	export FC=${FC}
-    fi
-    if [ -z ${F77} ]; then
-	export F77=`which gfortran`
-    else
-	export F77=${F77}
-    fi
-    if [ -z ${F90} ]; then
-	export F90=`which gfortran`
-    else
-	export F90=${F90}
-    fi
+  if [ -z ${CC} ]; then
+    export CC=`which gcc`
+  else
+    export CC=${CC}
+  fi
+  if [ -z ${CXX} ]; then
+    export CXX=`which g++`
+  else
+    export CXX=${CXX}
+  fi
+  if [ -z ${FC} ]; then
+    export FC=`which gfortran`
+  else
+    export FC=${FC}
+  fi
+  if [ -z ${F77} ]; then
+    export F77=`which gfortran`
+  else
+    export F77=${F77}
+  fi
+  if [ -z ${F90} ]; then
+    export F90=`which gfortran`
+  else
+    export F90=${F90}
+  fi
 elif [ ${COMPILER_FAMILY} = "pgi" ]; then
-    if [ -z ${CC} ]; then
-	export CC=`which pgcc`
-    else
-	export CC=${CC}
-    fi
-    if [ -z ${CXX} ]; then
-	export CXX=`which pgc++`
-    else
-	export CXX=${CXX}
-    fi
-    if [ -z ${F90} ]; then
-	export F90=`which pgf90`
-	export F77=${F90}
-	export FC=${F90}
-    else
-	export F90=${F90}
-	export F77=${F90}
-	export FC=${F90}
-    fi
+  if [ -z ${CC} ]; then
+    export CC=`which pgcc`
+  else
+    export CC=${CC}
+  fi
+  if [ -z ${CXX} ]; then
+    export CXX=`which pgc++`
+  else
+    export CXX=${CXX}
+  fi
+  if [ -z ${F90} ]; then
+    export F90=`which pgf90`
+    export F77=${F90}
+    export FC=${F90}
+  else
+    export F90=${F90}
+    export F77=${F90}
+    export FC=${F90}
+  fi
 elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
-    if [ -z ${CC} ]; then
-	export CC=`which icc`
-    else
-	export CC=${CC}
-    fi
-    if [ -z ${CXX} ]; then
-	export CXX=`which icc`
-    else
-	export CXX=${CXX}
-    fi
-    if [ -z ${FC} ]; then
-	export FC=`which ifort`
-    else
-	export FC=${FC}
-    fi
-    if [ -z ${F77} ]; then
-	export F77=`which ifort`
-    else
-	export F77=${F77}
-    fi
-    if [ -z ${F90} ]; then
-	export F90=`which ifort`
-    else
-	export F90=${F90}
-    fi
+  if [ -z ${CC} ]; then
+    export CC=`which icc`
+  else
+    export CC=${CC}
+  fi
+  if [ -z ${CXX} ]; then
+    export CXX=`which icc`
+  else
+    export CXX=${CXX}
+  fi
+  if [ -z ${FC} ]; then
+    export FC=`which ifort`
+  else
+    export FC=${FC}
+  fi
+  if [ -z ${F77} ]; then
+    export F77=`which ifort`
+  else
+    export F77=${F77}
+  fi
+  if [ -z ${F90} ]; then
+    export F90=`which ifort`
+  else
+    export F90=${F90}
+  fi
 else
   echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, PrgEnv-intel, or pgi"
   exit
@@ -303,13 +303,13 @@ echo
 # Load Python module
 
 if [ ${USE_MODULES} = "TRUE" ]; then
-    if [ ! -z ${PYTHON_MODULE} ]; then
-	PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
-	PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
-	echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
-	echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
-	module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
-    fi
+  if [ ! -z ${PYTHON_MODULE} ]; then
+    PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
+    PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
+    echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
+    echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+    module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+  fi
 fi
 
 if [[ ${MET_PYTHON}/bin/python3 ]]; then
@@ -338,22 +338,22 @@ if [ $COMPILE_GSL -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -404,22 +404,22 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "rm ${LIB_DIR}/lib/zlib.a"
   rm ${LIB_DIR}/lib/libz.a
@@ -439,22 +439,22 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -473,22 +473,22 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -513,8 +513,8 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
@@ -524,7 +524,7 @@ fi
 # Depends on jpeg
 # Edit 'mfhdf/hdiff/Makefile' as follows:
 #  From: LIBS = -ljpeg -lz
-#    To: LIBS = -ljpeg -lz -lm
+#  To: LIBS = -ljpeg -lz -lm
 if [ $COMPILE_HDF -eq 1 ]; then
   echo
   echo "Compiling HDF at `date`"
@@ -538,8 +538,8 @@ if [ $COMPILE_HDF -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   cat mfhdf/hdiff/Makefile | \
     sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
@@ -559,15 +559,15 @@ if [ $COMPILE_HDF -eq 1 ]; then
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -586,22 +586,22 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
   cp include/*.h ${LIB_DIR}/include/
 fi
@@ -621,15 +621,15 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 
   echo
@@ -646,15 +646,15 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 
   echo
@@ -667,15 +667,15 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -693,22 +693,22 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
   ./configure --prefix=${LIB_DIR} --with-png=yes > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1 --with-zlib=${LIB_DIR} LDFLAGS=-L${LIB_DIR} CPPFLAGS=-I${LIB_DIR}"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -716,38 +716,38 @@ fi
 # Compile CAIRO
 if [ $COMPILE_CAIRO -eq 1 ]; then
 
-    # If on Cray, compile PIXMAN
-    if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
-	echo
-	echo "Compiling pixman at `date`"
-	mkdir -p  ${LIB_DIR}/pixman
-	cd ${LIB_DIR}/pixman
-	rm -rf pixman*
-	tar -xzf ${TAR_DIR}/pixman*.tar.gz
-	cd pixman*
-	echo "cd `pwd`"
-	echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-	./configure --prefix=${LIB_DIR} > configure.log 2>&1
-	ret=$?
-	if [ $ret != 0 ]; then
-            echo "configure returned with non-zero ($ret) status"
-            exit 1
-	fi
-	echo "make > make.log 2>&1"
-	make > make.log 2>&1
-	ret=$?
-	if [ $ret != 0 ]; then
-            echo "make returned with non-zero ($ret) status"
-            exit 1
-	fi
-	echo "make install > make_install.log 2>&1"
-	make install > make_install.log 2>&1
-	ret=$?
-	if [ $? != 0 ]; then
-            echo "make install returned with non-zero ($ret) status"
-            exit 1
-	fi
+  # If on Cray, compile PIXMAN
+  if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
+    echo
+    echo "Compiling pixman at `date`"
+    mkdir -p  ${LIB_DIR}/pixman
+    cd ${LIB_DIR}/pixman
+    rm -rf pixman*
+    tar -xzf ${TAR_DIR}/pixman*.tar.gz
+    cd pixman*
+    echo "cd `pwd`"
+    echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
+    ./configure --prefix=${LIB_DIR} > configure.log 2>&1
+    ret=$?
+    if [ $ret != 0 ]; then
+      echo "configure returned with non-zero ($ret) status"
+      exit 1
     fi
+    echo "make > make.log 2>&1"
+    make > make.log 2>&1
+    ret=$?
+    if [ $ret != 0 ]; then
+      echo "make returned with non-zero ($ret) status"
+      exit 1
+    fi
+    echo "make install > make_install.log 2>&1"
+    make install > make_install.log 2>&1
+    ret=$?
+    if [ $? != 0 ]; then
+      echo "make install returned with non-zero ($ret) status"
+      exit 1
+    fi
+  fi
 
   echo
   echo "Compiling CAIRO at `date`"
@@ -758,29 +758,29 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
   cd cairo*
   export PKG_CONFIG=`which pkg-config`
   if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
-      export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
+    export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
   echo "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
   ./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "configure returned with non-zero ($ret) status"
-     exit 1
+    echo "configure returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
-     echo "make returned with non-zero ($ret) status"
-     exit 1
+    echo "make returned with non-zero ($ret) status"
+    exit 1
   fi
   echo "make install > make_install.log 2>&1"
   make install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
-     echo "make install returned with non-zero ($ret) status"
-     exit 1
+    echo "make install returned with non-zero ($ret) status"
+    exit 1
   fi
 fi
 
@@ -799,26 +799,26 @@ if [ $COMPILE_MET -eq 1 ]; then
   cd met*
 
   if [ -z ${MET_BUFRLIB} ]; then
-      export MET_BUFRLIB=${LIB_DIR}/lib
-      export BUFRLIB_NAME=-lbufr
+    export MET_BUFRLIB=${LIB_DIR}/lib
+    export BUFRLIB_NAME=-lbufr
   fi
 
   if [ -z ${MET_GRIB2CLIB} ]; then
-      export MET_GRIB2CLIB=${LIB_DIR}/lib
-      export MET_GRIB2CINC=${LIB_DIR}/include
-      export LIB_JASPER=${LIB_DIR}/lib
-      export LIB_LIBPNG=${LIB_DIR}/lib
-      export LIB_Z=${LIB_DIR}/lib
-      export GRIB2CLIB_NAME=-lgrib2c
+    export MET_GRIB2CLIB=${LIB_DIR}/lib
+    export MET_GRIB2CINC=${LIB_DIR}/include
+    export LIB_JASPER=${LIB_DIR}/lib
+    export LIB_LIBPNG=${LIB_DIR}/lib
+    export LIB_Z=${LIB_DIR}/lib
+    export GRIB2CLIB_NAME=-lgrib2c
   fi
 
   if [ -z ${MET_NETCDF} ]; then
-      export MET_NETCDF=${LIB_DIR}
-      export MET_HDF5=${LIB_DIR}
+    export MET_NETCDF=${LIB_DIR}
+    export MET_HDF5=${LIB_DIR}
   fi
 
   if [ -z ${MET_GSL} ]; then
-      export MET_GSL=${LIB_DIR}
+    export MET_GSL=${LIB_DIR}
   fi
 
   export MET_PYTHON_LD=${MET_PYTHON_LD}
@@ -834,8 +834,8 @@ if [ $COMPILE_MET -eq 1 ]; then
   export MET_FONT_DIR=${TEST_BASE}/fonts
 
   if [ "${SET_D64BIT}" = "TRUE" ]; then
-      export CFLAGS="-D__64BIT__"
-      export CXXFLAGS="-D__64BIT__"
+    export CFLAGS="-D__64BIT__"
+    export CXXFLAGS="-D__64BIT__"
   fi
 
   echo "MET Configuration settings..."
@@ -848,46 +848,46 @@ if [ $COMPILE_MET -eq 1 ]; then
 
   echo "cd `pwd`"
   if [[ -z ${MET_PYTHON_CC} && -z ${MET_PYTHON_LD} ]]; then
-      if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
-	  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
-	  else
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1
-	  fi
+    if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
       else
-          if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-	      echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-	      ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
-	  else
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.lo\
-g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1
-	  fi
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1
       fi
+    else
+      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
+      else
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.lo\
+g 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1
+      fi
+    fi
   else
-      if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
-	  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
+    if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-	  else
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
-          fi
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
       else
-          if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\
 g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-	  else
-              echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-              ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.log 2>&1
-          fi
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
       fi
+    else
+      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
+g 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
+      else
+        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\
+g 2>&1"
+        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.log 2>&1
+      fi
+    fi
   fi
 
   ret=$?
@@ -919,7 +919,6 @@ g 2>&1"
     echo "make test returned with non-zero ($ret) status"
     exit 1
   fi
-
 fi
 
 echo "Finished compiling at `date`"
