@@ -431,7 +431,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool GaussianGrid::is_global() const
+bool GaussianGrid::wrap_lon() const
 
 {
 
