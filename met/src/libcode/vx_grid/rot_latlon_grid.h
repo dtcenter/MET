@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -72,7 +70,7 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 
@@ -84,7 +82,8 @@ class RotatedLatLonGrid : public LatLonGrid {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
+inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 );    }
+inline bool   RotatedLatLonGrid::wrap_lon() const { return ( wrapLon ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +93,3 @@ inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

@@ -553,7 +553,7 @@ return ( angle );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StereographicGrid::is_global() const
+bool StereographicGrid::wrap_lon() const
 
 {
 

@@ -23,6 +23,7 @@ config_DATA = \
 	ConfigMapData \
 	Ascii2NcConfig_default \
 	EnsembleStatConfig_default \
+	GenEnsProdConfig_default \
 	GridStatConfig_default \
 	GridDiagConfig_default \
 	IODA2NCConfig_default \

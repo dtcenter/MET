@@ -23,7 +23,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!--                                                                  -->
-  <!-- gen_vx_mask                                                    -->
+  <!-- gen_vx_mask                                                      -->
   <!--                                                                  -->
 
   <test name="test_all_gen_vx_mask_1">
@@ -49,6 +49,23 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_circles.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- gen_ens_prod                                                     -->
+  <!--                                                                  -->
+
+  <test name="test_all_gen_ens_prod">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+      -ens &MET_DATA;/sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+      -config &MET_SCRIPTS;/config/GenEnsProdConfig \
+      -out &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc</grid_nc>
     </output>
   </test>
 

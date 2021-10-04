@@ -1051,6 +1051,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    for(i=0; i<n_interp; i++) {
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
+      vx_pd.set_interp_thresh(interp_info.vld_thresh);
    }
 
    // After sizing VxPairDataPoint, add settings for each array element
