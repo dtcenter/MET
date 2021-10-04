@@ -376,7 +376,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool GoesImagerGrid::is_global() const
+bool GoesImagerGrid::wrap_lon() const
 
 {
 

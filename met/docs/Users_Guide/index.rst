@@ -50,6 +50,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    config_options_tc
    reformat_point
    reformat_grid
+   gen-ens-prod
    masking
    point-stat
    grid-stat

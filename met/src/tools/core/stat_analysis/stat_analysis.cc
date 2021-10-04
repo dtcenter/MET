@@ -74,7 +74,6 @@ static int using_python = false;
 
 #ifdef WITH_PYTHON
 
-// static ConcatString user_script_path = "/d3/personal/randy/github/develop/stat_analysis_test/test.py";
 static ConcatString user_script_path;
 static StringArray  user_script_args;
 
@@ -185,40 +184,52 @@ int main(int argc, char * argv []) {
       //
       // Process the STAT files found in the search directories.
       //
-
 #ifdef WITH_PYTHON
       if ( using_python )  {
-
          process_python(default_job);
-
       } else {
 #endif
          process_search_dirs();
-
 #ifdef WITH_PYTHON
       }
 #endif
 
       //
-      // If a config file was specified, process the jobs.
+      // If a job was specified on the command line, run it.
       //
-      if(config_file.length() > 0) {
-
+      if(default_job.job_type != no_stat_job_type) {
+         process_job(command_line_job_options.c_str(), 1);
+      }
+      //
+      // Or process config file jobs.
+      //
+      else if(config_file.length() > 0) {
          jobs_sa = conf.lookup_string_array(conf_key_jobs);
+
+         //
+         // At least one job in the config file.
+         //
+         if(jobs_sa.n() == 0) {
+            mlog << Error << "\nmain() -> "
+                 << "no jobs defined in \"" << config_file << "\"!\n\n";
+            throw(1);
+         }
 
          for(i=0; i<jobs_sa.n_elements(); i++) {
             process_job(jobs_sa[i].c_str(), i+1);
          }
       }
       //
-      // Otherwise, process the job specified on the command line.
+      // At least one job must be defined.
       //
       else {
-         process_job(command_line_job_options.c_str(), 1);
+         mlog << Error << "\nmain() -> "
+              << "at least one job must be specified on the command line "
+              << "with \"-job\" or in a configuration file with \"-config\"!\n\n";
+         throw(1);
       }
-
    }
-   catch(int j) { // Catch an error
+   catch(int j) { // Catch errors
 
       mlog << Error << "\nmain() -> "
            << "encountered an error value of " << j
