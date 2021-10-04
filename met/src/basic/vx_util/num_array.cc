@@ -176,7 +176,12 @@ void NumArray::extend(int len, bool exact)
 
 {
    
-   if ( Nalloc >= len )  return;
+   if ( Nalloc >= len ) {
+      cout << "In num_array.cc: extend(), Nalloc >= len, Nalloc = " << Nalloc << " len = " << len << endl;
+      return;
+   }
+
+
    
    if ( ! exact )  {
       
@@ -187,9 +192,23 @@ void NumArray::extend(int len, bool exact)
       if ( len%num_array_alloc_inc )  ++k;
       
       len = k*num_array_alloc_inc;
-      
-   }
 
+      cout << "In num_array.cc: extend(), below !exact, len = " << len << endl;
+   }
+   
+
+
+   /*
+   int k;
+
+   k = len/num_array_alloc_inc;
+
+   if ( len%num_array_alloc_inc )  ++k;
+
+   len = k*num_array_alloc_inc;
+   */
+
+   
    vector<double> u;
    u.reserve(len);
    
@@ -213,7 +232,8 @@ void NumArray::extend(int len, bool exact)
    u.clear();
    
    Nalloc = len;
-
+   cout << "In num_array.cc: extend(), Nalloc = " << Nalloc << endl;
+   
    return;
 
 }
@@ -313,7 +333,7 @@ int NumArray::has(double d, bool forward) const
       }
    }
 
-   cout << "found = " << found << endl;
+   //cout << "found = " << found << endl;
    
    return ( found );
 
@@ -343,12 +363,10 @@ void NumArray::add(double d)
 
 {
 
-   //cout << "In num_array.cc add(double), CHECK" << endl;
+   cout << "In num_array.cc: add(double d), Nelements + 1 = " << Nelements + 1 << endl;
    
    extend(Nelements + 1, false);
 
-   cout << "d = " << d << endl;
-   
    e.push_back(d);
    
    Sorted = false;
