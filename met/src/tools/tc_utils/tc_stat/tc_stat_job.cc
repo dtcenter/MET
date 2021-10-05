@@ -4059,15 +4059,16 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
       // summary job output is sorted nicely.
       not_converted = true;
       if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 && cur != na_str) {
-         if(lead = timestring_to_sec(cur.c_str()) < 100*sec_per_hour) {
+         if((lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
             not_converted = false;
             // Handle positive and negative lead times
             key << (lead < 0 ? ":-0" : ":0")
                 << sec_to_hhmmss(abs(lead));
          }
       }
+
       // Otherwise, just append the current case info
-      if (not_converted) key << ":" << cur;
+      if(not_converted) key << ":" << cur;
    } // end for i
 
    return(key);
