@@ -1341,6 +1341,9 @@ void TCStatJob::event_equalize_tracks() {
    mlog << Debug(3)
         << "Applying track-based event equalization logic.\n";
 
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
+
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
 
@@ -1425,6 +1428,9 @@ void TCStatJob::event_equalize_lines() {
 
    mlog << Debug(3)
         << "Applying line-based event equalization logic.\n";
+
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
