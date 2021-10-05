@@ -113,8 +113,9 @@ void NumArray::clear()
 
    e.clear();
  
-   Nelements = Nalloc = 0;
-
+   //Nelements = Nalloc = 0;
+   Nalloc = 0;
+   
    Sorted = false;
 
    return;
@@ -129,10 +130,11 @@ void NumArray::erase()
 
 {
 
-   Nelements = 0;
-
+   //Nelements = 0;
+   //clear();
+   
    Sorted = false;
-
+   
    return;
 
 }
@@ -147,20 +149,21 @@ void NumArray::assign(const NumArray & a)
 
    clear();
 
-   if ( a.Nelements == 0 )  return;
+   if ( a.n_elements() == 0 )  return;
 
-   extend(a.Nelements);
+   extend(a.n_elements());
 
    int j;
 
-   for (j=0; j<(a.Nelements); ++j)  {
+   for (j=0; j<(a.n_elements()); ++j)  {
 
-      e[j] = a.e[j];
+      //e[j] = a.e[j];
+      e.push_back(a.e[j]);
 
    }
 
-   Nelements = a.Nelements;
-
+   //Nelements = a.n_elements();
+   
    Sorted = a.Sorted;
 
 
@@ -180,8 +183,6 @@ void NumArray::extend(int len, bool exact)
       cout << "In num_array.cc: extend(), Nalloc >= len, Nalloc = " << Nalloc << " len = " << len << endl;
       return;
    }
-
-
    
    if ( ! exact )  {
       
@@ -196,7 +197,6 @@ void NumArray::extend(int len, bool exact)
       cout << "In num_array.cc: extend(), below !exact, len = " << len << endl;
    }
    
-
 
    /*
    int k;
@@ -215,19 +215,17 @@ void NumArray::extend(int len, bool exact)
    int j;
 
    fill(u.begin(), u.end(), 0);
+   
+   if(e.size() > 0) {
 
-   if ( e.size() > 0 )  {
-
-      for (j=0; j<Nelements; ++j)  {
-
-         u[j] = e[j];
-
+      for (j=0; j<n_elements(); ++j) {
+         //u[j] = e[j];
+         u.push_back(e[j]);
       }
-
-      e.clear();
       
+      e.clear();
    }
-
+      
    e = u;
    u.clear();
    
@@ -249,14 +247,14 @@ void NumArray::dump(ostream & out, int depth) const
    Indent prefix(depth);
 
 
-   out << prefix << "Nelements = " << Nelements << "\n";
+   out << prefix << "n_elements() = " << n_elements() << "\n";
    out << prefix << "Nalloc    = " << Nalloc    << "\n";
    out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
 
    int j;
-
-   for (j=0; j<Nelements; ++j)  {
-
+   
+   for (j=0; j<n_elements(); ++j)  {
+      
       out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
    }
@@ -279,10 +277,10 @@ double NumArray::operator[](int i) const
 
 {
 
-   if ( (i < 0) || (i >= Nelements) )  {
+   if ( (i < 0) || (i >= n_elements()) )  {
 
       mlog << Error << "\nNumArray::operator[](int) const -> "
-           << "range check error ... Nelements = " << Nelements
+           << "range check error ... n_elements() = " << n_elements()
            << ", i = " << i << "\n\n";
 
       exit ( 1 );
@@ -317,7 +315,7 @@ int NumArray::has(double d, bool forward) const
    int found = 0;
 
    if (forward) {
-      for (j=0; j<Nelements; ++j) {
+      for (j=0; j<n_elements(); ++j) {
          if ( is_eq(e[j], d) ) {
             found = 1;
             break;
@@ -325,7 +323,7 @@ int NumArray::has(double d, bool forward) const
       }
    }
    else {
-      for (j=Nelements-1; j>=0; --j) {
+      for (j=n_elements()-1; j>=0; --j) {
          if ( is_eq(e[j], d) ) {
             found = 1;
             break;
@@ -363,10 +361,10 @@ void NumArray::add(double d)
 
 {
 
-   cout << "In num_array.cc: add(double d), Nelements + 1 = " << Nelements + 1 << endl;
+   cout << "In num_array.cc: add(double d), n_elements() + 1 = " << n_elements() + 1 << endl;
    
-   extend(Nelements + 1, false);
-
+   extend(n_elements() + 1, false);
+   
    e.push_back(d);
    
    Sorted = false;
@@ -383,13 +381,11 @@ void NumArray::add(const NumArray & a)
 
 {
 
-   //cout << "In num_array.cc add(NumArray), CHECK" << endl;
-   
-   extend(Nelements + a.Nelements);
+   extend(n_elements() + a.n_elements());
 
    int j;
 
-   for (j=0; j<(a.Nelements); ++j)  {
+   for (j=0; j<(a.n_elements()); ++j)  {
 
       e.push_back(a.e[j]);
 
@@ -409,7 +405,7 @@ void NumArray::add_const(double v, int n)
 
 {
 
-   extend(Nelements + n);
+   extend(n_elements() + n);
 
    int j;
 
@@ -433,8 +429,8 @@ void NumArray::add_seq(int beg, int end)
 
 {
 
-   extend(Nelements + (end - beg + 1));
-
+   extend(n_elements() + (end - beg + 1));
+   
    int j;
 
    for (j=beg; j<=end; ++j)  {
@@ -461,7 +457,7 @@ void NumArray::add_css(const char *text)
 
    sa.parse_css(text);
 
-   extend(Nelements + sa.n_elements());
+   extend(n_elements() + sa.n_elements());
 
    int j;
 
@@ -489,7 +485,7 @@ void NumArray::add_css_sec(const char *text)
 
    sa.parse_css(text);
 
-   extend(Nelements + sa.n_elements());
+   extend(n_elements() + sa.n_elements());
 
    int j;
 
@@ -528,7 +524,7 @@ void NumArray::set(double d)
 {
 
    erase();
-
+   
    add(d);
 
    //
@@ -563,7 +559,7 @@ void NumArray::set(int i, double d)
 
 {
 
-   if ( (i < 0) || (i >= Nelements) )  {
+   if ( (i < 0) || (i >= n_elements()) )  {
 
       mlog << Error << "\nNumArray::set(int, double) -> "
            << "range check error\n\n";
@@ -607,7 +603,7 @@ void NumArray::reorder(const NumArray &i_na) {
    int i, j;
 
    // Check that the index array is of the correct length
-   if(i_na.n_elements() != Nelements) {
+   if(i_na.n_elements() != n_elements()) {
       mlog << Error << "\nNumArray::reorder(const NumArray &) -> "
            << "the index and sorting arrays must have the same length\n\n";
       exit(1);
@@ -659,10 +655,10 @@ int NumArray::rank_array(int &ties)
    // and their computed ranks.  The ranks are stored as doubles since
    // they can be set to 0.5 in the case of ties.
    //
-   data      = new double [Nelements];
-   data_loc  = new int    [Nelements];
-   data_rank = new double [Nelements];
-
+   data      = new double [n_elements()];
+   data_loc  = new int    [n_elements()];
+   data_rank = new double [n_elements()];
+   
    if ( !data || !data_loc || !data_rank )  {
 
       mlog << Error << "\nint NumArray::rank_array() -> "
@@ -675,7 +671,7 @@ int NumArray::rank_array(int &ties)
    //
    // Search the data array for valid data and keep track of its location
    //
-   for(i=0, n_vld=0; i<Nelements; i++) {
+   for(i=0, n_vld=0; i<n_elements(); i++) {
 
       if(!is_bad_data(e[i])) {
          data[n_vld]     = e[i];
@@ -723,8 +719,7 @@ double NumArray::percentile_array(double t)
    //
    if ( !Sorted ) sort_array();
 
-   //v = percentile(e, Nelements, t);
-   v = percentile(e.data(), Nelements, t);
+   v = percentile(e.data(), n_elements(), t);
    
    return ( v );
 
@@ -741,7 +736,7 @@ double NumArray::compute_percentile(double v, bool inclusive) const
    int i, n, nvld;
    double ptile;
 
-   for ( i=0,n=0,nvld=0; i<Nelements; i++ )  {
+   for ( i=0,n=0,nvld=0; i<n_elements(); i++ )  {
 
       if ( is_bad_data(e[i]) )  continue;
 
@@ -788,7 +783,7 @@ void NumArray::compute_mean_variance(double &mn, double &var) const
    int j, count;
    double s, s_sq;
 
-   if(Nelements == 0) {
+   if(n_elements() == 0) {
 
       mn = var = bad_data_double;
 
@@ -798,7 +793,7 @@ void NumArray::compute_mean_variance(double &mn, double &var) const
    s = s_sq = 0.0;
    count = 0;
 
-   for(j=0; j<Nelements; j++) {
+   for(j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s    += e[j];
       s_sq += e[j]*e[j];
@@ -852,7 +847,7 @@ double NumArray::sum() const
    int j, count;
    double s;
 
-   for(j=0, count=0, s=0.0; j<Nelements; j++) {
+   for(j=0, count=0, s=0.0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s += e[j];
       count++;
@@ -876,7 +871,7 @@ double NumArray::mode() const
    NumArray uniq_v, uniq_n;
    double v;
 
-   for(j=0; j<Nelements; j++) {
+   for(j=0; j<n_elements(); j++) {
 
       // If value isn't already in the list, add it
       if(!uniq_v.has(e[j])) {
@@ -921,13 +916,13 @@ double NumArray::min() const
 
 {
 
-   if(Nelements == 0) return(bad_data_double);
+   if(n_elements() == 0) return(bad_data_double);
 
    int j;
 
    double min_v = e[0];
 
-   for(j=0; j<Nelements; j++) {
+   for(j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       if(e[j] < min_v) min_v = e[j];
    }
@@ -944,13 +939,13 @@ double NumArray::max() const
 
 {
 
-   if(Nelements == 0) return(bad_data_double);
+   if(n_elements() == 0) return(bad_data_double);
 
    int j;
 
    double max_v = e[0];
 
-   for(j=0; j<Nelements; j++) {
+   for(j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       if(e[j] > max_v) max_v = e[j];
    }
@@ -987,7 +982,7 @@ int NumArray::n_valid() const
 
    int j, n_vld;
 
-   for(j=0, n_vld=0; j<Nelements; j++) {
+   for(j=0, n_vld=0; j<n_elements(); j++) {
       if(!is_bad_data(e[j])) n_vld++;
    }
 
@@ -1005,13 +1000,13 @@ ConcatString NumArray::serialize() const
 
    ConcatString s;
 
-   if(Nelements == 0) return(s);
+   if(n_elements() == 0) return(s);
 
    int j;
 
    s << e[0];
-   for(j=1; j<Nelements; j++) s << " " << e[j];
-
+   for(j=1; j<n_elements(); j++) s << " " << e[j];
+   
    return(s);
 
 }
@@ -1027,14 +1022,14 @@ NumArray NumArray::subset(int beg, int end) const
    NumArray subset_na;
 
    // Check bounds
-   if ( beg < 0 || beg >= Nelements ||
-        end < 0 || end >= Nelements ||
+   if ( beg < 0 || beg >= n_elements() ||
+        end < 0 || end >= n_elements() ||
         end < beg )  {
       mlog << Error << "\nNumArray::subset(int, int) -> "
            << "range check error\n\n";
       exit ( 1 );
    }
-
+   
    // Store subset
    for(int i=beg; i<=end; i++) subset_na.add(e[i]);
 
@@ -1054,14 +1049,14 @@ NumArray NumArray::subset(const NumArray &keep) const
    NumArray subset_na;
 
    // Check bounds
-   if ( keep.n_elements() != Nelements )  {
+   if ( keep.n_elements() != n_elements() )  {
       mlog << Error << "\nNumArray::subset(const NumArray &) -> "
            << "the number of elements do not match\n\n";
       exit ( 1 );
    }
-
+   
    // Store subset
-   for(int i=0; i<=Nelements; i++)  {
+   for(int i=0; i<=n_elements(); i++)  {
       if(keep[i])  subset_na.add(e[i]);
    }
 
@@ -1079,8 +1074,8 @@ double NumArray::mean() const
 
    int j, count;
    double s, mn;
-
-   for(j=0, count=0, s=0.0; j<Nelements; j++) {
+   
+   for(j=0, count=0, s=0.0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s += e[j];
       count++;
@@ -1104,8 +1099,8 @@ double NumArray::mean_sqrt() const
    NumArray wgt;
 
    // for simple mean, call weighted mean with constant weight
-   wgt.add_const(1.0, Nelements);
-
+   wgt.add_const(1.0, n_elements());
+   
    return(wmean_sqrt(wgt));
 
 }
@@ -1121,8 +1116,8 @@ double NumArray::mean_fisher() const
    NumArray wgt;
 
    // for simple mean, call weighted mean with constant weight
-   wgt.add_const(1.0, Nelements);
-
+   wgt.add_const(1.0, n_elements());
+   
    return(wmean_fisher(wgt));
 
 }
@@ -1135,7 +1130,7 @@ double NumArray::wmean(const NumArray &wgt) const
 
 {
 
-   if ( wgt.n_elements() != Nelements )  {
+   if ( wgt.n_elements() != n_elements() )  {
       mlog << Error << "\nNumArray::wmean(const NumArray &) -> "
            << "the number of elements do not match\n\n";
       exit ( 1 );
@@ -1144,7 +1139,7 @@ double NumArray::wmean(const NumArray &wgt) const
    int j, count;
    double w, s, wmn;
 
-   for(j=0, count=0, w=0.0, s=0.0; j<Nelements; j++) {
+   for(j=0, count=0, w=0.0, s=0.0; j<n_elements(); j++) {
       if(is_bad_data(e[j]) || is_bad_data(wgt[j])) continue;
       s += wgt[j]*e[j];
       w += wgt[j];
@@ -1171,8 +1166,8 @@ double NumArray::wmean_sqrt(const NumArray &wgt) const
    double v;
 
    // square the current values
-   squares.extend(Nelements);
-   for(j=0; j<Nelements; j++) {
+   squares.extend(n_elements());
+   for(j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : e[j]*e[j]);
       squares.add(v);
    }
@@ -1198,8 +1193,8 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
    double v;
 
    // apply fisher transform
-   xform.extend(Nelements);
-   for(j=0; j<Nelements; j++) {
+   xform.extend(n_elements());
+   for(j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : atanh(e[j]));
       xform.add(v);
    }

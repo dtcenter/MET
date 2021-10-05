@@ -42,7 +42,7 @@ class NumArray {
 
       vector<double> e;
       
-      int Nelements;
+      //int Nelements;
 
       int Nalloc;
 
@@ -58,7 +58,7 @@ class NumArray {
       void clear();
 
       void erase();
-
+      
       void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
@@ -126,8 +126,8 @@ class NumArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int            NumArray::n_elements()         const { return ( Nelements ); }
-inline int            NumArray::n         ()         const { return ( Nelements ); }
+inline int            NumArray::n_elements()         const { return ( e.size() ); }
+inline int            NumArray::n         ()         const { return ( e.size() ); }
 inline const double * NumArray::vals()               const { return ( e.data() );         }
 inline       double * NumArray::buf()                 { return ( e.data() );         }
 inline void           NumArray::inc(int i, int v)          { e[i] += v; return;    }
