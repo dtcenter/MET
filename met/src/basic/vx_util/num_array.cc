@@ -115,7 +115,8 @@ void NumArray::clear()
  
    //Nelements = Nalloc = 0;
    Nalloc = 0;
-   
+   //e.n_elements() = 0;
+
    Sorted = false;
 
    return;
@@ -149,8 +150,11 @@ void NumArray::assign(const NumArray & a)
 
    clear();
 
-   if ( a.n_elements() == 0 )  return;
-
+   if ( a.n_elements() == 0 ) {
+      cout << "In num_array.cc: assign(), if a.n_elements() == 0, a.n_elements() = " << a.n_elements() << endl;
+      return;
+   }
+   
    extend(a.n_elements());
 
    int j;
@@ -163,9 +167,11 @@ void NumArray::assign(const NumArray & a)
    }
 
    //Nelements = a.n_elements();
+   //e.n_elements() = a.n_elements();
+
+   cout << "In num_array.cc: assign(), a.n_elements() = " << a.n_elements() << " e.size = " << e.size() << " n_elements() = " << n_elements() << endl;
    
    Sorted = a.Sorted;
-
 
    return;
 
@@ -178,11 +184,15 @@ void NumArray::assign(const NumArray & a)
 void NumArray::extend(int len, bool exact)
 
 {
+
+   cout << "In num_array.cc: extend(), at very begining: Nalloc = " << Nalloc << " len = " << len << endl;
    
    if ( Nalloc >= len ) {
       cout << "In num_array.cc: extend(), Nalloc >= len, Nalloc = " << Nalloc << " len = " << len << endl;
       return;
    }
+
+   /*
    
    if ( ! exact )  {
       
@@ -197,40 +207,45 @@ void NumArray::extend(int len, bool exact)
       cout << "In num_array.cc: extend(), below !exact, len = " << len << endl;
    }
    
-
-   /*
-   int k;
-
-   k = len/num_array_alloc_inc;
-
-   if ( len%num_array_alloc_inc )  ++k;
-
-   len = k*num_array_alloc_inc;
    */
 
+
+   //cout << "In num_array.cc: extend(), before u.reserve(len), len = " << len << endl;
    
    vector<double> u;
    u.reserve(len);
    
+   //cout << "In num_array.cc: extend(), u.size() = " << u.size() << endl;
+   
    int j;
 
-   fill(u.begin(), u.end(), 0);
+   //fill(u.begin(), u.end(), 0);
+
+   cout << "In num_array.cc: extend(), before loop over n_elements(), n_elements() = " << n_elements() << endl;
    
    if(e.size() > 0) {
 
       for (j=0; j<n_elements(); ++j) {
          //u[j] = e[j];
          u.push_back(e[j]);
+         cout << "In num_array.cc: extend(): u[j] = " << u[j] << endl;
       }
+
+      cout << "In num_array.cc: extend(), after loop, u.size() = " << u.size() << endl;
       
       e.clear();
    }
       
    e = u;
+
+   //cout << "In num_array.cc: extend(), near bottom, e.size() = " << e.size() << endl;
+   
    u.clear();
+
+   //cout << "In num_array.cc: extend(), after loop over n_elements(), n_elements() = " << n_elements() << endl;
    
    Nalloc = len;
-   cout << "In num_array.cc: extend(), Nalloc = " << Nalloc << endl;
+   //cout << "In num_array.cc: extend(), Nalloc = " << Nalloc << endl;
    
    return;
 
@@ -361,11 +376,15 @@ void NumArray::add(double d)
 
 {
 
-   cout << "In num_array.cc: add(double d), n_elements() + 1 = " << n_elements() + 1 << endl;
+   //cout << "In num_array.cc: add(double d), n_elements() + 1 = " << n_elements() + 1 << endl;
    
    extend(n_elements() + 1, false);
+
+   cout << "In num_array.cc: add(double d), d = " << d << endl;
    
    e.push_back(d);
+
+   cout << "In num_array.cc: after push_back, n_elements() =  " << n_elements() << endl;
    
    Sorted = false;
 
@@ -1166,7 +1185,7 @@ double NumArray::wmean_sqrt(const NumArray &wgt) const
    double v;
 
    // square the current values
-   squares.extend(n_elements());
+   //squares.extend(n_elements());
    for(j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : e[j]*e[j]);
       squares.add(v);
@@ -1193,7 +1212,7 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
    double v;
 
    // apply fisher transform
-   xform.extend(n_elements());
+   //xform.extend(n_elements());
    for(j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : atanh(e[j]));
       xform.add(v);
