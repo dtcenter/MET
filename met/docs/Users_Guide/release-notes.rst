@@ -5,8 +5,39 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version 10.1.0-beta2 release notes (|release_date|)
+MET Version 10.1.0-beta3 release notes (|release_date|)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* New tools:
+
+   * **Create new Gen-Ens-Prod tool for ensemble product generation** (`#1904 <https://github.com/dtcenter/MET/issues/1904>`_).
+
+* Bugfixes:
+
+   * Fix PB2NC to better inventory BUFR input data when processing all variables (`#1894 <https://github.com/dtcenter/MET/issues/1894>`_).
+   * Fix IODA2NC bug rejecting all input observations in unit tests (`#1922 <https://github.com/dtcenter/MET/issues/1922>`_).
+   * Fix Stat-Analysis skill score index job which always writes a dump row output file (`#1914 <https://github.com/dtcenter/MET/issues/1914>`_).
+   * Fix TC-Stat event equalization logic to include any model name requested using -amodel (`#1932 <https://github.com/dtcenter/MET/issues/1932>`_).
+
+* Enhancements:
+
+   * **Enhance MET to use point observations falling between the first and last columns of a global grid** (`#1823 <https://github.com/dtcenter/MET/issues/1823>`_).
+   * **Enhance the PBL derivation logic in PB2NC** (`#1913 <https://github.com/dtcenter/MET/issues/1913>`_).
+   * **Add obs_quality_exc configuration option to specify which quality flags should be excluded** (`#1858 <https://github.com/dtcenter/MET/issues/1858>`_).
+
+* Logging:
+
+   * Resolve PB2NC string truncation warning messages (`#1909 <https://github.com/dtcenter/MET/issues/1909>`_).
+   * Print warning message for fields that contain no valid data (`#1912 <https://github.com/dtcenter/MET/issues/1912>`_).
+   * Review and revise the warning messages when running the MET unit tests (`#1921 <https://github.com/dtcenter/MET/issues/1921>`_).
+
+* Repository and installation:
+
+   * Enhance compilation script and its documentation (`#1395 <https://github.com/dtcenter/MET/issues/1395>`_).
+   * Reduce the Security hotspots from SonarQube (`#1903 <https://github.com/dtcenter/MET/issues/1903>`_).
+
+MET Version 10.1.0-beta2 release notes (20210901)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * New output:
 
@@ -43,7 +74,7 @@ MET Version 10.1.0-beta2 release notes (|release_date|)
    * Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).
 
 MET Version 10.1.0-beta1 release notes (20210613)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Add the HSS_EC statistic to the MCTS line type and a configurable option for its computation (`#1749 <http://github.com/dtcenter/MET/issues/1749>`_).
 * Implement a common API for reading and writing the common NetCDF point observation file format (`#1402 <http://github.com/dtcenter/MET/issues/1402>`_ and `#1581 <http://github.com/dtcenter/MET/issues/1581>`_).
