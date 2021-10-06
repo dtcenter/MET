@@ -1904,7 +1904,7 @@ void process_pbfile(int i_pb) {
            << diff_file_time_count << " messages with different reference time ("
            << unix_to_yyyymmdd_hhmmss(file_ut) << "):\n";
       for (int idx=0; idx<diff_file_times.n_elements(); idx++) {
-         mlog << Warning << method_name << "\t"
+         mlog << Warning << method_name << "\t- "
               << unix_to_yyyymmdd_hhmmss(diff_file_times[idx]) << "\n";
       }
       mlog << Warning << "\n";
@@ -2885,10 +2885,10 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
            << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
            << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
       if( no_overlap ) {
-         mlog << Warning << "\n" << method_name
+         mlog << Debug(4) << "\n" << method_name
               << "Can not combine TQ and UV records because of no overlapping."
               << "  TQZ count: " << tq_count << ", UV count: " << uv_count
-              << "  common_levels: " << common_levels.n() << "\n\n";
+              << "  common_levels: " << common_levels.n() << "\n";
          return pqtzuv_map_merged.size();
       }
 
@@ -2988,8 +2988,8 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
            << ")\n";
 
       if (pbl_level <= 0) {
-         mlog << Warning << "\n" <<  method_name
-              << "Skip CALPBL because an empty list after combining TQZ and UV\n\n";
+         mlog << Debug(4) << method_name
+              << "Skip CALPBL because an empty list after combining TQZ and UV\n";
       }
       else {
          // Order all observations by pressure from bottom to top
@@ -3103,12 +3103,12 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
    if (is_bad_data(pbl_value)) {
-      mlog << Warning << "\nFailed to compute PBL " << pbl_value << " (" << hdr_info << ")\n\n";
+      mlog << Debug(4) << "Failed to compute PBL " << pbl_value << " (" << hdr_info << ")\n";
    }
    else if (pbl_value < hdr_elv) {
-      mlog << Warning << "\nNot saved because the computed PBL (" << pbl_value
+      mlog << Debug(4) << "Not saved because the computed PBL (" << pbl_value
            << ") is less than the station elevation (" << hdr_elv
-           << "). " << hdr_info << "\n\n";
+           << "). " << hdr_info << "\n";
       obs_arr[4] = 0;
    }
    else {
@@ -3120,9 +3120,9 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
            << "   lat: " << hdr_lat << ", lon: " << hdr_lon
            << ", elv: " << hdr_elv << " " << hdr_info << "\n\n";
       if (obs_arr[4] > MAX_PBL) {
-         mlog << Warning << "\nNot saved the computed PBL (" << obs_arr[4] << " from "
+         mlog << Debug(4) << "Not saved the computed PBL (" << obs_arr[4] << " from "
               << pbl_value << ") because of the MAX PBL " << MAX_PBL
-              << "  (" << hdr_info<< ")\n\n";
+              << "  (" << hdr_info<< ")\n";
       }
       else addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                           hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
@@ -3205,7 +3205,7 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
             float next_value = next_pqtzuv[index];
             if (is_bad_data(prev_value) || is_bad_data(next_value)) {
                if ((!IGNORE_Q_PBL && index==1) || (!IGNORE_Z_PBL && index==3)) {
-                  mlog << Warning << method_name << "   Missing value for "
+                  mlog << Debug(4) << method_name << "   Missing value for "
                        << (is_bad_data(prev_value) ? "previous" : "next")
                        << " data for index " << index << " at pressure "
                        << (is_bad_data(prev_value) ? prev_pqtzuv[0] : next_pqtzuv[0])

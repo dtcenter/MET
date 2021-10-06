@@ -2338,7 +2338,7 @@ void process_madis_maritime(NcFile *&f_in) {
    }
    if (missing_qty_vars.n() > 0) {
       for (int idx=0; idx<missing_qty_vars.n(); idx++)
-         mlog << Warning << "    missing Qty variable: " << missing_qty_vars[idx] << "\n";
+         mlog << Debug(1) << "    missing Qty variable: " << missing_qty_vars[idx] << "\n";
    }
    
    //
@@ -3291,7 +3291,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    }
    if (missing_qty_vars.n() > 0) {
       for (int idx=0; idx<missing_qty_vars.n(); idx++)
-         mlog << Warning << "    missing Qty variable: " << missing_qty_vars[idx] << "\n";
+         mlog << Debug(1) << "    missing Qty variable: " << missing_qty_vars[idx] << "\n";
    }
 
    //

@@ -230,7 +230,7 @@ bool SSIndexJobInfo::add(STATLine &line) {
 ////////////////////////////////////////////////////////////////////////
 
 SSIDXData SSIndexJobInfo::compute_ss_index() {
-   int i, n_vld;
+   int i, n_vld, n_diff;
    double fcst_stat, ref_stat;
    double ss, ss_sum, weight_sum, ss_avg;
    CNTInfo fcst_cnt, ref_cnt;
@@ -241,7 +241,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
         << " initialization time(s): " << write_css(init_time) << "\n";
 
    // Compute a skill score for each term
-   for(i=0, n_vld=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
+   for(i=0, n_vld=0, n_diff=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
 
       // Continuous stats
       if(job_lt[i] == stat_sl1l2) {
@@ -304,15 +304,16 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
 
       // Check if the number of aggregated lines differ
       if(nint(n_fcst_lines[i]) != nint(n_ref_lines[i])) {
-         mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
+         n_diff++;
+         mlog << Debug(3) << "\nSSIndexJobInfo::compute_ss_index() -> "
               << "the number of aggregated forecast and reference lines "
               << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
               << ") for term " << i+1 << " (" << term_cs << ").\n\n";
       }
 
       if(is_bad_data(ss)) {
-         mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
-              << "can't compute the skill score for term " << i+1
+         mlog << Debug(3) << "\nSSIndexJobInfo::compute_ss_index() -> "
+              << "cannot compute the skill score for term " << i+1
               << " (" << term_cs << ").\n\n";
       }
       else {
@@ -320,6 +321,22 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
       }
 
    } // end for i
+
+   // Print warning about differing numbers of input lines
+   if(n_diff > 0) {
+      mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
+           << "the number of aggregated forecast and reference lines "
+           << "differ for " << n_diff << " of the " << n_term << " terms. "
+           << "Rerun at verbosity level 3 (-v 3) for details.\n\n";
+   }
+
+   // Print warning about bad data in skill scores
+   if(n_vld != n_term) {
+      mlog << Warning << "\nSSIndexJobInfo::compute_ss_index() -> "
+           << "cannot compute the skill score for " << n_term - n_vld
+           << " of the " << n_term << " terms. "
+           << "Rerun at verbosity level 3 (-v 3) for details.\n\n";
+   }
 
    // Check the required ratio of valid terms
    if(((double) n_vld / n_term) < ss_index_vld_thresh) {

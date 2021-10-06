@@ -175,9 +175,10 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
 
    // Range check the probability value
    if(l.prob() < 0 || l.prob() > 100) {
-      mlog << Warning
+      mlog << Debug(4) 
            << "\nbool ProbInfoArray::add() -> "
-           << "bad probability value ... \"" << l.prob() << "\"\n\n";
+           << "skipping probability value (" << l.prob()
+           << ") outside of range (0, 100).\n\n";
       return(false);
    }
 

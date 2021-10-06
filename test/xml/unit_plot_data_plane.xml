@@ -108,7 +108,7 @@
     <param> \
       &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
       &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps \
-      'name="PRMSL";level="L0";GRIB_ens="+1";' \
+      'name="PRMSL";level="L0";GRIB_ens="+1";lead_time="00";' \
       -title "GRIB1 GEFS  PRMSL ENS +1" \
       -v 1
     </param>
@@ -122,7 +122,7 @@
     <param> \
       &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
       &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps \
-      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";' \
+      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";lead_time="00";' \
       -title "GRIB1 GEFS  PRMSL ENS low_res_ctl" \
       -v 1
     </param>

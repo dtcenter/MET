@@ -612,7 +612,7 @@ void process_ioda_file(int i_pb) {
 
       char valid_time[ndatetime+1];
       m_strncpy(valid_time, (const char *)(hdr_vld_block + (i_read * ndatetime)),
-                ndatetime, method_name, "valid_time");
+                ndatetime, method_name, "valid_time", true);
       valid_time[ndatetime] = 0;
       msg_ut = yyyymmddThhmmss_to_unix(valid_time);
 
@@ -891,7 +891,6 @@ void process_ioda_file(int i_pb) {
       mlog << Warning << "\n" << method_name << " -> "
            << "No IODA records retained from file: "
            << ioda_files[i_pb] << "\n\n";
-      return;
    }
 
    return;
@@ -1116,8 +1115,8 @@ bool get_meta_data_float(NcFile *f_in, StringArray &metadata_vars,
                            << "trouble getting " << metadata_name << "\n";
       }
    }
-   else mlog << Warning << "\n" << method_name
-             << "Metadata for " << metadata_key << " does not exist!\n\n";
+   else mlog << Debug(4) << method_name
+             << "Metadata for " << metadata_key << " does not exist!\n";
    if(status) {
       for(int idx=0; idx<nlocs; idx++)
          if(check_missing_thresh(metadata_buf[idx])) metadata_buf[idx] = bad_data_float;
@@ -1178,11 +1177,11 @@ bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
       NcVar qc_var = get_var(f_in, ioda_name.c_str());
       if(IS_VALID_NC(qc_var)) {
          status = get_nc_data(&qc_var, qc_buf, nlocs);
-         if(!status) mlog << Warning << "\n" << method_name
-                           << "trouble getting " << ioda_name << "\n\n";
+         if(!status) mlog << Debug(4) << method_name
+                          << "trouble getting " << ioda_name << "\n";
       }
-      else mlog << Warning << "\n" << method_name
-                << "\"" << ioda_name << "\" does not exist!\n\n";
+      else mlog << Debug(4) << method_name
+                << "\"" << ioda_name << "\" does not exist!\n";
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)
