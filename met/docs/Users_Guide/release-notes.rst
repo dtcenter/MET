@@ -12,18 +12,18 @@ MET Version 10.1.0-beta3 release notes (|release_date|)
 
    * **Create new Gen-Ens-Prod tool for ensemble product generation** (`#1904 <https://github.com/dtcenter/MET/issues/1904>`_).
 
+* Enhancements:
+
+   * **Enhance MET to use point observations falling between the first and last columns of a global grid** (`#1823 <https://github.com/dtcenter/MET/issues/1823>`_).
+   * **Enhance the PBL derivation logic in PB2NC** (`#1913 <https://github.com/dtcenter/MET/issues/1913>`_).
+   * **Add obs_quality_exc configuration option to specify which quality flags should be excluded** (`#1858 <https://github.com/dtcenter/MET/issues/1858>`_).
+
 * Bugfixes:
 
    * Fix PB2NC to better inventory BUFR input data when processing all variables (`#1894 <https://github.com/dtcenter/MET/issues/1894>`_).
    * Fix IODA2NC bug rejecting all input observations in unit tests (`#1922 <https://github.com/dtcenter/MET/issues/1922>`_).
    * Fix Stat-Analysis skill score index job which always writes a dump row output file (`#1914 <https://github.com/dtcenter/MET/issues/1914>`_).
    * Fix TC-Stat event equalization logic to include any model name requested using -amodel (`#1932 <https://github.com/dtcenter/MET/issues/1932>`_).
-
-* Enhancements:
-
-   * **Enhance MET to use point observations falling between the first and last columns of a global grid** (`#1823 <https://github.com/dtcenter/MET/issues/1823>`_).
-   * **Enhance the PBL derivation logic in PB2NC** (`#1913 <https://github.com/dtcenter/MET/issues/1913>`_).
-   * **Add obs_quality_exc configuration option to specify which quality flags should be excluded** (`#1858 <https://github.com/dtcenter/MET/issues/1858>`_).
 
 * Logging:
 
