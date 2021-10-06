@@ -139,14 +139,8 @@ void StatHdrInfo::add(const STATLine &line) {
       vx_mask.add(line.vx_mask());
    if(!interp_mthd.has(line.interp_mthd()))
       interp_mthd.add(line.interp_mthd());
-
-   if(!interp_pnts.has(line.interp_pnts())){
-
-      //cout << "CHECK1" << endl;
-      
+   if(!interp_pnts.has(line.interp_pnts()))
       interp_pnts.add(line.interp_pnts());
-   }
-   
    cs = line.get_item("FCST_THRESH", false);
    cs.strip_paren();
    if(!fcst_thresh.has(cs)) fcst_thresh.add(cs);

@@ -151,6 +151,8 @@ int main(int argc, char * argv []) {
    //
    sanity_check();
 
+   cout << "In stat_analysis.cc: CHECK1" << endl;
+   
    //
    // Setup the default job using the config file options
    //
@@ -158,6 +160,10 @@ int main(int argc, char * argv []) {
    set_job_from_config(conf, default_job);
    default_job.set_precision(conf.output_precision());
 
+
+   cout << "In stat_analysis.cc: CHECK2" << endl;
+   
+   
    //
    // Write out the default job
    //
