@@ -465,7 +465,6 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
                   "INTERP_MTHD", interp_mthd, true));
 
    // INTERP_PNTS
-   cout << "interp_pnts.n() = " << interp_pnts.n() << endl;
    css = write_css(interp_pnts);
    if(interp_pnts.n() == 0 || interp_pnts.n() > 1) {
       mlog << Warning
