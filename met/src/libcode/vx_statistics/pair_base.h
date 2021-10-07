@@ -119,7 +119,7 @@ class PairBase {
       void clear();
       void erase();
 
-      void extend(int, bool exact = true); // Allocate memory for expected size
+      void extend(int); // Allocate memory for expected size
 
       bool is_point_vx() const;
 

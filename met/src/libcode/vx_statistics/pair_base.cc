@@ -157,23 +157,23 @@ void PairBase::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::extend(int n, bool exact) {
+void PairBase::extend(int n) {
 
-   o_na.extend  (n, exact);
-   x_na.extend  (n, exact);
-   y_na.extend  (n, exact);
-   wgt_na.extend(n, exact);
+   o_na.extend  (n);
+   x_na.extend  (n);
+   y_na.extend  (n);
+   wgt_na.extend(n);
 
-   cmn_na.extend(n, exact);
-   csd_na.extend(n, exact);
-   cdf_na.extend(n, exact);
+   cmn_na.extend(n);
+   csd_na.extend(n);
+   cdf_na.extend(n);
 
    if(IsPointVx) {
-      lat_na.extend(n, exact);
-      lon_na.extend(n, exact);
-      vld_ta.extend(n, exact);
-      lvl_na.extend(n, exact);
-      elv_na.extend(n, exact);
+      lat_na.extend(n);
+      lon_na.extend(n);
+      vld_ta.extend(n);
+      lvl_na.extend(n);
+      elv_na.extend(n);
    }
 
    return;
