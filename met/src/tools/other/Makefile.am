@@ -22,6 +22,10 @@ if ENABLE_GIS_UTILS
   SUBDIRS	+= gis_utils
 endif
 
+if ENABLE_GEN_ENS_PROD
+  SUBDIRS += gen_ens_prod
+endif
+
 if ENABLE_GEN_VX_MASK
   SUBDIRS += gen_vx_mask
 endif

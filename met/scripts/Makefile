@@ -51,6 +51,7 @@ all: ${TESTS}
 
 include $(MK_DIR)/ascii2nc.mk
 include $(MK_DIR)/ensemble_stat.mk
+include $(MK_DIR)/gen_ens_prod.mk
 include $(MK_DIR)/gen_vx_mask.mk
 include $(MK_DIR)/grib2.mk
 include $(MK_DIR)/grid_stat.mk
@@ -94,6 +95,7 @@ clean:
 	rm -f ${TESTS}
 	rm -f ${TEST_OUT_DIR}/ascii2nc/*
 	rm -f ${TEST_OUT_DIR}/ensemble_stat/*
+	rm -f ${TEST_OUT_DIR}/gen_ens_prod/*
 	rm -f ${TEST_OUT_DIR}/gen_vx_mask/*
 	rm -f ${TEST_OUT_DIR}/grid_stat/*
 	rm -f ${TEST_OUT_DIR}/madis2nc/*

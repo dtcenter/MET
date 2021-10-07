@@ -279,7 +279,7 @@ class VxPairDataEnsemble {
                          unixtime, const char *, float *, Grid &,
                          const char * = 0, const DataPlane * = 0);
 
-      void add_ens(int, bool mn);
+      void add_ens(int, bool mn, Grid &);
 
       int  get_n_pair() const;
 

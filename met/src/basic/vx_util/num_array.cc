@@ -509,6 +509,28 @@ void NumArray::set(int i, double d)
 ////////////////////////////////////////////////////////////////////////
 
 
+void NumArray::set_const(double v, int n)
+
+{
+
+erase();
+
+add_const(v, n);
+
+   //
+   // a constant array is sorted
+   //
+
+Sorted = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::sort_array()
 
 {

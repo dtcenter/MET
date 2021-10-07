@@ -1340,6 +1340,9 @@ void TCStatJob::event_equalize_tracks() {
    mlog << Debug(3)
         << "Applying track-based event equalization logic.\n";
 
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
+
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
 
@@ -1424,6 +1427,9 @@ void TCStatJob::event_equalize_lines() {
 
    mlog << Debug(3)
         << "Applying line-based event equalization logic.\n";
+
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
@@ -4034,7 +4040,6 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
                            const StringArray &case_cols) {
    int i;
    int lead = 0;
-   bool not_converted;
    ConcatString key, cur;
 
    // Initialize the map key with prefix
@@ -4048,20 +4053,23 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
       // For bad data, use the NA string
       if(is_bad_data(atoi(cur.c_str()))) cur = na_string;
 
-      // Special handling for lead time:
+      // Special handling for lead times < 100 hours:
       // Switch 2-digit hours to 3-digit hours so that the
       // summary job output is sorted nicely.
-      not_converted = true;
+      bool need_cur = true;
       if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 && cur != na_str) {
-         if(lead = timestring_to_sec(cur.c_str()) < 100*sec_per_hour) {
-            not_converted = false;
+         if(abs(lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
+
             // Handle positive and negative lead times
             key << (lead < 0 ? ":-0" : ":0")
                 << sec_to_hhmmss(abs(lead));
+            need_cur = false;
          }
       }
-      // Otherwise, just append the current case info
-      if (not_converted) key << ":" << cur;
+
+      // Append the current case info if needed
+      if(need_cur) key << ":" << cur;
+
    } // end for i
 
    return(key);
