@@ -112,10 +112,6 @@ void NumArray::clear()
 {
 
    e.clear();
- 
-   //Nelements = Nalloc = 0;
-   Nalloc = 0;
-   //e.n_elements() = 0;
 
    Sorted = false;
 
@@ -131,11 +127,15 @@ void NumArray::erase()
 
 {
 
-   //Nelements = 0;
-   //clear();
-   
-   Sorted = false;
-   
+   // SETH, please figure out if we can remove the vector
+   // contents but keep the allocated memory instead of needing
+   // to reallocate again later.
+
+   // After switching to STL::vector, there is no option to
+   // erase memory without deleting the allocated memory.
+
+   clear();
+
    return;
 
 }
@@ -149,23 +149,8 @@ void NumArray::assign(const NumArray & a)
 {
 
    clear();
-   
-   if ( a.n_elements() == 0 ) {
-      cout << "In num_array.cc: assign(), if a.n_elements() == 0, a.n_elements() = " << a.n_elements() << endl;
-      return;
-   }
-   
-   extend(a.n_elements());
-   
-   int j;
 
-   for (j=0; j<(a.n_elements()); ++j)  {
-
-      e.push_back(a.e[j]);
-
-   }
-
-   cout << "In num_array.cc: assign(), a.n_elements() = " << a.n_elements() << " e.size = " << e.size() << " n_elements() = " << n_elements() << endl;
+   e = a.e;
    
    Sorted = a.Sorted;
 
@@ -177,42 +162,12 @@ void NumArray::assign(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::extend(int len, bool exact)
+void NumArray::extend(int len)
 
 {
 
-   /*
-   if ( Nalloc >= len ) {
-      return;
-   }
-   */
-   
-   //e.reserve(len); // tried using just this instead of code block below
-   
-   vector<double> u;
-   u.reserve(len);
-   
-   int j;
+   e.reserve(len);
 
-   //fill(u.begin(), u.end(), 0);
-
-   //cout << "In num_array.cc: extend(), before loop over n_elements(), n_elements() = " << n_elements() << endl;
-   
-   if(e.size() > 0) {
-
-      for (j=0; j<n_elements(); ++j) {
-         u.push_back(e[j]);
-      }
-      
-      e.clear();
-   }
-      
-   e = u;
-   u.clear();
-   
-   Nalloc = len;
-   cout << "In num_array.cc: extend(), Nalloc = len = " << Nalloc << endl;
-   
    return;
 
 }
@@ -228,12 +183,11 @@ void NumArray::dump(ostream & out, int depth) const
    Indent prefix(depth);
 
 
-   out << prefix << "n_elements() = " << n_elements() << "\n";
-   out << prefix << "Nalloc    = " << Nalloc    << "\n";
-   out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
+   out << prefix << "Length = " << n_elements() << "\n";
+   out << prefix << "Sorted = " << (Sorted ? "true" : "false") << "\n";
 
    int j;
-   
+
    for (j=0; j<n_elements(); ++j)  {
       
       out << prefix << "Element # " << j << " = " << e[j] << "\n";
@@ -261,7 +215,7 @@ double NumArray::operator[](int i) const
    if ( (i < 0) || (i >= n_elements()) )  {
 
       mlog << Error << "\nNumArray::operator[](int) const -> "
-           << "range check error ... n_elements() = " << n_elements()
+           << "range check error ... Length = " << n_elements()
            << ", i = " << i << "\n\n";
 
       exit ( 1 );
@@ -311,8 +265,6 @@ int NumArray::has(double d, bool forward) const
          }
       }
    }
-
-   //cout << "found = " << found << endl;
    
    return ( found );
 
@@ -341,15 +293,9 @@ void NumArray::add(int k)
 void NumArray::add(double d)
 
 {
-
-   cout << "In num_array.cc: add(double d), d = " << d << endl;
-   
-   extend(n_elements() + 1, false);
    
    e.push_back(d);
 
-   cout << "In num_array.cc: after push_back, n_elements() =  " << n_elements() << "\n" << endl;
-   
    Sorted = false;
 
    return;
@@ -365,7 +311,6 @@ void NumArray::add(const NumArray & a)
 {
 
    extend(n_elements() + a.n_elements());
-   //e.reserve(n_elements() + a.n_elements());
    
    int j;
 
@@ -438,11 +383,11 @@ void NumArray::add_css(const char *text)
 {
 
    StringArray sa;
-   
+
    sa.parse_css(text);
 
    extend(n_elements() + sa.n_elements());
-   
+
    int j;
 
    for (j=0; j<sa.n_elements(); j++)  {
@@ -568,8 +513,10 @@ void NumArray::sort_array()
 
 {
 
-   if(!Sorted) {
+   if ( !Sorted )  {
+
       sort(e.begin(), e.end());
+
    }
    
    Sorted = true;
@@ -615,6 +562,8 @@ void NumArray::reorder(const NumArray &i_na) {
    return;
 }
 
+// SETH, please review the logic of the functions below.
+// Do they still work OK after switching to STL::vector?
 
 ////////////////////////////////////////////////////////////////////////
 //
