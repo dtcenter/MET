@@ -151,7 +151,7 @@ void NumArray::assign(const NumArray & a)
    clear();
    
    if ( a.n_elements() == 0 ) {
-      cout << "In num_array.cc: assign(), if a.n_elements() == 0, a.n_elements() = " << a.n_elements() << endl;
+      //cout << "In num_array.cc: assign(), if a.n_elements() == 0, a.n_elements() = " << a.n_elements() << endl;
       return;
    }
    
@@ -165,7 +165,7 @@ void NumArray::assign(const NumArray & a)
 
    }
 
-   cout << "In num_array.cc: assign(), a.n_elements() = " << a.n_elements() << " e.size = " << e.size() << " n_elements() = " << n_elements() << endl;
+   //cout << "In num_array.cc: assign(), a.n_elements() = " << a.n_elements() << " e.size = " << e.size() << " n_elements() = " << n_elements() << endl;
    
    Sorted = a.Sorted;
 
@@ -211,7 +211,7 @@ void NumArray::extend(int len, bool exact)
    u.clear();
    
    Nalloc = len;
-   cout << "In num_array.cc: extend(), Nalloc = len = " << Nalloc << endl;
+   //cout << "In num_array.cc: extend(), Nalloc = len = " << Nalloc << endl;
    
    return;
 
@@ -342,13 +342,13 @@ void NumArray::add(double d)
 
 {
 
-   cout << "In num_array.cc: add(double d), d = " << d << endl;
+   //cout << "In num_array.cc: add(double d), d = " << d << endl;
    
    extend(n_elements() + 1, false);
    
    e.push_back(d);
 
-   cout << "In num_array.cc: after push_back, n_elements() =  " << n_elements() << "\n" << endl;
+   //cout << "In num_array.cc: after push_back, n_elements() =  " << n_elements() << "\n" << endl;
    
    Sorted = false;
 
