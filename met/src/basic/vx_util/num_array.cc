@@ -293,7 +293,7 @@ void NumArray::add(int k)
 void NumArray::add(double d)
 
 {
-   
+
    e.push_back(d);
 
    Sorted = false;
