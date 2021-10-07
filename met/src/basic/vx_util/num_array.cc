@@ -127,15 +127,10 @@ void NumArray::erase()
 
 {
 
-   // SETH, please figure out if we can remove the vector
-   // contents but keep the allocated memory instead of needing
-   // to reallocate again later.
-
-   // After switching to STL::vector, there is no option to
-   // erase memory without deleting the allocated memory.
-
-   clear();
-
+   int n = e.size();
+   e.clear();
+   e.reserve(n);
+   
    return;
 
 }
