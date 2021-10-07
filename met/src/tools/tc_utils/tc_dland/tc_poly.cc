@@ -217,7 +217,7 @@ void TCPolyArray::extend(int n, bool exact) {
    if(!exact) {
       int k = n/tc_poly_array_alloc_inc;
 
-      if(n%num_array_alloc_inc) k++;
+      if(n%tc_poly_array_alloc_inc) k++;
 
       n = k*tc_poly_array_alloc_inc;
    }
