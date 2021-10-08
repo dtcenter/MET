@@ -69,6 +69,7 @@ The usage statement for the Ensemble Stat tool is shown below:
          [-grid_obs file]
          [-point_obs file]
          [-ens_mean file]
+         [-ctrl file]
          [-obs_valid_beg time]
          [-obs_valid_end time]
          [-outdir path]
@@ -92,23 +93,23 @@ Optional arguments for ensemble_stat
 
 4. To produce ensemble statistics using gridded observations, use the **-grid_obs file** option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
 
+5. To produce ensemble statistics using point observations, use the **-point_obs file** option to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files.
 
-5. To produce ensemble statistics using point observations, use the **-point_obs file** to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files.
+6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
 
+7. The **-ctrl file** option specifies and ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread.
 
-6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** from earlier versions of MET.
+8. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
 
-7. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
+9. As above, use **-obs_valid_end time** in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation time window.
 
-8. As above, use **-obs_valid_end time** in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation time window.
+10. Specify the **-outdir path** option to override the default output directory (./).
 
-9. Specify the **-outdir path** option to override the default output directory (./).
+11. The **-log** file outputs log messages to the specified file.
 
-10. The **-log** file outputs log messages to the specified file.
+12. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
-
-12. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+13. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the ensemble_stat calling sequence is shown below:
 
