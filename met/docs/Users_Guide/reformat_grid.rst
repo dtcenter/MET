@@ -74,7 +74,9 @@ Required arguments for the pcp_combine
 Optional arguments for pcp_combine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-field string** option defines the data to be extracted from the input files. Use this option when processing fields other than **APCP** or non-GRIB files. It can be used multiple times and output will be created for each. In general, the field string should include the name and level of the requested data and be enclosed in single quotes (e.g. -field 'name="ACPCP"; level="A6";' for 6-hourly accumulated convective precipitation from a GRIB file). It is processed as an inline configuration file and may also include data filtering, censoring, and conversion options.
+3. The **-field string** option defines the data to be extracted from the input files. Use this option when processing fields other than **APCP** or non-GRIB files. It can be used multiple times and output will be created for each.
+
+In general, the field string should include the name and level of the requested data and be enclosed in single quotes. It is processed as an inline configuration file and may also include data filtering, censoring, and conversion options. For example, use **-field ‘name=”ACPCP”; level=”A6”; convert(x)=x/25.4;’ to read 6-hourly accumulated convective precipitation from a GRIB file and convert from millimeters to inches. 
 
 4. The **-name list** option is a comma-separated list of output variable names which override the default choices. If specified, the number of names must match the number of variables to be written to the output file.
 
