@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5565334.svg)](https://doi.org/10.5281/zenodo.5565334)
+
 # MET
 
 This repository contains the source code for the Model Evaluation Tools package (met), unit test code (test), and scripts used to build and test the code (scripts).
