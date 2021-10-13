@@ -130,7 +130,7 @@ void NumArray::erase()
    int n = e.size();
    e.clear();
    e.reserve(n);
-   
+
    return;
 
 }
