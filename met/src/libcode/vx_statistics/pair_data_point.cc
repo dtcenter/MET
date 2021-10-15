@@ -97,11 +97,11 @@ void PairDataPoint::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::extend(int n, bool exact) {
+void PairDataPoint::extend(int n) {
 
-   PairBase::extend(n, exact);
+   PairBase::extend(n);
 
-   f_na.extend(n, exact);
+   f_na.extend(n);
 
    return;
 }
