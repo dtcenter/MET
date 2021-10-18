@@ -127,6 +127,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "omp.h"
+
 #include "grid_stat.h"
 
 #include "vx_statistics.h"
@@ -184,6 +186,15 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+#ifdef _OPENMP
+#pragma omp parallel
+#pragma omp single
+  {
+    // Report number of threads if compiled with OpenMP
+    std::cout << "Running on " << omp_get_num_threads() << " threads.\n";
+  }
+#endif
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);

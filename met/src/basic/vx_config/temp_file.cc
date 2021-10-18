@@ -65,12 +65,10 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void remove_temp_file(const ConcatString file_name) {
-   int errno;
-
    //
    // Attempt to remove the file and print out any error message
    //
-   if((errno = remove(file_name.c_str())) != 0) {
+   if(!remove(file_name.c_str())) {
       mlog << Error << "\nremove_temp_file() -> "
            << "can't delete temporary file: \""
            << file_name << "\" ("

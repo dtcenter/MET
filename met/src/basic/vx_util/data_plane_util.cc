@@ -16,6 +16,8 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
+#include "omp.h"
+
 #include "data_plane_util.h"
 #include "interp_util.h"
 #include "two_to_one.h"
@@ -247,21 +249,28 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       }
    }
 
-   // Build the grid template
-   GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+#pragma omp parallel default(shared) private(x,y,n_vld,n_thr,gp,v)
+   {
 
-   mlog << Debug(3)
-        << "Computing fractional coverage field using the "
-        << t.get_str() << " threshold and the "
-        << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
-        << ") " << gt->getClassName() << " interpolation method.\n";
+     // Build the grid template
+     GridTemplateFactory gtf;
+     GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
-   // Initialize the fractional coverage field
-   frac_dp = dp;
-   frac_dp.set_constant(bad_data_double);
+#pragma omp single
+   {
+     mlog << Debug(3)
+          << "Computing fractional coverage field using the "
+          << t.get_str() << " threshold and the "
+          << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+          << ") " << gt->getClassName() << " interpolation method.\n";
+
+     // Initialize the fractional coverage field
+     frac_dp = dp;
+     frac_dp.set_constant(bad_data_double);
+   }
 
    // Compute the fractional coverage meeting the threshold criteria
+#pragma omp for schedule (static)
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
 
@@ -324,6 +333,8 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    } // end for x
 
    delete gt;
+
+   } // End of omp parallel
 
    return;
 }
