@@ -933,227 +933,251 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
                            const SingleThresh *fthr, const SingleThresh *othr)
 
 {
-
-int i, count;
-double ptile, diff;
-NumArray data;
-const NumArray * ptr = 0;
-
+   
+   int i, count;
+   double ptile, diff;
+   NumArray data;
+   const NumArray * ptr = 0;
+   
    //
    //  handle sample percentile types
    //
-
-     if ( Ptype == perc_thresh_sample_fcst  )  ptr = fptr;
-else if ( Ptype == perc_thresh_sample_obs   )  ptr = optr;
-else if ( Ptype == perc_thresh_sample_climo )  ptr = cptr;
-
+   
+   if ( Ptype == perc_thresh_sample_fcst  )  ptr = fptr;
+   else if ( Ptype == perc_thresh_sample_obs   )  ptr = optr;
+   else if ( Ptype == perc_thresh_sample_climo )  ptr = cptr;
+   
    //
    //  handle bias-correction type
    //
+   
+   else if ( Ptype == perc_thresh_freq_bias )  {
+      
+      //cout << "Ptype = " << Ptype << endl;
+      
+      if ( !fptr || !optr || !fthr || !othr )  {
+         
+         mlog << Error << "\nSimple_Node::set_perc() -> "
+              << "not enough information provided to define the "
+              << perc_thresh_info[Ptype].long_name
+              << " threshold \"" << s << "\".\n\n";
+         
+         exit ( 1 );
+         
+      }
 
-else if ( Ptype == perc_thresh_freq_bias )  {
-
-   if ( !fptr || !optr || !fthr || !othr )  {
-
-      mlog << Error << "\nSimple_Node::set_perc() -> "
-           << "not enough information provided to define the "
-           << perc_thresh_info[Ptype].long_name
-           << " threshold \"" << s << "\".\n\n";
-
-      exit ( 1 );
-
-   }
-
+      cout << "perc_thresh_info[Ptype].long_name = " << perc_thresh_info[Ptype].long_name << endl;
+   
       //
       //  bias-correct the observation
       //
+      
+      if ( othr->get_ptype() == perc_thresh_freq_bias &&
+           fthr->get_ptype() == no_perc_thresh_type   &&
+           fthr->get_type()  != thresh_complex )  {
 
-   if ( othr->get_ptype() == perc_thresh_freq_bias &&
-        fthr->get_ptype() == no_perc_thresh_type   &&
-        fthr->get_type()  != thresh_complex )  {
-
-      ptr = optr;
-      op  = fthr->get_type();
-      PT  = fptr->compute_percentile(fthr->get_value(),
-                                     is_inclusive(fthr->get_type()));
-
-      mlog << Debug(3)
-           << "The forecast threshold \"" << fthr->get_str()
-           << "\" includes " << PT * 100.0 << "% of the data.\n";
-
-   }
+         ptr = optr;
+         op  = fthr->get_type();
+         PT  = fptr->compute_percentile(fthr->get_value(),
+                                        is_inclusive(fthr->get_type()));
+         
+         mlog << Debug(3)
+              << "The forecast threshold \"" << fthr->get_str()
+              << "\" includes " << PT * 100.0 << "% of the data.\n";
+         
+      }
 
       //
       //  bias-correct the forecast
       //
+      
+      else if ( fthr->get_ptype() == perc_thresh_freq_bias &&
+                othr->get_ptype() == no_perc_thresh_type   &&
+                othr->get_type()  != thresh_complex )  {
 
-   else if ( fthr->get_ptype() == perc_thresh_freq_bias &&
-             othr->get_ptype() == no_perc_thresh_type   &&
-             othr->get_type()  != thresh_complex )  {
+         cout << "fthr->get_ptype() = " << fthr->get_ptype() << endl;
+         cout << "fthr->get_type() = " << fthr->get_type() << endl;
+      
+      
+         ptr = fptr;
+         op  = othr->get_type();
+         PT  = optr->compute_percentile(othr->get_value(),
+                                        is_inclusive(othr->get_type()));
 
-      ptr = fptr;
-      op  = othr->get_type();
-      PT  = optr->compute_percentile(othr->get_value(),
-                                     is_inclusive(othr->get_type()));
+         mlog << Debug(3)
+              << "The observation threshold \"" << othr->get_str()
+              << "\" includes " << PT * 100.0 << "% of the data.\n";
 
-      mlog << Debug(3)
-           << "The observation threshold \"" << othr->get_str()
-           << "\" includes " << PT * 100.0 << "% of the data.\n";
+      }
+      
+      else {
+         
+         mlog << Error << "\nSimple_Node::set_perc() -> "
+              << "unsupported options for computing the "
+              << perc_thresh_info[Ptype].long_name
+              << " threshold \"" << s << "\".\n\n";
 
-   }
+         exit ( 1 );
 
-   else {
+      }
 
-      mlog << Error << "\nSimple_Node::set_perc() -> "
-           << "unsupported options for computing the "
-           << perc_thresh_info[Ptype].long_name
-           << " threshold \"" << s << "\".\n\n";
+      //
+      //  multiple percentile by 100
+      //
 
-      exit ( 1 );
+      if ( is_bad_data(PT) )  {
 
-   }
+         mlog << Error << "\nSimple_Node::set_perc() -> "
+              << "unable to compute the percentile for the "
+              << perc_thresh_info[Ptype].long_name
+              << " threshold \"" << s << "\".\n\n";
 
-   //
-   //  multiple percentile by 100
-   //
+         exit ( 1 );
+      }
 
-   if ( is_bad_data(PT) )  {
+      PT *= 100.0;
 
-      mlog << Error << "\nSimple_Node::set_perc() -> "
-           << "unable to compute the percentile for the "
-           << perc_thresh_info[Ptype].long_name
-           << " threshold \"" << s << "\".\n\n";
-
-      exit ( 1 );
-   }
-
-   PT *= 100.0;
-
-}
+   } // end else if PT == perc_thresh_freq_bias
+   
    //
    //  nothing to do
    //
+   
+   else  {
 
-else  {
+      return;
 
-   return;
+   }
 
-}
+   if ( !ptr )  {
+      
+      mlog << Error << "\nSimple_Node::set_perc() -> "
+           << perc_thresh_info[Ptype].long_name
+           << " threshold \"" << s
+           << "\" requested but no data provided.\n\n";
+      
+      exit ( 1 );
 
-if ( !ptr )  {
-
-   mlog << Error << "\nSimple_Node::set_perc() -> "
-        << perc_thresh_info[Ptype].long_name
-        << " threshold \"" << s
-        << "\" requested but no data provided.\n\n";
-
-   exit ( 1 );
-
-}
+   }
 
    //
    //  remove bad data, if necessary
    //
 
-if ( ptr->has(bad_data_double) ) {
+   if ( ptr->has(bad_data_double) ) {
 
-   data.extend(ptr->n());
+      data.extend(ptr->n());
 
-   for ( i=0; i<ptr->n(); i++ )  {
+      for ( i=0; i<ptr->n(); i++ )  {
 
-      if ( !is_bad_data(ptr->vals()[i]) )  data.add(ptr->vals()[i]);
-
+         if ( !is_bad_data(ptr->vals()[i]) )  data.add(ptr->vals()[i]);
+         
+      }
    }
-}
-else {
-
-   data = *ptr;
-
-}
-
+   else {
+      
+      data = *ptr;
+      
+   }
+   
    //
    //  compute the percentile threshold
    //
 
-if ( data.n() == 0 )  {
+   if ( data.n() == 0 )  {
 
-   mlog << Error << "\nSimple_Node::set_perc() -> "
-        << "can't compute " << perc_thresh_info[Ptype].long_name
-        << " threshold \"" << s
-        << "\" because no valid data was provided.\n\n";
+      mlog << Error << "\nSimple_Node::set_perc() -> "
+           << "can't compute " << perc_thresh_info[Ptype].long_name
+           << " threshold \"" << s
+           << "\" because no valid data was provided.\n\n";
 
       exit ( 1 );
 
-}
-else  {
-
-   //
-   //  strip previous definition from strings
-   //
-
-   s.strip_paren();
-   abbr_s.strip_paren();
-
-   //
-   //  compute the percentile and update the strings
-   //
-
-   T = data.percentile_array((double) PT / 100.0);
-
-   if ( !is_bad_data(T) )  {
-
-      ConcatString cs;
-
-      cs << T;
-
-      fix_float(cs);
-
-           s << "(" << cs << ")";
-      abbr_s << "(" << cs << ")";
-
-   }
-
-   //
-   //  compute the actual percentile and check tolerance
-   //
-
-   if ( op == thresh_le || op == thresh_ge || op == thresh_eq )  {
-
-      for ( i=count=0; i<data.n(); i++ )  if ( data[i] <= T ) count++;
-
    }
    else  {
+      
+      //
+      //  strip previous definition from strings
+      //
 
-      for ( i=count=0; i<data.n(); i++ )  if ( data[i] <  T ) count++;
+      s.strip_paren();
+      abbr_s.strip_paren();
+
+      //cout << "s = " << s << endl;
+      //cout << "abbr_s = " << abbr_s << endl;
+
+      ConcatString fs = s;
+
+      //string this_str = "==FBIAS";
+      //string blank_str = "";
+      
+      cout << "fs = " << fs << endl;
+      fs.replace("==FBIAS", " ", false);
+      double fbias_val = atof(fs.c_str());
+      cout << "fbias_val = " << fbias_val << endl;
+      
+      //
+      //  compute the percentile and update the strings
+      //
+
+      T = data.percentile_array((double) PT / 100.0);
+
+      if ( !is_bad_data(T) )  {
+
+         ConcatString cs;
+
+         cs << T;
+
+         fix_float(cs);
+
+         s << "(" << cs << ")";
+         abbr_s << "(" << cs << ")";
+
+      }
+
+      //
+      //  compute the actual percentile and check tolerance
+      //
+
+      if ( op == thresh_le || op == thresh_ge || op == thresh_eq )  {
+
+         for ( i=count=0; i<data.n(); i++ )  if ( data[i] <= T ) count++;
+
+      }
+      else  {
+
+         for ( i=count=0; i<data.n(); i++ )  if ( data[i] <  T ) count++;
+
+      }
+
+      //cout << "s = " << s << endl;
+   
+      ptile = (double) count / data.n();
+      diff  = abs(PT / 100.0 - ptile);
+
+      if ( !is_eq(PT / 100.0, ptile, perc_thresh_default_tol) )  {
+
+         mlog << Warning << "\nSimple_Node::set_perc() -> "
+              << "the requested percentile (" << PT
+              << "%) for threshold \"" << s
+              << "\" differs from the actual percentile ("
+              << ptile * 100.0 << ") by " << diff * 100.0 << "%.\n"
+              << "This is common for small samples or data that contains "
+              << "ties.\n\n";
+
+      }
+      else  {
+
+         mlog << Debug(3)
+              << "The requested percentile (" << PT
+              << "%) for threshold threshold \"" << s
+              << "\" includes " << ptile * 100.0 << "% of the data.\n";
+
+      }
 
    }
 
-   ptile = (double) count / data.n();
-   diff  = abs(PT / 100.0 - ptile);
-
-   if ( !is_eq(PT / 100.0, ptile, perc_thresh_default_tol) )  {
-
-      mlog << Warning << "\nSimple_Node::set_perc() -> "
-           << "the requested percentile (" << PT
-           << "%) for threshold \"" << s
-           << "\" differs from the actual percentile ("
-           << ptile * 100.0 << ") by " << diff * 100.0 << "%.\n"
-           << "This is common for small samples or data that contains "
-           << "ties.\n\n";
-
-   }
-   else  {
-
-      mlog << Debug(3)
-           << "The requested percentile (" << PT
-           << "%) for threshold threshold \"" << s
-           << "\" includes " << ptile * 100.0 << "% of the data.\n";
-
-   }
-
-}
-
-return;
+   return;
 
 }
 
