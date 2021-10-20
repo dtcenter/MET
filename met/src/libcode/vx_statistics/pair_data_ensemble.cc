@@ -143,35 +143,35 @@ void PairDataEnsemble::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::extend(int n, bool exact) {
+void PairDataEnsemble::extend(int n) {
    int i;
 
    // Allocate memory for the number of observations.
    // Only applies to arrays sized by n_obs which does not include:
    //   rhist_na, relp_na, phist_na
 
-   PairBase::extend(n, exact);
+   PairBase::extend(n);
 
-   obs_error_entry.extend(n, exact);
+   obs_error_entry.extend(n);
 
-   for(i=0; i<n_ens; i++) e_na[i].extend(n, exact);
+   for(i=0; i<n_ens; i++) e_na[i].extend(n);
 
-   v_na.extend               (n, exact);
-   r_na.extend               (n, exact);
-   crps_emp_na.extend        (n, exact);
-   crpscl_emp_na.extend      (n, exact);
-   crps_gaus_na.extend       (n, exact);
-   crpscl_gaus_na.extend     (n, exact);
-   ign_na.extend             (n, exact);
-   pit_na.extend             (n, exact);
-   skip_ba.extend            (n, exact);
-   var_na.extend             (n, exact);
-   var_oerr_na.extend        (n, exact);
-   var_plus_oerr_na.extend   (n, exact);
-   esum_na.extend            (n, exact);
-   esumsq_na.extend          (n, exact);
-   mn_na.extend              (n, exact);
-   mn_oerr_na.extend         (n, exact);
+   v_na.extend               (n);
+   r_na.extend               (n);
+   crps_emp_na.extend        (n);
+   crpscl_emp_na.extend      (n);
+   crps_gaus_na.extend       (n);
+   crpscl_gaus_na.extend     (n);
+   ign_na.extend             (n);
+   pit_na.extend             (n);
+   skip_ba.extend            (n);
+   var_na.extend             (n);
+   var_oerr_na.extend        (n);
+   var_plus_oerr_na.extend   (n);
+   esum_na.extend            (n);
+   esumsq_na.extend          (n);
+   mn_na.extend              (n);
+   mn_oerr_na.extend         (n);
 
    return;
 }
