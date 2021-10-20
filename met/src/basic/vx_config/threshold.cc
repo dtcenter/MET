@@ -1103,14 +1103,9 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
       s.strip_paren();
       abbr_s.strip_paren();
 
-      //cout << "s = " << s << endl;
-      //cout << "abbr_s = " << abbr_s << endl;
-
+      // Get the FBIAS value
+      // Convert the numeric value to a double (float)
       ConcatString fs = s;
-
-      //string this_str = "==FBIAS";
-      //string blank_str = "";
-      
       cout << "fs = " << fs << endl;
       fs.replace("==FBIAS", " ", false);
       double fbias_val = atof(fs.c_str());
@@ -1150,11 +1145,13 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 
       }
 
-      //cout << "s = " << s << endl;
-   
-      ptile = (double) count / data.n();
+      if(fbias_val > 0) 
+         ptile = (double) (fbias_val *count) / data.n();
+      else 
+         ptile = (double) count / data.n();
+      
       diff  = abs(PT / 100.0 - ptile);
-
+      
       if ( !is_eq(PT / 100.0, ptile, perc_thresh_default_tol) )  {
 
          mlog << Warning << "\nSimple_Node::set_perc() -> "
