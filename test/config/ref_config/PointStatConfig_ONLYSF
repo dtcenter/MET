@@ -84,7 +84,7 @@ fcst = {
 
       {
         name       = "PRMSL";
-        level      = [ "Z0" ];
+        level      = [ "L0" ];
         cat_thresh = [ >0.0 ];
       }
    ];
