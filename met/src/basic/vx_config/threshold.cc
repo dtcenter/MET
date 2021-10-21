@@ -953,8 +953,6 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
    
    else if ( Ptype == perc_thresh_freq_bias )  {
       
-      //cout << "Ptype = " << Ptype << endl;
-      
       if ( !fptr || !optr || !fthr || !othr )  {
          
          mlog << Error << "\nSimple_Node::set_perc() -> "
@@ -966,8 +964,6 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
          
       }
 
-      cout << "perc_thresh_info[Ptype].long_name = " << perc_thresh_info[Ptype].long_name << endl;
-   
       //
       //  bias-correct the observation
       //
@@ -994,11 +990,7 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
       else if ( fthr->get_ptype() == perc_thresh_freq_bias &&
                 othr->get_ptype() == no_perc_thresh_type   &&
                 othr->get_type()  != thresh_complex )  {
-
-         cout << "fthr->get_ptype() = " << fthr->get_ptype() << endl;
-         cout << "fthr->get_type() = " << fthr->get_type() << endl;
-      
-      
+         
          ptr = fptr;
          op  = othr->get_type();
          PT  = optr->compute_percentile(othr->get_value(),
@@ -1103,13 +1095,13 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
       s.strip_paren();
       abbr_s.strip_paren();
 
+      //
       // Get the FBIAS value
       // Convert the numeric value to a double (float)
+      //
       ConcatString fs = s;
-      cout << "fs = " << fs << endl;
       fs.replace("==FBIAS", " ", false);
       double fbias_val = atof(fs.c_str());
-      cout << "fbias_val = " << fbias_val << endl;
       
       //
       //  compute the percentile and update the strings
