@@ -530,17 +530,15 @@ void NumArray::set_const(double v, int n)
 
 {
 
-erase();
+   if ( !Sorted )  {
 
-add_const(v, n);
+      sort(e.begin(), e.end());
 
-   //
-   // a constant array is sorted
-   //
+   }
+   
+   Sorted = true;
 
-Sorted = true;
-
-return;
+   return;
 
 }
 
