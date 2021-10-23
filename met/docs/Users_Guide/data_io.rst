@@ -18,6 +18,112 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 
 Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
+Requirements for CF Compliant NetCDF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MET tools uses following attributes and variables for the CF Compliant NetCDF.
+
+1. The global attribute "Conventions".
+
+2. The "standard_name" and "units" attributes for coordinate variables. The "axis" attribute ("T" or "time") must exist at the time variable if the "standard_name" attribute does not exist.
+
+3. The "coordinates" attribute at the data variables. It contains the coordinate variable names.
+
+4. The "grid_mapping" attribute at the data variables for projections and the matching grid mapping variable (optional for the latitude_longitude projection).
+
+5. The gridded data should be evenly spaced horizontally and vertically.
+
+6. (Optional) the "forecast_reference_time" variable for init_time.
+
+MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conversions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
+
+The grid mapping variable contains the projection information. The grid mapping variable can be found by looking at the variable attribute "grid_mapping" from the data variables. The "standard_name" attribute is used to filter out the coordinate variables like time, latitude, and longitude variables. The value of the "grid_mapping" attribute is the name of the grid mapping variable. Four projections are supported with grid mapping variables: latitude_longitude, lambert_conformal_conic, polar_stereographic, and geostationary. In case of the latitude_longitude projection, the latitude and longitude variable names should be the same as the dimension names and the "units" attribute should be valid.
+
+Here are examples for the grid mapping variable ("edr" is the data variable):
+
+**Example 1: grid mapping for latitude_longitude projection**
+
+.. code-block:: none
+
+    float edr(time, z, lat, lon) ;
+            edr:units = "m^(2/3) s^-1" ;
+            edr:long_name = "Median eddy dissipation rate" ;
+            edr:coordinates = "lat lon" ;
+            edr:_FillValue = -9999.f ;
+            edr:grid_mapping = "grid_mapping" ;
+    int grid_mapping ;
+            grid_mapping:grid_mapping_name = "latitude_longitude" ;
+            grid_mapping:semi_major_axis = 6371000. ;
+            grid_mapping:inverse_flattening = 0 ;
+
+
+**Example 2: grid mapping for lambert_conformal_conic projection**
+
+.. code-block:: none
+
+    float edr(time, z, y, x) ;
+            edr:units = "m^(2/3) s^-1" ;
+            edr:long_name = "Eddy dissipation rate" ;
+            edr:coordinates = "lat lon" ;
+            edr:_FillValue = -9999.f ;
+            edr:grid_mapping = "grid_mapping" ;
+    int grid_mapping ;
+            grid_mapping:grid_mapping_name = "lambert_conformal_conic" ;
+            grid_mapping:standard_parallel = 25. ;
+            grid_mapping:longitude_of_central_meridian = -95. ;
+            grid_mapping:latitude_of_projection_origin = 25. ;
+            grid_mapping:false_easting = 0 ;
+            grid_mapping:false_northing = 0 ;
+            grid_mapping:GRIB_earth_shape = "spherical" ;
+            grid_mapping:GRIB_earth_shape_code = 0 ;
+
+When the grid mapping variable is not available, MET detects the latitude_longitude projection in following order:
+
+1. the lat/lon projection from the dimensions
+
+2. the lat/lon projection from the "coordinates" attribute from the data variable
+
+3. the lat/lon projection from the latitude and longitude variables by tte "standard_name" attribute
+
+MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed at the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon”.
+
+If there are no latitude and longitude variables from dimensions, MET gets coordinate variable names from the "coordinates" attribute. The matching coordinate variables should have the proper "units" attribute.
+
+MET gets the time, latitude, and the longitude variables by looking at the standard name: "time", "latitude", and "longitude" as the last option.
+
+MET gets the valid time from the time variable and the "forecast_reference_time" variable for the init_time. If the time variable does not exist, it can come from the file name. MET supports only two cases:
+
+1. TRMM_3B42_3hourly_filename (3B42.<yyyymmdd>.<hh>.7.G3.nc)
+
+2. TRMM_3B42_daily_filename (3B42_daily.<yyyy>.<mm>.<dd>.7.G3.nc)
+
+.. list-table:: Valid strings for the "units" attribute.
+  :widths: auto
+  :header-rows: 1
+
+  * - time
+    - latitude
+    - longitude
+  * - "seconds since YYYY-MM-DD HH:MM:SS"
+      "minutes since YYYY-MM-DD HH:MM:SS"
+      "hours since YYYY-MM-DD HH:MM:SS"
+      "days since YYYY-MM-DD HH:MM:SS"
+      Accepts "Y", "YY", "YYY", "M", "D", "HH", and "HH:MM"
+      "HH:MM:SS" is optional
+    - "degrees_north"
+      "degree_north"
+      "degree_N"
+      "degrees_N"
+      "degreeN"
+      "degreesN"
+    - "degrees_east"
+      "degree_east"
+      "degree_E"
+      "degrees_E"
+      "degreeE"
+      "degreesE"
+
+
 .. _Intermediate data formats:
 
 Intermediate data formats
