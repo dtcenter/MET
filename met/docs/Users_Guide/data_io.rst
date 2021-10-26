@@ -104,23 +104,23 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
   * - time
     - latitude
     - longitude
-  * - "seconds since YYYY-MM-DD HH:MM:SS"
-      "minutes since YYYY-MM-DD HH:MM:SS"
-      "hours since YYYY-MM-DD HH:MM:SS"
-      "days since YYYY-MM-DD HH:MM:SS"
-      Accepts "Y", "YY", "YYY", "M", "D", "HH", and "HH:MM"
+  * - "seconds since YYYY-MM-DD HH:MM:SS",
+      "minutes since YYYY-MM-DD HH:MM:SS",
+      "hours since YYYY-MM-DD HH:MM:SS",
+      "days since YYYY-MM-DD HH:MM:SS",
+      Accepts "Y", "YY", "YYY", "M", "D", "HH", and "HH:MM".
       "HH:MM:SS" is optional
-    - "degrees_north"
-      "degree_north"
-      "degree_N"
-      "degrees_N"
-      "degreeN"
+    - "degrees_north",
+      "degree_north",
+      "degree_N",
+      "degrees_N",
+      "degreeN",
       "degreesN"
-    - "degrees_east"
-      "degree_east"
-      "degree_E"
-      "degrees_E"
-      "degreeE"
+    - "degrees_east",
+      "degree_east",
+      "degree_E",
+      "degrees_E",
+      "degreeE",
       "degreesE"
 
 
