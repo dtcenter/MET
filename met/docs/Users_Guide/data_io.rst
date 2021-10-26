@@ -21,21 +21,21 @@ Tropical cyclone forecasts and observations are typically provided in a specific
 Requirements for CF Compliant NetCDF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MET tools uses following attributes and variables for the CF Compliant NetCDF.
+The MET tools use following attributes and variables for input CF Compliant NetCDF data.
 
 1. The global attribute "Conventions".
 
-2. The "standard_name" and "units" attributes for coordinate variables. The "axis" attribute ("T" or "time") must exist at the time variable if the "standard_name" attribute does not exist.
+2. The ""`standard_name <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#standard-name>`_" and "`units <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#units>`_" attributes for coordinate variables. The "`axis <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#time-axis-ex>`_" attribute ("T" or "time") must exist as the time variable if the "standard_name" attribute does not exist.
 
-3. The "coordinates" attribute at the data variables. It contains the coordinate variable names.
+3. The "`coordinates <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#coordinate-types>`_" attribute for the data variables. It contains the coordinate variable names.
 
-4. The "grid_mapping" attribute at the data variables for projections and the matching grid mapping variable (optional for the latitude_longitude projection).
+4. The "`grid_mapping <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#appendix-grid-mappings>`_" attribute for the data variables for projections and the matching grid mapping variable (optional for the latitude_longitude projection).
 
 5. The gridded data should be evenly spaced horizontally and vertically.
 
-6. (Optional) the "forecast_reference_time" variable for init_time.
+6. (Optional) the "`forecast_reference_time <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#scalar-coordinate-variables>`_" variable for init_time.
 
-MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conversions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
+MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
 
 The grid mapping variable contains the projection information. The grid mapping variable can be found by looking at the variable attribute "grid_mapping" from the data variables. The "standard_name" attribute is used to filter out the coordinate variables like time, latitude, and longitude variables. The value of the "grid_mapping" attribute is the name of the grid mapping variable. Four projections are supported with grid mapping variables: latitude_longitude, lambert_conformal_conic, polar_stereographic, and geostationary. In case of the latitude_longitude projection, the latitude and longitude variable names should be the same as the dimension names and the "units" attribute should be valid.
 
@@ -83,13 +83,13 @@ When the grid mapping variable is not available, MET detects the latitude_longit
 
 2. the lat/lon projection from the "coordinates" attribute from the data variable
 
-3. the lat/lon projection from the latitude and longitude variables by tte "standard_name" attribute
+3. the lat/lon projection from the latitude and longitude variables by the "standard_name" attribute
 
-MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed at the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon”.
+MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed in the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon”.
 
 If there are no latitude and longitude variables from dimensions, MET gets coordinate variable names from the "coordinates" attribute. The matching coordinate variables should have the proper "units" attribute.
 
-MET gets the time, latitude, and the longitude variables by looking at the standard name: "time", "latitude", and "longitude" as the last option.
+MET gets the time, latitude, and longitude variables by looking at the standard name: "time", "latitude", and "longitude" as the last option.
 
 MET gets the valid time from the time variable and the "forecast_reference_time" variable for the init_time. If the time variable does not exist, it can come from the file name. MET supports only two cases:
 
