@@ -312,9 +312,10 @@ if ( empty(name) )  {
 
 DictionaryStack DS(*this);
 ConcatString temp_filename = get_tmp_dir();
-
-temp_filename << "/" << make_temp_file_name("met_config", 0);
-
+ 
+temp_filename << "/" << "met_config";
+temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+ 
 recursive_envs(name, temp_filename.c_str());
 
 bison_input_filename = (const char *) temp_filename.c_str();
@@ -422,9 +423,10 @@ if ( empty(s) )  {
 ofstream out;
 ConcatString temp_filename = get_tmp_dir();
 
-temp_filename << "/" << make_temp_file_name("config", ".temp");
-
- out.open(temp_filename.c_str());
+temp_filename << "/" << "met_config";
+temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+ 
+out.open(temp_filename.c_str());
 
 if ( ! out )  {
 
