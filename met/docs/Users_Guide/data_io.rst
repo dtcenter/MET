@@ -123,6 +123,12 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
       "degreeE",
       "degreesE"
 
+Performance with NetCDF input data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is no limitation on the NetCDF file size. The size of the data variables matters than the file size. NetCDF API loads the meta data first on opening the NetCDF. It's the similar on accesing data variables. It's two API calls: getting the meta data and getting the actual data. The memory is allocated and consumed at the second API call (getting actual data).
+
+The dimensions of the data variables matter. MET requests the NetCDF data need based: 1) 1oading and processing a data plane, and 2) loading and processing the next data plane. This means an extra step for slicing with one more dimension NetCDF input data. The performance is quite different if the compression is enabled with high resolution data. NetCDF does compression per variable. The variables can have different compression levels (0 to 9, 0 is not compressed). The number of decompression is the same between 1 more and 1 less dimension NetCDF input files (combined VS separated). The difference is the amount of data to be decompressed which requires more memory. For example, let's assume the time dimension is 30. NetCDF data with 1 less dimension (no time dimension) does decompression 30 times for nx by ny dataset. NetCDF with 1 more dimension does compression 30 times for 30 by nx by ny dataset & slicing for target time offset. So it's better to have multiple NetCDF files with 1 less dimension than a big file with bigger variable data if compressed. If the compression is not enabled, the file size will be much bigger (more disk space).
 
 .. _Intermediate data formats:
 
