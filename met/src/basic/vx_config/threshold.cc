@@ -1173,9 +1173,7 @@ else  {
    //  compute the actual percentile and check tolerance
    //
 
-   for ( i=count=0; i<data.n(); i++ )  if ( check(data[i]) ) count++;
-
-   ptile = (double) count / data.n();
+   ptile = data.compute_percentile(T, is_inclusive(op));
    diff  = abs(PT / 100.0 - ptile);
 
    if ( !is_eq(PT / 100.0, ptile, perc_thresh_default_tol) )  {
