@@ -1139,7 +1139,14 @@ else  {
           else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT * fbias_val;
       }
 
-      if ( PT_new > 100.0 )  PT_new = 100.0;
+      if ( PT_new > 100.0 )  {
+         mlog << Warning << "\nSimple_Node::set_perc() -> "
+              << "For " << (fbias_fcst ? "forecast" : "observation" )
+              << " threshold \"" << s << "\" the required percentile of "
+              << PT_new << " exceeds the maximum possible value. "
+              << "Resetting to 100.\n\n";
+         PT_new = 100.0;
+      }
 
       mlog << Debug(3)
            << "For " << (fbias_fcst ? "forecast" : "observation" )
