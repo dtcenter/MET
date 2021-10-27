@@ -934,7 +934,7 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 
 {
 
-int i, count;
+int i;
 double ptile, diff;
 NumArray data;
 const NumArray * ptr = 0;
