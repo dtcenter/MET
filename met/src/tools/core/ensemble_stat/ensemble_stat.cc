@@ -219,21 +219,18 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    //
-   // add the options function calls
-   //
-   cline.add(set_grid_obs,      "-grid_obs", 1);
-   cline.add(set_point_obs,     "-point_obs", 1);
-   cline.add(set_ens_mean,      "-ens_mean", 1);
-   cline.add(set_ctrl_file,     "-ctrl", 1);
-   cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
-   cline.add(set_obs_valid_end, "-obs_valid_end", 1);
-   cline.add(set_outdir,        "-outdir", 1);
-   cline.add(set_compress,      "-compress",  1);
-
-   //
+   // add the option function calls
    // quietly support deprecated -ssvar_mean option
    //
-   cline.add(set_ens_mean,      "-ssvar_mean", 1);
+   cline.add(set_grid_obs,      "-grid_obs",      1);
+   cline.add(set_point_obs,     "-point_obs",     1);
+   cline.add(set_ens_mean,      "-ens_mean",      1);
+   cline.add(set_ctrl_file,     "-ctrl",          1);
+   cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
+   cline.add(set_obs_valid_end, "-obs_valid_end", 1);
+   cline.add(set_outdir,        "-outdir",        1);
+   cline.add(set_compress,      "-compress",      1);
+   cline.add(set_ens_mean,      "-ssvar_mean",    1);
 
    //
    // parse the command line
