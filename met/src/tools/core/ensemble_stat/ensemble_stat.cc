@@ -293,6 +293,13 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
+   // Prepend the control member, if specified
+   if(ctrl_file.nonempty()) {
+      ctrl_index = 0;
+      ens_file_list.insert(ctrl_index, ctrl_file.c_str());
+      n_ens++;
+   }
+
    // Check that the end_ut >= beg_ut
    if(obs_valid_beg_ut != (unixtime) 0 &&
       obs_valid_end_ut != (unixtime) 0 &&
@@ -383,12 +390,9 @@ void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << ens_file_list.n() << "]:\n";
    for(i=0; i<ens_file_list.n(); i++) {
-      mlog << "   " << ens_file_list[i]  << "\n";
+      mlog << "   " << ens_file_list[i]
+           << (i == ctrl_index ? " (control)\n" : "\n");
    }
-
-   // List the control member file
-   mlog << Debug(1) << "Ensemble Control: "
-        << (ctrl_file.empty() ? "None" : ctrl_file.c_str()) << "\n";
 
    // List the input gridded observations files
    if(grid_obs_file_list.n() > 0) {
@@ -761,8 +765,8 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
 void process_ensemble() {
    int i, j;
-   bool need_reset;
-   DataPlane ens_dp, ctrl_dp;
+   bool reset;
+   DataPlane ens_dp;
    unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
@@ -772,18 +776,38 @@ void process_ensemble() {
            << "Processing ensemble field: "
            << conf_info.ens_info[i]->magic_str() << "\n";
 
-      // Need to reinitialize counts and sums for each ensemble field
-      need_reset = true;
-
       // Loop through each of the input forecast files
-      for(j=0; j<ens_file_list.n(); j++) {
+      for(j=0, reset=true; j<ens_file_list.n(); j++) {
 
          // Skip bad data files
-         if(!ens_file_vld[j]) continue;
+         if(!ens_file_vld[j]) {
+
+            // Error out if the control member file is not valid
+            if(j==ctrl_index) {
+               mlog << Error << "\nprocess_ensemble() -> "
+                    << "the control member file is not valid.\n\n";
+               exit(1);
+            }
+
+            // Otherwise, continue
+            continue;
+         }
 
          // Read the current field
          if(!get_data_plane(ens_file_list[j].c_str(), etype,
-                            conf_info.ens_info[i], ens_dp, true)) continue;
+                            conf_info.ens_info[i], ens_dp, true)) {
+
+            // Error out if the control member data cannot be read
+            if(j==ctrl_index) {
+               mlog << Error << "\nprocess_ensemble() -> "
+                    << "can't find \"" << conf_info.ens_info[i]->magic_str()
+                    << "\" data in the control member file.\n\n";
+               exit(1);
+            }
+
+            // Otherwise, continue
+            continue;
+         }
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0) {
@@ -791,40 +815,13 @@ void process_ensemble() {
          }
 
          // Reset the running sums and counts
-         if(need_reset) {
-
-            need_reset = false;
-
-            // Reset the running sums and counts
+         if(reset) {
             clear_counts();
-
-            // Read ensemble control member data, if provided
-            if(ctrl_file.nonempty()) {
-
-               // Error out if missing
-               if(!get_data_plane(ctrl_file.c_str(), etype,
-                                  conf_info.ens_info[i], ctrl_dp, true)) {
-                  mlog << Error << "\nprocess_ensemble() -> "
-                       << "control member ensemble field \""
-                       << conf_info.ens_info[i]->magic_str()
-                       << "\" not found in file \"" << ctrl_file << "\"\n\n";
-                  exit(1);
-               }
-
-               // Apply current data to the running sums and counts
-               track_counts(i, ctrl_dp, true);
-
-            } // end if ctrl_file
-
-            mlog << Debug(3)
-                 << "Found " << (ctrl_dp.is_empty() ? 0 : 1)
-                 << " control member field(s) for \""
-                 << conf_info.ens_info[i]->magic_str() << "\".\n";
-
-         } // end if need_reset
+            reset = false;
+         }
 
          // Apply current data to the running sums and counts
-         track_counts(i, ens_dp, false);
+         track_counts(i, ens_dp, j == ctrl_index);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
@@ -838,8 +835,7 @@ void process_ensemble() {
       write_ens_nc(i, ens_dp);
 
       // Store the ensemble mean output file
-      ens_mean_file =
-         out_nc_file_list[out_nc_file_list.n() - 1];
+      ens_mean_file = out_nc_file_list[out_nc_file_list.n() - 1];
 
    } // end for i
 
@@ -861,7 +857,7 @@ void process_vx() {
       if(point_obs_file_list.n() == 0 &&
          grid_obs_file_list.n()  == 0) {
          mlog << Error << "\nprocess_vx() -> "
-              << " when \"fcst.field\" is non-empty, you must use "
+              << "when \"fcst.field\" is non-empty, you must use "
               << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
               << "verifying observations.\n\n";
          exit(1);
@@ -1116,7 +1112,8 @@ int process_point_ens(int i_ens, int &n_miss) {
                                 ens_mean_file : ens_mean_user);
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
-        << "Processing " << file_type << " file: " << ens_file << "\n";
+        << "Processing " << file_type << " file: " << ens_file
+        << (i_ens == ctrl_index ? " (control)\n" : "\n");
 
    // Loop through each of the fields to be verified and extract
    // the forecast fields for verification
@@ -1687,6 +1684,7 @@ void process_grid_vx() {
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
             pd_all.set_climo_cdf_info(conf_info.vx_opt[i].cdf_info);
+            pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0][0][0].ctrl_index;
             pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
@@ -1916,7 +1914,8 @@ void process_grid_scores(int i_vx,
             pd.add_ens(j-n_miss, fcst_dp[j](x, y));
 
             // Store the unperturbed ensemble value
-            pd.add_ens_var_sums(i, fraw_dp[j](x, y));
+            // Exclude the control member from the variance
+            if(j != ctrl_index) pd.add_ens_var_sums(i, fraw_dp[j](x, y));
          }
       } // end for j
    } // end for i
