@@ -90,6 +90,7 @@ class PairDataEnsemble : public PairBase {
 
       int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
+      int        ctrl_index;      // Index of the control member
       bool       skip_const;      // Skip cases where the observation and
                                   // all ensemble members are constant
       BoolArray  skip_ba;         // Flag for each observation [n_obs]
@@ -106,6 +107,7 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
       NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
+      NumArray   esumn_na;        // Count of ensemble values [n_obs]
 
       NumArray   mn_na;           // Ensemble mean value [n_obs]
       NumArray   mn_oerr_na;      // Mean of perturbed members [n_obs]
@@ -292,6 +294,8 @@ class VxPairDataEnsemble {
       void print_obs_summary();
 
       void calc_obs_summary();
+
+      void set_ctrl_index(int);
 
       void set_skip_const(bool);
 };
