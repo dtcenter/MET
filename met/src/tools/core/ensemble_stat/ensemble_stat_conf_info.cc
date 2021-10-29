@@ -590,12 +590,12 @@ int EnsembleStatConfInfo::n_stat_row() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
+void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size, int ctrl_index) {
 
    // This should be called after process_masks()
    for(int i=0; i<n_vx; i++) {
 
-      vx_opt[i].set_vx_pd(this);
+      vx_opt[i].set_vx_pd(this, ctrl_index);
 
       // Set up the ensemble size
       vx_opt[i].vx_pd.set_ens_size(ens_size[i]);
@@ -840,7 +840,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
+void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_index) {
    int i, n;
    int n_msg_typ = msg_typ.n_elements();
    int n_mask    = mask_name.n_elements();

@@ -26,9 +26,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// Index for the control memeber in the ensemble file list
-static int ctrl_index = bad_data_int;
-
 // Indices for the output flag types in the configuration file
 static const int i_ecnt     = 0;
 static const int i_rps      = 1;
@@ -142,7 +139,7 @@ class EnsembleStatVxOpt {
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
                           gsl_rng *, bool, bool, bool);
-      void set_vx_pd(EnsembleStatConfInfo *);
+      void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
 
@@ -241,7 +238,7 @@ class EnsembleStatConfInfo {
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);
-      void set_vx_pd     (const IntArray &);
+      void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
       int get_n_ens_var()    const;

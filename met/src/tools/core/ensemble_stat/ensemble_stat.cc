@@ -867,7 +867,7 @@ void process_vx() {
       conf_info.process_masks(grid);
 
       // Setup the PairDataEnsemble objects
-      conf_info.set_vx_pd(n_vx_vld);
+      conf_info.set_vx_pd(n_vx_vld, ctrl_index);
 
       // Process the point observations
       if(point_obs_flag) process_point_vx();

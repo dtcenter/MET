@@ -106,6 +106,7 @@ static ConcatString ens_mean_user; // User-specified ensemble mean data file
 static ConcatString ens_mean_file; // Computed ensemble mean output file
 
 static ConcatString ctrl_file;     // Control member
+static int          ctrl_index = bad_data_int; // Control member index
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
