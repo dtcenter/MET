@@ -433,7 +433,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Compute perturbed ensemble mean and variance
             // Exclude the control member from the variance
             mn_oerr_na.add(cur_ens.mean());
-            var_oerr_na.add(cur_ens.variance(ctrl_index)); // JHG
+            var_oerr_na.add(cur_ens.variance(ctrl_index));
 
             // Compute the variance plus observation error variance.
             var_plus_oerr_na.add(var_unperturbed +
@@ -476,8 +476,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 
          // Ensemble mean and standard deviation
          // Exclude the control member from the standard deviation
-         mean = cur_ens.mean();
-         stdev = cur_ens.stdev(ctrl_index); // JHG
+         mean  = cur_ens.mean();
+         stdev = cur_ens.stdev(ctrl_index);
 
          // Store Gaussian CRPS stats
          crps_gaus_na.add(compute_crps_gaus(o_na[i], mean, stdev));
