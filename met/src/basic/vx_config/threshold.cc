@@ -1132,11 +1132,11 @@ else  {
 
       if ( fbias_fcst )  {
                if ( op == thresh_le || op == thresh_lt )  PT_new = PT * fbias_val;
-          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT / fbias_val;
+          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT / fbias_val;     
       }
       else  {
                if ( op == thresh_le || op == thresh_lt )  PT_new = PT / fbias_val;
-          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT * fbias_val;
+          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT * fbias_val;     
       }
 
       if ( PT_new > 100.0 )  {
@@ -1145,6 +1145,7 @@ else  {
               << " threshold \"" << s << "\" the required percentile of "
               << PT_new << " exceeds the maximum possible value. "
               << "Resetting to 100.\n\n";
+         
          PT_new = 100.0;
       }
 
