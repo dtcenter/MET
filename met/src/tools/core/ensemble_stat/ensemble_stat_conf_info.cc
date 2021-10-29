@@ -936,6 +936,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
+   vx_pd.set_ctrl_index(ctrl_index);
    vx_pd.set_skip_const(skip_const);
 
    return;

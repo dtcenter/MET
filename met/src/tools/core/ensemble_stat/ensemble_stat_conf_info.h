@@ -26,6 +26,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+// Index for the control memeber in the ensemble file list
+static int ctrl_index = bad_data_int;
+
 // Indices for the output flag types in the configuration file
 static const int i_ecnt     = 0;
 static const int i_rps      = 1;
