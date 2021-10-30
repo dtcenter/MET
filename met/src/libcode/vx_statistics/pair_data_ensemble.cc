@@ -652,11 +652,14 @@ void PairDataEnsemble::compute_ssvar() {
    for(i=0; i<o_na.n(); i++) {
 
       // Check if point should be skipped
-      // Exclude the control member from the variance
-      if(skip_ba[i] || i == ctrl_index) continue;
+      if(skip_ba[i]) continue;
 
       // Store ensemble values for the current observation
-      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
+      // Exclude the control member from the variance
+      for(j=0, cur.erase(); j<n_ens; j++) {
+         if(j == ctrl_index) continue;
+         cur.add(e_na[j][i]);
+      }
 
       // Build a variance point
       ens_ssvar_pt pt;
