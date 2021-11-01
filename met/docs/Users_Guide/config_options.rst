@@ -93,12 +93,13 @@ The configuration file language supports the following data types:
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
       
-    * "==FBIAS1" to automatically de-bias the data. This option must be
-      used in conjunction with a simple threshold in the other field.
-      For example, when "obs.cat_thresh = >5.0" and
-      "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
-      observations and then chooses a forecast threshold which results in a
-      frequency bias of 1.
+    * "==FBIASvalue", like: "==FBIAS1", "==FBIAS0.9", "==FBIAS1.1", ect to
+      automatically de-bias the data. This option must be used in
+      conjunction with a simple threshold in the other field. For example,
+      when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
+      MET applies the >5.0 threshold to the observations and then chooses a
+      forecast threshold which results in a frequency bias of 1.
+      The frequency bias can be any float value > 0.0.
       
     * "CDP" for climatological distribution percentile thresholds.
       These thresholds require that the climatological mean and standard
@@ -119,7 +120,7 @@ The configuration file language supports the following data types:
     For example, "==CDP25" is automatically expanded to 4 percentile bins:
     >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
      
-  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
+  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIASvalue are
     requested, MET recomputes the actual percentile that the threshold
     represents. If the requested percentile and actual percentile differ by
     more than 5%, a warning message is printed. This may occur when the
