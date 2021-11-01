@@ -2015,7 +2015,7 @@ void clear_counts() {
 
 void track_counts(int i_vx, const DataPlane &ens_dp, bool is_ctrl) {
    int i, j, k;
-   double ens;
+   double v;
 
    // Ensemble thresholds
    const int n_thr = conf_info.ens_ta[i_vx].n();
@@ -2025,10 +2025,10 @@ void track_counts(int i_vx, const DataPlane &ens_dp, bool is_ctrl) {
    for(i=0; i<nxy; i++) {
 
       // Get current values
-      ens = ens_dp.data()[i];
+      v = ens_dp.data()[i];
 
       // Skip bad data values
-      if(is_bad_data(ens)) continue;
+      if(is_bad_data(v)) continue;
 
       // Otherwise, update counts and sums
       else {
@@ -2037,22 +2037,22 @@ void track_counts(int i_vx, const DataPlane &ens_dp, bool is_ctrl) {
          cnt_na.buf()[i] += 1;
 
          // Ensemble sum
-         sum_na.buf()[i] += ens;
+         sum_na.buf()[i] += v;
 
          // Ensemble min and max
-         if(ens <= min_na.buf()[i] || is_bad_data(min_na.buf()[i])) min_na.buf()[i] = ens;
-         if(ens >= max_na.buf()[i] || is_bad_data(max_na.buf()[i])) max_na.buf()[i] = ens;
+         if(v <= min_na.buf()[i] || is_bad_data(min_na.buf()[i])) min_na.buf()[i] = v;
+         if(v >= max_na.buf()[i] || is_bad_data(max_na.buf()[i])) max_na.buf()[i] = v;
 
          // Standard deviation sum, sum of squares, and count, excluding control member
          if(!is_ctrl) {
-            stdev_sum_na.buf()[i] += ens;
-            stdev_ssq_na.buf()[i] += ens*ens;
+            stdev_sum_na.buf()[i] += v;
+            stdev_ssq_na.buf()[i] += v*v;
             stdev_cnt_na.buf()[i] += 1;
          }
 
          // Event frequency
          for(j=0; j<n_thr; j++) {
-            if(thr_buf[j].check(ens)) thresh_cnt_na[j].inc(i, 1);
+            if(thr_buf[j].check(v)) thresh_cnt_na[j].inc(i, 1);
          }
       } // end else
    } // end for i
