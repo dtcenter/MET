@@ -167,7 +167,7 @@ distance_map = {
 //
 output_flag = {
    fho    = NONE;
-   ctc    = NONE;
+   ctc    = BOTH;
    cts    = BOTH;
    mctc   = NONE;
    mcts   = NONE;
