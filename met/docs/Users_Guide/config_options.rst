@@ -94,7 +94,8 @@ The configuration file language supports the following data types:
       the user has already determined to be 2.5 outside of MET.
       
     * "==FBIAS" for a user-specified frequency bias value.
-      automatically de-bias the data. This option must be used in
+      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to select a low-bias threshold, or "==FBIAS1.1" to select a high-bias threshold.
+      This option must be used in
       conjunction with a simple threshold in the other field. For example,
       when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
       MET applies the >5.0 threshold to the observations and then chooses a
