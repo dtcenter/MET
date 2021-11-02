@@ -121,7 +121,7 @@ The configuration file language supports the following data types:
     For example, "==CDP25" is automatically expanded to 4 percentile bins:
     >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
      
-  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIASvalue are
+  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS are
     requested, MET recomputes the actual percentile that the threshold
     represents. If the requested percentile and actual percentile differ by
     more than 5%, a warning message is printed. This may occur when the
