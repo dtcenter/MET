@@ -93,7 +93,7 @@ The configuration file language supports the following data types:
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
       
-    * "==FBIASvalue", like: "==FBIAS1", "==FBIAS0.9", "==FBIAS1.1", ect to
+    * "==FBIAS" for a user-specified frequency bias value.
       automatically de-bias the data. This option must be used in
       conjunction with a simple threshold in the other field. For example,
       when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
