@@ -97,7 +97,7 @@ Optional arguments for ensemble_stat
 
 6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
 
-7. The **-ctrl file** option specifies and ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread.
+7. The **-ctrl file** option specifies an ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread.
 
 8. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
 
