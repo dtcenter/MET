@@ -192,7 +192,7 @@ output_flag = {
 //
 // NetCDF matched pairs output file
 //
-nc_pairs_flag = {
+nc_pairs_flag = FALSE;
    latlon       = TRUE;
    raw          = TRUE;
    diff         = TRUE;
