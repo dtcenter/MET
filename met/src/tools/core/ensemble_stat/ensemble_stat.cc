@@ -2387,8 +2387,8 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
          ens_min[i]   = (float) min_na[i];
          ens_max[i]   = (float) max_na[i];
          v = max_na[i] - min_na[i];
-         ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
-                         0.0 : (float) max_na[i] - min_na[i]);
+         if(is_eq(v, 0.0)) v = 0;
+         ens_range[i] = (float) v;
       }
    } // end for i
 
