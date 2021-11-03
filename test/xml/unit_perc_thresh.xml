@@ -101,10 +101,8 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_ctc.txt</stat>
       <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_sl1l2.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_pairs.nc</grid_nc>
     </output>
   </test>
 
