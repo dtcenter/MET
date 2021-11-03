@@ -206,7 +206,7 @@ output_flag = {
 //
 ensemble_flag = {
    mean      = TRUE;
-   stdev     = FALSE;
+   stdev     = TRUE;
    minus     = FALSE;
    plus      = FALSE;
    min       = TRUE;
