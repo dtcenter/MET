@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   ascii2nc.cc
-//2
+//
 //   Description:
 //      Parse ASCII observations and convert them to NetCDF.
 //
