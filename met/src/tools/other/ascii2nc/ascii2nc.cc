@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   ascii2nc.cc
-//
+//2
 //   Description:
 //      Parse ASCII observations and convert them to NetCDF.
 //
@@ -116,7 +116,7 @@ static ASCIIFormat ascii_format = ASCIIFormat_None;
 ////////////////////////////////////////////////////////////////////////
 
 // Variables for command line arguments
-static vector< ConcatString > asfile_list;
+static vector<ConcatString> asfile_list;
 static ConcatString ncfile;
 
 static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
@@ -234,10 +234,13 @@ int main(int argc, char *argv[]) {
    file_handler->setMessageTypeMap(config_info.getMessageTypeMap());
 
    //
-   // Process the files.  If a configuration file was specified, do any
-   // extra processing specified.
+   // Read the input files
    //
-   file_handler->readAsciiFiles(asfile_list);
+   if(!file_handler->readAsciiFiles(asfile_list)) {
+      mlog << Error << "\n" << program_name << "-> "
+           << "encountered an error while reading input files!\n\n";
+      exit(1);
+   }
 
    //
    // Summarize the observations, if directed.  We need to use a different
