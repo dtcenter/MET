@@ -904,8 +904,7 @@ void write_ens_var_int(int i_var, int *ens_data, const DataPlane &dp,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ens_data_plane(int i_var, const DataPlane &ens_dp, const DataPlane &dp,
-                         const char *type_str,
-                         const char *long_name_str) {
+                          const char *type_str, const char *long_name_str) {
 
    // Allocate memory for this data
    float *ens_data = new float [nxy];

@@ -1157,6 +1157,59 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::variance(int skip_index) const
+
+{
+
+   if(n() == 0)  return ( bad_data_double );
+
+   int j, count;
+   double s, s_sq, var;
+
+   s = s_sq = 0.0;
+   count = 0;
+
+   for(j=0; j<n(); j++) {
+      if(is_bad_data(e[j]) || j == skip_index) continue;
+      s    += e[j];
+      s_sq += e[j]*e[j];
+      count++;
+   }
+
+   // Check for slightly negative precision error
+   if(count > 1) {
+      var = (s_sq - s*s/(double) count)/((double) (count - 1));
+      if(is_eq(var, 0.0)) var = 0.0;
+   }
+   else {
+      var = bad_data_double;
+   }
+
+   return(var);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::stdev(int skip_index) const
+
+{
+
+   double v = variance(skip_index);
+
+   if ( !is_bad_data(v) )  v = sqrt(v);
+
+   return(v);
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 
 //

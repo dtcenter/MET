@@ -105,6 +105,9 @@ static bool         ens_mean_flag; // Flag for ensemble mean processing
 static ConcatString ens_mean_user; // User-specified ensemble mean data file
 static ConcatString ens_mean_file; // Computed ensemble mean output file
 
+static ConcatString ctrl_file;     // Control member
+static int          ctrl_index = bad_data_int; // Control member index
+
 // Input Observation files
 static StringArray  grid_obs_file_list;
 static int          grid_obs_flag = 0;
@@ -121,11 +124,11 @@ static ConcatString         config_file;
 static ConcatString         out_file;
 
 // Optional arguments
-static unixtime     ens_valid_ut        = (unixtime) 0;
-static NumArray     ens_lead_na;
+static unixtime ens_valid_ut = (unixtime) 0;
+static NumArray ens_lead_na;
 
-static unixtime     obs_valid_beg_ut    = (unixtime) 0;
-static unixtime     obs_valid_end_ut    = (unixtime) 0;
+static unixtime obs_valid_beg_ut = (unixtime) 0;
+static unixtime obs_valid_end_ut = (unixtime) 0;
 
 static ConcatString out_dir;
 
@@ -179,9 +182,10 @@ static Met2dDataFileFactory mtddf_factory;
 static StatHdrColumns shc;
 
 // Arrays to store running sums and counts
-static NumArray count_na, min_na, max_na, sum_na, sum_sq_na;
-static NumArray *thresh_count_na = (NumArray *) 0; // [n_thresh]
-static NumArray **thresh_nbrhd_count_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
+static NumArray cnt_na, min_na, max_na, sum_na;
+static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
+static NumArray *thresh_cnt_na = (NumArray *) 0; // [n_thresh]
+static NumArray **thresh_nbrhd_cnt_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

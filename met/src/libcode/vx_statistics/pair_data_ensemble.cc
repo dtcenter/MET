@@ -108,6 +108,7 @@ void PairDataEnsemble::clear() {
 
    n_ens = 0;
    n_pair = 0;
+   ctrl_index = bad_data_int;
    skip_const = false;
    skip_ba.clear();
 
@@ -121,6 +122,7 @@ void PairDataEnsemble::clear() {
 
    esum_na.clear();
    esumsq_na.clear();
+   esumn_na.clear();
 
    mn_na.clear();
    mn_oerr_na.clear();
@@ -170,6 +172,7 @@ void PairDataEnsemble::extend(int n) {
    var_plus_oerr_na.extend   (n);
    esum_na.extend            (n);
    esumsq_na.extend          (n);
+   esumn_na.extend           (n);
    mn_na.extend              (n);
    mn_oerr_na.extend         (n);
 
@@ -222,6 +225,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
    n_pair         = pd.n_pair;
+   ctrl_index     = pd.ctrl_index;
    skip_const     = pd.skip_const;
    skip_ba        = pd.skip_ba;
 
@@ -231,6 +235,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    esum_na        = pd.esum_na;
    esumsq_na      = pd.esumsq_na;
+   esumn_na       = pd.esumn_na;
 
    mn_na          = pd.mn_na;
    mn_oerr_na     = pd.mn_oerr_na;
@@ -290,12 +295,14 @@ void PairDataEnsemble::add_ens_var_sums(int i_obs, double v) {
    if(i_obs >= esum_na.n()) {
       esum_na.add(0.0);
       esumsq_na.add(0.0);
+      esumn_na.add(0.0);
    }
 
    // Track sums of the raw ensemble member values
    if(!is_bad_data(v)) {
       esum_na.inc(i_obs, v);
       esumsq_na.inc(i_obs, v*v);
+      esumn_na.inc(i_obs, 1);
    }
 
    return;
@@ -416,17 +423,17 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       else {
 
          // Compute the variance of the unperturbed ensemble members
-         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], v_na[i]);
+         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
          // Process the observation error information.
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
-            // Compute perturbed ensemble mean and variance 
-            cur_ens.compute_mean_variance(mean, var_perturbed);
-            mn_oerr_na.add(mean);
-            var_oerr_na.add(var_perturbed);
+            // Compute perturbed ensemble mean and variance
+            // Exclude the control member from the variance
+            mn_oerr_na.add(cur_ens.mean());
+            var_oerr_na.add(cur_ens.variance(ctrl_index));
 
             // Compute the variance plus observation error variance.
             var_plus_oerr_na.add(var_unperturbed +
@@ -467,8 +474,12 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
          crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
 
+         // Ensemble mean and standard deviation
+         // Exclude the control member from the standard deviation
+         mean  = cur_ens.mean();
+         stdev = cur_ens.stdev(ctrl_index);
+
          // Store Gaussian CRPS stats
-         cur_ens.compute_mean_stdev(mean, stdev);
          crps_gaus_na.add(compute_crps_gaus(o_na[i], mean, stdev));
          crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
@@ -613,7 +624,7 @@ struct ssvar_bin_comp {
 
 void PairDataEnsemble::compute_ssvar() {
    int i, j;
-   double mn, var;
+   double var;
    ssvar_bin_map bins;
    NumArray cur;
 
@@ -644,21 +655,22 @@ void PairDataEnsemble::compute_ssvar() {
       if(skip_ba[i]) continue;
 
       // Store ensemble values for the current observation
-      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
-
-      // Compute standard deviation
-      cur.compute_mean_variance(mn, var);
+      // Exclude the control member from the variance
+      for(j=0, cur.erase(); j<n_ens; j++) {
+         if(j == ctrl_index) continue;
+         cur.add(e_na[j][i]);
+      }
 
       // Build a variance point
       ens_ssvar_pt pt;
-      pt.var = var;
+      pt.var = cur.variance();
       pt.f   = mn_na[i];
       pt.o   = o_na[i];
       pt.w   = wgt_na[i];
 
       // Determine the bin for the current point and add it to the list
       // Bins are defined starting at 0 and are left-closed, right-open
-      j = floor(var/ssvar_bin_size);
+      j = floor(pt.var/ssvar_bin_size);
       string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
@@ -801,7 +813,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
-      //   o_qc_sa, esum_na, esumsq_na
+      //   o_qc_sa, esum_na, esumsq_na, esumn_na
 
       pd.wgt_na.add(wgt_na[i]);
       pd.o_na.add(o_na[i]);
@@ -1667,7 +1679,10 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                else {
 
                   // Track unperturbed ensemble variance sums
-                  pd[i][j][k].add_ens_var_sums(l, fcst_v);
+                  // Exclude the control member from the variance
+                  if(member != pd[i][j][k].ctrl_index) {
+                     pd[i][j][k].add_ens_var_sums(l, fcst_v);
+                  }
 
                   // Apply observation error perturbation, if requested
                   if(obs_error_info->flag) {
@@ -1772,6 +1787,21 @@ void VxPairDataEnsemble::calc_obs_summary() {
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
             pd[i][j][k].calc_obs_summary();
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_ctrl_index(int index) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].ctrl_index = index;
          }
       }
    }

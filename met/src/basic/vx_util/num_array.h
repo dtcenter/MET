@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include "concat_string.h"
+#include "is_bad_data.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -106,6 +107,9 @@ class NumArray {
       double mean() const;
       double mean_sqrt() const;
       double mean_fisher() const;
+
+      double variance(int skip_index = bad_data_int) const;
+      double stdev(int skip_index = bad_data_int) const;
 
       double wmean(const NumArray &) const;
       double wmean_sqrt(const NumArray &) const;

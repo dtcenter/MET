@@ -139,7 +139,7 @@ class EnsembleStatVxOpt {
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
                           gsl_rng *, bool, bool, bool);
-      void set_vx_pd(EnsembleStatConfInfo *);
+      void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
 
@@ -238,7 +238,7 @@ class EnsembleStatConfInfo {
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);
-      void set_vx_pd     (const IntArray &);
+      void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
       int get_n_ens_var()    const;
