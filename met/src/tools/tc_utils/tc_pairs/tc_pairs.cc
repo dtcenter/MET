@@ -437,7 +437,7 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
 
    // Filter the EDECK tracks using the config file information
    mlog << Debug(2)
-        << "Filtering " << edeck_probs.n_probs()
+        << "Filtering " << edeck_probs.n_prob_rirw()
         << " probabilities based on config file settings.\n";
    filter_probs(edeck_probs);
 
@@ -446,11 +446,11 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    //
 
    mlog << Debug(2)
-        << "Matching " << edeck_probs.n_probs()
+        << "Matching " << edeck_probs.n_prob_rirw()
         << " EDECK probabilities to "
         << bdeck_tracks.n() << " BDECK tracks.\n";
 
-   for(i=0; i<edeck_probs.n_probs(); i++) {
+   for(i=0; i<edeck_probs.n_prob_rirw(); i++) {
 
       for(j=0,n_match=0; j<bdeck_tracks.n(); j++) {
 
@@ -708,7 +708,7 @@ void process_prob_files(const StringArray &files,
 
    // Dump out the track information
    mlog << Debug(3)
-        << "Identified " << probs.n_probs() << " probabilities.\n";
+        << "Identified " << probs.n_prob_rirw() << " probabilities.\n";
 
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
@@ -717,9 +717,9 @@ void process_prob_files(const StringArray &files,
    }
    // Dump out track info
    else {
-      for(i=0; i<probs.n_probs(); i++) {
+      for(i=0; i<probs.n_prob_rirw(); i++) {
          mlog << Debug(4)
-              << "[Prob " << i+1 << " of " << probs.n_probs()
+              << "[Prob " << i+1 << " of " << probs.n_prob_rirw()
               << "] " << probs[i]->serialize() << "\n";
       }
    }
@@ -928,7 +928,7 @@ void filter_probs(ProbInfoArray &probs) {
    // Loop through the pairs and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
    // basin, cyclone, initialization time, and initialization hour.
-   for(i=0; i<p.n_probs(); i++) {
+   for(i=0; i<p.n_prob_rirw(); i++) {
 
       // Valid time window
       if((conf_info.ValidBeg > 0 &&
@@ -977,11 +977,11 @@ void filter_probs(ProbInfoArray &probs) {
 
    // Print summary filtering info
    mlog << Debug(3)
-        << "Total probabilities read = " << p.n_probs()     << "\n"
-        << "Total probabilities kept = " << probs.n_probs() << "\n"
-        << "Rejected for valid time  = " << n_vld           << "\n"
-        << "Rejected for init mask   = " << n_mask_init     << "\n"
-        << "Rejected for valid mask  = " << n_mask_vld      << "\n";
+        << "Total probabilities read = " << p.n_prob_rirw()     << "\n"
+        << "Total probabilities kept = " << probs.n_prob_rirw() << "\n"
+        << "Rejected for valid time  = " << n_vld               << "\n"
+        << "Rejected for init mask   = " << n_mask_init         << "\n"
+        << "Rejected for valid mask  = " << n_mask_vld          << "\n";
 
    return;
 }
