@@ -66,9 +66,9 @@ class ProbGenInfo : public ProbInfoBase {
          //  do stuff
          //
 
-      void initialize(const ATCFProbLine &);
+      void initialize(const ATCFProbLine &, double);
       bool is_match  (const ATCFProbLine &) const;
-      bool add       (const ATCFProbLine &, bool check_dup = false);
+      bool add       (const ATCFProbLine &, double, bool check_dup = false);
       
 };
 

@@ -467,8 +467,8 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
                  << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
 
             // Compute the distances to land
-            cur_ri.set_adland(compute_dland(cur_ri.prob_rirw().lat(), -1.0*cur_ri.prob_rirw().lon()));
-            cur_ri.set_bdland(compute_dland(cur_ri.blat(),            -1.0*cur_ri.blon()));
+            cur_ri.set_adland(edeck_probs[i]->dland());
+            cur_ri.set_bdland(compute_dland(cur_ri.blat(), -1.0*cur_ri.blon()));
 
             // Store the current pair
             prob_rirw_pairs.add(cur_ri);
@@ -640,6 +640,7 @@ void process_prob_files(const StringArray &files,
                         const StringArray &model_suffix,
                         ProbInfoArray &probs) {
    int i, cur_read, cur_add, tot_read, tot_add;
+   double dland;
    LineDataFile f;
    ConcatString suffix;
    ATCFProbLine line;
@@ -683,10 +684,13 @@ void process_prob_files(const StringArray &files,
          // Check the keep status
          if(!is_keeper(&line)) continue;
 
-         // Attempt to add the current line to ProbInfoArray
-         if(probs.add(line, conf_info.CheckDup)) {
-            cur_add++;
-            tot_add++;
+         // Only process probability of RI lines
+         if(line.type() == ATCFLineType_ProbRI) {
+            dland = compute_dland(line.lat(), -1.0*line.lon());
+            if(probs.add(line, dland, conf_info.CheckDup)) {
+               cur_add++;
+               tot_add++;
+            }
          }
       }
 

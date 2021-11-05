@@ -69,7 +69,7 @@ class ProbInfoArray {
          //  do stuff
          //
 
-      bool add(const ATCFProbLine &, bool check_dup = false);
+      bool add(const ATCFProbLine &, double dland, bool check_dup = false);
       void add(const ProbRIRWInfo &);
       void add(const ProbGenInfo &);
 };

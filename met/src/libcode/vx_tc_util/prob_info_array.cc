@@ -209,7 +209,7 @@ const ProbGenInfo & ProbInfoArray::prob_gen(int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
    bool status = false;
 
    // Range check the probability value
@@ -228,13 +228,13 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
 
          // Add line to an existing entry
          if(ProbRIRW.size()  > 0 &&
-            ProbRIRW[ProbRIRW.size()-1].add(l, check_dup)) {
+            ProbRIRW[ProbRIRW.size()-1].add(l, dland, check_dup)) {
             status = true;
          }
          // Add a new entry
          else {
             ProbRIRWInfo ri;
-            ri.add(l, check_dup);
+            ri.add(l, dland, check_dup);
             ProbRIRW.push_back(ri);
             status = true;
          }
@@ -244,13 +244,13 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
 
          // Add line to an existing entry
          if(ProbGen.size()  > 0 &&
-            ProbGen[ProbGen.size()-1].add(l, check_dup)) {
+            ProbGen[ProbGen.size()-1].add(l, dland, check_dup)) {
             status = true;
          }
          // Add a new entry
          else {
             ProbGenInfo gi;
-            gi.add(l, check_dup);
+            gi.add(l, dland, check_dup);
 
             // Check for the expected genesis type and predicted location
             if(gi.gen_or_dis() != "genFcst") {

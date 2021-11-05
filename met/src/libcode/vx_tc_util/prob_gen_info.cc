@@ -138,11 +138,11 @@ void ProbGenInfo::assign(const ProbGenInfo &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbGenInfo::initialize(const ATCFProbLine &l) {
+void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
 
-   ProbInfoBase::initialize(l);
+   ProbInfoBase::initialize(l, dland);
 
    Initials =  l.get_item(ProbGenInitialsOffset);
    GenOrDis =  l.get_item(ProbGenOrDisOffset);
@@ -170,7 +170,7 @@ bool ProbGenInfo::is_match(const ATCFProbLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbGenInfo::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbGenInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
@@ -184,7 +184,7 @@ bool ProbGenInfo::add(const ATCFProbLine &l, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l);
+   if(Type == NoATCFLineType) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return(false);

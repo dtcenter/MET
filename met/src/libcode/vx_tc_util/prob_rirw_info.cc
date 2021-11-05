@@ -149,11 +149,11 @@ int ProbRIRWInfo::rirw_window() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::initialize(const ATCFProbLine &l) {
+void ProbRIRWInfo::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
 
-   ProbInfoBase::initialize(l);
+   ProbInfoBase::initialize(l, dland);
 
    Value    = parse_int(l.get_item(ProbRIRWValueOffset).c_str());
    Initials =           l.get_item(ProbRIRWInitialsOffset);
@@ -177,7 +177,7 @@ bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
@@ -191,7 +191,7 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l);
+   if(Type == NoATCFLineType) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return(false);
