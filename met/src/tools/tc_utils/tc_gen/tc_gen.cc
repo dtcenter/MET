@@ -20,6 +20,7 @@
 //   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
 //   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
 //   005    04/02/21  Halley Gotway   Refinements for MET #1714
+//   006    11/04/21  Halley Gotway   Add -edeck for MET #1809
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,19 +57,24 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
-static void   process_genesis      ();
+static void   process_genesis      (const GenesisInfoArray &,
+                                    const TrackInfoArray &);
+static void   process_edecks       (const GenesisInfoArray &,
+                                    const TrackInfoArray &);
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     const char *,
                                     StringArray &, StringArray &);
-static void   process_fcst_tracks  (const StringArray &,
+static void   parse_genesis        (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &);
-static void   process_best_tracks  (const StringArray &,
+static void   parse_tracks         (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &,
                                     TrackInfoArray &);
-
+static void   parse_edecks         (const StringArray &,
+                                    const StringArray &,
+                                    ProbInfoArray &);
 static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const ConcatString &,
                                     const GenesisInfoArray &,
@@ -105,6 +111,7 @@ static void   usage                ();
 static void   set_source           (const StringArray &, const char *,
                                     StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
+static void   set_edeck            (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
@@ -119,8 +126,30 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Identify and process genesis events and write output
-   process_genesis();
+   // Process the verifying BEST and operational tracks
+   StringArray track_files, track_files_model_suffix;
+   GenesisInfoArray best_ga;
+   TrackInfoArray oper_ta;
+
+   // Get the list of verifing track files
+   get_atcf_files(track_source, track_model_suffix, atcf_reg_exp,
+                  track_files,  track_files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << track_files.n()
+        << " verifying track files.\n";
+   parse_tracks(track_files, track_files_model_suffix,
+                best_ga, oper_ta);
+
+   // Score genesis events and write output
+   if(genesis_source.n() > 0) {
+      process_genesis(best_ga, oper_ta);
+   }
+
+   // Score EDECK genesis probabilities and write output
+   if(edeck_source.n() > 0) {
+      process_edecks(best_ga, oper_ta);
+   }
 
    return(0);
 }
@@ -143,6 +172,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add function calls for the arguments
    cline.add(set_genesis, "-genesis", -1);
+   cline.add(set_edeck,   "-edeck",   -1);
    cline.add(set_track,   "-track",   -1);
    cline.add(set_config,  "-config",   1);
    cline.add(set_out,     "-out",      1);
@@ -154,18 +184,26 @@ void process_command_line(int argc, char **argv) {
    for(i=genesis_model_suffix.n(); i<genesis_source.n(); i++) {
       genesis_model_suffix.add("");
    }
+   for(i=edeck_model_suffix.n(); i<edeck_source.n(); i++) {
+      edeck_model_suffix.add("");
+   }
    for(i=track_model_suffix.n(); i<track_source.n(); i++) {
       track_model_suffix.add("");
    }
 
    // Check for the minimum number of arguments
-   if(genesis_source.n()   == 0 ||
-      track_source.n()     == 0 ||
-      config_file.length() == 0) {
-      mlog << Error
-           << "\nprocess_command_line(int argc, char **argv) -> "
-           << "the \"-genesis\", \"-track\", and \"-config\" command "
+   if(genesis_source.n() == 0 && edeck_source.n() == 0) {
+      mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
+           << "at least one of the \"-genesis\" or \"-edeck\" command "
            << "line options are required\n\n";
+      usage();
+   }
+
+   // Check for the minimum number of arguments
+   if(track_source.n() == 0 || config_file.length() == 0) {
+      mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
+           << "the \"-track\" and \"-config\" command line options "
+           << "are required\n\n";
       usage();
    }
 
@@ -175,6 +213,14 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << genesis_source.n()
            << "] Genesis Source: " << genesis_source[i]
            << ", Model Suffix: " << genesis_model_suffix[i] << "\n";
+   }
+
+   // List the input edeck files
+   for(i=0; i<edeck_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << edeck_source.n()
+           << "] EDECK Source: " << edeck_source[i]
+           << ", Model Suffix: " << edeck_model_suffix[i] << "\n";
    }
 
    // List the input track track files
@@ -202,12 +248,11 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_genesis() {
+void process_genesis(const GenesisInfoArray &best_ga,
+                     const TrackInfoArray &oper_ta) {
    int i, j;
    StringArray genesis_files, genesis_files_model_suffix;
-   StringArray track_files, track_files_model_suffix;
-   GenesisInfoArray fcst_ga, best_ga, empty_ga;
-   TrackInfoArray oper_ta;
+   GenesisInfoArray fcst_ga, empty_ga;
    ConcatString model, cs;
    map<ConcatString,GenesisInfoArray> model_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
@@ -221,18 +266,8 @@ void process_genesis() {
    mlog << Debug(2)
         << "Processing " << genesis_files.n()
         << " forecast genesis track files.\n";
-   process_fcst_tracks(genesis_files, genesis_files_model_suffix,
-                       fcst_ga);
-
-   // Get the list of verifing track files
-   get_atcf_files(track_source, track_model_suffix, atcf_reg_exp,
-                  track_files,  track_files_model_suffix);
-
-   mlog << Debug(2)
-        << "Processing " << track_files.n()
-        << " verifying track files.\n";
-   process_best_tracks(track_files, track_files_model_suffix,
-                       best_ga, oper_ta);
+   parse_genesis(genesis_files, genesis_files_model_suffix,
+                 fcst_ga);
 
    // Setup output files based on the number of techniques present
    // and possible pairs.
@@ -324,7 +359,126 @@ void process_genesis() {
       nc_out = (NcFile *) 0;
    }
 
+   return;
+}
 
+////////////////////////////////////////////////////////////////////////
+
+void process_edecks(const GenesisInfoArray &best_ga,
+                    const TrackInfoArray &oper_ta) {
+   int i, j;
+   StringArray edeck_files, edeck_files_model_suffix;
+   ProbInfoArray fcst_pa, empty_pa;
+   ConcatString model, cs;
+   map<ConcatString,TrackInfoArray> model_ta_map;
+   map<ConcatString,TrackInfoArray>::iterator it;
+   map<int,PCTInfo> gen_prob_map;
+   map<int,PCTInfo>::iterator gen_it;
+   PCTInfo pct_info;
+
+   // Get the list of EDECK files
+   get_atcf_files(edeck_source, edeck_model_suffix, atcf_reg_exp,
+                  edeck_files,  edeck_files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << edeck_files.n()
+        << " forecast EDECK files.\n";
+   parse_edecks(edeck_files, edeck_files_model_suffix,
+                fcst_pa);
+
+   /* JHG, need to think about the output files!
+   // Setup output files based on the number of techniques present
+   // and possible pairs.
+   int n_time = (conf_info.FcstSecEnd - conf_info.FcstSecBeg) /
+                (conf_info.InitFreqHr*sec_per_hour) + 1;
+   int n_pair = best_ga.n() * n_time + fcst_ga.n();
+   setup_txt_files(fcst_ga.n_technique(), n_pair);
+
+   // If requested, setup the NetCDF output file
+   if(!conf_info.NcInfo.all_false()) setup_nc_file();
+
+   // Process each verification filter
+   for(i=0; i<conf_info.n_vx(); i++) {
+
+      // Initialize
+      model_ta_map.clear();
+
+      // Subset the forecast genesis probabilities
+      for(j=0; j<fcst_ta.n(); j++) {
+
+         // Check filters
+         if(!conf_info.VxOpt[i].is_keeper(fcst_ta[j])) continue;
+
+         // Store the current forecast ATCF ID
+         model = fcst_ta[j].technique();
+
+         // Check specified forecast models
+         if( conf_info.VxOpt[i].Model.n() > 0 &&
+            !conf_info.VxOpt[i].Model.has(model)) continue;
+
+         // Add a new map entry, if necessary
+         if(model_ta_map.count(model) == 0) {
+            empty_ta.clear();
+            model_ta_map[model] = empty_ta;
+         }
+
+         // Store the current genesis event
+         model_ta_map[model].add(fcst_ta[j]);
+
+      } // end j
+
+      // Process the genesis probabilities for each model
+      for(j=0,it=model_ta_map.begin(); it!=model_ta_map.end(); it++,j++) {
+
+         // Initialize
+         pct_info.clear();
+         pct_info.Model = it->first;
+         pct_info.set_vx_opt(&conf_info.VxOpt[i],
+                             &conf_info.NcOutGrid);
+
+         mlog << Debug(2)
+              << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+              << ") " << ": Model " << j+1 << "] " << "For " << it->first
+              << " model, comparing " << it->second.n()
+              << " genesis forecasts to " << best_ga.n() << " "
+              << conf_info.BestEventInfo.Technique << " and "
+              << oper_ta.n() << " " << conf_info.OperTechnique
+              << " tracks.\n";
+
+         // Get the pairs
+         get_genesis_pairs(conf_info.VxOpt[i], it->first, it->second,
+                           best_ga, oper_ta, pairs);
+
+         // Do the categorical verification
+         do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
+
+         // Write the statistics output
+         write_stats(pairs, ctc_info);
+
+         // Write NetCDF output fields
+         if(!conf_info.VxOpt[i].NcInfo.all_false()) {
+            write_nc(ctc_info);
+         }
+
+
+
+      } // end for j
+
+   } // end for i n_vx
+
+   // Finish output files
+   finish_txt_files();
+
+   // Close the NetCDF output file
+   if(nc_out) {
+
+      // List the NetCDF file after it is finished
+      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
+
+      delete nc_out;
+      nc_out = (NcFile *) 0;
+   }
+*/
    return;
 }
 
@@ -715,7 +869,7 @@ void get_atcf_files(const StringArray &source,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fcst_tracks(const StringArray &files,
+void parse_genesis(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray  &fcst_ga) {
    int i, j;
@@ -737,7 +891,7 @@ void process_fcst_tracks(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error << "\nprocess_fcst_tracks() -> "
+         mlog << Error << "\nparse_genesis() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -842,10 +996,10 @@ void process_fcst_tracks(const StringArray &files,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_best_tracks(const StringArray &files,
-                         const StringArray &model_suffix,
-                         GenesisInfoArray  &best_ga,
-                         TrackInfoArray    &oper_ta) {
+void parse_tracks(const StringArray &files,
+                  const StringArray &model_suffix,
+                  GenesisInfoArray  &best_ga,
+                  TrackInfoArray    &oper_ta) {
    int i, i_bga, n_lines;
    ConcatString suffix, gen_basin, case_cs, storm_id;
    StringArray best_tech, oper_tech;
@@ -871,8 +1025,7 @@ void process_best_tracks(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_best_tracks() -> "
+         mlog << Error << "\nparse_tracks() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -976,7 +1129,7 @@ void process_best_tracks(const StringArray &files,
             i--;
          }
          else {
-            mlog << Warning << "\nprocess_best_tracks() -> "
+            mlog << Warning << "\nparse_tracks() -> "
                  << case_cs << "neither " << best_ga[i_bga].storm_id()
                  << " nor " << best_gi.storm_id()
                  << " matches the basin!\n\n";
@@ -999,6 +1152,160 @@ void process_best_tracks(const StringArray &files,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+/* JHG   int i, i_bga;
+   ConcatString suffix, gen_basin, case_cs, storm_id;
+   StringArray best_tech, oper_tech;
+   TrackInfoArray best_ta;
+   GenesisInfo best_gi;
+
+
+
+   */
+void parse_edecks(const StringArray &files,
+                  const StringArray &model_suffix,
+                  ProbInfoArray     &fcst_pa) {
+   int i, n_lines;
+   ConcatString suffix;
+   LineDataFile f;
+   ATCFProbLine line;
+
+   int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
+
+   // Initialize
+   fcst_pa.clear();
+   n_lines = 0;
+
+   // Process each of the input ATCF files
+   for(i=0; i<files.n(); i++) {
+
+      // Open the current file
+      if(!f.open(files[i].c_str())) {
+         mlog << Error << "\nparse_edecks() -> "
+              << "unable to open file \"" << files[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
+      // Process the input track lines
+      while(f >> line) {
+
+         // Skip off-hour track points
+         if((line.valid_hour() % valid_freq_sec) != 0) continue;
+
+         // Only process genesis probability lines
+         if(line.type() == ATCFLineType_ProbGN) {
+            if(fcst_pa.add(line)) n_lines++;
+         }
+      }
+
+      // Close the current file
+      f.close();
+
+   } // end for i
+
+   // Dump out the total number of lines
+   mlog << Debug(3)
+        << "Read a total of " << n_lines << " "
+        << atcflinetype_to_string(ATCFLineType_ProbGN)
+        << " lines from " << files.n() << " input files.\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 6) {
+      mlog << Debug(6) << fcst_pa.serialize_r() << "\n";
+   }
+
+/*
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 6) {
+      mlog << Debug(6) << "BEST tracks:\n"
+           << best_ta.serialize_r() << "\n"
+           << "Operational tracks:\n"
+           << oper_ta.serialize_r() << "\n";
+   }
+
+   // Search the BEST tracks for genesis events
+   for(i=0; i<best_ta.n(); i++) {
+
+      // Attempt to define genesis
+      if(!best_gi.set(best_ta[i], conf_info.BestEventInfo)) {
+         continue;
+      }
+
+      // Skip invest tracks with a large cyclone number
+      if(atof(best_ta[i].cyclone().c_str()) > max_best_cyclone_number) {
+         mlog << Debug(6)
+              << "Skipping Best track genesis event for cyclone number "
+              << best_ta[i].cyclone() << " > " << max_best_cyclone_number
+              << ".\n";
+         continue;
+      }
+
+      // Check for duplicates
+      if(best_ga.has_storm(best_gi, i_bga)) {
+
+         // Determine the basin for this genesis event
+         gen_basin = conf_info.compute_basin(best_gi.lat(),
+                                             -1.0*best_gi.lon());
+
+         case_cs << cs_erase << "For duplicate "
+                 << unix_to_yyyymmdd_hhmmss(best_gi.genesis_time()) << " "
+                 << best_gi.technique() << " track genesis at ("
+                 << best_gi.lat() << ", " << best_gi.lon() << ") in the "
+                 << gen_basin << " basin, ";
+
+         // Keep existing storm id and discard the new one
+         if(gen_basin == best_ga[i_bga].basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_ga[i_bga].storm_id()
+                 << " and discard " << best_gi.storm_id()
+                 << ".\n";
+            best_ta.erase_storm_id(best_gi.storm_id());
+            oper_ta.erase_storm_id(best_gi.storm_id());
+            i--;
+            continue;
+         }
+         // Discard the existing storm id and add the new one
+         else if(gen_basin == best_gi.basin()) {
+            mlog << Debug(3)
+                 << case_cs << "keep " << best_gi.storm_id()
+                 << " and discard " << best_ga[i_bga].storm_id()
+                 << ".\n";
+            best_ga.erase_storm_id(best_ga[i_bga].storm_id());
+            best_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            oper_ta.erase_storm_id(best_ga[i_bga].storm_id());
+            i--;
+         }
+         else {
+            mlog << Warning << "\nparse_tracks() -> "
+                 << case_cs << "neither " << best_ga[i_bga].storm_id()
+                 << " nor " << best_gi.storm_id()
+                 << " matches the basin!\n\n";
+            continue;
+         }
+      }
+
+      // Compute the distance to land
+      best_gi.set_dland(conf_info.compute_dland(
+                        best_gi.lat(), -1.0*best_gi.lon()));
+
+      // Store the genesis event
+      best_ga.add(best_gi);
+
+   } // end for i
+
+   // Dump out the number of genesis events
+   mlog << Debug(2) << "Found " << best_ga.n()
+        << " BEST genesis events.\n";
+*/
+   return;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1547,19 +1854,24 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-genesis path\n"
-        << "\t-track path\n"
+        << "\t-genesis source and/or -edeck source\n"
+        << "\t-track source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-genesis path\" is one or more ATCF genesis "
+        << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_gen_reg_exp << "\" (required).\n"
+        << atcf_gen_reg_exp << "\" (required if no -edeck).\n"
 
-        << "\t\t\"-track path\" is one or more ATCF track "
+        << "\t\t\"-edeck source\" is one or more ensemble model output "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_reg_exp << "\" (required if no -genesis).\n"
+
+        << "\t\t\"-track source\" is one or more ATCF track "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << atcf_reg_exp << "\" for the verifying BEST and operational "
@@ -1644,6 +1956,12 @@ void set_source(const StringArray &a, const char *type_str,
 
 void set_genesis(const StringArray & a) {
    set_source(a, "genesis", genesis_source, genesis_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_edeck(const StringArray & a) {
+   set_source(a, "edeck", edeck_source, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////

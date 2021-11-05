@@ -89,6 +89,7 @@ static const int max_best_cyclone_number = 50;
 
 // Input files
 static StringArray   genesis_source, genesis_model_suffix;
+static StringArray   edeck_source, edeck_model_suffix;
 static StringArray   track_source, track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;
