@@ -206,7 +206,6 @@ bool ProbInfoBase::is_match(const ATCFProbLine &l) const {
           Cyclone   == l.cyclone_number() &&
           Technique == l.technique() &&
           InitTime  == l.warning_time() &&
-          ValidTime == l.valid() &&
           Lat       == l.lat() &&
           Lon       == l.lon());
 }

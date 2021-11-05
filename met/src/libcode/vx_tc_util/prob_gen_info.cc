@@ -17,30 +17,30 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "prob_rirw_info.h"
+#include "prob_gen_info.h"
 #include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ProbRIRWInfo
+//  Code for class ProbGenInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::ProbRIRWInfo() {
+ProbGenInfo::ProbGenInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::~ProbRIRWInfo() {
+ProbGenInfo::~ProbGenInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
+ProbGenInfo::ProbGenInfo(const ProbGenInfo & t) {
 
    init_from_scratch();
 
@@ -49,7 +49,7 @@ ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
+ProbGenInfo & ProbGenInfo::operator=(const ProbGenInfo & t) {
 
    if(this == &t) return(*this);
 
@@ -60,7 +60,7 @@ ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::init_from_scratch() {
+void ProbGenInfo::init_from_scratch() {
 
    clear();
 
@@ -69,29 +69,27 @@ void ProbRIRWInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::clear() {
+void ProbGenInfo::clear() {
 
    ProbInfoBase::clear();
 
-   Value = bad_data_double;
    Initials.clear();
-   RIRWBeg = bad_data_int;
-   RIRWEnd = bad_data_int;
+   GenOrDis.clear();
+   GenTime = (unixtime) 0;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
+void ProbGenInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    ProbInfoBase::dump(out, indent_depth);
 
-   out << prefix << "Value           = "   << Value << "\n";
    out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
-   out << prefix << "RIRWBeg         = "   << RIRWBeg << "\n";
-   out << prefix << "RIRWEnd         = "   << RIRWEnd << "\n";
+   out << prefix << "GenOrDis        = \"" << GenOrDis.contents() << "\"\n";
+   out << prefix << "GenTime         = "   << unix_to_yyyymmdd_hhmmss(GenTime) << "\n";
 
    out << flush;
 
@@ -101,22 +99,21 @@ void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIRWInfo::serialize() const {
+ConcatString ProbGenInfo::serialize() const {
    ConcatString s;
 
    s << ProbInfoBase::serialize()
-     << ", ProbRIRWInfo: "
-     << "Value = " << Value
-     << ", Initials = \"" << Initials << "\""
-     << ", RIRWBeg = " << RIRWBeg
-     << ", RIRWEnd = " << RIRWEnd;
+     << ", ProbGenInfo: "
+     << "Initials = \"" << Initials << "\""
+     << ", GenOrDis = \"" << GenOrDis << "\""
+     << ", GenTime = " << unix_to_yyyymmdd_hhmmss(GenTime) << "\n";
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
+ConcatString ProbGenInfo::serialize_r(int n, int indent_depth) const {
    ConcatString s;
 
    s << ProbInfoBase::serialize_r(n, indent_depth);
@@ -126,64 +123,60 @@ ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
+void ProbGenInfo::assign(const ProbGenInfo &p) {
 
    clear();
 
    ProbInfoBase::assign(p);
 
-   Value    = p.Value;
    Initials = p.Initials;
-   RIRWBeg  = p.RIRWBeg;
-   RIRWEnd  = p.RIRWEnd;
+   GenOrDis = p.GenOrDis;
+   GenTime  = p.GenTime;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int ProbRIRWInfo::rirw_window() const {
-   return((is_bad_data(rirw_beg()) || is_bad_data(rirw_end()) ?
-           bad_data_int : rirw_end() - rirw_beg()));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ProbRIRWInfo::initialize(const ATCFProbLine &l) {
+void ProbGenInfo::initialize(const ATCFProbLine &l) {
 
    clear();
 
    ProbInfoBase::initialize(l);
 
-   Value    = parse_int(l.get_item(ProbRIRWValueOffset).c_str());
-   Initials =           l.get_item(ProbRIRWInitialsOffset);
-   RIRWBeg  = parse_int(l.get_item(ProbRIRWBegOffset).c_str());
-   RIRWEnd  = parse_int(l.get_item(ProbRIRWEndOffset).c_str());
+   Initials =  l.get_item(ProbGenInitialsOffset);
+   GenOrDis =  l.get_item(ProbGenOrDisOffset);
+
+   // Store an empty string as unixtime 0
+   GenTime  = (l.get_item(ProbGenTimeOffset).empty() ?
+               (unixtime) 0 :
+               parse_time(l.get_item(ProbGenTimeOffset).c_str()));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
+bool ProbGenInfo::is_match(const ATCFProbLine &l) const {
 
    if(!ProbInfoBase::is_match(l)) return(false);
 
-   return(ValidTime == l.valid() &&
-          Value     == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
-          RIRWBeg   == parse_int(l.get_item(ProbRIRWBegOffset).c_str()) &&
-          RIRWEnd   == parse_int(l.get_item(ProbRIRWEndOffset).c_str()));
+   unixtime gen_ut = (l.get_item(ProbGenTimeOffset).empty() ?
+                      (unixtime) 0 :
+                      parse_time(l.get_item(ProbGenTimeOffset).c_str()));
+
+   return(GenTime == gen_ut);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbGenInfo::add(const ATCFProbLine &l, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
       if(has(l)) {
          mlog << Warning
-              << "\nProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) -> "
+              << "\nProbGenInfo::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCF line:\n"
               << l.get_line() << "\n\n";
          return(false);
@@ -205,21 +198,6 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
    if(check_dup) ProbLines.add(l.get_line());
 
    return(true);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ProbRIRWInfo::set(const TCStatLine &l) {
-
-   ProbInfoBase::set(l);
-
-   // Store column information
-   Value    = atof(l.get_item("AWIND_END"));
-   Initials = l.get_item("Initials", false);
-   RIRWBeg  = atoi(l.get_item("RIRW_BEG"));
-   RIRWEnd  = atoi(l.get_item("RIRW_END"));
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
