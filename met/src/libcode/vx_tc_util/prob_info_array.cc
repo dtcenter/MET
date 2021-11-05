@@ -292,8 +292,8 @@ void ProbInfoArray::add(const ProbRIRWInfo &rirw) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbInfoArray::add(const ProbGenInfo &gn) {
-   ProbGen.push_back(gn);
+void ProbInfoArray::add(const ProbGenInfo &gi) {
+   ProbGen.push_back(gi);
    return;
 }
 
