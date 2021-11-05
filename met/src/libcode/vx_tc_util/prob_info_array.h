@@ -19,6 +19,7 @@
 #include "atcf_prob_line.h"
 #include "prob_info_base.h"
 #include "prob_rirw_info.h"
+#include "prob_gen_info.h"
 
 #include "vx_util.h"
 
@@ -36,6 +37,7 @@ class ProbInfoArray {
       void assign(const ProbInfoArray &);
 
       vector<ProbRIRWInfo> ProbRIRW;
+      vector<ProbGenInfo>  ProbGen;
 
    public:
 
@@ -60,19 +62,23 @@ class ProbInfoArray {
       int n_prob_rirw() const;
       const ProbRIRWInfo & prob_rirw(int) const;
 
+      int n_prob_gen() const;
+      const ProbGenInfo & prob_gen(int) const;
+
          //
          //  do stuff
          //
 
       bool add(const ATCFProbLine &, bool check_dup = false);
       void add(const ProbRIRWInfo &);
-
+      void add(const ProbGenInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int ProbInfoArray::n_probs()     const { return(ProbRIRW.size()); }
-inline int ProbInfoArray::n_prob_rirw() const { return(ProbRIRW.size()); }
+inline int ProbInfoArray::n_probs()     const { return(ProbRIRW.size() + ProbGen.size()); }
+inline int ProbInfoArray::n_prob_rirw() const { return(ProbRIRW.size());                  }
+inline int ProbInfoArray::n_prob_gen()  const { return(ProbGen.size());                   }
 
 ////////////////////////////////////////////////////////////////////////
 
