@@ -508,6 +508,71 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
+   bool keep = true;
+
+   // ATCF ID processed elsewhere
+
+   // Check storm id
+   if(StormId.n() > 0 &&
+      !has_storm_id(StormId, gi.basin(), gi.cyclone(), gi.init()))
+      keep = false;
+
+   // Check storm name: no included in genesis probabilities
+
+   // Initialization time
+   if((InitBeg     > 0 &&  InitBeg >   gi.init())  ||
+      (InitEnd     > 0 &&  InitEnd <   gi.init())  ||
+      (InitInc.n() > 0 && !InitInc.has(gi.init())) ||
+      (InitExc.n() > 0 &&  InitExc.has(gi.init())))
+      keep = false;
+
+   // Initialization hours
+   if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
+      keep = false;
+
+   // Lead times: JHG, gi has up to 3 lead times!?
+   /*
+   if(Lead.n() > 0 && !Lead.has(gi.lead()))
+      keep = false;
+*/
+
+   // Valid time window: JHG, gi has 3 valid times!?
+/*
+   if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
+      (ValidEnd > 0 && ValidEnd < gi.valid_max()))
+      keep = false;
+*/
+   // Poly masking
+   if(VxPolyMask.n_points() > 0 &&
+     !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
+      keep = false;
+
+   // Area masking
+   if(!VxAreaMask.is_empty()) {
+      double x, y;
+      VxGridMask.latlon_to_xy(gi.lat(), -1.0*gi.lon(), x, y);
+      if(x < 0 || x >= VxGridMask.nx() ||
+         y < 0 || y >= VxGridMask.ny()) {
+         keep = false;
+      }
+      else {
+         keep = VxAreaMask(nint(x), nint(y));
+      }
+   }
+
+   // Distance to land
+   if((DLandThresh.get_type() != no_thresh_type) &&
+      (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
+      keep = false;
+
+   // Return the keep status
+   return(keep);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 STATOutputType TCGenVxOpt::output_map(STATLineType t) const {
    return(OutputMap.at(t));
 }

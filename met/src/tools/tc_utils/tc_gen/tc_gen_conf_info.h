@@ -161,6 +161,7 @@ class TCGenVxOpt {
       void parse_nc_info(Dictionary &);
 
       bool is_keeper(const GenesisInfo &) const;
+      bool is_keeper(const ProbGenInfo &) const;
 
       STATOutputType output_map(STATLineType) const;
 };
