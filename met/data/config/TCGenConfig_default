@@ -213,6 +213,11 @@ ops_method_flag = TRUE;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Genesis probability thresholds
+//
+genesis_prob_thresh = ==0.25;
+
+//
 // Confidence interval alpha value
 //
 ci_alpha = 0.05;

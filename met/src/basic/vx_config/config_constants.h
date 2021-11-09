@@ -1097,6 +1097,7 @@ static const char conf_key_ops_hit_window[]                  = "ops_hit_window";
 static const char conf_key_discard_init_post_genesis_flag[]  = "discard_init_post_genesis_flag";
 static const char conf_key_dev_method_flag[]                 = "dev_method_flag";
 static const char conf_key_ops_method_flag[]                 = "ops_method_flag";
+static const char conf_key_genesis_prob_thresh[]             = "genesis_prob_thresh";
 static const char conf_key_fcst_fy_oy[]                      = "fcst_fy_oy";
 static const char conf_key_fcst_fy_on[]                      = "fcst_fy_on";
 static const char conf_key_fcst_tracks[]                     = "fcst_tracks";

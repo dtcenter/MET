@@ -145,6 +145,7 @@ class TCGenVxOpt {
       bool   DiscardFlag, DevFlag, OpsFlag;
 
       // Output file options
+      ThreshArray GenProbThresh;
       double CIAlpha;
       map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;

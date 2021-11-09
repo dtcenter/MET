@@ -164,6 +164,7 @@ void TCGenVxOpt::clear() {
    OpsHitBeg = OpsHitEnd = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
+   GenProbThresh.clear();
    CIAlpha = bad_data_double;
    OutputMap.clear();
    NcInfo.clear();
@@ -288,7 +289,10 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
            << " must be set to true!\n\n";
       exit(1);
    }
-   
+
+   // Conf: genesis_prob_thresh
+   GenProbThresh = dict.lookup_thresh_array(conf_key_genesis_prob_thresh);
+
    // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
 
@@ -531,18 +535,10 @@ bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
    if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
       keep = false;
 
-   // Lead times: JHG, gi has up to 3 lead times!?
-   /*
-   if(Lead.n() > 0 && !Lead.has(gi.lead()))
-      keep = false;
-*/
+   // Lead and valid times:
+   // ProbGenInfo objects can contain multiple lead/valid times.
+   // Do not filter by them here.
 
-   // Valid time window: JHG, gi has 3 valid times!?
-/*
-   if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
-      (ValidEnd > 0 && ValidEnd < gi.valid_max()))
-      keep = false;
-*/
    // Poly masking
    if(VxPolyMask.n_points() > 0 &&
      !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
@@ -569,7 +565,6 @@ bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
    // Return the keep status
    return(keep);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
