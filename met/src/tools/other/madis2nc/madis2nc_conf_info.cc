@@ -52,43 +52,47 @@ void Madis2NcConfInfo::init_from_scratch()
 
 void Madis2NcConfInfo::clear()
 {
+   mesonet_optional_vars.clear();
    _version.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void Madis2NcConfInfo::read_config(const string &default_filename,
-				   const string &user_filename)
+                                   const string &user_filename)
 {
-  // Read the config file constants
+   // Read the config file constants
 
-  _conf.read(replace_path(config_const_filename).c_str());
-  
-  // Read the default config file
+   _conf.read(replace_path(config_const_filename).c_str());
 
-  _conf.read(replace_path(default_filename).c_str());
+   // Read the default config file
 
-  // Read the user config file
+   _conf.read(replace_path(default_filename).c_str());
 
-  _conf.read(user_filename.c_str());
+   // Read the user config file
 
-  // Process the configuration file
+   _conf.read(user_filename.c_str());
 
-  process_config();
+   // Process the configuration file
 
-  return;
+   process_config();
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void Madis2NcConfInfo::process_config()
 {
-  
-  _version = parse_conf_version(&_conf);
-  check_met_version(_version.c_str());
 
-  _timeSummaryInfo = parse_conf_time_summary(&_conf);
-  
+   _version = parse_conf_version(&_conf);
+   check_met_version(_version.c_str());
+
+   StringArray sa = _conf.lookup_string_array(conf_key_mesonet_opt_var, false);
+   for(int i=0; i<sa.n_elements(); i++) mesonet_optional_vars.add(sa[i]);
+
+   _timeSummaryInfo = parse_conf_time_summary(&_conf);
+
    return;
 }
 

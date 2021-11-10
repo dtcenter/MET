@@ -23,20 +23,25 @@
 class Madis2NcConfInfo {
 
 public:
-     
+
   Madis2NcConfInfo();
   ~Madis2NcConfInfo();
 
   void read_config(const string &default_filename,
-		   const string &user_filename);
+                   const string &user_filename);
+
+  StringArray get_mosonet_optional_vars() const
+  {
+     return mesonet_optional_vars;
+  }
 
   TimeSummaryInfo getSummaryInfo() const
   {
      return _timeSummaryInfo;
   }
-  
+
   int get_compression_level() { return _conf.nc_compression(); }
-  
+
 protected:
 
   ///////////////////////
@@ -46,6 +51,9 @@ protected:
   // TCPairs configuration object
 
   MetConfig _conf;
+
+  // Mesonet optional variables
+  StringArray mesonet_optional_vars;
 
   // Config file version
 
