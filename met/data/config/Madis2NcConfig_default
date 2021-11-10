@@ -16,6 +16,8 @@
 // when the obs name is given instead of grib_code
 //
 
+mesonet_opt_var = [ "precip3hr", "precip6hr", "precip12hr", "precip10min" ];
+
 time_summary = {
   flag = FALSE;
   raw_data = FALSE;
