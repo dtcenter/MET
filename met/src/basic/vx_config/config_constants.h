@@ -855,6 +855,12 @@ static const char conf_key_txt_output          [] = "txt_output";
 static const char conf_key_do_polylines_flag   [] = "do_polylines";
 
 //
+// MADIS2NC specific parameter key names
+//
+
+static const char conf_key_mesonet_opt_var[]      = "mesonet_opt_var";
+
+//
 // PB2NC specific parameter key names
 //
 
