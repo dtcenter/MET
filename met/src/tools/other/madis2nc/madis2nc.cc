@@ -84,11 +84,15 @@ static void clean_up();
 static void setup_netcdf_out(int nhdr);
 
 static bool get_filtered_nc_data(NcVar var, float *data, const long dim,
-                                 const long cur, const char *var_name);
+                                 const long cur, const char *var_name, bool required=true);
+static bool get_filtered_nc_data_opt(NcVar var, float *data, const long dim,
+                                     const long cur, const char *var_name, StringArray optional_vars);
+
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
-                                    const long *cur, const char *var_name, bool count_bad=false);
+                                    const long *cur, const char *var_name);
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
-                                    const long *cur, const char *var_name, bool count_bad=false);
+                                    const long *cur, const char *var_name);
+static void get_nc_qty_data(NcVar *nc_var, char *nc_data_arr, int buf_size, int offset);
 
 static void check_quality_control_flag(int &value, const char qty, const char *var_name);
 static void check_quality_control_flag(float &value, const char qty, const char *var_name);
@@ -415,7 +419,7 @@ void setup_netcdf_out(int nhdr) {
 
 static bool get_filtered_nc_data(NcVar var, float *data,
                                  const long dim, const long cur,
-                                 const char *var_name) {
+                                 const char *var_name, bool required) {
 
    bool status = false;
    float in_fill_value;
@@ -439,15 +443,15 @@ static bool get_filtered_nc_data(NcVar var, float *data,
               << "Fail to read data [" << var_name << "].\n\n";
       }
    }
-   else {
+   else if (required) {
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
    if (!status) {
       for (int idx=0; idx<dim; idx++) {
          data[idx] = bad_data_float;
-         rej_fill++;
       }
+      if (required) rej_fill += dim;
    }
    return status;
 
@@ -455,18 +459,21 @@ static bool get_filtered_nc_data(NcVar var, float *data,
 
 ////////////////////////////////////////////////////////////////////////
 
+static bool get_filtered_nc_data_opt(NcVar var, float *data, const long dim,
+                                     const long cur, const char *var_name, StringArray optional_vars) {
+   bool required = optional_vars.n() ==0 || !optional_vars.has(var_name);
+   bool status = get_filtered_nc_data(var, data, dim, cur, var_name, required);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
-                                    const long *cur, const char *var_name,
-                                    bool count_bad) {
+                                    const long *cur, const char *var_name) {
 
    bool status = false;
    int in_fill_value;
    int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(int)";
-
-   for (int offset=0; offset<data_len; offset++) {
-      data[offset] = bad_data_int;
-   }
 
    if (IS_VALID_NC(var)) {
 
@@ -492,24 +499,24 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
-   if (!status && count_bad) rej_fill = data_len;
+   if (!status) {
+      for (int offset=0; offset<data_len; offset++) {
+         data[offset] = bad_data_int;
+      }
+      rej_fill += data_len;
+   }
    return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
-                                    const long *cur, const char *var_name,
-                                    bool count_bad) {
+                                    const long *cur, const char *var_name) {
 
    bool status = false;
    float in_fill_value;
    int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(float) ";
-
-   for (int offset=0; offset<data_len; offset++) {
-      data[offset] = bad_data_float;
-   }
 
    if (IS_VALID_NC(var)) {
 
@@ -535,8 +542,20 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
-   if (!status && count_bad) rej_fill = data_len;
+   if (!status) {
+      for (int offset=0; offset<data_len; offset++) {
+         data[offset] = bad_data_float;
+      }
+      rej_fill += data_len;
+   }
    return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void get_nc_qty_data(NcVar *nc_var, char *nc_data_arr, int buf_size, int offset) {
+   if (IS_VALID_NC_P(nc_var)) get_nc_data(nc_var, nc_data_arr, buf_size, offset);
+   else memset(nc_data_arr, 0, buf_size*sizeof(char));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -938,34 +957,20 @@ void process_madis_metar(NcFile *&f_in) {
       get_nc_data(&in_hdr_lon_var, &hdr_lon_arr[0], buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, &hdr_elv_arr[0], buf_size, i_hdr_s, "elevation");
 
-      if (IS_VALID_NC(seaLevelPressQty_var)) get_nc_data(&seaLevelPressQty_var, seaLevelPressQty, buf_size, i_hdr_s);
-      else memset(seaLevelPressQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(visibilityQty_var))    get_nc_data(&visibilityQty_var, visibilityQty, buf_size, i_hdr_s);
-      else memset(visibilityQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(temperatureQty_var))   get_nc_data(&temperatureQty_var, temperatureQty, buf_size, i_hdr_s);
-      else memset(temperatureQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(dewpointQty_var))      get_nc_data(&dewpointQty_var, dewpointQty, buf_size, i_hdr_s);
-      else memset(dewpointQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(windDirQty_var))       get_nc_data(&windDirQty_var, windDirQty, buf_size, i_hdr_s);
-      else memset(windDirQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(windSpeedQty_var))     get_nc_data(&windSpeedQty_var, windSpeedQty, buf_size, i_hdr_s);
-      else memset(windSpeedQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(windGustQty_var))      get_nc_data(&windGustQty_var, windGustQty, buf_size, i_hdr_s);
-      else memset(windGustQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(minTemp24HourQty_var)) get_nc_data(&minTemp24HourQty_var, minTemp24HourQty, buf_size, i_hdr_s);
-      else memset(minTemp24HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(maxTemp24HourQty_var)) get_nc_data(&maxTemp24HourQty_var, maxTemp24HourQty, buf_size, i_hdr_s);
-      else memset(maxTemp24HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(precip1HourQty_var))   get_nc_data(&precip1HourQty_var, precip1HourQty, buf_size, i_hdr_s);
-      else memset(precip1HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(precip3HourQty_var))   get_nc_data(&precip3HourQty_var, precip3HourQty, buf_size, i_hdr_s);
-      else memset(precip3HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(precip6HourQty_var))   get_nc_data(&precip6HourQty_var, precip6HourQty, buf_size, i_hdr_s);
-      else memset(precip6HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(precip24HourQty_var))  get_nc_data(&precip24HourQty_var, precip24HourQty, buf_size, i_hdr_s);
-      else memset(precip24HourQty, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(snowCoverQty_var))     get_nc_data(&snowCoverQty_var, snowCoverQty, buf_size, i_hdr_s);
-      else memset(snowCoverQty, 0, buf_size*sizeof(char));
+      get_nc_qty_data(&seaLevelPressQty_var, seaLevelPressQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&visibilityQty_var, visibilityQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&temperatureQty_var, temperatureQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&dewpointQty_var, dewpointQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&windDirQty_var, windDirQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&windSpeedQty_var, windSpeedQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&windGustQty_var, windGustQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&minTemp24HourQty_var, minTemp24HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&maxTemp24HourQty_var, maxTemp24HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&precip1HourQty_var, precip1HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&precip3HourQty_var, precip3HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&precip6HourQty_var, precip6HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&precip24HourQty_var, precip24HourQty, buf_size, i_hdr_s);
+      get_nc_qty_data(&snowCoverQty_var, snowCoverQty, buf_size, i_hdr_s);
 
       get_filtered_nc_data(seaLevelPress_var,  seaLevelPress, buf_size, i_hdr_s, "seaLevelPress" );
       get_filtered_nc_data(visibility_var,     visibility,    buf_size, i_hdr_s, "visibility"    );
@@ -2419,28 +2424,17 @@ void process_madis_maritime(NcFile *&f_in) {
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr, buf_size, i_hdr_s, "eleveation");
 
-      if (IS_VALID_NC(in_windDirQty_var))       get_nc_data(&in_windDirQty_var, windDirQty_arr, buf_size, i_hdr_s);
-      else memset(windDirQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windSpeedQty_var))     get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr, buf_size, i_hdr_s);
-      else memset(windSpeedQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_temperatureQty_var))   get_nc_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
-      else memset(temperatureQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_dewpointQty_var))      get_nc_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
-      else memset(dewpointQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_seaLevelPressQty_var)) get_nc_data(&in_seaLevelPressQty_var, seaLevelPressQty_arr, buf_size, i_hdr_s);
-      else memset(seaLevelPressQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windGustQty_var))      get_nc_data(&in_windGustQty_var, windGustQty_arr, buf_size, i_hdr_s);
-      else memset(windGustQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip1HourQty_var))   get_nc_data(&in_precip1HourQty_var, precip1HourQty_arr, buf_size, i_hdr_s);
-      else memset(precip1HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip6HourQty_var))   get_nc_data(&in_precip6HourQty_var, precip6HourQty_arr, buf_size, i_hdr_s);
-      else memset(precip6HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip12HourQty_var))  get_nc_data(&in_precip12HourQty_var, precip12HourQty_arr, buf_size, i_hdr_s);
-      else memset(precip12HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip18HourQty_var))  get_nc_data(&in_precip18HourQty_var, precip18HourQty_arr, buf_size, i_hdr_s);
-      else memset(precip18HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip24HourQty_var))  get_nc_data(&in_precip24HourQty_var, precip24HourQty_arr, buf_size, i_hdr_s);
-      else memset(precip24HourQty_arr, 0, buf_size*sizeof(char));
+      get_nc_qty_data(&in_windDirQty_var, windDirQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windSpeedQty_var, windSpeedQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_seaLevelPressQty_var, seaLevelPressQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windGustQty_var, windGustQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip1HourQty_var, precip1HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip6HourQty_var, precip6HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip12HourQty_var, precip12HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip18HourQty_var, precip18HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip24HourQty_var, precip24HourQty_arr, buf_size, i_hdr_s);
 
       get_filtered_nc_data(in_pressure_var,      pressure_arr,      buf_size, i_hdr_s, "pressure"     );
       get_filtered_nc_data(in_windDir_var,       windDir_arr,       buf_size, i_hdr_s, "windDir"      );
@@ -2747,15 +2741,26 @@ void process_madis_mesonet(NcFile *&f_in) {
    if (IS_INVALID_NC(in_windDir10Qty_var)) missing_qty_vars.add("windDir10DD");
    if (IS_INVALID_NC(in_windSpeed10Qty_var)) missing_qty_vars.add("windSpeed10DD");
 
+   StringArray optional_vars = conf_info.get_mosonet_optional_vars();
+   bool has_optional_vars = optional_vars.n() > 0;
    if (missing_vars.n() > 0) {
-      mlog << Error << "\n" << method_name << "Please check if the input is a MESONET.\n\n";
-      for (int idx=0; idx<missing_vars.n(); idx++)
-         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
-      exit(1);
+      StringArray filtered_missing_vars;
+      for (int idx=0; idx<missing_vars.n(); idx++) {
+         if (has_optional_vars && optional_vars.has(missing_vars[idx])) continue;
+         filtered_missing_vars.add(missing_vars[idx]);
+      }
+      if (filtered_missing_vars.n()>0) {
+         mlog << Error << "\n" << method_name << "Please check if the input is a MESONET.\n\n";
+         for (int idx=0; idx<filtered_missing_vars.n(); idx++)
+            mlog << Warning << "    missing variable: " << filtered_missing_vars[idx] << "\n";
+         exit(1);
+      }
    }
    if (missing_qty_vars.n() > 0) {
-      for (int idx=0; idx<missing_qty_vars.n(); idx++)
+      for (int idx=0; idx<missing_qty_vars.n(); idx++) {
+         if (has_optional_vars && optional_vars.has(missing_qty_vars[idx])) continue;
          mlog << Debug(1) << "    missing Qty variable: " << missing_qty_vars[idx] << "\n";
+      }
    }
    
    //
@@ -2795,6 +2800,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
+   bool is_required;
    for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       float hdr_lat_arr[buf_size];
@@ -2859,76 +2865,54 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr, buf_size, i_hdr_s, "eleveation");
 
-      if (IS_VALID_NC(in_temperatureQty_var))      get_nc_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
-      else memset(temperatureQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_dewpointQty_var))         get_nc_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
-      else memset(dewpointQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_relHumidityQty_var))      get_nc_data(&in_relHumidityQty_var, relHumidityQty_arr, buf_size, i_hdr_s);
-      else memset(relHumidityQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_stationPressureQty_var))  get_nc_data(&in_stationPressureQty_var, stationPressureQty_arr, buf_size, i_hdr_s);
-      else memset(stationPressureQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_seaLevelPressureQty_var)) get_nc_data(&in_seaLevelPressureQty_var, seaLevelPressureQty_arr, buf_size, i_hdr_s);
-      else memset(seaLevelPressureQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windDirQty_var))          get_nc_data(&in_windDirQty_var, windDirQty_arr, buf_size, i_hdr_s);
-      else memset(windDirQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windSpeedQty_var))        get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr, buf_size, i_hdr_s);
-      else memset(windSpeedQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windGustQty_var))         get_nc_data(&in_windGustQty_var, windGustQty_arr, buf_size, i_hdr_s);
-      else memset(windGustQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_visibilityQty_var))       get_nc_data(&in_visibilityQty_var, visibilityQty_arr, buf_size, i_hdr_s);
-      else memset(visibilityQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precipRateQty_var))       get_nc_data(&in_precipRateQty_var, precipRateQty_arr, buf_size, i_hdr_s);
-      else memset(precipRateQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_solarRadiationQty_var))   get_nc_data(&in_solarRadiationQty_var, solarRadiationQty_arr, buf_size, i_hdr_s);
-      else memset(solarRadiationQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_seaSurfaceTempQty_var))   get_nc_data(&in_seaSurfaceTempQty_var, seaSurfaceTempQty_arr, buf_size, i_hdr_s);
-      else memset(seaSurfaceTempQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_totalColumnPWVQty_var))   get_nc_data(&in_totalColumnPWVQty_var, totalColumnPWVQty_arr, buf_size, i_hdr_s);
-      else memset(totalColumnPWVQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_soilTemperatureQty_var))  get_nc_data(&in_soilTemperatureQty_var, soilTemperatureQty_arr, buf_size, i_hdr_s);
-      else memset(soilTemperatureQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_minTemp24HourQty_var))    get_nc_data(&in_minTemp24HourQty_var, minTemp24HourQty_arr, buf_size, i_hdr_s);
-      else memset(minTemp24HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_maxTemp24HourQty_var))    get_nc_data(&in_maxTemp24HourQty_var, maxTemp24HourQty_arr, buf_size, i_hdr_s);
-      else memset(maxTemp24HourQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip3hrQty_var))        get_nc_data(&in_precip3hrQty_var, precip3hrQty_arr, buf_size, i_hdr_s);
-      else memset(precip3hrQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip6hrQty_var))        get_nc_data(&in_precip6hrQty_var, precip6hrQty_arr, buf_size, i_hdr_s);
-      else memset(precip6hrQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip12hrQty_var))       get_nc_data(&in_precip12hrQty_var, precip12hrQty_arr, buf_size, i_hdr_s);
-      else memset(precip12hrQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip10minQty_var))      get_nc_data(&in_precip10minQty_var, precip10minQty_arr, buf_size, i_hdr_s);
-      else memset(precip10minQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_precip1minQty_var))       get_nc_data(&in_precip1minQty_var, precip1minQty_arr, buf_size, i_hdr_s);
-      else memset(precip1minQty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windDir10Qty_var))        get_nc_data(&in_windDir10Qty_var, windDir10Qty_arr, buf_size, i_hdr_s);
-      else memset(windDir10Qty_arr, 0, buf_size*sizeof(char));
-      if (IS_VALID_NC(in_windSpeed10Qty_var))      get_nc_data(&in_windSpeed10Qty_var, windSpeed10Qty_arr, buf_size, i_hdr_s);
-      else memset(windSpeed10Qty_arr, 0, buf_size*sizeof(char));
+      get_nc_qty_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_relHumidityQty_var, relHumidityQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_stationPressureQty_var, stationPressureQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_seaLevelPressureQty_var, seaLevelPressureQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windDirQty_var, windDirQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windSpeedQty_var, windSpeedQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windGustQty_var, windGustQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_visibilityQty_var, visibilityQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precipRateQty_var, precipRateQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_solarRadiationQty_var, solarRadiationQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_seaSurfaceTempQty_var, seaSurfaceTempQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_totalColumnPWVQty_var, totalColumnPWVQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_soilTemperatureQty_var, soilTemperatureQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_minTemp24HourQty_var, minTemp24HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_maxTemp24HourQty_var, maxTemp24HourQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip3hrQty_var, precip3hrQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip6hrQty_var, precip6hrQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip12hrQty_var, precip12hrQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip10minQty_var, precip10minQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_precip1minQty_var, precip1minQty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windDir10Qty_var, windDir10Qty_arr, buf_size, i_hdr_s);
+      get_nc_qty_data(&in_windSpeed10Qty_var, windSpeed10Qty_arr, buf_size, i_hdr_s);
 
-      get_filtered_nc_data(in_temperature_var,      temperature_arr,      buf_size, i_hdr_s, "temperature"     );
-      get_filtered_nc_data(in_dewpoint_var,         dewpoint_arr,         buf_size, i_hdr_s, "dewpoint"        );
-      get_filtered_nc_data(in_relHumidity_var,      relHumidity_arr,      buf_size, i_hdr_s, "relHumidity"     );
-      get_filtered_nc_data(in_stationPressure_var,  stationPressure_arr,  buf_size, i_hdr_s, "stationPressure" );
-      get_filtered_nc_data(in_seaLevelPressure_var, seaLevelPressure_arr, buf_size, i_hdr_s, "seaLevelPressure");
-      get_filtered_nc_data(in_windDir_var,          windDir_arr,          buf_size, i_hdr_s, "windDir"         );
-      get_filtered_nc_data(in_windSpeed_var,        windSpeed_arr,        buf_size, i_hdr_s, "windSpeed"       );
-      get_filtered_nc_data(in_windGust_var,         windGust_arr,         buf_size, i_hdr_s, "windGust"        );
-      get_filtered_nc_data(in_visibility_var,       visibility_arr,       buf_size, i_hdr_s, "visibility"      );
-      get_filtered_nc_data(in_precipRate_var,       precipRate_arr,       buf_size, i_hdr_s, "precipRate"      );
-      get_filtered_nc_data(in_solarRadiation_var,   solarRadiation_arr,   buf_size, i_hdr_s, "solarRadiation"  );
-      get_filtered_nc_data(in_seaSurfaceTemp_var,   seaSurfaceTemp_arr,   buf_size, i_hdr_s, "seaSurfaceTemp"  );
-      get_filtered_nc_data(in_totalColumnPWV_var,   totalColumnPWV_arr,   buf_size, i_hdr_s, "totalColumnPWV"  );
-      get_filtered_nc_data(in_soilTemperature_var,  soilTemperature_arr,  buf_size, i_hdr_s, "soilTemperature" );
-      get_filtered_nc_data(in_minTemp24Hour_var,    minTemp24Hour_arr,    buf_size, i_hdr_s, "minTemp24Hour"   );
-      get_filtered_nc_data(in_maxTemp24Hour_var,    maxTemp24Hour_arr,    buf_size, i_hdr_s, "maxTemp24Hour"   );
-      get_filtered_nc_data(in_precip3hr_var,        precip3hr_arr,        buf_size, i_hdr_s, "precip3hr"       );
-      get_filtered_nc_data(in_precip6hr_var,        precip6hr_arr,        buf_size, i_hdr_s, "precip6hr"       );
-      get_filtered_nc_data(in_precip12hr_var,       precip12hr_arr,       buf_size, i_hdr_s, "precip12hr"      );
-      get_filtered_nc_data(in_precip10min_var,      precip10min_arr,      buf_size, i_hdr_s, "precip10min"     );
-      get_filtered_nc_data(in_precip1min_var,       precip1min_arr,       buf_size, i_hdr_s, "precip1min"      );
-      get_filtered_nc_data(in_windDir10_var,        windDir10_arr,        buf_size, i_hdr_s, "windDir10"       );
-      get_filtered_nc_data(in_windSpeed10_var,      windSpeed10_arr,      buf_size, i_hdr_s, "windSpeed10"     );
+      get_filtered_nc_data_opt(in_temperature_var,      temperature_arr,      buf_size, i_hdr_s, "temperature"     , optional_vars);
+      get_filtered_nc_data_opt(in_dewpoint_var,         dewpoint_arr,         buf_size, i_hdr_s, "dewpoint"        , optional_vars);
+      get_filtered_nc_data_opt(in_relHumidity_var,      relHumidity_arr,      buf_size, i_hdr_s, "relHumidity"     , optional_vars);
+      get_filtered_nc_data_opt(in_stationPressure_var,  stationPressure_arr,  buf_size, i_hdr_s, "stationPressure" , optional_vars);
+      get_filtered_nc_data_opt(in_seaLevelPressure_var, seaLevelPressure_arr, buf_size, i_hdr_s, "seaLevelPressure", optional_vars);
+      get_filtered_nc_data_opt(in_windDir_var,          windDir_arr,          buf_size, i_hdr_s, "windDir"         , optional_vars);
+      get_filtered_nc_data_opt(in_windSpeed_var,        windSpeed_arr,        buf_size, i_hdr_s, "windSpeed"       , optional_vars);
+      get_filtered_nc_data_opt(in_windGust_var,         windGust_arr,         buf_size, i_hdr_s, "windGust"        , optional_vars);
+      get_filtered_nc_data_opt(in_visibility_var,       visibility_arr,       buf_size, i_hdr_s, "visibility"      , optional_vars);
+      get_filtered_nc_data_opt(in_precipRate_var,       precipRate_arr,       buf_size, i_hdr_s, "precipRate"      , optional_vars);
+      get_filtered_nc_data_opt(in_solarRadiation_var,   solarRadiation_arr,   buf_size, i_hdr_s, "solarRadiation"  , optional_vars);
+      get_filtered_nc_data_opt(in_seaSurfaceTemp_var,   seaSurfaceTemp_arr,   buf_size, i_hdr_s, "seaSurfaceTemp"  , optional_vars);
+      get_filtered_nc_data_opt(in_totalColumnPWV_var,   totalColumnPWV_arr,   buf_size, i_hdr_s, "totalColumnPWV"  , optional_vars);
+      get_filtered_nc_data_opt(in_soilTemperature_var,  soilTemperature_arr,  buf_size, i_hdr_s, "soilTemperature" , optional_vars);
+      get_filtered_nc_data_opt(in_minTemp24Hour_var,    minTemp24Hour_arr,    buf_size, i_hdr_s, "minTemp24Hour"   , optional_vars);
+      get_filtered_nc_data_opt(in_maxTemp24Hour_var,    maxTemp24Hour_arr,    buf_size, i_hdr_s, "maxTemp24Hour"   , optional_vars);
+      get_filtered_nc_data_opt(in_precip3hr_var,        precip3hr_arr,        buf_size, i_hdr_s, "precip3hr"       , optional_vars);
+      get_filtered_nc_data_opt(in_precip6hr_var,        precip6hr_arr,        buf_size, i_hdr_s, "precip6hr"       , optional_vars);
+      get_filtered_nc_data_opt(in_precip12hr_var,       precip12hr_arr,       buf_size, i_hdr_s, "precip12hr"      , optional_vars);
+      get_filtered_nc_data_opt(in_precip10min_var,      precip10min_arr,      buf_size, i_hdr_s, "precip10min"     , optional_vars);
+      get_filtered_nc_data_opt(in_precip1min_var,       precip1min_arr,       buf_size, i_hdr_s, "precip1min"      , optional_vars);
+      get_filtered_nc_data_opt(in_windDir10_var,        windDir10_arr,        buf_size, i_hdr_s, "windDir10"       , optional_vars);
+      get_filtered_nc_data_opt(in_windSpeed10_var,      windSpeed10_arr,      buf_size, i_hdr_s, "windSpeed10"     , optional_vars);
+
 
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
