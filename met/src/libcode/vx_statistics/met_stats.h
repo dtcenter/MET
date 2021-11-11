@@ -546,6 +546,7 @@ class PCTInfo {
 
       void clear();
       void allocate_n_alpha(int);
+      void set_fthresh(const ThreshArray &);
       void compute_stats();
       void compute_ci();
 };
