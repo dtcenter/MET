@@ -677,7 +677,7 @@ Optional arguments for madis2nc
 An example of the madis2nc calling sequence is shown below:
 
 .. code-block:: none
-		
+
     madis2nc sample_madis_obs.nc \
     sample_madis_obs_met.nc -log madis.log -v 3
 
@@ -703,6 +703,16 @@ _________________
 
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+
+_________________
+
+
+.. code-block:: none
+
+		mesonet_opt_var = [ "precip3hr", "precip6hr", "precip12hr", "precip10min" ];
+
+
+This entry is an array of variables which are optional variables for the MESONET type input data. Above variables are not available from sometime in 2016.
 
 __________________
 
