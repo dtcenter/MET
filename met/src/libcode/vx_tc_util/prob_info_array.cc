@@ -209,6 +209,26 @@ const ProbGenInfo & ProbInfoArray::prob_gen(int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ProbInfoArray::n_technique() const {
+   StringArray sa;
+
+   // Count the number of unique technique names
+   for(int i=0; i<ProbRIRW.size(); i++) {
+      if(!sa.has(ProbRIRW[i].technique())) {
+         sa.add(ProbRIRW[i].technique());
+      }
+   }
+   for(int i=0; i<ProbGen.size(); i++) {
+      if(!sa.has(ProbGen[i].technique())) {
+         sa.add(ProbGen[i].technique());
+      }
+   }
+
+   return(sa.n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
    bool status = false;
 

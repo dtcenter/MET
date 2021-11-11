@@ -65,6 +65,8 @@ class ProbInfoArray {
       int n_prob_gen() const;
       const ProbGenInfo & prob_gen(int) const;
 
+      int n_technique() const;
+
          //
          //  do stuff
          //
