@@ -95,8 +95,9 @@ static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
-static void   write_stats          (const PairDataGenesis &,
+static void   write_ctc_stats      (const PairDataGenesis &,
                                     GenCTCInfo &);
+static void   write_pct_stats      (int, PCTInfo &, PCTInfo &);
 static void   write_genmpr_row     (StatHdrColumns &,
                                     const PairDataGenesis &,
                                     STATOutputType,
@@ -149,6 +150,19 @@ int main(int argc, char *argv[]) {
    // Score EDECK genesis probabilities and write output
    if(edeck_source.n() > 0) {
       score_genesis_prob(best_ga, oper_ta);
+   }
+
+   // Finish output files
+   finish_txt_files();
+
+   // Close the NetCDF output file
+   if(nc_out) {
+
+      // List the NetCDF file after it is finished
+      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
+
+      delete nc_out;
+      nc_out = (NcFile *) 0;
    }
 
    return(0);
@@ -335,7 +349,7 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
          do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
 
          // Write the statistics output
-         write_stats(pairs, ctc_info);
+         write_ctc_stats(pairs, ctc_info);
 
          // Write NetCDF output fields
          if(!conf_info.VxOpt[i].NcInfo.all_false()) {
@@ -346,19 +360,6 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
 
    } // end for i n_vx
 
-   // Finish output files
-   finish_txt_files();
-
-   // Close the NetCDF output file
-   if(nc_out) {
-
-      // List the NetCDF file after it is finished
-      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-
-      delete nc_out;
-      nc_out = (NcFile *) 0;
-   }
-
    return;
 }
 
@@ -366,15 +367,16 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
 
 void score_genesis_prob(const GenesisInfoArray &best_ga,
                         const TrackInfoArray &oper_ta) {
-   int i, j;
+   int i, j, k, l, prob_time;
+   double prob_value;
+   IntArray prob_times;
    StringArray edeck_files, edeck_files_model_suffix;
    ProbInfoArray fcst_pa, empty_pa;
    ConcatString model, cs;
    map<ConcatString,ProbInfoArray> model_pa_map;
-   map<ConcatString,ProbInfoArray>::iterator it;
-   map<int,PCTInfo> gen_prob_map;
-   map<int,PCTInfo>::iterator gen_it;
-   PCTInfo pct_info;
+   map<ConcatString,ProbInfoArray>::iterator model_it;
+   map<int,PCTInfo> pct_dev_map, pct_ops_map;
+   PCTInfo empty_pct;
 
    // Get the list of EDECK files
    get_atcf_files(edeck_source, edeck_model_suffix, atcf_reg_exp,
@@ -386,17 +388,9 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
    process_edecks(edeck_files, edeck_files_model_suffix,
                   fcst_pa);
 
-   /* JHG, need to think about the output files!
-   // Setup output files based on the number of techniques present
-   // and possible pairs.
-   int n_time = (conf_info.FcstSecEnd - conf_info.FcstSecBeg) /
-                (conf_info.InitFreqHr*sec_per_hour) + 1;
-   int n_pair = best_ga.n() * n_time + fcst_ga.n();
-   setup_txt_files(fcst_ga.n_technique(), n_pair);
+   // Setup output files based on the number of techniques
+   setup_txt_files(fcst_pa.n_technique(), 0);
 
-   // If requested, setup the NetCDF output file
-   if(!conf_info.NcInfo.all_false()) setup_nc_file();
-*/
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
 
@@ -404,6 +398,7 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
       model_pa_map.clear();
 
       // Subset the forecast genesis probabilities
+      // Organize them into a map by model name
       for(j=0; j<fcst_pa.n_prob_gen(); j++) {
 
          // Check filters
@@ -427,58 +422,71 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
 
       } // end for j
 
+      // Initialize the empty PCTInfo object
+      empty_pct.clear();
+      empty_pct.set_fthresh(conf_info.VxOpt[i].GenProbThresh);
+      empty_pct.allocate_n_alpha(1);
+      empty_pct.alpha[0] = conf_info.VxOpt[i].CIAlpha;
+
+      // Initialize the PCTInfo maps
+      prob_times.clear();
+      pct_dev_map.clear();
+      pct_ops_map.clear();
+
       // Process the genesis probabilities for each model
-      for(j=0,it=model_pa_map.begin(); it!=model_pa_map.end(); it++,j++) {
-/* JHG
-         // Initialize
-         pct_info.clear();
-         pct_info.Model = it->first;
-         pct_info.set_vx_opt(&conf_info.VxOpt[i],
-                             &conf_info.NcOutGrid);
-*/
+      for(j=0,model_it=model_pa_map.begin();
+          model_it!=model_pa_map.end();
+          model_it++,j++) {
+
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
-              << ") " << ": Model " << j+1 << "] " << "For " << it->first
-              << " model, comparing " << it->second.n_prob_gen()
+              << ") " << ": Model " << j+1 << "] " << "For " << model_it->first
+              << " model, comparing " << model_it->second.n_prob_gen()
               << " genesis forecasts to " << best_ga.n() << " "
               << conf_info.BestEventInfo.Technique << " and "
               << oper_ta.n() << " " << conf_info.OperTechnique
               << " tracks.\n";
-/*
-         // Get the pairs
-         get_genesis_pairs(conf_info.VxOpt[i], it->first, it->second,
-                           best_ga, oper_ta, pairs);
 
-         // Do the categorical verification
-         do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
+         // Loop over the probability of genesis events
+         for(k=0; k<model_it->second.n_prob_gen(); k++) {
 
-         // Write the statistics output
-         write_stats(pairs, ctc_info);
+            // JHG search for a match!
+            // For now, just assume it's a hit.
+            // Also need to define SHC values.
+            bool dev_match = true;
+            bool ops_match = true;
 
-         // Write NetCDF output fields
-         if(!conf_info.VxOpt[i].NcInfo.all_false()) {
-            write_nc(ctc_info);
+            // Loop over the individual probabilities
+            for(l=0; l<model_it->second.prob_gen(k).n_prob(); l++) {
+
+               // Current lead time
+               prob_time  = nint(model_it->second.prob_gen(k).prob_item(l));
+               prob_value = model_it->second.prob_gen(k).prob(l) / 100.0;
+
+               // Add a new map entries for this lead time, if necessary
+               if(!prob_times.has(prob_time)) {
+                  prob_times.add(prob_time);
+                  pct_dev_map[prob_time] = empty_pct;
+                  pct_ops_map[prob_time] = empty_pct;
+               }
+
+               // Increment counts
+               if(dev_match) pct_dev_map[prob_time].pct.inc_event   (prob_value);
+               else          pct_dev_map[prob_time].pct.inc_nonevent(prob_value);
+               if(ops_match) pct_ops_map[prob_time].pct.inc_event   (prob_value);
+               else          pct_ops_map[prob_time].pct.inc_nonevent(prob_value);
+
+            } // end for l
+         } // end for k
+
+         // Write probabilistic output
+         for(k=0; k<prob_times.n(); k++) {
+            write_pct_stats(i, pct_dev_map[prob_times[k]], pct_ops_map[prob_times[k]]);
          }
-*/
-
 
       } // end for j
-
    } // end for i n_vx
-/*
-   // Finish output files
-   finish_txt_files();
 
-   // Close the NetCDF output file
-   if(nc_out) {
-
-      // List the NetCDF file after it is finished
-      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-
-      delete nc_out;
-      nc_out = (NcFile *) 0;
-   }
-*/
    return;
 }
 
@@ -1215,15 +1223,6 @@ void process_edecks(const StringArray &files,
 
    return;
 }
-/* JHG
-   // Compute the distance to land
-   for(i=0; i<fcst_pa.n_prob_gen(); i++) {
-
-
-      fcst_pa JHG
-         fcst_gi.set_dland(conf_info.compute_dland(
-                           fcst_gi.lat(), -1.0*fcst_gi.lon()));
-*/
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1232,69 +1231,152 @@ void process_edecks(const StringArray &files,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(int n_model, int n_pair) {
-   int i, n_rows, n_cols;
+   int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
-   // Check to see if the text files have already been set up
-   if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
+   // Check to see if the stat file stream has already been setup
+   bool init_from_scratch = (stat_out == (ofstream *) 0);
 
-   // Initialize file stream
-   stat_out = (ofstream *) 0;
+   // Get the maximum number of probability thresholds
+   n_prob = conf_info.get_max_n_prob_thresh();
 
-   // Build the file name
-   stat_file << out_base << stat_file_ext;
+   // Compute the number of rows/cols needs for each file type
+   for(i=0, stat_rows=0, stat_cols=0; i<n_txt; i++) {
 
-   // Create the output STAT file
-   open_txt_file(stat_out, stat_file.c_str());
+      // Ignore disabled line types
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_None) continue;
 
-   // Setup the STAT AsciiTable
-   n_rows = 1 + 6 * n_model * conf_info.n_vx();
-   if(conf_info.OutputMap[stat_genmpr] != STATOutputType_None) {
-      n_rows += n_model * conf_info.n_vx() * n_pair;
-   }
-   n_cols = 1 + n_header_columns + n_cts_columns;
-   stat_at.set_size(n_rows, n_cols);
-   setup_table(stat_at);
+      // Compute the number of rows for this line type
+      switch(i) {
 
-   // Write the text header row
-   write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+         // 2x2 contingency table output:
+         // 1 header + 2 vx methods * # models * # filters
+         case(i_fho):
+         case(i_ctc):
+         case(i_cts):
+            n_rows = 1 + 2 * n_model * conf_info.n_vx();
+            break;
 
-   // Initialize the row index to 1 to account for the header
-   i_stat_row = 1;
+         // Nx2 probabilistic contingency table output:
+         // 1 header + 2 vx methods * 3 leads * # models * # filters
+         case(i_pct):
+         case(i_pstd):
+         case(i_pjc):
+         case(i_prc):
+            n_rows = 1 + 2 * 3 * n_model * conf_info.n_vx();
+            break;
 
-   // Setup each of the optional output text files
-   for(i=0; i<n_txt; i++) {
+         // For stat_genmpr:
+         // 1 header + 2 vx methods * # models * # filters * # pairs
+         default:
+            n_rows = 1 + n_model * conf_info.n_vx() * n_pair;
+            break;
+      } // end switch
 
-      // Only set it up if requested in the config file
+      // Compute the number of columns for this line type
+      switch(i) {
+
+         case(i_pct):
+            n_cols = get_n_pct_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         case(i_pstd):
+            n_cols = get_n_pstd_columns(n_prob) + n_header_columns + 1;
+            break;
+
+         case(i_pjc):
+            n_cols = get_n_pjc_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         case(i_prc):
+            n_cols = get_n_prc_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         default:
+           n_cols = n_txt_columns[i]  + n_header_columns + 1;
+           break;
+      } // end switch
+
+      // Track the total number of rows and maximum number of columns
+      stat_rows += n_rows;
+      if(stat_cols < n_cols) stat_cols = n_cols;
+
+      // Process optional ouptut files
       if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
 
-         // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         // Create new output file and stream
+         if(init_from_scratch) {
 
-         // Build the file name
-         txt_file[i] << out_base << "_" << txt_file_abbr[i]
-                     << txt_file_ext;
+            // Initialize file stream
+            txt_out[i] = (ofstream *) 0;
 
-         // Create the output text file
-         open_txt_file(txt_out[i], txt_file[i].c_str());
+            // Build the file name
+            txt_file[i] << out_base << "_" << txt_file_abbr[i]
+                        << txt_file_ext;
 
-         // Setup the text AsciiTable
-         if(txt_file_type[i] == stat_genmpr) {
-            n_rows = 1 + n_model * conf_info.n_vx() * n_pair;
+            // Create the output text file
+            open_txt_file(txt_out[i], txt_file[i].c_str());
+
+            // Setup the text AsciiTable
+            txt_at[i].set_size(n_rows, n_cols);
+            setup_table(txt_at[i]);
+
+            // Write header row
+            switch(i) {
+
+               case(i_pct):
+                  write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_pstd):
+                  write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_pjc):
+                  write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_prc):
+                  write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               default:
+                  write_header_row(txt_columns[i], n_txt_columns[i], 1,
+                                   txt_at[i], 0, 0);
+                  break;
+            } // end switch
+
+            // Initialize the row index to 1 to account for the header
+            i_txt_row[i] = 1;
          }
+         // Otherwise, resize the existing table
          else {
-            n_rows = 1 + 2 * n_model * conf_info.n_vx();
+            txt_at[i].expand(n_rows, n_cols);
          }
-         n_cols = 1 + n_header_columns + n_txt_columns[i];
-         txt_at[i].set_size(n_rows, n_cols);
-         setup_table(txt_at[i]);
+      } // end if
+   } // end for i
 
-         // Write header row
-         write_header_row(txt_columns[i], n_txt_columns[i], 1,
-                          txt_at[i], 0, 0);
+   // Process the stat file
+   if(init_from_scratch) {
 
-         // Initialize the row index to 1 to account for the header
-         i_txt_row[i] = 1;
-      }
+      // Build the file name
+      stat_file << out_base << stat_file_ext;
+
+      // Create the output STAT file
+      open_txt_file(stat_out, stat_file.c_str());
+
+      // Setup the STAT AsciiTable
+      stat_at.set_size(stat_rows, stat_cols);
+      setup_table(stat_at);
+
+      // Write the text header row
+      write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+
+      // Initialize the row index to 1 to account for the header
+      i_stat_row = 1;
+   }
+   // Otherwise, resize the existing table
+   else {
+      stat_at.expand(stat_rows, stat_cols);
    }
 
    return;
@@ -1360,8 +1442,8 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_stats(const PairDataGenesis &gpd,
-                 GenCTCInfo &gci) {
+void write_ctc_stats(const PairDataGenesis &gpd,
+                     GenCTCInfo &gci) {
 
    // Setup header columns
    shc.set_model(gci.Model.c_str());
@@ -1465,6 +1547,86 @@ void write_stats(const PairDataGenesis &gpd,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_stats(int i_vx, PCTInfo &pct_dev, PCTInfo &pct_ops) {
+
+   // Write PCT output
+   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]] != STATOutputType_None) {
+
+      if(conf_info.VxOpt[i_vx].DevFlag) {
+         write_pct_row(shc, pct_dev,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pct], i_txt_row[i_pct]);
+      }
+      if(conf_info.VxOpt[i_vx].OpsFlag) {
+         write_pct_row(shc, pct_ops,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pct], i_txt_row[i_pct]);
+      }
+   }
+
+   // Write PSTD output
+   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]] != STATOutputType_None) {
+
+      if(conf_info.VxOpt[i_vx].DevFlag) {
+         pct_dev.compute_stats();
+         pct_dev.compute_ci();
+         write_pstd_row(shc, pct_dev,
+                        conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]],
+                        1, 1, stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+      if(conf_info.VxOpt[i_vx].OpsFlag) {
+         pct_ops.compute_stats();
+         pct_ops.compute_ci();
+         write_pstd_row(shc, pct_ops,
+                        conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]],
+                        1, 1, stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+   }
+
+   // Write PJC output
+   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]] != STATOutputType_None) {
+
+      if(conf_info.VxOpt[i_vx].DevFlag) {
+         write_pct_row(shc, pct_dev,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pjc], i_txt_row[i_pjc]);
+      }
+      if(conf_info.VxOpt[i_vx].OpsFlag) {
+         write_pct_row(shc, pct_ops,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pjc], i_txt_row[i_pjc]);
+      }
+   }
+
+   // Write PRC output
+   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]] != STATOutputType_None) {
+
+      if(conf_info.VxOpt[i_vx].DevFlag) {
+         write_pct_row(shc, pct_dev,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_prc]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_prc], i_txt_row[i_prc]);
+      }
+      if(conf_info.VxOpt[i_vx].OpsFlag) {
+         write_pct_row(shc, pct_ops,
+                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_prc]],
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_prc], i_txt_row[i_prc]);
+      }
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void write_genmpr_row(StatHdrColumns &shc,

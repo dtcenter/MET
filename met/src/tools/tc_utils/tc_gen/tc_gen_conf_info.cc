@@ -292,6 +292,8 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
    // Conf: genesis_prob_thresh
    GenProbThresh = dict.lookup_thresh_array(conf_key_genesis_prob_thresh);
+   GenProbThresh = string_to_prob_thresh(GenProbThresh.get_str().c_str());
+   check_prob_thresh(GenProbThresh);
 
    // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
@@ -882,6 +884,19 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
 STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
    return(OutputMap.at(t));
 }
+
+////////////////////////////////////////////////////////////////////////
+
+int TCGenConfInfo::get_max_n_prob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<VxOpt.size(); i++) {
+      n = max(n, VxOpt[i].GenProbThresh.n());
+   }
+
+   return(n);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //

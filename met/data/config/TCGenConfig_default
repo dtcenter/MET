@@ -227,8 +227,12 @@ ci_alpha = 0.05;
 //
 output_flag = {
    fho    = NONE;
-   ctc    = BOTH; 
+   ctc    = BOTH;
    cts    = BOTH;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
    genmpr = NONE;
 }
 

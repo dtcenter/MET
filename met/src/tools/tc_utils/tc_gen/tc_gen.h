@@ -60,17 +60,21 @@ static const char * default_config_filename =
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   fho_columns, ctc_columns, cts_columns, genmpr_columns
+   fho_columns, ctc_columns,   cts_columns,
+   pct_columns, pstd_columns,  pjc_columns,
+   prc_columns, genmpr_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_fho_columns, n_ctc_columns, n_cts_columns, n_genmpr_columns
+   n_fho_columns, n_ctc_columns,   n_cts_columns,
+   n_pct_columns, n_pstd_columns,  n_pjc_columns,
+   n_prc_columns, n_genmpr_columns
 };
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "fho", "ctc", "cts", "genmpr"
+   "fho", "ctc", "cts", "pct", "pstd", "pjc", "prc", "genmpr"
 };
 
 const ConcatString genesis_name    ("GENESIS");
@@ -89,8 +93,8 @@ static const int max_best_cyclone_number = 50;
 
 // Input files
 static StringArray   genesis_source, genesis_model_suffix;
-static StringArray   edeck_source, edeck_model_suffix;
-static StringArray   track_source, track_model_suffix;
+static StringArray   edeck_source,   edeck_model_suffix;
+static StringArray   track_source,   track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;
 

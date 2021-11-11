@@ -29,16 +29,24 @@
 static const int i_fho    = 0;
 static const int i_ctc    = 1;
 static const int i_cts    = 2;
-static const int i_genmpr = 3;
+static const int i_pct    = 3;
+static const int i_pstd   = 4;
+static const int i_pjc    = 5;
+static const int i_prc    = 6;
+static const int i_genmpr = 7;
 
-static const int n_txt = 4;
+static const int n_txt = 8;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
    stat_fho,   //  0
    stat_ctc,   //  1
    stat_cts,   //  2
-   stat_genmpr //  3
+   stat_pct,   //  3
+   stat_pstd,  //  4
+   stat_pjc,   //  5
+   stat_prc,   //  6
+   stat_genmpr //  7
 };
 
 // Names for output data plane types
@@ -77,7 +85,6 @@ struct TCGenNcOutInfo {
    bool do_best_tracks;
    bool do_best_fy_oy;
    bool do_best_fn_oy;
-
 
       //////////////////////////////////////////////////////////////////
 
@@ -244,6 +251,9 @@ class TCGenConfInfo {
       int compression_level();
    
       STATOutputType output_map(STATLineType) const;
+
+      // Maximum across all verification tasks
+      int get_max_n_prob_thresh() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
