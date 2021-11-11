@@ -152,7 +152,7 @@ class TCGenVxOpt {
       bool   DiscardFlag, DevFlag, OpsFlag;
 
       // Output file options
-      ThreshArray GenProbThresh;
+      ThreshArray ProbGenThresh;
       double CIAlpha;
       map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
@@ -311,6 +311,41 @@ class GenCTCInfo {
 
    void inc_pnt(double, double, const string &);
    void inc_trk(const GenesisInfo &, const string &);
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class ProbGenPCTInfo {
+
+   private:
+
+      void init_from_scratch();
+
+      PCTInfo DefaultPCT;
+
+   public:
+
+      ProbGenPCTInfo();
+     ~ProbGenPCTInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+   ConcatString Model;
+   unixtime InitBeg, InitEnd;
+   const TCGenVxOpt* VxOpt;
+   IntArray LeadTimes;
+   map<int,PCTInfo> PCTDev, PCTOps;
+
+   SingleThresh ValidGenesisDHrThresh;
+
+      //////////////////////////////////////////////////////////////////
+
+   void clear();
+
+   void set_vx_opt(const TCGenVxOpt *);
+
+   void add(const ProbGenInfo &);
+
 };
 
 ////////////////////////////////////////////////////////////////////////

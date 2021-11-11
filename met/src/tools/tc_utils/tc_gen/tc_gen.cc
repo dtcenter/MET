@@ -85,6 +85,11 @@ static void   get_genesis_pairs    (const TCGenVxOpt &,
 static void   do_genesis_ctc       (const TCGenVxOpt &,
                                     PairDataGenesis &,
                                     GenCTCInfo &);
+static void   do_probgen_pct       (const TCGenVxOpt &,
+                                    const ProbInfoArray &,
+                                    const GenesisInfoArray &,
+                                    const TrackInfoArray &,
+                                    ProbGenPCTInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
@@ -97,7 +102,8 @@ static void   setup_nc_file        ();
 
 static void   write_ctc_stats      (const PairDataGenesis &,
                                     GenCTCInfo &);
-static void   write_pct_stats      (int, PCTInfo &, PCTInfo &);
+static void   write_pct_stats      (ProbGenPCTInfo &);
+
 static void   write_genmpr_row     (StatHdrColumns &,
                                     const PairDataGenesis &,
                                     STATOutputType,
@@ -271,7 +277,7 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
    map<ConcatString,GenesisInfoArray> model_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
    PairDataGenesis pairs;
-   GenCTCInfo ctc_info;
+   GenCTCInfo genesis_ctc;
 
    // Get the list of genesis track files
    get_atcf_files(genesis_source, genesis_model_suffix, atcf_gen_reg_exp,
@@ -323,14 +329,14 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
 
       } // end for j
 
-      // Process the genesis events for each model.
+      // Process the genesis events for each model
       for(j=0,it=model_ga_map.begin(); it!=model_ga_map.end(); it++,j++) {
 
          // Initialize
-         ctc_info.clear();
-         ctc_info.Model = it->first;
-         ctc_info.set_vx_opt(&conf_info.VxOpt[i],
-                             &conf_info.NcOutGrid);
+         genesis_ctc.clear();
+         genesis_ctc.Model = it->first;
+         genesis_ctc.set_vx_opt(&conf_info.VxOpt[i],
+                                &conf_info.NcOutGrid);
 
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
@@ -346,14 +352,14 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
                            best_ga, oper_ta, pairs);
 
          // Do the categorical verification
-         do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
+         do_genesis_ctc(conf_info.VxOpt[i], pairs, genesis_ctc);
 
          // Write the statistics output
-         write_ctc_stats(pairs, ctc_info);
+         write_ctc_stats(pairs, genesis_ctc);
 
          // Write NetCDF output fields
          if(!conf_info.VxOpt[i].NcInfo.all_false()) {
-            write_nc(ctc_info);
+            write_nc(genesis_ctc);
          }
    
       } // end for j
@@ -367,16 +373,13 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
 
 void score_genesis_prob(const GenesisInfoArray &best_ga,
                         const TrackInfoArray &oper_ta) {
-   int i, j, k, l, prob_time;
-   double prob_value;
-   IntArray prob_times;
+   int i, j;
    StringArray edeck_files, edeck_files_model_suffix;
    ProbInfoArray fcst_pa, empty_pa;
-   ConcatString model, cs;
+   ConcatString model;
    map<ConcatString,ProbInfoArray> model_pa_map;
-   map<ConcatString,ProbInfoArray>::iterator model_it;
-   map<int,PCTInfo> pct_dev_map, pct_ops_map;
-   PCTInfo empty_pct;
+   map<ConcatString,ProbInfoArray>::iterator it;
+   ProbGenPCTInfo probgen_pct;
 
    // Get the list of EDECK files
    get_atcf_files(edeck_source, edeck_model_suffix, atcf_reg_exp,
@@ -397,8 +400,8 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
       // Initialize
       model_pa_map.clear();
 
-      // Subset the forecast genesis probabilities
-      // Organize them into a map by model name
+      // Organize the forecast genesis probabilities
+      // into a map by model name
       for(j=0; j<fcst_pa.n_prob_gen(); j++) {
 
          // Check filters
@@ -422,70 +425,27 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
 
       } // end for j
 
-      // Initialize the empty PCTInfo object
-      empty_pct.clear();
-      empty_pct.set_fthresh(conf_info.VxOpt[i].GenProbThresh);
-      empty_pct.allocate_n_alpha(1);
-      empty_pct.alpha[0] = conf_info.VxOpt[i].CIAlpha;
-
-      // Initialize the PCTInfo maps
-      prob_times.clear();
-      pct_dev_map.clear();
-      pct_ops_map.clear();
-
       // Process the genesis probabilities for each model
-      for(j=0,model_it=model_pa_map.begin();
-          model_it!=model_pa_map.end();
-          model_it++,j++) {
+      for(j=0,it=model_pa_map.begin(); it!=model_pa_map.end(); it++,j++) {
 
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
-              << ") " << ": Model " << j+1 << "] " << "For " << model_it->first
-              << " model, comparing " << model_it->second.n_prob_gen()
-              << " genesis forecasts to " << best_ga.n() << " "
+              << ") " << ": Model " << j+1 << "] " << "For " << it->first
+              << " model, comparing " << it->second.n_prob_gen()
+              << " probability of genesis forecasts to " << best_ga.n() << " "
               << conf_info.BestEventInfo.Technique << " and "
               << oper_ta.n() << " " << conf_info.OperTechnique
               << " tracks.\n";
 
-         // Loop over the probability of genesis events
-         for(k=0; k<model_it->second.n_prob_gen(); k++) {
+         // Do the probabilistic verification
+         do_probgen_pct(conf_info.VxOpt[i], it->second,
+                        best_ga, oper_ta, probgen_pct);
 
-            // JHG search for a match!
-            // For now, just assume it's a hit.
-            // Also need to define SHC values.
-            bool dev_match = true;
-            bool ops_match = true;
-
-            // Loop over the individual probabilities
-            for(l=0; l<model_it->second.prob_gen(k).n_prob(); l++) {
-
-               // Current lead time
-               prob_time  = nint(model_it->second.prob_gen(k).prob_item(l));
-               prob_value = model_it->second.prob_gen(k).prob(l) / 100.0;
-
-               // Add a new map entries for this lead time, if necessary
-               if(!prob_times.has(prob_time)) {
-                  prob_times.add(prob_time);
-                  pct_dev_map[prob_time] = empty_pct;
-                  pct_ops_map[prob_time] = empty_pct;
-               }
-
-               // Increment counts
-               if(dev_match) pct_dev_map[prob_time].pct.inc_event   (prob_value);
-               else          pct_dev_map[prob_time].pct.inc_nonevent(prob_value);
-               if(ops_match) pct_ops_map[prob_time].pct.inc_event   (prob_value);
-               else          pct_ops_map[prob_time].pct.inc_nonevent(prob_value);
-
-            } // end for l
-         } // end for k
-
-         // Write probabilistic output
-         for(k=0; k<prob_times.n(); k++) {
-            write_pct_stats(i, pct_dev_map[prob_times[k]], pct_ops_map[prob_times[k]]);
-         }
+         // Write the statistics output
+         write_pct_stats(probgen_pct);
 
       } // end for j
-   } // end for i n_vx
+   } // end for i
 
    return;
 }
@@ -757,6 +717,51 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void do_probgen_pct(const TCGenVxOpt &vx_opt,
+                    const ProbInfoArray &model_pa,
+                    const GenesisInfoArray &best_ga,
+                    const TrackInfoArray &oper_ta,
+                    ProbGenPCTInfo &pgi) {
+   int i, j, prob_lead;
+   double prob_value;
+
+   // Initialize
+   pgi.clear();
+   pgi.set_vx_opt(&vx_opt);
+
+   // Score each of the probability forecasts
+   for(i=0; i<model_pa.n_prob_gen(); i++) {
+
+      // Store info about each probability of genesis forecast
+      pgi.add(model_pa.prob_gen(i));
+
+      // JHG search for a match!
+      // For now, just assume it's a hit.
+      // Also need to define SHC values.
+      bool dev_match = true;
+      bool ops_match = true;
+
+      // Loop over the individual probabilities
+      for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
+
+         prob_lead  = nint(model_pa.prob_gen(i).prob_item(j));
+         prob_value = model_pa.prob_gen(i).prob(j) / 100.0;
+
+         // Increment counts
+         if(dev_match) pgi.PCTDev[prob_lead].pct.inc_event   (prob_value);
+         else          pgi.PCTDev[prob_lead].pct.inc_nonevent(prob_value);
+         if(ops_match) pgi.PCTOps[prob_lead].pct.inc_event   (prob_value);
+         else          pgi.PCTOps[prob_lead].pct.inc_nonevent(prob_value);
+
+      } // end for j
+   } // end for i
+
+   return;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1550,79 +1555,118 @@ void write_ctc_stats(const PairDataGenesis &gpd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_pct_stats(int i_vx, PCTInfo &pct_dev, PCTInfo &pct_ops) {
+void write_pct_stats(ProbGenPCTInfo &pgi) {
+   int i, lead_hr, lead_sec;
 
-   // Write PCT output
-   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]] != STATOutputType_None) {
+   // Setup header columns
+   shc.set_model(pgi.Model.c_str());
+   shc.set_desc(pgi.VxOpt->Desc.c_str());
+   shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
+   shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
+                na_str : pgi.VxOpt->VxMaskName.c_str());
 
-      if(conf_info.VxOpt[i_vx].DevFlag) {
-         write_pct_row(shc, pct_dev,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pct], i_txt_row[i_pct]);
-      }
-      if(conf_info.VxOpt[i_vx].OpsFlag) {
-         write_pct_row(shc, pct_ops,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pct]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pct], i_txt_row[i_pct]);
-      }
-   }
+   // Write results for each lead time
+   for(i=0; i<pgi.LeadTimes.n(); i++) {
 
-   // Write PSTD output
-   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]] != STATOutputType_None) {
+      lead_hr  = pgi.LeadTimes[i];
+      lead_sec = lead_hr * sec_per_hour;
 
-      if(conf_info.VxOpt[i_vx].DevFlag) {
-         pct_dev.compute_stats();
-         pct_dev.compute_ci();
-         write_pstd_row(shc, pct_dev,
-                        conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]],
-                        1, 1, stat_at, i_stat_row,
-                        txt_at[i_pstd], i_txt_row[i_pstd]);
-      }
-      if(conf_info.VxOpt[i_vx].OpsFlag) {
-         pct_ops.compute_stats();
-         pct_ops.compute_ci();
-         write_pstd_row(shc, pct_ops,
-                        conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pstd]],
-                        1, 1, stat_at, i_stat_row,
-                        txt_at[i_pstd], i_txt_row[i_pstd]);
-      }
-   }
+      // Timing information
+      shc.set_fcst_lead_sec(lead_sec);
+      shc.set_fcst_valid_beg(pgi.InitBeg + lead_sec);
+      shc.set_fcst_valid_end(pgi.InitEnd + lead_sec);
+      shc.set_obs_lead_sec(bad_data_int);
+      shc.set_obs_valid_beg(pgi.InitBeg + lead_sec); // JHG, should these be BEST track times?
+      shc.set_obs_valid_end(pgi.InitBeg + lead_sec); // JHG, should these be BEST track times?
 
-   // Write PJC output
-   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]] != STATOutputType_None) {
+      // Write PCT output
+      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
 
-      if(conf_info.VxOpt[i_vx].DevFlag) {
-         write_pct_row(shc, pct_dev,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pjc], i_txt_row[i_pjc]);
+         if(pgi.VxOpt->DevFlag) {
+            shc.set_fcst_var(probgen_dev_name);
+            shc.set_obs_var (probgen_dev_name);
+            write_pct_row(shc, pgi.PCTDev[lead_hr],
+                          pgi.VxOpt->output_map(stat_pct),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_pct], i_txt_row[i_pct]);
+         }
+         if(pgi.VxOpt->OpsFlag) {
+            shc.set_fcst_var(probgen_ops_name);
+            shc.set_obs_var (probgen_ops_name);
+            write_pct_row(shc, pgi.PCTOps[lead_hr],
+                          pgi.VxOpt->output_map(stat_pct),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_pct], i_txt_row[i_pct]);
+         }
       }
-      if(conf_info.VxOpt[i_vx].OpsFlag) {
-         write_pct_row(shc, pct_ops,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pjc], i_txt_row[i_pjc]);
-      }
-   }
 
-   // Write PRC output
-   if(conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_pjc]] != STATOutputType_None) {
+      // Write PSTD output
+      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
 
-      if(conf_info.VxOpt[i_vx].DevFlag) {
-         write_pct_row(shc, pct_dev,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_prc]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_prc], i_txt_row[i_prc]);
+         if(pgi.VxOpt->DevFlag) {
+            pgi.PCTDev[lead_hr].compute_stats();
+            pgi.PCTDev[lead_hr].compute_ci();
+            shc.set_fcst_var(probgen_dev_name);
+            shc.set_obs_var (probgen_dev_name);
+            write_pstd_row(shc, pgi.PCTDev[lead_hr],
+                           pgi.VxOpt->output_map(stat_pstd),
+                           1, 1, stat_at, i_stat_row,
+                           txt_at[i_pstd], i_txt_row[i_pstd]);
+         }
+         if(pgi.VxOpt->OpsFlag) {
+            pgi.PCTOps[lead_hr].compute_stats();
+            pgi.PCTOps[lead_hr].compute_ci();
+            shc.set_fcst_var(probgen_ops_name);
+            shc.set_obs_var (probgen_ops_name);
+            write_pstd_row(shc, pgi.PCTOps[lead_hr],
+                           pgi.VxOpt->output_map(stat_pstd) ,
+                           1, 1, stat_at, i_stat_row,
+                           txt_at[i_pstd], i_txt_row[i_pstd]);
+         }
       }
-      if(conf_info.VxOpt[i_vx].OpsFlag) {
-         write_pct_row(shc, pct_ops,
-                       conf_info.VxOpt[i_vx].OutputMap[txt_file_type[i_prc]],
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_prc], i_txt_row[i_prc]);
+
+      // Write PJC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+
+         if(pgi.VxOpt->DevFlag) {
+            shc.set_fcst_var(probgen_dev_name);
+            shc.set_obs_var (probgen_dev_name);
+            write_pct_row(shc, pgi.PCTDev[lead_hr],
+                          pgi.VxOpt->output_map(stat_pjc),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_pjc], i_txt_row[i_pjc]);
+         }
+         if(pgi.VxOpt->OpsFlag) {
+            shc.set_fcst_var(probgen_ops_name);
+            shc.set_obs_var (probgen_ops_name);
+            write_pct_row(shc, pgi.PCTOps[lead_hr],
+                          pgi.VxOpt->output_map(stat_pjc),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_pjc], i_txt_row[i_pjc]);
+         }
       }
-   }
+
+      // Write PRC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+
+         if(pgi.VxOpt->DevFlag) {
+            shc.set_fcst_var(probgen_dev_name);
+            shc.set_obs_var (probgen_dev_name);
+            write_pct_row(shc, pgi.PCTDev[lead_hr],
+                          pgi.VxOpt->output_map(stat_pjc),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_prc], i_txt_row[i_prc]);
+         }
+         if(pgi.VxOpt->OpsFlag) {
+            shc.set_fcst_var(probgen_ops_name);
+            shc.set_obs_var (probgen_ops_name);
+            write_pct_row(shc, pgi.PCTOps[lead_hr],
+                          pgi.VxOpt->output_map(stat_pjc),
+                          1, 1, stat_at, i_stat_row,
+                          txt_at[i_prc], i_txt_row[i_prc]);
+         }
+      }
+   } // end for i
 
    return;
 }

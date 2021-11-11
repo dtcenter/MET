@@ -164,7 +164,7 @@ void TCGenVxOpt::clear() {
    OpsHitBeg = OpsHitEnd = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
-   GenProbThresh.clear();
+   ProbGenThresh.clear();
    CIAlpha = bad_data_double;
    OutputMap.clear();
    NcInfo.clear();
@@ -290,10 +290,10 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
       exit(1);
    }
 
-   // Conf: genesis_prob_thresh
-   GenProbThresh = dict.lookup_thresh_array(conf_key_genesis_prob_thresh);
-   GenProbThresh = string_to_prob_thresh(GenProbThresh.get_str().c_str());
-   check_prob_thresh(GenProbThresh);
+   // Conf: prob_genesis_thresh
+   ProbGenThresh = dict.lookup_thresh_array(conf_key_prob_genesis_thresh);
+   ProbGenThresh = string_to_prob_thresh(ProbGenThresh.get_str().c_str());
+   check_prob_thresh(ProbGenThresh);
 
    // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
@@ -891,12 +891,11 @@ int TCGenConfInfo::get_max_n_prob_thresh() const {
    int i, n;
 
    for(i=0,n=0; i<VxOpt.size(); i++) {
-      n = max(n, VxOpt[i].GenProbThresh.n());
+      n = max(n, VxOpt[i].ProbGenThresh.n());
    }
 
    return(n);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1203,6 +1202,100 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
       int dhr = (gi[i].valid() - gi.genesis_time())/sec_per_hour;
       if(ValidGenesisDHrThresh.check(dhr)) {
          inc_pnt(gi[i].lat(), gi[i].lon(), s);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class ProbGenPCTInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::ProbGenPCTInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::~ProbGenPCTInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::clear() {
+
+   DefaultPCT.clear();
+
+   Model.clear();
+   InitBeg = InitEnd = (unixtime) 0;
+
+   PCTDev.clear();
+   PCTOps.clear();
+
+   VxOpt = (const TCGenVxOpt *) 0;
+   LeadTimes.clear();
+
+   ValidGenesisDHrThresh.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
+
+   if(!vx_opt) return;
+
+   // Store pointer
+   VxOpt = vx_opt;
+
+   // Store config options
+   ValidGenesisDHrThresh = VxOpt->ValidGenesisDHrThresh;
+
+   // Setup the default PCTInfo object
+   DefaultPCT.set_fthresh(VxOpt->ProbGenThresh);
+   DefaultPCT.allocate_n_alpha(1);
+   DefaultPCT.alpha[0] = VxOpt->CIAlpha;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::add(const ProbGenInfo &pgi) {
+   int i, lead_hr;
+
+   // Store the model name
+   if(Model.empty()) Model = pgi.technique();
+
+   // Track the range of valid times
+   if(InitBeg == 0 || InitBeg > pgi.init()) InitBeg = pgi.init();
+   if(InitEnd == 0 || InitEnd < pgi.init()) InitEnd = pgi.init();
+
+   // Add new map entry for each lead time, if needed
+   for(i=0; i<pgi.n_prob(); i++) {
+
+      lead_hr = nint(pgi.prob_item(i));
+
+      if(!LeadTimes.has(lead_hr)) {
+         LeadTimes.add(lead_hr);
+         PCTDev[lead_hr] = DefaultPCT;
+         PCTOps[lead_hr] = DefaultPCT;
       }
    }
 
