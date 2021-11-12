@@ -486,7 +486,7 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
          for (int offset=0; offset<data_len; offset++) {
             if(is_eq(data[offset], in_fill_value)) {
                data[offset] = bad_data_int;
-               if(count_bad) rej_fill++;
+               rej_fill++;
             }
          }
       }
@@ -529,7 +529,7 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
          for (int offset=0; offset<data_len; offset++) {
             if(is_eq(data[offset], in_fill_value)) {
                data[offset] = bad_data_float;
-               if(count_bad) rej_fill++;
+               rej_fill++;
             }
          }
       }
