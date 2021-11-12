@@ -60,10 +60,10 @@ class ProbInfoArray {
       const ProbInfoBase * operator[](int) const;
 
       int n_prob_rirw() const;
-      const ProbRIRWInfo & prob_rirw(int) const;
+      ProbRIRWInfo & prob_rirw(int);
 
       int n_prob_gen() const;
-      const ProbGenInfo & prob_gen(int) const;
+      ProbGenInfo & prob_gen(int);
 
       int n_technique() const;
 

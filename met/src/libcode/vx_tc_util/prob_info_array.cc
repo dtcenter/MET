@@ -181,7 +181,7 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) const {
+ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) {
 
    // Check range
    if((n < 0) || (n >= (int) ProbRIRW.size())) {
@@ -195,7 +195,7 @@ const ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const ProbGenInfo & ProbInfoArray::prob_gen(int n) const {
+ProbGenInfo & ProbInfoArray::prob_gen(int n) {
 
    // Check range
    if((n < 0) || (n >= (int) ProbGen.size())) {
