@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "prob_info_base.h"
+#include "genesis_info.h"
 
 #include "vx_util.h"
 
@@ -69,7 +70,12 @@ class ProbGenInfo : public ProbInfoBase {
       void initialize(const ATCFProbLine &, double);
       bool is_match  (const ATCFProbLine &) const;
       bool add       (const ATCFProbLine &, double, bool check_dup = false);
-      
+
+      bool is_match  (const TrackPoint &,
+                      const double, const int, const int) const;
+      bool is_match  (const GenesisInfo &,
+                      const double, const int, const int) const;
+
 };
 
 ////////////////////////////////////////////////////////////////////////

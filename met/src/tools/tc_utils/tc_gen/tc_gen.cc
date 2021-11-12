@@ -95,6 +95,10 @@ static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
+static int    find_probgen_match   (const ProbGenInfo &,
+                                    const GenesisInfoArray &,
+                                    const TrackInfoArray &,
+                                    bool, double, int, int);
 
 static void   setup_txt_files      (int, int);
 static void   setup_table          (AsciiTable &);
@@ -725,8 +729,9 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
                     const GenesisInfoArray &best_ga,
                     const TrackInfoArray &oper_ta,
                     ProbGenPCTInfo &pgi) {
-   int i, j, prob_lead;
+   int i, j, i_bga, prob_lead;
    double prob_value;
+   bool dev_match, ops_match;
 
    // Initialize
    pgi.clear();
@@ -738,17 +743,27 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
       // Store info about each probability of genesis forecast
       pgi.add(model_pa.prob_gen(i));
 
-      // JHG search for a match!
-      // For now, just assume it's a hit.
-      // Also need to define SHC values.
-      bool dev_match = true;
-      bool ops_match = true;
+      // Search for a BEST track match
+      i_bga = find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
+                                 vx_opt.GenesisMatchPointTrack,
+                                 vx_opt.GenesisMatchRadius,
+                                 vx_opt.GenesisMatchBeg,
+                                 vx_opt.GenesisMatchEnd);
 
       // Loop over the individual probabilities
       for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
 
          prob_lead  = nint(model_pa.prob_gen(i).prob_item(j));
          prob_value = model_pa.prob_gen(i).prob(j) / 100.0;
+
+         // Score no matching BEST track as a non-event
+         if(!is_bad_data(i_bga)) {
+            dev_match = ops_match = false;
+         }
+         // Otherwise, check the time window
+         else {
+            dev_match = ops_match = true;
+         }
 
          // Increment counts
          if(dev_match) pgi.PCTDev[prob_lead].pct.inc_event   (prob_value);
@@ -850,6 +865,94 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
 
    return(i_best);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+int find_probgen_match(const ProbGenInfo      &prob_gi,
+                       const GenesisInfoArray &bga,
+                       const TrackInfoArray   &ota,
+                       bool point2track, double rad,
+                       int beg, int end) {
+   int i, j, i_best, i_oper;
+
+   ConcatString case_cs;
+   case_cs << prob_gi.technique() << " "
+           << unix_to_yyyymmdd_hhmmss(prob_gi.init())
+           << " initialization, "
+           << unix_to_yyyymmdd_hhmmss(prob_gi.gen_time())
+           << " forecast genesis at (" << prob_gi.lat() << ", "
+           << prob_gi.lon() << ")";
+
+   // Search for a BEST track genesis match
+   for(i=0, i_best=bad_data_int;
+       i<bga.n() && is_bad_data(i_best);
+       i++) {
+
+      // Check all BEST track points
+      if(point2track) {
+
+         for(j=0; j<bga[i].n_points(); j++) {
+            if(prob_gi.is_match(bga[i][j], rad, beg, end)) {
+               i_best = i;
+               mlog << Debug(4) << case_cs
+                    << " MATCHES BEST genesis track "
+                    << bga[i].storm_id() << ".\n";
+               break;
+            }
+         }
+      }
+      // Check only the BEST genesis points
+      else {
+
+         if(prob_gi.is_match(bga[i], rad, beg, end)) {
+            i_best = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES BEST genesis point "
+                 << bga[i].storm_id() << ".\n";
+            break;
+         }
+      }
+   } // end for bga
+
+   // If no BEST track match was found, search the operational tracks
+   if(is_bad_data(i_best)) {
+
+      for(i=0, i_oper=bad_data_int;
+          i<ota.n() && is_bad_data(i_oper);
+          i++) {
+
+         // Each operational track contains only lead time 0
+         if(ota[i].n_points() == 0) continue;
+
+         if(prob_gi.is_match(ota[i][0], rad, beg, end)) {
+            i_oper = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES operational " << ota[i].technique()
+                 << " genesis track " << ota[i].storm_id() << ".\n";
+            break;
+         }
+      } // end for ota
+
+      // Find BEST track for this operational track
+      if(!is_bad_data(i_oper)) {
+         for(i=0; i<bga.n(); i++) {
+            if(bga[i].storm_id() == ota[i_oper].storm_id()) {
+               i_best = i;
+               break;
+            }
+         }
+      }
+   }
+
+   // Check for no match
+   if(is_bad_data(i_best)) {
+      mlog << Debug(4) << case_cs
+           << " has NO MATCH in the BEST or operational tracks.\n";
+   }
+
+   return(i_best);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1162,6 +1265,19 @@ void process_tracks(const StringArray &files,
    // Dump out the number of genesis events
    mlog << Debug(2) << "Found " << best_ga.n()
         << " BEST genesis events.\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() > 6) {
+      mlog << Debug(6) << best_ga.serialize_r() << "\n";
+   }
+   // Dump out track info
+   else {
+      for(i=0; i<best_ga.n(); i++) {
+         mlog << Debug(6) << "[Genesis " << i+1 << " of "
+              << best_ga.n() << "] " << best_ga[i].serialize()
+              << "\n";
+      }
+   }
 
    return;
 }

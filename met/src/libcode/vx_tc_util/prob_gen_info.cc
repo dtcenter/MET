@@ -17,6 +17,8 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include "nav.h"
+
 #include "prob_gen_info.h"
 #include "atcf_offsets.h"
 
@@ -198,6 +200,28 @@ bool ProbGenInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
    if(check_dup) ProbLines.add(l.get_line());
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool ProbGenInfo::is_match(const TrackPoint &p, const double rad,
+                           const int beg, const int end) const {
+
+   // Check for matching in time and space
+   return(p.valid() >= (GenTime + beg) &&
+          p.valid() <= (GenTime + end) &&
+          gc_dist(Lat, Lon, p.lat(), p.lon()) <= rad);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool ProbGenInfo::is_match(const GenesisInfo &gi, const double rad,
+                           const int beg, const int end) const {
+
+   // Input genesis point
+   const TrackPoint *p = gi.genesis();
+
+   return(p ? is_match(*p, rad, beg, end) : false);
 }
 
 ////////////////////////////////////////////////////////////////////////
