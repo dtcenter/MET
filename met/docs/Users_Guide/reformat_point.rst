@@ -712,7 +712,7 @@ _________________
 		mesonet_opt_var = [ "precip3hr", "precip6hr", "precip12hr", "precip10min" ];
 
 
-This entry is an array of variables which are optional variables for the MESONET type input data. Above variables are not available from sometime in 2016.
+This entry is an array of variables which are optional variables for the MESONET input data. Above variables are not available from sometime in 2016.
 
 __________________
 
