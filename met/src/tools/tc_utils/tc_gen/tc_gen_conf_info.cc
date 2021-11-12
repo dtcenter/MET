@@ -1243,14 +1243,12 @@ void ProbGenPCTInfo::clear() {
 
    Model.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   BestBeg = BestEnd = (unixtime) 0;
 
-   PCTDev.clear();
-   PCTOps.clear();
+   PCT.clear();
 
    VxOpt = (const TCGenVxOpt *) 0;
    LeadTimes.clear();
-
-   ValidGenesisDHrThresh.clear();
 
    return;
 }
@@ -1263,9 +1261,6 @@ void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
 
    // Store pointer
    VxOpt = vx_opt;
-
-   // Store config options
-   ValidGenesisDHrThresh = VxOpt->ValidGenesisDHrThresh;
 
    // Setup the default PCTInfo object
    DefaultPCT.set_fthresh(VxOpt->ProbGenThresh);
@@ -1283,9 +1278,16 @@ void ProbGenPCTInfo::add(const ProbGenInfo &pgi) {
    // Store the model name
    if(Model.empty()) Model = pgi.technique();
 
-   // Track the range of valid times
+   // Track the range of forecast initalization times
    if(InitBeg == 0 || InitBeg > pgi.init()) InitBeg = pgi.init();
    if(InitEnd == 0 || InitEnd < pgi.init()) InitEnd = pgi.init();
+
+   // Track the range of verifying BEST genesis events
+   if(pgi.best_gen()) {
+      unixtime ut = pgi.best_gen()->genesis_time();
+      if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
+      if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
+   }
 
    // Add new map entry for each lead time, if needed
    for(i=0; i<pgi.n_prob(); i++) {
@@ -1294,8 +1296,7 @@ void ProbGenPCTInfo::add(const ProbGenInfo &pgi) {
 
       if(!LeadTimes.has(lead_hr)) {
          LeadTimes.add(lead_hr);
-         PCTDev[lead_hr] = DefaultPCT;
-         PCTOps[lead_hr] = DefaultPCT;
+         PCT[lead_hr] = DefaultPCT;
       }
    }
 

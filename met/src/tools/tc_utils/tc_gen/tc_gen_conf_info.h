@@ -332,11 +332,10 @@ class ProbGenPCTInfo {
 
    ConcatString Model;
    unixtime InitBeg, InitEnd;
+   unixtime BestBeg, BestEnd;
    const TCGenVxOpt* VxOpt;
    IntArray LeadTimes;
-   map<int,PCTInfo> PCTDev, PCTOps;
-
-   SingleThresh ValidGenesisDHrThresh;
+   map<int,PCTInfo> PCT;
 
       //////////////////////////////////////////////////////////////////
 
