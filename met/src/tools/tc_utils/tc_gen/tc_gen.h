@@ -80,8 +80,7 @@ static const char *txt_file_abbr[n_txt] = {
 const ConcatString genesis_name    ("GENESIS");
 const ConcatString genesis_dev_name("GENESIS_DEV");
 const ConcatString genesis_ops_name("GENESIS_OPS");
-const ConcatString probgen_dev_name("PROBGEN_DEV");
-const ConcatString probgen_ops_name("PROBGEN_OPS");
+const ConcatString probgenesis_name("PROBGENESIS");
 
 // Maximum Best track cyclone number to be processed
 // Cyclone numbers > 50 are for testing or invests

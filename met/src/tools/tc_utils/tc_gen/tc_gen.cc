@@ -86,7 +86,7 @@ static void   do_genesis_ctc       (const TCGenVxOpt &,
                                     PairDataGenesis &,
                                     GenCTCInfo &);
 static void   do_probgen_pct       (const TCGenVxOpt &,
-                                    const ProbInfoArray &,
+                                    ProbInfoArray &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     ProbGenPCTInfo &);
@@ -95,7 +95,7 @@ static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
-static int    find_probgen_match   (const ProbGenInfo &,
+static void   find_probgen_match   (ProbGenInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
@@ -725,13 +725,13 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 ////////////////////////////////////////////////////////////////////////
 
 void do_probgen_pct(const TCGenVxOpt &vx_opt,
-                    const ProbInfoArray &model_pa,
+                    ProbInfoArray &model_pa,
                     const GenesisInfoArray &best_ga,
                     const TrackInfoArray &oper_ta,
                     ProbGenPCTInfo &pgi) {
-   int i, j, i_bga, prob_lead;
+   int i, j, prob_lead, time_diff;
    double prob_value;
-   bool dev_match, ops_match;
+   bool is_event;
 
    // Initialize
    pgi.clear();
@@ -740,15 +740,15 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
    // Score each of the probability forecasts
    for(i=0; i<model_pa.n_prob_gen(); i++) {
 
+      // Search for a BEST track match
+      find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
+                         vx_opt.GenesisMatchPointTrack,
+                         vx_opt.GenesisMatchRadius,
+                         vx_opt.GenesisMatchBeg,
+                         vx_opt.GenesisMatchEnd);
+
       // Store info about each probability of genesis forecast
       pgi.add(model_pa.prob_gen(i));
-
-      // Search for a BEST track match
-      i_bga = find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
-                                 vx_opt.GenesisMatchPointTrack,
-                                 vx_opt.GenesisMatchRadius,
-                                 vx_opt.GenesisMatchBeg,
-                                 vx_opt.GenesisMatchEnd);
 
       // Loop over the individual probabilities
       for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
@@ -756,20 +756,20 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
          prob_lead  = nint(model_pa.prob_gen(i).prob_item(j));
          prob_value = model_pa.prob_gen(i).prob(j) / 100.0;
 
-         // Score no matching BEST track as a non-event
-         if(!is_bad_data(i_bga)) {
-            dev_match = ops_match = false;
+         // Event verifies is the BEST genesis occurs in the specified time window
+         if(model_pa.prob_gen(i).best_gen()) {
+            time_diff = model_pa.prob_gen(i).best_gen()->genesis_time() -
+                        model_pa.prob_gen(i).init();
+            is_event  = time_diff >= 0 &&
+                        time_diff <= (prob_lead * sec_per_hour);
          }
-         // Otherwise, check the time window
          else {
-            dev_match = ops_match = true;
+            is_event = false;
          }
 
          // Increment counts
-         if(dev_match) pgi.PCTDev[prob_lead].pct.inc_event   (prob_value);
-         else          pgi.PCTDev[prob_lead].pct.inc_nonevent(prob_value);
-         if(ops_match) pgi.PCTOps[prob_lead].pct.inc_event   (prob_value);
-         else          pgi.PCTOps[prob_lead].pct.inc_nonevent(prob_value);
+         if(is_event) pgi.PCT[prob_lead].pct.inc_event   (prob_value);
+         else         pgi.PCT[prob_lead].pct.inc_nonevent(prob_value);
 
       } // end for j
    } // end for i
@@ -868,11 +868,11 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
 
 ////////////////////////////////////////////////////////////////////////
 
-int find_probgen_match(const ProbGenInfo      &prob_gi,
-                       const GenesisInfoArray &bga,
-                       const TrackInfoArray   &ota,
-                       bool point2track, double rad,
-                       int beg, int end) {
+void find_probgen_match(ProbGenInfo      &prob_gi,
+                        const GenesisInfoArray &bga,
+                        const TrackInfoArray   &ota,
+                        bool point2track, double rad,
+                        int beg, int end) {
    int i, j, i_best, i_oper;
 
    ConcatString case_cs;
@@ -950,7 +950,11 @@ int find_probgen_match(const ProbGenInfo      &prob_gi,
            << " has NO MATCH in the BEST or operational tracks.\n";
    }
 
-   return(i_best);
+   // Store a pointer to the match
+   if(!is_bad_data(i_best)) prob_gi.set_best_gen(&bga[i_best]);
+   else                     prob_gi.set_best_gen((GenesisInfo *) 0);
+
+   return;
 }
 
 
@@ -1378,12 +1382,12 @@ void setup_txt_files(int n_model, int n_pair) {
             break;
 
          // Nx2 probabilistic contingency table output:
-         // 1 header + 2 vx methods * 3 leads * # models * # filters
+         // 1 header + 1 vx method * 3 leads * # models * # filters
          case(i_pct):
          case(i_pstd):
          case(i_pjc):
          case(i_prc):
-            n_rows = 1 + 2 * 3 * n_model * conf_info.n_vx();
+            n_rows = 1 * 3 * n_model * conf_info.n_vx();
             break;
 
          // For stat_genmpr:
@@ -1680,6 +1684,8 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
    shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
                 na_str : pgi.VxOpt->VxMaskName.c_str());
+   shc.set_fcst_var(probgenesis_name);
+   shc.set_obs_var (probgenesis_name);
 
    // Write results for each lead time
    for(i=0; i<pgi.LeadTimes.n(); i++) {
@@ -1692,95 +1698,41 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       shc.set_fcst_valid_beg(pgi.InitBeg + lead_sec);
       shc.set_fcst_valid_end(pgi.InitEnd + lead_sec);
       shc.set_obs_lead_sec(bad_data_int);
-      shc.set_obs_valid_beg(pgi.InitBeg + lead_sec); // JHG, should these be BEST track times?
-      shc.set_obs_valid_end(pgi.InitBeg + lead_sec); // JHG, should these be BEST track times?
+      shc.set_obs_valid_beg(pgi.BestBeg);
+      shc.set_obs_valid_end(pgi.BestEnd);
 
       // Write PCT output
       if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
-
-         if(pgi.VxOpt->DevFlag) {
-            shc.set_fcst_var(probgen_dev_name);
-            shc.set_obs_var (probgen_dev_name);
-            write_pct_row(shc, pgi.PCTDev[lead_hr],
-                          pgi.VxOpt->output_map(stat_pct),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_pct], i_txt_row[i_pct]);
-         }
-         if(pgi.VxOpt->OpsFlag) {
-            shc.set_fcst_var(probgen_ops_name);
-            shc.set_obs_var (probgen_ops_name);
-            write_pct_row(shc, pgi.PCTOps[lead_hr],
-                          pgi.VxOpt->output_map(stat_pct),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_pct], i_txt_row[i_pct]);
-         }
+         write_pct_row(shc, pgi.PCT[lead_hr],
+                       pgi.VxOpt->output_map(stat_pct),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pct], i_txt_row[i_pct]);
       }
 
       // Write PSTD output
       if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
-
-         if(pgi.VxOpt->DevFlag) {
-            pgi.PCTDev[lead_hr].compute_stats();
-            pgi.PCTDev[lead_hr].compute_ci();
-            shc.set_fcst_var(probgen_dev_name);
-            shc.set_obs_var (probgen_dev_name);
-            write_pstd_row(shc, pgi.PCTDev[lead_hr],
-                           pgi.VxOpt->output_map(stat_pstd),
-                           1, 1, stat_at, i_stat_row,
-                           txt_at[i_pstd], i_txt_row[i_pstd]);
-         }
-         if(pgi.VxOpt->OpsFlag) {
-            pgi.PCTOps[lead_hr].compute_stats();
-            pgi.PCTOps[lead_hr].compute_ci();
-            shc.set_fcst_var(probgen_ops_name);
-            shc.set_obs_var (probgen_ops_name);
-            write_pstd_row(shc, pgi.PCTOps[lead_hr],
-                           pgi.VxOpt->output_map(stat_pstd) ,
-                           1, 1, stat_at, i_stat_row,
-                           txt_at[i_pstd], i_txt_row[i_pstd]);
-         }
+         pgi.PCT[lead_hr].compute_stats();
+         pgi.PCT[lead_hr].compute_ci();
+         write_pstd_row(shc, pgi.PCT[lead_hr],
+                        pgi.VxOpt->output_map(stat_pstd),
+                        1, 1, stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
       }
 
       // Write PJC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-
-         if(pgi.VxOpt->DevFlag) {
-            shc.set_fcst_var(probgen_dev_name);
-            shc.set_obs_var (probgen_dev_name);
-            write_pct_row(shc, pgi.PCTDev[lead_hr],
-                          pgi.VxOpt->output_map(stat_pjc),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_pjc], i_txt_row[i_pjc]);
-         }
-         if(pgi.VxOpt->OpsFlag) {
-            shc.set_fcst_var(probgen_ops_name);
-            shc.set_obs_var (probgen_ops_name);
-            write_pct_row(shc, pgi.PCTOps[lead_hr],
-                          pgi.VxOpt->output_map(stat_pjc),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_pjc], i_txt_row[i_pjc]);
-         }
+         write_pct_row(shc, pgi.PCT[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pjc], i_txt_row[i_pjc]);
       }
 
       // Write PRC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-
-         if(pgi.VxOpt->DevFlag) {
-            shc.set_fcst_var(probgen_dev_name);
-            shc.set_obs_var (probgen_dev_name);
-            write_pct_row(shc, pgi.PCTDev[lead_hr],
-                          pgi.VxOpt->output_map(stat_pjc),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_prc], i_txt_row[i_prc]);
-         }
-         if(pgi.VxOpt->OpsFlag) {
-            shc.set_fcst_var(probgen_ops_name);
-            shc.set_obs_var (probgen_ops_name);
-            write_pct_row(shc, pgi.PCTOps[lead_hr],
-                          pgi.VxOpt->output_map(stat_pjc),
-                          1, 1, stat_at, i_stat_row,
-                          txt_at[i_prc], i_txt_row[i_prc]);
-         }
+         write_pct_row(shc, pgi.PCT[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_prc], i_txt_row[i_prc]);
       }
    } // end for i
 
