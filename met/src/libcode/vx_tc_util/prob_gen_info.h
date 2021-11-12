@@ -38,6 +38,9 @@ class ProbGenInfo : public ProbInfoBase {
       ConcatString GenOrDis;
       unixtime     GenTime;
 
+      // Pointer to the matching BEST genesis event
+      const GenesisInfo * BestGen;
+
    public:
 
       ProbGenInfo();
@@ -55,6 +58,8 @@ class ProbGenInfo : public ProbInfoBase {
          //  set stuff
          //
 
+      void set_best_gen(const GenesisInfo *);
+
          //
          //  get stuff
          //
@@ -62,6 +67,7 @@ class ProbGenInfo : public ProbInfoBase {
       const ConcatString & initials()   const;
       const ConcatString & gen_or_dis() const;
       unixtime             gen_time()   const;
+      const GenesisInfo *  best_gen()   const;
 
          //
          //  do stuff
@@ -83,6 +89,7 @@ class ProbGenInfo : public ProbInfoBase {
 inline const ConcatString & ProbGenInfo::initials()   const { return(Initials); }
 inline const ConcatString & ProbGenInfo::gen_or_dis() const { return(GenOrDis); }
 inline unixtime             ProbGenInfo::gen_time()   const { return(GenTime);  }
+inline const GenesisInfo *  ProbGenInfo::best_gen()   const { return(BestGen);  }
 
 ////////////////////////////////////////////////////////////////////////
 
