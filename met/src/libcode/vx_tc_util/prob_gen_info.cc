@@ -79,7 +79,6 @@ void ProbGenInfo::clear() {
    GenOrDis.clear();
    GenesisTime = (unixtime) 0;
    GenesisLead = 0;
-   BestGen = (const GenesisInfo *) 0;
 
    return;
 }
@@ -95,7 +94,6 @@ void ProbGenInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "GenOrDis        = \"" << GenOrDis.contents() << "\"\n";
    out << prefix << "GenesisTime     = "   << unix_to_yyyymmdd_hhmmss(GenesisTime) << "\n";
    out << prefix << "GenesisLead     = "   << sec_to_hhmmss(GenesisLead) << "\n";
-   out << prefix << "BestGen         = "   << (BestGen ? "set" : "(nul)") << "\n";
 
    out << flush;
 
@@ -113,8 +111,7 @@ ConcatString ProbGenInfo::serialize() const {
      << "Initials = \"" << Initials << "\""
      << ", GenOrDis = \"" << GenOrDis << "\""
      << ", GenesisTime = " << unix_to_yyyymmdd_hhmmss(GenesisTime)
-     << ", GenesisLead = " << sec_to_hhmmss(GenesisLead)
-     << ", BestGen = " << (BestGen ? "set" : "(nul)") << "\n";
+     << ", GenesisLead = " << sec_to_hhmmss(GenesisLead) << "\n";
 
    return(s);
 }
@@ -141,16 +138,6 @@ void ProbGenInfo::assign(const ProbGenInfo &p) {
    GenOrDis    = p.GenOrDis;
    GenesisTime = p.GenesisTime;
    GenesisLead = p.GenesisLead;
-   BestGen     = p.BestGen;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ProbGenInfo::set_best_gen(const GenesisInfo *bg) {
-
-   BestGen = bg;
 
    return;
 }
@@ -180,8 +167,6 @@ void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
                    parse_time(l.get_item(ProbGenTimeOffset).c_str()));
    GenesisLead = (GenesisTime == 0 ? bad_data_int :
                   GenesisTime - InitTime);
-
-   BestGen = (const GenesisInfo *) 0;
 
    return;
 }

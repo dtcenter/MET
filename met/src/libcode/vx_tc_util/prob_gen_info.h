@@ -39,9 +39,6 @@ class ProbGenInfo : public ProbInfoBase {
       unixtime     GenesisTime;
       int          GenesisLead;
 
-      // Pointer to the matching BEST genesis event
-      const GenesisInfo * BestGen;
-
    public:
 
       ProbGenInfo();
@@ -93,7 +90,6 @@ inline const ConcatString & ProbGenInfo::initials()     const { return(Initials)
 inline const ConcatString & ProbGenInfo::gen_or_dis()   const { return(GenOrDis);    }
 inline unixtime             ProbGenInfo::genesis_time() const { return(GenesisTime); }
 inline int                  ProbGenInfo::genesis_lead() const { return(GenesisLead); }
-inline const GenesisInfo *  ProbGenInfo::best_gen()     const { return(BestGen);     }
 
 ////////////////////////////////////////////////////////////////////////
 
