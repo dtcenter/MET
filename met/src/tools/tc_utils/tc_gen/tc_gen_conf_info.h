@@ -335,7 +335,14 @@ class ProbGenPCTInfo {
    unixtime BestBeg, BestEnd;
    const TCGenVxOpt* VxOpt;
    IntArray LeadTimes;
-   map<int,PCTInfo> PCT;
+
+   // Map of lead times to PCT tables
+   map<int,PCTInfo> PCTMap;
+
+   // Map of lead times to vectors of pair info
+   map<int,vector<const ProbGenInfo *>> PGIMap;
+   map<int,vector<int>>                 IdxMap;
+   map<int,vector<bool>>                EvtMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -343,7 +350,7 @@ class ProbGenPCTInfo {
 
    void set_vx_opt(const TCGenVxOpt *);
 
-   void add(const ProbGenInfo &);
+   void add(const ProbGenInfo &, int, bool);
 
 };
 

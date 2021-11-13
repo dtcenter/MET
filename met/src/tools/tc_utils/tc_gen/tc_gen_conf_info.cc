@@ -1245,7 +1245,10 @@ void ProbGenPCTInfo::clear() {
    InitBeg = InitEnd = (unixtime) 0;
    BestBeg = BestEnd = (unixtime) 0;
 
-   PCT.clear();
+   PCTMap.clear();
+   PGIMap.clear();
+   IdxMap.clear();
+   EvtMap.clear();
 
    VxOpt = (const TCGenVxOpt *) 0;
    LeadTimes.clear();
@@ -1272,8 +1275,8 @@ void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbGenPCTInfo::add(const ProbGenInfo &pgi) {
-   int i, lead_hr;
+void ProbGenPCTInfo::add(const ProbGenInfo &pgi, int index, bool is_event) {
+   int i;
 
    // Store the model name
    if(Model.empty()) Model = pgi.technique();
@@ -1289,16 +1292,32 @@ void ProbGenPCTInfo::add(const ProbGenInfo &pgi) {
       if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
    }
 
-   // Add new map entry for each lead time, if needed
-   for(i=0; i<pgi.n_prob(); i++) {
+   // Current lead time and probability value
+   int lead_hr = nint(pgi.prob_item(index));
+   double prob = pgi.prob(index) / 100.0;
 
-      lead_hr = nint(pgi.prob_item(i));
+   // Add new map entries, if needed
+   if(!LeadTimes.has(lead_hr)) {
 
-      if(!LeadTimes.has(lead_hr)) {
-         LeadTimes.add(lead_hr);
-         PCT[lead_hr] = DefaultPCT;
-      }
+      LeadTimes.add(lead_hr);
+      vector<const ProbGenInfo *> empty_pgi;
+      vector<int>                 empty_idx;
+      vector<bool>                empty_evt;
+
+      PCTMap[lead_hr] = DefaultPCT;
+      PGIMap[lead_hr] = empty_pgi;
+      IdxMap[lead_hr] = empty_idx;
+      EvtMap[lead_hr] = empty_evt;
    }
+
+   // Update map entries
+   PGIMap[lead_hr].push_back(&pgi);
+   IdxMap[lead_hr].push_back(index);
+   EvtMap[lead_hr].push_back(is_event);
+
+   // Increment counts
+   if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
+   else         PCTMap[lead_hr].pct.inc_nonevent(prob);
 
    return;
 }

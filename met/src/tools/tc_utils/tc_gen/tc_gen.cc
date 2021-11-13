@@ -106,15 +106,23 @@ static void   setup_nc_file        ();
 
 static void   write_ctc_stats      (const PairDataGenesis &,
                                     GenCTCInfo &);
-static void   write_pct_stats      (ProbGenPCTInfo &);
-
-static void   write_genmpr_row     (StatHdrColumns &,
+static void   write_ctc_genmpr_row (StatHdrColumns &,
                                     const PairDataGenesis &,
                                     STATOutputType,
                                     AsciiTable &, int &,
                                     AsciiTable &, int &);
-static void   write_genmpr_cols    (const PairDataGenesis &, int,
+static void   write_ctc_genmpr_cols(const PairDataGenesis &, int,
                                     AsciiTable &, int, int);
+
+static void   write_pct_stats      (ProbGenPCTInfo &);
+static void   write_pct_genmpr_row (StatHdrColumns &,
+                                    ProbGenPCTInfo &, int,
+                                    STATOutputType,
+                                    AsciiTable &, int &,
+                                    AsciiTable &, int &);
+static void   write_pct_genmpr_cols(ProbGenPCTInfo &, int, int,
+                                    AsciiTable &, int, int);
+
 static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
 
@@ -396,7 +404,7 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
                   fcst_pa);
 
    // Setup output files based on the number of techniques
-   setup_txt_files(fcst_pa.n_technique(), 0);
+   setup_txt_files(fcst_pa.n_technique(), fcst_pa.n_prob_gen() * 3);
 
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
@@ -729,8 +737,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
                     const GenesisInfoArray &best_ga,
                     const TrackInfoArray &oper_ta,
                     ProbGenPCTInfo &pgi) {
-   int i, j, prob_lead, time_diff;
-   double prob_value;
+   int i, j, time_diff;
    bool is_event;
 
    // Initialize
@@ -747,29 +754,22 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
                          vx_opt.GenesisMatchBeg,
                          vx_opt.GenesisMatchEnd);
 
-      // Store info about each probability of genesis forecast
-      pgi.add(model_pa.prob_gen(i));
-
       // Loop over the individual probabilities
       for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
-
-         prob_lead  = nint(model_pa.prob_gen(i).prob_item(j));
-         prob_value = model_pa.prob_gen(i).prob(j) / 100.0;
 
          // Event verifies is the BEST genesis occurs in the specified time window
          if(model_pa.prob_gen(i).best_gen()) {
             time_diff = model_pa.prob_gen(i).best_gen()->genesis_time() -
                         model_pa.prob_gen(i).init();
             is_event  = time_diff >= 0 &&
-                        time_diff <= (prob_lead * sec_per_hour);
+                        time_diff <= (model_pa.prob_gen(i).prob_item(j) * sec_per_hour);
          }
          else {
             is_event = false;
          }
 
-         // Increment counts
-         if(is_event) pgi.PCT[prob_lead].pct.inc_event   (prob_value);
-         else         pgi.PCT[prob_lead].pct.inc_nonevent(prob_value);
+         // Store pair info
+         pgi.add(model_pa.prob_gen(i), j, is_event);
 
       } // end for j
    } // end for i
@@ -879,7 +879,7 @@ void find_probgen_match(ProbGenInfo      &prob_gi,
    case_cs << prob_gi.technique() << " "
            << unix_to_yyyymmdd_hhmmss(prob_gi.init())
            << " initialization, "
-           << unix_to_yyyymmdd_hhmmss(prob_gi.gen_time())
+           << unix_to_yyyymmdd_hhmmss(prob_gi.genesis_time())
            << " forecast genesis at (" << prob_gi.lat() << ", "
            << prob_gi.lon() << ")";
 
@@ -1595,7 +1595,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_fho_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_fho),
+                       gci.VxOpt->output_map(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1604,7 +1604,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_fho_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_fho),
+                       gci.VxOpt->output_map(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1617,7 +1617,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_ctc_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_ctc),
+                       gci.VxOpt->output_map(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -1626,7 +1626,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_ctc_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_ctc),
+                       gci.VxOpt->output_map(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -1642,7 +1642,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_cts_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_cts),
+                       gci.VxOpt->output_map(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -1654,7 +1654,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_cts_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_cts),
+                       gci.VxOpt->output_map(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -1664,10 +1664,10 @@ void write_ctc_stats(const PairDataGenesis &gpd,
    if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
       shc.set_fcst_var(genesis_name);
       shc.set_obs_var (genesis_name);
-      write_genmpr_row(shc, gpd,
-                       gci.VxOpt->OutputMap.at(stat_genmpr),
-                       stat_at, i_stat_row,
-                       txt_at[i_genmpr], i_txt_row[i_genmpr]);
+      write_ctc_genmpr_row(shc, gpd,
+                           gci.VxOpt->output_map(stat_genmpr),
+                           stat_at, i_stat_row,
+                           txt_at[i_genmpr], i_txt_row[i_genmpr]);
    }
 
    return;
@@ -1675,77 +1675,11 @@ void write_ctc_stats(const PairDataGenesis &gpd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_pct_stats(ProbGenPCTInfo &pgi) {
-   int i, lead_hr, lead_sec;
-
-   // Setup header columns
-   shc.set_model(pgi.Model.c_str());
-   shc.set_desc(pgi.VxOpt->Desc.c_str());
-   shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
-   shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
-                na_str : pgi.VxOpt->VxMaskName.c_str());
-   shc.set_fcst_var(probgenesis_name);
-   shc.set_obs_var (probgenesis_name);
-
-   // Write results for each lead time
-   for(i=0; i<pgi.LeadTimes.n(); i++) {
-
-      lead_hr  = pgi.LeadTimes[i];
-      lead_sec = lead_hr * sec_per_hour;
-
-      // Timing information
-      shc.set_fcst_lead_sec(lead_sec);
-      shc.set_fcst_valid_beg(pgi.InitBeg + lead_sec);
-      shc.set_fcst_valid_end(pgi.InitEnd + lead_sec);
-      shc.set_obs_lead_sec(bad_data_int);
-      shc.set_obs_valid_beg(pgi.BestBeg);
-      shc.set_obs_valid_end(pgi.BestEnd);
-
-      // Write PCT output
-      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCT[lead_hr],
-                       pgi.VxOpt->output_map(stat_pct),
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pct], i_txt_row[i_pct]);
-      }
-
-      // Write PSTD output
-      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
-         pgi.PCT[lead_hr].compute_stats();
-         pgi.PCT[lead_hr].compute_ci();
-         write_pstd_row(shc, pgi.PCT[lead_hr],
-                        pgi.VxOpt->output_map(stat_pstd),
-                        1, 1, stat_at, i_stat_row,
-                        txt_at[i_pstd], i_txt_row[i_pstd]);
-      }
-
-      // Write PJC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCT[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_pjc], i_txt_row[i_pjc]);
-      }
-
-      // Write PRC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCT[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
-                       1, 1, stat_at, i_stat_row,
-                       txt_at[i_prc], i_txt_row[i_prc]);
-      }
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_genmpr_row(StatHdrColumns &shc,
-                      const PairDataGenesis &gpd,
-                      STATOutputType out_type,
-                      AsciiTable &stat_at, int &stat_row,
-                      AsciiTable &txt_at, int &txt_row) {
+void write_ctc_genmpr_row(StatHdrColumns &shc,
+                          const PairDataGenesis &gpd,
+                          STATOutputType out_type,
+                          AsciiTable &stat_at, int &stat_row,
+                          AsciiTable &txt_at, int &txt_row) {
    int i;
    unixtime ut;
 
@@ -1753,6 +1687,8 @@ void write_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
@@ -1761,7 +1697,7 @@ void write_genmpr_row(StatHdrColumns &shc,
       // Pointers for current case
       const GenesisInfo* fgi = gpd.fcst_gen(i);
       const GenesisInfo* bgi = gpd.best_gen(i);
- 
+
       // Store timing info
       shc.set_fcst_lead_sec(gpd.lead_time(i));
       ut = (fgi ? fgi->genesis_time() : bgi->genesis_time());
@@ -1776,7 +1712,7 @@ void write_genmpr_row(StatHdrColumns &shc,
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      write_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
+      write_ctc_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_type == STATOutputType_Both) {
@@ -1795,16 +1731,17 @@ void write_genmpr_row(StatHdrColumns &shc,
 
 ////////////////////////////////////////////////////////////////////////
 
- void write_genmpr_cols(const PairDataGenesis &gpd, int i,
-                        AsciiTable &at, int r, int c) {
+ void write_ctc_genmpr_cols(const PairDataGenesis &gpd, int i,
+                            AsciiTable &at, int r, int c) {
 
     // Pointers for current case
     const GenesisInfo* fgi = gpd.fcst_gen(i);
     const GenesisInfo* bgi = gpd.best_gen(i);
-    
+
     //
     // Genesis Matched Pairs (GENMPR):
     //    TOTAL,       INDEX,       STORM_ID,
+    //    PROB_LEAD,   PROB_VAL,
     //    AGEN_INIT,   AGEN_FHR,
     //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
     //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
@@ -1821,44 +1758,265 @@ void write_genmpr_row(StatHdrColumns &shc,
     at.set_entry(r, c+2,  // Best track Storm ID
        gpd.best_storm_id(i));
 
-    at.set_entry(r, c+3,  // Fcst genesis initialization time
+    at.set_entry(r, c+3,  // Probability lead time
+       na_str);
+
+    at.set_entry(r, c+4,  // Probability value
+       na_str);
+
+    at.set_entry(r, c+5,  // Fcst genesis initialization time
        fgi ? unix_to_yyyymmdd_hhmmss(fgi->init()) : na_str);
 
-    at.set_entry(r, c+4,  // Fcst genesis hour
+    at.set_entry(r, c+6,  // Fcst genesis hour
        fgi ? fgi->genesis_fhr() : bad_data_int);
 
-    at.set_entry(r, c+5,  // Fcst track latitude
+    at.set_entry(r, c+7,  // Fcst track latitude
        fgi ? fgi->lat() : bad_data_double);
 
-    at.set_entry(r, c+6,  // Fcst track longitude
+    at.set_entry(r, c+8,  // Fcst track longitude
        fgi ? fgi->lon() : bad_data_double);
 
-    at.set_entry(r, c+7,  // Fcst track distance to land
+    at.set_entry(r, c+9,  // Fcst track distance to land
        fgi ? fgi->dland() : bad_data_double);
 
-    at.set_entry(r, c+8,  // Best track latitude
+    at.set_entry(r, c+10,  // Best track latitude
        bgi ? bgi->lat() : bad_data_double);
 
-    at.set_entry(r, c+9, // Best track longitude
+    at.set_entry(r, c+11, // Best track longitude
        bgi ? bgi->lon() : bad_data_double);
 
-    at.set_entry(r, c+10, // Best track distance to land
+    at.set_entry(r, c+12, // Best track distance to land
        bgi ? bgi->dland() : bad_data_double);
 
-    at.set_entry(r, c+11, // Genesis distance
+    at.set_entry(r, c+13, // Genesis distance
        gpd.gen_diff(i).DevDist);
 
-    at.set_entry(r, c+12, // Genesis time difference
+    at.set_entry(r, c+14, // Genesis time difference
        sec_to_hhmmss(gpd.gen_diff(i).DevDSec));
 
-    at.set_entry(r, c+13, // Genesis - Init time
+    at.set_entry(r, c+15, // Genesis - Init time
        sec_to_hhmmss(gpd.gen_diff(i).OpsDSec));
 
-    at.set_entry(r, c+14, // Development category
+    at.set_entry(r, c+16, // Development category
        genesispaircategory_to_string(gpd.gen_diff(i).DevCategory));
 
-    at.set_entry(r, c+15, // Operational category
+    at.set_entry(r, c+17, // Operational category
        genesispaircategory_to_string(gpd.gen_diff(i).OpsCategory));
+
+    return;
+ }
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_stats(ProbGenPCTInfo &pgi) {
+   int i, lead_hr, lead_sec;
+
+   // Setup header columns
+   shc.set_model(pgi.Model.c_str());
+   shc.set_desc(pgi.VxOpt->Desc.c_str());
+   shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
+   shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
+                na_str : pgi.VxOpt->VxMaskName.c_str());
+   shc.set_fcst_var(prob_genesis_name);
+   shc.set_obs_var (prob_genesis_name);
+
+   // Write results for each lead time
+   for(i=0; i<pgi.LeadTimes.n(); i++) {
+
+      lead_hr  = pgi.LeadTimes[i];
+      lead_sec = lead_hr * sec_per_hour;
+
+      // Timing information
+      shc.set_fcst_lead_sec(lead_sec);
+      shc.set_fcst_valid_beg(pgi.InitBeg + lead_sec);
+      shc.set_fcst_valid_end(pgi.InitEnd + lead_sec);
+      shc.set_obs_lead_sec(bad_data_int);
+      shc.set_obs_valid_beg(pgi.BestBeg);
+      shc.set_obs_valid_end(pgi.BestEnd);
+
+      // Write PCT output
+      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pct),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pct], i_txt_row[i_pct]);
+      }
+
+      // Write PSTD output
+      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
+         pgi.PCTMap[lead_hr].compute_stats();
+         pgi.PCTMap[lead_hr].compute_ci();
+         write_pstd_row(shc, pgi.PCTMap[lead_hr],
+                        pgi.VxOpt->output_map(stat_pstd),
+                        1, 1, stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+
+      // Write PJC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pjc], i_txt_row[i_pjc]);
+      }
+
+      // Write PRC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_prc], i_txt_row[i_prc]);
+      }
+
+      // Write out GENMPR
+      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+         shc.set_fcst_var(prob_genesis_name);
+         shc.set_obs_var (prob_genesis_name);
+         write_pct_genmpr_row(shc, pgi, lead_hr,
+                              pgi.VxOpt->output_map(stat_genmpr),
+                              stat_at, i_stat_row,
+                              txt_at[i_genmpr], i_txt_row[i_genmpr]);
+      }
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_genmpr_row(StatHdrColumns &shc,
+                          ProbGenPCTInfo &pgi,
+                          int lead_hr,
+                          STATOutputType out_type,
+                          AsciiTable &stat_at, int &stat_row,
+                          AsciiTable &txt_at, int &txt_row) {
+   int i;
+   unixtime ut;
+
+   // GENMPR line type
+   shc.set_line_type(stat_genmpr_str);
+
+   // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each matched pair
+   for(i=0; i<pgi.PGIMap[lead_hr].size(); i++) {
+
+      // Pointers for current case
+      const ProbGenInfo *fgi = pgi.PGIMap[lead_hr][i];
+      const GenesisInfo *bgi = fgi->best_gen();
+
+      // Store timing info
+      shc.set_fcst_lead_sec(fgi->genesis_lead());
+      ut = fgi->genesis_time();
+      shc.set_fcst_valid_beg(ut);
+      shc.set_fcst_valid_end(ut);
+      shc.set_obs_lead_sec(bad_data_int);
+      ut = (bgi ? bgi->genesis_time() : ut);
+      shc.set_obs_valid_beg(ut);
+      shc.set_obs_valid_end(ut);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_pct_genmpr_cols(pgi, lead_hr, i,
+                            stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ void write_pct_genmpr_cols(ProbGenPCTInfo &pgi,
+                            int lead_hr, int index,
+                            AsciiTable &at, int r, int c) {
+
+   // Pointers for current case
+   const ProbGenInfo *fgi = pgi.PGIMap[lead_hr][index];
+   const GenesisInfo *bgi = fgi->best_gen();
+   int i_prob = pgi.IdxMap[lead_hr][index];
+
+    //
+    // Genesis Matched Pairs (GENMPR):
+    //    TOTAL,       INDEX,       STORM_ID,
+    //    PROB_LEAD,   PROB_VAL,
+    //    AGEN_INIT,   AGEN_FHR,
+    //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
+    //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
+    //    GEN_DIST,    GEN_TDIFF,   INIT_TDIFF,
+    //    DEV_CAT,     OPS_CAT
+    //
+
+    at.set_entry(r, c+0,  // Total number of pairs
+       (int) pgi.PGIMap[lead_hr].size());
+
+    at.set_entry(r, c+1,  // Index of current pair
+       index+1);
+
+    at.set_entry(r, c+2,  // Best track Storm ID
+       (bgi ? bgi->storm_id() : na_str));
+
+    at.set_entry(r, c+3,  // Probability lead time
+       fgi->prob_item(i_prob));
+
+    at.set_entry(r, c+4,  // Probability value
+       fgi->prob(i_prob));
+
+    at.set_entry(r, c+5,  // Fcst genesis initialization time
+       unix_to_yyyymmdd_hhmmss(fgi->init()));
+
+    at.set_entry(r, c+6,  // Fcst genesis hour
+       fgi->genesis_fhr());
+
+    at.set_entry(r, c+7,  // Fcst genesis latitude
+       fgi->lat());
+
+    at.set_entry(r, c+8,  // Fcst genesis longitude
+       fgi->lon());
+
+    at.set_entry(r, c+9,  // Fcst genesis distance to land
+       fgi->dland());
+
+    at.set_entry(r, c+10,  // Best track latitude
+       bgi ? bgi->lat() : bad_data_double);
+
+    at.set_entry(r, c+11, // Best track longitude
+       bgi ? bgi->lon() : bad_data_double);
+
+    at.set_entry(r, c+12, // Best track distance to land
+       bgi ? bgi->dland() : bad_data_double);
+
+    at.set_entry(r, c+13, // Genesis distance
+       na_str);
+
+    at.set_entry(r, c+14, // Genesis time difference
+       na_str);
+
+    at.set_entry(r, c+15, // Genesis - Init time
+       na_str);
+
+    at.set_entry(r, c+16, // Development category
+       na_str);
+
+    at.set_entry(r, c+17, // Operational category
+       (pgi.EvtMap[lead_hr][index] ? "FY_OY" : "FY_ON" ));
 
     return;
  }
