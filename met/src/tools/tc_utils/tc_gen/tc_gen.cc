@@ -100,7 +100,7 @@ static int    find_probgen_match   (const ProbGenInfo &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
 
-static void   setup_txt_files      (int, int);
+static void   setup_txt_files      (int, int, int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
@@ -306,7 +306,7 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
    int n_time = (conf_info.FcstSecEnd - conf_info.FcstSecBeg) /
                 (conf_info.InitFreqHr*sec_per_hour) + 1;
    int n_pair = best_ga.n() * n_time + fcst_ga.n();
-   setup_txt_files(fcst_ga.n_technique(), n_pair);
+   setup_txt_files(fcst_ga.n_technique(), 1, n_pair);
 
    // If requested, setup the NetCDF output file
    if(!conf_info.NcInfo.all_false()) setup_nc_file();
@@ -385,7 +385,7 @@ void score_track_genesis(const GenesisInfoArray &best_ga,
 
 void score_genesis_prob(const GenesisInfoArray &best_ga,
                         const TrackInfoArray &oper_ta) {
-   int i, j;
+   int i, j, n, max_n_prob, n_pair;
    StringArray edeck_files, edeck_files_model_suffix;
    ProbInfoArray fcst_pa, empty_pa;
    ConcatString model;
@@ -403,8 +403,15 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
    process_edecks(edeck_files, edeck_files_model_suffix,
                   fcst_pa);
 
+   // Count up the total number of probabilities
+   for(i=0,max_n_prob=0,n_pair=0; i<fcst_pa.n_prob_gen(); i++) {
+      n = fcst_pa.prob_gen(i).n_prob();
+      if(n > max_n_prob) max_n_prob = n;
+      n_pair += n;
+   }
+
    // Setup output files based on the number of techniques
-   setup_txt_files(fcst_pa.n_technique(), fcst_pa.n_prob_gen() * 3);
+   setup_txt_files(fcst_pa.n_technique(), max_n_prob, n_pair);
 
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
@@ -1357,7 +1364,7 @@ void process_edecks(const StringArray &files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(int n_model, int n_pair) {
+void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
    // Check to see if the stat file stream has already been setup
@@ -1384,18 +1391,18 @@ void setup_txt_files(int n_model, int n_pair) {
             break;
 
          // Nx2 probabilistic contingency table output:
-         // 1 header + 1 vx method * 3 leads * # models * # filters
+         // 1 header + 1 vx method * # models * #probs * # filters
          case(i_pct):
          case(i_pstd):
          case(i_pjc):
          case(i_prc):
-            n_rows = 1 * 3 * n_model * conf_info.n_vx();
+            n_rows = 1 + n_model * max_n_prob * conf_info.n_vx();
             break;
 
          // For stat_genmpr:
          // 1 header + 2 vx methods * # models * # filters * # pairs
          default:
-            n_rows = 1 + n_model * conf_info.n_vx() * n_pair;
+            n_rows = 1 + 2 * n_model * conf_info.n_vx() * n_pair;
             break;
       } // end switch
 
