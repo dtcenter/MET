@@ -77,8 +77,8 @@ void ProbGenInfo::clear() {
 
    Initials.clear();
    GenOrDis.clear();
-   GenTime = (unixtime) 0;
-
+   GenesisTime = (unixtime) 0;
+   GenesisLead = 0;
    BestGen = (const GenesisInfo *) 0;
 
    return;
@@ -93,7 +93,8 @@ void ProbGenInfo::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
    out << prefix << "GenOrDis        = \"" << GenOrDis.contents() << "\"\n";
-   out << prefix << "GenTime         = "   << unix_to_yyyymmdd_hhmmss(GenTime) << "\n";
+   out << prefix << "GenesisTime     = "   << unix_to_yyyymmdd_hhmmss(GenesisTime) << "\n";
+   out << prefix << "GenesisLead     = "   << sec_to_hhmmss(GenesisLead) << "\n";
    out << prefix << "BestGen         = "   << (BestGen ? "set" : "(nul)") << "\n";
 
    out << flush;
@@ -111,7 +112,8 @@ ConcatString ProbGenInfo::serialize() const {
      << ", ProbGenInfo: "
      << "Initials = \"" << Initials << "\""
      << ", GenOrDis = \"" << GenOrDis << "\""
-     << ", GenTime = " << unix_to_yyyymmdd_hhmmss(GenTime)
+     << ", GenesisTime = " << unix_to_yyyymmdd_hhmmss(GenesisTime)
+     << ", GenesisLead = " << sec_to_hhmmss(GenesisLead)
      << ", BestGen = " << (BestGen ? "set" : "(nul)") << "\n";
 
    return(s);
@@ -135,11 +137,11 @@ void ProbGenInfo::assign(const ProbGenInfo &p) {
 
    ProbInfoBase::assign(p);
 
-   Initials = p.Initials;
-   GenOrDis = p.GenOrDis;
-   GenTime  = p.GenTime;
-
-   BestGen  = p.BestGen;
+   Initials    = p.Initials;
+   GenOrDis    = p.GenOrDis;
+   GenesisTime = p.GenesisTime;
+   GenesisLead = p.GenesisLead;
+   BestGen     = p.BestGen;
 
    return;
 }
@@ -155,6 +157,14 @@ void ProbGenInfo::set_best_gen(const GenesisInfo *bg) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ProbGenInfo::genesis_fhr() const {
+   return(is_bad_data(GenesisLead) ?
+          bad_data_int :
+          nint((double) GenesisLead/sec_per_hour));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
@@ -165,9 +175,11 @@ void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
    GenOrDis = l.get_item(ProbGenOrDisOffset);
 
    // Store an empty string as unixtime 0
-   GenTime  = (l.get_item(ProbGenTimeOffset).empty() ?
-               (unixtime) 0 :
-               parse_time(l.get_item(ProbGenTimeOffset).c_str()));
+   GenesisTime  = (l.get_item(ProbGenTimeOffset).empty() ?
+                   (unixtime) 0 :
+                   parse_time(l.get_item(ProbGenTimeOffset).c_str()));
+   GenesisLead = (GenesisTime == 0 ? bad_data_int :
+                  GenesisTime - InitTime);
 
    BestGen = (const GenesisInfo *) 0;
 
@@ -184,7 +196,7 @@ bool ProbGenInfo::is_match(const ATCFProbLine &l) const {
                       (unixtime) 0 :
                       parse_time(l.get_item(ProbGenTimeOffset).c_str()));
 
-   return(GenTime == gen_ut);
+   return(GenesisTime == gen_ut);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -225,8 +237,8 @@ bool ProbGenInfo::is_match(const TrackPoint &p, const double rad,
                            const int beg, const int end) const {
 
    // Check for matching in time and space
-   return(p.valid() >= (GenTime + beg) &&
-          p.valid() <= (GenTime + end) &&
+   return(p.valid() >= (GenesisTime + beg) &&
+          p.valid() <= (GenesisTime + end) &&
           gc_dist(Lat, Lon, p.lat(), p.lon()) <= rad);
 }
 

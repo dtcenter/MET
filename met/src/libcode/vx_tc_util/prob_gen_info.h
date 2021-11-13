@@ -36,7 +36,8 @@ class ProbGenInfo : public ProbInfoBase {
       // Probability of Genesis specific values
       ConcatString Initials;
       ConcatString GenOrDis;
-      unixtime     GenTime;
+      unixtime     GenesisTime;
+      int          GenesisLead;
 
       // Pointer to the matching BEST genesis event
       const GenesisInfo * BestGen;
@@ -64,10 +65,12 @@ class ProbGenInfo : public ProbInfoBase {
          //  get stuff
          //
 
-      const ConcatString & initials()   const;
-      const ConcatString & gen_or_dis() const;
-      unixtime             gen_time()   const;
-      const GenesisInfo *  best_gen()   const;
+      const ConcatString & initials()     const;
+      const ConcatString & gen_or_dis()   const;
+      unixtime             genesis_time() const;
+      int                  genesis_lead() const;
+      int                  genesis_fhr()  const;
+      const GenesisInfo *  best_gen()     const;
 
          //
          //  do stuff
@@ -86,10 +89,11 @@ class ProbGenInfo : public ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & ProbGenInfo::initials()   const { return(Initials); }
-inline const ConcatString & ProbGenInfo::gen_or_dis() const { return(GenOrDis); }
-inline unixtime             ProbGenInfo::gen_time()   const { return(GenTime);  }
-inline const GenesisInfo *  ProbGenInfo::best_gen()   const { return(BestGen);  }
+inline const ConcatString & ProbGenInfo::initials()     const { return(Initials);    }
+inline const ConcatString & ProbGenInfo::gen_or_dis()   const { return(GenOrDis);    }
+inline unixtime             ProbGenInfo::genesis_time() const { return(GenesisTime); }
+inline int                  ProbGenInfo::genesis_lead() const { return(GenesisLead); }
+inline const GenesisInfo *  ProbGenInfo::best_gen()     const { return(BestGen);     }
 
 ////////////////////////////////////////////////////////////////////////
 
