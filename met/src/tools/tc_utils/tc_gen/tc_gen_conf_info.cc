@@ -1246,9 +1246,10 @@ void ProbGenPCTInfo::clear() {
    BestBeg = BestEnd = (unixtime) 0;
 
    PCTMap.clear();
-   PGIMap.clear();
-   IdxMap.clear();
-   EvtMap.clear();
+   FcstGenMap.clear();
+   FcstIdxMap.clear();
+   BestGenMap.clear();
+   BestEvtMap.clear();
 
    VxOpt = (const TCGenVxOpt *) 0;
    LeadTimes.clear();
@@ -1275,45 +1276,51 @@ void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbGenPCTInfo::add(const ProbGenInfo &pgi, int index, bool is_event) {
+void ProbGenPCTInfo::add(const ProbGenInfo &fgi, int index,
+                         const GenesisInfo *bgi, bool is_event) {
    int i;
+   unixtime ut;
 
    // Store the model name
-   if(Model.empty()) Model = pgi.technique();
+   if(Model.empty()) Model = fgi.technique();
 
    // Track the range of forecast initalization times
-   if(InitBeg == 0 || InitBeg > pgi.init()) InitBeg = pgi.init();
-   if(InitEnd == 0 || InitEnd < pgi.init()) InitEnd = pgi.init();
+   ut = fgi.init();
+   if(InitBeg == 0 || InitBeg > ut) InitBeg = ut;
+   if(InitEnd == 0 || InitEnd < ut) InitEnd = ut;
 
    // Track the range of verifying BEST genesis events
-   if(pgi.best_gen()) {
-      unixtime ut = pgi.best_gen()->genesis_time();
+   if(bgi) {
+      ut = bgi->genesis_time();
       if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
       if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
    }
 
    // Current lead time and probability value
-   int lead_hr = nint(pgi.prob_item(index));
-   double prob = pgi.prob(index) / 100.0;
+   int lead_hr = nint(fgi.prob_item(index));
+   double prob = fgi.prob(index) / 100.0;
 
    // Add new map entries, if needed
    if(!LeadTimes.has(lead_hr)) {
 
       LeadTimes.add(lead_hr);
-      vector<const ProbGenInfo *> empty_pgi;
+      vector<const ProbGenInfo *> empty_fgi;
       vector<int>                 empty_idx;
+      vector<const GenesisInfo *> empty_bgi;
       vector<bool>                empty_evt;
 
-      PCTMap[lead_hr] = DefaultPCT;
-      PGIMap[lead_hr] = empty_pgi;
-      IdxMap[lead_hr] = empty_idx;
-      EvtMap[lead_hr] = empty_evt;
+      PCTMap    [lead_hr] = DefaultPCT;
+      FcstGenMap[lead_hr] = empty_fgi;
+      FcstIdxMap[lead_hr] = empty_idx;
+      BestGenMap[lead_hr] = empty_bgi;
+      BestEvtMap[lead_hr] = empty_evt;
    }
 
    // Update map entries
-   PGIMap[lead_hr].push_back(&pgi);
-   IdxMap[lead_hr].push_back(index);
-   EvtMap[lead_hr].push_back(is_event);
+   FcstGenMap[lead_hr].push_back(&fgi);
+   FcstIdxMap[lead_hr].push_back(index);
+   BestGenMap[lead_hr].push_back(bgi);
+   BestEvtMap[lead_hr].push_back(is_event);
 
    // Increment counts
    if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);

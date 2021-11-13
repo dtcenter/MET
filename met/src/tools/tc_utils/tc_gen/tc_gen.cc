@@ -95,7 +95,7 @@ static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
-static void   find_probgen_match   (ProbGenInfo &,
+static int    find_probgen_match   (const ProbGenInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
@@ -737,8 +737,9 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
                     const GenesisInfoArray &best_ga,
                     const TrackInfoArray &oper_ta,
                     ProbGenPCTInfo &pgi) {
-   int i, j, time_diff;
+   int i, i_bga, j, time_diff;
    bool is_event;
+   const GenesisInfo *bgi;
 
    // Initialize
    pgi.clear();
@@ -748,18 +749,23 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
    for(i=0; i<model_pa.n_prob_gen(); i++) {
 
       // Search for a BEST track match
-      find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
-                         vx_opt.GenesisMatchPointTrack,
-                         vx_opt.GenesisMatchRadius,
-                         vx_opt.GenesisMatchBeg,
-                         vx_opt.GenesisMatchEnd);
+      i_bga = find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
+                                 vx_opt.GenesisMatchPointTrack,
+                                 vx_opt.GenesisMatchRadius,
+                                 vx_opt.GenesisMatchBeg,
+                                 vx_opt.GenesisMatchEnd);
+
+      // Pointer to the matching BEST track
+      bgi = (is_bad_data(i_bga) ?
+             (const GenesisInfo *) 0 :
+             &best_ga[i_bga]);
 
       // Loop over the individual probabilities
       for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
 
          // Event verifies is the BEST genesis occurs in the specified time window
-         if(model_pa.prob_gen(i).best_gen()) {
-            time_diff = model_pa.prob_gen(i).best_gen()->genesis_time() -
+         if(bgi) {
+            time_diff = bgi->genesis_time() -
                         model_pa.prob_gen(i).init();
             is_event  = time_diff >= 0 &&
                         time_diff <= (model_pa.prob_gen(i).prob_item(j) * sec_per_hour);
@@ -769,7 +775,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
          }
 
          // Store pair info
-         pgi.add(model_pa.prob_gen(i), j, is_event);
+         pgi.add(model_pa.prob_gen(i), j, bgi, is_event);
 
       } // end for j
    } // end for i
@@ -780,9 +786,9 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-int find_genesis_match(const GenesisInfo      &fcst_gi,
+int find_genesis_match(const GenesisInfo &fcst_gi,
                        const GenesisInfoArray &bga,
-                       const TrackInfoArray   &ota,
+                       const TrackInfoArray &ota,
                        bool point2track, double rad,
                        int beg, int end) {
    int i, j, i_best, i_oper;
@@ -868,11 +874,11 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
 
 ////////////////////////////////////////////////////////////////////////
 
-void find_probgen_match(ProbGenInfo      &prob_gi,
-                        const GenesisInfoArray &bga,
-                        const TrackInfoArray   &ota,
-                        bool point2track, double rad,
-                        int beg, int end) {
+int find_probgen_match(const ProbGenInfo &prob_gi,
+                       const GenesisInfoArray &bga,
+                       const TrackInfoArray &ota,
+                       bool point2track, double rad,
+                       int beg, int end) {
    int i, j, i_best, i_oper;
 
    ConcatString case_cs;
@@ -950,11 +956,7 @@ void find_probgen_match(ProbGenInfo      &prob_gi,
            << " has NO MATCH in the BEST or operational tracks.\n";
    }
 
-   // Store a pointer to the match
-   if(!is_bad_data(i_best)) prob_gi.set_best_gen(&bga[i_best]);
-   else                     prob_gi.set_best_gen((GenesisInfo *) 0);
-
-   return;
+   return(i_best);
 }
 
 
@@ -1903,11 +1905,11 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pgi.PGIMap[lead_hr].size(); i++) {
+   for(i=0; i<pgi.FcstGenMap[lead_hr].size(); i++) {
 
       // Pointers for current case
-      const ProbGenInfo *fgi = pgi.PGIMap[lead_hr][i];
-      const GenesisInfo *bgi = fgi->best_gen();
+      const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][i];
+      const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][i];
 
       // Store timing info
       shc.set_fcst_lead_sec(fgi->genesis_lead());
@@ -1949,9 +1951,10 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
                             AsciiTable &at, int r, int c) {
 
    // Pointers for current case
-   const ProbGenInfo *fgi = pgi.PGIMap[lead_hr][index];
-   const GenesisInfo *bgi = fgi->best_gen();
-   int i_prob = pgi.IdxMap[lead_hr][index];
+   const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][index];
+   const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][index];
+
+   int i_prob = pgi.FcstIdxMap[lead_hr][index];
 
     //
     // Genesis Matched Pairs (GENMPR):
@@ -1965,7 +1968,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
     //
 
     at.set_entry(r, c+0,  // Total number of pairs
-       (int) pgi.PGIMap[lead_hr].size());
+       (int) pgi.FcstGenMap[lead_hr].size());
 
     at.set_entry(r, c+1,  // Index of current pair
        index+1);
@@ -2016,7 +2019,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
        na_str);
 
     at.set_entry(r, c+17, // Operational category
-       (pgi.EvtMap[lead_hr][index] ? "FY_OY" : "FY_ON" ));
+       (pgi.BestEvtMap[lead_hr][index] ? "FYOY" : "FYON" ));
 
     return;
  }
