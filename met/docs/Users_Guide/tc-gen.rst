@@ -429,7 +429,6 @@ ______________________
      pjc    = NONE;
      prc    = NONE;
      genmpr = NONE;
-}
   }
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
   version    = "VN.N";
