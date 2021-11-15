@@ -62,6 +62,7 @@
 //   031    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
 //   032    10/07/21  Halley Gotway  MET #1905 Add -ctrl option.
+//   032    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -295,6 +296,14 @@ void process_command_line(int argc, char **argv) {
 
    // Prepend the control member, if specified
    if(ctrl_file.nonempty()) {
+
+      if(ens_file_list.has(ctrl_file)) {
+         mlog << Error << "\nprocess_command_line() -> "
+              << "the ensemble control file should not appear in the list "
+              << "of ensemble member files:\n" << ctrl_file << "\n\n";
+         exit(1);
+      }
+
       ctrl_index = 0;
       ens_file_list.insert(ctrl_index, ctrl_file.c_str());
       n_ens++;
