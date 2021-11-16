@@ -5,8 +5,29 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version 10.1.0-beta3 release notes (|release_date|)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MET Version 10.1.0-beta4 release notes (20211116)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Enhancements:
+
+   * **Add logic to Ensemble-Stat to handle an ensemble control member** (`#1905 <https://github.com/dtcenter/MET/issues/1905>`_).
+   * Enhance Ensemble-Stat and Gen-Ens-Prod to error out if the control member also appears in the list of ensemble members (`#1968 <https://github.com/dtcenter/MET/issues/1968>`_).
+   * **Enhance TC-Gen to verify genesis probabilities from ATCF e-deck files** (`#1809 <https://github.com/dtcenter/MET/issues/1809>`_).
+   * Modify the STAT-Analysis GO Index configuration file (`#1945 <https://github.com/dtcenter/MET/issues/1945>`_).
+   * **Support percentile thresholds for frequency bias not equal to 1 (e.g. ==FBIAS0.9)** (`#1761 <https://github.com/dtcenter/MET/issues/1761>`_).
+   * Reimplement the NumArray class based on an STL template (`#1899 <https://github.com/dtcenter/MET/issues/1899>`_).
+
+* Bugfixes:
+
+   * Fix bug with the incrementing of numbers in temporary file names (`#1906 <https://github.com/dtcenter/MET/issues/1906>`_).
+   * Fix ascii2nc to check the return status when reading ASCII input files (`#1957 <https://github.com/dtcenter/MET/issues/1957>`_).
+
+* Documentation:
+
+   * Enhance the documentation with meta-data that is expected by MET for netCDF (`#1949 <https://github.com/dtcenter/MET/issues/1949>`_).
+
+MET Version 10.1.0-beta3 release notes (20211006)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * New tools:
 
