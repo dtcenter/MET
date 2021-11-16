@@ -80,7 +80,11 @@ oper_technique = "CARQ";
 // Array of dictionaries containing the track filtering options
 // If empty, a single filter is defined using the top-level settings.
 //
-filter = [];
+filter = [
+   {
+      desc = "ALL";
+   }
+];
 
 //
 // Description written to output DESC column
@@ -154,7 +158,7 @@ dland_thresh = NA;
 // Genesis matching logic. Compare the forecast genesis point to all points in
 // the Best track (TRUE) or the single Best track genesis point (FALSE).
 //
-genesis_match_point_to_track = TRUE;
+genesis_match_point_to_track = FALSE;
 
 //
 // Radius in km to search for a matching genesis event
@@ -166,8 +170,8 @@ genesis_match_radius = 500;
 // matching Best track point
 //
 genesis_match_window = {
-   beg = 0;
-   end = 0;
+   beg = -6;
+   end =  6;
 }
 
 //
@@ -176,7 +180,7 @@ genesis_match_window = {
 dev_hit_radius = 500;
 
 //
-// Time window in hours, relative to the model genesis time, for a development
+// Time window in hours, relative to the model genesis time, for a development 
 // scoring method hit
 //
 dev_hit_window = {
@@ -227,29 +231,19 @@ ci_alpha = 0.05;
 //
 output_flag = {
    fho    = NONE;
-   ctc    = BOTH;
-   cts    = BOTH;
-   pct    = NONE;
-   pstd   = NONE;
-   pjc    = NONE;
-   prc    = NONE;
-   genmpr = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   pct    = BOTH;
+   pstd   = BOTH;
+   pjc    = BOTH;
+   prc    = BOTH;
+   genmpr = BOTH;
 }
 
 //
 // NetCDF genesis pair counts
 //
-nc_pairs_flag = {
-   latlon       = TRUE;
-   fcst_genesis = TRUE;
-   fcst_tracks  = TRUE;
-   fcst_fy_oy   = TRUE;
-   fcst_fy_on   = TRUE;
-   best_genesis = TRUE;
-   best_tracks  = TRUE;
-   best_fy_oy   = TRUE;
-   best_fn_oy   = TRUE;
-}
+nc_pairs_flag = FALSE;
 
 //
 // Specify which track points should be counted by thresholding the track point

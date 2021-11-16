@@ -164,6 +164,7 @@ void TCGenVxOpt::clear() {
    OpsHitBeg = OpsHitEnd = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
+   ProbGenThresh.clear();
    CIAlpha = bad_data_double;
    OutputMap.clear();
    NcInfo.clear();
@@ -288,7 +289,12 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
            << " must be set to true!\n\n";
       exit(1);
    }
-   
+
+   // Conf: prob_genesis_thresh
+   ProbGenThresh = dict.lookup_thresh_array(conf_key_prob_genesis_thresh);
+   ProbGenThresh = string_to_prob_thresh(ProbGenThresh.get_str().c_str());
+   check_prob_thresh(ProbGenThresh);
+
    // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
 
@@ -478,6 +484,62 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
    if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
       (ValidEnd > 0 && ValidEnd < gi.valid_max()))
       keep = false;
+
+   // Poly masking
+   if(VxPolyMask.n_points() > 0 &&
+     !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
+      keep = false;
+
+   // Area masking
+   if(!VxAreaMask.is_empty()) {
+      double x, y;
+      VxGridMask.latlon_to_xy(gi.lat(), -1.0*gi.lon(), x, y);
+      if(x < 0 || x >= VxGridMask.nx() ||
+         y < 0 || y >= VxGridMask.ny()) {
+         keep = false;
+      }
+      else {
+         keep = VxAreaMask(nint(x), nint(y));
+      }
+   }
+
+   // Distance to land
+   if((DLandThresh.get_type() != no_thresh_type) &&
+      (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
+      keep = false;
+
+   // Return the keep status
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
+   bool keep = true;
+
+   // ATCF ID processed elsewhere
+
+   // Check storm id
+   if(StormId.n() > 0 &&
+      !has_storm_id(StormId, gi.basin(), gi.cyclone(), gi.init()))
+      keep = false;
+
+   // Check storm name: no included in genesis probabilities
+
+   // Initialization time
+   if((InitBeg     > 0 &&  InitBeg >   gi.init())  ||
+      (InitEnd     > 0 &&  InitEnd <   gi.init())  ||
+      (InitInc.n() > 0 && !InitInc.has(gi.init())) ||
+      (InitExc.n() > 0 &&  InitExc.has(gi.init())))
+      keep = false;
+
+   // Initialization hours
+   if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
+      keep = false;
+
+   // Lead and valid times:
+   // ProbGenInfo objects can contain multiple lead/valid times.
+   // Do not filter by them here.
 
    // Poly masking
    if(VxPolyMask.n_points() > 0 &&
@@ -824,6 +886,18 @@ STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int TCGenConfInfo::get_max_n_prob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<VxOpt.size(); i++) {
+      n = max(n, VxOpt[i].ProbGenThresh.n());
+   }
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class GenCTCInfo
 //
@@ -1130,6 +1204,127 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
          inc_pnt(gi[i].lat(), gi[i].lon(), s);
       }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class ProbGenPCTInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::ProbGenPCTInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::~ProbGenPCTInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::clear() {
+
+   DefaultPCT.clear();
+
+   Model.clear();
+   InitBeg = InitEnd = (unixtime) 0;
+   BestBeg = BestEnd = (unixtime) 0;
+
+   PCTMap.clear();
+   FcstGenMap.clear();
+   FcstIdxMap.clear();
+   BestGenMap.clear();
+   BestEvtMap.clear();
+
+   VxOpt = (const TCGenVxOpt *) 0;
+   LeadTimes.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
+
+   if(!vx_opt) return;
+
+   // Store pointer
+   VxOpt = vx_opt;
+
+   // Setup the default PCTInfo object
+   DefaultPCT.set_fthresh(VxOpt->ProbGenThresh);
+   DefaultPCT.allocate_n_alpha(1);
+   DefaultPCT.alpha[0] = VxOpt->CIAlpha;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::add(const ProbGenInfo &fgi, int index,
+                         const GenesisInfo *bgi, bool is_event) {
+   int i;
+   unixtime ut;
+
+   // Store the model name
+   if(Model.empty()) Model = fgi.technique();
+
+   // Track the range of forecast initalization times
+   ut = fgi.init();
+   if(InitBeg == 0 || InitBeg > ut) InitBeg = ut;
+   if(InitEnd == 0 || InitEnd < ut) InitEnd = ut;
+
+   // Track the range of verifying BEST genesis events
+   if(bgi) {
+      ut = bgi->genesis_time();
+      if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
+      if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
+   }
+
+   // Current lead time and probability value
+   int lead_hr = nint(fgi.prob_item(index));
+   double prob = fgi.prob(index) / 100.0;
+
+   // Add new map entries, if needed
+   if(!LeadTimes.has(lead_hr)) {
+
+      LeadTimes.add(lead_hr);
+      vector<const ProbGenInfo *> empty_fgi;
+      vector<int>                 empty_idx;
+      vector<const GenesisInfo *> empty_bgi;
+      vector<bool>                empty_evt;
+
+      PCTMap    [lead_hr] = DefaultPCT;
+      FcstGenMap[lead_hr] = empty_fgi;
+      FcstIdxMap[lead_hr] = empty_idx;
+      BestGenMap[lead_hr] = empty_bgi;
+      BestEvtMap[lead_hr] = empty_evt;
+   }
+
+   // Update map entries
+   FcstGenMap[lead_hr].push_back(&fgi);
+   FcstIdxMap[lead_hr].push_back(index);
+   BestGenMap[lead_hr].push_back(bgi);
+   BestEvtMap[lead_hr].push_back(is_event);
+
+   // Increment counts
+   if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
+   else         PCTMap[lead_hr].pct.inc_nonevent(prob);
 
    return;
 }

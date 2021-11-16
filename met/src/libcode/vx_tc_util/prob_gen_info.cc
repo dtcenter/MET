@@ -17,30 +17,32 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "prob_rirw_info.h"
+#include "nav.h"
+
+#include "prob_gen_info.h"
 #include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ProbRIRWInfo
+//  Code for class ProbGenInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::ProbRIRWInfo() {
+ProbGenInfo::ProbGenInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::~ProbRIRWInfo() {
+ProbGenInfo::~ProbGenInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
+ProbGenInfo::ProbGenInfo(const ProbGenInfo & t) {
 
    init_from_scratch();
 
@@ -49,7 +51,7 @@ ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
+ProbGenInfo & ProbGenInfo::operator=(const ProbGenInfo & t) {
 
    if(this == &t) return(*this);
 
@@ -60,7 +62,7 @@ ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::init_from_scratch() {
+void ProbGenInfo::init_from_scratch() {
 
    clear();
 
@@ -69,29 +71,29 @@ void ProbRIRWInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::clear() {
+void ProbGenInfo::clear() {
 
    ProbInfoBase::clear();
 
-   Value = bad_data_double;
    Initials.clear();
-   RIRWBeg = bad_data_int;
-   RIRWEnd = bad_data_int;
+   GenOrDis.clear();
+   GenesisTime = (unixtime) 0;
+   GenesisLead = 0;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
+void ProbGenInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    ProbInfoBase::dump(out, indent_depth);
 
-   out << prefix << "Value           = "   << Value << "\n";
    out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
-   out << prefix << "RIRWBeg         = "   << RIRWBeg << "\n";
-   out << prefix << "RIRWEnd         = "   << RIRWEnd << "\n";
+   out << prefix << "GenOrDis        = \"" << GenOrDis.contents() << "\"\n";
+   out << prefix << "GenesisTime     = "   << unix_to_yyyymmdd_hhmmss(GenesisTime) << "\n";
+   out << prefix << "GenesisLead     = "   << sec_to_hhmmss(GenesisLead) << "\n";
 
    out << flush;
 
@@ -101,22 +103,22 @@ void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIRWInfo::serialize() const {
+ConcatString ProbGenInfo::serialize() const {
    ConcatString s;
 
    s << ProbInfoBase::serialize()
-     << ", ProbRIRWInfo: "
-     << "Value = " << Value
-     << ", Initials = \"" << Initials << "\""
-     << ", RIRWBeg = " << RIRWBeg
-     << ", RIRWEnd = " << RIRWEnd;
+     << ", ProbGenInfo: "
+     << "Initials = \"" << Initials << "\""
+     << ", GenOrDis = \"" << GenOrDis << "\""
+     << ", GenesisTime = " << unix_to_yyyymmdd_hhmmss(GenesisTime)
+     << ", GenesisLead = " << sec_to_hhmmss(GenesisLead) << "\n";
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
+ConcatString ProbGenInfo::serialize_r(int n, int indent_depth) const {
    ConcatString s;
 
    s << ProbInfoBase::serialize_r(n, indent_depth);
@@ -126,64 +128,71 @@ ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
+void ProbGenInfo::assign(const ProbGenInfo &p) {
 
    clear();
 
    ProbInfoBase::assign(p);
 
-   Value    = p.Value;
-   Initials = p.Initials;
-   RIRWBeg  = p.RIRWBeg;
-   RIRWEnd  = p.RIRWEnd;
+   Initials    = p.Initials;
+   GenOrDis    = p.GenOrDis;
+   GenesisTime = p.GenesisTime;
+   GenesisLead = p.GenesisLead;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int ProbRIRWInfo::rirw_window() const {
-   return((is_bad_data(rirw_beg()) || is_bad_data(rirw_end()) ?
-           bad_data_int : rirw_end() - rirw_beg()));
+int ProbGenInfo::genesis_fhr() const {
+   return(is_bad_data(GenesisLead) ?
+          bad_data_int :
+          nint((double) GenesisLead/sec_per_hour));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::initialize(const ATCFProbLine &l, double dland) {
+void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
 
    ProbInfoBase::initialize(l, dland);
 
-   Value    = parse_int(l.get_item(ProbRIRWValueOffset).c_str());
-   Initials =           l.get_item(ProbRIRWInitialsOffset);
-   RIRWBeg  = parse_int(l.get_item(ProbRIRWBegOffset).c_str());
-   RIRWEnd  = parse_int(l.get_item(ProbRIRWEndOffset).c_str());
+   Initials = l.get_item(ProbGenInitialsOffset);
+   GenOrDis = l.get_item(ProbGenOrDisOffset);
+
+   // Store an empty string as unixtime 0
+   GenesisTime  = (l.get_item(ProbGenTimeOffset).empty() ?
+                   (unixtime) 0 :
+                   parse_time(l.get_item(ProbGenTimeOffset).c_str()));
+   GenesisLead = (GenesisTime == 0 ? bad_data_int :
+                  GenesisTime - InitTime);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
+bool ProbGenInfo::is_match(const ATCFProbLine &l) const {
 
    if(!ProbInfoBase::is_match(l)) return(false);
 
-   return(ValidTime == l.valid() &&
-          Value     == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
-          RIRWBeg   == parse_int(l.get_item(ProbRIRWBegOffset).c_str()) &&
-          RIRWEnd   == parse_int(l.get_item(ProbRIRWEndOffset).c_str()));
+   unixtime gen_ut = (l.get_item(ProbGenTimeOffset).empty() ?
+                      (unixtime) 0 :
+                      parse_time(l.get_item(ProbGenTimeOffset).c_str()));
+
+   return(GenesisTime == gen_ut);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
+bool ProbGenInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
       if(has(l)) {
          mlog << Warning
-              << "\nProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) -> "
+              << "\nProbGenInfo::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCF line:\n"
               << l.get_line() << "\n\n";
          return(false);
@@ -209,17 +218,24 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::set(const TCStatLine &l) {
+bool ProbGenInfo::is_match(const TrackPoint &p, const double rad,
+                           const int beg, const int end) const {
 
-   ProbInfoBase::set(l);
+   // Check for matching in time and space
+   return(p.valid() >= (GenesisTime + beg) &&
+          p.valid() <= (GenesisTime + end) &&
+          gc_dist(Lat, Lon, p.lat(), p.lon()) <= rad);
+}
 
-   // Store column information
-   Value    = atof(l.get_item("AWIND_END"));
-   Initials = l.get_item("Initials", false);
-   RIRWBeg  = atoi(l.get_item("RIRW_BEG"));
-   RIRWEnd  = atoi(l.get_item("RIRW_END"));
+////////////////////////////////////////////////////////////////////////
 
-   return;
+bool ProbGenInfo::is_match(const GenesisInfo &gi, const double rad,
+                           const int beg, const int end) const {
+
+   // Input genesis point
+   const TrackPoint *p = gi.genesis();
+
+   return(p ? is_match(*p, rad, beg, end) : false);
 }
 
 ////////////////////////////////////////////////////////////////////////

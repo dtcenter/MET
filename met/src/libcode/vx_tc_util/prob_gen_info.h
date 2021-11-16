@@ -8,42 +8,43 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_PROB_RI_INFO_H__
-#define  __VX_PROB_RI_INFO_H__
+#ifndef  __VX_PROB_GEN_INFO_H__
+#define  __VX_PROB_GEN_INFO_H__
 
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 
 #include "prob_info_base.h"
+#include "genesis_info.h"
 
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-// ProbRIRWInfo class stores probability of rapid intensification.
+// ProbGenInfo class stores probability of rapid intensification.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ProbRIRWInfo : public ProbInfoBase {
+class ProbGenInfo : public ProbInfoBase {
 
    private:
 
       void init_from_scratch();
-      void assign(const ProbRIRWInfo &);
+      void assign(const ProbGenInfo &);
 
-      // Prob RI specific values
-      double       Value;
+      // Probability of Genesis specific values
       ConcatString Initials;
-      int          RIRWBeg; // hours
-      int          RIRWEnd; // hours
+      ConcatString GenOrDis;
+      unixtime     GenesisTime;
+      int          GenesisLead;
 
    public:
 
-      ProbRIRWInfo();
-     ~ProbRIRWInfo();
-      ProbRIRWInfo(const ProbRIRWInfo &);
-      ProbRIRWInfo & operator=(const ProbRIRWInfo &);
+      ProbGenInfo();
+     ~ProbGenInfo();
+      ProbGenInfo(const ProbGenInfo &);
+      ProbGenInfo & operator=(const ProbGenInfo &);
 
       void clear();
 
@@ -55,15 +56,18 @@ class ProbRIRWInfo : public ProbInfoBase {
          //  set stuff
          //
 
+      void set_best_gen(const GenesisInfo *);
+
          //
          //  get stuff
          //
 
-      double               value()       const;
-      const ConcatString & initials()    const;
-      int                  rirw_beg()    const;
-      int                  rirw_end()    const;
-      int                  rirw_window() const;
+      const ConcatString & initials()     const;
+      const ConcatString & gen_or_dis()   const;
+      unixtime             genesis_time() const;
+      int                  genesis_lead() const;
+      int                  genesis_fhr()  const;
+      const GenesisInfo *  best_gen()     const;
 
          //
          //  do stuff
@@ -72,19 +76,23 @@ class ProbRIRWInfo : public ProbInfoBase {
       void initialize(const ATCFProbLine &, double);
       bool is_match  (const ATCFProbLine &) const;
       bool add       (const ATCFProbLine &, double, bool check_dup = false);
-      void set       (const TCStatLine &);
+
+      bool is_match  (const TrackPoint &,
+                      const double, const int, const int) const;
+      bool is_match  (const GenesisInfo &,
+                      const double, const int, const int) const;
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double               ProbRIRWInfo::value()    const { return(Value);    }
-inline const ConcatString & ProbRIRWInfo::initials() const { return(Initials); }
-inline int                  ProbRIRWInfo::rirw_beg() const { return(RIRWBeg);  }
-inline int                  ProbRIRWInfo::rirw_end() const { return(RIRWEnd);  }
+inline const ConcatString & ProbGenInfo::initials()     const { return(Initials);    }
+inline const ConcatString & ProbGenInfo::gen_or_dis()   const { return(GenOrDis);    }
+inline unixtime             ProbGenInfo::genesis_time() const { return(GenesisTime); }
+inline int                  ProbGenInfo::genesis_lead() const { return(GenesisLead); }
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __VX_PROB_RI_INFO_H__  */
+#endif   /*  __VX_PROB_GEN_INFO_H__  */
 
 ////////////////////////////////////////////////////////////////////////

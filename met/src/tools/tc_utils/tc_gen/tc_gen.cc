@@ -20,6 +20,7 @@
 //   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
 //   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
 //   005    04/02/21  Halley Gotway   Refinements for MET #1714
+//   006    11/04/21  Halley Gotway   Add -edeck for MET #1809
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,19 +57,24 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
-static void   process_genesis      ();
+static void   score_track_genesis  (const GenesisInfoArray &,
+                                    const TrackInfoArray &);
+static void   score_genesis_prob   (const GenesisInfoArray &,
+                                    const TrackInfoArray &);
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     const char *,
                                     StringArray &, StringArray &);
-static void   process_fcst_tracks  (const StringArray &,
+static void   process_genesis      (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &);
-static void   process_best_tracks  (const StringArray &,
+static void   process_tracks       (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &,
                                     TrackInfoArray &);
-
+static void   process_edecks       (const StringArray &,
+                                    const StringArray &,
+                                    ProbInfoArray &);
 static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const ConcatString &,
                                     const GenesisInfoArray &,
@@ -79,25 +85,44 @@ static void   get_genesis_pairs    (const TCGenVxOpt &,
 static void   do_genesis_ctc       (const TCGenVxOpt &,
                                     PairDataGenesis &,
                                     GenCTCInfo &);
+static void   do_probgen_pct       (const TCGenVxOpt &,
+                                    ProbInfoArray &,
+                                    const GenesisInfoArray &,
+                                    const TrackInfoArray &,
+                                    ProbGenPCTInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
+static int    find_probgen_match   (const ProbGenInfo &,
+                                    const GenesisInfoArray &,
+                                    const TrackInfoArray &,
+                                    bool, double, int, int);
 
-static void   setup_txt_files      (int, int);
+static void   setup_txt_files      (int, int, int);
 static void   setup_table          (AsciiTable &);
 static void   setup_nc_file        ();
 
-static void   write_stats          (const PairDataGenesis &,
+static void   write_ctc_stats      (const PairDataGenesis &,
                                     GenCTCInfo &);
-static void   write_genmpr_row     (StatHdrColumns &,
+static void   write_ctc_genmpr_row (StatHdrColumns &,
                                     const PairDataGenesis &,
                                     STATOutputType,
                                     AsciiTable &, int &,
                                     AsciiTable &, int &);
-static void   write_genmpr_cols    (const PairDataGenesis &, int,
+static void   write_ctc_genmpr_cols(const PairDataGenesis &, int,
                                     AsciiTable &, int, int);
+
+static void   write_pct_stats      (ProbGenPCTInfo &);
+static void   write_pct_genmpr_row (StatHdrColumns &,
+                                    ProbGenPCTInfo &, int,
+                                    STATOutputType,
+                                    AsciiTable &, int &,
+                                    AsciiTable &, int &);
+static void   write_pct_genmpr_cols(ProbGenPCTInfo &, int, int,
+                                    AsciiTable &, int, int);
+
 static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
 
@@ -105,6 +130,7 @@ static void   usage                ();
 static void   set_source           (const StringArray &, const char *,
                                     StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
+static void   set_edeck            (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
@@ -119,8 +145,43 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Identify and process genesis events and write output
-   process_genesis();
+   // Process the verifying BEST and operational tracks
+   StringArray track_files, track_files_model_suffix;
+   GenesisInfoArray best_ga;
+   TrackInfoArray oper_ta;
+
+   // Get the list of verifing track files
+   get_atcf_files(track_source, track_model_suffix, atcf_reg_exp,
+                  track_files,  track_files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << track_files.n()
+        << " verifying track files.\n";
+   process_tracks(track_files, track_files_model_suffix,
+                  best_ga, oper_ta);
+
+   // Score genesis events and write output
+   if(genesis_source.n() > 0) {
+      score_track_genesis(best_ga, oper_ta);
+   }
+
+   // Score EDECK genesis probabilities and write output
+   if(edeck_source.n() > 0) {
+      score_genesis_prob(best_ga, oper_ta);
+   }
+
+   // Finish output files
+   finish_txt_files();
+
+   // Close the NetCDF output file
+   if(nc_out) {
+
+      // List the NetCDF file after it is finished
+      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
+
+      delete nc_out;
+      nc_out = (NcFile *) 0;
+   }
 
    return(0);
 }
@@ -143,6 +204,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add function calls for the arguments
    cline.add(set_genesis, "-genesis", -1);
+   cline.add(set_edeck,   "-edeck",   -1);
    cline.add(set_track,   "-track",   -1);
    cline.add(set_config,  "-config",   1);
    cline.add(set_out,     "-out",      1);
@@ -154,18 +216,26 @@ void process_command_line(int argc, char **argv) {
    for(i=genesis_model_suffix.n(); i<genesis_source.n(); i++) {
       genesis_model_suffix.add("");
    }
+   for(i=edeck_model_suffix.n(); i<edeck_source.n(); i++) {
+      edeck_model_suffix.add("");
+   }
    for(i=track_model_suffix.n(); i<track_source.n(); i++) {
       track_model_suffix.add("");
    }
 
    // Check for the minimum number of arguments
-   if(genesis_source.n()   == 0 ||
-      track_source.n()     == 0 ||
-      config_file.length() == 0) {
-      mlog << Error
-           << "\nprocess_command_line(int argc, char **argv) -> "
-           << "the \"-genesis\", \"-track\", and \"-config\" command "
+   if(genesis_source.n() == 0 && edeck_source.n() == 0) {
+      mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
+           << "at least one of the \"-genesis\" or \"-edeck\" command "
            << "line options are required\n\n";
+      usage();
+   }
+
+   // Check for the minimum number of arguments
+   if(track_source.n() == 0 || config_file.length() == 0) {
+      mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
+           << "the \"-track\" and \"-config\" command line options "
+           << "are required\n\n";
       usage();
    }
 
@@ -175,6 +245,14 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << genesis_source.n()
            << "] Genesis Source: " << genesis_source[i]
            << ", Model Suffix: " << genesis_model_suffix[i] << "\n";
+   }
+
+   // List the input edeck files
+   for(i=0; i<edeck_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << edeck_source.n()
+           << "] EDECK Source: " << edeck_source[i]
+           << ", Model Suffix: " << edeck_model_suffix[i] << "\n";
    }
 
    // List the input track track files
@@ -202,17 +280,16 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_genesis() {
+void score_track_genesis(const GenesisInfoArray &best_ga,
+                         const TrackInfoArray &oper_ta) {
    int i, j;
    StringArray genesis_files, genesis_files_model_suffix;
-   StringArray track_files, track_files_model_suffix;
-   GenesisInfoArray fcst_ga, best_ga, empty_ga;
-   TrackInfoArray oper_ta;
+   GenesisInfoArray fcst_ga, empty_ga;
    ConcatString model, cs;
    map<ConcatString,GenesisInfoArray> model_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
    PairDataGenesis pairs;
-   GenCTCInfo ctc_info;
+   GenCTCInfo genesis_ctc;
 
    // Get the list of genesis track files
    get_atcf_files(genesis_source, genesis_model_suffix, atcf_gen_reg_exp,
@@ -221,25 +298,15 @@ void process_genesis() {
    mlog << Debug(2)
         << "Processing " << genesis_files.n()
         << " forecast genesis track files.\n";
-   process_fcst_tracks(genesis_files, genesis_files_model_suffix,
-                       fcst_ga);
-
-   // Get the list of verifing track files
-   get_atcf_files(track_source, track_model_suffix, atcf_reg_exp,
-                  track_files,  track_files_model_suffix);
-
-   mlog << Debug(2)
-        << "Processing " << track_files.n()
-        << " verifying track files.\n";
-   process_best_tracks(track_files, track_files_model_suffix,
-                       best_ga, oper_ta);
+   process_genesis(genesis_files, genesis_files_model_suffix,
+                   fcst_ga);
 
    // Setup output files based on the number of techniques present
    // and possible pairs.
    int n_time = (conf_info.FcstSecEnd - conf_info.FcstSecBeg) /
                 (conf_info.InitFreqHr*sec_per_hour) + 1;
    int n_pair = best_ga.n() * n_time + fcst_ga.n();
-   setup_txt_files(fcst_ga.n_technique(), n_pair);
+   setup_txt_files(fcst_ga.n_technique(), 1, n_pair);
 
    // If requested, setup the NetCDF output file
    if(!conf_info.NcInfo.all_false()) setup_nc_file();
@@ -272,16 +339,16 @@ void process_genesis() {
          // Store the current genesis event
          model_ga_map[model].add(fcst_ga[j]);
 
-      } // end j
+      } // end for j
 
-      // Process the genesis events for each model.
+      // Process the genesis events for each model
       for(j=0,it=model_ga_map.begin(); it!=model_ga_map.end(); it++,j++) {
 
          // Initialize
-         ctc_info.clear();
-         ctc_info.Model = it->first;
-         ctc_info.set_vx_opt(&conf_info.VxOpt[i],
-                             &conf_info.NcOutGrid);
+         genesis_ctc.clear();
+         genesis_ctc.Model = it->first;
+         genesis_ctc.set_vx_opt(&conf_info.VxOpt[i],
+                                &conf_info.NcOutGrid);
 
          mlog << Debug(2)
               << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
@@ -297,33 +364,107 @@ void process_genesis() {
                            best_ga, oper_ta, pairs);
 
          // Do the categorical verification
-         do_genesis_ctc(conf_info.VxOpt[i], pairs, ctc_info);
+         do_genesis_ctc(conf_info.VxOpt[i], pairs, genesis_ctc);
 
          // Write the statistics output
-         write_stats(pairs, ctc_info);
+         write_ctc_stats(pairs, genesis_ctc);
 
          // Write NetCDF output fields
          if(!conf_info.VxOpt[i].NcInfo.all_false()) {
-            write_nc(ctc_info);
+            write_nc(genesis_ctc);
          }
    
       } // end for j
 
    } // end for i n_vx
 
-   // Finish output files
-   finish_txt_files();
+   return;
+}
 
-   // Close the NetCDF output file
-   if(nc_out) {
+////////////////////////////////////////////////////////////////////////
 
-      // List the NetCDF file after it is finished
-      mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
+void score_genesis_prob(const GenesisInfoArray &best_ga,
+                        const TrackInfoArray &oper_ta) {
+   int i, j, n, max_n_prob, n_pair;
+   StringArray edeck_files, edeck_files_model_suffix;
+   ProbInfoArray fcst_pa, empty_pa;
+   ConcatString model;
+   map<ConcatString,ProbInfoArray> model_pa_map;
+   map<ConcatString,ProbInfoArray>::iterator it;
+   ProbGenPCTInfo probgen_pct;
 
-      delete nc_out;
-      nc_out = (NcFile *) 0;
+   // Get the list of EDECK files
+   get_atcf_files(edeck_source, edeck_model_suffix, atcf_reg_exp,
+                  edeck_files,  edeck_files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << edeck_files.n()
+        << " forecast EDECK files.\n";
+   process_edecks(edeck_files, edeck_files_model_suffix,
+                  fcst_pa);
+
+   // Count up the total number of probabilities
+   for(i=0,max_n_prob=0,n_pair=0; i<fcst_pa.n_prob_gen(); i++) {
+      n = fcst_pa.prob_gen(i).n_prob();
+      if(n > max_n_prob) max_n_prob = n;
+      n_pair += n;
    }
 
+   // Setup output files based on the number of techniques
+   setup_txt_files(fcst_pa.n_technique(), max_n_prob, n_pair);
+
+   // Process each verification filter
+   for(i=0; i<conf_info.n_vx(); i++) {
+
+      // Initialize
+      model_pa_map.clear();
+
+      // Organize the forecast genesis probabilities
+      // into a map by model name
+      for(j=0; j<fcst_pa.n_prob_gen(); j++) {
+
+         // Check filters
+         if(!conf_info.VxOpt[i].is_keeper(fcst_pa.prob_gen(j))) continue;
+
+         // Store the current forecast ATCF ID
+         model = fcst_pa.prob_gen(j).technique();
+
+         // Check specified forecast models
+         if( conf_info.VxOpt[i].Model.n() > 0 &&
+            !conf_info.VxOpt[i].Model.has(model)) continue;
+
+         // Add a new map entry, if necessary
+         if(model_pa_map.count(model) == 0) {
+            empty_pa.clear();
+            model_pa_map[model] = empty_pa;
+         }
+
+         // Store the current genesis event
+         model_pa_map[model].add(fcst_pa.prob_gen(j));
+
+      } // end for j
+
+      // Process the genesis probabilities for each model
+      for(j=0,it=model_pa_map.begin(); it!=model_pa_map.end(); it++,j++) {
+
+         mlog << Debug(2)
+              << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+              << ") " << ": Model " << j+1 << "] " << "For " << it->first
+              << " model, comparing " << it->second.n_prob_gen()
+              << " probability of genesis forecasts to " << best_ga.n() << " "
+              << conf_info.BestEventInfo.Technique << " and "
+              << oper_ta.n() << " " << conf_info.OperTechnique
+              << " tracks.\n";
+
+         // Do the probabilistic verification
+         do_probgen_pct(conf_info.VxOpt[i], it->second,
+                        best_ga, oper_ta, probgen_pct);
+
+         // Write the statistics output
+         write_pct_stats(probgen_pct);
+
+      } // end for j
+   } // end for i
 
    return;
 }
@@ -598,9 +739,63 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-int find_genesis_match(const GenesisInfo      &fcst_gi,
+void do_probgen_pct(const TCGenVxOpt &vx_opt,
+                    ProbInfoArray &model_pa,
+                    const GenesisInfoArray &best_ga,
+                    const TrackInfoArray &oper_ta,
+                    ProbGenPCTInfo &pgi) {
+   int i, i_bga, j, time_diff;
+   bool is_event;
+   const GenesisInfo *bgi;
+
+   // Initialize
+   pgi.clear();
+   pgi.set_vx_opt(&vx_opt);
+
+   // Score each of the probability forecasts
+   for(i=0; i<model_pa.n_prob_gen(); i++) {
+
+      // Search for a BEST track match
+      i_bga = find_probgen_match(model_pa.prob_gen(i), best_ga, oper_ta,
+                                 vx_opt.GenesisMatchPointTrack,
+                                 vx_opt.GenesisMatchRadius,
+                                 vx_opt.GenesisMatchBeg,
+                                 vx_opt.GenesisMatchEnd);
+
+      // Pointer to the matching BEST track
+      bgi = (is_bad_data(i_bga) ?
+             (const GenesisInfo *) 0 :
+             &best_ga[i_bga]);
+
+      // Loop over the individual probabilities
+      for(j=0; j<model_pa.prob_gen(i).n_prob(); j++) {
+
+         // Event verifies is the BEST genesis occurs in the specified time window
+         if(bgi) {
+            time_diff = bgi->genesis_time() -
+                        model_pa.prob_gen(i).init();
+            is_event  = time_diff >= 0 &&
+                        time_diff <= (model_pa.prob_gen(i).prob_item(j) * sec_per_hour);
+         }
+         else {
+            is_event = false;
+         }
+
+         // Store pair info
+         pgi.add(model_pa.prob_gen(i), j, bgi, is_event);
+
+      } // end for j
+   } // end for i
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+int find_genesis_match(const GenesisInfo &fcst_gi,
                        const GenesisInfoArray &bga,
-                       const TrackInfoArray   &ota,
+                       const TrackInfoArray &ota,
                        bool point2track, double rad,
                        int beg, int end) {
    int i, j, i_best, i_oper;
@@ -686,6 +881,94 @@ int find_genesis_match(const GenesisInfo      &fcst_gi,
 
 ////////////////////////////////////////////////////////////////////////
 
+int find_probgen_match(const ProbGenInfo &prob_gi,
+                       const GenesisInfoArray &bga,
+                       const TrackInfoArray &ota,
+                       bool point2track, double rad,
+                       int beg, int end) {
+   int i, j, i_best, i_oper;
+
+   ConcatString case_cs;
+   case_cs << prob_gi.technique() << " "
+           << unix_to_yyyymmdd_hhmmss(prob_gi.init())
+           << " initialization, "
+           << unix_to_yyyymmdd_hhmmss(prob_gi.genesis_time())
+           << " forecast genesis at (" << prob_gi.lat() << ", "
+           << prob_gi.lon() << ")";
+
+   // Search for a BEST track genesis match
+   for(i=0, i_best=bad_data_int;
+       i<bga.n() && is_bad_data(i_best);
+       i++) {
+
+      // Check all BEST track points
+      if(point2track) {
+
+         for(j=0; j<bga[i].n_points(); j++) {
+            if(prob_gi.is_match(bga[i][j], rad, beg, end)) {
+               i_best = i;
+               mlog << Debug(4) << case_cs
+                    << " MATCHES BEST genesis track "
+                    << bga[i].storm_id() << ".\n";
+               break;
+            }
+         }
+      }
+      // Check only the BEST genesis points
+      else {
+
+         if(prob_gi.is_match(bga[i], rad, beg, end)) {
+            i_best = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES BEST genesis point "
+                 << bga[i].storm_id() << ".\n";
+            break;
+         }
+      }
+   } // end for bga
+
+   // If no BEST track match was found, search the operational tracks
+   if(is_bad_data(i_best)) {
+
+      for(i=0, i_oper=bad_data_int;
+          i<ota.n() && is_bad_data(i_oper);
+          i++) {
+
+         // Each operational track contains only lead time 0
+         if(ota[i].n_points() == 0) continue;
+
+         if(prob_gi.is_match(ota[i][0], rad, beg, end)) {
+            i_oper = i;
+            mlog << Debug(4) << case_cs
+                 << " MATCHES operational " << ota[i].technique()
+                 << " genesis track " << ota[i].storm_id() << ".\n";
+            break;
+         }
+      } // end for ota
+
+      // Find BEST track for this operational track
+      if(!is_bad_data(i_oper)) {
+         for(i=0; i<bga.n(); i++) {
+            if(bga[i].storm_id() == ota[i_oper].storm_id()) {
+               i_best = i;
+               break;
+            }
+         }
+      }
+   }
+
+   // Check for no match
+   if(is_bad_data(i_best)) {
+      mlog << Debug(4) << case_cs
+           << " has NO MATCH in the BEST or operational tracks.\n";
+   }
+
+   return(i_best);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 void get_atcf_files(const StringArray &source,
                     const StringArray &model_suffix,
                     const char *reg_exp,
@@ -715,9 +998,9 @@ void get_atcf_files(const StringArray &source,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fcst_tracks(const StringArray &files,
-                         const StringArray &model_suffix,
-                         GenesisInfoArray  &fcst_ga) {
+void process_genesis(const StringArray &files,
+                     const StringArray &model_suffix,
+                     GenesisInfoArray  &fcst_ga) {
    int i, j;
    int n_lines, tot_lines, tot_tracks, n_genesis;
    ConcatString suffix;
@@ -737,7 +1020,7 @@ void process_fcst_tracks(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error << "\nprocess_fcst_tracks() -> "
+         mlog << Error << "\nprocess_genesis() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -842,10 +1125,10 @@ void process_fcst_tracks(const StringArray &files,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_best_tracks(const StringArray &files,
-                         const StringArray &model_suffix,
-                         GenesisInfoArray  &best_ga,
-                         TrackInfoArray    &oper_ta) {
+void process_tracks(const StringArray &files,
+                    const StringArray &model_suffix,
+                    GenesisInfoArray  &best_ga,
+                    TrackInfoArray    &oper_ta) {
    int i, i_bga, n_lines;
    ConcatString suffix, gen_basin, case_cs, storm_id;
    StringArray best_tech, oper_tech;
@@ -871,8 +1154,7 @@ void process_best_tracks(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_best_tracks() -> "
+         mlog << Error << "\nprocess_tracks() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -976,7 +1258,7 @@ void process_best_tracks(const StringArray &files,
             i--;
          }
          else {
-            mlog << Warning << "\nprocess_best_tracks() -> "
+            mlog << Warning << "\nprocess_tracks() -> "
                  << case_cs << "neither " << best_ga[i_bga].storm_id()
                  << " nor " << best_gi.storm_id()
                  << " matches the basin!\n\n";
@@ -997,6 +1279,82 @@ void process_best_tracks(const StringArray &files,
    mlog << Debug(2) << "Found " << best_ga.n()
         << " BEST genesis events.\n";
 
+   // Dump out very verbose output
+   if(mlog.verbosity_level() > 6) {
+      mlog << Debug(6) << best_ga.serialize_r() << "\n";
+   }
+   // Dump out track info
+   else {
+      for(i=0; i<best_ga.n(); i++) {
+         mlog << Debug(6) << "[Genesis " << i+1 << " of "
+              << best_ga.n() << "] " << best_ga[i].serialize()
+              << "\n";
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_edecks(const StringArray &files,
+                    const StringArray &model_suffix,
+                    ProbInfoArray     &probs) {
+   int i, n_lines;
+   double dland;
+   ConcatString suffix;
+   LineDataFile f;
+   ATCFProbLine line;
+
+   int valid_freq_sec = conf_info.ValidFreqHr*sec_per_hour;
+
+   // Initialize
+   probs.clear();
+   n_lines = 0;
+
+   // Process each of the input ATCF files
+   for(i=0; i<files.n(); i++) {
+
+      // Open the current file
+      if(!f.open(files[i].c_str())) {
+         mlog << Error << "\nprocess_edecks() -> "
+              << "unable to open file \"" << files[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
+      // Process the input track lines
+      while(f >> line) {
+
+         // Skip off-hour track points
+         if((line.valid_hour() % valid_freq_sec) != 0) continue;
+
+         // Only process genesis probability lines
+         if(line.type() == ATCFLineType_ProbGN) {
+            dland = conf_info.compute_dland(line.lat(), -1.0*line.lon());
+            if(probs.add(line, dland, false)) n_lines++;
+         }
+      }
+
+      // Close the current file
+      f.close();
+
+   } // end for i
+
+   // Dump out the total number of lines
+   mlog << Debug(3)
+        << "Read a total of " << n_lines << " "
+        << atcflinetype_to_string(ATCFLineType_ProbGN)
+        << " lines from " << files.n() << " input files.\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 6) {
+      mlog << Debug(6) << probs.serialize_r() << "\n";
+   }
+
    return;
 }
 
@@ -1006,70 +1364,153 @@ void process_best_tracks(const StringArray &files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(int n_model, int n_pair) {
-   int i, n_rows, n_cols;
+void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
+   int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
-   // Check to see if the text files have already been set up
-   if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
+   // Check to see if the stat file stream has already been setup
+   bool init_from_scratch = (stat_out == (ofstream *) 0);
 
-   // Initialize file stream
-   stat_out = (ofstream *) 0;
+   // Get the maximum number of probability thresholds
+   n_prob = conf_info.get_max_n_prob_thresh();
 
-   // Build the file name
-   stat_file << out_base << stat_file_ext;
+   // Compute the number of rows/cols needs for each file type
+   for(i=0, stat_rows=0, stat_cols=0; i<n_txt; i++) {
 
-   // Create the output STAT file
-   open_txt_file(stat_out, stat_file.c_str());
+      // Ignore disabled line types
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_None) continue;
 
-   // Setup the STAT AsciiTable
-   n_rows = 1 + 6 * n_model * conf_info.n_vx();
-   if(conf_info.OutputMap[stat_genmpr] != STATOutputType_None) {
-      n_rows += n_model * conf_info.n_vx() * n_pair;
-   }
-   n_cols = 1 + n_header_columns + n_cts_columns;
-   stat_at.set_size(n_rows, n_cols);
-   setup_table(stat_at);
+      // Compute the number of rows for this line type
+      switch(i) {
 
-   // Write the text header row
-   write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+         // 2x2 contingency table output:
+         // 1 header + 2 vx methods * # models * # filters
+         case(i_fho):
+         case(i_ctc):
+         case(i_cts):
+            n_rows = 1 + 2 * n_model * conf_info.n_vx();
+            break;
 
-   // Initialize the row index to 1 to account for the header
-   i_stat_row = 1;
+         // Nx2 probabilistic contingency table output:
+         // 1 header + 1 vx method * # models * #probs * # filters
+         case(i_pct):
+         case(i_pstd):
+         case(i_pjc):
+         case(i_prc):
+            n_rows = 1 + n_model * max_n_prob * conf_info.n_vx();
+            break;
 
-   // Setup each of the optional output text files
-   for(i=0; i<n_txt; i++) {
+         // For stat_genmpr:
+         // 1 header + 2 vx methods * # models * # filters * # pairs
+         default:
+            n_rows = 1 + 2 * n_model * conf_info.n_vx() * n_pair;
+            break;
+      } // end switch
 
-      // Only set it up if requested in the config file
+      // Compute the number of columns for this line type
+      switch(i) {
+
+         case(i_pct):
+            n_cols = get_n_pct_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         case(i_pstd):
+            n_cols = get_n_pstd_columns(n_prob) + n_header_columns + 1;
+            break;
+
+         case(i_pjc):
+            n_cols = get_n_pjc_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         case(i_prc):
+            n_cols = get_n_prc_columns(n_prob)  + n_header_columns + 1;
+            break;
+
+         default:
+           n_cols = n_txt_columns[i]  + n_header_columns + 1;
+           break;
+      } // end switch
+
+      // Track the total number of rows and maximum number of columns
+      stat_rows += n_rows;
+      if(stat_cols < n_cols) stat_cols = n_cols;
+
+      // Process optional ouptut files
       if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
 
-         // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         // Create new output file and stream
+         if(init_from_scratch) {
 
-         // Build the file name
-         txt_file[i] << out_base << "_" << txt_file_abbr[i]
-                     << txt_file_ext;
+            // Initialize file stream
+            txt_out[i] = (ofstream *) 0;
 
-         // Create the output text file
-         open_txt_file(txt_out[i], txt_file[i].c_str());
+            // Build the file name
+            txt_file[i] << out_base << "_" << txt_file_abbr[i]
+                        << txt_file_ext;
 
-         // Setup the text AsciiTable
-         if(txt_file_type[i] == stat_genmpr) {
-            n_rows = 1 + n_model * conf_info.n_vx() * n_pair;
+            // Create the output text file
+            open_txt_file(txt_out[i], txt_file[i].c_str());
+
+            // Setup the text AsciiTable
+            txt_at[i].set_size(n_rows, n_cols);
+            setup_table(txt_at[i]);
+
+            // Write header row
+            switch(i) {
+
+               case(i_pct):
+                  write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_pstd):
+                  write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_pjc):
+                  write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               case(i_prc):
+                  write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
+                  break;
+
+               default:
+                  write_header_row(txt_columns[i], n_txt_columns[i], 1,
+                                   txt_at[i], 0, 0);
+                  break;
+            } // end switch
+
+            // Initialize the row index to 1 to account for the header
+            i_txt_row[i] = 1;
          }
+         // Otherwise, resize the existing table
          else {
-            n_rows = 1 + 2 * n_model * conf_info.n_vx();
+            txt_at[i].expand(n_rows, n_cols);
          }
-         n_cols = 1 + n_header_columns + n_txt_columns[i];
-         txt_at[i].set_size(n_rows, n_cols);
-         setup_table(txt_at[i]);
+      } // end if
+   } // end for i
 
-         // Write header row
-         write_header_row(txt_columns[i], n_txt_columns[i], 1,
-                          txt_at[i], 0, 0);
+   // Process the stat file
+   if(init_from_scratch) {
 
-         // Initialize the row index to 1 to account for the header
-         i_txt_row[i] = 1;
-      }
+      // Build the file name
+      stat_file << out_base << stat_file_ext;
+
+      // Create the output STAT file
+      open_txt_file(stat_out, stat_file.c_str());
+
+      // Setup the STAT AsciiTable
+      stat_at.set_size(stat_rows, stat_cols);
+      setup_table(stat_at);
+
+      // Write the text header row
+      write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+
+      // Initialize the row index to 1 to account for the header
+      i_stat_row = 1;
+   }
+   // Otherwise, resize the existing table
+   else {
+      stat_at.expand(stat_rows, stat_cols);
    }
 
    return;
@@ -1135,8 +1576,8 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_stats(const PairDataGenesis &gpd,
-                 GenCTCInfo &gci) {
+void write_ctc_stats(const PairDataGenesis &gpd,
+                     GenCTCInfo &gci) {
 
    // Setup header columns
    shc.set_model(gci.Model.c_str());
@@ -1163,7 +1604,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_fho_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_fho),
+                       gci.VxOpt->output_map(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1172,7 +1613,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_fho_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_fho),
+                       gci.VxOpt->output_map(stat_fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1185,7 +1626,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_ctc_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_ctc),
+                       gci.VxOpt->output_map(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -1194,7 +1635,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_ctc_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_ctc),
+                       gci.VxOpt->output_map(stat_ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -1210,7 +1651,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_cts_row(shc, gci.CTSDev,
-                       gci.VxOpt->OutputMap.at(stat_cts),
+                       gci.VxOpt->output_map(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -1222,7 +1663,7 @@ void write_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_cts_row(shc, gci.CTSOps,
-                       gci.VxOpt->OutputMap.at(stat_cts),
+                       gci.VxOpt->output_map(stat_cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -1232,21 +1673,22 @@ void write_stats(const PairDataGenesis &gpd,
    if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
       shc.set_fcst_var(genesis_name);
       shc.set_obs_var (genesis_name);
-      write_genmpr_row(shc, gpd,
-                       gci.VxOpt->OutputMap.at(stat_genmpr),
-                       stat_at, i_stat_row,
-                       txt_at[i_genmpr], i_txt_row[i_genmpr]);
+      write_ctc_genmpr_row(shc, gpd,
+                           gci.VxOpt->output_map(stat_genmpr),
+                           stat_at, i_stat_row,
+                           txt_at[i_genmpr], i_txt_row[i_genmpr]);
    }
 
    return;
 }
+
 ////////////////////////////////////////////////////////////////////////
 
-void write_genmpr_row(StatHdrColumns &shc,
-                      const PairDataGenesis &gpd,
-                      STATOutputType out_type,
-                      AsciiTable &stat_at, int &stat_row,
-                      AsciiTable &txt_at, int &txt_row) {
+void write_ctc_genmpr_row(StatHdrColumns &shc,
+                          const PairDataGenesis &gpd,
+                          STATOutputType out_type,
+                          AsciiTable &stat_at, int &stat_row,
+                          AsciiTable &txt_at, int &txt_row) {
    int i;
    unixtime ut;
 
@@ -1254,6 +1696,8 @@ void write_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
@@ -1262,7 +1706,7 @@ void write_genmpr_row(StatHdrColumns &shc,
       // Pointers for current case
       const GenesisInfo* fgi = gpd.fcst_gen(i);
       const GenesisInfo* bgi = gpd.best_gen(i);
- 
+
       // Store timing info
       shc.set_fcst_lead_sec(gpd.lead_time(i));
       ut = (fgi ? fgi->genesis_time() : bgi->genesis_time());
@@ -1277,7 +1721,7 @@ void write_genmpr_row(StatHdrColumns &shc,
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      write_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
+      write_ctc_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_type == STATOutputType_Both) {
@@ -1296,16 +1740,17 @@ void write_genmpr_row(StatHdrColumns &shc,
 
 ////////////////////////////////////////////////////////////////////////
 
- void write_genmpr_cols(const PairDataGenesis &gpd, int i,
-                        AsciiTable &at, int r, int c) {
+ void write_ctc_genmpr_cols(const PairDataGenesis &gpd, int i,
+                            AsciiTable &at, int r, int c) {
 
     // Pointers for current case
     const GenesisInfo* fgi = gpd.fcst_gen(i);
     const GenesisInfo* bgi = gpd.best_gen(i);
-    
+
     //
     // Genesis Matched Pairs (GENMPR):
     //    TOTAL,       INDEX,       STORM_ID,
+    //    PROB_LEAD,   PROB_VAL,
     //    AGEN_INIT,   AGEN_FHR,
     //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
     //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
@@ -1322,44 +1767,266 @@ void write_genmpr_row(StatHdrColumns &shc,
     at.set_entry(r, c+2,  // Best track Storm ID
        gpd.best_storm_id(i));
 
-    at.set_entry(r, c+3,  // Fcst genesis initialization time
+    at.set_entry(r, c+3,  // Probability lead time
+       na_str);
+
+    at.set_entry(r, c+4,  // Probability value
+       na_str);
+
+    at.set_entry(r, c+5,  // Fcst genesis initialization time
        fgi ? unix_to_yyyymmdd_hhmmss(fgi->init()) : na_str);
 
-    at.set_entry(r, c+4,  // Fcst genesis hour
+    at.set_entry(r, c+6,  // Fcst genesis hour
        fgi ? fgi->genesis_fhr() : bad_data_int);
 
-    at.set_entry(r, c+5,  // Fcst track latitude
+    at.set_entry(r, c+7,  // Fcst track latitude
        fgi ? fgi->lat() : bad_data_double);
 
-    at.set_entry(r, c+6,  // Fcst track longitude
+    at.set_entry(r, c+8,  // Fcst track longitude
        fgi ? fgi->lon() : bad_data_double);
 
-    at.set_entry(r, c+7,  // Fcst track distance to land
+    at.set_entry(r, c+9,  // Fcst track distance to land
        fgi ? fgi->dland() : bad_data_double);
 
-    at.set_entry(r, c+8,  // Best track latitude
+    at.set_entry(r, c+10,  // Best track latitude
        bgi ? bgi->lat() : bad_data_double);
 
-    at.set_entry(r, c+9, // Best track longitude
+    at.set_entry(r, c+11, // Best track longitude
        bgi ? bgi->lon() : bad_data_double);
 
-    at.set_entry(r, c+10, // Best track distance to land
+    at.set_entry(r, c+12, // Best track distance to land
        bgi ? bgi->dland() : bad_data_double);
 
-    at.set_entry(r, c+11, // Genesis distance
+    at.set_entry(r, c+13, // Genesis distance
        gpd.gen_diff(i).DevDist);
 
-    at.set_entry(r, c+12, // Genesis time difference
+    at.set_entry(r, c+14, // Genesis time difference
        sec_to_hhmmss(gpd.gen_diff(i).DevDSec));
 
-    at.set_entry(r, c+13, // Genesis - Init time
+    at.set_entry(r, c+15, // Genesis - Init time
        sec_to_hhmmss(gpd.gen_diff(i).OpsDSec));
 
-    at.set_entry(r, c+14, // Development category
+    at.set_entry(r, c+16, // Development category
        genesispaircategory_to_string(gpd.gen_diff(i).DevCategory));
 
-    at.set_entry(r, c+15, // Operational category
+    at.set_entry(r, c+17, // Operational category
        genesispaircategory_to_string(gpd.gen_diff(i).OpsCategory));
+
+    return;
+ }
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_stats(ProbGenPCTInfo &pgi) {
+   int i, lead_hr, lead_sec;
+
+   // Setup header columns
+   shc.set_model(pgi.Model.c_str());
+   shc.set_desc(pgi.VxOpt->Desc.c_str());
+   shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
+   shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
+                na_str : pgi.VxOpt->VxMaskName.c_str());
+   shc.set_fcst_var(prob_genesis_name);
+   shc.set_obs_var (prob_genesis_name);
+
+   // Write results for each lead time
+   for(i=0; i<pgi.LeadTimes.n(); i++) {
+
+      lead_hr  = pgi.LeadTimes[i];
+      lead_sec = lead_hr * sec_per_hour;
+
+      // Timing information
+      shc.set_fcst_lead_sec(lead_sec);
+      shc.set_fcst_valid_beg(pgi.InitBeg + lead_sec);
+      shc.set_fcst_valid_end(pgi.InitEnd + lead_sec);
+      shc.set_obs_lead_sec(bad_data_int);
+      shc.set_obs_valid_beg(pgi.BestBeg);
+      shc.set_obs_valid_end(pgi.BestEnd);
+
+      // Write PCT output
+      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pct),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pct], i_txt_row[i_pct]);
+      }
+
+      // Write PSTD output
+      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
+         pgi.PCTMap[lead_hr].compute_stats();
+         pgi.PCTMap[lead_hr].compute_ci();
+         write_pstd_row(shc, pgi.PCTMap[lead_hr],
+                        pgi.VxOpt->output_map(stat_pstd),
+                        1, 1, stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+
+      // Write PJC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_pjc], i_txt_row[i_pjc]);
+      }
+
+      // Write PRC output
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+         write_pct_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_pjc),
+                       1, 1, stat_at, i_stat_row,
+                       txt_at[i_prc], i_txt_row[i_prc]);
+      }
+
+      // Write out GENMPR
+      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+         shc.set_fcst_var(prob_genesis_name);
+         shc.set_obs_var (prob_genesis_name);
+         write_pct_genmpr_row(shc, pgi, lead_hr,
+                              pgi.VxOpt->output_map(stat_genmpr),
+                              stat_at, i_stat_row,
+                              txt_at[i_genmpr], i_txt_row[i_genmpr]);
+      }
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_genmpr_row(StatHdrColumns &shc,
+                          ProbGenPCTInfo &pgi,
+                          int lead_hr,
+                          STATOutputType out_type,
+                          AsciiTable &stat_at, int &stat_row,
+                          AsciiTable &txt_at, int &txt_row) {
+   int i;
+   unixtime ut;
+
+   // GENMPR line type
+   shc.set_line_type(stat_genmpr_str);
+
+   // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each matched pair
+   for(i=0; i<pgi.FcstGenMap[lead_hr].size(); i++) {
+
+      // Pointers for current case
+      const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][i];
+      const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][i];
+
+      // Store timing info
+      shc.set_fcst_lead_sec(fgi->genesis_lead());
+      ut = fgi->genesis_time();
+      shc.set_fcst_valid_beg(ut);
+      shc.set_fcst_valid_end(ut);
+      shc.set_obs_lead_sec(bad_data_int);
+      ut = (bgi ? bgi->genesis_time() : ut);
+      shc.set_obs_valid_beg(ut);
+      shc.set_obs_valid_end(ut);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_pct_genmpr_cols(pgi, lead_hr, i,
+                            stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ void write_pct_genmpr_cols(ProbGenPCTInfo &pgi,
+                            int lead_hr, int index,
+                            AsciiTable &at, int r, int c) {
+
+   // Pointers for current case
+   const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][index];
+   const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][index];
+
+   int i_prob = pgi.FcstIdxMap[lead_hr][index];
+
+    //
+    // Genesis Matched Pairs (GENMPR):
+    //    TOTAL,       INDEX,       STORM_ID,
+    //    PROB_LEAD,   PROB_VAL,
+    //    AGEN_INIT,   AGEN_FHR,
+    //    AGEN_LAT,    AGEN_LON,    AGEN_DLAND,
+    //    BGEN_LAT,    BGEN_LON,    BGEN_DLAND,
+    //    GEN_DIST,    GEN_TDIFF,   INIT_TDIFF,
+    //    DEV_CAT,     OPS_CAT
+    //
+
+    at.set_entry(r, c+0,  // Total number of pairs
+       (int) pgi.FcstGenMap[lead_hr].size());
+
+    at.set_entry(r, c+1,  // Index of current pair
+       index+1);
+
+    at.set_entry(r, c+2,  // Best track Storm ID
+       (bgi ? bgi->storm_id() : na_str));
+
+    at.set_entry(r, c+3,  // Probability lead time
+       fgi->prob_item(i_prob));
+
+    at.set_entry(r, c+4,  // Probability value
+       fgi->prob(i_prob));
+
+    at.set_entry(r, c+5,  // Fcst genesis initialization time
+       unix_to_yyyymmdd_hhmmss(fgi->init()));
+
+    at.set_entry(r, c+6,  // Fcst genesis hour
+       fgi->genesis_fhr());
+
+    at.set_entry(r, c+7,  // Fcst genesis latitude
+       fgi->lat());
+
+    at.set_entry(r, c+8,  // Fcst genesis longitude
+       fgi->lon());
+
+    at.set_entry(r, c+9,  // Fcst genesis distance to land
+       fgi->dland());
+
+    at.set_entry(r, c+10,  // Best track latitude
+       bgi ? bgi->lat() : bad_data_double);
+
+    at.set_entry(r, c+11, // Best track longitude
+       bgi ? bgi->lon() : bad_data_double);
+
+    at.set_entry(r, c+12, // Best track distance to land
+       bgi ? bgi->dland() : bad_data_double);
+
+    at.set_entry(r, c+13, // Genesis distance
+       na_str);
+
+    at.set_entry(r, c+14, // Genesis time difference
+       na_str);
+
+    at.set_entry(r, c+15, // Genesis - Init time
+       na_str);
+
+    at.set_entry(r, c+16, // Development category
+       na_str);
+
+    at.set_entry(r, c+17, // Operational category
+       (pgi.BestEvtMap[lead_hr][index] ? "FYOY" : "FYON" ));
 
     return;
  }
@@ -1547,19 +2214,24 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-genesis path\n"
-        << "\t-track path\n"
+        << "\t-genesis source and/or -edeck source\n"
+        << "\t-track source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-genesis path\" is one or more ATCF genesis "
+        << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_gen_reg_exp << "\" (required).\n"
+        << atcf_gen_reg_exp << "\" (required if no -edeck).\n"
 
-        << "\t\t\"-track path\" is one or more ATCF track "
+        << "\t\t\"-edeck source\" is one or more ensemble model output "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_reg_exp << "\" (required if no -genesis).\n"
+
+        << "\t\t\"-track source\" is one or more ATCF track "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << atcf_reg_exp << "\" for the verifying BEST and operational "
@@ -1644,6 +2316,12 @@ void set_source(const StringArray &a, const char *type_str,
 
 void set_genesis(const StringArray & a) {
    set_source(a, "genesis", genesis_source, genesis_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_edeck(const StringArray & a) {
+   set_source(a, "edeck", edeck_source, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -29,16 +29,24 @@
 static const int i_fho    = 0;
 static const int i_ctc    = 1;
 static const int i_cts    = 2;
-static const int i_genmpr = 3;
+static const int i_pct    = 3;
+static const int i_pstd   = 4;
+static const int i_pjc    = 5;
+static const int i_prc    = 6;
+static const int i_genmpr = 7;
 
-static const int n_txt = 4;
+static const int n_txt = 8;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
    stat_fho,   //  0
    stat_ctc,   //  1
    stat_cts,   //  2
-   stat_genmpr //  3
+   stat_pct,   //  3
+   stat_pstd,  //  4
+   stat_pjc,   //  5
+   stat_prc,   //  6
+   stat_genmpr //  7
 };
 
 // Names for output data plane types
@@ -77,7 +85,6 @@ struct TCGenNcOutInfo {
    bool do_best_tracks;
    bool do_best_fy_oy;
    bool do_best_fn_oy;
-
 
       //////////////////////////////////////////////////////////////////
 
@@ -145,6 +152,7 @@ class TCGenVxOpt {
       bool   DiscardFlag, DevFlag, OpsFlag;
 
       // Output file options
+      ThreshArray ProbGenThresh;
       double CIAlpha;
       map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
@@ -161,6 +169,7 @@ class TCGenVxOpt {
       void parse_nc_info(Dictionary &);
 
       bool is_keeper(const GenesisInfo &) const;
+      bool is_keeper(const ProbGenInfo &) const;
 
       STATOutputType output_map(STATLineType) const;
 };
@@ -242,6 +251,9 @@ class TCGenConfInfo {
       int compression_level();
    
       STATOutputType output_map(STATLineType) const;
+
+      // Maximum across all verification tasks
+      int get_max_n_prob_thresh() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -299,6 +311,49 @@ class GenCTCInfo {
 
    void inc_pnt(double, double, const string &);
    void inc_trk(const GenesisInfo &, const string &);
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class ProbGenPCTInfo {
+
+   private:
+
+      void init_from_scratch();
+
+      PCTInfo DefaultPCT;
+
+   public:
+
+      ProbGenPCTInfo();
+     ~ProbGenPCTInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+   ConcatString Model;
+   unixtime InitBeg, InitEnd;
+   unixtime BestBeg, BestEnd;
+   const TCGenVxOpt* VxOpt;
+   IntArray LeadTimes;
+
+   // Map of lead times to PCT tables
+   map<int,PCTInfo> PCTMap;
+
+   // Map of lead times to vectors of pair info
+   map<int,vector<const ProbGenInfo *>> FcstGenMap;
+   map<int,vector<int>>                 FcstIdxMap;
+   map<int,vector<const GenesisInfo *>> BestGenMap;
+   map<int,vector<bool>>                BestEvtMap;
+
+      //////////////////////////////////////////////////////////////////
+
+   void clear();
+
+   void set_vx_opt(const TCGenVxOpt *);
+
+   void add(const ProbGenInfo &, int,
+            const GenesisInfo *, bool);
+
 };
 
 ////////////////////////////////////////////////////////////////////////
