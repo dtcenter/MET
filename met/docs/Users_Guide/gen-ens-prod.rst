@@ -67,7 +67,7 @@ Required arguments gen_ens_prod
 Optional arguments for gen_ens_prod
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread.
+4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread. The control file should not appear in the **-ens** list of ensemble member files.
 
 5. The **-log** file outputs log messages to the specified file.
 

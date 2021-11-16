@@ -124,8 +124,12 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
             n_expect = MinATCFProbRIRWElements;
             break;
 
+         case ATCFLineType_ProbGN:
+            n_expect = MinATCFProbGNElements;
+            break;
+
          default:
-            mlog << Debug(4)
+            mlog << Debug(10)
                  << "ATCFProbLine::read_line(LineDataFile * ldf) -> "
                  << "skipping ATCF line type ("
                  << atcflinetype_to_string(Type) << ")\n";

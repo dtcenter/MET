@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
    while(f >> p_line) {
 
       // Add the current line to the array of probs
-      probs.add(p_line);
+      probs.add(p_line, bad_data_double, false);
 
       // Increment the line count
       count++;

@@ -21,6 +21,7 @@ libvx_tc_util_a_SOURCES = \
               prob_info_base.h prob_info_base.cc \
               prob_info_array.h prob_info_array.cc \
               prob_rirw_info.h prob_rirw_info.cc \
+              prob_gen_info.h prob_gen_info.cc \
               prob_rirw_pair_info.h prob_rirw_pair_info.cc \
               genesis_info.cc genesis_info.h \
               pair_data_genesis.cc pair_data_genesis.h \

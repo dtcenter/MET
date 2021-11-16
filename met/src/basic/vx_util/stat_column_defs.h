@@ -320,6 +320,7 @@ static const char * ssidx_columns [] = {
 
 static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
+   "PROB_LEAD",   "PROB_VAL",
    "AGEN_INIT",   "AGEN_FHR",
    "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",
    "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",

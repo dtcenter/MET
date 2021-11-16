@@ -2424,6 +2424,27 @@ void PCTInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PCTInfo::set_fthresh(const ThreshArray &ta) {
+
+   // Expand the probability thresholds, as needed
+   fthresh = string_to_prob_thresh(ta.get_str().c_str());
+
+   // Validate the threshold settings
+   check_prob_thresh(fthresh, true);
+
+   // Store the values in an array
+   NumArray prob_vals;
+   for(int i=0; i<fthresh.n(); i++) prob_vals.add(fthresh[i].get_value());
+
+   // Set the PCT size and thresholds
+   pct.set_size(prob_vals.n() - 1);
+   pct.set_thresholds(prob_vals.vals());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PCTInfo::compute_stats() {
 
    total       = pct.n();

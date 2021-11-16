@@ -12,9 +12,10 @@
 //
 //   Description:
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    09/10/21  Halley Gotway   Initial version (MET #1904).
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    09/10/21  Halley Gotway  MET #1904 Initial version.
+//   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -200,6 +201,14 @@ void process_command_line(int argc, char **argv) {
    // List the control member file
    mlog << Debug(1) << "Ensemble Control: "
         << (ctrl_file.empty() ? "None" : ctrl_file.c_str()) << "\n";
+
+   // Check for control in the list of ensemble files
+   if(ctrl_file.nonempty() && ens_files.has(ctrl_file)) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the ensemble control file should not appear in the list "
+           << "of ensemble member files:\n" << ctrl_file << "\n\n";
+      exit(1);
+   }
 
    // Check for missing non-python ensemble files
    for(i=0; i<ens_files.n(); i++) {
