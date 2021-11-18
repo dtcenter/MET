@@ -16,7 +16,9 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
-#include "omp.h"
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
 
 #include "data_plane_util.h"
 #include "interp_util.h"

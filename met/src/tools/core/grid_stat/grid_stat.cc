@@ -127,7 +127,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "omp.h"
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
 
 #include "grid_stat.h"
 
