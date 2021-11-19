@@ -1323,11 +1323,19 @@ for (j=0,x_old=0,y_old=0; j<nt; ++j)  {
 
    mask.calc_2d_centroid_at_t(t, xbar_2d, ybar_2d);
 
+   //
+   //  distance from the old to current (x, y)
+   //
+
    if ( j > 0 )  {
 
       dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
 
    }
+
+   //
+   //  update old (x, y) with current
+   //
 
    x_old = xbar_2d;
    y_old = ybar_2d;
