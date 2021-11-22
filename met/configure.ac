@@ -1069,7 +1069,7 @@ AC_SUBST(FC_LIBS, [-lgfortran])
 # For development, retain the "-g" option. Otherwise, discard it.
 
 AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CFLAGS_OPT="-g -O2"}], [: ${CFLAGS_OPT="-O2"}])
-AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CXXFLAGS_OPT="-g"}  ], [: ${CXXFLAGS_OPT="-O3"}] )
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CXXFLAGS_OPT="-g"}  ], [: ${CXXFLAGS_OPT=""}] )
 AM_COND_IF([ENABLE_DEVELOPMENT], [: ${FFLAGS_OPT="-g -O2"}], [: ${FFLAGS_OPT="-O2"}])
 
 AM_COND_IF([ENABLE_OPENMP], [: ${CFLAGS_OMP="-fopenmp"}],   [: ${CFLAGS_OMP=""}])
