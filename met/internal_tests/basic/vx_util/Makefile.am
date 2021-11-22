@@ -40,7 +40,7 @@ test_data_plane_LDADD = -lvx_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lgsl -lgslcblas $(OPENMP_LIBS)
 
 if ENABLE_PYTHON
 test_data_plane_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
@@ -56,7 +56,7 @@ test_add_rows_LDADD = -lvx_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lgsl -lgslcblas $(OPENMP_LIBS)
 
 if ENABLE_PYTHON
 test_add_rows_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
@@ -72,7 +72,7 @@ test_table_float_LDADD = -lvx_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lgsl -lgslcblas $(OPENMP_LIBS)
 
 
 if ENABLE_PYTHON
@@ -108,4 +108,4 @@ test_ascii_header_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) -lvx_util

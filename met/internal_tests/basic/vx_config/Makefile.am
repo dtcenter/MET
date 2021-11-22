@@ -32,7 +32,7 @@ test_config_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 
 test_user_func_SOURCES = test_user_func.cc
@@ -42,7 +42,7 @@ test_user_func_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_lookup_SOURCES = test_lookup.cc
 test_lookup_LDADD = -lvx_config \
@@ -51,7 +51,7 @@ test_lookup_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_lookup2_SOURCES = test_lookup2.cc
 test_lookup2_LDADD = -lvx_config \
@@ -60,7 +60,7 @@ test_lookup2_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_lookup3_SOURCES = test_lookup3.cc
 test_lookup3_LDADD = -lvx_config \
@@ -69,7 +69,7 @@ test_lookup3_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_string_SOURCES = test_string.cc
 test_string_LDADD = -lvx_config \
@@ -78,7 +78,7 @@ test_string_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_thresh_SOURCES = test_thresh.cc
 test_thresh_LDADD = -lvx_config \
@@ -87,7 +87,7 @@ test_thresh_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_string_then_config_SOURCES = test_string_then_config.cc
 test_string_then_config_LDADD = -lvx_config \
@@ -96,7 +96,7 @@ test_string_then_config_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)
 
 test_met_478_SOURCES = test_met_478.cc
 test_met_478_LDADD = -lvx_config \
@@ -105,4 +105,4 @@ test_met_478_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lgsl -lgslcblas
+	-lm -lgsl -lgslcblas $(OPENMP_LIBS)

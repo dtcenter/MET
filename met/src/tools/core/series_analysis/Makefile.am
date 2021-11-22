@@ -37,7 +37,7 @@ series_analysis_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)
 
 EXTRA_DIST = series_analysis.h \
 	series_analysis_conf_info.h

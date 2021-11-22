@@ -32,4 +32,4 @@ pcp_combine_LDADD = -lvx_data2d_factory \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)

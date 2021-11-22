@@ -26,5 +26,5 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) \
 	$(FLIBS)

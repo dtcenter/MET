@@ -48,7 +48,7 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
+	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) \
 	-lhdfeos \
 	-lmfhdf \
 	-ldf \

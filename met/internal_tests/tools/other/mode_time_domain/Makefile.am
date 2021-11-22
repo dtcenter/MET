@@ -69,5 +69,5 @@ test_velocity_LDADD = \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) -lz
 

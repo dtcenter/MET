@@ -50,7 +50,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) -lz
 
 EXTRA_DIST = mode_exec.h \
 	mode_ps_file.h \

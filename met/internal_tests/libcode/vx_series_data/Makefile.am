@@ -31,4 +31,4 @@ test_series_data_LDADD = -lvx_config \
 	-lvx_log \
 	-lvx_cal \
 	-lvx_util \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)

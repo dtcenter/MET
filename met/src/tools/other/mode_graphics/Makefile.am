@@ -40,7 +40,7 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_log \
 	-lvx_math \
-	-lcairo -lfreetype -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	-lcairo -lfreetype -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS) -lz
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

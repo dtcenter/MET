@@ -139,7 +139,7 @@ gen_climo_bin_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)
 
 # Build chk4copyright when making a distribution so that we can
 #  add missing copyrights to the source files

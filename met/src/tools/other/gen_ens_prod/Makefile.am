@@ -38,7 +38,7 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)
 
 EXTRA_DIST = gen_ens_prod.h \
 	gen_ens_prod_conf_info.h

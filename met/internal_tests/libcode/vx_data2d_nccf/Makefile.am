@@ -26,4 +26,4 @@ test_read_nccf_LDADD = -lvx_data2d_nccf \
 	-lvx_color \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)

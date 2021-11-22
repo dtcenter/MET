@@ -43,7 +43,7 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)
 
 EXTRA_DIST = wavelet_stat.h \
 	wavelet_stat_conf_info.h

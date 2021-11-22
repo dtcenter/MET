@@ -43,7 +43,7 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPENMP_LIBS)
 
 EXTRA_DIST = stat_analysis.h \
 	parse_stat_line.h \
