@@ -988,6 +988,30 @@ else
     AC_MSG_NOTICE([gsi_tools will not be compiled])
 fi
 
+# OpenMP
+
+AC_ARG_ENABLE(openmp,
+	  [AS_HELP_STRING([--enable-openmp], [Enable compilation of OpenMP support])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_OPENMP="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-openmp) ;;
+   esac],
+  [ENABLE_OPENMP="no"]
+)
+
+AM_CONDITIONAL([ENABLE_OPENMP], [test "x$ENABLE_OPENMP" = "xyes"])
+
+if test "x$ENABLE_OPENMP" = "xyes"; then
+    AC_DEFINE([ENABLE_OPENMP], [], ["build OpenMP support"])
+    AC_MSG_NOTICE([OpenMP support will be compiled])
+    CPPFLAGS="${CPPFLAGS} -DWITH_OPENMP -fopenmp"
+    OPENMP_LIBS="-lgomp"
+else
+    AC_MSG_NOTICE([OpenMP support will not be compiled])
+    OPENMP_LIBS=
+fi
+AC_SUBST([OPENMP_LIBS])
+
 # GRIB2
 
 AC_ARG_ENABLE(grib2,
@@ -1053,7 +1077,6 @@ AC_SUBST([PYTHON_LIBS])
 # Check for the MET_DEVELOPMENT environment variable
 
 AM_CONDITIONAL([ENABLE_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])
-AM_CONDITIONAL([ENABLE_OPENMP],      [test -n "$MET_OPENMP"])
 
 # Add MET_BASE to the CPPFLAGS
 
@@ -1068,17 +1091,9 @@ AC_SUBST(FC_LIBS, [-lgfortran])
 # For Intel compilers, "-g" slows down runtimes considerably (MET #1778).
 # For development, retain the "-g" option. Otherwise, discard it.
 
-AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CFLAGS_OPT="-g -O2"}], [: ${CFLAGS_OPT="-O2"}])
-AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CXXFLAGS_OPT="-g"}  ], [: ${CXXFLAGS_OPT=""}] )
-AM_COND_IF([ENABLE_DEVELOPMENT], [: ${FFLAGS_OPT="-g -O2"}], [: ${FFLAGS_OPT="-O2"}])
-
-AM_COND_IF([ENABLE_OPENMP], [: ${CFLAGS_OMP="-fopenmp"}],   [: ${CFLAGS_OMP=""}])
-AM_COND_IF([ENABLE_OPENMP], [: ${CXXFLAGS_OMP="-fopenmp"}], [: ${CXXFLAGS_OMP=""}])
-AM_COND_IF([ENABLE_OPENMP], [: ${FFLAGS_OMP="-fopenmp"}],   [: ${FFLAGS_OMP=""}])
-
-CFLAGS="$CFLAGS_OPT $CFLAGS_OMP"
-CXXFLAGS="$CXXFLAGS_OPT $CXXFLAGS_OMP"
-FFLAGS="$FFLAGS_OPT $FFLAGS_OMP"
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CFLAGS="-g -O2"}], [: ${CFLAGS="-O2"}])
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${CXXFLAGS="-g"}  ], [: ${CXXFLAGS=""}] )
+AM_COND_IF([ENABLE_DEVELOPMENT], [: ${FFLAGS="-g -O2"}], [: ${FFLAGS="-O2"}])
 
 # Checks for programs.
 
