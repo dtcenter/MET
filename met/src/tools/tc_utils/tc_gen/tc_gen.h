@@ -54,6 +54,9 @@ static const char * atcf_gen_reg_exp = "atcf_gen";
 // ATCF file name regular expression 
 static const char * atcf_reg_exp = ".dat";
 
+// Genesis shapefile regular expression
+static const char * gen_shp_reg_exp = "gtwo_areas*.shp";
+
 // Default configuration file name
 static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
@@ -95,6 +98,7 @@ static const int max_best_cyclone_number = 50;
 // Input files
 static StringArray   genesis_source, genesis_model_suffix;
 static StringArray   edeck_source,   edeck_model_suffix;
+static StringArray   shape_source;
 static StringArray   track_source,   track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;

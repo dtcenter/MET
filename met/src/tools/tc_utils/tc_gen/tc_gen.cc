@@ -21,6 +21,7 @@
 //   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
 //   005    04/02/21  Halley Gotway   Refinements for MET #1714
 //   006    11/04/21  Halley Gotway   Add -edeck for MET #1809
+//   007    11/22/21  Halley Gotway   Add -shape for MET #1810
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -57,10 +58,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
+
 static void   score_track_genesis  (const GenesisInfoArray &,
                                     const TrackInfoArray &);
 static void   score_genesis_prob   (const GenesisInfoArray &,
                                     const TrackInfoArray &);
+static void   score_genesis_shape  (const GenesisInfoArray &,
+                                    const TrackInfoArray &);
+
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     const char *,
@@ -131,6 +136,7 @@ static void   set_source           (const StringArray &, const char *,
                                     StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
 static void   set_edeck            (const StringArray &);
+static void   set_shape            (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
@@ -170,6 +176,11 @@ int main(int argc, char *argv[]) {
       score_genesis_prob(best_ga, oper_ta);
    }
 
+   // Score genesis shapefiles and write output
+   if(shape_source.n() > 0) {
+      score_genesis_shape(best_ga, oper_ta);
+   }
+
    // Finish output files
    finish_txt_files();
 
@@ -205,6 +216,7 @@ void process_command_line(int argc, char **argv) {
    // Add function calls for the arguments
    cline.add(set_genesis, "-genesis", -1);
    cline.add(set_edeck,   "-edeck",   -1);
+   cline.add(set_shape,   "-shape",   -1);
    cline.add(set_track,   "-track",   -1);
    cline.add(set_config,  "-config",   1);
    cline.add(set_out,     "-out",      1);
@@ -224,10 +236,10 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for the minimum number of arguments
-   if(genesis_source.n() == 0 && edeck_source.n() == 0) {
+   if((genesis_source.n() + edeck_source.n() + shape_source.n()) == 0) {
       mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
-           << "at least one of the \"-genesis\" or \"-edeck\" command "
-           << "line options are required\n\n";
+           << "at least one of the \"-genesis\", \"-edeck\", or \"-shape\" "
+           << "command line options are required\n\n";
       usage();
    }
 
@@ -253,6 +265,13 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << edeck_source.n()
            << "] EDECK Source: " << edeck_source[i]
            << ", Model Suffix: " << edeck_model_suffix[i] << "\n";
+   }
+
+   // List the input shapefiles
+   for(i=0; i<shape_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << shape_source.n()
+           << "] Shapefile Source: " << shape_source[i] << "\n";
    }
 
    // List the input track track files
@@ -466,6 +485,14 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
       } // end for j
    } // end for i
 
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void score_genesis_shape(const GenesisInfoArray &best_ga,
+                         const TrackInfoArray &oper_ta) {
+   // TODO: Work here to verify genesis shapes!
    return;
 }
 
@@ -2214,7 +2241,9 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-genesis source and/or -edeck source\n"
+        << "\t-genesis source\n"
+        << "\t-edeck source\n"
+        << "\t-shape source\n"
         << "\t-track source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
@@ -2224,12 +2253,17 @@ void usage() {
         << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_gen_reg_exp << "\" (required if no -edeck).\n"
+        << atcf_gen_reg_exp << "\" (required if no -edeck or -shape).\n"
 
         << "\t\t\"-edeck source\" is one or more ensemble model output "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_reg_exp << "\" (required if no -genesis).\n"
+        << atcf_reg_exp << "\" (required if no -genesis or -shape).\n"
+
+        << "\t\t\"-shape source\" is one or more genesis area shapefiles, "
+        << "an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << gen_shp_reg_exp << "\" (required if no -genesis or -edeck).\n"
 
         << "\t\t\"-track source\" is one or more ATCF track "
         << "files, an ASCII file list containing them, or a top-level "
@@ -2322,6 +2356,13 @@ void set_genesis(const StringArray & a) {
 
 void set_edeck(const StringArray & a) {
    set_source(a, "edeck", edeck_source, edeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_shape(const StringArray & a) {
+   StringArray suffix;
+   set_source(a, "shape", shape_source, suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
