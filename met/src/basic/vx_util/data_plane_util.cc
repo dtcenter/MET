@@ -16,7 +16,7 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
-#ifdef _OPENMP
+#ifdef WITH_OPENMP
   #include "omp.h"
 #endif
 

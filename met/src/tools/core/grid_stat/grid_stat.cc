@@ -127,7 +127,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifdef _OPENMP
+#ifdef WITH_OPENMP
   #include "omp.h"
 #endif
 
@@ -189,12 +189,12 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 
 int main(int argc, char *argv[]) {
 
-#ifdef _OPENMP
+#ifdef WITH_OPENMP
 #pragma omp parallel
 #pragma omp single
   {
     // Report number of threads if compiled with OpenMP
-    std::cout << "Running on " << omp_get_num_threads() << " threads.\n";
+    mlog << Debug(2) << "Running on " << omp_get_num_threads() << " threads.\n";
   }
 #endif
 
