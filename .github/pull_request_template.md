@@ -1,3 +1,11 @@
+## Expected Differences ##
+
+- [ ] Do these changes introduce new tools, command line arguments, or configuration file options? **[Yes or No]**</br>
+If **yes**, please describe:</br>
+
+- [ ] Do these changes modify the structure of existing or add new output data types (e.g. statistic line types or NetCDF variables)? **[Yes or No]**</br>
+If **yes**, please describe:</br>
+
 ## Pull Request Testing ##
 
 - [ ] Describe testing already performed for these changes:</br>
@@ -14,7 +22,7 @@ If **yes**, describe the new output and/or changes to the existing output:</br>
 - [ ] Please complete this pull request review by **[Fill in date]**.</br>
 
 ## Pull Request Checklist ##
-See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
+See the [METplus Workflow](https://metplus.readthedocs.io/en/latest/Contributors_Guide/github_workflow.html) for details.
 - [ ] Complete the PR definition above.
 - [ ] Ensure the PR title matches the feature or bugfix branch name.
 - [ ] Define the PR metadata, as permissions allow.
