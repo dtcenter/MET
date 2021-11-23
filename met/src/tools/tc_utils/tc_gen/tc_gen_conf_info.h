@@ -340,10 +340,10 @@ class ProbGenPCTInfo {
    map<int,PCTInfo> PCTMap;
 
    // Map of lead times to vectors of pair info
-   map<int,vector<const ProbGenInfo *>> FcstGenMap;
-   map<int,vector<int>>                 FcstIdxMap;
-   map<int,vector<const GenesisInfo *>> BestGenMap;
-   map<int,vector<bool>>                BestEvtMap;
+   map<int,vector<const ProbGenInfo *> > FcstGenMap;
+   map<int,vector<int> >                 FcstIdxMap;
+   map<int,vector<const GenesisInfo *> > BestGenMap;
+   map<int,vector<bool> >                BestEvtMap;
 
       //////////////////////////////////////////////////////////////////
 

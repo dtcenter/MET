@@ -1,3 +1,11 @@
+## Expected Differences ##
+
+- [ ] Do these changes introduce new tools, command line arguments, or configuration file options? **[Yes or No]**</br>
+If **yes**, please describe:</br>
+
+- [ ] Do these changes modify the structure of existing or add new output data types (e.g. statistic line types or NetCDF variables)? **[Yes or No]**</br>
+If **yes**, please describe:</br>
+
 ## Pull Request Testing ##
 
 - [ ] Describe testing already performed for these changes:</br>
