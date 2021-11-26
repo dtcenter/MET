@@ -1004,13 +1004,11 @@ AM_CONDITIONAL([ENABLE_OPENMP], [test "x$ENABLE_OPENMP" = "xyes"])
 if test "x$ENABLE_OPENMP" = "xyes"; then
     AC_DEFINE([ENABLE_OPENMP], [], ["build OpenMP support"])
     AC_MSG_NOTICE([OpenMP support will be compiled])
-    CPPFLAGS="${CPPFLAGS} -DWITH_OPENMP -fopenmp"
-    OPENMP_LIBS="-lgomp"
+    CPPFLAGS="${CPPFLAGS} -fopenmp"
+    LDFLAGS="${LDFLAGS} -fopenmp"
 else
     AC_MSG_NOTICE([OpenMP support will not be compiled])
-    OPENMP_LIBS=
 fi
-AC_SUBST([OPENMP_LIBS])
 
 # GRIB2
 
