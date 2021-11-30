@@ -196,7 +196,8 @@ Example: To configure MET to install all of the available tools in the "bin" sub
 .. code-block:: none
 
   1. ./configure --prefix=`pwd` --enable-grib2 --enable-python \
-                 --enable-modis --enable-mode_graphics --enable-lidar2nc
+                 --enable-modis --enable-mode_graphics --enable-lidar2nc \
+                 --enable-openmp
   2. Type 'make install >& make_install.log &'
   3. Type 'tail -f make_install.log' to view the execution of the make.
   4. When make is finished, type 'CTRL-C' to quit the tail.
@@ -271,6 +272,14 @@ Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_
   --enable-lidar2nc
   
 Enable compilation of utilities using the LIDAR2NC tool.
+
+.. code-block:: none
+
+  --enable-openmp
+
+Enable compilation of OpenMP directives within the code. This allows some code
+regions to benefit from thread-parallel execution. Runtime environment variable
+:code:`OMP_NUM_THREADS` controls the number of threads.
 
 .. code-block:: none
 
