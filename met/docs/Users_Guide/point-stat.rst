@@ -1281,7 +1281,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_VCNT:
 
-.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
   :header-rows: 2
 
