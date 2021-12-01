@@ -8,6 +8,20 @@ describes the bugfix, enhancement, or new feature:
 MET Version |version| release notes (|release_date|)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Bugfixes:
+
+   * **Fix MTD to compute the CDIST_TRAVELLED value correctly** (`#1976 <http://github.com/dtcenter/MET/issues/1976>`_)
+   * **Fix MADIS2NC to handle the 2016 changes to its format** (`#1936 <http://github.com/dtcenter/MET/issues/1936>`_).
+   * Fix TC-Stat event equalization logic to include any model name requested using -amodel (`#1932 <http://github.com/dtcenter/MET/issues/1932>`_).
+   * Fix Ensemble-Stat failure when verifying against gridded ECMWF GRIB1 files (`#1879 <http://github.com/dtcenter/MET/issues/1879>`_).
+   * Fix python embedding when using a named grid with MET_PYTHON_EXE set (`#1798 <http://github.com/dtcenter/MET/issues/1798>`_).
+   * Fix the plot_tcmpr.R script to support specifying a directory with -lookin (`#1872 <http://github.com/dtcenter/MET/issues/1872>`_).
+   * Fix the plot_tcmpr.R script to plot extra-tropical cyclone tracks not verified against BEST tracks (`#1801 <http://github.com/dtcenter/MET/issues/1801>`_).
+   * Fix the Plot-Point-Obs documentation to remove the duplicate configuration section (`#1789 <http://github.com/dtcenter/MET/issues/1789>`_).
+
+MET Version 10.0.0 release notes (2021-05-10)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Repository and build:
   
    * **Migrate GitHub respository from the NCAR to DTCenter organization** (`#1462 <http://github.com/dtcenter/MET/issues/1462>`_).
