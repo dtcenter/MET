@@ -698,7 +698,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CTS_cont:
 
-.. list-table::  Format information for CTS (Contingency Table Statistics) output line type, continued from above
+.. list-table:: Format information for CTS (Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 2
 
@@ -804,7 +804,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CNT_cont:
 
-.. list-table::  Format information for CNT (Continuous Statistics) output line type continued from above table
+.. list-table:: Format information for CNT (Continuous Statistics) output line type continued from above table
   :widths: auto
   :header-rows: 2
 
