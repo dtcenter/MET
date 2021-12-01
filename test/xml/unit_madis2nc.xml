@@ -130,6 +130,18 @@
     </output>
   </test>
 
+  <test name="madis2nc_MESONET_optional_vars">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/mesonet/mesonet_20170101_0000.nc \
+      &OUTPUT_DIR;/madis2nc/mesonet_20170101_0000_F000.nc \
+      -type mesonet -mask_grid G207 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_20170101_0000_F000.nc</point_nc>
+    </output>
+  </test>
+
   <test name="madis2nc_ACARS_PROFILES">
     <exec>&MET_BIN;/madis2nc</exec>
     <param> \
