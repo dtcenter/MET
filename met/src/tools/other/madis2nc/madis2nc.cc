@@ -84,7 +84,7 @@ static void clean_up();
 static void setup_netcdf_out(int nhdr);
 
 static bool get_filtered_nc_data(NcVar var, float *data, const long dim,
-                                 const long cur, const char *var_name);
+                                 const long cur, const char *var_name, bool required=true);
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     const long *cur, const char *var_name, bool count_bad=false);
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
@@ -415,7 +415,7 @@ void setup_netcdf_out(int nhdr) {
 
 static bool get_filtered_nc_data(NcVar var, float *data,
                                  const long dim, const long cur,
-                                 const char *var_name) {
+                                 const char *var_name, bool required) {
 
    bool status = false;
    float in_fill_value;
@@ -439,15 +439,13 @@ static bool get_filtered_nc_data(NcVar var, float *data,
               << "Fail to read data [" << var_name << "].\n\n";
       }
    }
-   else {
+   else if (required) {
       mlog << Error << "\n" << method_name
            << "Can not read a NetCDF data because the variable [" << var_name << "] is missing.\n\n";
    }
-   if (!status) {
-      for (int idx=0; idx<dim; idx++) {
-         data[idx] = bad_data_float;
-         rej_fill++;
-      }
+   if(!status) {
+      for (int idx=0; idx<dim; idx++) data[idx] = bad_data_float;
+      rej_fill += dim;
    }
    return status;
 
@@ -2715,10 +2713,6 @@ void process_madis_mesonet(NcFile *&f_in) {
    if (IS_INVALID_NC(in_soilTemperature_var)) missing_vars.add("soilTemperature");
    if (IS_INVALID_NC(in_minTemp24Hour_var)) missing_vars.add("minTemp24Hour");
    if (IS_INVALID_NC(in_maxTemp24Hour_var)) missing_vars.add("maxTemp24Hour");
-   if (IS_INVALID_NC(in_precip3hr_var)) missing_vars.add("precip3hr");
-   if (IS_INVALID_NC(in_precip6hr_var)) missing_vars.add("precip6hr");
-   if (IS_INVALID_NC(in_precip12hr_var)) missing_vars.add("precip12hr");
-   if (IS_INVALID_NC(in_precip10min_var)) missing_vars.add("precip10min");
    if (IS_INVALID_NC(in_precip1min_var)) missing_vars.add("precip1min");
    if (IS_INVALID_NC(in_windDir10_var)) missing_vars.add("windDir10");
    if (IS_INVALID_NC(in_windSpeed10_var)) missing_vars.add("windSpeed10");
@@ -2922,10 +2916,10 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_filtered_nc_data(in_soilTemperature_var,  soilTemperature_arr,  buf_size, i_hdr_s, "soilTemperature" );
       get_filtered_nc_data(in_minTemp24Hour_var,    minTemp24Hour_arr,    buf_size, i_hdr_s, "minTemp24Hour"   );
       get_filtered_nc_data(in_maxTemp24Hour_var,    maxTemp24Hour_arr,    buf_size, i_hdr_s, "maxTemp24Hour"   );
-      get_filtered_nc_data(in_precip3hr_var,        precip3hr_arr,        buf_size, i_hdr_s, "precip3hr"       );
-      get_filtered_nc_data(in_precip6hr_var,        precip6hr_arr,        buf_size, i_hdr_s, "precip6hr"       );
-      get_filtered_nc_data(in_precip12hr_var,       precip12hr_arr,       buf_size, i_hdr_s, "precip12hr"      );
-      get_filtered_nc_data(in_precip10min_var,      precip10min_arr,      buf_size, i_hdr_s, "precip10min"     );
+      get_filtered_nc_data(in_precip3hr_var,        precip3hr_arr,        buf_size, i_hdr_s, "precip3hr"       , false);
+      get_filtered_nc_data(in_precip6hr_var,        precip6hr_arr,        buf_size, i_hdr_s, "precip6hr"       , false);
+      get_filtered_nc_data(in_precip12hr_var,       precip12hr_arr,       buf_size, i_hdr_s, "precip12hr"      , false);
+      get_filtered_nc_data(in_precip10min_var,      precip10min_arr,      buf_size, i_hdr_s, "precip10min"     , false);
       get_filtered_nc_data(in_precip1min_var,       precip1min_arr,       buf_size, i_hdr_s, "precip1min"      );
       get_filtered_nc_data(in_windDir10_var,        windDir10_arr,        buf_size, i_hdr_s, "windDir10"       );
       get_filtered_nc_data(in_windSpeed10_var,      windSpeed10_arr,      buf_size, i_hdr_s, "windSpeed10"     );
