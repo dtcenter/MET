@@ -65,7 +65,6 @@ include $(MK_DIR)/mode_analysis.mk
 include $(MK_DIR)/mode_graphics.mk
 include $(MK_DIR)/mode_time_domain.mk
 include $(MK_DIR)/modis.mk
-include $(MK_DIR)/openmp.mk
 include $(MK_DIR)/pb2nc.mk
 include $(MK_DIR)/pcp_combine.mk
 include $(MK_DIR)/plot_data_plane.mk
