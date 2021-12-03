@@ -196,8 +196,7 @@ Example: To configure MET to install all of the available tools in the "bin" sub
 .. code-block:: none
 
   1. ./configure --prefix=`pwd` --enable-grib2 --enable-python \
-                 --enable-modis --enable-mode_graphics --enable-lidar2nc \
-                 --enable-openmp
+                 --enable-modis --enable-mode_graphics --enable-lidar2nc
   2. Type 'make install >& make_install.log &'
   3. Type 'tail -f make_install.log' to view the execution of the make.
   4. When make is finished, type 'CTRL-C' to quit the tail.
@@ -275,14 +274,6 @@ Enable compilation of utilities using the LIDAR2NC tool.
 
 .. code-block:: none
 
-  --enable-openmp
-
-Enable compilation of OpenMP directives within the code. This allows some code
-regions to benefit from thread-parallel execution. Runtime environment variable
-:code:`OMP_NUM_THREADS` controls the number of threads.
-
-.. code-block:: none
-
   --enable-modis
 
 Enable compilation of the Modis-Regrid tool. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
@@ -298,6 +289,14 @@ Enable compilation of the MODE-Graphics tool. Requires $MET_CAIRO and $MET_FREET
   --disable-block4
 
 Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBUFR files.
+
+.. code-block:: none
+
+  --disable-openmp
+
+Disable compilation of OpenMP directives within the code which allows some code
+regions to benefit from thread-parallel execution. Runtime environment variable
+:code:`OMP_NUM_THREADS` controls the number of threads.
 
 Run the configure script with the **-help** argument to see the full list of configuration options.
 
