@@ -5,7 +5,7 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
-MET Version 10.1.0-beta4 release notes (20211116)
+MET Version 10.1.0-beta4 release notes (20211117)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Enhancements:
