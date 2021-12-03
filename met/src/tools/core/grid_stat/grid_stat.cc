@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 #pragma omp single
   {
     // Report number of threads if compiled with OpenMP
-    mlog << Debug(2) << "Running on " << omp_get_num_threads() << " threads.\n";
+    mlog << Debug(2) << "OpenMP running on " << omp_get_num_threads() << " thread(s).\n";
   }
 #endif
 
