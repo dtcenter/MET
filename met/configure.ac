@@ -8,6 +8,13 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
 
+# OpenMP
+
+AC_OPENMP()
+
+CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
+
 #
 # Look for the NetCDF library
 #
@@ -986,28 +993,6 @@ if test "x$ENABLE_GSI_TOOLS" = "xyes"; then
     AC_MSG_NOTICE([gsi_tools will be compiled])
 else
     AC_MSG_NOTICE([gsi_tools will not be compiled])
-fi
-
-# OpenMP
-
-AC_ARG_ENABLE(openmp,
-	  [AS_HELP_STRING([--enable-openmp], [Enable compilation of OpenMP support])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_OPENMP="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --enable-openmp) ;;
-   esac],
-  [ENABLE_OPENMP="no"]
-)
-
-AM_CONDITIONAL([ENABLE_OPENMP], [test "x$ENABLE_OPENMP" = "xyes"])
-
-if test "x$ENABLE_OPENMP" = "xyes"; then
-    AC_DEFINE([ENABLE_OPENMP], [], ["build OpenMP support"])
-    AC_MSG_NOTICE([OpenMP support will be compiled])
-    CPPFLAGS="${CPPFLAGS} -fopenmp"
-    LDFLAGS="${LDFLAGS} -fopenmp"
-else
-    AC_MSG_NOTICE([OpenMP support will not be compiled])
 fi
 
 # GRIB2
