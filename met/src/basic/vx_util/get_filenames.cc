@@ -198,9 +198,16 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    }
 
+   //
+   //  get filenames from the directory and sort them
+   //  to make the order consistent across platforms
+   //
+
    if ( S_ISDIR(sbuf.st_mode) )  {
 
       b = get_filenames_from_dir(entry_path, prefix, suffix);
+
+      b.sort();
 
       a.add(b);
 
