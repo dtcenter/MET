@@ -45,6 +45,8 @@ using namespace std;
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#include "handle_openmp.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
@@ -80,6 +82,9 @@ static void set_ctrl_file  (const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);

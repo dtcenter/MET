@@ -187,7 +187,7 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 
 int main(int argc, char *argv[]) {
 
-   // Setup OpenMP (if compiled-in)
+   // Set up OpenMP (if enabled)
    init_openmp();
 
    // Set handler to be called for memory allocation error
