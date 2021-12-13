@@ -126,6 +126,41 @@
   </test>
 
   <!--                                                                  -->
+  <!-- GRID: named grids                                                -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID_NAMED_GRIDS">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      G004 G130 \
+      &OUTPUT_DIR;/gen_vx_mask/GRID_NAMED_GRIDS_mask.nc \
+      -type grid -name G130_grid \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_NAMED_GRIDS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- GRID: grid specification strings                                 -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID_SPEC_STRINGS">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      "latlon 720 361 -90 0 0.5 0.5" \
+      "latlon 200 100 -40 -50 0.5 0.5" \
+      &OUTPUT_DIR;/gen_vx_mask/GRID_SPEC_STRINGS_mask.nc \
+      -type grid -name grid_spec \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_SPEC_STRINGS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- CIRCLE: compute minimum distances rather than a mask             -->
   <!--                                                                  -->
 
