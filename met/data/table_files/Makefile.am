@@ -87,9 +87,9 @@ tablefiles_DATA = \
 	grib1_ncep_141_7.txt \
 	grib1_ncep_2_7.txt \
 	grib1_lidar2nc.txt \
-	grib2_af_gpp.txt \
 	grib2_all.txt \
 	grib2_bom.txt \
+	grib2_gpp_af.txt \
 	grib2_mrms.txt \
 	grib2_ndfd.txt
 
