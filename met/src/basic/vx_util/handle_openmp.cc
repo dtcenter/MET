@@ -28,7 +28,8 @@ void init_openmp() {
   const char* env_omp_num_threads = std::getenv("OMP_NUM_THREADS");
   if (!env_omp_num_threads) {
     mlog << Debug(2) << "OMP_NUM_THREADS is not set." 
-         << " Defaulting to 1 thread. \n";
+         << " Defaulting to 1 thread."
+         << " Recommend setting OMP_NUM_THREADS for faster runtimes.\n";
     omp_set_num_threads(1);
   }
 
