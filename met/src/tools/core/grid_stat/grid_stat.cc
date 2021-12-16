@@ -85,8 +85,7 @@
 //                    output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   036    02/14/17  Win            MET-621 enhancement support- additional
-//                    nc_pairs_flag 'apply_mask'
+//   036    02/14/17  Win            MET#621 Add nc_pairs_flag.apply_mask
 //   037    05/15/17  Prestopnik P   Add shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    08/18/17  Halley Gotway  Add fourier decomposition.
@@ -109,6 +108,7 @@
 //   051    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
 //   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
+//   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -930,12 +930,13 @@ void process_scores() {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
-            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
                (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1006,7 +1007,6 @@ void process_scores() {
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
@@ -1016,18 +1016,15 @@ void process_scores() {
                   // Write out VAL1L2
                   if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
                      vl1l2_info[m].vacount > 0) {
-
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
 
-
                   // Write out VCNT
                   if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vcnt_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vcnt],
                         stat_at, i_stat_row,
@@ -1677,12 +1674,13 @@ void process_scores() {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
-            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
                (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1754,7 +1752,6 @@ void process_scores() {
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
@@ -1764,12 +1761,21 @@ void process_scores() {
                   // Write out VAL1L2
                   if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
                      vl1l2_info[m].vacount > 0) {
-
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
+
+                  // Write out VCNT
+                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
+                     vl1l2_info[m].vcount > 0) {
+                     write_vcnt_row(shc, vl1l2_info[m],
+                        conf_info.vx_opt[i].output_flag[i_vcnt],
+                        stat_at, i_stat_row,
+                        txt_at[i_vcnt], i_txt_row[i_vcnt]);
+                  }
+
                } // end for m
 
                // Reset the forecast variable name

@@ -25,7 +25,8 @@
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //   008    04/06/20  Halley Gotway   Generalize input_grid option.
 //   009    06/01/21  Seth Linden     Change -type from optional to required.
-//   010    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
+//   010    08/30/21  Halley Gotway   MET#1891 Fix input and mask fields.
+//   011    12/13/21  Halley Gotway   MET#1993 Fix -type grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -163,26 +164,26 @@ void process_command_line(int argc, char **argv) {
 
 void process_input_grid(DataPlane &dp) {
 
-   // Parse info.name as a white-space separated string
+   // Parse the input grid as a white-space separated string
    StringArray sa;
    sa.parse_wsss(input_gridname);
 
    // Search for a named grid
    if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
       mlog << Debug(3)
-           << "Use the grid named \"" << input_gridname << "\".\n";
+           << "Use input grid named \"" << input_gridname << "\".\n";
    }
    // Parse grid definition
    else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
       mlog << Debug(3)
-           << "Use the grid defined by string \"" << input_gridname
+           << "Use input grid defined by string \"" << input_gridname
            << "\".\n";
    }
    // Extract the grid from a gridded data file
    else {
 
       mlog << Debug(3)
-           << "Use the grid defined by file \"" << input_gridname
+           << "Use input grid defined by file \"" << input_gridname
            << "\".\n";
 
       // Read the input grid and data plane, if requested
@@ -249,13 +250,44 @@ void process_mask_file(DataPlane &dp) {
            mask_type == MaskType_Lon) {
    }
 
-   // Otherwise, process the mask file as a gridded data file
+   // Otherwise, process the mask file as a named grid, grid specification
+   // string or gridded data file
    else {
 
-      // Read the mask grid and data plane, if requested
-      get_data_plane(mask_filename, mask_field_str,
-                     mask_type == MaskType_Data,
-                     dp, grid_mask);
+      // For the grid mask type, support named grids and grid
+      // specification strings
+      if(mask_type == MaskType_Grid) {
+
+         // Parse the mask file as a white-space separated string
+         StringArray sa;
+         sa.parse_wsss(mask_filename);
+
+         // Search for a named grid
+         if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid_mask)) {
+            mlog << Debug(3)
+                 << "Use mask grid named \"" << mask_filename << "\".\n";
+         }
+         // Parse grid definition
+         else if(sa.n() > 1 && parse_grid_def(sa, grid_mask)) {
+            mlog << Debug(3)
+                 << "Use mask grid defined by string \"" << mask_filename
+                 << "\".\n";
+         }
+      }
+
+      // Parse as a gridded data file if not already set
+      if(grid_mask.nxy() == 0) {
+
+         // Extract the grid from a gridded data file
+         mlog << Debug(3)
+              << "Use mask grid defined by file \"" << mask_filename
+              << "\".\n";
+
+         // Read the mask grid and data plane, if requested
+         get_data_plane(mask_filename, mask_field_str,
+                        mask_type == MaskType_Data,
+                        dp, grid_mask);
+      }
 
       mlog << Debug(2)
            << "Parsed Mask Grid:\t" << grid_mask.name()
