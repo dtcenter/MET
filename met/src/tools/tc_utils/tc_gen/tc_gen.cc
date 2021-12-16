@@ -15,13 +15,13 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    05/17/19  Halley Gotway   New
-//   001    10/21/20  Halley Gotway   Fix for MET #1465
-//   002    12/15/20  Halley Gotway   Matching logic for MET #1448
-//   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
-//   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
-//   005    04/02/21  Halley Gotway   Refinements for MET #1714
-//   006    11/04/21  Halley Gotway   Add -edeck for MET #1809
-//   007    11/22/21  Halley Gotway   Add -shape for MET #1810
+//   001    10/21/20  Halley Gotway   MET #1465 Fix lead window
+//   002    12/15/20  Halley Gotway   MET #1448 Refine matching logic
+//   003    12/31/20  Halley Gotway   MET #1430 Add NetCDF output
+//   004    01/14/21  Halley Gotway   MET #1597 Add GENMPR output
+//   005    04/02/21  Halley Gotway   MET #1714 Refinem matching logic
+//   006    11/04/21  Halley Gotway   MET #1809 Add -edeck option
+//   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //
 ////////////////////////////////////////////////////////////////////////
 

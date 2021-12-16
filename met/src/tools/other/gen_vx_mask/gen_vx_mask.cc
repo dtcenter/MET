@@ -25,8 +25,8 @@
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //   008    04/06/20  Halley Gotway   Generalize input_grid option.
 //   009    06/01/21  Seth Linden     Change -type from optional to required.
-//   010    08/30/21  Halley Gotway   MET#1891 Fix input and mask fields.
-//   011    12/13/21  Halley Gotway   MET#1993 Fix -type grid.
+//   010    08/30/21  Halley Gotway   MET #1891 Fix input and mask fields.
+//   011    12/13/21  Halley Gotway   MET #1993 Fix -type grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
