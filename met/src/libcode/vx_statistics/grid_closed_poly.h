@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   polyline.h
+//   Filename:   grid_closed_poly.h
 //
 //   Description:
 //
@@ -19,11 +19,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef  __DATA2D_UTIL_GCP_H__
-#define  __DATA2D_UTIL_GCP_H__
+#ifndef  __GRID_CLOSED_POLY_H__
+#define  __GRID_CLOSED_POLY_H__
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 
@@ -33,13 +32,9 @@
 #include "shp_poly_record.h"
 #include "vx_grid.h"
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-class GridClosedPoly : public Polyline
-
-{
+class GridClosedPoly : public Polyline {
 
    protected:
 
@@ -67,13 +62,9 @@ class GridClosedPoly : public Polyline
 
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
-
-{
+class GridClosedPolyArray : public NCRR_Array<GridClosedPoly> {
 
    public:
 
@@ -83,14 +74,8 @@ class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
 
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#endif   //  __DATA2D_UTIL_GCP_H__
-
+#endif   //  __GRID_CLOSED_POLY_H__
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-

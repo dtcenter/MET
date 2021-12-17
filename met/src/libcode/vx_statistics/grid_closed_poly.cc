@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   polyline.cc
+//   Filename:   grid_closed_poly.cc
 //
 //   Description:
 //
@@ -34,170 +34,119 @@ using namespace std;
 #include "vx_util.h"
 #include "grid_closed_poly.h"
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Code for class GridClosedPoly
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-GridClosedPoly::GridClosedPoly()
-
-{
-
-gcp_init_from_scratch();
-
+GridClosedPoly::GridClosedPoly() {
+   gcp_init_from_scratch();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+GridClosedPoly::~GridClosedPoly() { }
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GridClosedPoly::clear() {
+
+   Polyline::clear();
+
+   u_min = u_max = v_min = v_max = 0.0;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+GridClosedPoly::GridClosedPoly(const GridClosedPoly & g) {
+
+   gcp_init_from_scratch();
+
+   gcp_assign(g);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+GridClosedPoly & GridClosedPoly::operator=(const GridClosedPoly & g) {
+
+   if(this == &g) return(*this);
+
+   gcp_assign(g);
+
+   return(*this);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GridClosedPoly::gcp_init_from_scratch() {
+
+   u_min = u_max = v_min = v_max = 0.0;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GridClosedPoly::gcp_assign(const GridClosedPoly & g) {
+
+   Polyline::assign(g);
+
+   u_min = g.u_min;
+   u_max = g.u_max;
+
+   v_min = g.v_min;
+   v_max = g.v_max;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GridClosedPoly::add_point(double uu, double vv) {
+
+   if(n_points == 0) {
+      u_min = u_max = uu;
+      v_min = v_max = vv;
+   }
+   else {
+      if(uu < u_min) u_min = uu;
+      if(uu > u_max) u_max = uu;
+
+      if(vv < v_min) v_min = vv;
+      if(vv > v_max) v_max = vv;
+   }
+
+   Polyline::add_point(uu, vv);
+
+   return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-GridClosedPoly::~GridClosedPoly()
-
-{
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void GridClosedPoly::clear()
-
-{
-
-Polyline::clear();
-
-u_min = u_max = v_min = v_max = 0.0;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-GridClosedPoly::GridClosedPoly(const GridClosedPoly & g)
-
-{
-
-gcp_init_from_scratch();
-
-gcp_assign(g);
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-GridClosedPoly & GridClosedPoly::operator=(const GridClosedPoly & g)
-
-{
-
-if ( this == &g )  return ( * this );
-
-gcp_assign(g);
-
-
-return ( * this );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void GridClosedPoly::gcp_init_from_scratch()
-
-{
-
-u_min = u_max = v_min = v_max = 0.0;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void GridClosedPoly::gcp_assign(const GridClosedPoly & g)
-
-{
-
-Polyline::assign(g);
-
-u_min = g.u_min;
-u_max = g.u_max;
-
-v_min = g.v_min;
-v_max = g.v_max;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void GridClosedPoly::add_point(double uu, double vv)
-
-{
-
-if ( n_points == 0 )  {
-
-   u_min = u_max = uu;  v_min = v_max = vv;
-
-} else {
-
-   if ( uu < u_min )  u_min = uu;
-   if ( uu > u_max )  u_max = uu;
-
-   if ( vv < v_min )  v_min = vv;
-   if ( vv > v_max )  v_max = vv;
-
-}
-
-Polyline::add_point(uu, vv);
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-int GridClosedPoly::is_inside(double u_test, double v_test) const
-
-{
+int GridClosedPoly::is_inside(double u_test, double v_test) const {
 
    //
    //  test bounding box
    //
 
-if ( u_test < u_min )  return ( 0 );
-if ( u_test > u_max )  return ( 0 );
+   if(u_test < u_min) return(0);
+   if(u_test > u_max) return(0);
 
-if ( v_test < v_min )  return ( 0 );
-if ( v_test > v_max )  return ( 0 );
+   if(v_test < v_min) return(0);
+   if(v_test > v_max) return(0);
 
    //
    //  test polyline
    //
 
-const int status = Polyline::is_inside(u_test, v_test);
+   const int status = Polyline::is_inside(u_test, v_test);
 
-return ( status );
-
+   return(status);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -205,86 +154,63 @@ return ( status );
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
 
-bool GridClosedPolyArray::is_inside(double u_test, double v_test) const
+   if(Nelements == 0) return(false);
 
-{
-
-if ( Nelements == 0 )  return ( false );
-
-int j, status;
+   int j, status;
 
    //
    //  if the test point is inside **ANY** of the element polylines, return true
    //
+   for(j=0; j<Nelements; j++) {
 
-for (j=0; j<Nelements; ++j)  {
+      status = e[j]->is_inside(u_test, v_test);
 
-   status = e[j]->is_inside(u_test, v_test);
+      if(status != 0) return(true);
+   }
 
-   if ( status != 0 )  return ( true );
-
-}
-
-
-return ( false );
+   return(false);
 
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid) {
 
-void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid)
+   clear();
 
-{
+   int i, j, k, m;
+   int start, stop;
+   double lat, lon;
+   double x, y;
+   GridClosedPoly g;
 
-clear();
+   if(r.n_parts == 0) return;
 
-int i, j, k, m;
-int start, stop;
-double lat, lon;
-double x, y;
-GridClosedPoly g;
+   for(j=0; j<(r.n_parts); j++) {
 
+      g.clear();
 
-if ( r.n_parts == 0 )  return;
+      start = r.start_index(j);
+      stop  = r.stop_index(j);
 
+      i = stop - start + 1;
 
-for (j=0; j<(r.n_parts); ++j)  {
+      for(k=0; k<i; k++) {
 
-   g.clear();
+         m = start + k;
 
-   start = r.start_index(j);
+         lat = r.lat(m);
+         lon = r.lon(m);
 
-   stop  = r.stop_index(j);
+         grid.latlon_to_xy(lat, lon, x, y);
+         g.add_point(x, y);
 
-   i = stop - start + 1;
+      } // for k
+   } // for j
 
-   // g.extend(stop - start + 1);
-
-   for (k=0; k<i; ++k)  {
-
-      m = start + k;
-
-      lat = r.lat(m);
-      lon = r.lon(m);
-
-      grid.latlon_to_xy(lat, lon, x, y);
-
-      g.add_point(x, y);
-
-   }   //  for k
-
-}   //  for j
-
-
-return;
-
+   return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
