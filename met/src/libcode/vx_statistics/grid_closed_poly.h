@@ -42,8 +42,7 @@ class GridClosedPoly : public Polyline {
 
       void gcp_assign(const GridClosedPoly &);
 
-         //  bounding box info
-
+      // bounding box limits
       double u_min, u_max;
       double v_min, v_max;
 
@@ -56,9 +55,11 @@ class GridClosedPoly : public Polyline {
 
       void clear();
 
-      int is_inside(double u_test, double v_test) const;   //  test bounding box first
+      // tests bounding box first for efficiency
+      int is_inside(double u_test, double v_test) const;
 
-      void add_point(double, double);   //  updates bounding box
+      // updates bounding box for each new point
+      void add_point(double, double);
 
 };
 
@@ -70,7 +71,7 @@ class GridClosedPolyArray : public NCRR_Array<GridClosedPoly> {
 
       bool is_inside(double u_test, double v_test) const;
 
-      void set (const ShpPolyRecord &, const Grid &);
+      void set(const ShpPolyRecord &, const Grid &);
 
 };
 

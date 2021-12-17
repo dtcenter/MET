@@ -161,7 +161,7 @@ bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
    int j, status;
 
    //
-   //  if the test point is inside **ANY** of the element polylines, return true
+   // return true if the test point is inside **ANY** of the polylines
    //
    for(j=0; j<Nelements; j++) {
 
@@ -176,7 +176,7 @@ bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid) {
+void GridClosedPolyArray::set(const ShpPolyRecord &r, const Grid &grid) {
 
    clear();
 
@@ -184,13 +184,13 @@ void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid) {
    int start, stop;
    double lat, lon;
    double x, y;
-   GridClosedPoly g;
+   GridClosedPoly p;
 
    if(r.n_parts == 0) return;
 
    for(j=0; j<(r.n_parts); j++) {
 
-      g.clear();
+      p.clear();
 
       start = r.start_index(j);
       stop  = r.stop_index(j);
@@ -204,10 +204,16 @@ void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid) {
          lat = r.lat(m);
          lon = r.lon(m);
 
+         lon *= -1.0; // west is positive for us
+
          grid.latlon_to_xy(lat, lon, x, y);
-         g.add_point(x, y);
+         p.add_point(x, y);
 
       } // for k
+
+      // store the current poly
+      add(p);
+
    } // for j
 
    return;
