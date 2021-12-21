@@ -317,8 +317,8 @@ Running on different cores, this reduces the execution time. At the end of the
 parallel region, the code returns to single-thread execution.
 
 A limited number of code regions are parallelized in MET. As a consequence,
-there are limits to the A limited number of code regions are parallelized
-in MET. As a consequence, there are limits to the leaving the remaining
+there are limits to the overall speed gains acheivable. Only the parallel
+regions of code will get faster with more threads, leaving the remaining
 serial portions to dominate the runtime.
 
 Not all top-level executables use parallelized code. If OpenMP is available,
@@ -327,7 +327,7 @@ for faster runtimes.
 
 **Setting the number of threads**
 
-he number of threads is controlled by the environment variable
+The number of threads is controlled by the environment variable
 *OMP_NUM_THREADS* . For example, on a quad core machine, the user might choose
 to run on 4 threads:
 
@@ -345,13 +345,13 @@ itself. For example:
 The case where this variable remains unset is handled inside the code, which
 defaults to a single thread.
 
-here are choices when deciding how many threads to use. To perform a single run
+There are choices when deciding how many threads to use. To perform a single run
 as fast as possible, it would likely be appropriate to use as many threads as
 there are (physical) cores available on the specific system. However, it is not
 a cast-iron guarantee that more threads will always translate into more speed.
-In theory, there is a chance that running across multiple NUMA regions may
-carry negative performance impacts. This has not been observed in practice,
-however.
+In theory, there is a chance that running across multiple non-uniform memory
+access (NUMA) regions may carry negative performance impacts. This has not been
+observed in practice, however.
 
 A lower thread count is appropriate when time-to-solution is not so critical,
 because cores remain idle when the code is not inside a parallel region. Fewer
@@ -372,7 +372,22 @@ parallelization:
 
 **Thread Binding**    
 
-coming soon...
+It is normally beneficial to bind threads to particular cores, sometimes called
+*affinitization*. There are a few reasons for this, but at the very least it
+guarantees that threads remain evenly distributed across the available cores.
+Otherwise, the operating system may migrate threads between cores during a run.
+
+OpenMP provides some environment variables to handle this: :code:`OMP_PLACES`
+and  :code:`OMP_PROC_BIND`.  We anticipate that the effect of setting only
+:code:`OMP_PROC_BIND=true` would be neutral-to-positive.
+
+However, there are sometimes compiler-specific environment variables. Instead,
+thread affinitization is sometimes handled by MPI launchers, since OpenMP is
+often used in MPI codes to reduce intra-node communications.
+
+Where code is running in a production context, it is worth being familiar with
+the binding / affinitization method on the particular system and building it
+into any relevant scripting.
 
 Settings common to multiple tools
 ---------------------------------
