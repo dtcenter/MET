@@ -357,7 +357,7 @@ A lower thread count is appropriate when time-to-solution is not so critical,
 because cores remain idle when the code is not inside a parallel region. Fewer
 threads typically means better resource utilization.
 
-**Which code is parallized?**
+**Which code is parallelized?**
 
 Regions of parallelized code are:
 
