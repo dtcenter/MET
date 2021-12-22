@@ -45,7 +45,6 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
 
    overview
    installation
-   openmp
    data_io
    config_options
    config_options_tc
