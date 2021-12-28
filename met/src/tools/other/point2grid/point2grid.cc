@@ -43,6 +43,11 @@ using namespace std;
 
 #include "point2grid_conf_info.h"
 
+#ifdef WITH_PYTHON
+#include "data2d_nc_met.h"
+#include "pointdata_python.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
@@ -53,6 +58,7 @@ static const int TYPE_OBS      = 1;     // MET Point Obs NetCDF (from xxx2nc)
 static const int TYPE_NCCF     = 2;     // CF NetCDF with time and lat/lon variables
 static const int TYPE_GOES     = 5;
 static const int TYPE_GOES_ADP = 6;
+static const int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
 
 static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
 static const int        DefaultInterpWdth = 2;
@@ -120,14 +126,19 @@ static NcDim  lon_dim ;
 static void process_command_line(int, char **);
 static void process_data_file();
 static void process_point_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, const Grid fr_grid, const Grid to_grid);
+                               VarInfo *, const Grid to_grid);
+#ifdef WITH_PYTHON
+static void process_point_python(string python_command, MetConfig &config,
+                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray);
+#endif
 static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, Met2dDataFile *fr_mtddf, const Grid to_grid);
+                                    VarInfo *, Met2dDataFile *fr_mtddf,
+                                    const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname);
 static void write_nc_int(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname);
+                         const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage();
 static void set_field(const StringArray &);
@@ -265,11 +276,26 @@ void process_command_line(int argc, char **argv) {
    OutputFilename = cline[2];
 
    // Check if the input file
-   if ( !file_exists(InputFilename.c_str()) ) {
-      mlog << Error << "\n" << method_name
-           << "file does not exist \"" << InputFilename << "\"\n\n";
-      exit(1);
+   bool use_python = false;
+#ifdef WITH_PYTHON
+   string python_command = InputFilename;
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
    }
+   else
+#endif
+      if ( !file_exists(InputFilename.c_str()) ) {
+         mlog << Error << "\n" << method_name
+              << "file does not exist \"" << InputFilename << "\"\n\n";
+         exit(1);
+      }
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -347,18 +373,42 @@ void process_data_file() {
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
-   nc_in = open_ncfile(InputFilename.c_str());
-   
-   // Get the obs type before opening NetCDF
-   int obs_type = get_obs_type(nc_in);
-   bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-
-   if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
-   
-   // Read the input data file
+   bool goes_data = false;
+   bool use_python = false;
+   int obs_type = TYPE_UNKNOWN;
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
-   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+#ifdef WITH_PYTHON
+   string python_command = InputFilename;
+   MetPointData *met_point_obs = 0;
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
+
+      python_command = python_command.substr(offset+1);
+      obs_type = TYPE_PYTHON;
+      fr_mtddf = new MetNcMetDataFile();
+   }
+   else
+#endif
+   {
+      nc_in = open_ncfile(InputFilename.c_str());
+
+      // Get the obs type before opening NetCDF
+      obs_type = get_obs_type(nc_in);
+      goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+
+      if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
+
+      // Read the input data file
+      fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+   }
 
    if(!fr_mtddf) {
       mlog << Error << "\n" << method_name
@@ -384,7 +434,11 @@ void process_data_file() {
    // For python types read the first field to set the grid
 
    // Determine the "from" grid
+#ifdef WITH_PYTHON
+   if (!use_python) fr_grid = fr_mtddf->grid();
+#else
    fr_grid = fr_mtddf->grid();
+#endif
 
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
@@ -410,12 +464,17 @@ void process_data_file() {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
+      process_point_file(nc_in, config, vinfo, to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
+#ifdef WITH_PYTHON
+   else if (TYPE_PYTHON == obs_type) {
+      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+   }
+#endif
    else {
       mlog << Error << "\n" << method_name
            << "Please check the input file. Only supports GOES, MET point obs, "
@@ -599,8 +658,8 @@ IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                        const Grid fr_grid, const Grid to_grid) {
+void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
+                            const Grid to_grid) {
    int nhdr, nobs;
    int nx, ny, var_count, to_count, var_count2;
    int idx, hdr_idx;
@@ -616,8 +675,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
-   static const char *method_name = "process_point_file() -> ";
-   static const char *method_name_s = "process_point_file()";
+   static const char *method_name = "process_point_met_data() -> ";
+   static const char *method_name_s = "process_point_met_data()";
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -626,35 +685,29 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       usage();
    }
 
-   MetNcPointObsIn nc_point_obs;
-   nc_point_obs.set_netcdf(nc_in, true);
-   // Read the dimensions and variables
-   nc_point_obs.read_dim_headers();
-   nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
-   // Read all obs data to compute the cell mapping
-   nc_point_obs.read_obs_data();
-   NcHeaderData header_data = nc_point_obs.get_header_data();
-   NcPointObsData obs_data = nc_point_obs.get_point_obs_data();
+//   MetNcPointObsIn nc_point_obs;
+   MetPointHeader *header_data = met_point_obs->get_header_data();
+   MetPointObsData *obs_data = met_point_obs->get_point_obs_data();
 
-   nhdr = nc_point_obs.get_hdr_cnt();
-   nobs = nc_point_obs.get_obs_cnt();
+   nhdr = met_point_obs->get_hdr_cnt();
+   nobs = met_point_obs->get_obs_cnt();
    bool empty_input = (nhdr == 0 && nobs == 0);
-   bool use_var_id = nc_point_obs.is_using_var_id();
+   bool use_var_id = met_point_obs->is_using_var_id();
 
    float *hdr_lats = new float[nhdr];
    float *hdr_lons = new float[nhdr];
    IntArray var_index_array;
    IntArray valid_time_array;
-   StringArray qc_tables = nc_point_obs.get_qty_data();
-   StringArray var_names = nc_point_obs.get_var_names();
-   StringArray hdr_valid_times = header_data.vld_array;
+   StringArray qc_tables = met_point_obs->get_qty_data();
+   StringArray var_names = met_point_obs->get_var_names();
+   StringArray hdr_valid_times = header_data->vld_array;
    hdr_valid_times.sort();
 
-   nc_point_obs.get_lats(hdr_lats);
-   nc_point_obs.get_lons(hdr_lons);
+   met_point_obs->get_lats(hdr_lats);
+   met_point_obs->get_lons(hdr_lons);
 
    // Check the message types
-   prepare_message_types(header_data.typ_array);
+   prepare_message_types(header_data->typ_array);
 
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
@@ -732,7 +785,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                else {
                   bool not_found_grib_code = true;
                   for (idx=0; idx<nobs; idx++) {
-                     if (var_idx_or_gc == obs_data.obs_ids[idx]) {
+                     if (var_idx_or_gc == obs_data->obs_ids[idx]) {
                         not_found_grib_code = false;
                         break;
                      }
@@ -757,10 +810,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                log_msg << "GRIB codes: ";
                IntArray grib_codes;
                for (idx=0; idx<nobs; idx++) {
-                  if (!grib_codes.has(obs_data.obs_ids[idx])) {
-                     grib_codes.add(obs_data.obs_ids[idx]);
+                  if (!grib_codes.has(obs_data->obs_ids[idx])) {
+                     grib_codes.add(obs_data->obs_ids[idx]);
                      if (0 < idx) log_msg << ", ";
-                     log_msg << obs_data.obs_ids[idx];
+                     log_msg << obs_data->obs_ids[idx];
                   }
                }
             }
@@ -836,29 +889,29 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          var_count = var_count2 = to_count = 0;
          filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
          for (idx=0; idx < nobs; idx++) {
-            if (var_idx_or_gc == obs_data.obs_ids[idx]) {
+            if (var_idx_or_gc == obs_data->obs_ids[idx]) {
                var_count2++;
-               hdr_idx = obs_data.obs_hids[idx];
+               hdr_idx = obs_data->obs_hids[idx];
                if (0 < valid_time_array.n() &&
-                     !valid_time_array.has(header_data.vld_idx_array[hdr_idx])) {
+                     !valid_time_array.has(header_data->vld_idx_array[hdr_idx])) {
                   filtered_by_time++;
                   continue;
                }
 
-               if(!keep_message_type(header_data.typ_idx_array[hdr_idx])) {
+               if(!keep_message_type(header_data->typ_idx_array[hdr_idx])) {
                   filtered_by_msg_type++;
                   continue;
                }
 
                // Filter by QC flag
-               if (has_qc_flags && !qc_idx_array.has(obs_data.obs_qids[idx])) {
+               if (has_qc_flags && !qc_idx_array.has(obs_data->obs_qids[idx])) {
                   filtered_by_qc++;
                   continue;
                }
 
                var_index_array.add(idx);
                var_count++;
-               if (is_eq(obs_data.obs_vals[idx], 0.)) obs_count_zero_from++;
+               if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
                else obs_count_non_zero_from++;
             }
          }
@@ -869,7 +922,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
          cellMapping = new IntArray[nx * ny];
          if( get_grid_mapping(to_grid, cellMapping, var_index_array,
-                              obs_data.obs_hids, hdr_lats, hdr_lons) ) {
+                              obs_data->obs_hids, hdr_lats, hdr_lons) ) {
             int from_index;
             IntArray cellArray;
             NumArray dataArray;
@@ -905,7 +958,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      dataArray.extend(cellArray.n());
                      for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
-                        data_value = obs_data.get_obs_val(from_index);
+                        data_value = obs_data->get_obs_val(from_index);
                         if (is_bad_data(data_value)) continue;
 
                         if(mlog.verbosity_level() >= 4) {
@@ -1073,13 +1126,108 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
    delete [] hdr_lats;
    delete [] hdr_lons;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+                        const Grid to_grid) {
+   int nhdr, nobs;
+   int nx, ny, var_count, to_count, var_count2;
+   int idx, hdr_idx;
+   int var_idx_or_gc;
+   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
+   ConcatString vname, vname_cnt, vname_mask;
+   DataPlane fr_dp, to_dp;
+   DataPlane cnt_dp, mask_dp;
+   DataPlane prob_dp, prob_mask_dp;
+   NcVar var_obs_gc, var_obs_var;
+
+   clock_t start_clock =  clock();
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
+   unixtime requested_valid_time, valid_time;
+   static const char *method_name = "process_point_file() -> ";
+   static const char *method_name_s = "process_point_file()";
+
+   // Check for at least one configuration string
+   if(FieldSA.n() < 1) {
+      mlog << Error << "\n" << method_name
+           << "The -field option must be used at least once!\n\n";
+      usage();
+   }
+
+   MetNcPointObsIn nc_point_obs;
+   nc_point_obs.set_netcdf(nc_in, true);
+   // Read the dimensions and variables
+   nc_point_obs.read_dim_headers();
+   nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
+   // Read all obs data to compute the cell mapping
+   nc_point_obs.read_obs_data();
+   process_point_met_data(&nc_point_obs, config, vinfo, to_grid);
+
    nc_point_obs.close();
+
+   mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+#ifdef WITH_PYTHON
+
+void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
+                          const Grid to_grid, bool use_xarray) {
+   int nhdr, nobs;
+   int nx, ny, var_count, to_count, var_count2;
+   int idx, hdr_idx;
+   int var_idx_or_gc;
+   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
+   ConcatString vname, vname_cnt, vname_mask;
+   DataPlane fr_dp, to_dp;
+   DataPlane cnt_dp, mask_dp;
+   DataPlane prob_dp, prob_mask_dp;
+   NcVar var_obs_gc, var_obs_var;
+
+   clock_t start_clock =  clock();
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
+   unixtime requested_valid_time, valid_time;
+   static const char *method_name = "process_point_python() -> ";
+   static const char *method_name_s = "process_point_python()";
+
+   // Check for at least one configuration string
+   if(FieldSA.n() < 1) {
+      mlog << Error << "\n" << method_name
+           << "The -field option must be used at least once!\n\n";
+      usage();
+   }
+
+   MetPythonPointDataFile met_point_file;
+   if(!met_point_file.open(python_command.c_str(), use_xarray)) {
+      met_point_file.close();
+
+      mlog << Error << "\n" << method_name
+           << "trouble getting point observation file from python command "
+           << python_command << "\n\n";
+
+      exit(1);
+   }
+
+   MetPointData *met_point_obs = met_point_file.get_met_point_data();
+   process_point_met_data(met_point_obs, config, vinfo, to_grid);
+
+   met_point_file.close();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
    return;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1097,7 +1245,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
    int from_size = fr_grid.nx() * fr_grid.ny();
-   static const char *method_name = "process_point_file_with_latlon() -> ";
+   static const char *method_name = "process_point_nccf_file() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
    NcVar var_lon = get_nc_var_lon(nc_in);
