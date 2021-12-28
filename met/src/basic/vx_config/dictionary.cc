@@ -775,8 +775,15 @@ if ( Type != StringType )  {
 
 }
 
+ConcatString *sub_text =  Text;
+ConcatString cur_env_val;
+if ( get_env(met_ens_member_id, cur_env_val) )  {
 
-return ( Text );
+   sub_text->replace(met_ens_member_id, cur_env_val.c_str(), false);
+
+}
+
+return ( sub_text );
 
 }
 
