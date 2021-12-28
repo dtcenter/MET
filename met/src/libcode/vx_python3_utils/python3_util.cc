@@ -12,7 +12,6 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
-#include "concat_string.h"
 #include "vx_math.h"
 
 #include "python3_util.h"
@@ -125,6 +124,18 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool pyobject_as_bool (PyObject * obj)
+
+{
+
+return ( 1 == PyObject_IsTrue(obj) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double pyobject_as_double (PyObject * obj)
 
 {
@@ -208,6 +219,29 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 }
 
 return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray pyobject_as_string_array (PyObject * obj)
+
+{
+
+StringArray a;
+ConcatString s;
+PyObject *item = 0;
+
+int size = PyList_Size (obj);
+for (int idx=0; idx<size; idx++) {
+   item = PyList_GetItem(obj, idx);
+   s = pyobject_as_concat_string (item);
+   a.add(s);
+}
+
+return a;
 
 }
 

@@ -56,9 +56,11 @@ extern PyObject * get_attribute(PyObject *, const char * attribute_name);
 
 
 extern int          pyobject_as_int           (PyObject *);
+extern bool         pyobject_as_bool           (PyObject *);
 extern double       pyobject_as_double        (PyObject *);
 extern std::string  pyobject_as_string        (PyObject *);
 extern ConcatString pyobject_as_concat_string (PyObject *);
+extern StringArray  pyobject_as_string_array  (PyObject *);
 
 
 ////////////////////////////////////////////////////////////////////////
