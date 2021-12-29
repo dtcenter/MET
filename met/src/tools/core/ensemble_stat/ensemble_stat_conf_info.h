@@ -95,6 +95,7 @@ class EnsembleStatVxOpt {
       VxPairDataEnsemble vx_pd;          // Ensemble pair data
 
       ConcatString   var_str;            // nc_pairs_var_str string
+      ConcatString   control_id;         // Control ID
 
       int            beg_ds;             // Begin observation time window offset
       int            end_ds;             // End observation time window offset
