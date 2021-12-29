@@ -762,28 +762,32 @@ return ( Bval );
 ////////////////////////////////////////////////////////////////////////
 
 
-const ConcatString * DictionaryEntry::string_value() const
+const ConcatString DictionaryEntry::string_value() const
 
 {
 
-if ( Type != StringType )  {
+   if ( Type != StringType )  {
 
-   mlog << Error
-        << "\nDictionaryEntry::string_value() -> bad type\n\n";
+      mlog << Error
+           << "\nDictionaryEntry::string_value() -> bad type\n\n";
 
-   exit ( 1 );
+      exit ( 1 );
 
-}
+   }
 
-ConcatString *sub_text =  Text;
-ConcatString cur_env_val;
-if ( get_env(met_ens_member_id, cur_env_val) )  {
+   ConcatString sub_text = ConcatString(*Text);
+   ConcatString cur_env_val;
+   if ( get_env(met_ens_member_id, cur_env_val) )  {
+      mlog << Debug(1) << "A: text is " << *Text
+           << " and sub_text is " << sub_text << " and cur val is " << cur_env_val << "\n";
+      if(!cur_env_val.empty()) {
+         sub_text.replace(met_ens_member_id, cur_env_val.c_str(), false);
+      }
+      mlog << Debug(1) << "B: text is " << *Text
+           << " and sub_text is " << sub_text << " and cur val is " << cur_env_val << "\n";
+   }
 
-   sub_text->replace(met_ens_member_id, cur_env_val.c_str(), false);
-
-}
-
-return ( sub_text );
+   return ( sub_text );
 
 }
 
@@ -1823,7 +1827,7 @@ if ( !Entry || !is_correct_type )  {
 
 }
 
-return ( *(Entry->string_value()) );
+return ( Entry->string_value() );
 
 }
 
@@ -1881,7 +1885,7 @@ if ( !Entry || !is_correct_type )  {
 
 if ( Entry->type() == StringType )  {
 
-   array.add( *(Entry->string_value()) );
+   array.add( Entry->string_value() );
 
    return ( array );
 
@@ -1918,7 +1922,7 @@ if ( Dict->n_entries() > 0 )  {
 
 for (int i=0; i<Dict->n_entries(); i++)  {
 
-   array.add(*(*Dict)[i]->string_value());
+   array.add((*Dict)[i]->string_value());
 
 }
 

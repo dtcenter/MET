@@ -125,7 +125,7 @@ class DictionaryEntry {
 
       int     n_args () const;
 
-      const ConcatString * string_value () const;
+      const ConcatString string_value () const;
 
       Dictionary * dict_value () const;
 
