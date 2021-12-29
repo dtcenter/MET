@@ -318,29 +318,27 @@ void process_ensemble() {
    vector<EnsInfo*>::const_iterator var_it = conf_info.ens_input.begin();
    vector<InputInfo>::const_iterator it;
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
-      it = (*var_it)->inputs.begin();
-
-      mlog << Debug(2) << "\n" << sep_str << "\n\n"
-           << "Processing ensemble field: "
-           << (*it).var_info->magic_str() << "\n";
 
       // Need to reinitialize counts and sums for each ensemble field
       need_reset = true;
 
-      for(n_ens_vld=0; it != (*var_it)->inputs.end(); it++) {
+      for(it = (*var_it)->inputs.begin(),n_ens_vld=0; it != (*var_it)->inputs.end(); it++) {
+
+         if((*it).var_info) {
+            mlog << Debug(2) << "\n" << sep_str << "\n\n"
+                 << "Processing ensemble field: "
+                 << (*it).var_info->magic_str() << "\n";
+            var_info = (*it).var_info;
+         } else {
+            // If var_info is NULL, use first input's var_info
+            var_info = (*var_it)->inputs[0].var_info;
+         }
 
          // Get index of file to process
          i_file = (*it).file_index;
 
          // Skip bad data files
          if(!ens_file_vld[i_file]) continue;
-
-         // If var_info is NULL, use first input's var_info
-         if((*it).var_info) {
-            var_info = (*it).var_info;
-         } else {
-            var_info = (*var_it)->inputs[0].var_info;
-         }
 
          // Read data and track the valid data count
          if(!get_data_plane(ens_files[i_file].c_str(), etype,
