@@ -51,6 +51,23 @@ struct GenEnsProdNcOutInfo {
    void set_all_true();
 };
 
+
+////////////////////////////////////////////////////////////////////////
+
+struct InputInfo {
+    VarInfo * var_info;
+    int file_index;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+struct EnsInfo {
+    vector<InputInfo> inputs;
+    ConcatString nc_var_str; // ensemble variable name strings
+    ThreshArray cat_ta; // ensemble categorical thresholds
+    GenEnsProdNcOutInfo nc_info; // ensemble product outputs
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 class GenEnsProdConfInfo {
@@ -78,11 +95,8 @@ class GenEnsProdConfInfo {
       ConcatString         desc;            // Description
       ConcatString         control_id;      // Control ID
 
-      vector<VarInfo *>    ens_info;        // Array of VarInfo pointers (allocated)
+      vector<EnsInfo *>    ens_input;       // Vector of EnsInfo pointers (allocated)
       vector<ClimoCDFInfo> cdf_info;        // Array of climo CDF info objects
-      vector<ThreshArray>  cat_ta;          // Array for ensemble categorical thresholds
-      StringArray          nc_var_str;      // Array of ensemble variable name strings
-      vector<GenEnsProdNcOutInfo> nc_info;  // Array of ensemble product outputs
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
