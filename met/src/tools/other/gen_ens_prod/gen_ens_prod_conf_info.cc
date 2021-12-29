@@ -163,7 +163,6 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
    for(i=0,max_n_cat=0; i<n_var; i++) {
 
       EnsInfo * ens_info = new EnsInfo();
-      //vector<InputInfo> input_info_list;
 
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {
