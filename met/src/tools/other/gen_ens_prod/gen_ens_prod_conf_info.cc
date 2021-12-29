@@ -100,7 +100,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(GrdFileType etype) {
+void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
    int i;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) 0;
@@ -121,6 +121,26 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
 
    // Conf: desc
    desc = parse_conf_string(&conf, conf_key_desc);
+
+   // Conf: ens_member_ids
+   ens_member_ids = parse_conf_ens_member_ids(&conf);
+
+   // error check ens_member_ids and ensemble file list
+   if(n_ens_files > 1 && ens_member_ids.n() > 1) {
+      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+           << "The \"" << conf_key_ens_member_ids << "\" "
+           << "must be empty if more than "
+           << "one file is provided.\n\n";
+      exit(1);
+   }
+
+   // if no ensemble member IDs were provided, add an empty string
+   if(ens_member_ids.n() == 0) {
+      ens_member_ids.add("");
+   }
+
+   // Conf: control_id
+   control_id = parse_conf_string(&conf, conf_key_control_id, false);
 
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);

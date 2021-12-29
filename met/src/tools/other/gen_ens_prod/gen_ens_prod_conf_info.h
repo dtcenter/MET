@@ -76,12 +76,14 @@ class GenEnsProdConfInfo {
       // Data parsed from the Gen-Ens-Prod configuration object
       ConcatString         model;           // Model name
       ConcatString         desc;            // Description
+      ConcatString         control_id;      // Control ID
 
       vector<VarInfo *>    ens_info;        // Array of VarInfo pointers (allocated)
       vector<ClimoCDFInfo> cdf_info;        // Array of climo CDF info objects
       vector<ThreshArray>  cat_ta;          // Array for ensemble categorical thresholds
       StringArray          nc_var_str;      // Array of ensemble variable name strings
       vector<GenEnsProdNcOutInfo> nc_info;  // Array of ensemble product outputs
+      StringArray          ens_member_ids;  // Array of ensemble member ID strings
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
       InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
@@ -96,7 +98,7 @@ class GenEnsProdConfInfo {
       void clear();
 
       void read_config   (const ConcatString, const ConcatString);
-      void process_config(GrdFileType);
+      void process_config(GrdFileType, int);
 
       GenEnsProdNcOutInfo parse_nc_info(Dictionary *);
 

@@ -57,6 +57,14 @@ ens = {
    ];
 }
 
+// Ensemble member ID list
+// Only set if processing a single file with all ensembles
+ens_member_ids = [];
+
+// Control member ID
+// Only set if processing a single file with all ensembles
+control_id = "";
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
