@@ -136,8 +136,8 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 0) usage();
 
    // Check that the required arguments have been set
-   n_ens = ens_files.n();
-   if(ens_files.n() == 0) {
+   n_ens_files = ens_files.n();
+   if(n_ens_files == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the ensemble file list must be set using the "
            << "\"-ens\" option.\n\n";
@@ -193,8 +193,8 @@ void process_command_line(int argc, char **argv) {
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
-        << ens_files.n() << "]:\n";
-   for(i=0; i<ens_files.n(); i++) {
+        << n_ens_files << "]:\n";
+   for(i=0; i<n_ens_files; i++) {
       mlog << "   " << ens_files[i]  << "\n";
    }
 
@@ -211,7 +211,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for missing non-python ensemble files
-   for(i=0; i<ens_files.n(); i++) {
+   for(i=0; i<n_ens_files; i++) {
       if(!file_exists(ens_files[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
          mlog << Warning << "\nprocess_command_line() -> "
@@ -324,7 +324,7 @@ void process_ensemble() {
       need_reset = true;
 
       // Loop through the ensemble member files
-      for(i_file=0, n_ens_vld=0; i_file<ens_files.n(); i_file++) {
+      for(i_file=0, n_ens_vld=0; i_file<n_ens_files; i_file++) {
 
          // Skip bad data files
          if(!ens_file_vld[i_file]) continue;
@@ -396,9 +396,9 @@ void process_ensemble() {
       } // end for i_file
 
       // Check for too much missing data
-      if(((double) n_ens_vld/n_ens) < conf_info.vld_ens_thresh) {
+      if(((double) n_ens_vld/n_ens_files) < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_ensemble() -> "
-              << n_ens - n_ens_vld << " of " << n_ens
+              << n_ens_files - n_ens_vld << " of " << n_ens_files
               << " missing fields for \"" << conf_info.ens_info[i_var]->magic_str()
               << "\" exceeds the maximum allowable specified by \""
               << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
