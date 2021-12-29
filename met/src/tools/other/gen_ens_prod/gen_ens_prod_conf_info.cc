@@ -68,6 +68,8 @@ void GenEnsProdConfInfo::clear() {
          if((*it).var_info) { delete (*it).var_info; }
       }
 
+     if((*var_it)->ctrl_info) { delete (*var_it)->ctrl_info; }
+
      if(*var_it) { delete *var_it; }
 
    }
@@ -201,6 +203,21 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
          } // end for k
 
       } // end for j
+
+      // Get field info for control member if set
+      if(!control_id.empty()) {
+
+         // Set environment variable for ens member ID
+         setenv(met_ens_member_id, control_id.c_str(), 1);
+
+         // Allocate new VarInfo object
+         next_var = info_factory.new_var_info(etype);
+
+         // Set the current dictionary
+         next_var->set_dict(i_edict);
+
+         ens_info->ctrl_info = next_var;
+      }
 
       // Conf: nc_var_str
       ens_info->nc_var_str =parse_conf_string(&i_edict, conf_key_nc_var_str, false);

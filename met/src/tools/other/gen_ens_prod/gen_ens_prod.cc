@@ -203,7 +203,7 @@ void process_command_line(int argc, char **argv) {
         << (ctrl_file.empty() ? "None" : ctrl_file.c_str()) << "\n";
 
    // Check for control in the list of ensemble files
-   if(ctrl_file.nonempty() && ens_files.has(ctrl_file)) {
+   if(ctrl_file.nonempty() && ens_files.has(ctrl_file) && n_ens_files != 1) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the ensemble control file should not appear in the list "
            << "of ensemble member files:\n" << ctrl_file << "\n\n";
@@ -371,13 +371,19 @@ void process_ensemble() {
 
             // Read ensemble control member data, if provided
             if(ctrl_file.nonempty()) {
+               VarInfo * ctrl_info;
+               if((*var_it)->ctrl_info) {
+                  ctrl_info = (*var_it)->ctrl_info;
+               } else {
+                  ctrl_info = var_info;
+               }
 
                // Error out if missing
                if(!get_data_plane(ctrl_file.c_str(), etype,
-                                  var_info, ctrl_dp)) {
+                                  ctrl_info, ctrl_dp)) {
                   mlog << Error << "\nprocess_ensemble() -> "
                        << "control member ensemble field \""
-                       << var_info->magic_str()
+                       << ctrl_info->magic_str()
                        << "\" not found in file \"" << ctrl_file << "\"\n\n";
                   exit(1);
                }

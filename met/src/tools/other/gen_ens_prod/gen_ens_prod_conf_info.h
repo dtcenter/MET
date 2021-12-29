@@ -63,9 +63,10 @@ struct InputInfo {
 
 struct EnsInfo {
     vector<InputInfo> inputs;
-    ConcatString nc_var_str; // ensemble variable name strings
-    ThreshArray cat_ta; // ensemble categorical thresholds
-    GenEnsProdNcOutInfo nc_info; // ensemble product outputs
+    ConcatString nc_var_str;      // Ensemble variable name strings
+    ThreshArray cat_ta;           // Ensemble categorical thresholds
+    GenEnsProdNcOutInfo nc_info;  // Ensemble product outputs
+    VarInfo * ctrl_info;          // Field info for control member
 };
 
 ////////////////////////////////////////////////////////////////////////
