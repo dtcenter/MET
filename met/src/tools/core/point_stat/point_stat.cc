@@ -738,29 +738,29 @@ void process_obs_file(int i_nc) {
    StringArray obs_qty_array = met_point_obs->get_qty_data();
    if( use_var_id ) var_names = met_point_obs->get_var_names();
 
-   int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
+   const int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
    // Process each observation in the file
    int str_length, block_size;
-   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=block_size) {
-      int block_size2 = (obs_count - i_block_start_idx);
-      if (block_size2 > BUFFER_SIZE) block_size2 = BUFFER_SIZE;
+   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
+      block_size = (obs_count - i_block_start_idx);
+      if (block_size > buf_size) block_size = buf_size;
 
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             block_size2, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
+                             block_size, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
       else
 #endif
-         status = nc_point_obs.read_obs_data(block_size2, i_block_start_idx,
+         status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
                                             (float *)obs_arr_block,
                                             obs_qty_idx_block, (char *)0);
       if (!status) exit(1);
 
       int hdr_idx;
-      for(int i_block_idx=0; i_block_idx<block_size2; i_block_idx++) {
+      for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
          i_obs = i_block_start_idx + i_block_idx;
 
          for (j=0; j<OBS_ARRAY_LEN; j++) {

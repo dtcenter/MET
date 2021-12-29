@@ -1055,7 +1055,7 @@ void process_point_obs(int i_nc) {
         << " observations from " << (hdr_count)
         << " header messages.\n";
 
-   int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
+   const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
 
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
@@ -1072,7 +1072,7 @@ void process_point_obs(int i_nc) {
 
    for(int i_start=0; i_start<obs_count; i_start+=buf_size) {
       int buf_size2 = (obs_count-i_start);
-      if (buf_size2 > DEF_NC_BUFFER_SIZE) buf_size2 = DEF_NC_BUFFER_SIZE;
+      if (buf_size2 > buf_size) buf_size2 = buf_size;
 
 #ifdef WITH_PYTHON
       if (use_python)
