@@ -1,0 +1,20 @@
+name: Build Docker Image and Trigger METplus Workflow
+
+on:
+  push:
+    branches:
+      - feature_1695_ensemble_single_file
+    paths:
+      - 'met/src/**'
+
+jobs:
+  build:
+    name: Handle Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker Image
+        run: .github/jobs/build_docker_image.sh
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
