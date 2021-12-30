@@ -1,5 +1,5 @@
 #! /bin/bash
-exit
+
 # utility function to run command get log the time it took to run
 function time_command {
   local start_seconds=$SECONDS
@@ -17,8 +17,7 @@ function time_command {
 
 prefix=refs/heads/
 branch_name=${GITHUB_REF#"$prefix"}
-#branch_name=${GITHUB_HEAD_REF}
-DOCKERHUB_TAG=dtcenter/met-dev:${branch_name}
+DOCKERHUB_TAG=dtcenter/met:${branch_name}
 
 DOCKERFILE_DIR=${GITHUB_WORKSPACE}/scripts/docker
 

@@ -3,7 +3,9 @@ name: Build Docker Image and Trigger METplus Workflow
 on:
   push:
     branches:
-      - feature_1695_ensemble_single_file
+      - develop
+    paths:
+      - 'met/src/**'
 
 jobs:
   build:
@@ -26,11 +28,11 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'dtcenter',
-              repo: 'ghatest',
-              workflow_id: 'external_trigger.yml',
-              ref: 'test_external_trigger',
+              repo: 'METplus',
+              workflow_id: 'testing.yml',
+              ref: 'develop',
               inputs: {
                 repo_name: 'MET',
-                docker_tag: 'feature_1695_blah'
+                docker_tag: 'develop'
               },
             });
