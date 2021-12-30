@@ -1,5 +1,5 @@
 #! /bin/bash
-
+exit
 # utility function to run command get log the time it took to run
 function time_command {
   local start_seconds=$SECONDS

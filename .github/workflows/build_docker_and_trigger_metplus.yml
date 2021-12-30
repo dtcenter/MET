@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - feature_1695_ensemble_single_file
-    paths:
-      - 'met/src/**'
 
 jobs:
   build:
@@ -18,3 +16,19 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  trigger_metplus:
+    name: Trigger METplus testing workflow
+    uses: actions/github-script@v5
+    with:
+      github-token: ${{ secrets.METPLUS_TOKEN }}
+      script: |
+        await github.rest.actions.createWorkflowDispatch({
+          owner: 'dtcenter',
+          repo: 'ghatest',
+          workflow_id: 'workflows/external_trigger.yml',
+          ref: 'test_external_trigger',
+          inputs: {
+            repo_name: 'MET',
+            docker_tag: 'feature_1695_blah'
+          },
+        });
