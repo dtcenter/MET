@@ -22,9 +22,11 @@ DOCKERHUB_TAG=dtcenter/met-dev:${branch_name}
 
 DOCKERFILE_DIR=${GITHUB_WORKSPACE}/scripts/docker
 
+echo "::group::Docker Build Command"
 time_command docker build -t ${DOCKERHUB_TAG} \
        --build-arg SOURCE_BRANCH=$branch_name \
        $DOCKERFILE_DIR
+echo "::endgroup::"
 
 # skip docker push if credentials are not set
 if [ -z ${DOCKER_USERNAME+x} ] || [ -z ${DOCKER_PASSWORD+x} ]; then
@@ -34,4 +36,6 @@ fi
 
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
+echo "::group::Docker Push Command"
 time_command docker push ${DOCKERHUB_TAG}
+echo "::endgroup::"
