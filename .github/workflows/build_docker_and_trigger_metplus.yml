@@ -18,17 +18,19 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   trigger_metplus:
     name: Trigger METplus testing workflow
-    uses: actions/github-script@v5
-    with:
-      github-token: ${{ secrets.METPLUS_TOKEN }}
-      script: |
-        await github.rest.actions.createWorkflowDispatch({
-          owner: 'dtcenter',
-          repo: 'ghatest',
-          workflow_id: 'external_trigger.yml',
-          ref: 'test_external_trigger',
-          inputs: {
-            repo_name: 'MET',
-            docker_tag: 'feature_1695_blah'
-          },
-        });
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.METPLUS_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'dtcenter',
+              repo: 'ghatest',
+              workflow_id: 'external_trigger.yml',
+              ref: 'test_external_trigger',
+              inputs: {
+                repo_name: 'MET',
+                docker_tag: 'feature_1695_blah'
+              },
+            });
