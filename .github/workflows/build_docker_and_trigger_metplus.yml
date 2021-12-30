@@ -25,7 +25,7 @@ jobs:
         await github.rest.actions.createWorkflowDispatch({
           owner: 'dtcenter',
           repo: 'ghatest',
-          workflow_id: 'workflows/external_trigger.yml',
+          workflow_id: 'external_trigger.yml',
           ref: 'test_external_trigger',
           inputs: {
             repo_name: 'MET',
