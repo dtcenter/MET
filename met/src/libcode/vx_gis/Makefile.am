@@ -12,23 +12,16 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_gis.a
 
-libvx_gis_a_SOURCES = shapetype_to_string.h   \
-                      shapetype_to_string.cc  \
-                      dbf_file.cc  \
-                      dbf_file.h  \
-                      shp_array.h  \
-                      shp_file.cc  \
-                      shp_file.h  \
-                      shp_point_record.cc  \
-                      shp_point_record.h  \
-                      shp_poly_record.cc  \
-                      shp_poly_record.h  \
-                      shp_types.h  \
-                      shx_file.cc  \
-                      shx_file.h
-
-
-
+libvx_gis_a_SOURCES = \
+           dbf_file.cc dbf_file.h \
+           shx_file.cc shx_file.h \
+           shp_file.cc shp_file.h \
+           shp_types.h \
+           shapetype_to_string.cc shapetype_to_string.h \
+           shp_array.h \
+           shp_point_record.cc shp_point_record.h \
+           shp_poly_record.cc shp_poly_record.h \
+           vx_gis.h
 
 libvx_gis_a_CPPFLAGS = ${MET_CPPFLAGS}
 
