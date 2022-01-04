@@ -56,19 +56,12 @@ void GenEnsProdConfInfo::init_from_scratch() {
 
 void GenEnsProdConfInfo::clear() {
    vector<EnsVarInfo*>::const_iterator var_it = ens_input.begin();
-   vector<InputInfo>::const_iterator it;
 
    // Clear, erase, and initialize members
    model.clear();
    desc.clear();
 
    for(; var_it != ens_input.end(); var_it++) {
-
-      for(it = (*var_it)->inputs.begin(); it != (*var_it)->inputs.end(); it++) {
-         if((*it).var_info) { delete (*it).var_info; }
-      }
-
-     if((*var_it)->ctrl_info) { delete (*var_it)->ctrl_info; }
 
      if(*var_it) { delete *var_it; }
 
@@ -107,13 +100,15 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
+void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files) {
    int i, j;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) 0;
    Dictionary i_edict;
    InterpMthd mthd;
    VarInfo * next_var;
+
+   int n_ens_files = ens_files->n();
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -166,6 +161,19 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
 
       EnsVarInfo * ens_info = new EnsVarInfo();
 
+      // Get the current dictionary
+      i_edict = parse_conf_i_vx_dict(edict, i);
+
+      // get VarInfo magic string without substituted values
+      unsetenv(met_ens_member_id);
+      ConcatString name = i_edict.lookup_string("name");
+      ConcatString level = i_edict.lookup_string("level");
+      if(level.nonempty() && level[0] != '(') {
+          ens_info->raw_magic_str << name << "/" << level;
+      } else {
+          ens_info->raw_magic_str << name << level;
+      }
+
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {
 
@@ -174,9 +182,6 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
 
          // Allocate new VarInfo object
          next_var = info_factory.new_var_info(etype);
-
-         // Get the current dictionary
-         i_edict = parse_conf_i_vx_dict(edict, i);
 
          // Set the current dictionary
          next_var->set_dict(i_edict);
@@ -192,14 +197,16 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
          InputInfo input_info;
          input_info.var_info = next_var;
          input_info.file_index = 0;
-         ens_info->inputs.push_back(input_info);
+         input_info.file_list = ens_files;
+         ens_info->add_input(input_info);
 
          // Add InputInfo to ens info list for each ensemble file provided
          // set var_info to NULL to note first VarInfo should be used
          for(int k=1; k<n_ens_files; k++) {
             input_info.var_info = NULL;
             input_info.file_index = k;
-            ens_info->inputs.push_back(input_info);
+            input_info.file_list = ens_files;
+            ens_info->add_input(input_info);
          } // end for k
 
       } // end for j
@@ -216,7 +223,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
          // Set the current dictionary
          next_var->set_dict(i_edict);
 
-         ens_info->ctrl_info = next_var;
+         ens_info->set_ctrl(next_var);
       }
 
       // Conf: nc_var_str
@@ -429,3 +436,60 @@ void GenEnsProdNcOutInfo::set_all_true() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class EnsVarInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+EnsVarInfo::EnsVarInfo() {
+   ctrl_info = NULL;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+EnsVarInfo::~EnsVarInfo() {
+   vector<InputInfo>::const_iterator it;
+   for(it = inputs.begin(); it != inputs.end(); it++) {
+      if((*it).var_info) { delete (*it).var_info; }
+   }
+
+   if(ctrl_info) { delete ctrl_info; }
+}
+
+void EnsVarInfo::add_input(InputInfo input) {
+   inputs.push_back(input);
+}
+
+int EnsVarInfo::inputs_n() {
+   return inputs.size();
+}
+
+void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
+    ctrl_info = ctrl;
+}
+
+VarInfo * EnsVarInfo::get_ctrl(int index) {
+   if(ctrl_info) {
+      return ctrl_info;
+   }
+   return inputs[index].var_info;
+}
+
+VarInfo * EnsVarInfo::get_var_info(int index) {
+   if(inputs[index].var_info) {
+      return inputs[index].var_info;
+   }
+   return inputs[0].var_info;
+}
+
+ConcatString EnsVarInfo::get_file(int index) {
+   int file_index = inputs[index].file_index;
+   return (*inputs[index].file_list)[file_index];
+}
+
+int EnsVarInfo::get_file_index(int index) {
+   return inputs[index].file_index;
+}

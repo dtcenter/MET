@@ -181,7 +181,7 @@ void process_command_line(int argc, char **argv) {
    etype = ens_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(etype, n_ens_files);
+   conf_info.process_config(etype, &ens_files);
 
    // Allocate arrays to store threshold counts
    thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
@@ -244,7 +244,7 @@ void process_grid(const Grid &fcst_grid) {
    // Parse regridding logic
    RegridInfo ri;
    if(conf_info.get_n_var() > 0) {
-      ri = conf_info.ens_input[0]->inputs[0].var_info->regrid();
+      ri = conf_info.ens_input[0]->get_var_info()->regrid();
    }
    else {
       mlog << Error << "\nprocess_grid() -> "
@@ -314,44 +314,44 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_ensemble() {
-   int i_var, i_file, n_ens_vld;
+   int i_var, i_ens, n_ens_vld;
    bool need_reset;
    DataPlane ens_dp, ctrl_dp, cmn_dp, csd_dp;
    unixtime max_init_ut = bad_data_ll;
    VarInfo * var_info;
+   ConcatString ens_file;
 
    // Loop through each of the ensemble fields to be processed
    vector<EnsVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
-   vector<InputInfo>::const_iterator it;
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
       need_reset = true;
 
-      for(it = (*var_it)->inputs.begin(),n_ens_vld=0; it != (*var_it)->inputs.end(); it++) {
+      var_info = (*var_it)->get_var_info();
+      mlog << Debug(2) << "\n" << sep_str << "\n\n"
+           << "Processing ensemble field: "
+           << (*var_it)->raw_magic_str << "\n";
 
-         if((*it).var_info) {
-            mlog << Debug(2) << "\n" << sep_str << "\n\n"
-                 << "Processing ensemble field: "
-                 << (*it).var_info->magic_str() << "\n";
-            var_info = (*it).var_info;
-         } else {
-            // If var_info is NULL, use first input's var_info
-            var_info = (*var_it)->inputs[0].var_info;
-         }
+      for(i_ens=n_ens_vld=0; i_ens < (*var_it)->inputs_n(); i_ens++) {
 
-         // Get index of file to process
-         i_file = (*it).file_index;
+         // get file and VarInfo to process
+         ens_file = (*var_it)->get_file(i_ens);
+         var_info = (*var_it)->get_var_info(i_ens);
 
          // Skip bad data files
-         if(!ens_file_vld[i_file]) continue;
+         if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
+
+         mlog << Debug(3) << "\n"
+              << "Reading field: "
+              << var_info->magic_str() << "\n";
 
          // Read data and track the valid data count
-         if(!get_data_plane(ens_files[i_file].c_str(), etype,
+         if(!get_data_plane(ens_file.c_str(), etype,
                             var_info, ens_dp)) {
             mlog << Warning << "\nprocess_ensemble() -> "
                  << "ensemble field \"" << var_info->magic_str()
-                 << "\" not found in file \"" << ens_files[i_file] << "\"\n\n";
+                 << "\" not found in file \"" << ens_file << "\"\n\n";
             continue;
          }
          else {
@@ -377,12 +377,11 @@ void process_ensemble() {
 
             // Read ensemble control member data, if provided
             if(ctrl_file.nonempty()) {
-               VarInfo * ctrl_info;
-               if((*var_it)->ctrl_info) {
-                  ctrl_info = (*var_it)->ctrl_info;
-               } else {
-                  ctrl_info = var_info;
-               }
+               VarInfo * ctrl_info = (*var_it)->get_ctrl(i_ens);
+
+               mlog << Debug(3) << "\n"
+                    << "Reading control field: "
+                    << ctrl_info->magic_str() << "\n";
 
                // Error out if missing
                if(!get_data_plane(ctrl_file.c_str(), etype,
@@ -422,7 +421,7 @@ void process_ensemble() {
       if(((double) n_ens_vld/n_ens_files) < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_ensemble() -> "
               << n_ens_files - n_ens_vld << " of " << n_ens_files
-              << " missing fields for \"" << (*var_it)->inputs[0].var_info->magic_str()
+              << " missing fields for \"" << (*var_it)->get_var_info()->magic_str()
               << "\" exceeds the maximum allowable specified by \""
               << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
               << ") in the configuration file.\n\n";
@@ -844,8 +843,8 @@ void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << ens_info->inputs[0].var_info->name_attr() << "_"
-                << ens_info->inputs[0].var_info->level_attr()
+                << ens_info->get_var_info()->name_attr() << "_"
+                << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -863,16 +862,16 @@ void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane
    //
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
-               << ens_info->inputs[0].var_info->name_attr();
+               << ens_info->get_var_info()->name_attr();
    }
    else {
       name_str << cs_erase
-               << ens_info->inputs[0].var_info->name_attr() << "_"
+               << ens_info->get_var_info()->name_attr() << "_"
                << type_str;
    }
 
    // Add the variable attributes
-   add_var_att_local(ens_info->inputs[0].var_info, &ens_var, false, dp,
+   add_var_att_local(ens_info->get_var_info(), &ens_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -900,8 +899,8 @@ void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << ens_info->inputs[0].var_info->name_attr() << "_"
-                << ens_info->inputs[0].var_info->level_attr()
+                << ens_info->get_var_info()->name_attr() << "_"
+                << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -915,11 +914,11 @@ void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << ens_info->inputs[0].var_info->name_attr() << "_"
+            << ens_info->get_var_info()->name_attr() << "_"
             << type_str;
 
    // Add the variable attributes
-   add_var_att_local(ens_info->inputs[0].var_info, &ens_var, true, dp,
+   add_var_att_local(ens_info->get_var_info(), &ens_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
