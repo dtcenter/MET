@@ -42,5 +42,5 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # This is a cron script -- create the shell environment for this job
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
-             /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin"
+             /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin:$PATH"
 
