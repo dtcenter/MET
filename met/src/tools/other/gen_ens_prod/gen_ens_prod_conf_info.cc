@@ -180,14 +180,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       i_edict = parse_conf_i_vx_dict(edict, i);
 
       // get VarInfo magic string without substituted values
-      unsetenv(met_ens_member_id);
-      ConcatString name = i_edict.lookup_string("name");
-      ConcatString level = i_edict.lookup_string("level");
-      if(level.nonempty() && level[0] != '(') {
-          ens_info->raw_magic_str << name << "/" << level;
-      } else {
-          ens_info->raw_magic_str << name << level;
-      }
+      ens_info->raw_magic_str = raw_magic_str(i_edict);
 
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {
@@ -521,6 +514,24 @@ ConcatString EnsVarInfo::get_file(int index) {
 
 int EnsVarInfo::get_file_index(int index) {
    return inputs[index].file_index;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString raw_magic_str(Dictionary i_edict) {
+   ConcatString magic_str;
+
+   ConcatString name = i_edict.lookup_string("name");
+   ConcatString level = i_edict.lookup_string("level");
+
+   if(level.nonempty() && level[0] != '(') {
+      magic_str << name << "/" << level;
+   } else {
+      magic_str << name << level;
+   }
+
+   return magic_str;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
