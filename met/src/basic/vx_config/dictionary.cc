@@ -778,13 +778,11 @@ const ConcatString DictionaryEntry::string_value() const
    ConcatString sub_text = ConcatString(*Text);
    ConcatString cur_env_val;
    if ( get_env(met_ens_member_id, cur_env_val) )  {
-      mlog << Debug(1) << "A: text is " << *Text
-           << " and sub_text is " << sub_text << " and cur val is " << cur_env_val << "\n";
+
       if(!cur_env_val.empty()) {
          sub_text.replace(met_ens_member_id, cur_env_val.c_str(), false);
       }
-      mlog << Debug(1) << "B: text is " << *Text
-           << " and sub_text is " << sub_text << " and cur val is " << cur_env_val << "\n";
+
    }
 
    return ( sub_text );
