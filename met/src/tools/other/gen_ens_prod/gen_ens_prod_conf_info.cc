@@ -110,6 +110,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
 
    int n_ens_files = ens_files->n();
 
+   // Unset MET_ENS_MEMBER_ID in case it is set by the user
+   unsetenv(met_ens_member_id);
+
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
