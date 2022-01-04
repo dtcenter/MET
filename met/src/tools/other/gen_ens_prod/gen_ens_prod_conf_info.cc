@@ -137,7 +137,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       exit(1);
    }
 
-   // if no ensemble member IDs were provided, add an empty string
+   // If no ensemble member IDs were provided, add an empty string
    if(ens_member_ids.n() == 0) {
       ens_member_ids.add("");
    }
@@ -459,17 +459,25 @@ EnsVarInfo::~EnsVarInfo() {
    if(ctrl_info) { delete ctrl_info; }
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void EnsVarInfo::add_input(InputInfo input) {
    inputs.push_back(input);
 }
+
+////////////////////////////////////////////////////////////////////////
 
 int EnsVarInfo::inputs_n() {
    return inputs.size();
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
     ctrl_info = ctrl;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_ctrl(int index) {
    if(ctrl_info) {
@@ -478,6 +486,8 @@ VarInfo * EnsVarInfo::get_ctrl(int index) {
    return inputs[index].var_info;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 VarInfo * EnsVarInfo::get_var_info(int index) {
    if(inputs[index].var_info) {
       return inputs[index].var_info;
@@ -485,11 +495,17 @@ VarInfo * EnsVarInfo::get_var_info(int index) {
    return inputs[0].var_info;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 ConcatString EnsVarInfo::get_file(int index) {
    int file_index = inputs[index].file_index;
    return (*inputs[index].file_list)[file_index];
 }
 
+////////////////////////////////////////////////////////////////////////
+
 int EnsVarInfo::get_file_index(int index) {
    return inputs[index].file_index;
 }
+
+////////////////////////////////////////////////////////////////////////
