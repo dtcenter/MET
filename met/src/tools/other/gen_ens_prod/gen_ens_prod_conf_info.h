@@ -61,7 +61,7 @@ struct InputInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct EnsInfo {
+struct EnsVarInfo {
     vector<InputInfo> inputs;
     ConcatString nc_var_str;      // Ensemble variable name strings
     ThreshArray cat_ta;           // Ensemble categorical thresholds
@@ -96,7 +96,7 @@ class GenEnsProdConfInfo {
       ConcatString         desc;            // Description
       ConcatString         control_id;      // Control ID
 
-      vector<EnsInfo *>    ens_input;       // Vector of EnsInfo pointers (allocated)
+      vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       vector<ClimoCDFInfo> cdf_info;        // Array of climo CDF info objects
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
 

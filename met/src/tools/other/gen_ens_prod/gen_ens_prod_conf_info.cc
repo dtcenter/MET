@@ -55,7 +55,7 @@ void GenEnsProdConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::clear() {
-   vector<EnsInfo*>::const_iterator var_it = ens_input.begin();
+   vector<EnsVarInfo*>::const_iterator var_it = ens_input.begin();
    vector<InputInfo>::const_iterator it;
 
    // Clear, erase, and initialize members
@@ -164,7 +164,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, int n_ens_files) {
    // Parse the ensemble field information
    for(i=0,max_n_cat=0; i<n_var; i++) {
 
-      EnsInfo * ens_info = new EnsInfo();
+      EnsVarInfo * ens_info = new EnsVarInfo();
 
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {

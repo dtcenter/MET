@@ -53,17 +53,17 @@ static void process_ensemble();
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
-static void track_counts(EnsInfo *, const DataPlane &, bool,
+static void track_counts(EnsVarInfo *, const DataPlane &, bool,
                          const DataPlane &, const DataPlane &);
 
 static void setup_nc_file();
-static void write_ens_nc(EnsInfo *, int, const DataPlane &,
+static void write_ens_nc(EnsVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void write_ens_var_float(EnsInfo *, float *, const DataPlane &,
+static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(EnsInfo *, int *, const DataPlane &,
+static void write_ens_var_int(EnsVarInfo *, int *, const DataPlane &,
                               const char *, const char *);
-static void write_ens_data_plane(EnsInfo *, const DataPlane &, const DataPlane &,
+static void write_ens_data_plane(EnsVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
 static void add_var_att_local(VarInfo *, NcVar *, bool is_int,
@@ -315,7 +315,7 @@ void process_ensemble() {
    VarInfo * var_info;
 
    // Loop through each of the ensemble fields to be processed
-   vector<EnsInfo*>::const_iterator var_it = conf_info.ens_input.begin();
+   vector<EnsVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
    vector<InputInfo>::const_iterator it;
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
@@ -458,7 +458,7 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(EnsInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl,
+void track_counts(EnsVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl,
                   const DataPlane &cmn_dp, const DataPlane &csd_dp) {
    int i, j, k;
    double ens, cmn, csd;
@@ -569,7 +569,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(EnsInfo * ens_info, int n_ens_vld,
+void write_ens_nc(EnsVarInfo * ens_info, int n_ens_vld,
                   const DataPlane &ens_dp,
                   const DataPlane &cmn_dp,
                   const DataPlane &csd_dp) {
@@ -826,7 +826,7 @@ void write_ens_nc(EnsInfo * ens_info, int n_ens_vld,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(EnsInfo * ens_info, float *ens_data, const DataPlane &dp,
+void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar ens_var;
@@ -882,7 +882,7 @@ void write_ens_var_float(EnsInfo * ens_info, float *ens_data, const DataPlane &d
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(EnsInfo * ens_info, int *ens_data, const DataPlane &dp,
+void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar ens_var;
@@ -929,7 +929,7 @@ void write_ens_var_int(EnsInfo * ens_info, int *ens_data, const DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_data_plane(EnsInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
+void write_ens_data_plane(EnsVarInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
                           const char *type_str, const char *long_name_str) {
 
    // Allocate memory for this data
