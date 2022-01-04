@@ -128,22 +128,34 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    // Conf: ens_member_ids
    ens_member_ids = parse_conf_ens_member_ids(&conf);
 
-   // error check ens_member_ids and ensemble file list
-   if(n_ens_files > 1 && ens_member_ids.n() > 1) {
-      mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
-           << "The \"" << conf_key_ens_member_ids << "\" "
-           << "must be empty if more than "
-           << "one file is provided.\n\n";
-      exit(1);
+   // Conf: control_id
+   control_id = parse_conf_string(&conf, conf_key_control_id, false);
+
+    // Error check ens_member_ids and ensemble file list
+   if(ens_member_ids.n() > 1) {
+
+      // Only a single file should be provided if using ens_member_ids
+      if(n_ens_files > 1) {
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+              << "The \"" << conf_key_ens_member_ids << "\" "
+              << "must be empty if more than "
+              << "one file is provided.\n\n";
+         exit(1);
+      }
+
+      // If control ID is set, it cannot be found in ens_member_ids
+      if(!control_id.empty() && ens_member_ids.has(control_id)) {
+          mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+               << "control_id (" << control_id << ") must not be found "
+               << "in ens_member_ids\n\n";
+          exit(1);
+      }
    }
 
    // If no ensemble member IDs were provided, add an empty string
    if(ens_member_ids.n() == 0) {
       ens_member_ids.add("");
    }
-
-   // Conf: control_id
-   control_id = parse_conf_string(&conf, conf_key_control_id, false);
 
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);
