@@ -152,8 +152,8 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
   ens = {
     field = [
       {
-        name       = "fcst";
-        level      = "(MET_ENS_MEMBER_ID,0,*,*)";
+        name  = "fcst";
+        level = "(MET_ENS_MEMBER_ID,0,*,*)";
       }
     ];
   }
@@ -165,9 +165,9 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
   ens = {
     field = [
       {
-        name       = "fcst";
-        level      = "L0";
-        GRIB_ens="+MET_ENS_MEMBER_ID";
+        name     = "fcst";
+        level    = "L0";
+        GRIB_ens = "+MET_ENS_MEMBER_ID";
       }
     ];
   }
