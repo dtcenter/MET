@@ -28,6 +28,7 @@ tc_gen_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_statistics \
+	-lvx_gis \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
