@@ -1,4 +1,3 @@
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2021
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
 
 using namespace std;
 
@@ -311,15 +309,12 @@ unsigned char buf[32];
    //  seek to the first record
    //
 
-// pos = pos_first_record;
-
 pos = 32;
 
-if ( lseek(fd, pos, SEEK_SET) < 0 )  {
+if ( ::lseek(fd, pos, SEEK_SET) < 0 )  {
 
-   mlog << Error
-        << "\n\n   DbfHeader::set_subrecords(int) -> lseek error ... "
-        << strerror(errno) << "\n\n";
+   mlog << Error << "\nDbfHeader::set_subrecords(int) -> "
+        << "lseek error ... " << strerror(errno) << "\n\n";
 
    exit ( 1 );
 
@@ -339,8 +334,8 @@ for (j=0; j<n_subrecs; ++j)  {
 
    if ( n_read != bytes )  {
 
-      mlog << Error
-            << "\n\n  DbfHeader::set_subrecords(int) -> read error ... n_read = " << n_read << "\n\n";
+      mlog << Error << "\nDbfHeader::set_subrecords(int) -> "
+           << "read error ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -372,8 +367,8 @@ DbfSubRecord * DbfHeader::lookup_subrec(const char * text) const
 
 if ( empty(text) )  {
 
-   mlog << Error
-        << "\n\n  DbfHeader::set_subrecords(const char *) -> empty string!\n\n";
+   mlog << Error << "\nDbfHeader::set_subrecords(const char *) -> "
+        << "empty string!\n\n";
 
    exit ( 1 );
 
@@ -552,7 +547,6 @@ out << prefix << "field_flags        = " << ((int) field_flags) << '\n';
 out << prefix << "autoinc_next_value = " << autoinc_next_value  << '\n';
 out << prefix << "autoinc_step_value = " << autoinc_step_value  << '\n';
 
-
    //
    //  done
    //
@@ -588,9 +582,6 @@ field_flags = buf[18];
 memcpy(&autoinc_next_value, buf + 19, 4);
 
 autoinc_step_value = (int) (buf[23]);
-
-
-
 
    //
    //  done
@@ -651,7 +642,6 @@ for (j=0; j<(h.n_subrecs); ++j)  {
 
    }
 
-   // for (k=0; k<len; ++k)  out << line[pos + k];
    for (k=pos; k<=k_max; ++k)  out << line[k];
 
    out << "\"\n" << flush;
@@ -672,6 +662,382 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Code for class DbfFile
+   //
 
 
+////////////////////////////////////////////////////////////////////////
 
+
+DbfFile::DbfFile()
+
+{
+
+init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DbfFile::~DbfFile()
+
+{
+
+close();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DbfFile::DbfFile(const DbfFile &)
+
+{
+
+mlog << Error << "\nDbfFile::DbfFile(const DbfFile &) -> "
+     << "should never be called!\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DbfFile & DbfFile::operator=(const DbfFile &)
+
+{
+
+mlog << Error << "\nDbfFile::operator=(const DbfFile &) -> "
+     << "should never be called!\n\n";
+
+exit ( 1 );
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DbfFile::init_from_scratch()
+
+{
+
+fd = -1;
+
+close();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DbfFile::close()
+
+{
+
+if ( fd >= 0 )  ::close(fd);
+
+fd = -1;
+
+memset(&Header, 0, sizeof(Header));
+
+Filename.clear();
+
+At_Eof = false;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * DbfFile::filename() const
+
+{
+
+if ( Filename.empty() )  return ( (const char *) 0 );
+
+return ( Filename.text() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool DbfFile::open(const char * path)
+
+{
+
+size_t n_read, bytes;
+int j;
+
+close();
+
+if ( (fd = met_open(path, O_RDONLY)) < 0 )  {
+
+   fd = -1;
+
+   return ( false );
+
+}
+
+Filename = path;
+
+   //
+   //  read the file header
+   //
+
+const size_t  buf_size = 65536;
+unsigned char buf[buf_size];
+
+bytes = 32;
+
+if((n_read = ::read(fd, buf, bytes)) != bytes) {
+   mlog << Warning << "\nDbfFile::open(const char * path) -> "
+        << "trouble reading file header from dbf file \""
+        << path << "\"\n\n";
+   close();
+
+   return(false);
+}
+
+Header.set_header(buf);
+
+   //
+   //  subrecords
+   //
+
+Header.set_subrecords(fd);
+
+   //
+   //  done
+   //
+
+return ( true );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+int DbfFile::position() const
+
+{
+
+if ( ! is_open() )  {
+
+   mlog << Error << "\nDbfFile::position() -> "
+        << "no file open!\n\n";
+
+   exit ( 1 );
+
+}
+
+const int pos = ::lseek(fd, 0, SEEK_CUR);
+
+if ( pos < 0 )  {
+
+   mlog << Error << "\nDbfFile::position() const -> "
+        << "lseek error ... " << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( pos );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DbfFile::lseek(int offset, int whence)
+
+{
+
+
+if ( ! is_open() )  {
+
+   mlog << Error << "\nDbfFile::lseek() -> "
+        << "no file open!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+if ( ::lseek(fd, offset, whence) < 0 )  {
+
+   mlog << Error << "\nDbfFile::lseek() -> "
+        << "lseek(2) failed! ... " << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool DbfFile::read(unsigned char * buf, int n_bytes)
+
+{
+
+if ( ! is_open() )  {
+
+   mlog << Error << "\nDbfFile::read() -> "
+        << "no file open!\n\n";
+
+   exit ( 1 );
+
+}
+
+int n_read;
+
+n_read = ::read(fd, buf, n_bytes);
+
+if ( n_read < 0 )  {   //  some kind of error
+
+   mlog << Error << "\nDbfFile::read() -> "
+        << "read error on dbf file \"" << Filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( n_read == 0 )  return ( false );
+
+if ( n_read == n_bytes )  return ( true );
+
+return ( false );   //  gotta return something
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray DbfFile::subrecord_names()
+
+{
+
+StringArray sa;
+
+   //
+   //  subrecords (if any)
+   //
+
+if ( Header.subrec )  {
+
+   for (int j=0; j<Header.n_subrecs; ++j)  {
+
+      sa.add(Header.subrec[j].field_name);
+
+   }
+
+}
+
+return ( sa );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray DbfFile::subrecord_values(int i_rec)
+
+{
+
+size_t n_read, bytes, pos;
+const size_t buf_size = 65536;
+unsigned char buf[buf_size];
+ConcatString cs;
+StringArray sa;
+int j;
+
+   //
+   //  check range
+   //
+
+if ( i_rec < 0 || i_rec > (Header.n_records) )  {
+
+   mlog << Error << "\nDbfFile::subrecord_values(int i_rec) -> "
+        << "requested record index (" << i_rec << ") out of range (0,"
+        << Header.n_records << ")!\n\n";
+
+   exit ( 1 );
+
+}
+
+bytes = Header.record_length;
+
+if ( ::lseek(fd, Header.pos_first_record + i_rec * bytes, SEEK_SET) < 0 )  {
+
+   mlog << Error << "\nDbfFile::subrecord_values(int i_rec) -> "
+        << "lseek error\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  read the requested record into the buffer
+   //
+
+n_read = ::read(fd, buf, bytes < buf_size ? bytes : buf_size);
+
+if ( n_read != bytes )  {
+
+   mlog << Error << "\nDbfFile::subrecord_values(int i_rec) -> "
+        << "read error ... n_read = " << n_read << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( Header.record_length < buf_size)  buf[Header.record_length] = 0;
+
+std::string s = (const char *) buf+1; //  skip first byte
+
+   //
+   //  parse each subrecord value
+   //
+
+for (j=0,pos=0; j<(Header.n_subrecs); ++j)  {
+
+   cs = s.substr(pos, Header.subrec[j].field_length);
+   cs.ws_strip();
+   sa.add(cs);
+
+   pos += Header.subrec[j].field_length;
+
+}
+
+return ( sa );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
