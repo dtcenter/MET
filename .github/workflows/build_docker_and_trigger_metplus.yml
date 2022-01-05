@@ -37,9 +37,9 @@ jobs:
               workflow_id: 'testing.yml',
               ref: 'develop',
               inputs: {
-                repo_name: '${{ github.repository }}',
-                docker_tag: '${{ github.ref }}',
+                repository: '${{ github.repository }}',
+                ref: '${{ github.ref }}',
                 actor: '${{ github.actor }}',
-                commit: '${{ github.sha }}'
+                sha: '${{ github.sha }}'
               },
             });
