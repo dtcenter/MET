@@ -39,6 +39,7 @@ jobs:
               inputs: {
                 repo_name: '${{ github.repository }}',
                 docker_tag: '${{ github.ref }}',
-                actor: '${{ github.actor }}'
+                actor: '${{ github.actor }}',
+                commit: '${{ github.sha }}'
               },
             });
