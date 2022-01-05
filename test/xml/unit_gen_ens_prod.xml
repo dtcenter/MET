@@ -75,4 +75,29 @@
     </output>
   </test>
 
+  <test name="gen_ens_prod_SINGLE_FILE_NO_CTRL">
+    <param> \
+        -ens    &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NO_CTRL_198201.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NO_CTRL_198201.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="gen_ens_prod_SINGLE_FILE_WITH_CTRL">
+    <param> \
+        -ens    &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file \
+        -ctrl   &OUTPUT_DIR;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_WITH_CTRL_198201.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_WITH_CTRL_198201.nc</grid_nc>
+    </output>
+  </test>
+
   </met_test>
