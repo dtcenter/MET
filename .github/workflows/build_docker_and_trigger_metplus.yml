@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - develop
-    paths:
-      - 'met/src/**'
+    paths-ignore:
+      - 'met/docs/**'
 
 jobs:
   build_met_docker:
