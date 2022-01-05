@@ -2155,7 +2155,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
 
       // Write PJC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCTMap[lead_hr],
+         write_pjc_row(shc, pgi.PCTMap[lead_hr],
                        pgi.VxOpt->output_map(stat_pjc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pjc], i_txt_row[i_pjc]);
@@ -2163,8 +2163,8 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
 
       // Write PRC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
+         write_prc_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_prc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_prc], i_txt_row[i_prc]);
       }
