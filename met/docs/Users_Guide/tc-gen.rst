@@ -6,7 +6,7 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, probabilistic shapefile warning areas, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
 
 .. _tc-gen_stat_aspects:
 
@@ -19,6 +19,8 @@ As with other extreme events (where the event occurs much less frequently than t
 
 For probabilistic forecasts specified using the **-edeck** command line option, it identifies genesis events in the reference dataset. It applies user-specified configuration options to pair the forecast probabilities to the reference genesis events. These pairs are added to an Nx2 probabilistic contingency table. If the reference genesis event occurs within in the predicted time window, the pair is counted in the observation-yes column. Otherwise, it is added to the observation-no column.
 
+For each probabilistic warning area shapefile specified using the **-shape** command line option, it processes metadata from the corresponding database file. The database file is assumed to exist at exactly the same path as the shapefile, but with a ".dbf" suffix instead of ".shp". Note that only shapefiles exactly following NHC's "gtwo_areas_YYYYMMDDHHMM.shp" file naming convention and corresonding metadata conventions are supported. For each shapefile record, the database file defines up to three corresponding probability values. The first percentage is interpreted as the probability of genesis inside the defined shape within 48 hours. The second and, if provided, third percentages are interpreted as the 120-hour and 168-hour probabiltities, respectively. For each probability, the reference genesis events are searched for a match within the defined time window. These pairs are added to an Nx2 probabilistic contingency table. The probabilistic contingeny tables and statistics are computed and reported separately for each combination of hurricance basin and probability hour encountered in the input. Note that the filtering capability provided for the **-genesis** and **-edeck** options are not supported for the **-shape** option.
+
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
 Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
@@ -28,7 +30,7 @@ Care should be taken when interpreting the statistics for filtered data. In some
 Practical information
 _____________________
 
-This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for tc_gen.
+This section describes how to configure and run the TC-Gen tool. The following sections describe the usage statement, required arguments, and optional arguments for tc_gen.
 
 tc_gen usage
 ~~~~~~~~~~~~
@@ -38,7 +40,9 @@ The usage statement for tc_gen is shown below:
 .. code-block:: none
 
   Usage: tc_gen
-         -genesis source and/or -edeck source
+         -genesis source
+         -edeck source
+         -shape source
          -track source 
          -config file
          [-out base]
@@ -52,20 +56,24 @@ Required arguments for tc_gen
 
 1. The **-genesis source** argument is the path to one or more ATCF or fort.66 (see documentation listed below) files generated by the Geophysical Fluid Dynamics Laboratory (GFDL) Vortex Tracker when run in tcgen mode or an ASCII file list or a top-level directory containing them. The required file format is described in the "Output formats" section of the `GFDL Vortex Tracker users guide. <https://dtcenter.org/sites/default/files/community-code/gfdl/standalone_tracker_UG_v3.9a.pdf>`_
 
-2. The **-edeck source** argument is the path to one or more ATCF edeck files, an ASCII file list containing them, or a top-level directory with files matching the regular expression ".dat". The probability of genesis are read from each edeck input file and verified against at the **-track** data. The **-genesis** or **-edeck** option must be used at least once. 
+2. The **-edeck source** argument is the path to one or more ATCF edeck files, an ASCII file list containing them, or a top-level directory with files matching the regular expression ".dat". The probability of genesis are read from each edeck input file and verified against at the **-track** data.
 
-3. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g. CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
+3. The **-shape source** argument is the path to one or more NHC genesis warning area shapefiles, an ASCII file list containing them, or a top-level directory with files matching the regular expression "gtwo_areas.*.shp". The genesis warning areas and corresponding 2, 5, and 7 day probability values area verified against the **-track** data.
 
-4. The **-config** file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+Note: The **-genesis**, **-edeck**, or **-shape** options must be used at least once.
+
+4. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g. CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
+
+5. The **-config** file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for tc_gen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-out base** argument indicates the path of the output file base. This argument overrides the default output file base (./tc_gen)
+6. The **-out base** argument indicates the path of the output file base. This argument overrides the default output file base (./tc_gen)
 
-6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+7. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+8. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 Scoring Logic
 ^^^^^^^^^^^^^
@@ -120,6 +128,25 @@ The TC-Gen tool implements the following logic:
 
  * Report the Nx2 probabilistic contingency table counts and statistics for each forecast model, lead time, and configuration file filter. These counts and statistics are identified in the output files as *PROB_GENESIS*.
 
+* For **-shape** inputs:
+
+ * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g. 00, 06, 12, 18) and store that as the issuance time.
+
+ * Open the shapefile and corresponding database file. Process each record.
+
+  * For each record, extract the shape and metadata which defines the basin and 2, 5, and 7 day probabilities.
+
+  * Check if this shape is a duplicate that has already been processed. If so, skip it.
+
+  * Search the Best track genesis events to see if any occurred inside the shape within 7 days of the issuance time. If multiple genesis events occurred, choose the one closest to the issuance time.
+
+  * If not found, score each probability as a miss.
+
+  * If found, further check the 2 and 5 day time windows to classify each probability as a hit or miss.
+
+  * Add each probability pair to an Nx2 probabilistic contingency table, tracking results separately for each combination of hurricane basin and lead time.
+
+ * Report the Nx2 probabilistic contingency table counts and statistics for each basin and lead time encountered in the data. These counts and statistics are identified in the output files as *GENESIS_SHAPE*.
 
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -415,7 +442,7 @@ ______________________
 
   prob_genesis_thresh = ==0.25;
 
-The **prob_genesis_thresh** entry defines the probability thresholds used to create the output Nx2 contingency table when verifying edeck probability of genesis forecasts. The default is probability bins of width 0.25. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
+The **prob_genesis_thresh** entry defines the probability thresholds used to create the output Nx2 contingency table when verifying edeck probability of genesis forecasts and probabilistic shapefile warning areas. The default is probability bins of width 0.25. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
 
 ______________________
 
@@ -435,12 +462,12 @@ ______________________
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
   version    = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. TC-Gen writes output for 2x2 contingency tables to the **FHO**, **CTC**, and **CTS** line types when verifying deterministic genesis forecasts specified using the **-track** command line option. TC-Gen writes output for Nx2 probabilistic contingency tables to the **PCT**, **PSTD**, **PJC**, and **PRC** line types when verifying the probability of genesis forecasts specified using the **-edeck** command line option. Note that the **genmpr** line type is specific to TC-Gen and describes individual genesis matched pairs.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. TC-Gen writes output for 2x2 contingency tables to the **FHO**, **CTC**, and **CTS** line types when verifying deterministic genesis forecasts specified using the **-track** command line option. TC-Gen writes output for Nx2 probabilistic contingency tables to the **PCT**, **PSTD**, **PJC**, and **PRC** line types when verifying the probability of genesis forecasts specified using the **-edeck** command line option and probabilistic shapefiles using the **-shape** command line option. Note that the **genmpr** line type is specific to TC-Gen and describes individual genesis matched pairs.
 
 tc_gen output
 ~~~~~~~~~~~~~
 
-TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_fho.txt, tc_gen_ctc.txt**, **tc_gen_cts.txt**, **tc_gen_genmpr.txt**, and **tc_gen_pairs.nc**. The format of the STAT and ASCII output of the TC-Gen tool matches the output of other MET tools with the exception of the genesis matched pair line type. Please refer to the tables in :numref:`point_stat-output` for a description of the common output line types. The genesis matched pair line type and NetCDF output file are described below.
+TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, **./tc_gen** writes output files in the current working directory named **tc_gen.stat** and, optionally, **tc_gen_pairs.nc** and **tc_gen_{TYPE}.txt** for each of the supported output line types. These output files can easily be redirected to another location using the **-out** command line option. The format of the STAT and ASCII output of the TC-Gen tool matches the output of other MET tools with the exception of the genesis matched pair line type. Please refer to the tables in :numref:`point_stat-output` for a description of the common output line types. The genesis matched pair line type and NetCDF output file are described below.
 
 .. _table_TG_header_info_tg_outputs:
 
@@ -483,7 +510,7 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - Maximum Best track valid time in YYYYMMDD_HHMMSS format
   * - 10
     - FCST_VAR
-    - Genesis methodology (GENESIS_DEV, GENESIS_OPS, or PROB_GENESIS)
+    - Genesis methodology (GENESIS_DEV, GENESIS_OPS, PROB_GENESIS, or GENESIS_SHAPE)
   * - 11
     - FCST_UNITS
     - Does not apply and is set to NA
@@ -492,7 +519,7 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - Does not apply and is set to NA
   * - 13
     - OBS_VAR
-    - Genesis methodology (GENESIS_DEV, GENESIS_OPS, or PROB_GENESIS)
+    - Genesis methodology (GENESIS_DEV, GENESIS_OPS, PROB_GENESIS, or GENESIS_SHAPE)
   * - 14
     - OBS_UNITS
     - Does not apply and is set to NA
