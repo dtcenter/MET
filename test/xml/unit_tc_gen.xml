@@ -53,4 +53,22 @@
     </output>
   </test>
 
+  <!-- Verify genesis shapes -->
+
+  <test name="tc_gen_shape">
+    <exec>&MET_BIN;/tc_gen</exec>
+    <param> \
+      -shape &DATA_DIR;/genesis/shape \
+      -track &DATA_DIR;/bdeck/genesis/atcf/2021 \
+      -config &CONFIG_DIR;/TCGenConfig_shape \
+      -out &OUTPUT_DIR;/tc_gen/tc_gen_shape \
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_shape.log \
+      -v 5 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_shape.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_shape_pct.txt</stat>
+    </output>
+  </test>
+
 </met_test>
