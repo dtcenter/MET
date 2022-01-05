@@ -1242,6 +1242,9 @@ void ProbGenPCTInfo::clear() {
    DefaultPCT.clear();
 
    Model.clear();
+   VarName.clear();
+   VxMask.clear();
+
    InitBeg = InitEnd = (unixtime) 0;
    BestBeg = BestEnd = (unixtime) 0;
 
@@ -1276,13 +1279,15 @@ void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbGenPCTInfo::add(const ProbGenInfo &fgi, int index,
-                         const GenesisInfo *bgi, bool is_event) {
-   int i;
+void ProbGenPCTInfo::add_pgi(const ProbGenInfo &fgi, int index,
+                             const GenesisInfo *bgi, bool is_event) {
    unixtime ut;
 
-   // Store the model name
-   if(Model.empty()) Model = fgi.technique();
+   // Store the model and variable names
+   if(Model.empty())   Model   = fgi.technique();
+   if(VarName.empty()) VarName = prob_genesis_name;
+   if(VxMask.empty())  VxMask  = (VxOpt->VxMaskName.empty() ?
+                                  na_str : VxOpt->VxMaskName);
 
    // Track the range of forecast initalization times
    ut = fgi.init();
@@ -1323,6 +1328,54 @@ void ProbGenPCTInfo::add(const ProbGenInfo &fgi, int index,
    BestEvtMap[lead_hr].push_back(is_event);
 
    // Increment counts
+   if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
+   else         PCTMap[lead_hr].pct.inc_nonevent(prob);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::add_shape(const ConcatString &basin, unixtime issue_ut,
+                               int lead_hr, double prob, const GenesisInfo *bgi,
+                               bool is_event) {
+   unixtime ut;
+
+   // Store the model and variable names
+   if(Model.empty())   Model   = "OPER";
+   if(VarName.empty()) VarName = genesis_shape_name;
+   if(VxMask.empty())  VxMask  = basin;
+
+   // Track the range of forecast issue times
+   ut = issue_ut;
+   if(InitBeg == 0 || InitBeg > ut) InitBeg = ut;
+   if(InitEnd == 0 || InitEnd < ut) InitEnd = ut;
+
+   // Track the range of verifying BEST genesis events
+   if(bgi) {
+      ut = bgi->genesis_time();
+      if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
+      if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
+   }
+
+   // Add new map entries, if needed
+   if(!LeadTimes.has(lead_hr)) {
+
+      LeadTimes.add(lead_hr);
+      vector<const GenesisInfo *> empty_bgi;
+      vector<bool>                empty_evt;
+
+      PCTMap    [lead_hr] = DefaultPCT;
+      BestGenMap[lead_hr] = empty_bgi;
+      BestEvtMap[lead_hr] = empty_evt;
+   }
+
+   // Update map entries
+   BestGenMap[lead_hr].push_back(bgi);
+   BestEvtMap[lead_hr].push_back(is_event);
+
+   // Increment counts
+   prob /= 100.0;
    if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
    else         PCTMap[lead_hr].pct.inc_nonevent(prob);
 

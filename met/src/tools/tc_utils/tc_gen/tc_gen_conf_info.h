@@ -49,6 +49,14 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_genmpr //  7
 };
 
+// Output data type names
+
+static const string genesis_name      ("GENESIS");
+static const string genesis_dev_name  ("GENESIS_DEV");
+static const string genesis_ops_name  ("GENESIS_OPS");
+static const string prob_genesis_name ("PROB_GENESIS");
+static const string genesis_shape_name("GENESIS_SHAPE");
+
 // Names for output data plane types
 
 static const string fgen_str       = "fcst_genesis";
@@ -71,6 +79,8 @@ static const string ncout_str[n_ncout] = {
    fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
    fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
 };
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -331,6 +341,9 @@ class ProbGenPCTInfo {
       //////////////////////////////////////////////////////////////////
 
    ConcatString Model;
+   ConcatString VarName;
+   ConcatString VxMask;
+
    unixtime InitBeg, InitEnd;
    unixtime BestBeg, BestEnd;
    const TCGenVxOpt* VxOpt;
@@ -351,8 +364,12 @@ class ProbGenPCTInfo {
 
    void set_vx_opt(const TCGenVxOpt *);
 
-   void add(const ProbGenInfo &, int,
-            const GenesisInfo *, bool);
+   void add_pgi(const ProbGenInfo &, int,
+                const GenesisInfo *, bool);
+
+   void add_shape(const ConcatString &, unixtime,
+                  int, double, const GenesisInfo *,
+                  bool);
 
 };
 
