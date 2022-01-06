@@ -288,7 +288,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for at least one valid input ensemble file
-   if(ens_file_list.n() == 0) {
+   if(n_ens_files == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "no valid input ensemble member files specified!\n\n";
       exit(1);
@@ -397,8 +397,8 @@ void process_command_line(int argc, char **argv) {
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
-        << ens_file_list.n() << "]:\n";
-   for(i=0; i<ens_file_list.n(); i++) {
+        << n_ens_files << "]:\n";
+   for(i=0; i<n_ens_files; i++) {
       mlog << "   " << ens_file_list[i]
            << (i == ctrl_index ? " (control)\n" : "\n");
    }
@@ -422,7 +422,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for missing non-python ensemble files
-   for(i=0; i<ens_file_list.n(); i++) {
+   for(i=0; i<n_ens_files; i++) {
 
       if(!file_exists(ens_file_list[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
@@ -579,7 +579,7 @@ void process_n_vld() {
    for(i=0; i<conf_info.get_n_ens_var(); i++) {
 
       // Loop through the ensemble files
-      for(j=0, n_vld=0; j<ens_file_list.n(); j++) {
+      for(j=0, n_vld=0; j<n_ens_files; j++) {
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -618,7 +618,7 @@ void process_n_vld() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Loop through the ensemble files
-      for(j=0, n_vld=0; j<ens_file_list.n(); j++) {
+      for(j=0, n_vld=0; j<n_ens_files; j++) {
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -786,7 +786,7 @@ void process_ensemble() {
            << conf_info.ens_info[i]->magic_str() << "\n";
 
       // Loop through each of the input forecast files
-      for(j=0, reset=true; j<ens_file_list.n(); j++) {
+      for(j=0, reset=true; j<n_ens_files; j++) {
 
          // Skip bad data files
          if(!ens_file_vld[j]) {
@@ -930,7 +930,7 @@ void process_point_vx() {
    }
 
    // Process each ensemble file
-   for(i=0, n_miss=0; i<ens_file_list.n(); i++) {
+   for(i=0, n_miss=0; i<n_ens_files; i++) {
 
       // If the current forecast file is valid, process it
       if(!ens_file_vld[i]) {
@@ -1482,7 +1482,7 @@ void process_grid_vx() {
       }
 
       // Loop through each of the input ensemble files
-      for(j=0, n_miss=0; j<ens_file_list.n(); j++) {
+      for(j=0, n_miss=0; j<n_ens_files; j++) {
 
          // Initialize
          fcst_dp[j].clear();
@@ -1655,7 +1655,7 @@ void process_grid_vx() {
          }
 
          // Looop through the ensemble members
-         for(k=0; k<ens_file_list.n(); k++) {
+         for(k=0; k<n_ens_files; k++) {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
