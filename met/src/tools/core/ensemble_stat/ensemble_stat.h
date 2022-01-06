@@ -93,8 +93,8 @@ static const int max_n_rec = 300;
 ////////////////////////////////////////////////////////////////////////
 
 // Input Ensemble files
-static int          n_ens;         // Number of ensemble members
-static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens]
+static int          n_ens_files;   // Number of ensemble members
+static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens_files]
 static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
 
 static StringArray  ens_file_list;

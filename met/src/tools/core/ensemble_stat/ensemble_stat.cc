@@ -251,7 +251,7 @@ void process_command_line(int argc, char **argv) {
       //
       if(is_integer(cline[0].c_str()) == 0) {
          ens_file_list = parse_ascii_file_list(cline[0].c_str());
-         n_ens = ens_file_list.n();
+         n_ens_files = ens_file_list.n();
       }
       else {
          usage();
@@ -265,21 +265,21 @@ void process_command_line(int argc, char **argv) {
       //
       if(is_integer(cline[0].c_str()) == 1) {
 
-         n_ens = atoi(cline[0].c_str());
+         n_ens_files = atoi(cline[0].c_str());
 
-         if(n_ens <= 0) {
+         if(n_ens_files <= 0) {
             mlog << Error << "\nprocess_command_line() -> "
                  << "the number of ensemble member files must be >= 1 ("
-                 << n_ens << ")\n\n";
+                 << n_ens_files << ")\n\n";
             exit(1);
          }
 
-         if((cline.n() - 2) == n_ens) {
+         if((cline.n() - 2) == n_ens_files) {
 
             //
             // Add each of the ensemble members to the list of files.
             //
-            for(i=1; i<=n_ens; i++) ens_file_list.add(cline[i]);
+            for(i=1; i<=n_ens_files; i++) ens_file_list.add(cline[i]);
          }
          else {
             usage();
@@ -306,7 +306,7 @@ void process_command_line(int argc, char **argv) {
 
       ctrl_index = 0;
       ens_file_list.insert(ctrl_index, ctrl_file.c_str());
-      n_ens++;
+      n_ens_files++;
    }
 
    // Check that the end_ut >= beg_ut
@@ -601,9 +601,9 @@ void process_n_vld() {
       } // end for j
 
       // Check for enough valid data
-      if((double) n_vld/n_ens < conf_info.vld_ens_thresh) {
+      if((double) n_vld/n_ens_files < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-              << n_ens - n_vld << " missing ensemble fields exceeds the "
+              << n_ens_files - n_vld << " missing ensemble fields exceeds the "
               << "maximum allowable specified by \"ens.ens_thresh\" "
               << "in the configuration file.\n\n";
          exit(1);
@@ -645,9 +645,9 @@ void process_n_vld() {
       } // end for j
 
       // Check for enough valid data
-      if((double) n_vld/n_ens < conf_info.vld_ens_thresh) {
+      if((double) n_vld/n_ens_files < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-              << n_ens - n_vld << " missing forecast fields exceeds the "
+              << n_ens_files - n_vld << " missing forecast fields exceeds the "
               << "maximum allowable specified by \"ens.ens_thresh\" "
               << "in the configuration file.\n\n";
          exit(1);
@@ -1404,8 +1404,8 @@ void process_grid_vx() {
    shc.set_obtype(conf_info.obtype.c_str());
 
    // Allocate space to store the forecast fields
-   fcst_dp = new DataPlane [n_ens];
-   fraw_dp = new DataPlane [n_ens];
+   fcst_dp = new DataPlane [n_ens_files];
+   fraw_dp = new DataPlane [n_ens_files];
 
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -1911,7 +1911,7 @@ void process_grid_scores(int i_vx,
       y = nint(pd.y_na[i]);
 
       // Loop through each of the ensemble members
-      for(j=0, n_miss=0; j<n_ens; j++) {
+      for(j=0, n_miss=0; j<n_ens_files; j++) {
 
          // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
