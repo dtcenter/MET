@@ -297,7 +297,7 @@ void process_command_line(int argc, char **argv) {
    // Prepend the control member, if specified
    if(ctrl_file.nonempty()) {
 
-      if(ens_file_list.has(ctrl_file)) {
+      if(ens_file_list.has(ctrl_file) && n_ens_files != 1) {
          mlog << Error << "\nprocess_command_line() -> "
               << "the ensemble control file should not appear in the list "
               << "of ensemble member files:\n" << ctrl_file << "\n\n";
