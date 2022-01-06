@@ -484,7 +484,7 @@ void process_command_line(int argc, char **argv) {
       if(!conf_info.nc_info.do_mean) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "enabling NetCDF ensemble mean computation to be used "
-              << "in verificaiton.\n\n";
+              << "in verification.\n\n";
          conf_info.nc_info.do_mean = true;
       }
    }
@@ -1649,7 +1649,7 @@ void process_grid_vx() {
          // Store a copy of the unperturbed observation field
          oraw_dp = obs_dp;
 
-         // Apply observation error bias correciton, if requested
+         // Apply observation error bias correction, if requested
          if(conf_info.vx_opt[i].obs_error.flag) {
             mlog << Debug(3)
                  << "Applying observation error bias correction to "
@@ -1660,7 +1660,7 @@ void process_grid_vx() {
                         conf_info.obtype.c_str());
          }
 
-         // Looop through the ensemble members
+         // Loop through the ensemble members
          for(k=0; k<n_ens_files; k++) {
 
             // Smooth the forecast field, if requested
