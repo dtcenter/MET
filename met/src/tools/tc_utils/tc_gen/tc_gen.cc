@@ -573,8 +573,10 @@ void score_genesis_shape(const GenesisInfoArray &best_ga) {
          exit(1);
       }
 
-      // Round the issue time up to the next hour:
-      issue_ut = (issue_ut / sec_per_hour) * sec_per_hour + sec_per_hour;
+      // Round the file timestamp to the nearest synoptic time (00, 06, 12, 18)
+      int h3 = 3*sec_per_hour;
+      int h6 = 6*sec_per_hour;
+      issue_ut = ( (int) (issue_ut + h3) / h6 ) * h6;
 
       // Open the dbf and shp files
       dbf_file.open(dbf_file_name.c_str());
