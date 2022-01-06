@@ -489,6 +489,12 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
+   if(conf_info.control_id.nonempty() && ctrl_file.empty()) {
+      mlog << Warning << "\nprocess_command_line() -> "
+           << "control_id is set in the config file but "
+           << "control file is not provided with -ctrl argument\n\n";
+   }
+
    // Deallocate memory for data files
    if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
    if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
