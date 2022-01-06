@@ -95,7 +95,6 @@ class EnsembleStatVxOpt {
       VxPairDataEnsemble vx_pd;          // Ensemble pair data
 
       ConcatString   var_str;            // nc_pairs_var_str string
-      ConcatString   control_id;         // Control ID
 
       int            beg_ds;             // Begin observation time window offset
       int            end_ds;             // End observation time window offset
@@ -199,6 +198,7 @@ class EnsembleStatConfInfo {
       VarInfo **          ens_info;         // Array of pointers for ensemble [n_ens_var] (allocated)
       ThreshArray *       ens_ta;           // Array for ensemble thresholds [n_ens_var] (allocated)
       StringArray         ens_var_str;      // Array for ensemble variable name strings [n_ens_var]
+      ConcatString        control_id;       // Control ID
 
       NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
       int                 n_nbrhd;          // Number of neighborhood sizes
