@@ -80,7 +80,14 @@ oper_technique = "CARQ";
 // Array of dictionaries containing the track filtering options
 // If empty, a single filter is defined using the top-level settings.
 //
-filter = [];
+filter = [
+   { desc = "SUMMER_INIT";  init_beg   = "20210601"; init_end = "20210901"; },
+   { desc = "00Z_12Z_INIT"; init_hour  = [ "00", "12" ];  },
+   { desc = "06Z_18Z_INIT"; init_hour  = [ "06", "18" ];  },
+   { desc = "AL_EP_BASIN";  basin_mask = ["AL", "EP" ];  },
+   { desc = "AL_BASIN";     basin_mask = "AL";  },
+   { desc = "EP_BASIN";     basin_mask = "EP";  }
+];
 
 //
 // Description written to output DESC column
