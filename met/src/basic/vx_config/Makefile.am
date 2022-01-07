@@ -11,7 +11,6 @@ include ${top_srcdir}/Make-include
 # Yacc/lex flags
 
 AM_YFLAGS	= --defines=config.tab.h -p config
-#AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
 
 # The library
 
