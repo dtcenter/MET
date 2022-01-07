@@ -80,6 +80,9 @@ static void   process_tracks       (const StringArray &,
 static void   process_edecks       (const StringArray &,
                                     const StringArray &,
                                     ProbInfoArray &);
+static void   process_shapes       (const StringArray &,
+                                    GenShapeInfoArray &);
+
 static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const ConcatString &,
                                     const GenesisInfoArray &,
@@ -95,6 +98,10 @@ static void   do_probgen_pct       (const TCGenVxOpt &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     ProbGenPCTInfo &);
+static void   do_genshape_pct      (const TCGenVxOpt &,
+                                    GenShapeInfoArray &,
+                                    const GenesisInfoArray &,
+                                    ProbGenPCTInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
@@ -104,9 +111,8 @@ static int    find_probgen_match   (const ProbGenInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
-static int    find_shape_match     (const ShpPolyRecord &,
-                                    const GenesisInfoArray &,
-                                    unixtime, unixtime);
+static int    find_genshape_match  (const GenShapeInfo &,
+                                    const GenesisInfoArray &);
 
 static void   setup_txt_files      (int, int, int);
 static void   setup_table          (AsciiTable &);
@@ -133,6 +139,8 @@ static void   write_pct_genmpr_cols(ProbGenPCTInfo &, int, int,
 
 static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
+
+static ConcatString string_to_basin_abbr(ConcatString);
 
 static void   usage                ();
 static void   set_source           (const StringArray &, const char *,
@@ -500,33 +508,12 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
 ////////////////////////////////////////////////////////////////////////
 
 void score_genesis_shape(const GenesisInfoArray &best_ga) {
-   int i, j, k, i_bga;
-   int n_rec, total_recs, total_probs;
-   StringArray shape_files, sa;
-   ConcatString shp_file_name, dbf_file_name, basin_cs, case_cs, cs;
-   NumArray probs;
-   unixtime issue_ut;
-   bool is_event;
-
-   DbfFile dbf_file;
-   ShpFile shp_file;
-   ShpPolyRecord poly_rec;
-   const GenesisInfo *bgi;
-
+   int i, j, total_probs;
+   StringArray shape_files;
+   GenShapeInfoArray shapes_all, shapes_subset;
    ProbGenPCTInfo probgen_pct;
-   map<ConcatString,ProbGenPCTInfo> basin_map;
-   map<ConcatString,ProbGenPCTInfo>::iterator it;
 
-   // Initialize to the first filter
-   probgen_pct.clear();
-   probgen_pct.set_vx_opt(&conf_info.VxOpt[0]);
-
-   // Setup output files based on the maximum number of basins
-   // and lead times possible
-   const int max_n_basin = 3;
-   setup_txt_files(max_n_basin, max_n_shape_prob, 0);
-
-   // Get the list of shapefiles
+   // Get the list of input shapefiles
    for(i=0; i<shape_source.n(); i++) {
       shape_files.add(get_filenames(shape_source[i], NULL, gen_shp_reg_exp));
    }
@@ -535,192 +522,43 @@ void score_genesis_shape(const GenesisInfoArray &best_ga) {
         << "Processing " << shape_files.n()
         << " shapefile(s) matching the \""
         << gen_shp_reg_exp << "\" regular expression.\n";
+   process_shapes(shape_files, shapes_all);
 
-   // Initialize counts
-   total_recs = total_probs = 0;
+   // Setup output files based on the maximum number of filters
+   // and lead times possible
+   setup_txt_files(conf_info.n_vx(), max_n_shape_prob, 0);
 
-   // Process each shapefile
-   for(i=0; i<shape_files.n(); i++) {
+   // Process each verification filter
+   for(i=0; i<conf_info.n_vx(); i++) {
 
-      // Get the corresponding dbf file
-      shp_file_name = shape_files[i];
-      dbf_file_name = shp_file_name;
-      dbf_file_name.replace(".shp", ".dbf", false);
+      // Initialize
+      shapes_subset.clear();
 
-      // Check that both exist
-      if(!file_exists(shp_file_name.c_str()) ||
-         !file_exists(dbf_file_name.c_str())) {
-         mlog << Error << "\nscore_genesis_shape() -> "
-              << "the specified shapefile (" << shp_file_name
-              << ") and corresponding database file (" << dbf_file_name
-              << ") must both exists!\n\n";
-      }
+      // Subset shapes based on filtering criteria
+      for(j=0, total_probs=0; j<shapes_all.n(); j++) {
 
-      // Extract the issue time from the filename:
-      //   gtwo_areas_YYYYMMDDHHMM.shp
-      sa = shp_file_name.basename().split("_.");
-      if(sa.n() >= 3 && sa[2].length() >= 12) {
-         cs << cs_erase
-            << sa[2].substr(0, 8).c_str() << "_"
-            << sa[2].substr(8, 4).c_str() << "00";
-         issue_ut = yyyymmdd_hhmmss_to_unix(cs.c_str());
-      }
-      else {
-         mlog << Error << "\nscore_genesis_shape() -> "
-              << "can't extract the issue time from \"" << shp_file_name
-              << "\" since it does not match the regular expression \""
-              << gen_shp_reg_exp << "\"!\n\n";
-         exit(1);
-      }
-
-      // Round the file timestamp to the nearest synoptic time (00, 06, 12, 18)
-      int h3 = 3*sec_per_hour;
-      int h6 = 6*sec_per_hour;
-      issue_ut = ( (int) (issue_ut + h3) / h6 ) * h6;
-
-      // Open the dbf and shp files
-      dbf_file.open(dbf_file_name.c_str());
-      shp_file.open(shp_file_name.c_str());
-
-      // Store the number of records
-      n_rec = dbf_file.header()->n_records;
-
-      // Update the running total
-      total_recs += n_rec;
-
-      // Check expected shape types
-      const ShapeType shape_type = (ShapeType) (shp_file.header()->shape_type);
-      if(shape_type != shape_type_polygon) {
-         mlog << Error << "\nscore_genesis_shape() -> "
-              << "shapefile type \"" << shapetype_to_string(shape_type)
-              << "\" in file \"" << shp_file_name
-              << "\" is not supported!\n\n";
-         exit(1);
-      }
-
-      mlog << Debug(4) << "[File " << i+1 << " of " << shape_files.n() << "]: "
-           << "Found " << n_rec << " records with issue time "
-           << unix_to_yyyymmdd_hhmmss(issue_ut) << " in file \""
-           << shp_file_name << "\".\n";
-
-      // Process each shape
-      for(j=0; j<n_rec; j++) {
-
-         // Check for end-of-file
-         if(shp_file.at_eof()) {
-            mlog << Error << "\nscore_genesis_shape() -> "
-                 << "hit shp file EOF before reading all records!\n\n";
-            exit(1);
+         // Check filters to define subset
+         if(conf_info.VxOpt[i].is_keeper(shapes_all[j])) {
+            shapes_subset.add(shapes_all[j]);
+            total_probs += shapes_all[j].n_prob();
          }
-
-         // Read the current shape and metadata
-         shp_file >> poly_rec;
-         poly_rec.toggle_longitudes();
-         sa = dbf_file.subrecord_values(j);
-         basin_cs = sa[0];
-         basin_cs.replace(" ", "_", false);
-
-         mlog << Debug(5)
-              << "  " << basin_cs << " basin shape " << j+1 << " has "
-              << poly_rec.n_points << " points with latitudes from "
-              << poly_rec.y_min() << " to " << poly_rec.y_max()
-              << " and longitudes from " << poly_rec.x_min() << " to "
-              << poly_rec.x_max() << ".\n";
-
-         // Parse probabilities from the subrecord values
-         for(k=0,probs.clear(); k<sa.n(); k++) {
-            if(check_reg_exp("[0-9]%$", sa[k].c_str())) {
-               probs.add(atoi(sa[k].c_str()));
-            }
-         }
-
-         // Range check
-         if(probs.n() == 0 || probs.n() > max_n_shape_prob) {
-            mlog << Warning << "\nscore_genesis_shape() -> "
-                 << "unexpected number of shapefile probabilities ("
-                 << probs.n() << ") in record " << j+1 << " of file \""
-                 << dbf_file_name << "\"!\n\n";
-            continue;
-         }
-
-         // Search for the genesis match
-         i_bga = find_shape_match(poly_rec, best_ga, issue_ut,
-                                  issue_ut + shape_prob_search_sec);
-
-         // Pointer to the matching BEST track
-         bgi = (is_bad_data(i_bga) ?
-                (const GenesisInfo *) 0 :
-                &best_ga[i_bga]);
-
-         // Update the running total
-         total_probs += probs.n();
-
-         // Score each probability
-         for(k=0; k<probs.n(); k++) {
-
-            // Assume no match
-            is_event = false;
-
-            case_cs << cs_erase << "    " << nint(probs[k])
-                 << "% probability of " << shape_prob_lead_hr[k]
-                 << "-hour genesis ";
-
-            // Best track match
-            if(bgi) {
-
-               // Check probability time window
-               is_event = (bgi->genesis_time() - issue_ut) <
-                          (shape_prob_lead_hr[k] * sec_per_hour);
-
-               if(is_event) {
-                  case_cs << "MATCHES "
-                          << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
-                          << " BEST track " << bgi->storm_id()
-                          << " genesis at (" << bgi->lat() << ", "
-                          << bgi->lon() << ").\n";
-               }
-               else {
-                  case_cs << "has NO MATCH in the BEST track.\n";
-               }
-            }
-            // No Best track match
-            else {
-               case_cs << "has NO MATCH in the BEST track.\n";
-            }
-
-            mlog << Debug(5) << case_cs;
-
-            // Add a new basin map entry, if needed
-            if(basin_map.count(basin_cs) == 0) {
-               basin_map[basin_cs] = probgen_pct;
-            }
-
-            // Store this probability
-            basin_map[basin_cs].add_shape(basin_cs, issue_ut,
-                                          shape_prob_lead_hr[k],
-                                          probs[k], bgi, is_event);
-
-         } // end for k
       } // end for j
 
-      // Close files
-      dbf_file.close();
-      shp_file.close();
+      mlog << Debug(2)
+           << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+           << ")" << "] Verifying " << total_probs << " probabilities from "
+           << shapes_subset.n() << " of the " << shapes_all.n()
+           << " input genesis shapes against " << best_ga.n() << " "
+           << conf_info.BestEventInfo.Technique << " genesis events.\n";
+
+      // Do the probabilistic verification
+      do_genshape_pct(conf_info.VxOpt[i], shapes_subset,
+                      best_ga, probgen_pct);
+
+      // Write the statistics output
+      write_pct_stats(probgen_pct);
 
    } // end for i
-
-   mlog << Debug(3) << "Found a total of " << total_probs
-        << " probabilities, for " << total_recs << " genesis shapes, for "
-        << basin_map.size() << " basins, from " << shape_files.n()
-        << " input files.\n";
-
-   // Write the shape statistics for each basin
-   for(it=basin_map.begin(); it!=basin_map.end(); it++) {
-
-         // Write the statistics output
-         write_pct_stats(it->second);
-
-   } // end for it
 
    return;
 }
@@ -1038,7 +876,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
          }
 
          // Store pair info
-         pgi.add_pgi(model_pa.prob_gen(i), j, bgi, is_event);
+         pgi.add_probgen(model_pa.prob_gen(i), j, bgi, is_event);
 
       } // end for j
    } // end for i
@@ -1046,6 +884,77 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void do_genshape_pct(const TCGenVxOpt &vx_opt,
+                     GenShapeInfoArray &fcst_sa,
+                     const GenesisInfoArray &best_ga,
+                     ProbGenPCTInfo &pgi) {
+   int i, j, i_bga;
+   const GenesisInfo *bgi;
+   bool is_event;
+   ConcatString case_cs;
+
+   // Initialize
+   pgi.clear();
+   pgi.set_vx_opt(&vx_opt);
+
+   // Loop over the array of shapes
+   for(i=0; i<fcst_sa.n(); i++) {
+
+      // Search for the genesis match
+      i_bga = find_genshape_match(fcst_sa[i], best_ga);
+
+      // Pointer to the matching BEST track
+      bgi = (is_bad_data(i_bga) ?
+             (const GenesisInfo *) 0 :
+             &best_ga[i_bga]);
+
+      // Score each probability
+      for(j=0; j<fcst_sa[i].n_prob(); j++) {
+
+         // Assume no match
+         is_event = false;
+
+         case_cs << cs_erase << fcst_sa[i].serialize() << " "
+                 << nint(fcst_sa[i].prob_val(j)*100.0)
+                 << "% probability of "
+                 << fcst_sa[i].lead_sec(j)/sec_per_hour
+                 << "-hour genesis ";
+
+         // Best track match
+         if(bgi) {
+
+            // Check probability time window
+            is_event = (bgi->genesis_time() - fcst_sa[i].issue_time()) <
+                       (fcst_sa[i].lead_sec(j));
+
+            if(is_event) {
+               case_cs << "MATCHES "
+                       << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
+                       << " BEST track " << bgi->storm_id()
+                       << " genesis at (" << bgi->lat() << ", "
+                       << bgi->lon() << ").\n";
+            }
+            else {
+               case_cs << "has NO MATCH in the BEST track.\n";
+            }
+         }
+         // No Best track match
+         else {
+            case_cs << "has NO MATCH in the BEST track.\n";
+         }
+
+         mlog << Debug(5) << case_cs;
+
+         // Store pair info
+         pgi.add_genshape(fcst_sa[i], j, bgi, is_event);
+
+      } // end for j
+   } // end for i
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1224,16 +1133,19 @@ int find_probgen_match(const ProbGenInfo &prob_gi,
 
 ////////////////////////////////////////////////////////////////////////
 
-int find_shape_match(const ShpPolyRecord &shp_poly,
-                     const GenesisInfoArray &bga,
-                     unixtime beg_ut, unixtime end_ut) {
+int find_genshape_match(const GenShapeInfo &gsi,
+                        const GenesisInfoArray &bga) {
    int i, i_bga;
    double x, y;
    unixtime min_ut;
 
+   // Time window
+   unixtime beg_ut = gsi.issue_time();
+   unixtime end_ut = beg_ut + shape_prob_search_sec;
+
    // Load the shape
    GridClosedPolyArray p;
-   p.set(shp_poly, conf_info.DLandGrid);
+   p.set(gsi.poly(), conf_info.DLandGrid);
 
    // Search Best track genesis events for a match
    for(i=0,i_bga=bad_data_int; i<bga.n(); i++) {
@@ -1649,6 +1561,140 @@ void process_edecks(const StringArray &files,
    if(mlog.verbosity_level() >= 6) {
       mlog << Debug(6) << probs.serialize_r() << "\n";
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_shapes(const StringArray &files,
+                    GenShapeInfoArray &shapes) {
+   int i, j, k, n_rec, total_probs;
+   unixtime file_ut;
+   ConcatString shp_file_name, dbf_file_name;
+   StringArray sa;
+   ConcatString cs;
+   GenShapeInfo gsi;
+   DbfFile dbf_file;
+   ShpFile shp_file;
+   ShpPolyRecord poly_rec;
+
+   // Initialize
+   total_probs = 0;
+
+   // Process each shapefile
+   for(i=0; i<files.n(); i++) {
+
+      // Get the corresponding dbf file
+      shp_file_name = files[i];
+      dbf_file_name = shp_file_name;
+      dbf_file_name.replace(".shp", ".dbf", false);
+
+      // Check that both exist
+      if(!file_exists(shp_file_name.c_str()) ||
+         !file_exists(dbf_file_name.c_str())) {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "the specified shapefile (" << shp_file_name
+              << ") and corresponding database file (" << dbf_file_name
+              << ") must both exists!\n\n";
+      }
+
+      // Extract the issue time from the filename:
+      //   gtwo_areas_YYYYMMDDHHMM.shp
+      sa = shp_file_name.basename().split("_.");
+      if(sa.n() >= 3 && sa[2].length() >= 12) {
+         cs << cs_erase
+            << sa[2].substr(0, 8).c_str() << "_"
+            << sa[2].substr(8, 4).c_str() << "00";
+         file_ut = yyyymmdd_hhmmss_to_unix(cs.c_str());
+      }
+      else {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "can't extract the issue time from \"" << shp_file_name
+              << "\" since it does not match the regular expression \""
+              << gen_shp_reg_exp << "\"!\n\n";
+         exit(1);
+      }
+
+      // Open the dbf and shp files
+      dbf_file.open(dbf_file_name.c_str());
+      shp_file.open(shp_file_name.c_str());
+
+      // Store the number of records
+      n_rec = dbf_file.header()->n_records;
+
+      // Check expected shape types
+      const ShapeType shape_type = (ShapeType) (shp_file.header()->shape_type);
+      if(shape_type != shape_type_polygon) {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "shapefile type \"" << shapetype_to_string(shape_type)
+              << "\" in file \"" << shp_file_name
+              << "\" is not supported!\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(4) << "[File " << i+1 << " of " << files.n() << "]: "
+           << "Found " << n_rec << " records in file \"" << shp_file_name << "\".\n";
+
+      // Process each shape
+      for(j=0; j<n_rec; j++) {
+
+         // Check for end-of-file
+         if(shp_file.at_eof()) {
+            mlog << Error << "\nrocess_shapes() -> "
+                 << "hit shp file EOF before reading all records!\n\n";
+            exit(1);
+         }
+
+         // Read the current shape and metadata
+         shp_file >> poly_rec;
+         poly_rec.toggle_longitudes();
+         sa = dbf_file.subrecord_values(j);
+
+         // Initialize GenShapeInfo
+         gsi.clear();
+         gsi.set_time(file_ut);
+         gsi.set_basin(string_to_basin_abbr(sa[0]).c_str());
+         gsi.set_poly(poly_rec);
+
+         // Parse probabilities from the subrecord values
+         for(k=0; k<sa.n(); k++) {
+
+            if(check_reg_exp("[0-9]%$", sa[k].c_str())) {
+
+               // Check for too many probabilities
+               if(gsi.n_prob() >= max_n_shape_prob) {
+                  mlog << Warning << "\nprocess_shapes() -> "
+                       << "unexpected number of shapefile probabilities ("
+                       << gsi.n_prob() << ") in record " << j+1
+                       << " of file \"" << dbf_file_name
+                       << "\"!\n\n";
+                  continue;
+               }
+
+               // Store the probability info
+               gsi.add_prob(shape_prob_lead_hr[gsi.n_prob()]*sec_per_hour,
+                            atoi(sa[k].c_str())/100.0);
+            }
+         } // end for k
+
+         // Store this shape, check for duplicates
+         if(shapes.add(gsi, true)) {
+            mlog << Debug(5) << "Add new " << gsi.serialize() << "\n";
+            total_probs += gsi.n_prob();
+         }
+
+      } // end for j
+
+      // Close files
+      dbf_file.close();
+      shp_file.close();
+
+   } // end for i
+
+   mlog << Debug(3) << "Found a total of " << total_probs
+        << " probabilities in " << shapes.n() << " genesis shapes from "
+        << files.n() << " input files.\n";
 
    return;
 }
@@ -2113,6 +2159,10 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
 ////////////////////////////////////////////////////////////////////////
 
 void write_pct_stats(ProbGenPCTInfo &pgi) {
+
+   // Check for no data to write
+   if(pgi.PCTMap.size() == 0) return;
+
    int i, lead_hr, lead_sec;
 
    // Setup header columns
@@ -2203,10 +2253,10 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pgi.FcstGenMap[lead_hr].size(); i++) {
+   for(i=0; i<pgi.ProbGenMap[lead_hr].size(); i++) {
 
       // Pointers for current case
-      const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][i];
+      const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][i];
       const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][i];
 
       // Store timing info
@@ -2249,10 +2299,10 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
                             AsciiTable &at, int r, int c) {
 
    // Pointers for current case
-   const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][index];
+   const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][index];
    const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][index];
 
-   int i_prob = pgi.FcstIdxMap[lead_hr][index];
+   int i_prob = pgi.ProbIdxMap[lead_hr][index];
 
     //
     // Genesis Matched Pairs (GENMPR):
@@ -2266,7 +2316,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
     //
 
     at.set_entry(r, c+0,  // Total number of pairs
-       (int) pgi.FcstGenMap[lead_hr].size());
+       (int) pgi.ProbGenMap[lead_hr].size());
 
     at.set_entry(r, c+1,  // Index of current pair
        index+1);
@@ -2495,6 +2545,19 @@ void finish_txt_files() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString string_to_basin_abbr(ConcatString cs) {
+   ConcatString abbr;
+
+        if(cs == "Atlantic")        abbr = "AL";
+   else if(cs == "East Pacific")    abbr = "EP";
+   else if(cs == "Central Pacific") abbr = "CP";
+   else                             abbr = cs;
+
+   return(abbr);
 }
 
 ////////////////////////////////////////////////////////////////////////
