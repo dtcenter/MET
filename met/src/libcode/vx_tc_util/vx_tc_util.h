@@ -24,6 +24,7 @@
 #include "prob_rirw_info.h"
 #include "prob_rirw_pair_info.h"
 #include "genesis_info.h"
+#include "gen_shape_info.h"
 #include "tc_columns.h"
 #include "tc_hdr_columns.h"
 #include "tc_stat_line.h"
