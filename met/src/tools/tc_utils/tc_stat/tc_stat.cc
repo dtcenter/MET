@@ -165,7 +165,7 @@ void process_jobs() {
    ConcatString jobstring;
    int i, n_jobs;
    TCLineCounts n;
-   const char *method_name = "process_jobs() -> ":
+   const char *method_name = "process_jobs() -> ";
 
    // Open the output file
    open_out_file();
