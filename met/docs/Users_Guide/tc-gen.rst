@@ -6,20 +6,24 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, probabilistic shapefile warning areas, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, operational shapefile warning areas, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
 
 .. _tc-gen_stat_aspects:
 
 Statistical aspects
 ___________________
 
-The TC-Gen tool processes both deterministic and probabilistic forecasts. For deterministic forecasts specified using the **-track** command line option, it identifies genesis events in both the forecasts and reference datasets, typically Best tracks. It applies user-specified configuration options to pair up the forecast and reference genesis events and categorize each pair as a hit, miss, or false alarm.
+The TC-Gen tool processes both deterministic and probabilistic forecasts.
+
+For deterministic forecasts specified using the **-track** command line option, it identifies genesis events in both the forecasts and reference datasets, typically Best tracks. It applies user-specified configuration options to pair up the forecast and reference genesis events and categorize each pair as a hit, miss, or false alarm.
 
 As with other extreme events (where the event occurs much less frequently than the non-event), the correct negative category is not computed since the non-events would dominate the contingency table. Therefore, only statistics that do not include correct negatives should be considered for this tool. The following CTS statistics are relevant: Base rate (BASER), Mean forecast (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS), Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS), Bias Adjusted Gilbert Skill Score (BAGSS).
 
 For probabilistic forecasts specified using the **-edeck** command line option, it identifies genesis events in the reference dataset. It applies user-specified configuration options to pair the forecast probabilities to the reference genesis events. These pairs are added to an Nx2 probabilistic contingency table. If the reference genesis event occurs within in the predicted time window, the pair is counted in the observation-yes column. Otherwise, it is added to the observation-no column.
 
-For each probabilistic warning area shapefile specified using the **-shape** command line option, it processes metadata from the corresponding database file. The database file is assumed to exist at exactly the same path as the shapefile, but with a ".dbf" suffix instead of ".shp". Note that only shapefiles exactly following NHC's "gtwo_areas_YYYYMMDDHHMM.shp" file naming convention and corresonding metadata conventions are supported. For each shapefile record, the database file defines up to three corresponding probability values. The first percentage is interpreted as the probability of genesis inside the defined shape within 48 hours. The second and, if provided, third percentages are interpreted as the 120-hour and 168-hour probabiltities, respectively. For each probability, the reference genesis events are searched for a match within the defined time window. These pairs are added to an Nx2 probabilistic contingency table. The probabilistic contingeny tables and statistics are computed and reported separately for each combination of hurricance basin and probability hour encountered in the input. Note that the filtering capability provided for the **-genesis** and **-edeck** options are not supported for the **-shape** option.
+For warning area shapefiles specified using the **-shape** command line option, it processes metadata from the corresponding database files. The database file is assumed to exist at exactly the same path as the shapefile, but with a ".dbf" suffix instead of ".shp". Note that only shapefiles exactly following the NOAA National Hurricane Center's (NHC) "gtwo_areas_YYYYMMDDHHMM.shp" file naming and corresonding metadata conventions are supported. For each shapefile record, the database file defines up to three corresponding probability values. The first percentage is interpreted as the probability of genesis inside the shape within 48 hours. The second and, if provided, third percentages are interpreted as the 120-hour and 168-hour probabilities, respectively. Care is taken to identify and either ignore or update duplicate shapes found in the input.
+
+The shapes are then subset based on the filtering criteria in the configuration file. For each probability and shape, the reference genesis events are searched for a match within the defined time window. These pairs are added to an Nx2 probabilistic contingency table. The probabilistic contingeny tables and statistics are computed and reported separately for filter defined and lead hour encountered in the input.
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
@@ -136,7 +140,11 @@ The TC-Gen tool implements the following logic:
 
   * For each record, extract the shape and metadata which defines the basin and 2, 5, and 7 day probabilities.
 
-  * Check if this shape is a duplicate that has already been processed. If so, skip it.
+  * Check if this shape is a duplicate that has already been processed. If it is an exact duplicate, with the same basin, file timestamp, issue time, and min/max lat/lon values, ignore it. If the file timestamp is older than the existing shape, also ignore it. If the file timestamp is newer than the existing shape, replace the existing shape with the new one.
+
+ * Loop over the filters defined in the configuration file and apply the following logic for each.
+
+  * Subset the list of genesis shapes based on the current filter criteria.
 
   * Search the Best track genesis events to see if any occurred inside the shape within 7 days of the issuance time. If multiple genesis events occurred, choose the one closest to the issuance time.
 
@@ -144,9 +152,9 @@ The TC-Gen tool implements the following logic:
 
   * If found, further check the 2 and 5 day time windows to classify each probability as a hit or miss.
 
-  * Add each probability pair to an Nx2 probabilistic contingency table, tracking results separately for each combination of hurricane basin and lead time.
+  * Add each probability pair to an Nx2 probabilistic contingency table, tracking results separately for each lead time.
 
- * Report the Nx2 probabilistic contingency table counts and statistics for each basin and lead time encountered in the data. These counts and statistics are identified in the output files as *GENESIS_SHAPE*.
+  * Report the Nx2 probabilistic contingency table counts and statistics for each lead time. These counts and statistics are identified in the output files as *GENESIS_SHAPE*.
 
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -266,6 +274,8 @@ ______________________
 
 The **init_beg**, **init_end**, **init_inc**, and **init_exc** entries define strings in YYYYMMDD[_HH[MMSS]] format which defines which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time meets all the criteria will be processed. The initialization time must fall between **init_beg**, and **init_end**, must appear in **init_inc** inclusion list, and must not appear in the **init_exc** exclusion list. Note that these settings only apply to the forecast and operational tracks, not the Best tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
+For genesis shapes, these options are used to filter the warning issuance time.
+
 ______________________
 
 .. code-block:: none
@@ -284,6 +294,8 @@ ______________________
 
 The **init_hour** and **lead** entries are arrays of strings in HH[MMSS] format defining which forecast tracks should be included. If left empty, all tracks will be used. Otherwise, only those forecast tracks whose initialization hour and lead times appear in the list will be used. Note that these settings only apply to the forecast tracks, not the Best tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
+For genesis shapes, the **init_hour** option is used to filter the warning issuance hour.
+
 ______________________
 
 .. code-block:: none
@@ -291,6 +303,8 @@ ______________________
   vx_mask = "";
 
 The **vx_mask** entry is a string defining the path to a Lat/Lon polyline file or a gridded data file that MET can read to subset the results spatially. If specified, only those genesis events whose Lat/Lon location falls within the specified area will be included.
+
+If specified for genesis shapes, the lat/lon of the central location of the shape will be checked. The central location is computed as the average of the min/max lat/lon values of the shape points.
 
 ______________________
 
@@ -301,6 +315,8 @@ ______________________
 The **basin_mask** entry is an array of strings listing tropical cycline basin abbreviations (e.g. AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
 
 The **vx_mask** and **basin_mask** names are concatenated and written to the **VX_MASK** output column.
+
+If **vx_mask** is not specified for genesis shapes and **basin_mask** is, the basin name is extracted from the shapefile metadata and compared to the **basin_mask** list.
 
 ______________________
 
