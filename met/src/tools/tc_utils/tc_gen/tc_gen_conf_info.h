@@ -80,8 +80,6 @@ static const string ncout_str[n_ncout] = {
    fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
 };
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 struct TCGenNcOutInfo {
@@ -139,6 +137,7 @@ class TCGenVxOpt {
       NumArray  Lead;
 
       // Spatial masking information
+      ConcatString VxMaskConf;
       ConcatString VxMaskName;
       MaskPoly     VxPolyMask;
       Grid         VxGridMask;
@@ -178,8 +177,9 @@ class TCGenVxOpt {
                               const StringArray &);
       void parse_nc_info(Dictionary &);
 
-      bool is_keeper(const GenesisInfo &) const;
-      bool is_keeper(const ProbGenInfo &) const;
+      bool is_keeper(const GenesisInfo &)  const;
+      bool is_keeper(const ProbGenInfo &)  const;
+      bool is_keeper(const GenShapeInfo &) const;
 
       STATOutputType output_map(STATLineType) const;
 };
@@ -353,10 +353,11 @@ class ProbGenPCTInfo {
    map<int,PCTInfo> PCTMap;
 
    // Map of lead times to vectors of pair info
-   map<int,vector<const ProbGenInfo *> > FcstGenMap;
-   map<int,vector<int> >                 FcstIdxMap;
-   map<int,vector<const GenesisInfo *> > BestGenMap;
-   map<int,vector<bool> >                BestEvtMap;
+   map<int,vector<const ProbGenInfo *> >  ProbGenMap;
+   map<int,vector<const GenShapeInfo *> > GenShapeMap;
+   map<int,vector<int> >                  ProbIdxMap;
+   map<int,vector<const GenesisInfo *> >  BestGenMap;
+   map<int,vector<bool> >                 BestEvtMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -364,12 +365,11 @@ class ProbGenPCTInfo {
 
    void set_vx_opt(const TCGenVxOpt *);
 
-   void add_pgi(const ProbGenInfo &, int,
-                const GenesisInfo *, bool);
+   void add_probgen(const ProbGenInfo &, int,
+                    const GenesisInfo *, bool);
 
-   void add_shape(const ConcatString &, unixtime,
-                  int, double, const GenesisInfo *,
-                  bool);
+   void add_genshape(const GenShapeInfo &, int,
+                     const GenesisInfo *, bool);
 
 };
 
