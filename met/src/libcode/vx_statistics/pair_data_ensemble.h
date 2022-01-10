@@ -174,7 +174,7 @@ class VxPairDataEnsemble {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
+      EnsVarInfo *fcst_info;     // Forecast field, allocated by EnsVarInfo
       VarInfo *climo_info;       // Climatology field, allocated by VarInfoFactory
       VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
 
@@ -233,7 +233,7 @@ class VxPairDataEnsemble {
 
       void clear();
 
-      void set_fcst_info(VarInfo *);
+      void set_fcst_info(EnsVarInfo *);
       void set_climo_info(VarInfo *);
       void set_obs_info(VarInfo *);
 
