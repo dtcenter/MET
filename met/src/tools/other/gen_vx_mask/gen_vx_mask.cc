@@ -1097,7 +1097,6 @@ void apply_shape_mask(DataPlane & dp) {
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,

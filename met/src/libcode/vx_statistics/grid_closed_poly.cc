@@ -186,8 +186,6 @@ void GridClosedPolyArray::set(const ShpPolyRecord &r, const Grid &grid) {
    double x, y;
    GridClosedPoly p;
 
-   if(r.n_parts == 0) return;
-
    for(j=0; j<(r.n_parts); j++) {
 
       p.clear();
