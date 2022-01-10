@@ -250,4 +250,20 @@
     </output>
   </test>
 
+  <!--  Single NetCDF input file with all ensembles.  -->
+
+  <test name="ensemble_stat_SINGLE_FILE_NC">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      &CONFIG_DIR;/EnsembleStatConfig_single_file_nc \
+      -grid_obs &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_19700101_000000V_ens.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
