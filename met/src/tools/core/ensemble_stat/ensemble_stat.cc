@@ -126,7 +126,7 @@ static void do_rps               (const EnsembleStatVxOpt &,
                                   const PairDataEnsemble *);
 
 static void clear_counts();
-static void track_counts(int, const DataPlane &, bool);
+static void track_counts(EnsVarInfo *, const DataPlane &, bool);
 
 static ConcatString get_ens_mn_var_name(int);
 
@@ -136,12 +136,12 @@ static void setup_table     (AsciiTable &);
 
 static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
-static void write_ens_nc(int, DataPlane &);
-static void write_ens_var_float(int, float *, const DataPlane &,
+static void write_ens_nc(EnsVarInfo *, int, DataPlane &);
+static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(int, int *, const DataPlane &,
+static void write_ens_var_int(EnsVarInfo *, int *, const DataPlane &,
                               const char *, const char *);
-static void write_ens_data_plane(int, const DataPlane &, const DataPlane &,
+static void write_ens_data_plane(EnsVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
 static void write_orank_nc(PairDataEnsemble &, DataPlane &, int, int, int);
@@ -382,7 +382,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Process the configuration
-   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id);
+   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id, &ens_file_list);
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -509,11 +509,11 @@ void process_grid(const Grid &fcst_grid) {
 
    // Parse regridding logic
    RegridInfo ri;
-   if(conf_info.get_n_ens_var() > 0) {
-      ri = conf_info.ens_info[0]->regrid();
+   if(conf_info.ens_input.size() > 0) {
+      ri = conf_info.ens_input[0]->get_var_info()->regrid();
    }
    else if(conf_info.get_n_vx() > 0) {
-      ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
+      ri = conf_info.vx_opt[0].vx_pd.fcst_info->get_var_info()->regrid();
    }
    else {
       mlog << Error << "\nprocess_grid() -> "
@@ -573,30 +573,40 @@ void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_n_vld() {
-   int i, j, n_vld;
+   int i_var, i_ens, j, n_vld, n_ens_inputs;
    DataPlane dp;
    DataPlaneArray dpa;
+   VarInfo * var_info;
+   ConcatString ens_file;
+   vector<EnsVarInfo*>::const_iterator var_it;
 
    // Initialize
    n_ens_vld.clear();
    n_vx_vld.clear();
 
    // Loop through the ensemble fields to be processed
-   for(i=0; i<conf_info.get_n_ens_var(); i++) {
+   var_it = conf_info.ens_input.begin();
+   n_ens_inputs = (*var_it)->inputs_n();
+
+   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Loop through the ensemble files
-      for(j=0, n_vld=0; j<n_ens_files; j++) {
+      for(i_ens=n_vld=0; i_ens < n_ens_inputs; i_ens++) {
+
+         // get file and VarInfo to process
+         ens_file = (*var_it)->get_file(i_ens);
+         var_info = (*var_it)->get_var_info(i_ens);
 
          // Check for valid file
-         if(!ens_file_vld[j]) continue;
+         if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
 
          // Check for valid data
-         if(!get_data_plane(ens_file_list[j].c_str(), etype,
-                            conf_info.ens_info[i], dp, false)) {
+         if(!get_data_plane(ens_file.c_str(), etype,
+                            var_info, dp, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "ensemble field \""
-                 << conf_info.ens_info[i]->magic_str()
-                 << "\" not found in file \"" << ens_file_list[j]
+                 << var_info->magic_str()
+                 << "\" not found in file \"" << ens_file
                  << "\"\n\n";
          }
          else {
@@ -604,46 +614,55 @@ void process_n_vld() {
             // Increment the valid counter
             n_vld++;
          }
-      } // end for j
+      } // end for i_ens
 
       // Check for enough valid data
-      if((double) n_vld/n_ens_files < conf_info.vld_ens_thresh) {
+      if((double) n_vld/n_ens_inputs < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-              << n_ens_files - n_vld << " missing ensemble fields exceeds the "
-              << "maximum allowable specified by \"ens.ens_thresh\" "
-              << "in the configuration file.\n\n";
+              << n_ens_inputs - n_vld << " of " << n_ens_inputs
+              << " missing fields for \"" << (*var_it)->get_var_info()->magic_str()
+              << "\" exceeds the maximum allowable specified by \""
+              << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
+              << ") in the configuration file.\n\n";
          exit(1);
       }
 
       // Store the valid data count
       n_ens_vld.add(n_vld);
 
-   } // end for i
+   } // end for i_var
 
    // Loop through the verification fields to be processed
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(i_var=0; i_var<conf_info.get_n_vx(); i_var++) {
 
-      // Loop through the ensemble files
-      for(j=0, n_vld=0; j<n_ens_files; j++) {
+      n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.fcst_info->inputs_n();
+
+      // Loop through the forecast files
+      for(i_ens=n_vld=0; i_ens < n_ens_inputs; i_ens++) {
+
+         // get forecast file and VarInfo to process
+         ens_file = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file(i_ens);
+         var_info = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info(i_ens);
+         j = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file_index(i_ens);
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
 
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
-         if(!get_data_plane_array(ens_file_list[j].c_str(), etype,
-                                  conf_info.vx_opt[i].vx_pd.fcst_info,
+         if(!get_data_plane_array(ens_file.c_str(), etype,
+                                  var_info,
                                   dpa, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "no data found for forecast field \""
-                 << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
-                 << "\" in file \"" << ens_file_list[j]
+                 << var_info->magic_str()
+                 << "\" in file \"" << ens_file
                  << "\"\n\n";
          }
          else {
 
             // Store the lead times for the first verification field
-            if(i==0) ens_lead_na.add(dpa[0].lead());
+            if(i_var==0) ens_lead_na.add(dpa[0].lead());
 
             // Increment the valid counter
             n_vld++;
@@ -651,11 +670,14 @@ void process_n_vld() {
       } // end for j
 
       // Check for enough valid data
-      if((double) n_vld/n_ens_files < conf_info.vld_ens_thresh) {
+      if((double) n_vld/n_ens_inputs < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-              << n_ens_files - n_vld << " missing forecast fields exceeds the "
-              << "maximum allowable specified by \"ens.ens_thresh\" "
-              << "in the configuration file.\n\n";
+                 << n_ens_inputs - n_vld << " of " << n_ens_inputs
+                 << " missing forecast fields for \""
+                 << conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info()->magic_str()
+                 << "\" exceeds the maximum allowable specified by \""
+                 << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
+                 << ") in the configuration file.\n\n";
          exit(1);
       }
 
@@ -779,20 +801,28 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_ensemble() {
-   int i, j;
+   int i_var, i_ens, j;
    bool reset;
    DataPlane ens_dp;
    unixtime max_init_ut = bad_data_ll;
+   VarInfo * var_info;
+   ConcatString ens_file;
+
+   vector<EnsVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
 
    // Loop through each of the ensemble fields to be processed
-   for(i=0; i<conf_info.get_n_ens_var(); i++) {
+   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
+
+      var_info = (*var_it)->get_var_info();
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing ensemble field: "
-           << conf_info.ens_info[i]->magic_str() << "\n";
+           << (*var_it)->raw_magic_str << "\n";
 
-      // Loop through each of the input forecast files
-      for(j=0, reset=true; j<n_ens_files; j++) {
+      // Loop through each of the input forecast files/variables
+      for(i_ens=0,reset=true; i_ens < (*var_it)->inputs_n(); i_ens++) {
+
+         j = (*var_it)->get_file_index(i_ens);
 
          // Skip bad data files
          if(!ens_file_vld[j]) {
@@ -808,14 +838,22 @@ void process_ensemble() {
             continue;
          }
 
+         // get file and VarInfo to process
+         ens_file = (*var_it)->get_file(i_ens);
+         var_info = (*var_it)->get_var_info(i_ens);
+
+         mlog << Debug(3) << "\n"
+              << "Reading field: "
+              << var_info->magic_str() << "\n";
+
          // Read the current field
-         if(!get_data_plane(ens_file_list[j].c_str(), etype,
-                            conf_info.ens_info[i], ens_dp, true)) {
+         if(!get_data_plane(ens_file.c_str(), etype,
+                            var_info, ens_dp, true)) {
 
             // Error out if the control member data cannot be read
             if(j==ctrl_index) {
                mlog << Error << "\nprocess_ensemble() -> "
-                    << "can't find \"" << conf_info.ens_info[i]->magic_str()
+                    << "can't find \"" << var_info->magic_str()
                     << "\" data in the control member file.\n\n";
                exit(1);
             }
@@ -836,23 +874,23 @@ void process_ensemble() {
          }
 
          // Apply current data to the running sums and counts
-         track_counts(i, ens_dp, j == ctrl_index);
+         track_counts(*var_it, ens_dp, j == ctrl_index);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
             max_init_ut = ens_dp.init();
          }
 
-      } // end for j
+      } // end for i_ens
 
       // Write out the ensemble information to a NetCDF file
       ens_dp.set_init(max_init_ut);
-      write_ens_nc(i, ens_dp);
+      write_ens_nc(*var_it, i_var, ens_dp);
 
       // Store the ensemble mean output file
       ens_mean_file = out_nc_file_list[out_nc_file_list.n() - 1];
 
-   } // end for i
+   } // end for var_it
 
    // Close the output NetCDF file
    if(nc_out) {
@@ -897,7 +935,7 @@ void process_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_vx() {
-   int i, n_miss;
+   int i, i_file, n_miss;
    unixtime beg_ut, end_ut;
 
    // Set observation time window for each verification task
@@ -935,11 +973,13 @@ void process_point_vx() {
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
    }
 
-   // Process each ensemble file
-   for(i=0, n_miss=0; i<n_ens_files; i++) {
+   // Loop through first vx inputs and process each ensemble file
+   for(i=0, n_miss=0; i<conf_info.vx_opt[0].vx_pd.fcst_info->inputs_n(); i++) {
+
+      i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i);
 
       // If the current forecast file is valid, process it
-      if(!ens_file_vld[i]) {
+      if(!ens_file_vld[i_file]) {
          n_miss++;
          continue;
       }
@@ -1121,8 +1161,11 @@ int process_point_ens(int i_ens, int &n_miss) {
    bool is_ens_mean = (-1 == i_ens);
    const char *file_type = (is_ens_mean ? "mean" : "ensemble");
 
+   // get file index from first verification for logging
+   int i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i_ens);
+
    // Determine the correct file to process
-   if(!is_ens_mean) ens_file = ConcatString(ens_file_list[i_ens]);
+   if(!is_ens_mean) ens_file = ConcatString(ens_file_list[i_file]);
    else             ens_file = (ens_mean_user.empty() ?
                                 ens_mean_file : ens_mean_user);
 
@@ -1143,8 +1186,11 @@ int process_point_ens(int i_ens, int &n_miss) {
          info = &ens_mean_info;
       }
       else {
-         info = conf_info.vx_opt[i].vx_pd.fcst_info;
+         info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(i_ens);
       }
+
+      // if not processing mean, get file based on current vx and ensemble index
+      if(!is_ens_mean) ens_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(i_ens);
 
       // Read the gridded data from the input forecast file
       if(!get_data_plane_array(ens_file.c_str(), info->file_type(), info,
@@ -1206,13 +1252,13 @@ void process_point_scores() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
@@ -1256,7 +1302,7 @@ void process_point_scores() {
 
                mlog << Debug(2)
                     << "Processing point verification "
-                    << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
+                    << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
                     << " versus "
                     << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                     << ", for observation type " << pd_ptr->msg_typ
@@ -1394,7 +1440,7 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   int i, j, k, l, m, n_miss;
+   int i, j, k, l, m, n_miss, i_file;
    bool found;
    MaskPlane  mask_mp;
    DataPlane *fcst_dp = (DataPlane *) 0;
@@ -1403,6 +1449,8 @@ void process_grid_vx() {
    DataPlane emn_dp, cmn_dp, csd_dp;
    PairDataEnsemble pd_all, pd;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
+   VarInfo * var_info;
+   ConcatString fcst_file;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1410,8 +1458,9 @@ void process_grid_vx() {
    shc.set_obtype(conf_info.obtype.c_str());
 
    // Allocate space to store the forecast fields
-   fcst_dp = new DataPlane [n_ens_files];
-   fraw_dp = new DataPlane [n_ens_files];
+   int num_dp = conf_info.vx_opt[0].vx_pd.fcst_info->inputs_n();
+   fcst_dp = new DataPlane [num_dp];
+   fraw_dp = new DataPlane [num_dp];
 
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -1427,13 +1476,13 @@ void process_grid_vx() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1487,16 +1536,20 @@ void process_grid_vx() {
          }
       }
 
-      // Loop through each of the input ensemble files
-      for(j=0, n_miss=0; j<n_ens_files; j++) {
+      // Loop through each of the input ensemble files/variables
+      for(j=0, n_miss=0; j < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); j++) {
 
          // Initialize
          fcst_dp[j].clear();
 
+         i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
+         var_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(j);
+         fcst_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(j);
+
          // If the current ensemble file is valid, read the field
-         if(ens_file_vld[j]) {
-            found = get_data_plane(ens_file_list[j].c_str(), etype,
-                                   conf_info.vx_opt[i].vx_pd.fcst_info,
+         if(ens_file_vld[i_file]) {
+            found = get_data_plane(fcst_file.c_str(), etype,
+                                   var_info,
                                    fcst_dp[j], true);
          }
          else {
@@ -1522,7 +1575,7 @@ void process_grid_vx() {
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) and " << (csd_dp.nx() == 0 ? 0 : 1)
            << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
+           << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
@@ -1589,7 +1642,7 @@ void process_grid_vx() {
             info = &ens_mean_info;
          }
          else {
-            info = conf_info.vx_opt[i].vx_pd.fcst_info;
+            info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
          }
 
          // Read the gridded data from the mean file
@@ -1661,7 +1714,7 @@ void process_grid_vx() {
          }
 
          // Loop through the ensemble members
-         for(k=0; k<n_ens_files; k++) {
+         for(k=0; k < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); k++) {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
@@ -1712,7 +1765,7 @@ void process_grid_vx() {
 
             mlog << Debug(2)
                  << "Processing gridded verification "
-                 << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
+                 << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
                  << " versus "
                  << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                  << ", for observation type " << shc.get_obtype()
@@ -1916,8 +1969,8 @@ void process_grid_scores(int i_vx,
       x = nint(pd.x_na[i]);
       y = nint(pd.y_na[i]);
 
-      // Loop through each of the ensemble members
-      for(j=0, n_miss=0; j<n_ens_files; j++) {
+      // Loop through each of the ensemble members1
+      for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.fcst_info->inputs_n(); j++) {
 
          // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
@@ -2028,13 +2081,13 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(int i_vx, const DataPlane &ens_dp, bool is_ctrl) {
+void track_counts(EnsVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl) {
    int i, j, k;
    double v;
 
    // Ensemble thresholds
-   const int n_thr = conf_info.ens_ta[i_vx].n();
-   SingleThresh *thr_buf = conf_info.ens_ta[i_vx].buf();
+   const int n_thr = ens_info->cat_ta.n();
+   SingleThresh *thr_buf = ens_info->cat_ta.buf();
 
    // Increment counts for each grid point
    for(i=0; i<nxy; i++) {
@@ -2106,8 +2159,8 @@ void track_counts(int i_vx, const DataPlane &ens_dp, bool is_ctrl) {
 ConcatString get_ens_mn_var_name(int i_vx) {
    ConcatString cs;
 
-   cs << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr() << "_"
-      << conf_info.vx_opt[i_vx].vx_pd.fcst_info->level_attr()
+   cs << conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info()->name_attr() << "_"
+      << conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info()->level_attr()
       << "_ENS_MEAN";
       cs.replace(",", "_",   false);
       cs.replace("*", "all", false);
@@ -2356,7 +2409,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(int i_var, DataPlane &ens_dp) {
+void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
    int i, j, k, l;
    double t, v;
    char type_str[max_str_len];
@@ -2409,56 +2462,56 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
 
    // Add the ensemble mean, if requested
    if(conf_info.nc_info.do_mean) {
-      write_ens_var_float(i_var, ens_mean, ens_dp,
+      write_ens_var_float(ens_info, ens_mean, ens_dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation, if requested
    if(conf_info.nc_info.do_stdev) {
-      write_ens_var_float(i_var, ens_stdev, ens_dp,
+      write_ens_var_float(ens_info, ens_stdev, ens_dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation, if requested
    if(conf_info.nc_info.do_minus) {
-      write_ens_var_float(i_var, ens_minus, ens_dp,
+      write_ens_var_float(ens_info, ens_minus, ens_dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation, if requested
    if(conf_info.nc_info.do_plus) {
-      write_ens_var_float(i_var, ens_plus, ens_dp,
+      write_ens_var_float(ens_info, ens_plus, ens_dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value, if requested
    if(conf_info.nc_info.do_min) {
-      write_ens_var_float(i_var, ens_min, ens_dp,
+      write_ens_var_float(ens_info, ens_min, ens_dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value, if requested
    if(conf_info.nc_info.do_max) {
-      write_ens_var_float(i_var, ens_max, ens_dp,
+      write_ens_var_float(ens_info, ens_max, ens_dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range, if requested
    if(conf_info.nc_info.do_range) {
-      write_ens_var_float(i_var, ens_range, ens_dp,
+      write_ens_var_float(ens_info, ens_range, ens_dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count, if requested
    if(conf_info.nc_info.do_vld) {
-      write_ens_var_int(i_var, ens_vld, ens_dp,
+      write_ens_var_int(ens_info, ens_vld, ens_dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
@@ -2470,7 +2523,7 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_ta[i_var].n(); i++) {
+      for(i=0; i<ens_info->cat_ta.n(); i++) {
 
          // Initialize
          prob_dp.erase();
@@ -2485,8 +2538,8 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
          // Write ensemble relative frequency
          if(conf_info.nc_info.do_freq) {
             snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
-                     conf_info.ens_ta[i_var][i].get_abbr_str().contents().c_str());
-            write_ens_data_plane(i_var, prob_dp, ens_dp, type_str,
+                     ens_info->cat_ta[i].get_abbr_str().contents().c_str());
+            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str,
                                  "Ensemble Relative Frequency");
          }
 
@@ -2504,10 +2557,10 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
 
                // Write neighborhood ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
-                        conf_info.ens_ta[i_var][i].get_abbr_str().contents().c_str(),
+                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
                         interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
-               write_ens_data_plane(i_var, nbrhd_dp, ens_dp, type_str,
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
                                     "Neighborhood Ensemble Probability");
             } // end for j
          } // end if do_nep
@@ -2520,7 +2573,7 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_ta[i_var].n(); i++) {
+      for(i=0; i<ens_info->cat_ta.n(); i++) {
 
          // Loop through each neigbhorhood size
          for(j=0; j<conf_info.get_n_nbrhd(); j++) {
@@ -2547,12 +2600,12 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
 
                // Output variable name
                snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
-                        conf_info.ens_ta[i_var][i].get_abbr_str().contents().c_str(),
+                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
                         interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
                         conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_data_plane(i_var, nbrhd_dp, ens_dp, type_str,
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
                                     "Neighborhood Maximum Ensemble Probability");
             } // end for k
          } // end for j
@@ -2574,20 +2627,20 @@ void write_ens_nc(int i_var, DataPlane &ens_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(int i_var, float *ens_data, const DataPlane &dp,
+void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_pairs_var_str config file entry
-   cs = conf_info.ens_var_str[i_var];
+   cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_var]->name_attr() << "_"
-                << conf_info.ens_info[i_var]->level_attr()
+                << ens_info->get_var_info()->name_attr() << "_"
+                << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -2605,16 +2658,16 @@ void write_ens_var_float(int i_var, float *ens_data, const DataPlane &dp,
    //
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
-               << conf_info.ens_info[i_var]->name_attr();
+               << ens_info->get_var_info()->name_attr();
    }
    else {
       name_str << cs_erase
-               << conf_info.ens_info[i_var]->name_attr() << "_"
+               << ens_info->get_var_info()->name_attr() << "_"
                << type_str;
    }
 
    // Add the variable attributes
-   add_var_att_local(conf_info.ens_info[i_var], &ens_var, false, dp,
+   add_var_att_local(ens_info->get_var_info(), &ens_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2630,20 +2683,20 @@ void write_ens_var_float(int i_var, float *ens_data, const DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(int i_var, int *ens_data, const DataPlane &dp,
+void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_pairs_var_str config file entry
-   cs = conf_info.ens_var_str[i_var];
+   cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_var]->name_attr() << "_"
-                << conf_info.ens_info[i_var]->level_attr()
+                << ens_info->get_var_info()->name_attr() << "_"
+                << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -2658,11 +2711,11 @@ void write_ens_var_int(int i_var, int *ens_data, const DataPlane &dp,
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.ens_info[i_var]->name_attr() << "_"
+            << ens_info->get_var_info()->name_attr() << "_"
             << type_str;
 
    // Add the variable attributes
-   add_var_att_local(conf_info.ens_info[i_var], &ens_var, true, dp,
+   add_var_att_local(ens_info->get_var_info(), &ens_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2678,7 +2731,7 @@ void write_ens_var_int(int i_var, int *ens_data, const DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_data_plane(int i_var, const DataPlane &ens_dp, const DataPlane &dp,
+void write_ens_data_plane(EnsVarInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
                           const char *type_str,  const char *long_name_str) {
 
    // Allocate memory for this data
@@ -2688,7 +2741,7 @@ void write_ens_data_plane(int i_var, const DataPlane &ens_dp, const DataPlane &d
    for(int i=0; i<nxy; i++) ens_data[i] = ens_dp.data()[i];
 
    // Write the output
-   write_ens_var_float(i_var, ens_data, dp, type_str, long_name_str);
+   write_ens_var_float(ens_info, ens_data, dp, type_str, long_name_str);
 
    // Cleanup
    if(ens_data) { delete [] ens_data; ens_data = (float *) 0; }
@@ -2817,7 +2870,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, false, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2879,7 +2932,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, true, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
