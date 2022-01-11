@@ -538,7 +538,6 @@ void process_ioda_file(int i_pb) {
    NcVar obs_var, qc_var;
    ConcatString unit_attr;
    ConcatString desc_attr;
-   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
       int *qc_data = new int[nlocs];
       float *obs_data = new float[nlocs];
@@ -558,11 +557,10 @@ void process_ioda_file(int i_pb) {
       }
 
       // Replace the input variable name to the output variable name
-      ConcatString new_name = name_map[raw_var_names[idx]];
-      if (0 >= new_name.length()) new_name = raw_var_names[idx];
+      ConcatString raw_name = raw_var_names[idx];
       // Filter out the same variable names from multiple input files
-      if (!obs_var_names.has(new_name)) {
-         obs_var_names.add(new_name);
+      if (!obs_var_names.has(raw_name)) {
+         obs_var_names.add(raw_name);
          obs_var_units.add(unit_attr);
          obs_var_descs.add(desc_attr);
       }
@@ -779,12 +777,10 @@ void process_ioda_file(int i_pb) {
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
          int var_idx;
-         ConcatString out_name = name_map[raw_var_names[idx]];
-         if (0 >= out_name.length()) out_name = raw_var_names[idx];
-         if (!obs_var_names.has(out_name, var_idx)) {
+         if (!obs_var_names.has(raw_var_names[idx], var_idx)) {
             mlog << Warning << "\n" << method_name
-                 << "Skip the variable " << out_name << " (" << raw_var_names[idx]
-                 << ") at " << ioda_files[i_pb] << "\n\n";
+                 << "Skip the variable " << raw_var_names[idx]
+                 << " at " << ioda_files[i_pb] << "\n\n";
             continue;
          }
          obs_arr[1] = var_idx;
@@ -930,13 +926,14 @@ void write_netcdf_hdr_data() {
    StringArray nc_var_name_arr;
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
-   const long var_count = obs_var_names.n();
-   const long units_count = obs_var_units.n();
+   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
 
-   for(int i=0; i<var_count; i++) {
-      nc_var_name_arr.add(obs_var_names[i]);
+   for(int i=0; i<obs_var_names.n(); i++) {
+      ConcatString new_name = name_map[obs_var_names[i]];
+      if (0 >= new_name.length()) new_name = obs_var_names[i];
+      nc_var_name_arr.add(new_name);
    }
-   for(int i=0; i<units_count; i++) {
+   for(int i=0; i<obs_var_units.n(); i++) {
       nc_var_unit_arr.add(obs_var_units[i]);
    }
    for(int i=0; i<obs_var_descs.n(); i++) {
