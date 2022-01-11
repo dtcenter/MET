@@ -926,14 +926,16 @@ void write_netcdf_hdr_data() {
    StringArray nc_var_name_arr;
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
+   const long var_count = obs_var_names.n();
+   const long units_count = obs_var_units.n();
    map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
 
-   for(int i=0; i<obs_var_names.n(); i++) {
+   for(int i=0; i<var_count; i++) {
       ConcatString new_name = name_map[obs_var_names[i]];
       if (0 >= new_name.length()) new_name = obs_var_names[i];
       nc_var_name_arr.add(new_name);
    }
-   for(int i=0; i<obs_var_units.n(); i++) {
+   for(int i=0; i<units_count; i++) {
       nc_var_unit_arr.add(obs_var_units[i]);
    }
    for(int i=0; i<obs_var_descs.n(); i++) {
