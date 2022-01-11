@@ -641,9 +641,10 @@ void process_n_vld() {
       // Check for enough valid data
       if((double) n_vld/n_ens_inputs < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-              << n_ens_inputs - n_vld << " of " << n_ens_inputs
-              << " missing fields for \"" << (*var_it)->get_var_info()->magic_str()
-              << "\" exceeds the maximum allowable specified by \""
+              << n_vld << " of " << n_ens_inputs
+              << " (" << (double)n_vld/n_ens_inputs << ")"
+              << " fields found for \"" << (*var_it)->get_var_info()->magic_str()
+              << "\" does not meet the threshold specified by \""
               << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
               << ") in the configuration file.\n\n";
          exit(1);
@@ -694,12 +695,13 @@ void process_n_vld() {
       // Check for enough valid data
       if((double) n_vld/n_ens_inputs < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_n_vld() -> "
-                 << n_ens_inputs - n_vld << " of " << n_ens_inputs
-                 << " missing forecast fields for \""
-                 << conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info()->magic_str()
-                 << "\" exceeds the maximum allowable specified by \""
-                 << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
-                 << ") in the configuration file.\n\n";
+              << n_vld << " of " << n_ens_inputs
+              << " (" << (double)n_vld/n_ens_inputs << ")"
+              << " forecast fields found for \""
+              << conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info()->magic_str()
+              << "\" does not meet the threshold specified by \""
+              << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
+              << ") in the configuration file.\n\n";
          exit(1);
       }
 
