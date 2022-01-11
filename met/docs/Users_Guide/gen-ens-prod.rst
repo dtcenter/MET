@@ -167,7 +167,7 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
       {
         name     = "fcst";
         level    = "L0";
-        GRIB_ens = "+MET_ENS_MEMBER_ID";
+        GRIB_ens = "MET_ENS_MEMBER_ID";
       }
     ];
   }
