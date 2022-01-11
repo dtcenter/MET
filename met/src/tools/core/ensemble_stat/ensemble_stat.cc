@@ -612,7 +612,7 @@ void process_n_vld() {
 
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
-      // Loop through the ensemble files
+      // Loop through the ensemble inputs
       for(i_ens=n_vld=0; i_ens < n_ens_inputs; i_ens++) {
 
          // get file and VarInfo to process
