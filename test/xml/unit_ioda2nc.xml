@@ -113,7 +113,7 @@
       &OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.same_input.nc \
       -config &CONFIG_DIR;/IODA2NCConfig_mask \
       -iodafile &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
-      -v 7
+      -v 2
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.same_input.nc</point_nc>
