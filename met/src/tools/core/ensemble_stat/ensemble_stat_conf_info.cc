@@ -129,7 +129,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
                                           bool grid_vx, bool point_vx,
                                           bool use_var_id,
-                                          StringArray * ens_files) {
+                                          StringArray * ens_files,
+                                          StringArray * fcst_files,
+                                          bool use_ctrl) {
    int i,j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -421,7 +423,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
                                   rng_ptr, grid_vx, point_vx,
                                   use_var_id, ens_member_ids,
-                                  ens_files);
+                                  fcst_files, use_ctrl, control_id);
 
          // For no point verification, store obtype as the message type
          if(!point_vx) {
@@ -751,18 +753,42 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        gsl_rng *rng_ptr, bool grid_vx,
                                        bool point_vx, bool use_var_id,
                                        StringArray ens_member_ids,
-                                       StringArray * ens_files) {
+                                       StringArray * fcst_files,
+                                       bool use_ctrl, ConcatString control_id) {
    int i, j;
+   int file_index_start = 0;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
    VarInfo * next_var;
+   InputInfo input_info;
 
    // Initialize
    clear();
 
    // Allocate new EnsVarInfo object for fcst
    vx_pd.fcst_info = new EnsVarInfo();
+
+   // Add control member as first input
+   if(use_ctrl) {
+
+      // Set environment variable for ens member ID
+      setenv(met_ens_member_id, control_id.c_str(), 1);
+
+      // Allocate new VarInfo object
+      next_var = info_factory.new_var_info(ftype);
+
+      // Set the current dictionary
+      next_var->set_dict(fdict);
+
+      input_info.var_info = next_var;
+      input_info.file_index = 0;
+      input_info.file_list = fcst_files;
+      vx_pd.fcst_info->add_input(input_info);
+
+      // Change the starting index to the first non-control file
+      file_index_start = 1;
+   }
 
    // Loop over ensemble member IDs to substitute
    for(i=0; i<ens_member_ids.n(); i++) {
@@ -776,18 +802,17 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       // Set the current dictionary
       next_var->set_dict(fdict);
 
-      InputInfo input_info;
       input_info.var_info = next_var;
-      input_info.file_index = 0;
-      input_info.file_list = ens_files;
+      input_info.file_index = file_index_start;
+      input_info.file_list = fcst_files;
       vx_pd.fcst_info->add_input(input_info);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to NULL to note first VarInfo should be used
-      for(j=1; j<ens_files->n(); j++) {
+      for(j=file_index_start+1; j<fcst_files->n(); j++) {
          input_info.var_info = NULL;
          input_info.file_index = j;
-         input_info.file_list = ens_files;
+         input_info.file_list = fcst_files;
          vx_pd.fcst_info->add_input(input_info);
       } // end for j
 
@@ -797,7 +822,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    vx_pd.obs_info  = info_factory.new_var_info(otype);
 
    // Set the VarInfo objects
-   //vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
 
    // Set the GRIB code for point observations

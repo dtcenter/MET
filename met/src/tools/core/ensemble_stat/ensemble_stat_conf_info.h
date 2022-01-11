@@ -139,7 +139,8 @@ class EnsembleStatVxOpt {
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
                           gsl_rng *, bool, bool, bool,
-                          StringArray, StringArray *);
+                          StringArray, StringArray *,
+                          bool, ConcatString);
       void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
@@ -236,7 +237,7 @@ class EnsembleStatConfInfo {
 
       void read_config   (const ConcatString , const ConcatString);
       void process_config(GrdFileType, GrdFileType, bool, bool, bool,
-                          StringArray *);
+                          StringArray *, StringArray *, bool);
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);

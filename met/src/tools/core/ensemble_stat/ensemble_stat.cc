@@ -294,6 +294,9 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
+   // Copy ensemble file list to forecast file list
+   fcst_file_list = ens_file_list;
+
    // Prepend the control member, if specified
    if(ctrl_file.nonempty()) {
 
@@ -305,8 +308,9 @@ void process_command_line(int argc, char **argv) {
       }
 
       ctrl_index = 0;
-      ens_file_list.insert(ctrl_index, ctrl_file.c_str());
-      n_ens_files++;
+
+      // Add control file to beginning of forecast file list
+      fcst_file_list.insert(ctrl_index, ctrl_file.c_str());
    }
 
    // Check that the end_ut >= beg_ut
@@ -382,7 +386,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Process the configuration
-   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id, &ens_file_list);
+   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id, &ens_file_list, &fcst_file_list, ctrl_file.nonempty());
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -399,9 +403,12 @@ void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_file_list[i]
-           << (i == ctrl_index ? " (control)\n" : "\n");
+      mlog << "   " << ens_file_list[i] << "\n";
    }
+
+   // List the control member file
+   mlog << Debug(1) << "Ensemble Control: "
+        << (ctrl_file.empty() ? "None" : ctrl_file.c_str()) << "\n";
 
    // List the input gridded observations files
    if(grid_obs_file_list.n() > 0) {
@@ -433,6 +440,21 @@ void process_command_line(int argc, char **argv) {
       }
       else {
          ens_file_vld.add(1);
+      }
+   }
+
+   // Check for missing non-python forecast files
+   for(i=0; i<fcst_file_list.n(); i++) {
+
+      if(!file_exists(fcst_file_list[i].c_str()) &&
+         !is_python_grdfiletype(etype)) {
+         mlog << Warning << "\nprocess_command_line() -> "
+              << "can't open input forecast file: "
+              << fcst_file_list[i] << "\n\n";
+         fcst_file_vld.add(0);
+      }
+      else {
+         fcst_file_vld.add(1);
       }
    }
 
@@ -577,7 +599,7 @@ void process_n_vld() {
    DataPlane dp;
    DataPlaneArray dpa;
    VarInfo * var_info;
-   ConcatString ens_file;
+   ConcatString ens_file, fcst_file;
    vector<EnsVarInfo*>::const_iterator var_it;
 
    // Initialize
@@ -637,26 +659,26 @@ void process_n_vld() {
 
       n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.fcst_info->inputs_n();
 
-      // Loop through the forecast files
+      // Loop through the forecast inputs
       for(i_ens=n_vld=0; i_ens < n_ens_inputs; i_ens++) {
 
          // get forecast file and VarInfo to process
-         ens_file = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file(i_ens);
+         fcst_file = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file(i_ens);
          var_info = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info(i_ens);
          j = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file_index(i_ens);
 
          // Check for valid file
-         if(!ens_file_vld[j]) continue;
+         if(!fcst_file_vld[j]) continue;
 
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
-         if(!get_data_plane_array(ens_file.c_str(), etype,
+         if(!get_data_plane_array(fcst_file.c_str(), etype,
                                   var_info,
                                   dpa, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "no data found for forecast field \""
                  << var_info->magic_str()
-                 << "\" in file \"" << ens_file
+                 << "\" in file \"" << fcst_file
                  << "\"\n\n";
          }
          else {
@@ -803,9 +825,10 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 void process_ensemble() {
    int i_var, i_ens, j;
    bool reset;
-   DataPlane ens_dp;
+   DataPlane ens_dp, ctrl_dp;
    unixtime max_init_ut = bad_data_ll;
    VarInfo * var_info;
+   VarInfo * ctrl_info;
    ConcatString ens_file;
 
    vector<EnsVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
@@ -825,18 +848,7 @@ void process_ensemble() {
          j = (*var_it)->get_file_index(i_ens);
 
          // Skip bad data files
-         if(!ens_file_vld[j]) {
-
-            // Error out if the control member file is not valid
-            if(j==ctrl_index) {
-               mlog << Error << "\nprocess_ensemble() -> "
-                    << "the control member file is not valid.\n\n";
-               exit(1);
-            }
-
-            // Otherwise, continue
-            continue;
-         }
+         if(!ens_file_vld[j]) { continue; }
 
          // get file and VarInfo to process
          ens_file = (*var_it)->get_file(i_ens);
@@ -848,19 +860,7 @@ void process_ensemble() {
 
          // Read the current field
          if(!get_data_plane(ens_file.c_str(), etype,
-                            var_info, ens_dp, true)) {
-
-            // Error out if the control member data cannot be read
-            if(j==ctrl_index) {
-               mlog << Error << "\nprocess_ensemble() -> "
-                    << "can't find \"" << var_info->magic_str()
-                    << "\" data in the control member file.\n\n";
-               exit(1);
-            }
-
-            // Otherwise, continue
-            continue;
-         }
+                            var_info, ens_dp, true)) { continue; }
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0) {
@@ -871,10 +871,32 @@ void process_ensemble() {
          if(reset) {
             clear_counts();
             reset = false;
+
+            // Read ensemble control member data, if provided
+            if(ctrl_file.nonempty()) {
+               ctrl_info = (*var_it)->get_ctrl(i_ens);
+
+               mlog << Debug(3) << "\n"
+                    << "Reading control field: "
+                    << ctrl_info->magic_str() << "\n";
+
+               // Error out if missing
+               if (!get_data_plane(ctrl_file.c_str(), etype,
+                                   ctrl_info, ctrl_dp, true)) {
+                  mlog << Error << "\nprocess_ensemble() -> "
+                       << "control member ensemble field \""
+                       << ctrl_info->magic_str()
+                       << "\" not found in file \"" << ctrl_file << "\"\n\n";
+                  exit(1);
+               }
+
+               // Apply current data to the running sums and counts
+               track_counts(*var_it, ctrl_dp, true);
+            }
          }
 
          // Apply current data to the running sums and counts
-         track_counts(*var_it, ens_dp, j == ctrl_index);
+         track_counts(*var_it, ens_dp, false);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
@@ -979,7 +1001,7 @@ void process_point_vx() {
       i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i);
 
       // If the current forecast file is valid, process it
-      if(!ens_file_vld[i_file]) {
+      if(!fcst_file_vld[i_file]) {
          n_miss++;
          continue;
       }
@@ -1165,7 +1187,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    int i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i_ens);
 
    // Determine the correct file to process
-   if(!is_ens_mean) ens_file = ConcatString(ens_file_list[i_file]);
+   if(!is_ens_mean) ens_file = ConcatString(fcst_file_list[i_file]);
    else             ens_file = (ens_mean_user.empty() ?
                                 ens_mean_file : ens_mean_user);
 
@@ -1547,7 +1569,7 @@ void process_grid_vx() {
          fcst_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(j);
 
          // If the current ensemble file is valid, read the field
-         if(ens_file_vld[i_file]) {
+         if(fcst_file_vld[i_file]) {
             found = get_data_plane(fcst_file.c_str(), etype,
                                    var_info,
                                    fcst_dp[j], true);
@@ -1969,7 +1991,7 @@ void process_grid_scores(int i_vx,
       x = nint(pd.x_na[i]);
       y = nint(pd.y_na[i]);
 
-      // Loop through each of the ensemble members1
+      // Loop through each of the ensemble members
       for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.fcst_info->inputs_n(); j++) {
 
          // Skip missing data
@@ -1986,6 +2008,7 @@ void process_grid_scores(int i_vx,
             if(j != ctrl_index) pd.add_ens_var_sums(i, fraw_dp[j](x, y));
          }
       } // end for j
+
    } // end for i
 
    return;
