@@ -314,7 +314,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_ensemble() {
-   int i_var, i_ens, n_ens_vld;
+   int i_var, i_ens, n_ens_vld, n_ens_inputs;
    bool need_reset;
    DataPlane ens_dp, ctrl_dp, cmn_dp, csd_dp;
    unixtime max_init_ut = bad_data_ll;
@@ -333,7 +333,8 @@ void process_ensemble() {
            << "Processing ensemble field: "
            << (*var_it)->raw_magic_str << "\n";
 
-      for(i_ens=n_ens_vld=0; i_ens < (*var_it)->inputs_n(); i_ens++) {
+      n_ens_inputs = (*var_it)->inputs_n();
+      for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
 
          // get file and VarInfo to process
          ens_file = (*var_it)->get_file(i_ens);
@@ -418,11 +419,12 @@ void process_ensemble() {
       } // end for it
 
       // Check for too much missing data
-      if(((double) n_ens_vld/n_ens_files) < conf_info.vld_ens_thresh) {
+      if(((double) n_ens_vld/n_ens_inputs) < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_ensemble() -> "
-              << n_ens_files - n_ens_vld << " of " << n_ens_files
-              << " missing fields for \"" << (*var_it)->get_var_info()->magic_str()
-              << "\" exceeds the maximum allowable specified by \""
+              << n_ens_vld << " of " << n_ens_inputs
+	      << " (" << (double)n_ens_vld/n_ens_inputs << ")"
+              << " fields found for \"" << (*var_it)->get_var_info()->magic_str()
+              << "\" does not meet the threshold specified by \""
               << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
               << ") in the configuration file.\n\n";
          exit(1);

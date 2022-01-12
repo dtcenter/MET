@@ -173,7 +173,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
 
    // Parse the ensemble field information
    for(i=0,max_n_cat=0; i<n_var; i++) {
-
+      
       GenEnsProdVarInfo * ens_info = new GenEnsProdVarInfo();
 
       // Get the current dictionary
