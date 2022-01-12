@@ -964,7 +964,6 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
    string var_name = obs_var_names[var_index];
    string out_name = name_map[var_name];
-cout << "  DEBUG HS var_name: " <<  var_name << ", out_name: " << out_name << ", passing: " << (0<out_name.length() ? out_name : var_name) << "\n";
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),
                                  hdr_vld,
