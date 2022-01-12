@@ -75,4 +75,58 @@
     </output>
   </test>
 
-  </met_test>
+  <test name="gen_ens_prod_SINGLE_FILE_NC_NO_CTRL">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+        -ens    &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file_nc \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NC_NO_CTRL.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NC_NO_CTRL.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="gen_ens_prod_SINGLE_FILE_NC_WITH_CTRL">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+        -ens    &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file_nc \
+        -ctrl   &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NC_WITH_CTRL.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_NC_WITH_CTRL.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="gen_ens_prod_SINGLE_FILE_GRIB_NO_CTRL">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+        -ens    &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file_grib \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_GRIB_NO_CTRL.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_GRIB_NO_CTRL.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="gen_ens_prod_SINGLE_FILE_GRIB_WITH_CTRL">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+        -ens    &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+        -config &CONFIG_DIR;/GenEnsProdConfig_single_file_grib \
+        -ctrl    &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+        -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_GRIB_WITH_CTRL.nc \
+        -v 2
+    </param>
+    <output>
+        <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_GRIB_WITH_CTRL.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

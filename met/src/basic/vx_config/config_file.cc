@@ -252,7 +252,7 @@ ConcatString MetConfig::get_tmp_dir()
    // Use the MET_TMP_DIR environment variable, if set.
    if(!get_env("MET_TMP_DIR", tmp_dir)) {
       const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
-      if ( LastLookupStatus ) tmp_dir = *(_e->string_value());
+      if ( LastLookupStatus ) tmp_dir = _e->string_value();
       else                    tmp_dir = default_tmp_dir;
    }
 

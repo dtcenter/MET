@@ -73,6 +73,7 @@ extern map<ConcatString,ThreshArray>
                        parse_conf_filter_attr_map(Dictionary *dict);
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
+extern StringArray     parse_conf_ens_member_ids(Dictionary *dict);
 
 extern void         check_mask_names(const StringArray &);
 
