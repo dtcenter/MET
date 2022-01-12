@@ -776,7 +776,7 @@ void process_ioda_file(int i_pb) {
 
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
-         int var_idx;
+         int var_idx = 0;
          if (!obs_var_names.has(raw_var_names[idx], var_idx)) {
             mlog << Warning << "\n" << method_name
                  << "Skip the variable " << raw_var_names[idx]
