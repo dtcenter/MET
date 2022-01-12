@@ -56,6 +56,13 @@ ens = {
    field = [ { name = "${FCST_COMMAND}"; } ];
 }
 
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = [];
+control_id = "";
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
