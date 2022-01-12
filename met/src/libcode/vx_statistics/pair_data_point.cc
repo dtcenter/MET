@@ -984,7 +984,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // Check for a large topography difference
-   if(sfc_info.topo_ptr && msg_typ_sfc.has(hdr_typ_str)) {
+   if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
 
       // Interpolate model topography to observation location
       double topo = compute_horz_interp(
@@ -1051,7 +1051,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // falls within the requested range.
    else {
 
-      if(!msg_typ_sfc.has(hdr_typ_str) &&
+      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info->level().lower() ||
           obs_hgt > obs_info->level().upper())) {
          rej_lvl++;
@@ -1105,7 +1105,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // type, set the observation level value to bad data so that it's not
    // used in the duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      msg_typ_sfc.has(hdr_typ_str)) {
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 
@@ -1208,7 +1208,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // For surface verification, apply land/sea and topo masks
             if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-               (msg_typ_sfc.has(hdr_typ_str))) {
+               (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
 
                bool is_land = msg_typ_lnd.has(hdr_typ_str);
 
