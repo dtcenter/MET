@@ -131,6 +131,7 @@ void StringArray::init_from_scratch()
 {
 
 IgnoreCase = 0;
+MaxLength = 0;
 
 clear();
 
