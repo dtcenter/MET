@@ -369,7 +369,7 @@ void process_ioda_file(int i_pb) {
    IntArray diff_file_times;
    int diff_file_time_count;
    StringArray variables_big_nlevels;
-   static const char *method_name = "process_ioda_file() ->";
+   static const char *method_name = "process_ioda_file() -> ";
    static const char *method_name_s = "process_ioda_file() ";
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
@@ -961,7 +961,10 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    else obs_qty.format("%d", nint(quality_mark));
 
    int var_index = obs_arr[1];
+   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
    string var_name = obs_var_names[var_index];
+   string out_name = name_map[var_name];
+cout << "  DEBUG HS var_name: " <<  var_name << ", out_name: " << out_name << ", passing: " << (0<out_name.length() ? out_name : var_name) << "\n";
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),
                                  hdr_vld,
@@ -969,7 +972,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                                  obs_qty.text(),
                                  var_index,
                                  obs_arr[2], obs_arr[3], obs_arr[4],
-                                 var_name);
+                                 (0<out_name.length() ? out_name : var_name));
    obs.setHeaderIndex(obs_arr[0]);
    observations.push_back(obs);
    if(do_summary) summary_obs->addObservationObj(obs);
