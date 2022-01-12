@@ -755,7 +755,7 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 
 		# Skip the time_bounds variable
 		# Note: Running "ncdiff -x -v time_bounds" successfully excludes that variable
-	        #       in version 4.7.0. However, it fails in version 4.9.2. 	
+		#       in version 4.7.0. However, it fails in version 4.9.2.
 		if (strVar == "time_bounds"){ next; }
 
 		# check the variable attributes for differences
