@@ -165,6 +165,7 @@ void process_jobs() {
    ConcatString jobstring;
    int i, n_jobs;
    TCLineCounts n;
+   const char *method_name = "process_jobs() -> ";
 
    // Open the output file
    open_out_file();
@@ -193,27 +194,29 @@ void process_jobs() {
 
       // Allocate a new job
       cur_job = factory.new_tc_stat_job(jobstring.c_str());
+      if (cur_job) {
+         // Set the job output file stream
+         cur_job->JobOut = tc_stat_out;
 
-      // Set the job output file stream
-      cur_job->JobOut = tc_stat_out;
+         // Set the output precision
+         cur_job->set_precision(conf_info.Conf.output_precision());
 
-      // Set the output precision
-      cur_job->set_precision(conf_info.Conf.output_precision());
+         // Serialize the current job
+         mlog << Debug(2)
+              << "\nProcessing Job " << i+1 << ": "
+              << cur_job->serialize() << "\n";
 
-      // Serialize the current job
-      mlog << Debug(2)
-           << "\nProcessing Job " << i+1 << ": "
-           << cur_job->serialize() << "\n";
+         // Initialize counts
+         memset(&n, 0, sizeof(TCLineCounts));
 
-      // Initialize counts
-      memset(&n, 0, sizeof(TCLineCounts));
+         // Do the job
+         cur_job->do_job(tcst_files, n);
 
-      // Do the job
-      cur_job->do_job(tcst_files, n);
-
-      mlog << Debug(2)
-           << "Job " << i+1 << " used " << n.NKeep << " out of "
-           << n.NRead << " lines read.\n";
+         mlog << Debug(2) << method_name
+              << "Job " << i+1 << " used " << n.NKeep << " out of "
+              << n.NRead << " lines read.\n";
+      }
+      else mlog << Debug(1) << method_name << "job is missing\n";
 
       mlog << Debug(3)
            << "Total lines read                 = " << n.NRead             << "\n"
