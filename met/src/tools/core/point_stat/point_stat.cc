@@ -98,6 +98,7 @@
 //   047    08/23/21  Seth Linden    Add ORANK line type for HiRA.
 //   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
+//   049    12/11/21  Halley Gotway  MET#1991 Fix VCNT output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1055,12 +1056,13 @@ void process_scores() {
                   do_cnt_sl1l2(conf_info.vx_opt[i], pd_ptr);
                }
 
-               // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+               // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
                if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
                    conf_info.vx_opt[i].vx_pd.fcst_info->is_v_wind() &&
                    conf_info.vx_opt[i].vx_pd.fcst_info->uv_index() >= 0  &&
                   (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                   conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
+                   conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
+                   conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
 
                   // Store the forecast variable name
                   shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1117,8 +1119,7 @@ void process_scores() {
                            txt_at[i_val1l2], i_txt_row[i_val1l2]);
                      }
 
-
-                    // Write out VCNT
+                     // Write out VCNT
                      if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
                         vl1l2_info[m].vcount > 0) {
                         write_vcnt_row(shc, vl1l2_info[m],
@@ -1126,7 +1127,6 @@ void process_scores() {
                            stat_at, i_stat_row,
                            txt_at[i_vcnt], i_txt_row[i_vcnt]);
                      }
-
 
                   } // end for m
 
