@@ -33,13 +33,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const int max_shp_poly_parts  =   600;
-// static const int max_shp_poly_points = (1 << 17);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  for both polyline and polygon records
    //
@@ -63,6 +56,8 @@ struct ShpPolyRecord {   //  this should really be a class, not a struct
 
       //
 
+   void clear();
+
    double x_min() const;
    double x_max() const;
 
@@ -81,7 +76,7 @@ struct ShpPolyRecord {   //  this should really be a class, not a struct
 
    bool is_closed() const;
 
-   void toggle_longitudes(); 
+   void toggle_longitudes();
 
 };
 

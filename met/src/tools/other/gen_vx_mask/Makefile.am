@@ -12,8 +12,7 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = gen_vx_mask
 
-gen_vx_mask_SOURCES = gen_vx_mask.cc  \
-                      grid_closed_poly.cc
+gen_vx_mask_SOURCES = gen_vx_mask.cc
 gen_vx_mask_CPPFLAGS = ${MET_CPPFLAGS}
 gen_vx_mask_LDFLAGS = ${MET_LDFLAGS}
 gen_vx_mask_LDADD = -lvx_shapedata \
@@ -51,5 +50,4 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-EXTRA_DIST = gen_vx_mask.h \
-	grid_closed_poly.h
+EXTRA_DIST = gen_vx_mask.h

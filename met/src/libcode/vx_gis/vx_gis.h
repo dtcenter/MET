@@ -6,40 +6,24 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
 
+#ifndef  __VX_GIS_H__
+#define  __VX_GIS_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#ifndef  __VX_STATISTICS_H__
-#define  __VX_STATISTICS_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "apply_mask.h"
-#include "grid_closed_poly.h"
-#include "compute_ci.h"
-#include "contable.h"
-#include "met_stats.h"
-#include "ens_stats.h"
-#include "compute_stats.h"
-#include "pair_base.h"
-#include "pair_data_point.h"
-#include "pair_data_ensemble.h"
-#include "read_climo.h"
-#include "obs_error.h"
-
+#include "dbf_file.h"
+#include "shx_file.h"
+#include "shp_file.h"
+#include "shp_types.h"
+#include "shp_array.h"
+#include "shapetype_to_string.h"
+#include "shp_point_record.h"
+#include "shp_poly_record.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#endif   //  __VX_STATISTICS_H__
-
+#endif   //  __VX_GIS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-

@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   polyline.h
+//   Filename:   grid_closed_poly.h
 //
 //   Description:
 //
@@ -19,11 +19,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef  __DATA2D_UTIL_GCP_H__
-#define  __DATA2D_UTIL_GCP_H__
+#ifndef  __GRID_CLOSED_POLY_H__
+#define  __GRID_CLOSED_POLY_H__
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 
@@ -33,13 +32,9 @@
 #include "shp_poly_record.h"
 #include "vx_grid.h"
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-class GridClosedPoly : public Polyline
-
-{
+class GridClosedPoly : public Polyline {
 
    protected:
 
@@ -47,8 +42,7 @@ class GridClosedPoly : public Polyline
 
       void gcp_assign(const GridClosedPoly &);
 
-         //  bounding box info
-
+      // bounding box limits
       double u_min, u_max;
       double v_min, v_max;
 
@@ -61,36 +55,28 @@ class GridClosedPoly : public Polyline
 
       void clear();
 
-      int is_inside(double u_test, double v_test) const;   //  test bounding box first
+      // tests bounding box first for efficiency
+      int is_inside(double u_test, double v_test) const;
 
-      void add_point(double, double);   //  updates bounding box
+      // updates bounding box for each new point
+      void add_point(double, double);
 
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
-
-{
+class GridClosedPolyArray : public NCRR_Array<GridClosedPoly> {
 
    public:
 
       bool is_inside(double u_test, double v_test) const;
 
-      void set (const ShpPolyRecord &, const Grid &);
+      void set(const ShpPolyRecord &, const Grid &);
 
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#endif   //  __DATA2D_UTIL_GCP_H__
-
+#endif   //  __GRID_CLOSED_POLY_H__
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
