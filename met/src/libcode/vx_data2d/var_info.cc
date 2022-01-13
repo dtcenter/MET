@@ -892,10 +892,14 @@ int EnsVarInfo::get_file_index(int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString raw_magic_str(Dictionary i_edict) {
+ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
    ConcatString magic_str;
 
    ConcatString name = i_edict.lookup_string("name");
+   if(file_type == FileType_Python_Numpy || file_type == FileType_Python_Xarray) {
+      return name;
+   }
+
    ConcatString level = i_edict.lookup_string("level");
 
    if(level.nonempty() && level[0] != '(') {

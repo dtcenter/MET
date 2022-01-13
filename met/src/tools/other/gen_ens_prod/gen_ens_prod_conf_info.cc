@@ -180,7 +180,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       i_edict = parse_conf_i_vx_dict(edict, i);
 
       // get VarInfo magic string without substituted values
-      ens_info->raw_magic_str = raw_magic_str(i_edict);
+      ens_info->raw_magic_str = raw_magic_str(i_edict, etype);
 
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {

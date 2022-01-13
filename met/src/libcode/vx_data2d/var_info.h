@@ -297,7 +297,7 @@ public:
     ConcatString raw_magic_str;   // Magic string w/o var substitution
 };
 
-ConcatString raw_magic_str(Dictionary i_edict);
+ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 
