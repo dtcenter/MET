@@ -97,6 +97,8 @@ class Shp_Array {
 
       int n() const { return ( Nelements ); }
 
+      int n_elements() const { return ( Nelements ); }
+
          //
          //  do stuff
          //
