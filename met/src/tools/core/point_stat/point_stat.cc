@@ -98,7 +98,7 @@
 //   047    08/23/21  Seth Linden    Add ORANK line type for HiRA.
 //   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
-//   049    12/11/21  Halley Gotway  MET#1991 Fix VCNT output.
+//   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //
 ////////////////////////////////////////////////////////////////////////
 

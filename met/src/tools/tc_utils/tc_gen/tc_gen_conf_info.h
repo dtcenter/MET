@@ -49,6 +49,14 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_genmpr //  7
 };
 
+// Output data type names
+
+static const string genesis_name      ("GENESIS");
+static const string genesis_dev_name  ("GENESIS_DEV");
+static const string genesis_ops_name  ("GENESIS_OPS");
+static const string prob_genesis_name ("PROB_GENESIS");
+static const string genesis_shape_name("GENESIS_SHAPE");
+
 // Names for output data plane types
 
 static const string fgen_str       = "fcst_genesis";
@@ -129,6 +137,7 @@ class TCGenVxOpt {
       NumArray  Lead;
 
       // Spatial masking information
+      ConcatString VxMaskConf;
       ConcatString VxMaskName;
       MaskPoly     VxPolyMask;
       Grid         VxGridMask;
@@ -168,8 +177,9 @@ class TCGenVxOpt {
                               const StringArray &);
       void parse_nc_info(Dictionary &);
 
-      bool is_keeper(const GenesisInfo &) const;
-      bool is_keeper(const ProbGenInfo &) const;
+      bool is_keeper(const GenesisInfo &)  const;
+      bool is_keeper(const ProbGenInfo &)  const;
+      bool is_keeper(const GenShapeInfo &) const;
 
       STATOutputType output_map(STATLineType) const;
 };
@@ -331,6 +341,9 @@ class ProbGenPCTInfo {
       //////////////////////////////////////////////////////////////////
 
    ConcatString Model;
+   ConcatString VarName;
+   ConcatString VxMask;
+
    unixtime InitBeg, InitEnd;
    unixtime BestBeg, BestEnd;
    const TCGenVxOpt* VxOpt;
@@ -340,10 +353,11 @@ class ProbGenPCTInfo {
    map<int,PCTInfo> PCTMap;
 
    // Map of lead times to vectors of pair info
-   map<int,vector<const ProbGenInfo *> > FcstGenMap;
-   map<int,vector<int> >                 FcstIdxMap;
-   map<int,vector<const GenesisInfo *> > BestGenMap;
-   map<int,vector<bool> >                BestEvtMap;
+   map<int,vector<const ProbGenInfo *> >  ProbGenMap;
+   map<int,vector<const GenShapeInfo *> > GenShapeMap;
+   map<int,vector<int> >                  ProbIdxMap;
+   map<int,vector<const GenesisInfo *> >  BestGenMap;
+   map<int,vector<bool> >                 BestEvtMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -351,8 +365,11 @@ class ProbGenPCTInfo {
 
    void set_vx_opt(const TCGenVxOpt *);
 
-   void add(const ProbGenInfo &, int,
-            const GenesisInfo *, bool);
+   void add_probgen(const ProbGenInfo &, int,
+                    const GenesisInfo *, bool);
+
+   void add_genshape(const GenShapeInfo &, int,
+                     const GenesisInfo *, bool);
 
 };
 

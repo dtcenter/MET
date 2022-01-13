@@ -1442,7 +1442,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // falls within the requested range.
    else {
 
-      if(!msg_typ_sfc.has(hdr_typ_str) &&
+      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info_grib->level().lower() ||
           obs_hgt > obs_info_grib->level().upper())) {
          return;
@@ -1481,7 +1481,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      msg_typ_sfc.has(hdr_typ_str)) {
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 

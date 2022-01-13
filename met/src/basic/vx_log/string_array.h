@@ -37,8 +37,6 @@ class StringArray {
 
       std::vector<std::string> s;
 
-      int  Nalloc;
-
       int  MaxLength;
 
       bool IgnoreCase;

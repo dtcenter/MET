@@ -50,8 +50,6 @@ ConcatString::ConcatString()
 
 init_from_scratch();
 
-set_alloc_inc(default_cs_alloc_inc);
-
 }
 
 
@@ -63,8 +61,6 @@ ConcatString::ConcatString(int _alloc_inc)
 {
 
 init_from_scratch();
-
-set_alloc_inc(_alloc_inc);
 
 }
 
@@ -237,23 +233,6 @@ void ConcatString::assign(const ConcatString & c)
 
    memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
    Precision = c.Precision;
-   AllocInc = c.AllocInc;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ConcatString::set_alloc_inc(int _alloc_inc)
-
-{
-
-if ( _alloc_inc < min_cs_alloc_inc )  _alloc_inc = min_cs_alloc_inc;
-
-AllocInc = _alloc_inc;
-
-return;
-
 }
 
 
