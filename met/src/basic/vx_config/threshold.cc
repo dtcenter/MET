@@ -1128,7 +1128,7 @@ else  {
       //  adjust PT by the requested frequency bias amount
       //
 
-      double PT_new;
+      double PT_new = 0.;
 
       if ( fbias_fcst )  {
                if ( op == thresh_le || op == thresh_lt )  PT_new = PT * fbias_val;

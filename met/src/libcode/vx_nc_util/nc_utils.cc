@@ -129,6 +129,9 @@ bool get_att_value(const NcAtt *att, double &att_val) {
 int get_att_value_int(const NcAtt *att) {
    int value = bad_data_int;
    static const char *method_name = "get_att_value_int(NcAtt) -> ";
+
+   if (IS_INVALID_NC_P(att)) return value;
+
    switch (att->getType().getId()) {
       case NC_BYTE:
          ncbyte b_value;
@@ -221,7 +224,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
 
 long long get_att_value_llong(const NcAtt *att) {
    long long value = bad_data_int;
-   att->getValues(&value);
+   if (IS_VALID_NC_P(att)) att->getValues(&value);
    return value;
 }
 
@@ -229,7 +232,7 @@ long long get_att_value_llong(const NcAtt *att) {
 
 double get_att_value_double(const NcAtt *att) {
    double value = bad_data_double;
-   att->getValues(&value);
+   if (IS_VALID_NC_P(att)) att->getValues(&value);
    return value;
 }
 
@@ -1657,6 +1660,8 @@ bool get_nc_data(NcVar *var, float *data) {
                   if (IS_VALID_NC_P(att_fill_value)) {
                      fill_value = get_att_value_char(att_fill_value);
                   }
+
+                  var->getVar(packed_data);
 
                   if (unsigned_value) {
                      int value;

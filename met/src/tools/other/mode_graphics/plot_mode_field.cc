@@ -1111,7 +1111,7 @@ if ( e->type() != StringType )  {
 
 }
 
-s = *(e->string_value());
+s = e->string_value();
 
 return ( s );
 
