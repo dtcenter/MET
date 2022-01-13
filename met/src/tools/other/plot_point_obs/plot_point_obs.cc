@@ -189,7 +189,6 @@ void process_point_obs(const char *point_obs_filename) {
       nc_point_obs.check_nc(point_obs_filename, method_name_s);   // exit if missing dims/vars
       nc_point_obs.read_obs_data();
 
-      use_var_id = nc_point_obs.is_using_var_id();
       use_obs_arr = nc_point_obs.is_using_obs_arr();
 
       // Print warning about ineffective command line arguments
@@ -219,6 +218,7 @@ void process_point_obs(const char *point_obs_filename) {
    int obs_qty_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
+   use_var_id = met_point_obs->is_using_var_id();
    if(use_var_id) var_list = met_point_obs->get_var_names();
    qty_list = met_point_obs->get_qty_data();
 
