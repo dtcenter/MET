@@ -318,7 +318,7 @@ python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
 
 bool use_var_id = pyobject_as_bool(python_value);
 met_pd_out.set_use_var_id(use_var_id);
-
+mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
 
 python_value = PyDict_GetItemString (python_met_point_data, python_key_nhdr);
 
