@@ -753,6 +753,21 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 	# for each variable present in the file, check for differences
 	for(strVar in names(ncFileD$var)){
 
+		# Skip the time_bounds, lat, and lon variables
+		# Note: Running "ncdiff -x -v time_bounds" successfully excludes that variable
+		#       in version 4.7.0, but not in version 4.9.2. Similarly, version 4.7.0
+		#       returns 0 diffs for variables named lat and lon while version 4.9.2
+		#       returns the raw values rather than their diffs.
+		# For now, just ignore these variables.
+		if(strVar == "time_bounds" ||
+		   strVar == "lat"         ||
+		   strVar == "latitude"    ||
+		   strVar == "lon"         ||
+		   strVar == "longitude" ){
+			if( 1 <= verb ){ cat("ignored var", strVar, "\n"); }
+			next;
+		}
+
 		# check the variable attributes for differences
 		listAtt1 = ncatt_get(ncFile1, varid=strVar);
 		listAtt1Nam = names(listAtt1);
