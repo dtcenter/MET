@@ -8,6 +8,13 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
 
+# OpenMP
+
+AC_OPENMP()
+
+CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
+
 #
 # Look for the NetCDF library
 #
