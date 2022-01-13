@@ -286,7 +286,7 @@ Required arguments for point_stat
 Optional arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. 
+4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. The python embedding will be activated if the **file** begines with 'PYTHON_NUMPY=" and followed by a python script name.
 
 5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
