@@ -112,7 +112,7 @@ class EnsembleStatVxOpt {
 
       StringArray    msg_typ;            // Verifying message types
 
-      ThreshArray    othr_ta;            // Observation filetering thresholds
+      ThreshArray    othr_ta;            // Observation filtering thresholds
 
       ClimoCDFInfo   cdf_info;           // Climo CDF info
 
@@ -139,7 +139,9 @@ class EnsembleStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
-                          gsl_rng *, bool, bool, bool);
+                          gsl_rng *, bool, bool, bool,
+                          StringArray, StringArray *,
+                          bool, ConcatString);
       void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
@@ -196,9 +198,9 @@ class EnsembleStatConfInfo {
       ConcatString        model;            // Model name
       ConcatString        obtype;           // Observation type
 
-      VarInfo **          ens_info;         // Array of pointers for ensemble [n_ens_var] (allocated)
-      ThreshArray *       ens_ta;           // Array for ensemble thresholds [n_ens_var] (allocated)
-      StringArray         ens_var_str;      // Array for ensemble variable name strings [n_ens_var]
+      vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
+      StringArray          ens_member_ids;  // Array of ensemble member ID strings
+      ConcatString         control_id;      // Control ID
 
       NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
       int                 n_nbrhd;          // Number of neighborhood sizes
@@ -235,7 +237,8 @@ class EnsembleStatConfInfo {
       void clear();
 
       void read_config   (const ConcatString , const ConcatString);
-      void process_config(GrdFileType, GrdFileType, bool, bool, bool);
+      void process_config(GrdFileType, GrdFileType, bool, bool, bool,
+                          StringArray *, StringArray *, bool);
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);

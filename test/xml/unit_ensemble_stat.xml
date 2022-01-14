@@ -250,4 +250,86 @@
     </output>
   </test>
 
+  <!--  Single NetCDF input file with all ensembles - no control member.  -->
+
+  <test name="ensemble_stat_SINGLE_FILE_NC_NO_CTRL">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>SINGLE_FILE_NC_NO_CTRL</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SINGLE_FILE_NC_NO_CTRL</value></pair>
+    </env>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      &CONFIG_DIR;/EnsembleStatConfig_single_file_nc \
+      -grid_obs &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19700101_000000V_ens.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--  Single NetCDF input file with all ensembles - with control member.  -->
+
+  <test name="ensemble_stat_SINGLE_FILE_NC_WITH_CTRL">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>SINGLE_FILE_NC_WITH_CTRL</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SINGLE_FILE_NC_WITH_CTRL</value></pair>
+    </env>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      &CONFIG_DIR;/EnsembleStatConfig_single_file_nc \
+      -grid_obs &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      -ctrl &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19700101_000000V_ens.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--  Single GRIB input file with all ensembles - no control member.  -->
+
+  <test name="ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>SINGLE_FILE_GRIB_NO_CTRL</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SINGLE_FILE_GRIB_NO_CTRL</value></pair>
+    </env>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &CONFIG_DIR;/EnsembleStatConfig_single_file_grib \
+      -grid_obs &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V_ens.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--  Single GRIB input file with all ensembles - with control member.  -->
+
+  <test name="ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>SINGLE_FILE_GRIB_WITH_CTRL</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SINGLE_FILE_GRIB_WITH_CTRL</value></pair>
+    </env>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &CONFIG_DIR;/EnsembleStatConfig_single_file_grib \
+      -grid_obs &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      -ctrl &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V_ens.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

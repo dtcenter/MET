@@ -49,4 +49,3 @@ export MET_TEST_RSCRIPT=/usr/local/R-4.1.2/bin/Rscript
 export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
              /usr/local/sbin:/usr/local/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
-

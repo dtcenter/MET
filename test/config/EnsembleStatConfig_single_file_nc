@@ -9,13 +9,13 @@
 //
 // Output model name to be written
 //
-model = "PYTHON";
+model = "WRF";
 
 //
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "${DESC}";
 
 //
 // Output observation type to be written
@@ -50,18 +50,25 @@ nc_var_str    = "";
 // Ensemble product fields to be processed
 //
 ens = {
+   file_type = NETCDF_NCCF;
    ens_thresh = 1.0;
    vld_thresh = 1.0;
-   file_type = PYTHON_NUMPY;
-   field = [ { name = "${FCST_COMMAND}"; } ];
+
+   field = [
+      {
+         name       = "fcst";
+         level      = "(MET_ENS_MEMBER_ID,0,*,*)";
+         cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
 }
 
 //
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
-ens_member_ids = [];
-control_id = "";
+ens_member_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+control_id = "0";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -95,19 +102,33 @@ nmep_smooth = {
 //
 // Forecast and observation fields to be verified
 //
-fcst = ens;
-obs  = {
-   file_type = PYTHON_NUMPY;
-   field = [ { name = "${OBS_COMMAND}"; } ];
+fcst = {
+   file_type = NETCDF_NCCF;
+   field = [
+      {
+         name       = "fcst";
+         level      = "(MET_ENS_MEMBER_ID,0,*,*)";
+         cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
 }
 
+obs = {
+   field = [
+      {
+         name       = "fcst";
+         level      = "(0,0,*,*)";
+         cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type   = [];
+message_type   = [ "ADPUPA" ];
 sid_inc        = [];
 sid_exc        = [];
 obs_thresh     = [ NA ];
@@ -134,7 +155,7 @@ obs_error = {
 }
 
 //
-// Mapping of message type group name to comma-separated list of values.
+// Mapping of message type group name to comma-separated list of values
 //
 message_type_group_map = [
    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
@@ -181,6 +202,14 @@ climo_mean = {
 climo_stdev = climo_mean;
 climo_stdev = {
    file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 10;
+   center_bins = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,17 +282,17 @@ output_flag = {
 ensemble_flag = {
    latlon    = TRUE;
    mean      = TRUE;
-   stdev     = FALSE;
-   minus     = FALSE;
-   plus      = FALSE;
-   min       = FALSE;
-   max       = FALSE;
-   range     = FALSE;
+   stdev     = TRUE;
+   minus     = TRUE;
+   plus      = TRUE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = TRUE;
    vld_count = TRUE;
-   frequency = FALSE;
+   frequency = TRUE;
    nep       = FALSE;
    nmep      = FALSE;
-   rank      = FALSE;
+   rank      = TRUE;
    weight    = FALSE;
 }
 
