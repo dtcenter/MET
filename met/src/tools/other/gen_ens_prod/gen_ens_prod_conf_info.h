@@ -99,7 +99,7 @@ class GenEnsProdConfInfo {
       void clear();
 
       void read_config   (const ConcatString, const ConcatString);
-      void process_config(GrdFileType, StringArray *);
+      void process_config(GrdFileType, StringArray *, bool);
 
       GenEnsProdNcOutInfo parse_nc_info(Dictionary *);
 

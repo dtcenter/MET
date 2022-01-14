@@ -186,7 +186,7 @@ void process_command_line(int argc, char **argv) {
    etype = ens_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(etype, &ens_files);
+   conf_info.process_config(etype, &ens_files, ctrl_file.nonempty());
 
    // Allocate arrays to store threshold counts
    thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
