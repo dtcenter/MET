@@ -114,6 +114,7 @@ fcst = {
 }
 
 obs = {
+   file_type = NETCDF_NCCF;
    field = [
       {
          name       = "fcst";
