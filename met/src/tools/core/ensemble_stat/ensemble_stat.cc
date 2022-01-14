@@ -302,7 +302,7 @@ void process_command_line(int argc, char **argv) {
    // Copy ensemble file list to forecast file list
    fcst_file_list = ens_file_list;
 
-   // Prepend the control member, if specified
+   // Append the control member, if specified
    if(ctrl_file.nonempty()) {
 
       if(ens_file_list.has(ctrl_file) && n_ens_files != 1) {
@@ -312,10 +312,9 @@ void process_command_line(int argc, char **argv) {
          exit(1);
       }
 
-      ctrl_index = 0;
-
-      // Add control file to beginning of forecast file list
-      fcst_file_list.insert(ctrl_index, ctrl_file.c_str());
+      // Add control file to end of forecast file list
+      fcst_file_list.add(ctrl_file.c_str());
+      ctrl_index = fcst_file_list.n() - 1;
    }
 
    // Check that the end_ut >= beg_ut

@@ -212,6 +212,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          exit(1);
       }
 
+      // The control ID must be set when the control file is specified
+      if(control_id.empty() && use_ctrl) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+              << "the control_id must be set if processing a single input "
+              << "file with the -ctrl option\n\n";
+         exit(1);
+      }
+
       // If control ID is set, it cannot be found in ens_member_ids
       if(!control_id.empty() && ens_member_ids.has(control_id)) {
          mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
@@ -322,6 +330,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       ens_input.push_back(ens_info);
    } // end for i
+
+   // Unset MET_ENS_MEMBER_ID that was previously set
+   unsetenv(met_ens_member_id);
 
    // Conf: ens.ens_thresh
    vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);
@@ -757,7 +768,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        StringArray * fcst_files,
                                        bool use_ctrl, ConcatString control_id) {
    int i, j;
-   int file_index_start = 0;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
@@ -769,27 +779,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
    // Allocate new EnsVarInfo object for fcst
    vx_pd.fcst_info = new EnsVarInfo();
-
-   // Add control member as first input
-   if(use_ctrl) {
-
-      // Set environment variable for ens member ID
-      setenv(met_ens_member_id, control_id.c_str(), 1);
-
-      // Allocate new VarInfo object
-      next_var = info_factory.new_var_info(ftype);
-
-      // Set the current dictionary
-      next_var->set_dict(fdict);
-
-      input_info.var_info = next_var;
-      input_info.file_index = 0;
-      input_info.file_list = fcst_files;
-      vx_pd.fcst_info->add_input(input_info);
-
-      // Change the starting index to the first non-control file
-      file_index_start = 1;
-   }
 
    // Loop over ensemble member IDs to substitute
    for(i=0; i<ens_member_ids.n(); i++) {
@@ -804,20 +793,38 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       next_var->set_dict(fdict);
 
       input_info.var_info = next_var;
-      input_info.file_index = file_index_start;
+      input_info.file_index = 0;
       input_info.file_list = fcst_files;
       vx_pd.fcst_info->add_input(input_info);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to NULL to note first VarInfo should be used
-      for(j=file_index_start+1; j<fcst_files->n(); j++) {
+      int last_member_index = fcst_files->n() - (use_ctrl ? 1 : 0);
+      for(j=1; j<last_member_index; j++) {
          input_info.var_info = NULL;
          input_info.file_index = j;
          input_info.file_list = fcst_files;
          vx_pd.fcst_info->add_input(input_info);
       } // end for j
-
    } // end for i
+
+   // Add control member as the last input
+   if(use_ctrl) {
+
+      // Set environment variable for ens member ID
+      setenv(met_ens_member_id, control_id.c_str(), 1);
+
+      // Allocate new VarInfo object
+      next_var = info_factory.new_var_info(ftype);
+
+      // Set the current dictionary
+      next_var->set_dict(fdict);
+
+      input_info.var_info = next_var;
+      input_info.file_index = fcst_files->n() - 1;
+      input_info.file_list = fcst_files;
+      vx_pd.fcst_info->add_input(input_info);
+   }
 
    // Allocate new VarInfo object for obs
    vx_pd.obs_info  = info_factory.new_var_info(otype);
