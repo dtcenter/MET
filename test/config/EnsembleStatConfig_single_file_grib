@@ -113,7 +113,6 @@ fcst = {
       }
    ];
 }
-obs = fcst;
 
 obs = {
    field = [
@@ -268,7 +267,7 @@ interp = {
 // Statistical output types
 //
 output_flag = {
-   ecnt  = NONE;
+   ecnt  = STAT;
    rps   = NONE;
    rhist = NONE;
    phist = NONE;
