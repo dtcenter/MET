@@ -62,7 +62,8 @@
 //   031    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
 //   032    10/07/21  Halley Gotway  MET #1905 Add -ctrl option.
-//   032    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
+//   033    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
+//   034    01/14/21  McCabe         MET #1695 All members in one file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -302,7 +303,7 @@ void process_command_line(int argc, char **argv) {
    // Copy ensemble file list to forecast file list
    fcst_file_list = ens_file_list;
 
-   // Prepend the control member, if specified
+   // Append the control member, if specified
    if(ctrl_file.nonempty()) {
 
       if(ens_file_list.has(ctrl_file) && n_ens_files != 1) {
@@ -312,10 +313,9 @@ void process_command_line(int argc, char **argv) {
          exit(1);
       }
 
-      ctrl_index = 0;
-
-      // Add control file to beginning of forecast file list
-      fcst_file_list.insert(ctrl_index, ctrl_file.c_str());
+      // Add control member file to end of the forecast file list
+      fcst_file_list.add(ctrl_file.c_str());
+      ctrl_file_index = fcst_file_list.n()-1;
    }
 
    // Check that the end_ut >= beg_ut
@@ -948,8 +948,12 @@ void process_vx() {
       // Process masks Grids and Polylines in the config file
       conf_info.process_masks(grid);
 
+      // Determine the index of the control member in list of data values
+      int ctrl_data_index = (is_bad_data(ctrl_file_index) ?
+                             bad_data_int : fcst_file_vld.sum()-1);
+
       // Setup the PairDataEnsemble objects
-      conf_info.set_vx_pd(n_vx_vld, ctrl_index);
+      conf_info.set_vx_pd(n_vx_vld, ctrl_data_index);
 
       // Process the point observations
       if(point_obs_flag) process_point_vx();
@@ -1200,7 +1204,7 @@ int process_point_ens(int i_ens, int &n_miss) {
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing " << file_type << " file: " << ens_file
-        << (i_ens == ctrl_index ? " (control)\n" : "\n");
+        << (i_ens == ctrl_file_index ? " (control)\n" : "\n");
 
    // Loop through each of the fields to be verified and extract
    // the forecast fields for verification
@@ -2012,7 +2016,7 @@ void process_grid_scores(int i_vx,
 
             // Store the unperturbed ensemble value
             // Exclude the control member from the variance
-            if(j != ctrl_index) pd.add_ens_var_sums(i, fraw_dp[j](x, y));
+            if(j != ctrl_file_index) pd.add_ens_var_sums(i, fraw_dp[j](x, y));
          }
       } // end for j
 

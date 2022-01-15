@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "CFS";
 
 //
 // Output description to be written
@@ -47,18 +47,25 @@ cat_thresh    = [];
 nc_var_str    = "";
 
 //
+// Override the NetCDF CFS variable names and times 
+//
+file_type      = NETCDF_NCCF;
+set_attr_init  = "19820101";
+set_attr_valid = "19820701";
+set_attr_name  = "TMP";
+set_attr_level = "Z2";
+
+//
 // Ensemble product fields to be processed
 //
 ens = {
-   file_type = NETCDF_NCCF;
    ens_thresh = 1.0;
    vld_thresh = 1.0;
 
    field = [
       {
-         name       = "fcst";
-         level      = "(MET_ENS_MEMBER_ID,0,*,*)";
-         cat_thresh = [ >0.0, >=5.0 ];
+         name  = "fcst";
+         level = "(MET_ENS_MEMBER_ID,6,*,*)";
       }
    ];
 }
@@ -103,12 +110,10 @@ nmep_smooth = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-   file_type = NETCDF_NCCF;
    field = [
       {
-         name       = "fcst";
-         level      = "(MET_ENS_MEMBER_ID,0,*,*)";
-         cat_thresh = [ >0.0, >=5.0 ];
+         name  = "fcst";
+         level = "(MET_ENS_MEMBER_ID,6,*,*)";
       }
    ];
 }
@@ -116,9 +121,8 @@ fcst = {
 obs = {
    field = [
       {
-         name       = "fcst";
-         level      = "(0,0,*,*)";
-         cat_thresh = [ >0.0, >=5.0 ];
+         name  = "fcst";
+         level = "(0,6,*,*)";
       }
    ];
 }
@@ -283,13 +287,13 @@ ensemble_flag = {
    latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
    min       = TRUE;
    max       = TRUE;
-   range     = TRUE;
+   range     = FALSE;
    vld_count = TRUE;
-   frequency = TRUE;
+   frequency = FALSE;
    nep       = FALSE;
    nmep      = FALSE;
    rank      = TRUE;

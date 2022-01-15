@@ -266,7 +266,9 @@
       -outdir &OUTPUT_DIR;/ensemble_stat -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19700101_000000V_ens.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V_orank.nc</grid_nc>
     </output>
   </test>
 
@@ -287,7 +289,9 @@
       -outdir &OUTPUT_DIR;/ensemble_stat -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19700101_000000V_ens.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V_orank.nc</grid_nc>
     </output>
   </test>
 
@@ -307,7 +311,9 @@
       -outdir &OUTPUT_DIR;/ensemble_stat -v 1
     </param>
     <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V_orank.nc</grid_nc>
     </output>
   </test>
 
@@ -328,7 +334,9 @@
       -outdir &OUTPUT_DIR;/ensemble_stat -v 1
     </param>
     <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V_orank.nc</grid_nc>
     </output>
   </test>
 

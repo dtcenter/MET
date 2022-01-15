@@ -100,7 +100,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files) {
+void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) 0;
@@ -143,6 +143,14 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
               << "The \"" << conf_key_ens_member_ids << "\" "
               << "must be empty if more than "
               << "one file is provided.\n\n";
+         exit(1);
+      }
+
+      // The control ID must be set when the control file is specified
+      if(control_id.empty() && use_ctrl) {
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+              << "the control_id must be set if processing a single input "
+              << "file with the -ctrl option\n\n";
          exit(1);
       }
 
