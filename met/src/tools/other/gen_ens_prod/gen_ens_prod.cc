@@ -16,6 +16,7 @@
 //   ----   ----      ----           -----------
 //   000    09/10/21  Halley Gotway  MET #1904 Initial version.
 //   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
+//   002    01/14/21  McCabe         MET #1695 All members in one file.
 //
 ////////////////////////////////////////////////////////////////////////
 

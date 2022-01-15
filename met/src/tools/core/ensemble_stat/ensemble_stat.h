@@ -107,8 +107,8 @@ static bool         ens_mean_flag; // Flag for ensemble mean processing
 static ConcatString ens_mean_user; // User-specified ensemble mean data file
 static ConcatString ens_mean_file; // Computed ensemble mean output file
 
-static ConcatString ctrl_file;     // Control member
-static int          ctrl_index = bad_data_int; // Control member index
+static ConcatString ctrl_file;     // Control member file
+static int          ctrl_file_index = bad_data_int; // Control member file index
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
