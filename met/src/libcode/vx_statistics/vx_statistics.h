@@ -19,6 +19,7 @@
 
 
 #include "apply_mask.h"
+#include "grid_closed_poly.h"
 #include "compute_ci.h"
 #include "contable.h"
 #include "met_stats.h"

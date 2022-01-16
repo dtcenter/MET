@@ -5,6 +5,27 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
+MET Version 10.1.0-beta5 release notes (20220114)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Enhancements:
+
+   * **Enhance GridStat to use OpenMP for efficient computation of neighborhood statistics by setting $OMP_NUM_THREADS** (`#1926 <https://github.com/dtcenter/MET/issues/>`_).
+   * **Enhance EnsembleStat and GenEnsProd to read all ensemble members from a single input file** (`#1695 <https://github.com/dtcenter/MET/issues/>`_).
+   * **Enhance TCGen to verify NHC tropical weather outlook shapefiles** (`#1810 <https://github.com/dtcenter/MET/issues/>`_).
+   * **Refine logic to prevent rounding shapefile points to the nearest grid point (affects GenVxMask -type shape masks)** (`#1810 <https://github.com/dtcenter/MET/issues/>`_).
+   * Enhance MADIS2NC to handle the 2016 updates to its format (`#1936 <https://github.com/dtcenter/MET/issues/>`_).
+   * Modify the interpretation of the message_type_group_map values to support the use of regular expressions (`#1974 <https://github.com/dtcenter/MET/issues/>`_).
+   * Address findings from the Cppcheck code analysis tool (`#1996 <https://github.com/dtcenter/MET/issues/>`_).
+   * Sort files read from directories to provide consistent behavior across platforms (`#1989 <https://github.com/dtcenter/MET/issues/>`_).
+
+* Bugfixes:
+
+   * **Fix MTD to compute the CDIST_TRAVELLED value correctly** (`#1976 <https://github.com/dtcenter/MET/issues/>`_).
+   * Fix PointStat and GridStat to write VCNT output even if no VL1L2 or VAL1L2 output is requested (`#1991 <https://github.com/dtcenter/MET/issues/>`_).
+   * Fix GenVxMask to handle named grids and grid specification strings for -type grid (`#1993 <https://github.com/dtcenter/MET/issues/>`_).
+   * Fix IODA2NC to handle the same input file being provided multiple times (`#1965 <https://github.com/dtcenter/MET/issues/>`_).
+
 MET Version 10.1.0-beta4 release notes (20211117)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

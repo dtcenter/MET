@@ -85,7 +85,7 @@
 //                    output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   036    02/14/17  Win            MET#621 Add nc_pairs_flag.apply_mask
+//   036    02/14/17  Win            MET #621 Add nc_pairs_flag.apply_mask
 //   037    05/15/17  Prestopnik P   Add shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    08/18/17  Halley Gotway  Add fourier decomposition.
@@ -126,6 +126,8 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "handle_openmp.h"
 
 #include "grid_stat.h"
 
@@ -184,6 +186,9 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);

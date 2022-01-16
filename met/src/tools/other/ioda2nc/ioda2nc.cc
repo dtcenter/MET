@@ -369,7 +369,8 @@ void process_ioda_file(int i_pb) {
    IntArray diff_file_times;
    int diff_file_time_count;
    StringArray variables_big_nlevels;
-   static const char *method_name = "process_ioda_file() ";
+   static const char *method_name = "process_ioda_file() -> ";
+   static const char *method_name_s = "process_ioda_file() ";
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
@@ -388,7 +389,7 @@ void process_ioda_file(int i_pb) {
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_in)) {
-      mlog << Error << "\n" << method_name << "-> "
+      mlog << Error << "\n" << method_name
            << "can't open input NetCDF file \"" << ioda_files[i_pb]
            << "\" for reading.\n\n";
       delete f_in;
@@ -444,7 +445,7 @@ void process_ioda_file(int i_pb) {
                                           dim_names, metadata_vars);
 
    if(!is_netcdf_ready) {
-      mlog << Error << "\n" << method_name << "-> "
+      mlog << Error << "\n" << method_name
            << "Please check the IODA file (required dimensions or meta variables are missing).\n\n";
       delete f_in;
       f_in = (NcFile *) 0;
@@ -460,7 +461,7 @@ void process_ioda_file(int i_pb) {
    if(dim_names.has("nrecs")) nrecs = get_dim_value(f_in, "nrecs", false);
    else {
       nrecs = nvars * nlocs;
-      mlog << Debug(3) << "\n" << method_name << "-> "
+      mlog << Debug(3) << "\n" << method_name
            << "nrecs dimension does not exist, so computed\n";
    }
    NcVar in_hdr_vld_var = get_var(f_in, "datetime@MetaData");
@@ -472,10 +473,10 @@ void process_ioda_file(int i_pb) {
    else {
       NcDim datetime_dim = get_nc_dim(&in_hdr_vld_var, 1);
       ndatetime = IS_VALID_NC(datetime_dim) ? get_dim_size(&datetime_dim) : nstring;
-      mlog << Debug(3) << "\n" << method_name << "-> "
+      mlog << Debug(3) << "\n" << method_name
            << "ndatetime dimension does not exist!\n";
    }
-   mlog << Debug(5) << method_name << "-> dimensions: nvars=" << nvars << ", nlocs=" << nlocs
+   mlog << Debug(5) << method_name << "dimensions: nvars=" << nvars << ", nlocs=" << nlocs
         << ", nrecs=" << nrecs << ", nstring=" << nstring << ", ndatetime=" << ndatetime << "\n";
 
    npbmsg_total = npbmsg = nlocs;
@@ -515,17 +516,17 @@ void process_ioda_file(int i_pb) {
    }
 
    if(!get_nc_data(&in_hdr_lat_var, hdr_lat_arr, nlocs)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "trouble getting latitude\n\n";
       exit(1);
    }
    if(!get_nc_data(&in_hdr_lon_var, hdr_lon_arr, nlocs)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "trouble getting longitude\n\n";
       exit(1);
    }
    if(!get_nc_data(&in_hdr_vld_var, hdr_vld_block, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "trouble getting datetime\n\n";
       exit(1);
    }
@@ -533,18 +534,16 @@ void process_ioda_file(int i_pb) {
    StringArray raw_var_names;
    if(do_all_vars || obs_var_names.n() == 0) raw_var_names = obs_value_vars;
    else raw_var_names = obs_var_names;
-   if(obs_var_names.n() > 0) obs_var_names.clear();
 
    NcVar obs_var, qc_var;
    ConcatString unit_attr;
    ConcatString desc_attr;
-   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
       int *qc_data = new int[nlocs];
       float *obs_data = new float[nlocs];
       ConcatString obs_var_name = raw_var_names[idx] + "@ObsValue";
-      
-      mlog << Debug(7) << method_name << " -> "
+
+      mlog << Debug(7) << method_name
            << "processing \"" << obs_var_name << "\" variable!\n";
       obs_var = get_var(f_in, obs_var_name.c_str());
       v_qc_data.push_back(qc_data);
@@ -556,13 +555,15 @@ void process_ioda_file(int i_pb) {
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
       }
-      obs_var_units.add(unit_attr);
-      obs_var_descs.add(desc_attr);
-      
+
       // Replace the input variable name to the output variable name
-      ConcatString new_name = name_map[raw_var_names[idx]];
-      if (0 < new_name.length()) obs_var_names.add(new_name);
-      else obs_var_names.add(raw_var_names[idx]);
+      ConcatString raw_name = raw_var_names[idx];
+      // Filter out the same variable names from multiple input files
+      if (!obs_var_names.has(raw_name)) {
+         obs_var_names.add(raw_name);
+         obs_var_units.add(unit_attr);
+         obs_var_descs.add(desc_attr);
+      }
    }
 
    // Initialize counts
@@ -573,7 +574,7 @@ void process_ioda_file(int i_pb) {
    bool showed_progress = false;
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name << " "
+      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name_s << " "
            << (end_t-start_t)/double(CLOCKS_PER_SEC)
            << " seconds for preparing\n";
       start_t = clock();
@@ -612,7 +613,7 @@ void process_ioda_file(int i_pb) {
 
       char valid_time[ndatetime+1];
       m_strncpy(valid_time, (const char *)(hdr_vld_block + (i_read * ndatetime)),
-                ndatetime, method_name, "valid_time", true);
+                ndatetime, method_name_s, "valid_time", true);
       valid_time[ndatetime] = 0;
       msg_ut = yyyymmddThhmmss_to_unix(valid_time);
 
@@ -662,7 +663,7 @@ void process_ioda_file(int i_pb) {
 
       if(has_msg_type) {
          int buf_len = sizeof(modified_hdr_typ);
-         m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name, "hdr_typ");
+         m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name_s, "hdr_typ");
          m_rstrip(hdr_typ, nstring);
 
          // If the message type is not listed in the configuration
@@ -675,22 +676,22 @@ void process_ioda_file(int i_pb) {
 
          if(0 < message_type_map.count((string)hdr_typ)) {
             ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
-            mlog << Debug(6) << "\n" << method_name << " -> "
+            mlog << Debug(6) << "\n" << method_name
                  << "Switching report type \"" << hdr_typ
                  << "\" to message type \"" << mappedMessageType << "\".\n";
             if(mappedMessageType.length() < HEADER_STR_LEN) buf_len = HEADER_STR_LEN;
             m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), buf_len,
-                      method_name, "modified_hdr_typ");
+                      method_name_s, "modified_hdr_typ");
          }
          else {
-            m_strncpy(modified_hdr_typ, hdr_typ, buf_len, method_name, "modified_hdr_typ2");
+            m_strncpy(modified_hdr_typ, hdr_typ, buf_len, method_name_s, "modified_hdr_typ2");
          }
          modified_hdr_typ[buf_len-1] = 0;
       }
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
-         m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name, "tmp_sid");
+         m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name_s, "tmp_sid");
          m_rstrip(tmp_sid, nstring);
          hdr_sid = tmp_sid;
       }
@@ -775,7 +776,14 @@ void process_ioda_file(int i_pb) {
 
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
-         obs_arr[1] = idx;
+         int var_idx = 0;
+         if (!obs_var_names.has(raw_var_names[idx], var_idx)) {
+            mlog << Warning << "\n" << method_name
+                 << "Skip the variable " << raw_var_names[idx]
+                 << " at " << ioda_files[i_pb] << "\n\n";
+            continue;
+         }
+         obs_arr[1] = var_idx;
          obs_arr[2] = obs_pres_arr[i_read];
          obs_arr[3] = obs_hght_arr[i_read];
          obs_arr[4] = v_obs_data[idx][i_read];
@@ -795,8 +803,6 @@ void process_ioda_file(int i_pb) {
       // store the header data and increment the IODA record
       // counter
       if(n_hdr_obs > 0) {
-         //nc_point_obs.add_header(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
-         //                        hdr_lat, hdr_lon, hdr_elv);
          i_msg++;
       }
       else {
@@ -839,12 +845,12 @@ void process_ioda_file(int i_pb) {
         << n_file_obs << "\n";
 
    if(npbmsg == rej_vld && 0 < rej_vld) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "All records were filtered out by valid time.\n"
            << "\tPlease adjust time range with \"-valid_beg\" and \"-valid_end\".\n"
            << "\tmin/max obs time from IODA file: " << min_time_str
            << " and " << max_time_str << ".\n"
-           << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n";
+           << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n\n";
    }
    else {
       mlog << Debug(1) << "Obs time between " << unix_to_yyyymmdd_hhmmss(min_msg_ut)
@@ -882,13 +888,13 @@ void process_ioda_file(int i_pb) {
 
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       method_end = clock();
-      cout << " PERF: " << method_name << " "
+      cout << " PERF: " << method_name_s
            << (method_end-method_start)/double(CLOCKS_PER_SEC)
            << " seconds\n";
    }
 
    if(i_msg <= 0) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "No IODA records retained from file: "
            << ioda_files[i_pb] << "\n\n";
    }
@@ -922,9 +928,12 @@ void write_netcdf_hdr_data() {
    StringArray nc_var_desc_arr;
    const long var_count = obs_var_names.n();
    const long units_count = obs_var_units.n();
+   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
 
    for(int i=0; i<var_count; i++) {
-      nc_var_name_arr.add(obs_var_names[i]);
+      ConcatString new_name = name_map[obs_var_names[i]];
+      if (0 >= new_name.length()) new_name = obs_var_names[i];
+      nc_var_name_arr.add(new_name);
    }
    for(int i=0; i<units_count; i++) {
       nc_var_unit_arr.add(obs_var_units[i]);
@@ -952,7 +961,9 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    else obs_qty.format("%d", nint(quality_mark));
 
    int var_index = obs_arr[1];
+   map<ConcatString,ConcatString> name_map = conf_info.getObsVarMap();
    string var_name = obs_var_names[var_index];
+   string out_name = name_map[var_name];
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),
                                  hdr_vld,
@@ -960,7 +971,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                                  obs_qty.text(),
                                  var_index,
                                  obs_arr[2], obs_arr[3], obs_arr[4],
-                                 var_name);
+                                 (0<out_name.length() ? out_name : var_name));
    obs.setHeaderIndex(obs_arr[0]);
    observations.push_back(obs);
    if(do_summary) summary_obs->addObservationObj(obs);

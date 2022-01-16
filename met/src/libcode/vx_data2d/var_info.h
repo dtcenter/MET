@@ -251,6 +251,54 @@ inline unixtime     VarInfo::valid_attr()     const { return(SetAttrValid);    }
 inline int          VarInfo::lead_attr()      const { return(SetAttrLead);     }
 inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
 
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store input file and field information
+//
+
+struct InputInfo {
+    VarInfo * var_info;         // Variable information to read
+    int file_index;             // Index in file_list of file to read
+    StringArray * file_list;    // Array of files (unallocated)
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store ensemble information
+//
+class EnsVarInfo {
+
+private:
+    vector<InputInfo> inputs;     // Vector of InputInfo
+    VarInfo * ctrl_info;          // Field info for control member
+public:
+    EnsVarInfo();
+    ~EnsVarInfo();
+    EnsVarInfo(const EnsVarInfo &);
+
+    void clear();
+    void assign(const EnsVarInfo &);
+
+    void add_input(InputInfo);
+    int inputs_n();
+
+    void set_ctrl(VarInfo *);
+    VarInfo * get_ctrl(int);
+
+    // Get VarInfo from first InputInfo if requested VarInfo is NULL
+    VarInfo * get_var_info(int index=0);
+    ConcatString get_file(int index=0);
+    int get_file_index(int index=0);
+
+    ConcatString nc_var_str;      // Ensemble variable name strings
+    ThreshArray cat_ta;           // Ensemble categorical thresholds
+    ConcatString raw_magic_str;   // Magic string w/o var substitution
+};
+
+ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type);
+
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif  // __VAR_INFO_H__

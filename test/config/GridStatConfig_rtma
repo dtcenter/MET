@@ -111,7 +111,7 @@ interp = {
    type = [
       { method = NEAREST; width  = 1; },
       { method = UW_MEAN; width  = 3; },
-      { method = MIN;     width  = 1; },
+      { method = MIN;     width  = 3; },
       { method = MAX;     width  = 3; }
    ];
 }

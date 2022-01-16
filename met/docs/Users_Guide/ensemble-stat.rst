@@ -97,7 +97,7 @@ Optional arguments for ensemble_stat
 
 6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
 
-7. The **-ctrl file** option specifies an ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread. The control file should not appear in the list of ensemble member files.
+7. The **-ctrl file** option specifies an ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread. The control file should not appear in the list of ensemble member files (unless processing a single file that contains all ensemble members).
 
 8. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
 
@@ -185,6 +185,50 @@ When summarizing the ensemble, for each grid point compute a ratio of the number
 
 
 For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g. a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
+
+_______________________
+
+.. code-block:: none
+
+  ens_member_ids = [];
+  control_id = "";
+
+The **ens_member_ids** array is only used if reading a single file that contains all ensemble members.
+It should contain a list of string identifiers that are substituted into the **ens** and/or **fcst** dictionary fields
+to determine which data to read from the file.
+The length of the array determines how many ensemble members will be processed for a given field.
+Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
+
+**NetCDF Example:**
+
+.. code-block:: none
+
+  ens = {
+    field = [
+      {
+        name  = "fcst";
+        level = "(MET_ENS_MEMBER_ID,0,*,*)";
+      }
+    ];
+  }
+
+**GRIB Example:**
+
+.. code-block:: none
+
+  ens = {
+    field = [
+      {
+        name     = "fcst";
+        level    = "L0";
+        GRIB_ens = "MET_ENS_MEMBER_ID";
+      }
+    ];
+  }
+
+**control_id** is a string that is substituted in the same way as the **ens_member_ids** values
+to read a control member. This value is only used when the **-ctrl** command line argument is
+used. The value should not be found in the **ens_member_ids** array.
 
 _______________________
 

@@ -2965,3 +2965,19 @@ ConcatString wavelettype_to_string(WaveletType type) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_ens_member_ids(Dictionary *dict) {
+   const char *method_name = "parse_conf_ens_member_ids() -> ";
+
+   StringArray sa = parse_conf_string_array(dict, conf_key_ens_member_ids, method_name);
+
+   if(sa.n() > 0) {
+      mlog << Debug(4) << method_name
+           << "Ensemble Member IDs \"" << conf_key_ens_member_ids << "\" list contains "
+           << sa.n() << " entries.\n";
+   }
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////

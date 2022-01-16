@@ -54,6 +54,9 @@ static const char * atcf_gen_reg_exp = "atcf_gen";
 // ATCF file name regular expression 
 static const char * atcf_reg_exp = ".dat";
 
+// Genesis shapefile regular expression
+static const char * gen_shp_reg_exp = "gtwo_areas.*.shp";
+
 // Default configuration file name
 static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
@@ -77,14 +80,16 @@ static const char *txt_file_abbr[n_txt] = {
    "fho", "ctc", "cts", "pct", "pstd", "pjc", "prc", "genmpr"
 };
 
-const ConcatString genesis_name     ("GENESIS");
-const ConcatString genesis_dev_name ("GENESIS_DEV");
-const ConcatString genesis_ops_name ("GENESIS_OPS");
-const ConcatString prob_genesis_name("PROB_GENESIS");
-
 // Maximum Best track cyclone number to be processed
 // Cyclone numbers > 50 are for testing or invests
 static const int max_best_cyclone_number = 50;
+
+// 2, 5, and 7 days shapefile probabilities
+static const int max_n_shape_prob = 3;
+static const int shape_prob_lead_hr[max_n_shape_prob] = {
+   48, 120, 168
+};
+static const int shape_prob_search_sec = 168*sec_per_hour;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -95,6 +100,7 @@ static const int max_best_cyclone_number = 50;
 // Input files
 static StringArray   genesis_source, genesis_model_suffix;
 static StringArray   edeck_source,   edeck_model_suffix;
+static StringArray   shape_source;
 static StringArray   track_source,   track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;

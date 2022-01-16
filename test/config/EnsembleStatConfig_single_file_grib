@@ -1,0 +1,317 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ensemble-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "GEFS";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "${DESC}";
+
+//
+// Output observation type to be written
+//
+obtype = "ANALYS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+// May be set separately in each "field" entry
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
+
+//
+// Ensemble product fields to be processed
+//
+ens = {
+   ens_thresh = 1.0;
+   vld_thresh = 1.0;
+
+   field = [
+      {
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "MET_ENS_MEMBER_ID";
+      }
+   ];
+}
+
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = ["+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10", "+11", "+12", "+13", "+14", "+15", "+16", "+17", "+18", "+19", "+20"];
+control_id = "hi_res_ctl";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+
+   field = [
+      {
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "MET_ENS_MEMBER_ID";
+      }
+   ];
+}
+
+obs = {
+   field = [
+      {
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "hi_res_ctl";
+      }
+   ];
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type   = [ "ADPUPA" ];
+sid_inc        = [];
+sid_exc        = [];
+obs_thresh     = [ NA ];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_perc_value = 50;
+skip_const     = FALSE;
+
+//
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   flag             = FALSE;   // TRUE or FALSE
+   dist_type        = NONE;    // Distribution type
+   dist_parm        = [];      // Distribution parameters
+   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
+   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
+   min              = NA;      // Valid range of data
+   max              = NA;
+}
+
+//
+// Mapping of message type group name to comma-separated list of values
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+];
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+//
+// Categorical thresholds to define ensemble probabilities
+// May be set separately in each "fcst.field" entry
+//
+prob_cat_thresh = [];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 10;
+   center_bins = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+   shape  = SQUARE;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   ecnt  = STAT;
+   rps   = NONE;
+   rhist = NONE;
+   phist = NONE;
+   orank = NONE;
+   ssvar = NONE;
+   relp  = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble product output types
+//
+ensemble_flag = {
+   latlon    = TRUE;
+   mean      = TRUE;
+   stdev     = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = FALSE;
+   vld_count = TRUE;
+   frequency = FALSE;
+   nep       = FALSE;
+   nmep      = FALSE;
+   rank      = TRUE;
+   weight    = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Random number generator
+//
+rng = {
+   type = "mt19937";
+   seed = "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag = NONE;
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V10.1.0";
+
+////////////////////////////////////////////////////////////////////////////////

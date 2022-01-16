@@ -25,8 +25,8 @@
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //   008    04/06/20  Halley Gotway   Generalize input_grid option.
 //   009    06/01/21  Seth Linden     Change -type from optional to required.
-//   010    08/30/21  Halley Gotway   MET#1891 Fix input and mask fields.
-//   011    12/13/21  Halley Gotway   MET#1993 Fix -type grid.
+//   010    08/30/21  Halley Gotway   MET #1891 Fix input and mask fields.
+//   011    12/13/21  Halley Gotway   MET #1993 Fix -type grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -549,10 +549,8 @@ void apply_poly_mask(DataPlane & dp) {
    bool inside;
    double lat, lon;
 
-   n_in = 0;
-
    // Check each grid point being inside the polyline
-   for(x=0; x<grid.nx(); x++) {
+   for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
@@ -565,10 +563,10 @@ void apply_poly_mask(DataPlane & dp) {
          if(complement) inside = !inside;
 
          // Increment count
-         if ( inside )  ++n_in;
+         if(inside) n_in++;
 
          // Store the current mask value
-         dp.set( (inside ? 1.0 : 0.0), x, y);
+         dp.set((inside ? 1.0 : 0.0), x, y);
 
       } // end for y
    } // end for x
@@ -631,7 +629,7 @@ void apply_box_mask(DataPlane &dp) {
    } // end for i
 
    // Loop through the field, handle the complement, and count up points
-   for(x=0, n_in=0; x<dp.nx(); x++) {
+   for(x=0,n_in=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
 
          inside = (dp(x, y) == 1);
@@ -644,8 +642,9 @@ void apply_box_mask(DataPlane &dp) {
 
          // Store the current mask value
          dp.set(inside, x, y);
-      }
-   }
+
+      } // end for y
+   } // end for x
 
    if(complement) {
       mlog << Debug(3)
@@ -706,6 +705,7 @@ void apply_circle_mask(DataPlane &dp) {
 
          // Store the result
          dp.set(v, x, y);
+
       } // end for y
    } // end for x
 
@@ -781,6 +781,7 @@ void apply_track_mask(DataPlane &dp) {
 
          // Store the result
          dp.set(v, x, y);
+
       } // end for y
    } // end for x
 
@@ -837,6 +838,7 @@ void apply_grid_mask(DataPlane &dp) {
 
          // Store the current mask value
          dp.set(inside, x, y);
+
       } // end for y
    } // end for x
 
@@ -898,6 +900,7 @@ void apply_data_mask(DataPlane &dp) {
 
          // Store the result
          dp.set(check ? 1.0 : 0.0, x, y);
+
       } // end for y
    } // end for x
 
@@ -1057,56 +1060,29 @@ void apply_lat_lon_mask(DataPlane &dp) {
 
 void apply_shape_mask(DataPlane & dp) {
    int x, y, n_in;
-   int j, k, n;
-   int start, stop;
-   double dx, dy, lat, lon;
    bool status = false;
-   GridClosedPoly p;
-   GridClosedPolyArray a;
 
-   // Load up array
-   for(j=0; j<(shape.n_parts); j++) {
-
-      p.clear();
-
-      start = shape.start_index(j);
-      stop  = shape.stop_index(j);
-
-      n = stop - start + 1;
-
-      for(k=0; k<n; ++k) {
-
-         lat = shape.lat(start + k);
-         lon = shape.lon(start + k);
-
-         lon = -lon;   //  west is positive for us
-
-         grid.latlon_to_xy(lat, lon, dx, dy);
-
-         x = nint(dx);
-         y = nint(dy);
-
-         p.add_point(x, y);
-      } // for k
-
-      a.add(p);
-
-   } // for j
+   // Load the shape
+   GridClosedPolyArray p;
+   p.set(shape, grid);
 
    // Check grid points
-   for(x=0, n_in=0; x<(grid.nx()); x++) {
-      for (y=0; y<(grid.ny()); y++) {
+   for(x=0,n_in=0; x<(grid.nx()); x++) {
+      for(y=0; y<(grid.ny()); y++) {
 
-         status = a.is_inside(x, y);
+         status = p.is_inside(x, y);
 
          // Check the complement
          if(complement) status = !status;
 
+         // Increment count
          if(status) n_in++;
 
-         dp.set( (status ? 1.0 : 0.0 ), x, y);
-      } // for y
-   } // for x
+         // Store the current mask value
+         dp.set((status ? 1.0 : 0.0 ), x, y);
+
+      } // end for y
+   } // end for x
 
    if(complement) {
       mlog << Debug(3)
@@ -1120,7 +1096,6 @@ void apply_shape_mask(DataPlane & dp) {
 
    return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 

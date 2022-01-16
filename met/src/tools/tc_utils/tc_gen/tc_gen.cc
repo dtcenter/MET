@@ -15,12 +15,13 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    05/17/19  Halley Gotway   New
-//   001    10/21/20  Halley Gotway   Fix for MET #1465
-//   002    12/15/20  Halley Gotway   Matching logic for MET #1448
-//   003    12/31/20  Halley Gotway   Add NetCDF output for MET #1430
-//   004    01/14/21  Halley Gotway   Add GENMPR output for MET #1597
-//   005    04/02/21  Halley Gotway   Refinements for MET #1714
-//   006    11/04/21  Halley Gotway   Add -edeck for MET #1809
+//   001    10/21/20  Halley Gotway   MET #1465 Fix lead window
+//   002    12/15/20  Halley Gotway   MET #1448 Refine matching logic
+//   003    12/31/20  Halley Gotway   MET #1430 Add NetCDF output
+//   004    01/14/21  Halley Gotway   MET #1597 Add GENMPR output
+//   005    04/02/21  Halley Gotway   MET #1714 Refinem matching logic
+//   006    11/04/21  Halley Gotway   MET #1809 Add -edeck option
+//   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,7 @@ using namespace std;
 #include "vx_statistics.h"
 #include "vx_tc_util.h"
 #include "vx_nc_util.h"
+#include "vx_gis.h"
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_log.h"
@@ -57,10 +59,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
+
 static void   score_track_genesis  (const GenesisInfoArray &,
                                     const TrackInfoArray &);
 static void   score_genesis_prob   (const GenesisInfoArray &,
                                     const TrackInfoArray &);
+static void   score_genesis_shape  (const GenesisInfoArray &);
+
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     const char *,
@@ -75,6 +80,9 @@ static void   process_tracks       (const StringArray &,
 static void   process_edecks       (const StringArray &,
                                     const StringArray &,
                                     ProbInfoArray &);
+static void   process_shapes       (const StringArray &,
+                                    GenShapeInfoArray &);
+
 static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const ConcatString &,
                                     const GenesisInfoArray &,
@@ -90,6 +98,10 @@ static void   do_probgen_pct       (const TCGenVxOpt &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     ProbGenPCTInfo &);
+static void   do_genshape_pct      (const TCGenVxOpt &,
+                                    GenShapeInfoArray &,
+                                    const GenesisInfoArray &,
+                                    ProbGenPCTInfo &);
 
 static int    find_genesis_match   (const GenesisInfo &,
                                     const GenesisInfoArray &,
@@ -99,6 +111,8 @@ static int    find_probgen_match   (const ProbGenInfo &,
                                     const GenesisInfoArray &,
                                     const TrackInfoArray &,
                                     bool, double, int, int);
+static int    find_genshape_match  (const GenShapeInfo &,
+                                    const GenesisInfoArray &);
 
 static void   setup_txt_files      (int, int, int);
 static void   setup_table          (AsciiTable &);
@@ -126,11 +140,14 @@ static void   write_pct_genmpr_cols(ProbGenPCTInfo &, int, int,
 static void   write_nc             (GenCTCInfo &);
 static void   finish_txt_files     ();
 
+static ConcatString string_to_basin_abbr(ConcatString);
+
 static void   usage                ();
 static void   set_source           (const StringArray &, const char *,
                                     StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
 static void   set_edeck            (const StringArray &);
+static void   set_shape            (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
@@ -162,12 +179,23 @@ int main(int argc, char *argv[]) {
 
    // Score genesis events and write output
    if(genesis_source.n() > 0) {
+      mlog << Debug(2)
+           << "Scoring track genesis forecasts.\n";
       score_track_genesis(best_ga, oper_ta);
    }
 
    // Score EDECK genesis probabilities and write output
    if(edeck_source.n() > 0) {
+      mlog << Debug(2)
+           << "Scoring probability of genesis forecasts.\n";
       score_genesis_prob(best_ga, oper_ta);
+   }
+
+   // Score genesis shapefiles and write output
+   if(shape_source.n() > 0) {
+      mlog << Debug(2)
+           << "Scoring genesis shapefiles.\n";
+      score_genesis_shape(best_ga);
    }
 
    // Finish output files
@@ -205,6 +233,7 @@ void process_command_line(int argc, char **argv) {
    // Add function calls for the arguments
    cline.add(set_genesis, "-genesis", -1);
    cline.add(set_edeck,   "-edeck",   -1);
+   cline.add(set_shape,   "-shape",   -1);
    cline.add(set_track,   "-track",   -1);
    cline.add(set_config,  "-config",   1);
    cline.add(set_out,     "-out",      1);
@@ -224,10 +253,10 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for the minimum number of arguments
-   if(genesis_source.n() == 0 && edeck_source.n() == 0) {
+   if((genesis_source.n() + edeck_source.n() + shape_source.n()) == 0) {
       mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
-           << "at least one of the \"-genesis\" or \"-edeck\" command "
-           << "line options are required\n\n";
+           << "at least one of the \"-genesis\", \"-edeck\", or \"-shape\" "
+           << "command line options are required\n\n";
       usage();
    }
 
@@ -253,6 +282,13 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << edeck_source.n()
            << "] EDECK Source: " << edeck_source[i]
            << ", Model Suffix: " << edeck_model_suffix[i] << "\n";
+   }
+
+   // List the input shapefiles
+   for(i=0; i<shape_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << shape_source.n()
+           << "] Shapefile Source: " << shape_source[i] << "\n";
    }
 
    // List the input track track files
@@ -464,6 +500,64 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
          write_pct_stats(probgen_pct);
 
       } // end for j
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void score_genesis_shape(const GenesisInfoArray &best_ga) {
+   int i, j, total_probs;
+   StringArray shape_files;
+   GenShapeInfoArray shapes_all, shapes_subset;
+   ProbGenPCTInfo probgen_pct;
+
+   // Get the list of input shapefiles
+   for(i=0; i<shape_source.n(); i++) {
+      shape_files.add(get_filenames(shape_source[i], NULL, gen_shp_reg_exp));
+   }
+
+   mlog << Debug(2)
+        << "Processing " << shape_files.n()
+        << " shapefile(s) matching the \""
+        << gen_shp_reg_exp << "\" regular expression.\n";
+   process_shapes(shape_files, shapes_all);
+
+   // Setup output files based on the maximum number of filters
+   // and lead times possible
+   setup_txt_files(conf_info.n_vx(), max_n_shape_prob, 0);
+
+   // Process each verification filter
+   for(i=0; i<conf_info.n_vx(); i++) {
+
+      // Initialize
+      shapes_subset.clear();
+
+      // Subset shapes based on filtering criteria
+      for(j=0, total_probs=0; j<shapes_all.n(); j++) {
+
+         // Check filters to define subset
+         if(conf_info.VxOpt[i].is_keeper(shapes_all[j])) {
+            shapes_subset.add(shapes_all[j]);
+            total_probs += shapes_all[j].n_prob();
+         }
+      } // end for j
+
+      mlog << Debug(2)
+           << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+           << ")" << "] Verifying " << total_probs << " probabilities from "
+           << shapes_subset.n() << " of the " << shapes_all.n()
+           << " input genesis shapes against " << best_ga.n() << " "
+           << conf_info.BestEventInfo.Technique << " genesis events.\n";
+
+      // Do the probabilistic verification
+      do_genshape_pct(conf_info.VxOpt[i], shapes_subset,
+                      best_ga, probgen_pct);
+
+      // Write the statistics output
+      write_pct_stats(probgen_pct);
+
    } // end for i
 
    return;
@@ -782,7 +876,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
          }
 
          // Store pair info
-         pgi.add(model_pa.prob_gen(i), j, bgi, is_event);
+         pgi.add_probgen(model_pa.prob_gen(i), j, bgi, is_event);
 
       } // end for j
    } // end for i
@@ -790,6 +884,77 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void do_genshape_pct(const TCGenVxOpt &vx_opt,
+                     GenShapeInfoArray &fcst_sa,
+                     const GenesisInfoArray &best_ga,
+                     ProbGenPCTInfo &pgi) {
+   int i, j, i_bga;
+   const GenesisInfo *bgi;
+   bool is_event;
+   ConcatString case_cs;
+
+   // Initialize
+   pgi.clear();
+   pgi.set_vx_opt(&vx_opt);
+
+   // Loop over the array of shapes
+   for(i=0; i<fcst_sa.n(); i++) {
+
+      // Search for the genesis match
+      i_bga = find_genshape_match(fcst_sa[i], best_ga);
+
+      // Pointer to the matching BEST track
+      bgi = (is_bad_data(i_bga) ?
+             (const GenesisInfo *) 0 :
+             &best_ga[i_bga]);
+
+      // Score each probability
+      for(j=0; j<fcst_sa[i].n_prob(); j++) {
+
+         // Assume no match
+         is_event = false;
+
+         case_cs << cs_erase << fcst_sa[i].serialize() << " "
+                 << nint(fcst_sa[i].prob_val(j)*100.0)
+                 << "% probability of "
+                 << fcst_sa[i].lead_sec(j)/sec_per_hour
+                 << "-hour genesis ";
+
+         // Best track match
+         if(bgi) {
+
+            // Check probability time window
+            is_event = (bgi->genesis_time() - fcst_sa[i].issue_time()) <
+                       (fcst_sa[i].lead_sec(j));
+
+            if(is_event) {
+               case_cs << "MATCHES "
+                       << unix_to_yyyymmdd_hhmmss(bgi->genesis_time())
+                       << " BEST track " << bgi->storm_id()
+                       << " genesis at (" << bgi->lat() << ", "
+                       << bgi->lon() << ").\n";
+            }
+            else {
+               case_cs << "has NO MATCH in the BEST track.\n";
+            }
+         }
+         // No Best track match
+         else {
+            case_cs << "has NO MATCH in the BEST track.\n";
+         }
+
+         mlog << Debug(5) << case_cs;
+
+         // Store pair info
+         pgi.add_genshape(fcst_sa[i], j, bgi, is_event);
+
+      } // end for j
+   } // end for i
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -966,6 +1131,48 @@ int find_probgen_match(const ProbGenInfo &prob_gi,
    return(i_best);
 }
 
+////////////////////////////////////////////////////////////////////////
+
+int find_genshape_match(const GenShapeInfo &gsi,
+                        const GenesisInfoArray &bga) {
+   int i, i_bga;
+   double x, y;
+   unixtime min_ut;
+
+   // Time window
+   unixtime beg_ut = gsi.issue_time();
+   unixtime end_ut = beg_ut + shape_prob_search_sec;
+
+   // Load the shape
+   GridClosedPolyArray p;
+   p.set(gsi.poly(), conf_info.DLandGrid);
+
+   // Search Best track genesis events for a match
+   for(i=0,i_bga=bad_data_int; i<bga.n(); i++) {
+
+      // First, check the time window
+      if(bga[i].genesis_time() < beg_ut ||
+         bga[i].genesis_time() > end_ut) continue;
+
+      // Second, check the polyline
+      conf_info.DLandGrid.latlon_to_xy(bga[i].lat(), -1.0*bga[i].lon(), x, y);
+      if(p.is_inside(x, y)) {
+
+         // First match found
+         if(is_bad_data(i_bga)) {
+            i_bga  = i;
+            min_ut = bga[i].genesis_time();
+         }
+         // Better match found
+         else if(bga[i].genesis_time() < min_ut) {
+            i_bga  = i;
+            min_ut = bga[i].genesis_time();
+         }
+      }
+   } // end for i
+
+   return(i_bga);
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1359,6 +1566,140 @@ void process_edecks(const StringArray &files,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void process_shapes(const StringArray &files,
+                    GenShapeInfoArray &shapes) {
+   int i, j, k, n_rec, total_probs;
+   unixtime file_ut;
+   ConcatString shp_file_name, dbf_file_name;
+   StringArray sa;
+   ConcatString cs;
+   GenShapeInfo gsi;
+   DbfFile dbf_file;
+   ShpFile shp_file;
+   ShpPolyRecord poly_rec;
+
+   // Initialize
+   total_probs = 0;
+
+   // Process each shapefile
+   for(i=0; i<files.n(); i++) {
+
+      // Get the corresponding dbf file
+      shp_file_name = files[i];
+      dbf_file_name = shp_file_name;
+      dbf_file_name.replace(".shp", ".dbf", false);
+
+      // Check that both exist
+      if(!file_exists(shp_file_name.c_str()) ||
+         !file_exists(dbf_file_name.c_str())) {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "the specified shapefile (" << shp_file_name
+              << ") and corresponding database file (" << dbf_file_name
+              << ") must both exists!\n\n";
+      }
+
+      // Extract the issue time from the filename:
+      //   gtwo_areas_YYYYMMDDHHMM.shp
+      sa = shp_file_name.basename().split("_.");
+      if(sa.n() >= 3 && sa[2].length() >= 12) {
+         cs << cs_erase
+            << sa[2].substr(0, 8).c_str() << "_"
+            << sa[2].substr(8, 4).c_str() << "00";
+         file_ut = yyyymmdd_hhmmss_to_unix(cs.c_str());
+      }
+      else {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "can't extract the issue time from \"" << shp_file_name
+              << "\" since it does not match the regular expression \""
+              << gen_shp_reg_exp << "\"!\n\n";
+         exit(1);
+      }
+
+      // Open the dbf and shp files
+      dbf_file.open(dbf_file_name.c_str());
+      shp_file.open(shp_file_name.c_str());
+
+      // Store the number of records
+      n_rec = dbf_file.header()->n_records;
+
+      // Check expected shape types
+      const ShapeType shape_type = (ShapeType) (shp_file.header()->shape_type);
+      if(shape_type != shape_type_polygon) {
+         mlog << Error << "\nprocess_shapes() -> "
+              << "shapefile type \"" << shapetype_to_string(shape_type)
+              << "\" in file \"" << shp_file_name
+              << "\" is not supported!\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(4) << "[File " << i+1 << " of " << files.n() << "]: "
+           << "Found " << n_rec << " records in file \"" << shp_file_name << "\".\n";
+
+      // Process each shape
+      for(j=0; j<n_rec; j++) {
+
+         // Check for end-of-file
+         if(shp_file.at_eof()) {
+            mlog << Error << "\nrocess_shapes() -> "
+                 << "hit shp file EOF before reading all records!\n\n";
+            exit(1);
+         }
+
+         // Read the current shape and metadata
+         shp_file >> poly_rec;
+         poly_rec.toggle_longitudes();
+         sa = dbf_file.subrecord_values(j);
+
+         // Initialize GenShapeInfo
+         gsi.clear();
+         gsi.set_time(file_ut);
+         gsi.set_basin(string_to_basin_abbr(sa[0]).c_str());
+         gsi.set_poly(poly_rec);
+
+         // Parse probabilities from the subrecord values
+         for(k=0; k<sa.n(); k++) {
+
+            if(check_reg_exp("[0-9]%$", sa[k].c_str())) {
+
+               // Check for too many probabilities
+               if(gsi.n_prob() >= max_n_shape_prob) {
+                  mlog << Warning << "\nprocess_shapes() -> "
+                       << "unexpected number of shapefile probabilities ("
+                       << gsi.n_prob() << ") in record " << j+1
+                       << " of file \"" << dbf_file_name
+                       << "\"!\n\n";
+                  continue;
+               }
+
+               // Store the probability info
+               gsi.add_prob(shape_prob_lead_hr[gsi.n_prob()]*sec_per_hour,
+                            atoi(sa[k].c_str())/100.0);
+            }
+         } // end for k
+
+         // Store this shape, check for duplicates
+         if(shapes.add(gsi, true)) {
+            mlog << Debug(5) << "Add new " << gsi.serialize() << "\n";
+            total_probs += gsi.n_prob();
+         }
+
+      } // end for j
+
+      // Close files
+      dbf_file.close();
+      shp_file.close();
+
+   } // end for i
+
+   mlog << Debug(3) << "Found a total of " << total_probs
+        << " probabilities in " << shapes.n() << " genesis shapes from "
+        << files.n() << " input files.\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Setup the output ASCII files
 //
@@ -1391,7 +1732,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
             break;
 
          // Nx2 probabilistic contingency table output:
-         // 1 header + 1 vx method * # models * #probs * # filters
+         // 1 header + 1 vx method * # models * # probs * # filters
          case(i_pct):
          case(i_pstd):
          case(i_pjc):
@@ -1818,16 +2159,19 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
 ////////////////////////////////////////////////////////////////////////
 
 void write_pct_stats(ProbGenPCTInfo &pgi) {
+
+   // Check for no data to write
+   if(pgi.PCTMap.size() == 0) return;
+
    int i, lead_hr, lead_sec;
 
    // Setup header columns
    shc.set_model(pgi.Model.c_str());
    shc.set_desc(pgi.VxOpt->Desc.c_str());
    shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
-   shc.set_mask(pgi.VxOpt->VxMaskName.empty() ?
-                na_str : pgi.VxOpt->VxMaskName.c_str());
-   shc.set_fcst_var(prob_genesis_name);
-   shc.set_obs_var (prob_genesis_name);
+   shc.set_mask(pgi.VxMask.c_str());
+   shc.set_fcst_var(pgi.VarName.c_str());
+   shc.set_obs_var (pgi.VarName.c_str());
 
    // Write results for each lead time
    for(i=0; i<pgi.LeadTimes.n(); i++) {
@@ -1863,7 +2207,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
 
       // Write PJC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCTMap[lead_hr],
+         write_pjc_row(shc, pgi.PCTMap[lead_hr],
                        pgi.VxOpt->output_map(stat_pjc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pjc], i_txt_row[i_pjc]);
@@ -1871,22 +2215,19 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
 
       // Write PRC output
       if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
-         write_pct_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
+         write_prc_row(shc, pgi.PCTMap[lead_hr],
+                       pgi.VxOpt->output_map(stat_prc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_prc], i_txt_row[i_prc]);
       }
 
       // Write out GENMPR
       if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
-         shc.set_fcst_var(prob_genesis_name);
-         shc.set_obs_var (prob_genesis_name);
          write_pct_genmpr_row(shc, pgi, lead_hr,
                               pgi.VxOpt->output_map(stat_genmpr),
                               stat_at, i_stat_row,
                               txt_at[i_genmpr], i_txt_row[i_genmpr]);
       }
-
    } // end for i
 
    return;
@@ -1912,10 +2253,10 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pgi.FcstGenMap[lead_hr].size(); i++) {
+   for(i=0; i<pgi.ProbGenMap[lead_hr].size(); i++) {
 
       // Pointers for current case
-      const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][i];
+      const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][i];
       const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][i];
 
       // Store timing info
@@ -1958,10 +2299,10 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
                             AsciiTable &at, int r, int c) {
 
    // Pointers for current case
-   const ProbGenInfo *fgi = pgi.FcstGenMap[lead_hr][index];
+   const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][index];
    const GenesisInfo *bgi = pgi.BestGenMap[lead_hr][index];
 
-   int i_prob = pgi.FcstIdxMap[lead_hr][index];
+   int i_prob = pgi.ProbIdxMap[lead_hr][index];
 
     //
     // Genesis Matched Pairs (GENMPR):
@@ -1975,7 +2316,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
     //
 
     at.set_entry(r, c+0,  // Total number of pairs
-       (int) pgi.FcstGenMap[lead_hr].size());
+       (int) pgi.ProbGenMap[lead_hr].size());
 
     at.set_entry(r, c+1,  // Index of current pair
        index+1);
@@ -2208,13 +2549,28 @@ void finish_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString string_to_basin_abbr(ConcatString cs) {
+   ConcatString abbr;
+
+        if(cs == "Atlantic")        abbr = "AL";
+   else if(cs == "East Pacific")    abbr = "EP";
+   else if(cs == "Central Pacific") abbr = "CP";
+   else                             abbr = cs;
+
+   return(abbr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-genesis source and/or -edeck source\n"
+        << "\t-genesis source\n"
+        << "\t-edeck source\n"
+        << "\t-shape source\n"
         << "\t-track source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
@@ -2224,12 +2580,17 @@ void usage() {
         << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_gen_reg_exp << "\" (required if no -edeck).\n"
+        << atcf_gen_reg_exp << "\" (required if no -edeck or -shape).\n"
 
         << "\t\t\"-edeck source\" is one or more ensemble model output "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
-        << atcf_reg_exp << "\" (required if no -genesis).\n"
+        << atcf_reg_exp << "\" (required if no -genesis or -shape).\n"
+
+        << "\t\t\"-shape source\" is one or more genesis area shapefiles, "
+        << "an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << gen_shp_reg_exp << "\" (required if no -genesis or -edeck).\n"
 
         << "\t\t\"-track source\" is one or more ATCF track "
         << "files, an ASCII file list containing them, or a top-level "
@@ -2322,6 +2683,13 @@ void set_genesis(const StringArray & a) {
 
 void set_edeck(const StringArray & a) {
    set_source(a, "edeck", edeck_source, edeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_shape(const StringArray & a) {
+   StringArray suffix;
+   set_source(a, "shape", shape_source, suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -40,6 +40,9 @@ class Dictionary;        //  forward reference
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char met_ens_member_id [] = "MET_ENS_MEMBER_ID";
+
+////////////////////////////////////////////////////////////////////////
 
 class DictionaryEntry {
 
@@ -122,7 +125,7 @@ class DictionaryEntry {
 
       int     n_args () const;
 
-      const ConcatString * string_value () const;
+      const ConcatString string_value () const;
 
       Dictionary * dict_value () const;
 

@@ -55,23 +55,23 @@ void GenEnsProdConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::clear() {
-   vector<VarInfo*>::const_iterator it;
+   vector<GenEnsProdVarInfo*>::const_iterator var_it = ens_input.begin();
 
    // Clear, erase, and initialize members
    model.clear();
    desc.clear();
-   for(it = ens_info.begin(); it != ens_info.end(); it++) {
-      if(*it) { delete *it; }
+
+   for(; var_it != ens_input.end(); var_it++) {
+
+     if(*var_it) { delete *var_it; }
+
    }
-   ens_info.clear();
+   ens_input.clear();
    cdf_info.clear();
-   cat_ta.clear();
-   nc_var_str.clear();
    nbrhd_prob.clear();
    nmep_smooth.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
-   nc_info.clear();
    version.clear();
 
    // Reset counts
@@ -100,12 +100,18 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(GrdFileType etype) {
-   int i;
+void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
+   int i, j;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) 0;
    Dictionary i_edict;
    InterpMthd mthd;
+   VarInfo * next_var;
+
+   int n_ens_files = ens_files->n();
+
+   // Unset MET_ENS_MEMBER_ID in case it is set by the user
+   unsetenv(met_ens_member_id);
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -122,6 +128,46 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
    // Conf: desc
    desc = parse_conf_string(&conf, conf_key_desc);
 
+   // Conf: ens_member_ids
+   ens_member_ids = parse_conf_ens_member_ids(&conf);
+
+   // Conf: control_id
+   control_id = parse_conf_string(&conf, conf_key_control_id, false);
+
+    // Error check ens_member_ids and ensemble file list
+   if(ens_member_ids.n() > 1) {
+
+      // Only a single file should be provided if using ens_member_ids
+      if(n_ens_files > 1) {
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+              << "The \"" << conf_key_ens_member_ids << "\" "
+              << "must be empty if more than "
+              << "one file is provided.\n\n";
+         exit(1);
+      }
+
+      // The control ID must be set when the control file is specified
+      if(control_id.empty() && use_ctrl) {
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+              << "the control_id must be set if processing a single input "
+              << "file with the -ctrl option\n\n";
+         exit(1);
+      }
+
+      // If control ID is set, it cannot be found in ens_member_ids
+      if(!control_id.empty() && ens_member_ids.has(control_id)) {
+          mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+               << "control_id (" << control_id << ") must not be found "
+               << "in ens_member_ids\n\n";
+          exit(1);
+      }
+   }
+
+   // If no ensemble member IDs were provided, add an empty string
+   if(ens_member_ids.n() == 0) {
+      ens_member_ids.add("");
+   }
+
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);
 
@@ -135,42 +181,88 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype) {
 
    // Parse the ensemble field information
    for(i=0,max_n_cat=0; i<n_var; i++) {
-
-      // Allocate new VarInfo object
-      ens_info.push_back(info_factory.new_var_info(etype));
+      
+      GenEnsProdVarInfo * ens_info = new GenEnsProdVarInfo();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
 
-      // Set the current dictionary
-      ens_info[i]->set_dict(i_edict);
+      // get VarInfo magic string without substituted values
+      ens_info->raw_magic_str = raw_magic_str(i_edict, etype);
 
-      // Dump the contents of the current VarInfo
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed ensemble field number " << i+1 << ":\n";
-         ens_info[i]->dump(cout);
+      // Loop over ensemble member IDs to substitute
+      for(j=0; j<ens_member_ids.n(); j++) {
+
+         // set environment variable for ens member ID
+         setenv(met_ens_member_id, ens_member_ids[j].c_str(), 1);
+
+         // Allocate new VarInfo object
+         next_var = info_factory.new_var_info(etype);
+
+         // Set the current dictionary
+         next_var->set_dict(i_edict);
+
+         // Dump the contents of the current VarInfo
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Parsed ensemble field number " << i+1
+                 << " (" << j+1 << "):\n";
+            next_var->dump(cout);
+         }
+
+         InputInfo input_info;
+         input_info.var_info = next_var;
+         input_info.file_index = 0;
+         input_info.file_list = ens_files;
+         ens_info->add_input(input_info);
+
+         // Add InputInfo to ens info list for each ensemble file provided
+         // set var_info to NULL to note first VarInfo should be used
+         for(int k=1; k<n_ens_files; k++) {
+            input_info.var_info = NULL;
+            input_info.file_index = k;
+            input_info.file_list = ens_files;
+            ens_info->add_input(input_info);
+         } // end for k
+
+      } // end for j
+
+      // Get field info for control member if set
+      if(!control_id.empty()) {
+
+         // Set environment variable for ens member ID
+         setenv(met_ens_member_id, control_id.c_str(), 1);
+
+         // Allocate new VarInfo object
+         next_var = info_factory.new_var_info(etype);
+
+         // Set the current dictionary
+         next_var->set_dict(i_edict);
+
+         ens_info->set_ctrl(next_var);
       }
 
       // Conf: nc_var_str
-      nc_var_str.add(parse_conf_string(&i_edict, conf_key_nc_var_str, false));
+      ens_info->nc_var_str =parse_conf_string(&i_edict, conf_key_nc_var_str, false);
 
       // Conf: cat_thresh
-      cat_ta.push_back(i_edict.lookup_thresh_array(conf_key_cat_thresh));
+      ens_info->cat_ta = i_edict.lookup_thresh_array(conf_key_cat_thresh);
 
       // Dump the contents of the current thresholds
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
               << "Parsed thresholds for ensemble field number " << i+1 << ":\n";
-         cat_ta[i].dump(cout);
+         ens_info->cat_ta.dump(cout);
       }
 
       // Keep track of the maximum number of thresholds
-      if(cat_ta[i].n() > max_n_cat) max_n_cat = cat_ta[i].n();
+      if(ens_info->cat_ta.n() > max_n_cat) max_n_cat = ens_info->cat_ta.n();
 
       // Conf: ensemble_flag
-      nc_info.push_back(parse_nc_info(&i_edict));
-   }
+      ens_info->nc_info = parse_nc_info(&i_edict);
+
+      ens_input.push_back(ens_info);
+   } // end for i
 
    // Conf: ens.ens_thresh
    vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);

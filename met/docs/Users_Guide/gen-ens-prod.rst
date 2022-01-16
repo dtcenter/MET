@@ -67,7 +67,7 @@ Required arguments gen_ens_prod
 Optional arguments for gen_ens_prod
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread. The control file should not appear in the **-ens** list of ensemble member files.
+4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread. The control file should not appear in the **-ens** list of ensemble member files (unless processing a single file that contains all ensemble members).
 
 5. The **-log** file outputs log messages to the specified file.
 
@@ -131,6 +131,50 @@ When summarizing the ensemble, compute a ratio of the number of valid ensemble f
 When summarizing the ensemble, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data for that grid point. This threshold must be between 0 and 1. Setting this threshold to 1 requires  that each grid point contain valid data for all ensemble members in order to compute ensemble product values for that grid point.
 
 For each dictionary entry in the **field** array, give the name and vertical or accumulation level, plus one or more categorical thresholds in the **cat_thresh** entry. The formatting for threshold are described in :numref:`config_options`. It is the user's responsibility to know the units for each model variable and choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies. For example, a threshold of >=5 is used to define the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
+
+_______________________
+
+.. code-block:: none
+
+  ens_member_ids = [];
+  control_id = "";
+
+The **ens_member_ids** array is only used if reading a single file that contains all ensemble members.
+It should contain a list of string identifiers that are substituted into the **ens** dictionary fields
+to determine which data to read from the file.
+The length of the array determines how many ensemble members will be processed for a given field.
+Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
+
+**NetCDF Example:**
+
+.. code-block:: none
+
+  ens = {
+    field = [
+      {
+        name  = "fcst";
+        level = "(MET_ENS_MEMBER_ID,0,*,*)";
+      }
+    ];
+  }
+
+**GRIB Example:**
+
+.. code-block:: none
+
+  ens = {
+    field = [
+      {
+        name     = "fcst";
+        level    = "L0";
+        GRIB_ens = "MET_ENS_MEMBER_ID";
+      }
+    ];
+  }
+
+**control_id** is a string that is substituted in the same way as the **ens_member_ids** values
+to read a control member. This value is only used when the **-ctrl** command line argument is
+used. The value should not be found in the **ens_member_ids** array.
 
 _______________________
 

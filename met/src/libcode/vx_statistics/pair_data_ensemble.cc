@@ -891,7 +891,7 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   fcst_info    = (VarInfo *) 0;
+   fcst_info    = (EnsVarInfo *) 0;
    climo_info   = (VarInfo *) 0;
    obs_info     = (VarInfo *) 0;
    pd           = (PairDataEnsemble ***) 0;
@@ -910,7 +910,7 @@ void VxPairDataEnsemble::init_from_scratch() {
 void VxPairDataEnsemble::clear() {
    int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *) 0; }
+   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) 0; }
    if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
    if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) 0; }
 
@@ -993,15 +993,14 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_fcst_info(VarInfo *info) {
+void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) 0; }
 
    // Perform a deep copy
-   fcst_info = f.new_var_info(info->file_type());
-   *fcst_info = *info;
+   fcst_info = new EnsVarInfo(*info);
 
    return;
 }
@@ -1442,7 +1441,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // falls within the requested range.
    else {
 
-      if(!msg_typ_sfc.has(hdr_typ_str) &&
+      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info_grib->level().lower() ||
           obs_hgt > obs_info_grib->level().upper())) {
          return;
@@ -1458,7 +1457,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // below the observation point.
    else {
       // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
       find_vert_lvl(climo_mn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
    }
@@ -1472,7 +1471,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // levels above and below the observation point.
    else {
       // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
       find_vert_lvl(climo_sd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
    }
@@ -1481,12 +1480,12 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      msg_typ_sfc.has(hdr_typ_str)) {
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 
    // Set flag for specific humidity
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
+   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Store pointer to ObsErrorEntry
@@ -1561,7 +1560,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Compute the interpolated climatology values using the
             // observation pressure level or height
-            to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+            to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
 
             // Compute the interpolated climatology mean
@@ -1570,7 +1569,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                        pd[0][0][k].interp_shape, gr.wrap_lon(),
                        interp_thresh, spfh_flag,
-                       fcst_info->level().type(),
+                       fcst_info->get_var_info()->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
             // Check for bad data
@@ -1597,7 +1596,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                         pd[0][0][k].interp_shape, gr.wrap_lon(),
                         interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
+                        fcst_info->get_var_info()->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Check for bad data
@@ -1630,7 +1629,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
    double to_lvl, fcst_v;
 
    // Set flag for specific humidity
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
+   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Loop through all the PairDataEnsemble objects and interpolate
@@ -1642,7 +1641,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             for(l=0; l<pd[i][j][k].n_obs; l++) {
 
                // Interpolate using the observation pressure level or height
-               to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+               to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                          pd[i][j][k].lvl_na[l] : pd[i][j][k].elv_na[l]);
 
                // For a single forecast field
@@ -1668,7 +1667,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                            pd[0][0][k].interp_shape,
                            gr.wrap_lon(),
                            interp_thresh, spfh_flag,
-                           fcst_info->level().type(),
+                           fcst_info->get_var_info()->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);
 
                // Store the ensemble mean

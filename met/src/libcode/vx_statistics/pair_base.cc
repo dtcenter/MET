@@ -71,6 +71,7 @@ void PairBase::clear() {
    msg_typ.clear();
    msg_typ_vals.clear();
 
+   interp_wdth = 0;
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
