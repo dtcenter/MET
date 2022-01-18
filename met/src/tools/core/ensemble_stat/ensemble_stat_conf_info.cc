@@ -50,8 +50,6 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   ens_info = (VarInfo **)          0;
-   ens_ta   = (ThreshArray *)       0;
    vx_opt   = (EnsembleStatVxOpt *) 0;
    rng_ptr  = (gsl_rng *)           0;
 
@@ -64,9 +62,9 @@ void EnsembleStatConfInfo::init_from_scratch() {
 
 void EnsembleStatConfInfo::clear() {
    int i;
+   vector<EnsVarInfo*>::const_iterator it = ens_input.begin();
 
    // Initialize values
-   ens_var_str.clear();
    model.clear();
    obtype.clear();
    vld_ens_thresh = bad_data_double;
@@ -92,12 +90,12 @@ void EnsembleStatConfInfo::clear() {
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) 0; }
 
-   if(ens_info) {
-      for(i=0; i<n_ens_var; i++) {
-         if(ens_info[i]) { delete ens_info[i]; ens_info[i] = (VarInfo *) 0; }
-      }
-      delete ens_info; ens_info = (VarInfo **) 0;
+   for(; it != ens_input.end(); it++) {
+
+      if(*it) { delete *it; }
+
    }
+   ens_input.clear();
 
    // Reset counts
    n_ens_var    = 0;
@@ -130,8 +128,11 @@ void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
                                           bool grid_vx, bool point_vx,
-                                          bool use_var_id) {
-   int i;
+                                          bool use_var_id,
+                                          StringArray * ens_files,
+                                          StringArray * fcst_files,
+                                          bool use_ctrl) {
+   int i,j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *edict  = (Dictionary *) 0;
@@ -139,12 +140,18 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    Dictionary *odict  = (Dictionary *) 0;
    Dictionary i_edict, i_fdict, i_odict;
    InterpMthd mthd;
+   VarInfo * next_var;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
    // Initialize
    clear();
+
+   n_ens_files = ens_files->n();
+
+   // Unset MET_ENS_MEMBER_ID in case it is set by the user
+   unsetenv(met_ens_member_id);
 
    // Conf: version
    version = parse_conf_version(&conf);
@@ -187,63 +194,145 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: ensemble_flag
    parse_nc_info();
 
+   // Conf: ens_member_ids
+   ens_member_ids = parse_conf_ens_member_ids(&conf);
+
+   // Conf: control_id
+   control_id = parse_conf_string(&conf, conf_key_control_id, false);
+
+   // Error check ens_member_ids and ensemble file list
+   if(ens_member_ids.n() > 1) {
+
+      // Only a single file should be provided if using ens_member_ids
+      if(ens_files->n() > 1) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+              << "The \"" << conf_key_ens_member_ids << "\" "
+              << "must be empty if more than "
+              << "one file is provided.\n\n";
+         exit(1);
+      }
+
+      // The control ID must be set when the control file is specified
+      if(control_id.empty() && use_ctrl) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+              << "the control_id must be set if processing a single input "
+              << "file with the -ctrl option\n\n";
+         exit(1);
+      }
+
+      // If control ID is set, it cannot be found in ens_member_ids
+      if(!control_id.empty() && ens_member_ids.has(control_id)) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+              << "control_id (" << control_id << ") must not be found "
+              << "in ens_member_ids\n\n";
+         exit(1);
+      }
+   }
+
+   // If no ensemble member IDs were provided, add an empty string
+   if(ens_member_ids.n() == 0) {
+      ens_member_ids.add("");
+   }
+
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);
+
 
    // Determine the number of ensemble fields to be processed
    n_ens_var = parse_conf_n_vx(edict);
 
-   // Allocate space based on the number of ensemble fields
-   if(n_ens_var > 0) {
-      ens_info = new VarInfo *   [n_ens_var];
-      ens_ta   = new ThreshArray [n_ens_var];
-   }
-
-   // Initialize pointers
-   for(i=0; i<n_ens_var; i++) ens_info[i] = (VarInfo *) 0;
-
     // Parse the ensemble field information
    for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
 
-      // Allocate new VarInfo object
-      ens_info[i] = info_factory.new_var_info(etype);
+      EnsVarInfo * ens_info = new EnsVarInfo();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
 
-      // Set the current dictionary
-      ens_info[i]->set_dict(i_edict);
+      // get VarInfo magic string without substituted values
+      ens_info->raw_magic_str = raw_magic_str(i_edict, etype);
 
-      // Dump the contents of the current VarInfo
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed ensemble field number " << i+1 << ":\n";
-         ens_info[i]->dump(cout);
+      // Loop over ensemble member IDs to substitute
+      for(j=0; j<ens_member_ids.n(); j++) {
+
+         // set environment variable for ens member ID
+         setenv(met_ens_member_id, ens_member_ids[j].c_str(), 1);
+
+         // Allocate new VarInfo object
+         next_var = info_factory.new_var_info(etype);
+
+         // Set the current dictionary
+         next_var->set_dict(i_edict);
+
+
+         // Dump the contents of the current VarInfo
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Parsed ensemble field number " << i+1
+                 << " (" << j+1 << "):\n";
+            next_var->dump(cout);
+         }
+
+         InputInfo input_info;
+         input_info.var_info = next_var;
+         input_info.file_index = 0;
+         input_info.file_list = ens_files;
+         ens_info->add_input(input_info);
+
+         // Add InputInfo to ens info list for each ensemble file provided
+         // set var_info to NULL to note first VarInfo should be used
+         for(int k=1; k<n_ens_files; k++) {
+            input_info.var_info = NULL;
+            input_info.file_index = k;
+            input_info.file_list = ens_files;
+            ens_info->add_input(input_info);
+         } // end for k
+
+      } // end for j
+
+      // Get field info for control member if set
+      if(!control_id.empty()) {
+
+         // Set environment variable for ens member ID
+         setenv(met_ens_member_id, control_id.c_str(), 1);
+
+         // Allocate new VarInfo object
+         next_var = info_factory.new_var_info(etype);
+
+         // Set the current dictionary
+         next_var->set_dict(i_edict);
+
+         ens_info->set_ctrl(next_var);
       }
 
       // Conf: ens_nc_var_str
-      ens_var_str.add(parse_conf_string(&i_edict, conf_key_nc_var_str, false));
+      ens_info->nc_var_str =parse_conf_string(&i_edict, conf_key_nc_var_str, false);
 
       // Conf: ens_nc_pairs
       // Only parse thresholds if probabilities are requested
       if(nc_info.do_freq || nc_info.do_nep || nc_info.do_nmep) {
 
          // Conf: cat_thresh
-         ens_ta[i] = i_edict.lookup_thresh_array(conf_key_cat_thresh);
+         ens_info->cat_ta = i_edict.lookup_thresh_array(conf_key_cat_thresh);
 
          // Dump the contents of the current thresholds
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)
                  << "Parsed thresholds for ensemble field number " << i+1 << ":\n";
-            ens_ta[i].dump(cout);
+            ens_info->cat_ta.dump(cout);
          }
 
          // Keep track of the maximum number of thresholds
-         if(ens_ta[i].n_elements() > max_n_thresh) {
-            max_n_thresh = ens_ta[i].n_elements();
+         if(ens_info->cat_ta.n_elements() > max_n_thresh) {
+            max_n_thresh = ens_info->cat_ta.n_elements();
          }
       }
-   }
+
+      ens_input.push_back(ens_info);
+   } // end for i
+
+   // Unset MET_ENS_MEMBER_ID that was previously set
+   unsetenv(met_ens_member_id);
 
    // Conf: ens.ens_thresh
    vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);
@@ -345,7 +434,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          // Process the options for this verification task
          vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
                                   rng_ptr, grid_vx, point_vx,
-                                  use_var_id);
+                                  use_var_id, ens_member_ids,
+                                  fcst_files, use_ctrl, control_id);
 
          // For no point verification, store obtype as the message type
          if(!point_vx) {
@@ -673,21 +763,73 @@ void EnsembleStatVxOpt::clear() {
 void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
                                        gsl_rng *rng_ptr, bool grid_vx,
-                                       bool point_vx, bool use_var_id) {
-   int i;
+                                       bool point_vx, bool use_var_id,
+                                       StringArray ens_member_ids,
+                                       StringArray * fcst_files,
+                                       bool use_ctrl, ConcatString control_id) {
+   int i, j;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
+   VarInfo * next_var;
+   InputInfo input_info;
 
    // Initialize
    clear();
 
-   // Allocate new VarInfo objects
-   vx_pd.fcst_info = info_factory.new_var_info(ftype);
+   // Allocate new EnsVarInfo object for fcst
+   vx_pd.fcst_info = new EnsVarInfo();
+
+   // Loop over ensemble member IDs to substitute
+   for(i=0; i<ens_member_ids.n(); i++) {
+
+      // set environment variable for ens member ID
+      setenv(met_ens_member_id, ens_member_ids[i].c_str(), 1);
+
+      // Allocate new VarInfo object
+      next_var = info_factory.new_var_info(ftype);
+
+      // Set the current dictionary
+      next_var->set_dict(fdict);
+
+      input_info.var_info = next_var;
+      input_info.file_index = 0;
+      input_info.file_list = fcst_files;
+      vx_pd.fcst_info->add_input(input_info);
+
+      // Add InputInfo to fcst info list for each ensemble file provided
+      // set var_info to NULL to note first VarInfo should be used
+      int last_member_index = fcst_files->n() - (use_ctrl ? 1 : 0);
+      for(j=1; j<last_member_index; j++) {
+         input_info.var_info = NULL;
+         input_info.file_index = j;
+         input_info.file_list = fcst_files;
+         vx_pd.fcst_info->add_input(input_info);
+      } // end for j
+   } // end for i
+
+   // Add control member as the last input
+   if(use_ctrl) {
+
+      // Set environment variable for ens member ID
+      setenv(met_ens_member_id, control_id.c_str(), 1);
+
+      // Allocate new VarInfo object
+      next_var = info_factory.new_var_info(ftype);
+
+      // Set the current dictionary
+      next_var->set_dict(fdict);
+
+      input_info.var_info = next_var;
+      input_info.file_index = fcst_files->n() - 1;
+      input_info.file_list = fcst_files;
+      vx_pd.fcst_info->add_input(input_info);
+   }
+
+   // Allocate new VarInfo object for obs
    vx_pd.obs_info  = info_factory.new_var_info(otype);
 
    // Set the VarInfo objects
-   vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
 
    // Set the GRIB code for point observations
@@ -697,7 +839,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
-      vx_pd.fcst_info->dump(cout);
+      vx_pd.fcst_info->get_var_info()->dump(cout);
       mlog << Debug(5)
            << "Parsed observation field:\n";
       vx_pd.obs_info->dump(cout);
@@ -707,10 +849,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // forecast field is a range of pressure levels, check to see if the
    // range of observation field pressure levels is wholly contained in the
    // fcst levels.  If not, print a warning message.
-   if(vx_pd.fcst_info->level().type() == LevelType_Pres &&
-      !is_eq(vx_pd.fcst_info->level().lower(), vx_pd.fcst_info->level().upper()) &&
-      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->level().lower() ||
-       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->level().upper())) {
+   if(vx_pd.fcst_info->get_var_info()->level().type() == LevelType_Pres &&
+      !is_eq(vx_pd.fcst_info->get_var_info()->level().lower(), vx_pd.fcst_info->get_var_info()->level().upper()) &&
+      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->get_var_info()->level().lower() ||
+       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->get_var_info()->level().upper())) {
 
       mlog << Warning
            << "\nEnsembleStatVxOpt::process_config() -> "
@@ -723,7 +865,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // No support for wind direction
-   if(vx_pd.fcst_info->is_wind_direction() ||
+   if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "wind direction may not be verified using grid_stat.\n\n";

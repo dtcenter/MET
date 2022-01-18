@@ -290,6 +290,14 @@ Enable compilation of the MODE-Graphics tool. Requires $MET_CAIRO and $MET_FREET
 
 Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBUFR files.
 
+.. code-block:: none
+
+  --disable-openmp
+
+Disable compilation of OpenMP directives within the code which allows some code
+regions to benefit from thread-parallel execution. Runtime environment variable
+:code:`OMP_NUM_THREADS` controls the number of threads.
+
 Run the configure script with the **-help** argument to see the full list of configuration options.
 
 Make Targets

@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "GEFS";
 
 //
 // Output description to be written
@@ -26,32 +26,39 @@ obtype = "ANALYS";
 
 //
 // Verification grid
+// May be set separately in each "field" entry
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
+
+//
 // Ensemble product fields to be processed
 //
 ens = {
-   ens_thresh = 0.75;
+   ens_thresh = 1.0;
    vld_thresh = 1.0;
 
    field = [
       {
-         name       = "TMP";
-         level      = "Z2";
-         cat_thresh = [ <=273.15, >273.15  ];
-      },
-      {
-         name       = "APCP";
-         level      = "A24";
-         cat_thresh = [ >0.0 ];
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "MET_ENS_MEMBER_ID";
       }
    ];
 }
@@ -60,8 +67,8 @@ ens = {
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
-ens_member_ids = [];
-control_id = "";
+ens_member_ids = ["+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10", "+11", "+12", "+13", "+14", "+15", "+16", "+17", "+18", "+19", "+20"];
+control_id = "hi_res_ctl";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -96,41 +103,43 @@ nmep_smooth = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type    = [ "ADPSFC" ];
-   sid_inc         = [];
-   sid_exc         = [];
-   obs_quality_inc = [];
-   obs_quality_exc = [];
 
    field = [
       {
-         name  = "TMP";
-         level = "Z2";
-      },
-      {
-         name       = "APCP";
-         level      = "A24";
-         obs_thresh = [ NA, >0, >=2.54 ];
-         obs_error = {
-            flag      = ${OBS_ERROR_FLAG};
-            dist_type = NONE;
-         }
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "MET_ENS_MEMBER_ID";
       }
    ];
 }
-obs = fcst;
 
+obs = {
+   field = [
+      {
+         name       = "PRMSL";
+	 level      = "L0";
+	 lead_time  = "06";
+	 GRIB_ens   = "hi_res_ctl";
+      }
+   ];
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
+message_type   = [ "ADPUPA" ];
+sid_inc        = [];
+sid_exc        = [];
 obs_thresh     = [ NA ];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
-skip_const     = ${SKIP_CONST};
+skip_const     = FALSE;
 
 //
 // Observation error options
@@ -138,14 +147,24 @@ skip_const     = ${SKIP_CONST};
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   flag             = FALSE;
-   dist_type        = NONE;
-   dist_parm        = [];
-   inst_bias_scale  = 1.0;
-   inst_bias_offset = 0.0;
-   min              = NA;
+   flag             = FALSE;   // TRUE or FALSE
+   dist_type        = NONE;    // Distribution type
+   dist_parm        = [];      // Distribution parameters
+   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
+   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
+   min              = NA;      // Valid range of data
    max              = NA;
 }
+
+//
+// Mapping of message type group name to comma-separated list of values
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+];
 
 //
 // Ensemble bin sizes
@@ -159,6 +178,41 @@ ens_phist_bin_size = 0.05;
 // May be set separately in each "fcst.field" entry
 //
 prob_cat_thresh = [];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 10;
+   center_bins = FALSE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -177,11 +231,17 @@ obs_window = {
 //
 mask = {
    grid  = [ "FULL" ];
-   poly  = [ "MET_BASE/poly/NWC.poly",
-             "MET_BASE/poly/GRB.poly" ];
+   poly  = [];
    sid   = [];
    llpnt = [];
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -191,6 +251,7 @@ mask = {
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
+   shape  = SQUARE;
 
    type = [
       {
@@ -206,13 +267,13 @@ interp = {
 // Statistical output types
 //
 output_flag = {
-   ecnt  = BOTH;
+   ecnt  = STAT;
    rps   = NONE;
-   rhist = BOTH;
-   phist = BOTH;
-   orank = BOTH;
-   ssvar = BOTH;
-   relp  = BOTH;
+   rhist = NONE;
+   phist = NONE;
+   orank = NONE;
+   ssvar = NONE;
+   relp  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,15 +282,16 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
+   latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
    min       = TRUE;
    max       = TRUE;
-   range     = TRUE;
+   range     = FALSE;
    vld_count = TRUE;
-   frequency = TRUE;
+   frequency = FALSE;
    nep       = FALSE;
    nmep      = FALSE;
    rank      = TRUE;

@@ -127,6 +127,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "handle_openmp.h"
+
 #include "grid_stat.h"
 
 #include "vx_statistics.h"
@@ -184,6 +186,9 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);

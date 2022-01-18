@@ -27,7 +27,7 @@ export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.8"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.8 -lcrypt -lpthread -ldl -lutil -lm"
 
 # -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
-export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__"
+export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
@@ -49,4 +49,3 @@ export MET_TEST_RSCRIPT=/usr/local/R-4.1.2/bin/Rscript
 export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
              /usr/local/sbin:/usr/local/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
-

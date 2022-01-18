@@ -57,7 +57,7 @@ in the configuration string on the command line:
 
 .. code-block:: none
 		
-     ${MET_BUILD_BASE}/bin/plot_data_plane 
+     plot_data_plane
      sample.grib china_tmp_2m_admin.ps \
      'name="TMP"; level="Z2"; \
      map_data = { source = [ { file_name = \
@@ -149,7 +149,7 @@ Let's use plot_data_plane as an example:
 
 .. code-block:: none
 		      
-		${MET_BUILD_BASE}/bin/plot_data_plane \ 
+		plot_data_plane \
 		MERGE_20161201_20170228.nc \ 
 		obs.ps \ 
 		'name="APCP"; level="(5,*,*)";'
@@ -281,20 +281,20 @@ lat/lon grid over Europe:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/regrid_data_plane gfs.t12z.pgrb2.0p50.f000 \
+		regrid_data_plane gfs.t12z.pgrb2.0p50.f000 \
 		'latlon 100 100 25 0 0.5 0.5' gfs_euro.nc -field 'name="TMP"; level="Z2";'
 
 Run the MET gen_vx_mask tool to apply your polyline to the European domain:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
+		gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
 
 Run the MET plot_data_plane tool to display the resulting mask field:
 
 .. code-block:: none
 		      
-		${MET_BUILD_BASE}/bin/plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND"; level="(*,*)";'
+		plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND"; level="(*,*)";'
 
 In this example, the mask is in roughly the right spot, but there
 are obvious problems with the latitude and longitude values used
@@ -452,7 +452,7 @@ Run Grid-Stat using the following commands and the attached config file
 .. code-block:: none
 		   
 		mkdir out 
-		${MET_BUILD_BASE}/bin/grid_stat \ 
+		grid_stat \
 		gfs_4_20160220_0000_012.grb2 \ 
 		ST4.2016022012.06h \ 
 		GridStatConfig \
@@ -490,7 +490,7 @@ commands to plot its NetCDF matched pairs output file:
 
 .. code-block:: none
 		   
-		${MET_BUILD_BASE}/bin/plot_data_plane \ 
+		plot_data_plane \
 		out/grid_stat_120000L_20160220_120000V_pairs.nc \ 
 		out/DIFF_APCP_06_A06_APCP_06_A06_CONUS.ps \ 
 		'name="DIFF_APCP_06_A06_APCP_06_A06_CONUS"; level="(*,*)";'
@@ -524,7 +524,7 @@ point where the temperature is less than 290 K to a value of 0:
 
 .. code-block:: none
 		
-		{MET_BUILD_BASE}/bin/gen_vx_mask \ 
+		gen_vx_mask \
 		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
 		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
 		APCP_03_where_2m_TMPge290.nc \ 
@@ -568,11 +568,10 @@ the output through plot_data_plane:
 
 .. code-block:: none
 		
-        {MET_BUILD_BASE}/bin/plot_data_plane \ 
-
-	APCP_03_where_2m_TMPge290.nc APCP_03_where_2m_TMPge290.ps \ 
-
-	'name="data_mask"; level="(*,*)";'
+        plot_data_plane \
+	     APCP_03_where_2m_TMPge290.nc \
+        APCP_03_where_2m_TMPge290.ps \
+        'name="data_mask"; level="(*,*)";'
 
 In the resulting plot, anywhere you see the pink value of 10, that's
 where gen_vx_mask has masked out the grid point.
@@ -593,21 +592,21 @@ through pcp_combine as a pass-through to put it into NetCDF format:
 
 .. code-block:: none
 		
-		[MET_BUILD_BASE}/pcp_combine -add 03_file.grb 03 APCP_00_03.nc
+		pcp_combine -add 03_file.grb 03 APCP_00_03.nc
 		
 If the user wanted the 3-6 hour accumulation, they would subtract
 0-6 and 0-3 accumulations:
 
 .. code-block:: none
 		
-		[MET_BUILD_BASE}/pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
+		pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
 
 Similarly, if they wanted the 6-9 hour accumulation, they would
 subtract 0-9 and 0-6 accumulations: 
 
 .. code-block:: none		
 
-		[MET_BUILD_BASE}/pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
+		pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
 
 And so on.
 
@@ -626,7 +625,7 @@ option instead.
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/pcp_combine -add \ 
+		pcp_combine -add \
 		WRFPRS_1997-06-03_APCP_A12.nc 'name="APCP_12"; level="(*,*)";' \ 
 		WRFPRS_d01_1997-06-04_00_APCP_A12.grb 12 \ 
 		Sum.nc
@@ -647,17 +646,17 @@ Here are 3 commands you could use to plot these data files:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
+		plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
 		WRFPRS_1997-06-03_APCP_A12.ps 'name="APCP_12"; level="(*,*)";' 
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
+		plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
 		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
+		plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
 **Q. Pcp-Combine - How do I correct a precipitation time range?**
 
@@ -756,11 +755,11 @@ examples:
 .. code-block:: none
 		
 		# Only using Stage IV data (ST4)
-		${MET_BUILD_BASE}/bin/pcp_combine -sum 00000000_000000 06 \
+		pcp_combine -sum 00000000_000000 06 \
 		20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
 
 		# Specify that files starting with pgbq[number][number]be used:
-		[MET_BUILD_BASE]/bin/pcp_combine \
+		pcp_combine \
 		-sum 20160221_18 06 20160222_18 24 \
 		gfs_APCP_24_20160221_18_F00_F24.nc \
 		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
@@ -826,7 +825,7 @@ Try the command:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/pcp_combine -subtract \ 
+		pcp_combine -subtract \
 		forecast.grb 'name="APCP"; level="L0"; lead_time="165500";' \ 
 		forecast2.grb 'name="APCP"; level="L0"; lead_time="160500";' \ 
 		forecast.nc -name APCP_A005000
@@ -877,7 +876,7 @@ GFS. In this example, process the 20150220 00Z initialization of GFS.
 
 .. code-block:: none
 		
-		${MET_BUILD_BASE}/bin/pcp_combine \ 
+		pcp_combine \
 		-sum 20150220_00 06 20150221_00 24 \ 
 		gfs_APCP_24_20150220_00_F00_F24.nc \ 
 		-pcprx "gfs_4_20150220_00.*grb2" \
@@ -897,7 +896,7 @@ hours 12 and 36:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/pcp_combine \ 
+		pcp_combine \
 		-sum 20150220_00 06 20150221_12 24 \ 
 		gfs_APCP_24_20150220_00_F12_F36.nc \ 
 		-pcprx "gfs_4_20150220_00.*grb2" \ 
@@ -911,7 +910,7 @@ the previous "-sum" job could be rewritten with "-add" like this:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/pcp_combine -add \ 
+		pcp_combine -add \
 		/d1/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 \ 
 		/d1/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 \ 
 		/d1/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 \ 
@@ -950,13 +949,12 @@ Plot-Data-Plane
 
 A.
 Check to see if the call to Gen-Vx-Mask actually did create good output
-with Plot-Data-Plane.
-Try running the following command from the top-level ${MET_BUILD_BASE}
-directory.
+with Plot-Data-Plane. The following commands assume that the MET executables
+are found in your path.
 
 .. code-block:: none
 		
-		bin/plot_data_plane \ 
+		plot_data_plane \
 		out/gen_vx_mask/CONUS_poly.nc \ 
 		out/gen_vx_mask/CONUS_poly.ps \
 		'name="CONUS"; level="(*,*)";'
@@ -997,7 +995,7 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 
 .. code-block:: none
 		
-		{MET_BASE}/bin/plot_data_plane \ 
+		plot_data_plane \
 		test_2.5_prog.grib \ 
 		test_2.5_prog.ps \
 		'name="TSTM"; level="A0"; file_type=GRIB2;' \ 
@@ -1013,7 +1011,7 @@ by running:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
+		plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
 
 "R2" tells MET to plot record number 2. Record numbers 1 and 2 both
 contain temperature data and 2-meters. Here's some wgrib2 output:
@@ -1039,9 +1037,9 @@ named wrf.grb, please try running the following commands to plot wind speed:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/plot_data_plane wrf.grb wrf_wind.ps \
+		plot_data_plane wrf.grb wrf_wind.ps \
 		'name"WIND"; level="Z10";' -v 3 
-		${MET_BUILD_BASE}/bin/plot_data_plane rtma.grb2 rtma_wind.ps \
+		plot_data_plane rtma.grb2 rtma_wind.ps \
 		'name"WIND"; level="Z10";' -v 3
 		
 In the first call, the log message should be similar to this: 
@@ -1114,7 +1112,7 @@ Run the "aggregate" job type in stat_analysis to do this:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/stat_analysis -lookin directory/file*_nbrcnt.txt \
+		stat_analysis -lookin directory/file*_nbrcnt.txt \
 		-job aggregate -line_type NBRCNT -by FCST_VAR,FCST_LEAD,FCST_THRESH,INTERP_MTHD,INTERP_PNTS -out_stat agg_nbrcnt.txt
 
 This job reads all the files that are passed to it on the command line with
@@ -1141,7 +1139,7 @@ to run the job separately for each unique entry found in the FCST_VAR column.
 
 .. code-block:: none
 		
-		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		stat_analysis \
 		-lookin point_stat_model2_120000L_20160501_120000V.stat \ 
 		-job aggregate_stat -line_type MPR -out_line_type PSTD \ 
 		-out_fcst_thresh ge0,ge0.1,ge0.2,ge0.3,ge0.4,ge0.5,ge0.6,ge0.7,ge0.8,ge0.9,ge1.0 \ 
@@ -1161,7 +1159,7 @@ cases without having to modify the source code.
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		stat_analysis \
 		-lookin out/grid_stat/grid_stat_120000L_20050807_120000V.stat \ 
 		-job filter -dump_row filter_cts.txt -line_type CTS \ 
 		-column_min BASER 0.05 -column_min FMEAN 0.05
@@ -1193,7 +1191,7 @@ Run the following job on the output from Grid-Stat generated when the
 
 .. code-block:: none
 		
-		${MET_BUILD_BASE}/bin/stat_analysis -lookin out/grid_stat \ 
+		stat_analysis -lookin out/grid_stat \
 		-job aggregate_stat -line_type SL1L2 -out_line_type CNT \ 
 		-by FCST_VAR,FCST_LEV \ 
 		-out_stat cnt.txt
@@ -1226,7 +1224,7 @@ Two more suggestions for faster run times.
 
 .. code-block:: none
 		
-		${MET_BUILD_BASE}/bin/stat_analysis \ 
+		stat_analysis \
 		-lookin diag_conv_anl.2015060100.stat \ 
 		-job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR \ 
 		-out_stat diag_conv_anl.2015060100_cnt.txt -set_hdr OBTYPE ALL_TYPES \ 
@@ -1250,7 +1248,7 @@ all grouped together.
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/tc_stat \ 
+		tc_stat \
 		-lookin d2014_vx_20141117_reset/al/tc_pairs/tc_pairs_H3WI_* \ 
 		-lookin d2014_vx_20141117_reset/al/tc_pairs/tc_pairs_HWFI_* \ 
 		-job summary -lead 480000 -column TRACK -amodel HWFI,H3WI \
@@ -1266,7 +1264,7 @@ To get the most output, run something like this:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/tc_stat \ 
+		tc_stat \
 		-lookin path/to/tc_pairs/output \ 
 		-job rirw -dump_row test \ 
 		-out_line_type CTC,CTS,MPR
@@ -1280,7 +1278,7 @@ in time.
 
 .. code-block:: none
 
-		{MET_BASE}/bin/tc_stat \ 
+		tc_stat \
 		-lookin path/to/tc_pairs/output \ 
 		-job rirw -dump_row test \
 		-rirw_time 36 -rirw_window 12 \
@@ -1291,7 +1289,7 @@ To stratify your results by lead time, you could add the "-by LEAD" option.
 
 .. code-block:: none
 
-		{MET_BASE}/bin/tc_stat \ 
+		tc_stat \
 		-lookin path/to/tc_pairs/output \ 
 		-job rirw -dump_row test \
 		-rirw_time 36 -rirw_window 12 \
@@ -1314,9 +1312,9 @@ and call convert to reformat from PostScript to PNG.
 		#!/bin/sh
 		for case in `echo "FCST OBS"`; do 
 		export TO_GRID=${case} 
-		/usr/local/${MET_BUILD_BASE}/bin/grid_stat gfs.t00z.pgrb2.0p25.f000 \
-		nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig \
-		/usr/local/${MET_BUILD_BASE}/bin/plot_data_plane \
+		grid_stat gfs.t00z.pgrb2.0p25.f000 \
+		nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig
+		plot_data_plane \
 		*TO_GRID_${case}*_pairs.nc TO_GRID_${case}.ps 'name="DIFF_TMP_P500_TMP_P500_FULL"; \
 		level="(*,*)";' 
 		convert -rotate 90 -background white -flatten TO_GRID_${case}.ps 
@@ -1349,7 +1347,7 @@ http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
 		Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin \
 		3B42.100921.00z.7.precipitation.nc
 		# Plot the result 
-		${MET_BUILD_BASE}/bin/plot_data_plane 3B42.100921.00z.7.precipitation.nc \
+		plot_data_plane 3B42.100921.00z.7.precipitation.nc \
 		3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
 
 It may be possible that the domain of the data is smaller. Here are some options:
@@ -1413,8 +1411,7 @@ and then plot the result.
 
 .. code-block:: none
 
-		setenv MET_BUILD_BASE `pwd` 
-		Rscript scripts/Rscripts/plot_tcmpr.R \
+		Rscript ${MET_BUILD_BASE}/scripts/Rscripts/plot_tcmpr.R \
 		-lookin tc_pairs_output.tcst \
 		-filter '-amodel AHWI,GFSI' \
 		-series AMODEL AHWI,GFSI,AHWI-GFSI \
@@ -1452,7 +1449,7 @@ some GFS data to a LatLon grid:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/regrid_data_plane \ 
+		regrid_data_plane \
 		gfs_2012040900_F012.grib G110 \ 
 		gfs_g110.nc -field 'name="TMP"; level="Z2";'
 
@@ -1499,7 +1496,7 @@ Below is a command example to run:
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/tc_pairs \ 
+		tc_pairs \
 		-adeck aep142014.h4hw.dat \ 
 		-bdeck bep142014.dat \ 
 		-config TCPairsConfig_v5.0 \ 
@@ -1557,7 +1554,7 @@ this example (suffix=_EXP):
 
 .. code-block:: none
 
-		${MET_BUILD_BASE}/bin/tc_pairs \ 
+		tc_pairs \
 		-adeck aal032014.h4hw.dat suffix=_EXP \ 
 		-adeck aal032014_hfip_d2014_BERTHA.dat \ 
 		-bdeck bal032014.dat \ 
@@ -1753,7 +1750,7 @@ breaking the command up like the below example.
 
 .. code-block:: none
 
-		['/h/WXQC/{MET_BUILD_BASE}/bin/regrid_data_plane', 
+		['regrid_data_plane',
 		'/h/data/global/WXQC/data/umm/1701150006', 
 		'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
 		'\'name="HGT"; level="P500";\'', '-v', '6']

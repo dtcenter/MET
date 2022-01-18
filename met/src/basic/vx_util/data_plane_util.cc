@@ -16,6 +16,10 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
+
 #include "data_plane_util.h"
 #include "interp_util.h"
 #include "two_to_one.h"
@@ -247,83 +251,95 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       }
    }
 
-   // Build the grid template
-   GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+#pragma omp parallel default(none)                 \
+   shared(mlog, dp, frac_dp, width, wrap_lon, t)   \
+   shared(use_climo, cmn, csd, vld_t, bad)         \
+   private(x, y, n_vld, n_thr, gp, v)
+   {
 
-   mlog << Debug(3)
-        << "Computing fractional coverage field using the "
-        << t.get_str() << " threshold and the "
-        << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
-        << ") " << gt->getClassName() << " interpolation method.\n";
+     // Build the grid template
+     GridTemplateFactory gtf;
+     GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
-   // Initialize the fractional coverage field
-   frac_dp = dp;
-   frac_dp.set_constant(bad_data_double);
+#pragma omp single
+     {
+       mlog << Debug(3)
+            << "Computing fractional coverage field using the "
+            << t.get_str() << " threshold and the "
+            << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+            << ") " << gt->getClassName() << " interpolation method.\n";
 
-   // Compute the fractional coverage meeting the threshold criteria
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+       // Initialize the fractional coverage field
+       frac_dp = dp;
+       frac_dp.set_constant(bad_data_double);
+     }
 
-         // For a new column, reset the grid template and counts.
-         if(y == 0) {
+     // Compute the fractional coverage meeting the threshold criteria
+#pragma omp for schedule (static)
+     for(x=0; x<dp.nx(); x++) {
+        for(y=0; y<dp.ny(); y++) {
 
-            // Initialize counts
-            n_vld = n_thr = 0;
+           // For a new column, reset the grid template and counts.
+           if(y == 0) {
 
-            // Sum all the points
-            for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
-                gp != NULL;
-                gp  = gt->getNextInGrid()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld++;
-               if(t.check(v,
-                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
-            }
-         }
-         // Subtract off the bottom edge, shift up, and add the top.
-         else {
+              // Initialize counts
+              n_vld = n_thr = 0;
 
-            // Subtract points from the the bottom edge
-            for(gp  = gt->getFirstInBotEdge();
-                gp != NULL;
-                gp  = gt->getNextInBotEdge()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld--;
-               if(t.check(v,
-                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
-            }
+              // Sum all the points
+              for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
+                  gp != NULL;
+                  gp  = gt->getNextInGrid()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld++;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+              }
+           }
+           // Subtract off the bottom edge, shift up, and add the top.
+           else {
 
-            // Increment Y
-            gt->incBaseY(1);
+              // Subtract points from the the bottom edge
+              for(gp  = gt->getFirstInBotEdge();
+                  gp != NULL;
+                  gp  = gt->getNextInBotEdge()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld--;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
+              }
 
-            // Add points from the the top edge
-            for(gp  = gt->getFirstInTopEdge();
-                gp != NULL;
-                gp  = gt->getNextInTopEdge()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld++;
-               if(t.check(v,
-                  (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                  (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
-            }
-         }
+              // Increment Y
+              gt->incBaseY(1);
 
-         // Check for enough valid data and compute fractional coverage
-         if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
-            frac_dp.set((double) n_thr/n_vld, x, y);
-         }
+              // Add points from the the top edge
+              for(gp  = gt->getFirstInTopEdge();
+                  gp != NULL;
+                  gp  = gt->getNextInTopEdge()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld++;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+              }
+           }
 
-      } // end for y
+           // Check for enough valid data and compute fractional coverage
+           if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
+              frac_dp.set((double) n_thr/n_vld, x, y);
+           }
 
-      // Increment X
-      if(x < (dp.nx() - 1)) gt->incBaseX(1);
+        } // end for y
 
-   } // end for x
+        // Increment X
+        if(x < (dp.nx() - 1)) gt->incBaseX(1);
 
-   delete gt;
+     } // end for x
+
+     delete gt;
+
+   } // End of omp parallel
 
    return;
 }

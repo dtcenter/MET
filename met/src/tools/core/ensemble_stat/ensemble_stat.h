@@ -93,20 +93,22 @@ static const int max_n_rec = 300;
 ////////////////////////////////////////////////////////////////////////
 
 // Input Ensemble files
-static int          n_ens;         // Number of ensemble members
-static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens]
+static int          n_ens_files;   // Number of ensemble members
+static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens_files]
 static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
 
-static StringArray  ens_file_list;
-static IntArray     ens_file_vld;
+static StringArray  ens_file_list;  // Array of ensemble input files
+static StringArray  fcst_file_list; // Array of ensemble input files including control
+static IntArray     ens_file_vld;   // Array of ensemble file valid status
+static IntArray     fcst_file_vld;  // Array of forecast file valid status
 static GrdFileType  etype = FileType_None;
 
 static bool         ens_mean_flag; // Flag for ensemble mean processing
 static ConcatString ens_mean_user; // User-specified ensemble mean data file
 static ConcatString ens_mean_file; // Computed ensemble mean output file
 
-static ConcatString ctrl_file;     // Control member
-static int          ctrl_index = bad_data_int; // Control member index
+static ConcatString ctrl_file;     // Control member file
+static int          ctrl_file_index = bad_data_int; // Control member file index
 
 // Input Observation files
 static StringArray  grid_obs_file_list;

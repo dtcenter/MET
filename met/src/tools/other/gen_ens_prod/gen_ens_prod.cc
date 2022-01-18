@@ -16,6 +16,7 @@
 //   ----   ----      ----           -----------
 //   000    09/10/21  Halley Gotway  MET #1904 Initial version.
 //   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
+//   002    01/14/21  McCabe         MET #1695 All members in one file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +46,8 @@ using namespace std;
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#include "handle_openmp.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
@@ -53,17 +56,17 @@ static void process_ensemble();
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
-static void track_counts(EnsVarInfo *, const DataPlane &, bool,
+static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
                          const DataPlane &, const DataPlane &);
 
 static void setup_nc_file();
-static void write_ens_nc(EnsVarInfo *, int, const DataPlane &,
+static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
+static void write_ens_var_float(GenEnsProdVarInfo *, float *, const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(EnsVarInfo *, int *, const DataPlane &,
+static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
                               const char *, const char *);
-static void write_ens_data_plane(EnsVarInfo *, const DataPlane &, const DataPlane &,
+static void write_ens_data_plane(GenEnsProdVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
 static void add_var_att_local(VarInfo *, NcVar *, bool is_int,
@@ -80,6 +83,9 @@ static void set_ctrl_file  (const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
@@ -181,7 +187,7 @@ void process_command_line(int argc, char **argv) {
    etype = ens_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(etype, &ens_files);
+   conf_info.process_config(etype, &ens_files, ctrl_file.nonempty());
 
    // Allocate arrays to store threshold counts
    thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
@@ -322,7 +328,7 @@ void process_ensemble() {
    ConcatString ens_file;
 
    // Loop through each of the ensemble fields to be processed
-   vector<EnsVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
+   vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
@@ -465,7 +471,7 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(EnsVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl,
+void track_counts(GenEnsProdVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl,
                   const DataPlane &cmn_dp, const DataPlane &csd_dp) {
    int i, j, k;
    double ens, cmn, csd;
@@ -576,7 +582,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(EnsVarInfo * ens_info, int n_ens_vld,
+void write_ens_nc(GenEnsProdVarInfo * ens_info, int n_ens_vld,
                   const DataPlane &ens_dp,
                   const DataPlane &cmn_dp,
                   const DataPlane &csd_dp) {
@@ -833,7 +839,7 @@ void write_ens_nc(EnsVarInfo * ens_info, int n_ens_vld,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane &dp,
+void write_ens_var_float(GenEnsProdVarInfo * ens_info, float *ens_data, const DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar ens_var;
@@ -889,7 +895,7 @@ void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp,
+void write_ens_var_int(GenEnsProdVarInfo * ens_info, int *ens_data, const DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar ens_var;
@@ -936,7 +942,7 @@ void write_ens_var_int(EnsVarInfo * ens_info, int *ens_data, const DataPlane &dp
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_data_plane(EnsVarInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
+void write_ens_data_plane(GenEnsProdVarInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
                           const char *type_str, const char *long_name_str) {
 
    // Allocate memory for this data

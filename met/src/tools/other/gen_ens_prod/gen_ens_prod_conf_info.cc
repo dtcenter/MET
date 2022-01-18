@@ -55,7 +55,7 @@ void GenEnsProdConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::clear() {
-   vector<EnsVarInfo*>::const_iterator var_it = ens_input.begin();
+   vector<GenEnsProdVarInfo*>::const_iterator var_it = ens_input.begin();
 
    // Clear, erase, and initialize members
    model.clear();
@@ -100,7 +100,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files) {
+void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) 0;
@@ -146,6 +146,14 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          exit(1);
       }
 
+      // The control ID must be set when the control file is specified
+      if(control_id.empty() && use_ctrl) {
+         mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
+              << "the control_id must be set if processing a single input "
+              << "file with the -ctrl option\n\n";
+         exit(1);
+      }
+
       // If control ID is set, it cannot be found in ens_member_ids
       if(!control_id.empty() && ens_member_ids.has(control_id)) {
           mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
@@ -173,14 +181,14 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
 
    // Parse the ensemble field information
    for(i=0,max_n_cat=0; i<n_var; i++) {
-
-      EnsVarInfo * ens_info = new EnsVarInfo();
+      
+      GenEnsProdVarInfo * ens_info = new GenEnsProdVarInfo();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
 
       // get VarInfo magic string without substituted values
-      ens_info->raw_magic_str = raw_magic_str(i_edict);
+      ens_info->raw_magic_str = raw_magic_str(i_edict, etype);
 
       // Loop over ensemble member IDs to substitute
       for(j=0; j<ens_member_ids.n(); j++) {
@@ -441,97 +449,6 @@ void GenEnsProdNcOutInfo::set_all_true() {
    do_climo_cdp = true;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////
-//
-//  Code for class EnsVarInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-EnsVarInfo::EnsVarInfo() {
-   ctrl_info = NULL;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-EnsVarInfo::~EnsVarInfo() {
-   vector<InputInfo>::const_iterator it;
-   for(it = inputs.begin(); it != inputs.end(); it++) {
-      if((*it).var_info) { delete (*it).var_info; }
-   }
-
-   if(ctrl_info) { delete ctrl_info; }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsVarInfo::add_input(InputInfo input) {
-   inputs.push_back(input);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsVarInfo::inputs_n() {
-   return inputs.size();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
-    ctrl_info = ctrl;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-VarInfo * EnsVarInfo::get_ctrl(int index) {
-   if(ctrl_info) {
-      return ctrl_info;
-   }
-   return inputs[index].var_info;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-VarInfo * EnsVarInfo::get_var_info(int index) {
-   if(inputs[index].var_info) {
-      return inputs[index].var_info;
-   }
-   return inputs[0].var_info;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString EnsVarInfo::get_file(int index) {
-   int file_index = inputs[index].file_index;
-   return (*inputs[index].file_list)[file_index];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsVarInfo::get_file_index(int index) {
-   return inputs[index].file_index;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString raw_magic_str(Dictionary i_edict) {
-   ConcatString magic_str;
-
-   ConcatString name = i_edict.lookup_string("name");
-   ConcatString level = i_edict.lookup_string("level");
-
-   if(level.nonempty() && level[0] != '(') {
-      magic_str << name << "/" << level;
-   } else {
-      magic_str << name << level;
-   }
-
-   return magic_str;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
