@@ -19,6 +19,12 @@ else
   echo "export MET_TEST_OUTPUT=${MET_TEST_OUTPUT}"
 fi
 
+# if MET_TEST_MET_PYTHON_EXE is not set, use default value
+if [[ -z "${MET_TEST_MET_PYTHON_EXE}" ]] ; then
+  export MET_TEST_MET_PYTHON_EXE=/usr/local/python3/bin/python3
+fi
+
+
 PERL_UNIT_OPTS=""
 for arg in $@; do
   [ $arg == "-memchk" -o $arg == "memchk" ] && PERL_UNIT_OPTS="$PERL_UNIT_OPTS -memchk"
