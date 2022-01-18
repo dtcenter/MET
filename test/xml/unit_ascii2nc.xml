@@ -68,11 +68,11 @@
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/qc_out_2012-09-07_00:00:00.GRM_P+FCST \
-      &OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P+FCST.nc \
+      &OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P_FCST.nc \
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P+FCST.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P_FCST.nc</point_nc>
     </output>
   </test>
 
