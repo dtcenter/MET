@@ -26,15 +26,3 @@ time_command docker build -t ${DOCKERHUB_TAG} \
        --build-arg SOURCE_BRANCH=$branch_name \
        $DOCKERFILE_DIR
 echo "::endgroup::"
-
-# skip docker push if credentials are not set
-if [ -z ${DOCKER_USERNAME+x} ] || [ -z ${DOCKER_PASSWORD+x} ]; then
-    echo "DockerHub credentials not set. Skipping docker push"
-    exit 0
-fi
-
-echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-
-echo "::group::Docker Push Command"
-time_command docker push ${DOCKERHUB_TAG}
-echo "::endgroup::"
