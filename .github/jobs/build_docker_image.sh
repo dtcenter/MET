@@ -21,8 +21,6 @@ DOCKERHUB_TAG=dtcenter/met:${branch_name}
 
 DOCKERFILE_DIR=${GITHUB_WORKSPACE}/scripts/docker
 
-echo "::group::Docker Build Command"
 time_command docker build -t ${DOCKERHUB_TAG} \
        --build-arg SOURCE_BRANCH=$branch_name \
        $DOCKERFILE_DIR
-echo "::endgroup::"

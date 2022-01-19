@@ -27,6 +27,4 @@ fi
 
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
-echo "::group::Docker Push Command"
 time_command docker push ${DOCKERHUB_TAG}
-echo "::endgroup::"
