@@ -2,8 +2,6 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-#prefix=refs/heads/
-#branch_name=${GITHUB_REF#"$prefix"}
 DOCKERHUB_TAG=dtcenter/met:${SOURCE_BRANCH}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/scripts/docker/Dockerfile.copy
