@@ -32,7 +32,7 @@ jobs:
 
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
-        if: ${{ steps.job_status.outputs.run_compile }}
+        if: ${{ steps.job_status.outputs.run_compile == 'true' }}
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           MET_BASE_IMAGE: minimum
