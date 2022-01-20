@@ -1,11 +1,16 @@
 name: Compilation Test
 
+# Test that compilation succeeds
+# for feature_ and bugfix_ branches
+# when file(s) under met/src have changed
+
 on:
   push:
     branches:
-      - feature_1546_ci_testing
-    paths-ignore:
-      - 'met/docs/**'
+      - 'feature_*'
+      - 'bugfix_*'
+    paths:
+      - 'met/src/**'
 
 jobs:
 
