@@ -32,7 +32,6 @@ jobs:
 
       - name: Upload logs as artifact
         uses: actions/upload-artifact@v2
-        if: failure()
         with:
           name: build_log
           path: docker_build.log
