@@ -4,6 +4,10 @@ name: Unit Tests
 # for pull requests into develop branch
 
 on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - develop
   push:
     branches:
       - 'feature_1546_ci_testing'
@@ -16,15 +20,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get branch name
+        id: get_branch_name
+        run: .github/jobs/get_branch_name.sh
+
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
         env:
           commit_msg: ${{ github.event.head_commit.message }}
-
-      - name: Get branch name for push event
-        id: get_branch_name
-        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}-PR
 
       - name: Create directories to store output
         run: |
