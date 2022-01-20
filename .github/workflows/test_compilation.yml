@@ -38,7 +38,9 @@ jobs:
           MET_BASE_IMAGE: minimum
 
       - name: Upload logs as artifact
+        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: build_log
           path: docker_build.log
+          if-no-files-found: ignore
