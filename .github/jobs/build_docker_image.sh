@@ -1,11 +1,6 @@
 #! /bin/bash
 
-# utility function to run command get log the time it took to run
-function time_command {
-  local start_seconds=$SECONDS
-  echo "RUNNING: $*"
-  "$@"
-  local error=$?
+source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
   local duration=$(( SECONDS - start_seconds ))
   echo "TIMING: Command took `printf '%02d' $(($duration / 60))`:`printf '%02d' $(($duration % 60))` (MM:SS): '$*'"
