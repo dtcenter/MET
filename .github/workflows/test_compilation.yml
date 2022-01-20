@@ -35,4 +35,4 @@ jobs:
         if: failure()
         with:
           name: build_log
-          path: ${GITHUB_WORKSPACE}/docker_build.log
+          path: docker_build.log
