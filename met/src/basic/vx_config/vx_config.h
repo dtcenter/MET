@@ -12,7 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "config_constants.h"
+#ginclude "config_constants.h"
 #include "config_file.h"
 #include "config_util.h"
 #include "config_funcs.h"
