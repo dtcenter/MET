@@ -28,8 +28,8 @@ jobs:
 
       - name: Create directories to store output
         run: |
-          mkdir -p ${RUNNER_WORKSPACE}/logs
-          mkdir -p ${RUNNER_WORKSPACE}/diff
+          mkdir -p ${{ runner.workspace }}/logs
+          mkdir -p ${{ runner.workspace }}/diff
 
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
@@ -40,7 +40,7 @@ jobs:
 
       - name: Copy Docker build log into logs directory
         if: ${{ steps.job_status.outputs.run_compile == 'true' }}
-        run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/
+        run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/; ls -lh ${RUNNER_WORKSPACE}/logs
 
       - name: Get test data from DockerHub
         run: .github/jobs/get_test_data.sh
@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: diff
-          path: ${RUNNER_WORKSPACE}/diff
+          path: ${{ runner.workspace }}/diff
           if-no-files-found: ignore
 
       - name: Upload logs as artifact
@@ -63,5 +63,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: logs
-          path: ${RUNNER_WORKSPACE}/logs
+          path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore

@@ -31,7 +31,7 @@ jobs:
         run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}
 
       - name: Create directories to store output
-        run: mkdir -p ${RUNNER_WORKSPACE/logs
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
@@ -49,5 +49,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: logs
-          path: ${RUNNER_WORKSPACE}/logs
+          path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
