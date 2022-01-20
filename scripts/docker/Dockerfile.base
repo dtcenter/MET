@@ -131,3 +131,7 @@ RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
  && cp include/*.h /usr/local/hdfeos/include/. \
  && cd /met/external_libs \
  && rm -rf HDF4.2r3 hdfeos
+
+RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
+ && mkdir -p /usr/local/share/met \
+ && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
