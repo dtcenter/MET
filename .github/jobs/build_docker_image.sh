@@ -8,8 +8,7 @@ DOCKERHUB_TAG=dtcenter/met:${SOURCE_BRANCH}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/scripts/docker/Dockerfile.copy
 
-LOG_FILE=${GITHUB_WORKSPACE}/docker_build.log
-echo "Logging to ${LOG_FILE}"
+CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
 
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \

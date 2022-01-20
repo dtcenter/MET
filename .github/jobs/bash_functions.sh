@@ -4,7 +4,16 @@
 function time_command {
   local start_seconds=$SECONDS
   echo "RUNNING: $*"
-  "$@"
+
+  # pipe output to log file if set
+  if [ "x$CMD_LOGFILE" == "x" ]; then
+      "$@"
+  else
+      echo "Logging to ${CMD_LOGFILE}"
+      "$@" &> $CMD_LOGFILE
+      unset CMD_LOGFILE
+  fi
+
   local error=$?
 
   local duration=$(( SECONDS - start_seconds ))
