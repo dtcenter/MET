@@ -1,6 +1,6 @@
 #! /bin/bash
 
-source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
+source ${MET_REPO_DIR}/.github/jobs/bash_functions.sh
 
 ###
 # Set environment variables needed to run unit tests

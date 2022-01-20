@@ -10,4 +10,4 @@ mount_args="-v ${RUNNER_WORKSPACE}/diff:/data/output/met_data_diff -v ${RUNNER_W
 
 # run unit test script inside Docker, mount MET input and truth data
 cmd="\${MET_REPO_DIR}/.github/jobs/run_unit_tests.sh"
-time_command docker run -e GITHUB_WORKSPACE ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
+time_command docker run ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
