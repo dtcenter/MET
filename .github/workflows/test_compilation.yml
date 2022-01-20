@@ -15,8 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get branch name
+        id: get_branch_name
+        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}
+
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
         env:
-          SOURCE_BRANCH: ${GITHUB_REF#"refs/heads/"}
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           MET_BASE_IMAGE: minimum
