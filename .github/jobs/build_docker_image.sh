@@ -11,4 +11,4 @@ CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \
     --build-arg MET_BASE_IMAGE \
-    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE} \
+    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}

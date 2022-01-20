@@ -1,16 +1,12 @@
-name: Compilation Test
+name: Unit Tests
 
-# Test that compilation succeeds
-# for feature_ and bugfix_ branches
-# when file(s) under met/src have changed
+# Compile MET and run unit tests
+# for pull requests into develop branch
 
 on:
   push:
     branches:
-      - 'feature_*'
-      - 'bugfix_*'
-    paths:
-      - 'met/src/**'
+      - 'feature_1546_ci_testing'
 
 jobs:
 
@@ -26,23 +22,41 @@ jobs:
         env:
           commit_msg: ${{ github.event.head_commit.message }}
 
-      - name: Get branch name
+      - name: Get branch name for push event
         id: get_branch_name
-        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}
+        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}-PR
 
       - name: Create directories to store output
-        run: mkdir -p ${RUNNER_WORKSPACE/logs
+        run: |
+          mkdir -p ${RUNNER_WORKSPACE/logs
+          mkdir -p ${RUNNER_WORKSPACE/diff
 
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
         if: ${{ steps.job_status.outputs.run_compile == 'true' }}
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
-          MET_BASE_IMAGE: minimum
+          MET_BASE_IMAGE: unit_test
 
       - name: Copy Docker build log into logs directory
-        if: always()
+        if: ${{ steps.job_status.outputs.run_compile == 'true' }}
         run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Get test data from DockerHub
+        run: .github/jobs/get_test_data.sh
+
+      - name: Run Unit Tests in Docker
+        run: .github/jobs/run_unit_docker.sh
+        env:
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
+
+      - name: Upload diff files as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: diff
+          path: ${RUNNER_WORKSPACE}/diff
+          if-no-files-found: ignore
 
       - name: Upload logs as artifact
         if: always()
