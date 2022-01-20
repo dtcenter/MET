@@ -14,4 +14,3 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \
     --build-arg MET_BASE_IMAGE \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE} \
-    &> ${LOG_FILE}
