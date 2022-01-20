@@ -39,8 +39,8 @@ jobs:
           MET_BASE_IMAGE: unit_test
 
       - name: Copy Docker build log into logs directory
-        if: ${{ steps.job_status.outputs.run_compile == 'true' }}
-        run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/; ls -lh ${RUNNER_WORKSPACE}/logs
+        if: ${{ always() && steps.job_status.outputs.run_compile == 'true' }}
+        run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/
 
       - name: Get test data from DockerHub
         run: .github/jobs/get_test_data.sh
