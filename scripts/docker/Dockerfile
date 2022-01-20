@@ -19,6 +19,7 @@ RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
     fi
 
 ENV MET_GIT_NAME    ${SOURCE_BRANCH}
+ENV MET_REPO_DIR    /met/MET-${MET_GIT_NAME}
 ENV MET_GIT_URL     https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT true
 
@@ -32,7 +33,7 @@ WORKDIR /met
 # Delete the MET source code for tagged releases matching "v"*.
 #
 RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
- && git clone ${MET_GIT_URL} /met/MET-${MET_GIT_NAME} \
- && cd /met/MET-${MET_GIT_NAME}/met \
+ && git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
+ && cd ${MET_REPO_DIR}/met \
  && git checkout ${MET_GIT_NAME} \
  && ../scripts/docker/build_met_docker.sh
