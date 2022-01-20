@@ -35,4 +35,4 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && git clone ${MET_GIT_URL} /met/MET-${MET_GIT_NAME} \
  && cd /met/MET-${MET_GIT_NAME}/met \
  && git checkout ${MET_GIT_NAME} \
- && ./scripts/docker/build_met_docker.sh
+ && ../scripts/docker/build_met_docker.sh
