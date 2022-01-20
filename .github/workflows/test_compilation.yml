@@ -1,0 +1,22 @@
+name: Compilation Test
+
+on:
+  push:
+    branches:
+      - feature_1546_ci_testing
+    paths-ignore:
+      - 'met/docs/**'
+
+jobs:
+
+  build_met_docker:
+    name: Handle Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker Image
+        run: .github/jobs/build_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${GITHUB_REF#"refs/heads/"}
+          MET_BASE_IMAGE: minimum

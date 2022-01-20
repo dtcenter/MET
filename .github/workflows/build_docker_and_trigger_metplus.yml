@@ -17,6 +17,9 @@ jobs:
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${GITHUB_REF#"refs/heads/"}
+          MET_BASE_IMAGE: minimum
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
