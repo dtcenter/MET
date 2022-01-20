@@ -9,13 +9,13 @@ on:
 
 jobs:
 
-  build_met_docker:
-    name: Handle Docker Image
+  compile:
+    name: Compile MET
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build Docker Image
+      - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
         env:
           SOURCE_BRANCH: ${GITHUB_REF#"refs/heads/"}
