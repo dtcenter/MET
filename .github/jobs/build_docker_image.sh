@@ -8,7 +8,11 @@ DOCKERHUB_TAG=dtcenter/met:${SOURCE_BRANCH}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/scripts/docker/Dockerfile.copy
 
+LOG_FILE=${GITHUB_WORKSPACE}/docker_build.log
+echo "Logging to ${LOG_FILE}"
+
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \
     --build-arg MET_BASE_IMAGE \
-    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
+    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE} \
+    &> ${LOG_FILE}

@@ -29,3 +29,10 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           MET_BASE_IMAGE: minimum
+
+      - name: Upload logs as artifact
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: build_log
+          path: ${GITHUB_WORKSPACE}/docker_build.log
