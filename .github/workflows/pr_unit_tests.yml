@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  compile:
-    name: Compile MET
+  unit_test:
+    name: Run MET Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,8 +28,8 @@ jobs:
 
       - name: Create directories to store output
         run: |
-          mkdir -p ${RUNNER_WORKSPACE/logs
-          mkdir -p ${RUNNER_WORKSPACE/diff
+          mkdir -p ${RUNNER_WORKSPACE}/logs
+          mkdir -p ${RUNNER_WORKSPACE}/diff
 
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
