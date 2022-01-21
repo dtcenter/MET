@@ -81,7 +81,7 @@
   <test name="ascii2nc_LITTLE_R_BAD_RECORD">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/ascii/OBS_2015080700_bad_record \
+      &DATA_DIR_OBS;/ascii/OBS:2015080700_bad_record \
       &OUTPUT_DIR;/ascii2nc/OBS_2015080700_bad_record.nc \
       -v 1
     </param>
