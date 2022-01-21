@@ -26,9 +26,9 @@
       &OUTPUT_DIR;/met_test_scripts/mode/mode_*_obj.nc
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/plot_mode_field/mode_120000L_20050807_120000V_000000A_obj_obs_simple.png</exist>
-      <exist>&OUTPUT_DIR;/plot_mode_field/mode_120000L_20050807_120000V_120000A_obj_obs_simple.png</exist>
-      <exist>&OUTPUT_DIR;/plot_mode_field/mode_240000L_20050808_000000V_240000A_obj_obs_simple.png</exist>
+      <exist>&OUTPUT_DIR;/mode_graphics/mode_120000L_20050807_120000V_000000A_obj_obs_simple.png</exist>
+      <exist>&OUTPUT_DIR;/mode_graphics/mode_120000L_20050807_120000V_120000A_obj_obs_simple.png</exist>
+      <exist>&OUTPUT_DIR;/mode_graphics/mode_240000L_20050808_000000V_240000A_obj_obs_simple.png</exist>
     </output>
   </test>
 
