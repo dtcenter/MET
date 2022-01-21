@@ -20,26 +20,33 @@ export MET_TEST_DIFF=/data/output/met_test_diff
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 export MET_TEST_MET_PYTHON_EXE=/usr/bin/python3
 
+# get list of tests to run from first argument
+TESTS=$1
+
 ###
 # Run MET unit tests
 ###
 
-echo "Running all MET unit tests..."
-CMD_LOGFILE=/met/logs/unit_test.log
-time_command ${MET_TEST_BASE}/bin/unit_test.sh
-if [ $? != 0 ]; then
-    echo "ERROR: Unit tests failed"
-    exit 1
-fi
+echo "Running MET unit tests..."
+for testname in $TESTS; do
+  CMD_LOGFILE=/met/logs/unit_${testname}.log
+  time_command ${MET_TEST_BASE}/perl/unit.pl ${MET_TEST_BASE}/xml/unit_${testname}.xml
+  if [ $? != 0 ]; then
+      echo "ERROR: Unit test ${testname} failed"
+      exit 1
+  fi
+done
 
 
 echo "Running comparison on test output"
-CMD_LOGFILE=/met/logs/comp_dir.log
-time_command ${MET_TEST_BASE}/bin/comp_dir.sh ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
-if [ $? != 0 ]; then
-    echo "ERROR: Test output comparison failed"
-    exit 1
-fi
+for testname in $TESTS; do
+  CMD_LOGFILE=/met/logs/comp_dir_${testname}.log
+  time_command ${MET_TEST_BASE}/bin/comp_dir.sh ${MET_TEST_TRUTH}/${testname} ${MET_TEST_OUTPUT}/${testname}
+  if [ $? != 0 ]; then
+      echo "ERROR: Test ${testname} output comparison failed"
+      exit 1
+  fi
+done
 
 echo "Running copy_diff_files.py"
 CMD_LOGFILE=/met/logs/copy_diff_files.log

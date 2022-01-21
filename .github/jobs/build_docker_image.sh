@@ -2,7 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG=dtcenter/met:${SOURCE_BRANCH}
+DOCKERHUB_TAG=${DOCKERHUB_REPO}:${SOURCE_BRANCH}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/scripts/docker/Dockerfile.copy
 

@@ -2,9 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-prefix=refs/heads/
-branch_name=${GITHUB_REF#"$prefix"}
-DOCKERHUB_TAG=dtcenter/met:${branch_name}
+DOCKERHUB_TAG=${DOCKERHUB_REPO}:${SOURCE_BRANCH}
 
 # skip docker push if credentials are not set
 if [ -z ${DOCKER_USERNAME+x} ] || [ -z ${DOCKER_PASSWORD+x} ]; then
