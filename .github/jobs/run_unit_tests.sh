@@ -26,8 +26,7 @@ export MET_TEST_MET_PYTHON_EXE=/usr/bin/python3
 
 echo "Running MET unit tests..."
 echo "TESTS_TO_RUN is X${TESTS_TO_RUN}X"
-THE_TESTS_TO_RUN="gaussian airnow"
-for testname in $THE_TESTS_TO_RUN; do
+for testname in $TESTS_TO_RUN; do
   CMD_LOGFILE=/met/logs/unit_${testname}.log
   time_command ${MET_TEST_BASE}/perl/unit.pl ${MET_TEST_BASE}/xml/unit_${testname}.xml
   if [ $? != 0 ]; then
@@ -38,7 +37,7 @@ done
 
 
 echo "Running comparison on test output"
-for testname in $TESTS; do
+for testname in $TESTS_TO_RUN; do
   CMD_LOGFILE=/met/logs/comp_dir_${testname}.log
   time_command ${MET_TEST_BASE}/bin/comp_dir.sh ${MET_TEST_TRUTH}/${testname} ${MET_TEST_OUTPUT}/${testname}
   if [ $? != 0 ]; then
