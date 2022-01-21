@@ -82,8 +82,8 @@ jobs:
     strategy:
       matrix:
         tests:
-          - "gaussian aeronet"
-          - "airnow"
+          - 'gaussian aeronet'
+          - 'airnow'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
