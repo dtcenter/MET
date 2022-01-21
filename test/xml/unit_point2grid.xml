@@ -106,19 +106,17 @@
     </output>
   </test>
 
-  <!-- JHG: Change the output directory from "regrid" to "point2grid" -->
-
   <test name="point2grid_pb2nc_big_input">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
       &DATA_DIR_OBS;/point_obs/prepbufr.gdas.2017060300.nc \
       G212 \
-      &OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_big_input.nc \
       -field 'name="TMP"; level="Z2";' \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_big_input.nc</grid_nc>
     </output>
   </test>
 
