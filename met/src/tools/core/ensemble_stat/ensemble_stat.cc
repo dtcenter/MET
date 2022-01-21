@@ -1164,7 +1164,7 @@ void process_point_obs(int i_nc) {
       if (!status) exit(1);
 
       // Process each observation in the file
-      for(int i_offset=0; i_offset<buf_size; i_offset++) {
+      for(int i_offset=0; i_offset<buf_size2; i_offset++) {
          int hdr_idx;
          i_obs = i_start + i_offset;
 
