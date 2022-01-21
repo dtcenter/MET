@@ -44,5 +44,10 @@ fi
 echo "Running copy_diff_files.py"
 CMD_LOGFILE=/met/logs/copy_diff_files.log
 time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
+if [ $? != 0 ]; then
+    echo "ERROR: Copy diff files script failed"
+    exit 1
+fi
+
 
 echo "Success"
