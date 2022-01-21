@@ -49,5 +49,12 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=met_base_image::$met_base_image
 echo ::set-output name=dockerhub_repo::$dockerhub_repo
 
+echo run_compile: $run_compile
+
+echo run_push: $run_push
+echo run_unit_tests: $run_unit_tests
+echo met_base_image: $met_base_image
+echo dockerhub_repo: $dockerhub_repo
+
 # get name of branch
 .github/jobs/get_branch_name.sh
