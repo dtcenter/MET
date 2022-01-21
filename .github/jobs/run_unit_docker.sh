@@ -12,8 +12,11 @@ volumes_from="--volumes-from met_input --volumes-from met_truth"
 mount_args="-v $LOCAL_DIFF_DIR:$DOCKER_DIFF_DIR -v ${RUNNER_WORKSPACE}/logs:/met/logs"
 
 # run unit test script inside Docker, mount MET input and truth data
-cmd="\${MET_REPO_DIR}/.github/jobs/run_unit_tests.sh \"${TESTS}\""
-time_command docker run ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
+cmd="\${MET_REPO_DIR}/.github/jobs/run_unit_tests.sh"
+time_command docker run -e TESTS ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
+if [ $? != 0 ]; then
+  exit 1
+fi
 
 # exit non-zero if there are any diff files
 if [ "$(ls -A $LOCAL_DIFF_DIR)" ]; then

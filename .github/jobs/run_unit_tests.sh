@@ -20,9 +20,6 @@ export MET_TEST_DIFF=/data/output/met_test_diff
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 export MET_TEST_MET_PYTHON_EXE=/usr/bin/python3
 
-# get list of tests to run from first argument
-TESTS=$1
-
 ###
 # Run MET unit tests
 ###
