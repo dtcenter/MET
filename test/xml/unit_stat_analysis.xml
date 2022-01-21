@@ -147,7 +147,7 @@
   <test name="stat_analysis_AGG_STAT_ORANK_ECNT">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V.stat \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type ECNT \
       -fcst_var APCP_24 -by VX_MASK \
       -set_hdr DESC VX_MASK \
