@@ -36,7 +36,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 fi
 
 # use unit_test MET base image if running unit tests
-if [ "$run_unit_tests" == "true" ]
+if [ "$run_unit_tests" == "true" ]; then
 
   met_base_image=unit_test
   run_push=true
