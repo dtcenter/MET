@@ -48,6 +48,8 @@ for filename in files_to_copy:
     output_path = output_path.replace(TRUTH_DIR, DIFF_DIR)
   else:
     continue
+  # change bad character - this can be removed once test output is changed
+  output_path = output_path.replace(':', '_')
   print(f"Copy {filename} to {output_path}")
   output_dir = os.path.dirname(output_path)
   if not os.path.exists(output_dir):
