@@ -10,15 +10,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_pb2nc.xml unit_madis2nc.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-
-
-  <!--                                                                 -->
-  <!--  NOTE: assumes that the madis2nc and pb2nc unit tests have run  -->
-  <!--                                                                 -->
 
   <test name="point_stat_QTY_INC_EXC_PB">
     <exec>&MET_BIN;/point_stat</exec>

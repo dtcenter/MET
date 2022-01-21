@@ -11,10 +11,14 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_pcp_combine.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
+
+  <!-- JHG: this pcp_combine command must be moved to unit_pcp_combine.xml -->
 
   <test name="pcp_combine_GRIB1_SUBTRACT">
     <exec>&MET_BIN;/pcp_combine</exec>

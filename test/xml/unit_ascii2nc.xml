@@ -11,6 +11,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -68,23 +70,23 @@
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/qc_out_2012-09-07_00:00:00.GRM_P+FCST \
-      &OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P+FCST.nc \
+      &OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P_FCST.nc \
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P+FCST.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P_FCST.nc</point_nc>
     </output>
   </test>
 
   <test name="ascii2nc_LITTLE_R_BAD_RECORD">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/ascii/OBS:2015080700_bad_record \
-      &OUTPUT_DIR;/ascii2nc/OBS:2015080700_bad_record.nc \
+      &DATA_DIR_OBS;/ascii/OBS_2015080700_bad_record \
+      &OUTPUT_DIR;/ascii2nc/OBS_2015080700_bad_record.nc \
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/OBS:2015080700_bad_record.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/OBS_2015080700_bad_record.nc</point_nc>
     </output>
   </test>
 

@@ -10,12 +10,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_point_stat.xml unit_grid_stat.xml unit_wavelet_stat.xml unit_ensemble_stat.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-
-  <!--  depends on unit_point_stat, unit_grid_stat, unit_wavelet_stat.xml, and unit_ensemble_stat.xml  -->
 
   <!--  jobs for wavelet_stat output  -->
 

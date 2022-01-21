@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_ascii2nc.xml unit_prepbufr.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -103,6 +105,8 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc</grid_nc>
     </output>
   </test>
+
+  <!-- JHG: Change the output directory from "regrid" to "point2grid" -->
 
   <test name="point2grid_pb2nc_big_input">
     <exec>&MET_BIN;/point2grid</exec>

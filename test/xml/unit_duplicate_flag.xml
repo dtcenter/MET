@@ -10,9 +10,9 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
-<met_test>
+<!-- Requires: unit_ascii2nc.xml -->
 
-  <!--  Depends on unit_ascii2nc to generate dup_test.nc obs file -->
+<met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>false</exit_on_fail>

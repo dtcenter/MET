@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_ascii2nc.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -18,7 +20,6 @@
 
   <!--                                    -->
   <!--  ensemble_stat                     -->
-  <!--  depends on unit_ascii2nc.xml      -->
   <!--                                    -->
 
   <!--  Pass input ensemble files on the command line - one missing.  -->
