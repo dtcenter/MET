@@ -30,13 +30,13 @@
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_qty_inc_exc \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/quality_filter -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -54,14 +54,14 @@
       &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040900_F012.grib \
       &CONFIG_DIR;/EnsembleStatConfig_qty_inc_exc \
       -point_obs &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
-      -outdir &OUTPUT_DIR;/ensemble_stat -v 3
+      -outdir &OUTPUT_DIR;/quality_filter -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_rhist.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_orank.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ens.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_orank.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ens.nc</grid_nc>
     </output>
   </test>
   
