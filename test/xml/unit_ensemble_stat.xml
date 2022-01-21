@@ -217,7 +217,7 @@
 
   <!--  Add observation error perturbations.  -->
 
-  <test name="ensemble_stat_OBS_ERROR">
+  <test name="ensemble_stat_OBSERR">
     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F024.grib \
@@ -227,10 +227,10 @@
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
           &MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>DESC</name>           <value>OBS_ERROR</value></pair>
+      <pair><name>DESC</name>           <value>OBSERR</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>TRUE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>TRUE</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>OBS_ERROR</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OBSERR</value></pair>
     </env>
     <param> \
       &OUTPUT_DIR;/ensemble_stat/input_file_list \
@@ -240,14 +240,14 @@
       -outdir &OUTPUT_DIR;/ensemble_stat -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ecnt.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_rhist.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_phist.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_orank.txt</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ens.nc</grid_nc>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_orank.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_ssvar.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
 
