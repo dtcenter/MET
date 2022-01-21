@@ -67,7 +67,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_shift_data_plane.xml \
           unit_mtd.xml \
           unit_climatology.xml \
-          unit_test_grib_tables.xml \
+          unit_grib_tables.xml \
           unit_grid_weight.xml \
           unit_netcdf.xml \
           unit_hira.xml \
