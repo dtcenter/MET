@@ -4,9 +4,12 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 DOCKERHUB_TAG=${DOCKERHUB_REPO}:${SOURCE_BRANCH}
 
-volumes_from="--volumes-from met_input"
+LOCAL_DIFF_DIR=${RUNNER_WORKSPACE}/diff
+DOCKER_DIFF_DIR=/data/output/met_test_diff
 
-mount_args="-v ${RUNNER_WORKSPACE}/logs:/met/logs"
+volumes_from="--volumes-from met_truth --volumes-from met_input"
+
+mount_args="-v $LOCAL_DIFF_DIR:$DOCKER_DIFF_DIR -v ${RUNNER_WORKSPACE}/logs:/met/logs"
 
 export TESTS_TO_RUN=$TESTS
 

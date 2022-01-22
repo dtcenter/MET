@@ -103,17 +103,17 @@ jobs:
         env:
           DATA_VERSION: develop
 
+      - name: Get test truth data from DockerHub
+        run: .github/jobs/get_test_truth_data.sh
+        env:
+          DATA_VERSION: develop
+
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
           DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-
-      - name: Get test truth data from DockerHub
-        run: .github/jobs/get_test_truth_data.sh
-        env:
-          DATA_VERSION: develop
 
       - name: Run Diff Tests in Docker
         run: .github/jobs/run_diff_docker.sh
