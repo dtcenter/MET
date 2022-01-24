@@ -27,9 +27,3 @@ time_command docker run -e TESTS_TO_RUN ${volumes_from} ${mount_args} ${DOCKERHU
 if [ $? != 0 ]; then
   exit 1
 fi
-
-# exit non-zero if there are any diff files
-if [ "$(ls -A $LOCAL_DIFF_DIR)" ]; then
-  echo "ERROR: Differences exist in the output"
-  exit 1
-fi
