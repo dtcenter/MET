@@ -13,7 +13,7 @@ function time_command {
       error=$?
   else
       echo "Logging to ${CMD_LOGFILE}"
-      "$@" &> $CMD_LOGFILE
+      "$@" &>> $CMD_LOGFILE
       error=$?
       unset CMD_LOGFILE
   fi
