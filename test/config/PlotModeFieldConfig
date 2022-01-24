@@ -9,7 +9,7 @@
 
 plot_info = {
 
-   output_directory = "${MET_TEST_OUTPUT}/plot_mode_field";
+   output_directory = "${MET_TEST_OUTPUT}/mode_graphics";
 
    size = 4;
 
