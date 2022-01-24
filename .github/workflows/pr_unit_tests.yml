@@ -81,8 +81,9 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'gaussian aeronet'
-          - 'airnow'
+          - 'ref_config'
+          - 'tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_gen'
+          - 'met_test_scripts mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag test_grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -127,8 +128,10 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'gaussian aeronet'
-          - 'airnow'
+          - 'pcp_combine'
+          - 'pb2nc'
+          - 'ascii2nc'
+          - 'madis2nc'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -173,8 +176,9 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'gaussian aeronet'
-          - 'airnow'
+          - 'climatology'
+          - 'point_stat grid_stat wavelet_stat ensemble_stat'
+          - 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -219,8 +223,7 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'gaussian aeronet'
-          - 'airnow'
+          - 'stat_analysis'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
