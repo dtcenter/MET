@@ -292,10 +292,6 @@ jobs:
           mkdir ${RUNNER_WORKSPACE}/output
           cp -r unit_tests_*/* ${RUNNER_WORKSPACE}/output/
 
-      - name: Display output directory content
-        run: ls -lh
-        working-directory: ${{ runner.workspace }}/output
-
       - uses: actions/checkout@v2
 
       - name: Run Diff Tests in Docker
