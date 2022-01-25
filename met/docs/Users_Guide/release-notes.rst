@@ -27,7 +27,7 @@ _________________________________________________
    * Fix IODA2NC to handle the same input file being provided multiple times (`#1965 <https://github.com/dtcenter/MET/issues/1965>`_).
 
 MET Version 10.1.0-beta4 release notes (20211117)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+________________________________________________
 
 * Enhancements:
 
