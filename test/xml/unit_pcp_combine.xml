@@ -187,10 +187,10 @@
       -subtract \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_06:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
-      &OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc
+      &OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12_00_00_PLEV_APCP06.nc
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12_00_00_PLEV_APCP06.nc</grid_nc>
     </output>
   </test>
 
