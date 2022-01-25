@@ -288,11 +288,13 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Copy test output into single directory
-        run: mkdir output; cp -r unit_tests_*/* output/
+        run: |
+          mkdir ${RUNNER_WORKSPACE}/output
+          cp -r unit_tests_*/* ${RUNNER_WORKSPACE}/output/
 
       - name: Display output directory content
         run: ls -lh
-        working-directory: output
+        working-directory: ${{ runner.workspace }}/output
 
       - uses: actions/checkout@v2
 
