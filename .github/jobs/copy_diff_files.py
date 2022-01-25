@@ -74,6 +74,7 @@ def main():
     all_files_to_copy = set()
     log_files = glob.glob(os.path.join(LOG_DIR, 'comp_dir*.log'))
     for log_file in log_files:
+        print(f"Parsing {log_file}")
         new_files = get_files_with_diffs(log_file)
         all_files_to_copy.update(new_files)
 
