@@ -203,7 +203,7 @@ An error in the syntax of a configuration file will result in an error from the
 MET tool stating the location of the parsing error.
 
 Runtime Environment Variables
-_____________________________
+-----------------------------
 
 MET_BASE
 ^^^^^^^^
@@ -390,9 +390,10 @@ the binding / affinitization method on the particular system and building it
 into any relevant scripting.
 
 Settings common to multiple tools
-_________________________________
+---------------------------------
 
-.. _exit_on_warning:
+exit_on_warning
+^^^^^^^^^^^^^^^
 
 :ref:`exit_on_warning <exit_on_warning>`
 
@@ -2289,7 +2290,7 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
   }
 
 Settings specific to individual tools
-_____________________________________
+-------------------------------------
 
 EnsembleStatConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
