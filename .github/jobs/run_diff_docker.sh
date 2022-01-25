@@ -14,7 +14,14 @@ DOCKER_OUTPUT_DIR=/data/output/met_test_output
 LOCAL_DIFF_DIR=${RUNNER_WORKSPACE}/diff
 DOCKER_DIFF_DIR=/data/output/met_test_diff
 
-mount_args="-v $LOCAL_OUTPUT_DIR:$DOCKER_OUTPUT_DIR -v $LOCAL_DIFF_DIR:$DOCKER_DIFF_DIR -v ${RUNNER_WORKSPACE}/logs:/met/logs"
+LOCAL_LOG_DIR=${RUNNER_WORKSPACE}/logs
+DOCKER_LOG_DIR=/met/logs
+
+# Create local directories to store output
+mkdir -p ${LOCAL_LOG_DIR}
+mkdir -p ${LOCAL_DIFF_DIR}
+
+mount_args="-v ${LOCAL_OUTPUT_DIR}:${DOCKER_OUTPUT_DIR} -v ${LOCAL_DIFF_DIR}:${DOCKER_DIFF_DIR} -v ${LOCAL_LOG_DIR}:${DOCKER_LOG_DIR}"
 
 # Set up data volumes
 volumes_from="--volumes-from met_truth"
