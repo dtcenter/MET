@@ -170,9 +170,6 @@ jobs:
           name: unit_tests_1a
           path: ${{ runner.workspace }}/output
 
-      - name: Check contents of output directory
-        run: ls -lh ${RUNNER_WORKSPACE}/output/*
-
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
@@ -288,7 +285,7 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Copy test output into single directory
-        run: cp -r unit_tests_*/* output/
+        run: mkdir output; cp -r unit_tests_*/* output/
 
       - name: Display output directory content
         run: ls -lh
