@@ -1,12 +1,13 @@
 .. _config_options_tc:
 
+**************************************
 Tropical Cyclone Configuration Options
-======================================
+**************************************
 
 See :numref:`config_options` for a description of the configuration file syntax.
 
 Configuration settings common to multiple tools
-_______________________________________________
+===============================================
 
 .. _storm_id_1:
 
@@ -200,11 +201,11 @@ The value should generally not be modified.
 
 
 Settings specific to individual tools
-_____________________________________
+=====================================
 
 
 TCPairsConfig_default
-~~~~~~~~~~~~~~~~~~~~~
+_____________________
 
 .. _model_1:
 
@@ -443,7 +444,7 @@ parameter will result in missed matches.
   ];
 
 TCStatConfig_default
-____________________
+====================
 
 .. _amodel, bmodel:
 
@@ -1004,7 +1005,7 @@ Where "job_name" is set to one of the following:
   jobs = [];
 
 TCGenConfig_default
-___________________
+===================
 
 .. _int_freq:
 
@@ -1094,7 +1095,7 @@ time of the first track point where all of these criteria are met.
   }
 
 Track filtering options which may be specified separately in each filter array entry
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+____________________________________________________________________________________
 
 .. _filter:
 
@@ -1237,7 +1238,7 @@ Genesis matching search radius in km.
   genesis_radius = 300;
 
 Global settings
-_______________
+===============
 
 .. _ci_alpha:
 
