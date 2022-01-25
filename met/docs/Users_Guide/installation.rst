@@ -39,7 +39,7 @@ In order to control the desired flow through MET, users are encouraged to run th
 .. _Install_Required-libraries-and:
 
 Required Libraries and Optional U1tilities
-=========================================
+==========================================
 
 Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in :numref:`Installation-of-required` :
 
