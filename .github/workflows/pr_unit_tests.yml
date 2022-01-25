@@ -283,6 +283,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
 
+      - name: Copy test output into single directory
+        run: cp -r unit_tests_*/* output/
+
+      - name: Display output directory content
+        run: ls -lh
+        working-directory: output
+
       - name: Run Diff Tests in Docker
         run: .github/jobs/run_diff_docker.sh
         env:
