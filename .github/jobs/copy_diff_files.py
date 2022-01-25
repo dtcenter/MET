@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import os
-import glob
 import shutil
 
 OUTPUT_DIR = os.environ['MET_TEST_OUTPUT']
