@@ -1132,26 +1132,28 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
       else if (data_buf.hdr_data_offset == data_buf.pb_hdr_data_offset) {
          int save_len = lengths[0];
          int pb_hdr_len = raw_hdr_cnt - offsets[0];
-         if (pb_hdr_len > buf_size) pb_hdr_len = buf_size;
+         if (pb_hdr_len > 0) {
+            if (pb_hdr_len > buf_size) pb_hdr_len = buf_size;
 
-         lengths[0] = pb_hdr_len;
-         if(IS_VALID_NC(hdr_prpt_typ_var) && !put_nc_data((NcVar *)&hdr_prpt_typ_var,
-                                                          data_buf.hdr_prpt_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the pb message type to the netCDF file\n\n";
-            exit(1);
+            lengths[0] = pb_hdr_len;
+            if(IS_VALID_NC(hdr_prpt_typ_var) && !put_nc_data((NcVar *)&hdr_prpt_typ_var,
+                                                             data_buf.hdr_prpt_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the pb message type to the netCDF file\n\n";
+               exit(1);
+            }
+            if(IS_VALID_NC(hdr_irpt_typ_var) && !put_nc_data((NcVar *)&hdr_irpt_typ_var,
+                                                             data_buf.hdr_irpt_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the in message type to the netCDF file\n\n";
+               exit(1);
+            }
+            if(IS_VALID_NC(hdr_inst_typ_var) && !put_nc_data((NcVar *)&hdr_inst_typ_var,
+                                                             data_buf.hdr_inst_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the instrument type to the netCDF file\n\n";
+               exit(1);
+            }
+            lengths[0] = save_len;
+            data_buf.pb_hdr_data_offset += pb_hdr_len;
          }
-         if(IS_VALID_NC(hdr_irpt_typ_var) && !put_nc_data((NcVar *)&hdr_irpt_typ_var,
-                                                          data_buf.hdr_irpt_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the in message type to the netCDF file\n\n";
-            exit(1);
-         }
-         if(IS_VALID_NC(hdr_inst_typ_var) && !put_nc_data((NcVar *)&hdr_inst_typ_var,
-                                                          data_buf.hdr_inst_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the instrument type to the netCDF file\n\n";
-            exit(1);
-         }
-         lengths[0] = save_len;
-         data_buf.pb_hdr_data_offset += pb_hdr_len;
       }
       else {
           mlog << Debug(6) << method_name
