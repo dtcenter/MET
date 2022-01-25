@@ -71,7 +71,7 @@ def copy_files_to_diff_dir(files_to_copy):
         shutil.copyfile(filename, output_path)
 
 def main():
-    log_file = glob.glob(os.path.join(LOG_DIR, 'comp_dir.log'))
+    log_file = os.path.join(LOG_DIR, 'comp_dir.log')
     print(f"Parsing {log_file}")
     all_files_to_copy = get_files_with_diffs(log_file)
 
