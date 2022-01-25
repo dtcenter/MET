@@ -85,6 +85,12 @@ climo_stdev = {
    file_name = [];
 }
 
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //

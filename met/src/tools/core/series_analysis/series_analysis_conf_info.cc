@@ -68,6 +68,7 @@ void SeriesAnalysisConfInfo::clear() {
    fcnt_ta.clear();
    ocnt_ta.clear();
    cnt_logic = SetLogic_None;
+   cdf_info.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -413,6 +414,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       while(ocnt_ta.n() < n) ocnt_ta.add(na_str);
 
    } // end if continuous
+
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&conf);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);
