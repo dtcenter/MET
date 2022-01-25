@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -137,6 +139,19 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP03.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="pcp_combine_sub_GRIB1_run2">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F030.grib 30 \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib 24 \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc</grid_nc>
     </output>
   </test>
 

@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/tc_data/bdeck">
 ]>
 
+<!-- Requires: unit_tc_pairs.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>

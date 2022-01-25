@@ -10,10 +10,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <!--
   Note:
     the compression test: the output filename should have the same length
-                          by appendinfg '_' for the file size comparison.
+                          by appending '_' for the file size comparison.
 -->
 
 <met_test>
