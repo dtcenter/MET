@@ -13,20 +13,15 @@ source ${MET_REPO_DIR}/.github/jobs/test_env_vars.sh
 ###
 
 echo "Running comparison on test output"
-for testname in $TESTS_TO_RUN; do
-  CMD_LOGFILE=/met/logs/comp_dir_${testname}.log
-  time_command ${MET_TEST_BASE}/bin/comp_dir.sh ${MET_TEST_TRUTH}/${testname} ${MET_TEST_OUTPUT}/${testname}
-  if [ $? != 0 ]; then
-      echo "ERROR: Test ${testname} output comparison failed"
-      exit 1
-  fi
-done
-
-test_list=($TESTS_TO_RUN)
-first_test=${test_list[0]}
+CMD_LOGFILE=/met/logs/comp_dir.log
+time_command ${MET_TEST_BASE}/bin/comp_dir.sh ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
+if [ $? != 0 ]; then
+    echo "ERROR: Test output comparison failed"
+    exit 1
+fi
 
 echo "Running copy_diff_files.py"
-CMD_LOGFILE=/met/logs/copy_diff_files_${first_test}_group.log
+CMD_LOGFILE=/met/logs/copy_diff_files.log
 time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
 if [ $? != 0 ]; then
     echo "ERROR: Copy diff files script failed"

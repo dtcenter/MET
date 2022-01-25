@@ -73,54 +73,7 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_1:
-    name: Run MET Unit Tests
-    runs-on: ubuntu-latest
-    needs: [job_control, compile]
-    if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
-    strategy:
-      matrix:
-        tests:
-          - 'ref_config'
-          - 'tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_gen'
-          - 'met_test_scripts mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag test_grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run Unit Tests in Docker
-        run: .github/jobs/run_unit_docker.sh
-        env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
-          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
-          TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
-
-      - name: Run Diff Tests in Docker
-        run: .github/jobs/run_diff_docker.sh
-        env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
-          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
-          TESTS: ${{ matrix.tests }}
-          TRUTH_DATA_VERSION: develop
-
-      - name: Upload diff files as artifact
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: diff
-          path: ${{ runner.workspace }}/diff
-          if-no-files-found: ignore
-
-      - name: Upload logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs
-          path: ${{ runner.workspace }}/logs
-          if-no-files-found: ignore
-
-  unit_tests_2a:
+  unit_tests_1a:
     name: Run MET Unit Tests
     runs-on: ubuntu-latest
     needs: [job_control, compile]
@@ -144,21 +97,92 @@ jobs:
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
 
-      - name: Run Diff Tests in Docker
-        run: .github/jobs/run_diff_docker.sh
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit_tests_1a
+          path: ${{ runner.workspace }}/output
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+
+  unit_tests_1b:
+    name: Run MET Unit Tests
+    runs-on: ubuntu-latest
+    needs: [job_control, compile]
+    if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
+    strategy:
+      matrix:
+        tests:
+          - 'ref_config'
+          - 'tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_gen'
+          - 'met_test_scripts mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag test_grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Unit Tests in Docker
+        run: .github/jobs/run_unit_docker.sh
         env:
           DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          TRUTH_DATA_VERSION: develop
+          INPUT_DATA_VERSION: develop
 
-      - name: Upload diff files as artifact
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit_tests_1b
+          path: ${{ runner.workspace }}/output
+
+      - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: diff
-          path: ${{ runner.workspace }}/diff
+          name: logs
+          path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+  unit_tests_2a:
+    name: Run MET Unit Tests
+    runs-on: ubuntu-latest
+    needs: unit_tests_1a
+    if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
+    strategy:
+      matrix:
+        tests:
+          - 'point_stat'
+          - 'grid_stat'
+          - 'wavelet_stat'
+          - 'ensemble_stat'
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download 1a output from artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: unit_tests_1a
+          path: ${{ runner.workspace }}/output
+
+      - name: Run Unit Tests in Docker
+        run: .github/jobs/run_unit_docker.sh
+        env:
+          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
+          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
+          TESTS: ${{ matrix.tests }}
+          INPUT_DATA_VERSION: develop
+
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit_tests_2a
+          path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
@@ -171,17 +195,22 @@ jobs:
   unit_tests_2b:
     name: Run MET Unit Tests
     runs-on: ubuntu-latest
-    needs: [job_control, compile, unit_tests_2a]
+    needs: unit_tests_1a
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
         tests:
           - 'climatology'
-          - 'point_stat grid_stat wavelet_stat ensemble_stat'
           - 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Download 1a output from artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: unit_tests_1a
+          path: ${{ runner.workspace }}/output
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -191,21 +220,11 @@ jobs:
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
 
-      - name: Run Diff Tests in Docker
-        run: .github/jobs/run_diff_docker.sh
-        env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
-          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
-          TESTS: ${{ matrix.tests }}
-          TRUTH_DATA_VERSION: develop
-
-      - name: Upload diff files as artifact
-        if: always()
+      - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: diff
-          path: ${{ runner.workspace }}/diff
-          if-no-files-found: ignore
+          name: unit_tests_2b
+          path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
@@ -215,10 +234,11 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_2c:
+
+  unit_tests_3a:
     name: Run MET Unit Tests
     runs-on: ubuntu-latest
-    needs: [job_control, compile, unit_tests_2b]
+    needs: unit_tests_2a
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
@@ -228,6 +248,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Download 2a output from artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: unit_tests_2a
+          path: ${{ runner.workspace }}/output
+
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
@@ -236,21 +262,11 @@ jobs:
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
 
-      - name: Run Diff Tests in Docker
-        run: .github/jobs/run_diff_docker.sh
-        env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
-          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
-          TESTS: ${{ matrix.tests }}
-          TRUTH_DATA_VERSION: develop
-
-      - name: Upload diff files as artifact
-        if: always()
+      - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: diff
-          path: ${{ runner.workspace }}/diff
-          if-no-files-found: ignore
+          name: unit_tests_3a
+          path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
@@ -260,17 +276,24 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  check_for_diffs:
+  run_diffs:
     name: Check if there were any differences
     runs-on: ubuntu-latest
-    needs: [unit_tests_1, unit_tests_2c]
+    needs: [unit_tests_1b, unit_tests_2b, unit_tests_3a]
     steps:
       - uses: actions/download-artifact@v2
+
+      - name: Run Diff Tests in Docker
+        run: .github/jobs/run_diff_docker.sh
+        env:
+          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
+          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
+          TRUTH_DATA_VERSION: develop
+
+      - name: Upload diff files as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
         with:
           name: diff
-          path: diff
-      - run: |
-          if [ "$(ls -A diff)" ]; then
-            echo "ERROR: Differences exist in the output"
-            exit 1
-          fi
+          path: ${{ runner.workspace }}/diff
+          if-no-files-found: ignore
