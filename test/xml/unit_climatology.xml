@@ -11,12 +11,13 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
+<!-- Requires: unit_pb2nc.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-  <!-- Depends on unit_pb2nc.xml -->
   <test name="climatology_POINT_STAT_GFS_2.5DEG">
     <exec>&MET_BIN;/point_stat</exec>
     <env>

@@ -10,12 +10,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-
-  <!-- No dependency on other XML files -->
 
   <!-- Test -set_hdr option with conventional obs -->
   <test name="gsid2mpr_CONV">
@@ -23,11 +23,11 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
       -set_hdr MODEL GSI_MEM001 \
-      -outdir &OUTPUT_DIR;/gsid2mpr \
+      -outdir &OUTPUT_DIR;/gsi_tools/gsid2mpr \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001.stat</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_conv_ges.mem001.stat</stat>
     </output>
   </test>
 
@@ -37,11 +37,11 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
       -set_hdr MODEL GSI_MEM001 \
-      -outdir &OUTPUT_DIR;/gsid2mpr \
+      -outdir &OUTPUT_DIR;/gsi_tools/gsid2mpr \
       -swap -no_check_dup -suffix _DUP_mpr.txt -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_DUP_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_conv_ges.mem001_DUP_mpr.txt</stat>
     </output>
   </test>
 
@@ -51,13 +51,13 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem001 \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem002 \
-      -outdir &OUTPUT_DIR;/gsid2mpr \
+      -outdir &OUTPUT_DIR;/gsi_tools/gsid2mpr \
       -suffix _mpr.txt \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_amsua_n18_ges.mem001_mpr.txt</stat>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_amsua_n18_ges.mem002_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_amsua_n18_ges.mem001_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_amsua_n18_ges.mem002_mpr.txt</stat>
     </output>
   </test>
 
@@ -66,11 +66,11 @@
     <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt \
+      -out &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_no_mean_orank.txt \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_no_mean_orank.txt</stat>
     </output>
   </test>
 
@@ -80,11 +80,11 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.ensmean \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
+      -out &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_orank.txt</stat>
     </output>
   </test>
 
@@ -93,11 +93,11 @@
     <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt \
+      -out &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt</stat>
     </output>
   </test>
 
@@ -108,11 +108,11 @@
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.ensmean \
       -channel 2,7,10 \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt \
+      -out &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt \
       -swap -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt</stat>
     </output>
   </test>
 
@@ -120,14 +120,14 @@
   <test name="stat_analysis_MPR_TO_CNT">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001.stat \
+      -lookin &OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_conv_ges.mem001.stat \
       -job aggregate_stat -line_type MPR -out_line_type CNT -by fcst_var \
       -column_thresh ANLY_USE ==1 \
-      -out_stat &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_cnt.txt \
+      -out_stat &OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_conv_ges.mem001_cnt.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsid2mpr/diag_conv_ges.mem001_cnt.txt</stat>
     </output>
   </test>
 
@@ -135,14 +135,14 @@
   <test name="stat_analysis_ORANK_TO_RHIST">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
+      -lookin &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -job aggregate_stat -line_type ORANK -out_line_type RHIST -by fcst_var \
       -column_thresh N_USE ==20 \
-      -out_stat &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt \
+      -out_stat &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt</stat>
     </output>
   </test>
 
@@ -150,14 +150,14 @@
   <test name="stat_analysis_ORANK_TO_SSVAR">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
+      -lookin &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -job aggregate_stat -line_type ORANK -out_line_type SSVAR -by fcst_var \
       -column_thresh N_USE ==20 -out_bin_size 0.10 \
-      -out_stat &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt \
+      -out_stat &OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt</stat>
+      <stat>&OUTPUT_DIR;/gsi_tools/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt</stat>
     </output>
   </test>
 
