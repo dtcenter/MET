@@ -26,7 +26,7 @@ test_list=($TESTS_TO_RUN)
 first_test=${test_list[0]}
 
 echo "Running copy_diff_files.py"
-CMD_LOGFILE=/met/logs/copy_diff_files_${first_test}.log
+CMD_LOGFILE=/met/logs/copy_diff_files_${first_test}_group.log
 time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
 if [ $? != 0 ]; then
     echo "ERROR: Copy diff files script failed"
