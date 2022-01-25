@@ -23,12 +23,14 @@ def get_files_with_diffs(log_file):
     # parse list of missing files
     if 'ERROR:' in missing_section:
         for missing_group in missing_section.split('ERROR:')[1:]:
-            rel_paths = missing_group.splitlines()[1:]
-            if OUTPUT_DIR in missing_group:
-                top_dir = TRUTH_DIR
-            elif TRUTH_DIR in missing_group:
-                top_dir = OUTPUT_DIR
+            dir_str, *rel_paths = missing_group.splitlines()
+            dir_str = dir_str.split()[1]
+            if OUTPUT_DIR in dir_str:
+                top_dir = dir_str.replace(OUTPUT_DIR, TRUTH_DIR)
+            elif TRUTH_DIR in dir_str:
+                top_dir = dir_str.replace(TRUTH_DIR, OUTPUT_DIR)
             else:
+                print("ERROR: SOMETHING WENT WRONG PARSING COMP_DIR OUTPUT")
                 continue
             for rel_path in rel_paths:
                 files_to_copy.add(os.path.join(top_dir, rel_path.strip()))
