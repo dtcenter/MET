@@ -291,6 +291,8 @@ jobs:
         run: ls -lh
         working-directory: output
 
+      - uses: actions/checkout@v2
+
       - name: Run Diff Tests in Docker
         run: .github/jobs/run_diff_docker.sh
         env:
