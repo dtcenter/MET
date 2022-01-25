@@ -6,6 +6,8 @@
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>

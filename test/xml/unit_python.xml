@@ -6,7 +6,7 @@
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
-  <!ENTITY MET_PYTHON_EXE "/usr/local/python3/bin/python3">
+  <!ENTITY MET_PYTHON_EXE "${MET_TEST_MET_PYTHON_EXE}">
   <!ENTITY ANACONDA_BIN   "/usr/local/anaconda3-20190923/bin">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
@@ -14,6 +14,8 @@
   <!ENTITY DATA_DIR_MODEL  "&INPUT_DIR;/model_data">
   <!ENTITY DATA_DIR_OBS    "&INPUT_DIR;/obs_data">
 ]>
+
+<!-- Requires: unit_pb2nc.xml unit_pcp_combine.xml -->
 
 <met_test>
 

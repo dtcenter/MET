@@ -9,6 +9,8 @@
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
 ]>
 
+<!-- Requires: unit_tc_dland.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
