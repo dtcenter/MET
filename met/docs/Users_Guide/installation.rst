@@ -1,22 +1,23 @@
 .. _installation:
 
+*************************************
 Software Installation/Getting Started
-=====================================
+*************************************
 
 Introduction
-____________
+============
 
 This section describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
 
-Supported architectures
-_______________________
+Supported Architectures
+=======================
 
 The MET package was developed on Debian Linux using the GNU compilers and the Portland Group (PGI) compilers. The MET package has also been built on several other Linux distributions using the GNU, PGI, and Intel compilers. Past versions of MET have also been ported to IBM machines using the IBM compilers, but we are currently unable to support this option as the development team lacks access to an IBM machine for testing. Other machines may be added to this list in future releases as they are tested. In particular, the goal is to support those architectures supported by the WRF model itself.
 
 The MET tools run on a single processor. Therefore, none of the utilities necessary for running WRF on multiple processors are necessary for running MET. Individual calls to the MET tools have relatively low computing and memory requirements. However users will likely be making many calls to the tools and passing those individual calls to several processors will accomplish the verification task more efficiently.
 
-Programming languages
-_____________________
+Programming Languages
+=====================
 
 The MET package, including MET-TC, is written primarily in C/C++ in order to be compatible with an extensive verification code base in C/C++ already in existence. In addition, the object-based MODE and MODE-TD verification tools rely heavily on the object-oriented aspects of C++. Knowledge of C/C++ is not necessary to use the MET package. The MET package has been designed to be highly configurable through the use of ASCII configuration files, enabling a great deal of flexibility without the need for source code modifications.
 
@@ -24,8 +25,8 @@ NCEP's BUFRLIB is written entirely in Fortran. The portion of MET that handles t
 
 The MET package is intended to be a tool for the modeling community to use and adapt. As users make upgrades and improvements to the tools, they are encouraged to offer those upgrades to the broader community by offering feedback to the developers.
 
-Required compilers and scripting languages
-__________________________________________
+Required Compilers and Acripting Languages
+==========================================
 
 The MET package was developed and tested using the GNU g++/gfortran compilers and the Intel icc/ifort compilers. As additional compilers are successfully tested, they will be added to the list of supported platforms/compilers.
 
@@ -37,8 +38,8 @@ In order to control the desired flow through MET, users are encouraged to run th
 
 .. _Install_Required-libraries-and:
 
-Required libraries and optional utilities
-_________________________________________
+Required Libraries and Optional U1tilities
+=========================================
 
 Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in :numref:`Installation-of-required` :
 
@@ -58,8 +59,8 @@ Two additional utilities are strongly recommended for use with MET:
 
 .. _Installation-of-required:
 
-Installation of required libraries
-__________________________________
+Installation of Required Libraries
+==================================
 
 As described in :numref:`Install_Required-libraries-and`, some external libraries are required for building the MET:
 
@@ -105,8 +106,8 @@ In the directions above, the static library file that is created will be named l
 
 .. _Installation-of-optional:
 
-Installation of optional utilities
-__________________________________
+Installation of Optional Utilities
+==================================
 
 As described in the introduction to this section, two additional utilities are strongly recommended for use with MET.
 
@@ -116,8 +117,8 @@ As described in the introduction to this section, two additional utilities are s
 
 .. _met_directory_structure:
 
-MET directory structure
-_______________________
+MET Directory Structure
+=======================
 
 The top-level MET directory consists of  Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in :numref:`Install_Building-the-MET`.
 
@@ -137,20 +138,20 @@ The *share/met/Rscripts* directory contains a handful of sample R scripts, inclu
 
 .. _Install_Building-the-MET:
 
-Building the MET package
-________________________
+Building the MET Package
+========================
 
 Building the MET package consists of three main steps: (1) install the required libraries, (2) configure the environment variables, and (3) configure and execute the build. Users can follow the instructions below or use a sample installation script.  Users can find the script and its instructions under on the `Downloads <https://dtcenter.org/community-code/model-evaluation-tools-met/download>`_ page of the MET website.
 
 Install the Required Libraries
-______________________________
+==============================
 
 • Please refer to :numref:`Installation-of-required` and :numref:`Installation-of-optional` on how to install the required and optional libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to include the path to the library files.
 
 Set Environment Variables
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The MET build uses environment variables to specify the locations of the needed external libraries. For each library, there is a set of three environment variables to describe the locations: $MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
 
@@ -188,8 +189,8 @@ The following environment variables should also be set:
 
 For ease of use, you should define these in your .cshrc or equivalent file.
 
-Configure and execute the build
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configure and Execute the Build
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
 
@@ -301,7 +302,7 @@ regions to benefit from thread-parallel execution. Runtime environment variable
 Run the configure script with the **-help** argument to see the full list of configuration options.
 
 Make Targets
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 The autoconf utility provides some standard make targets for the users. In MET, the following standard targets have been implemented and tested:
 
@@ -319,8 +320,8 @@ MET also has the following non-standard targets:
 
 .. _Sample Test cases:
    
-Sample test cases
-_________________
+Sample Test Cases
+=================
 
 Once the MET package has been built successfully, the user is encouraged to run the sample test scripts provided. They are run using make test in the top-level directory. Execute the following commands:
 
