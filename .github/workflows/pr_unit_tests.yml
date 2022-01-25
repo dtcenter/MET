@@ -320,3 +320,26 @@ jobs:
           name: logs
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+  update_truth:
+    name: Update Truth Data
+    runs-on: ubuntu-latest
+    needs: [job_control, unit_tests_1b, unit_tests_2b, unit_tests_3a]
+    if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download data from previous jobs
+        uses: actions/download-artifact@v2
+
+      - name: Copy test output into single directory
+        run: |
+          mkdir ${RUNNER_WORKSPACE}/met_test_truth
+          cp -r unit_tests_*/* ${RUNNER_WORKSPACE}/met_test_truth/
+
+      - name: Create Docker Data Volume
+        run: .github/jobs/create_docker_truth.sh
+        env:
+          TRUTH_DATA_VERSION: develop
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
