@@ -307,3 +307,11 @@ jobs:
           name: diff
           path: ${{ runner.workspace }}/diff
           if-no-files-found: ignore
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
