@@ -298,6 +298,52 @@
     </output>
   </test>
 
+  <test name="climatology_SERIES_ANALYSIS_PROB">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590409",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590410",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590411"
+
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590409",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590410",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590411"
+         </value>
+      </pair>
+    </env>
+    <param> \
+        -fcst &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F003.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F009.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F021.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F027.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F033.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F039.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F045.grib2 \
+              &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F051.grib2 \
+        -obs  &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0000_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0600_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1800_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120411_0000_000.grb2 \
+      -paired \
+      -out    &OUTPUT_DIR;/climatology/series_analysis_SREF_PROB_CLIMO_1.0DEG.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_climo_prob \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/climatology/series_analysis_SREF_PROB_CLIMO_1.0DEG.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="climatology_ENSEMBLE_STAT">
     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
