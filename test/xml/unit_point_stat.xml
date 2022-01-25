@@ -11,6 +11,8 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
+<!-- Requires: unit_ascii2nc.xml unit_pb2nc.xml -->
+
 <met_test>
 
   <!--                                    -->

@@ -21,7 +21,7 @@
 #=======================================================================
 
 # Constants
-EMAIL_LIST="johnhg@ucar.edu hsoh@ucar.edu jpresto@ucar.edu linden@ucar.edu"
+EMAIL_LIST="johnhg@ucar.edu hsoh@ucar.edu jpresto@ucar.edu linden@ucar.edu mccabe@ucar.edu"
 KEEP_DAYS=5
 
 # Usage statement

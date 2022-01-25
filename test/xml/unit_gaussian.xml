@@ -8,6 +8,8 @@
   <!ENTITY DATA_DIR_GAUSS "&INPUT_DIR;/gaussian">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -24,6 +26,5 @@
       <exist>&OUTPUT_DIR;/gaussian/gaussian_grib1.ps</exist>
     </output>
   </test>
-
 
 </met_test>

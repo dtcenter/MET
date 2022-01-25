@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -17,7 +19,6 @@
 
   <!--                                    -->
   <!--  gen_ens_prod                      -->
-  <!--  no dependencies                   -->
   <!--                                    -->
 
   <!--  Use -ens twice to include the control as a member.  -->
@@ -120,7 +121,7 @@
     <param> \
         -ens    &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
         -config &CONFIG_DIR;/GenEnsProdConfig_single_file_grib \
-        -ctrl    &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+        -ctrl   &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
         -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_SINGLE_FILE_GRIB_WITH_CTRL.nc \
         -v 2
     </param>
