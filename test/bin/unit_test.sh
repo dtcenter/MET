@@ -66,6 +66,11 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_gen.xml \
           unit_met_test_scripts.xml  \
           unit_modis.xml  \
+          unit_ref_config_lead_00.xml \
+          unit_ref_config_lead_12.xml \
+          unit_ref_config_lead_24.xml \
+          unit_ref_config_lead_36.xml \
+          unit_ref_config_lead_48.xml \
           unit_ref_config.xml \
           unit_mode_graphics.xml \
           unit_regrid.xml \
