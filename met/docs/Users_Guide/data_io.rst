@@ -20,7 +20,7 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
 Requirements for CF Compliant NetCDF
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------
 
 The MET tools use following attributes and variables for input CF Compliant NetCDF data.
 
@@ -125,7 +125,7 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
       "degreesE"
 
 Performance with NetCDF input data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 There is no limitation on the NetCDF file size. The size of the data variables matters more than the file size. The NetCDF API loads the metadata first upon opening the NetCDF file. It's similar for accessing data variables. There are two API calls: getting the metadata and getting the actual data. The memory is allocated and consumed at the second API call (getting the actual data).
 

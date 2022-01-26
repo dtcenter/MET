@@ -205,7 +205,7 @@ Settings specific to individual tools
 
 
 TCPairsConfig_default
-_____________________
+---------------------
 
 .. _model_1:
 
@@ -1095,7 +1095,7 @@ time of the first track point where all of these criteria are met.
   }
 
 Track filtering options which may be specified separately in each filter array entry
-____________________________________________________________________________________
+------------------------------------------------------------------------------------
 
 .. _filter:
 
