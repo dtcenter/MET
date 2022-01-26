@@ -13,4 +13,6 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+
 time_command docker push ${image_name}
