@@ -236,10 +236,10 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'point_stat'
-          - 'grid_stat'
-          - 'wavelet_stat'
-          - 'ensemble_stat'
+          - 'point_stat stat_analysis_ps'
+          - 'grid_stat stat_analysis_gs'
+          - 'wavelet_stat stat_analysis_ws'
+          - 'ensemble_stat stat_analysis_es'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -312,51 +312,10 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-
-  unit_tests_3a:
-    name: MET Unit Tests 3a
-    runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_2a]
-    if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
-    strategy:
-      matrix:
-        tests:
-          - 'stat_analysis'
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Download 2a output from artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: unit_tests_2a
-          path: ${{ runner.workspace }}/output
-
-      - name: Run Unit Tests in Docker
-        run: .github/jobs/run_unit_docker.sh
-        env:
-          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
-          TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
-
-      - name: Upload output as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: unit_tests_3a
-          path: ${{ runner.workspace }}/output
-
-      - name: Upload logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs
-          path: ${{ runner.workspace }}/logs
-          if-no-files-found: ignore
-
   run_diffs:
     name: Check for Differences
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1b, unit_tests_2b, unit_tests_3a, unit_tests_ref_config]
+    needs: [job_control, unit_tests_1b, unit_tests_2a, unit_tests_2b, unit_tests_ref_config]
     if: ${{ needs.job_control.outputs.run_diff == 'true' }}
     steps:
       - name: Download data from previous jobs
@@ -395,7 +354,7 @@ jobs:
   update_truth:
     name: Update Truth Data
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1b, unit_tests_2b, unit_tests_3a, unit_tests_ref_config]
+    needs: [job_control, unit_tests_1b, unit_tests_2a, unit_tests_2b, unit_tests_ref_config]
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
       - uses: actions/checkout@v2
