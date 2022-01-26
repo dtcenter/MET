@@ -1601,7 +1601,7 @@ entry is a dictionary containing information about how to handle input
 gridded data files. The "regird" entry specifies regridding logic and
 has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
 the path to a gridded data file defining the grid, or an explicit grid
-specification string. See the :ref:`regrid<regrid>` entry in
+specification string. See the :ref:`regrid` entry in
 the Configuration File Overview in the MET User's Guide for a more detailed
 description of the configuration file entries that control automated
 regridding.
