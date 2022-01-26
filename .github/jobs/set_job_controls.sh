@@ -5,11 +5,7 @@ run_push=false
 run_unit_tests=false
 run_diff=false
 run_update_truth=false
-#run_unit_tests=true
-#run_diff=true
-#run_update_truth=true
 met_base_image=minimum
-dockerhub_repo=dtcenter/met-dev
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
@@ -54,7 +50,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     run_unit_tests=false
     run_diff=false
     met_base_image=minimum
-    dockerhub_repo=dtcenter/met
+
   fi
 
 fi
@@ -73,13 +69,13 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
 echo ::set-output name=met_base_image::$met_base_image
-echo ::set-output name=dockerhub_repo::$dockerhub_repo
 
 echo run_compile: $run_compile
 echo run_push: $run_push
 echo run_unit_tests: $run_unit_tests
+echo run_diff: $run_diff
+echo run_update_truth: $run_update_truth
 echo met_base_image: $met_base_image
-echo dockerhub_repo: $dockerhub_repo
 
 # get name of branch
 .github/jobs/get_branch_name.sh

@@ -17,6 +17,9 @@ on:
       - 'develop-ref'
       - 'main_v*'
 
+env:
+  DOCKERHUB_REPO: dtcenter/met-dev
+
 jobs:
 
   job_control:
@@ -38,7 +41,6 @@ jobs:
       run_diff: ${{ steps.job_status.outputs.run_diff }}
       run_update_truth: ${{ steps.job_status.outputs.run_update_truth }}
       met_base_image: ${{ steps.job_status.outputs.met_base_image }}
-      dockerhub_repo: ${{ steps.job_status.outputs.dockerhub_repo }}
       branch_name: ${{ steps.job_status.outputs.branch_name }}
 
   compile:
@@ -55,7 +57,6 @@ jobs:
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           MET_BASE_IMAGE: ${{ needs.job_control.outputs.met_base_image }}
 
@@ -67,7 +68,6 @@ jobs:
         run: .github/jobs/push_docker_image.sh
         if: ${{ needs.job_control.outputs.run_push == 'true' }}
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -99,7 +99,6 @@ jobs:
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
@@ -136,7 +135,6 @@ jobs:
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
@@ -180,7 +178,6 @@ jobs:
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
@@ -222,7 +219,6 @@ jobs:
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
@@ -264,7 +260,6 @@ jobs:
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
           INPUT_DATA_VERSION: develop
@@ -302,7 +297,6 @@ jobs:
       - name: Run Diff Tests in Docker
         run: .github/jobs/run_diff_docker.sh
         env:
-          DOCKERHUB_REPO: ${{ needs.job_control.outputs.dockerhub_repo }}
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TRUTH_DATA_VERSION: develop
 
