@@ -2,12 +2,12 @@
 
 run_compile=true
 run_push=false
-#run_unit_tests=false
-#run_diff=false
-#run_update_truth=false
-run_unit_tests=true
-run_diff=true
-run_update_truth=true
+run_unit_tests=false
+run_diff=false
+run_update_truth=false
+#run_unit_tests=true
+#run_diff=true
+#run_update_truth=true
 met_base_image=minimum
 dockerhub_repo=dtcenter/met-dev
 
@@ -41,8 +41,8 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
     run_compile=true
     run_push=true
-    run_unit_tests=true
-    run_diff=true
+    run_unit_tests=false
+    run_diff=false
     run_update_truth=true
 
   # if develop branch, push Docker image to dtcenter/met
@@ -62,7 +62,7 @@ fi
 # use unit_test MET base image if running unit tests
 if [ "$run_unit_tests" == "true" ]; then
 
-  met_base_image=unit_test
+  #met_base_image=unit_test
   run_push=true
 
 fi
