@@ -10,11 +10,9 @@ dockerhub_repo=dtcenter/met-dev
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
-  # only run diff logic if pull request INTO develop or main_v*
-  # branches, not branches ending with -ref
-  if [ "${GITHUB_BASE_REF: -4}" != "-ref" ] && \
-    ([ "${GITHUB_BASE_REF:0:7}" == "develop" ]); then #|| \
-     #[ "${GITHUB_BASE_REF:0:6}" == "main_v" ]); then
+  # only run diff logic if pull request INTO
+  # branches not ending with -ref
+  if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
 
     run_unit_tests=true
     run_diff=true
@@ -41,7 +39,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     run_compile=true
     run_push=true
     run_unit_tests=true
-    run_diff=false
+    run_diff=true
     run_update_truth=true
 
   # if develop branch, push Docker image to dtcenter/met

@@ -8,9 +8,14 @@ on:
     types: [opened, reopened]
     branches:
       - develop
+      - 'main_v*'
   push:
     branches:
-      - 'feature_1546_ci_testing'
+      - 'feature_*'
+      - 'bugfix_*'
+      - 'develop'
+      - 'develop-ref'
+      - 'main_v*'
 
 jobs:
 
