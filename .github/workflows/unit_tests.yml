@@ -212,7 +212,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
+          INPUT_DATA_VERSION: 'none'
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2

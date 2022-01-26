@@ -7,8 +7,12 @@ DOCKERHUB_TAG=${DOCKERHUB_REPO}:${SOURCE_BRANCH}
 # Pull MET Image from DockerHub
 ${GITHUB_WORKSPACE}/.github/jobs/pull_docker_image.sh ${DOCKERHUB_TAG}
 
-# Get test input data
-${GITHUB_WORKSPACE}/.github/jobs/get_test_input_data.sh ${INPUT_DATA_VERSION}
+# Get test input data if needed
+volumes_from=""
+if $[ "${INPUT_DATA_VERSION}" != "none" ]; then
+  ${GITHUB_WORKSPACE}/.github/jobs/get_test_input_data.sh ${INPUT_DATA_VERSION}
+  volumes_from=${volumes_from}"--volumes-from met_input"
+fi
 
 # Set up directories to mount
 LOCAL_OUTPUT_DIR=${RUNNER_WORKSPACE}/output
@@ -22,9 +26,6 @@ mkdir -p ${LOCAL_LOG_DIR}
 mkdir -p ${LOCAL_OUTPUT_DIR}
 
 mount_args="-v ${LOCAL_OUTPUT_DIR}:${DOCKER_OUTPUT_DIR} -v ${LOCAL_LOG_DIR}:${DOCKER_LOG_DIR}"
-
-# Set up data volumes
-volumes_from="--volumes-from met_input"
 
 export TESTS_TO_RUN=$TESTS
 
