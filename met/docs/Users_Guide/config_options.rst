@@ -395,8 +395,6 @@ Settings common to multiple tools
 exit_on_warning
 ^^^^^^^^^^^^^^^
 
-:ref:`exit_on_warning <exit_on_warning>`
-
 The "exit_on_warning" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
 with bad status after writing the warning message.
