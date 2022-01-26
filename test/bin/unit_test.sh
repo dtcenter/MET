@@ -39,6 +39,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_madis2nc.xml \
           unit_trmm2nc.xml \
           unit_pb2nc.xml \
+          unit_pb2nc_indy.xml \
           unit_gen_vx_mask.xml \
           unit_gen_ens_prod.xml \
           unit_pcp_combine.xml \
