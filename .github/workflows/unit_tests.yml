@@ -160,8 +160,9 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'ref_config_lead_00 ref_config_lead_12 ref_config_lead_24'
-          - 'ref_config_lead_36 ref_config_lead_48'
+          - 'ref_config_lead_00 ref_config_lead_12'
+          - 'ref_config_lead_24 ref_config_lead_48'
+          - 'ref_config_lead_36'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
