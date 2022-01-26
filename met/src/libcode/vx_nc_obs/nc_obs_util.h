@@ -17,6 +17,7 @@
 using namespace netCDF;
 
 #include "nc_summary.h"
+#include "met_point_data.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,39 +79,6 @@ struct NcDataBuffer {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct NcHeaderData {
-   bool valid_point_obs;
-   int typ_len;
-   int sid_len;
-   int vld_len;
-   int strl_len;
-   int strll_len;
-   int min_vld_time;
-   int max_vld_time;
-   int hdr_count;
-   int hdr_type_count;
-
-   StringArray typ_array;
-   StringArray sid_array;
-   StringArray vld_array;
-   IntArray    vld_num_array;
-   IntArray    typ_idx_array;
-   IntArray    sid_idx_array;
-   IntArray    vld_idx_array;
-   NumArray    lat_array;
-   NumArray    lon_array;
-   NumArray    elv_array;
-   IntArray    prpt_typ_array;
-   IntArray    irpt_typ_array;
-   IntArray    inst_typ_array;
-
-   NcHeaderData();
-   void clear();
-   void reset_counters();
-};
-
-////////////////////////////////////////////////////////////////////////
-
 struct NetcdfObsVars {
    bool  attr_agl    ;
    bool  attr_pb2nc  ;
@@ -167,7 +135,7 @@ struct NetcdfObsVars {
    void create_hdr_vars (NcFile *f_out, const int hdr_count);
    void create_obs_vars (NcFile *f_out);
    void create_obs_name_vars (NcFile *f_out, const int var_count, const int unit_count);
-   void create_table_vars (NcFile *f_out, NcHeaderData &hdr_data, NcDataBuffer &data_buffer);
+   void create_table_vars (NcFile *f_out, MetPointHeader &hdr_data, NcDataBuffer &data_buffer);
    void create_pb_hdrs (NcFile *f_out, const int hdr_count);
    NcDim create_var_obs_var (NcFile *f_out, int var_count);
 
@@ -175,41 +143,25 @@ struct NetcdfObsVars {
    int get_obs_index();
 
    void read_dims_vars(NcFile *f_in);
-   void read_header_data(NcHeaderData &hdr_data);
+   void read_header_data(MetPointHeader &hdr_data);
    bool read_obs_data(int buf_size, int offset, int qty_len, float *obs_arr,
                       int *qty_idx_arr, char *obs_qty_buf);
-   void read_pb_hdr_data(NcHeaderData &hdr_data);
+   void read_pb_hdr_data(MetPointHeader &hdr_data);
 
    void write_header_to_nc(NcDataBuffer &data_buf, const int buf_size, const bool is_pb = false);
    void write_obs_buffer(NcDataBuffer &data_buffer, const int buf_size);
    void write_obs_var_names(StringArray &obs_names);
    void write_obs_var_units(StringArray &units);
    void write_obs_var_descriptions(StringArray &descriptions);
-   void write_table_vars(NcHeaderData &hdr_data, NcDataBuffer &data_buffer);
+   void write_table_vars(MetPointHeader &hdr_data, NcDataBuffer &data_buffer);
 
 };  // NetcdfObsVars
 
 ////////////////////////////////////////////////////////////////////////
 
-struct NcPointObsData {
-   int obs_cnt;
-   bool is_obs_array;
-   
-   int *obs_ids;       // grib_code or var_id
-   int *obs_hids;
-   int *obs_qids;
-   float *obs_lvls;
-   float *obs_hgts;
-   float *obs_vals;
-   float *obs_arr;       // nobs * 5
-   StringArray var_names;
-   StringArray qty_names;
+struct NcPointObsData : public MetPointObsData {
    
    NcPointObsData();
-   void clear();
-   void clear_numbers();
-   void clear_strings();
-   float get_obs_val(int index);
    bool read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop=true);
    bool read_obs_data_table_lookups(NetcdfObsVars obs_vars, bool stop=true);
 };
