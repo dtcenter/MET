@@ -2,9 +2,12 @@
 
 run_compile=true
 run_push=false
-run_unit_tests=false
-run_diff=false
-run_update_truth=false
+#run_unit_tests=false
+#run_diff=false
+#run_update_truth=false
+run_unit_tests=true
+run_diff=true
+run_update_truth=true
 met_base_image=minimum
 dockerhub_repo=dtcenter/met-dev
 
