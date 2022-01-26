@@ -31,11 +31,12 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
   else
 
-    # if develop or main_vX.Y branch, run diff tests
-    if [ "$branch_name" == "develop" ]; then
-       # || [ "${branch_name:0:6}" == "main_v" ]; then
+    # if develop or main_vX.Y branch, run diff tests using branch's truth data
+    if [ "$branch_name" == "develop" ] ||
+       [ "${branch_name:0:6}" == "main_v" ]; then
 
       run_diff=true
+      truth_data_version=${branch_name}
 
     fi
 
@@ -52,7 +53,6 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
     fi
   fi
-
 
 fi
 

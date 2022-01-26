@@ -337,6 +337,6 @@ jobs:
       - name: Create Docker Data Volume
         run: .github/jobs/create_docker_truth.sh
         env:
-          TRUTH_DATA_VERSION: ${{ needs.job_control.outputs.truth_data_version }}-test
+          TRUTH_DATA_VERSION: ${{ needs.job_control.outputs.truth_data_version }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
