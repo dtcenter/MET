@@ -90,10 +90,8 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'pcp_combine'
-          - 'pb2nc'
           - 'ascii2nc'
-          - 'madis2nc'
+          - 'pb2nc madis2nc pcp_combine'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -162,11 +160,8 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'ref_config_lead_00'
-          - 'ref_config_lead_12'
-          - 'ref_config_lead_24'
-          - 'ref_config_lead_36'
-          - 'ref_config_lead_48'
+          - 'ref_config_lead_00 ref_config_lead_12 ref_config_lead_24'
+          - 'ref_config_lead_36 ref_config_lead_48'
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
