@@ -35,6 +35,7 @@ PERL_UNIT=${MET_TEST_BASE}/perl/unit.pl
 
 # Unit test XML
 UNIT_XML="unit_ascii2nc.xml \
+          unit_ascii2nc_indy.xml \
           unit_madis2nc.xml \
           unit_trmm2nc.xml \
           unit_pb2nc.xml \
