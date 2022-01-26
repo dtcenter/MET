@@ -9,7 +9,7 @@ ${GITHUB_WORKSPACE}/.github/jobs/pull_docker_image.sh ${DOCKERHUB_TAG}
 
 # Get test input data if needed
 volumes_from=""
-if $[ "${INPUT_DATA_VERSION}" != "none" ]; then
+if [ "${INPUT_DATA_VERSION}" != "none" ]; then
   ${GITHUB_WORKSPACE}/.github/jobs/get_test_input_data.sh ${INPUT_DATA_VERSION}
   volumes_from=${volumes_from}"--volumes-from met_input"
 fi
