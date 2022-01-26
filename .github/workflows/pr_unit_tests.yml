@@ -298,6 +298,7 @@ jobs:
         run: .github/jobs/run_diff_docker.sh
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
+          RUN_UPDATE_TRUTH: ${{ needs.job_control.outputs.run_update_truth }}
           TRUTH_DATA_VERSION: develop
 
       - name: Upload diff files as artifact

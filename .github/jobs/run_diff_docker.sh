@@ -37,5 +37,12 @@ fi
 
 if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
   echo "ERROR: Differences exist in the output"
-  exit 1
+
+  # only exit non-zero (job fails) if not updating truth data
+  # this makes difference output available when updating truth data
+  # so it is easier to see what changed with the update
+  if [ "${RUN_UPDATE_TRUTH}" != "true" ]; then
+    exit 1
+  fi
+
 fi
