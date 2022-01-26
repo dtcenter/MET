@@ -42,6 +42,7 @@ jobs:
       run_update_truth: ${{ steps.job_status.outputs.run_update_truth }}
       met_base_image: ${{ steps.job_status.outputs.met_base_image }}
       branch_name: ${{ steps.job_status.outputs.branch_name }}
+      truth_data_version: ${{ steps.job_status.outputs.truth_data_version }}
 
   compile:
     name: Compile MET
@@ -299,7 +300,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           RUN_UPDATE_TRUTH: ${{ needs.job_control.outputs.run_update_truth }}
-          TRUTH_DATA_VERSION: develop
+          TRUTH_DATA_VERSION: ${{ needs.job_control.outputs.truth_data_version }}
 
       - name: Upload diff files as artifact
         if: always()
@@ -336,6 +337,6 @@ jobs:
       - name: Create Docker Data Volume
         run: .github/jobs/create_docker_truth.sh
         env:
-          TRUTH_DATA_VERSION: develop-test
+          TRUTH_DATA_VERSION: ${{ needs.job_control.outputs.truth_data_version }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

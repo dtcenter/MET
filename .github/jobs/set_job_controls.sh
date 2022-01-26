@@ -6,6 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_image=minimum
+truth_data_version=develop
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
@@ -26,6 +27,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
     run_update_truth=true
     run_diff=true
+    truth_data_version=${branch_name: -4}
 
   else
 
@@ -75,6 +77,7 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
 echo ::set-output name=met_base_image::$met_base_image
+echo ::set-output name=truth_data_version::$truth_data_version
 
 echo run_compile: $run_compile
 echo run_push: $run_push
@@ -82,6 +85,7 @@ echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
 echo met_base_image: $met_base_image
+echo truth_data_version: $truth_data_version
 
 # get name of branch
 .github/jobs/get_branch_name.sh
