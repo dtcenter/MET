@@ -21,12 +21,14 @@ DOCKER_LOG_DIR=/met/logs
 mkdir -p ${LOCAL_LOG_DIR}
 mkdir -p ${LOCAL_DIFF_DIR}
 
+# mount output and log dirs, mount GitHub files into MET_REPO_DIR
 mount_args="-v ${LOCAL_OUTPUT_DIR}:${DOCKER_OUTPUT_DIR} -v ${LOCAL_DIFF_DIR}:${DOCKER_DIFF_DIR} -v ${LOCAL_LOG_DIR}:${DOCKER_LOG_DIR}"
 
 # Set up data volumes
 volumes_from="--volumes-from met_truth"
 
-# run unit test script inside Docker, mount MET input and truth data
+# run unit test script inside Docker, mount MET output and truth data
+# set MET_REPO_DIR env var in Docker to mounted directory
 cmd="\${MET_REPO_DIR}/.github/jobs/run_diff_tests.sh"
 time_command docker run ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
 if [ $? != 0 ]; then
@@ -35,5 +37,12 @@ fi
 
 if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
   echo "ERROR: Differences exist in the output"
-  exit 1
+
+  # only exit non-zero (job fails) if not updating truth data
+  # this makes difference output available when updating truth data
+  # so it is easier to see what changed with the update
+  if [ "${RUN_UPDATE_TRUTH}" != "true" ]; then
+    exit 1
+  fi
+
 fi

@@ -6,59 +6,65 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_image=minimum
-dockerhub_repo=dtcenter/met-dev
+input_data_version=develop
+truth_data_version=develop
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
-  # only run diff logic if pull request INTO develop or main_v*
-  # branches, not branches ending with -ref
-  if [ "${GITHUB_BASE_REF: -4}" != "-ref" ] && \
-    ([ "${GITHUB_BASE_REF:0:7}" == "develop" ]); then #|| \
-     #[ "${GITHUB_BASE_REF:0:6}" == "main_v" ]); then
+  # only run diff logic if pull request INTO
+  # branches not ending with -ref
+  if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
 
-    run_unit_tests=true
     run_diff=true
 
   fi
 
 elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
-  # check commit messages for skip or force keywords
-  if grep -q "ci-skip-compile" <<< "$commit_msg"; then
-    run_compile=false
-  fi
-
-  if grep -q "ci-run-unit" <<< "$commit_msg"; then
-    run_unit_tests=true
-    run_diff=true
-  fi
-
   branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
 
   # if branch ends with -ref, update truth data from unit tests
   if [ "${branch_name: -4}" == -ref ]; then
 
-    run_compile=true
-    run_push=true
-    run_unit_tests=true
-    run_diff=false
     run_update_truth=true
+    run_diff=true
+    truth_data_version=${branch_name: -4}
 
-  # if develop branch, push Docker image to dtcenter/met
-  # set all options to prevent commit override
-  elif [ "$branch_name" == "develop" ]; then
-     # || [ "${branch_name:0:6}" == "main_v" ]; then
-    run_compile=true
-    run_push=true
-    run_unit_tests=false
-    run_diff=false
-    met_base_image=minimum
-    dockerhub_repo=dtcenter/met
+  else
+
+    # if develop or main_vX.Y branch, run diff tests using branch's truth data
+    if [ "$branch_name" == "develop" ] ||
+       [ "${branch_name:0:6}" == "main_v" ]; then
+
+      run_diff=true
+      truth_data_version=${branch_name}
+
+    fi
+
+    # check commit messages for ci-skip or ci-run keywords
+    if grep -q "ci-skip-compile" <<< "$commit_msg"; then
+
+      run_compile=false
+
+    fi
+
+    if grep -q "ci-run-unit" <<< "$commit_msg"; then
+
+      run_diff=true
+
+    fi
   fi
 
 fi
 
-# use unit_test MET base image if running unit tests
+# if updating truth or running diff, run unit tests
+if [ "$run_update_truth" == "true" ] || [ "$run_diff" == "true" ]; then
+
+  run_unit_tests=true
+
+fi
+
+# if running unit tests, use unit_test MET base image and push image
 if [ "$run_unit_tests" == "true" ]; then
 
   met_base_image=unit_test
@@ -72,13 +78,17 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
 echo ::set-output name=met_base_image::$met_base_image
-echo ::set-output name=dockerhub_repo::$dockerhub_repo
+echo ::set-output name=input_data_version::$input_data_version
+echo ::set-output name=truth_data_version::$truth_data_version
 
 echo run_compile: $run_compile
 echo run_push: $run_push
 echo run_unit_tests: $run_unit_tests
+echo run_diff: $run_diff
+echo run_update_truth: $run_update_truth
 echo met_base_image: $met_base_image
-echo dockerhub_repo: $dockerhub_repo
+echo input_data_version: $input_data_version
+echo truth_data_version: $truth_data_version
 
 # get name of branch
 .github/jobs/get_branch_name.sh
