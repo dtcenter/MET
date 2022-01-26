@@ -13,49 +13,55 @@ if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
   # branches not ending with -ref
   if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
 
-    run_unit_tests=true
     run_diff=true
 
   fi
 
 elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
-  # check commit messages for skip or force keywords
-  if grep -q "ci-skip-compile" <<< "$commit_msg"; then
-    run_compile=false
-  fi
-
-  if grep -q "ci-run-unit" <<< "$commit_msg"; then
-    run_unit_tests=true
-    run_diff=true
-  fi
-
   branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
 
   # if branch ends with -ref, update truth data from unit tests
   if [ "${branch_name: -4}" == -ref ]; then
 
-    run_compile=true
-    run_push=true
-    run_unit_tests=false
-    run_diff=false
     run_update_truth=true
+    run_diff=true
 
-  # if develop branch, push Docker image to dtcenter/met
-  # set all options to prevent commit override
-  elif [ "$branch_name" == "develop" ]; then
-     # || [ "${branch_name:0:6}" == "main_v" ]; then
-    run_compile=true
-    run_push=true
-    run_unit_tests=false
-    run_diff=false
-    met_base_image=minimum
+  else
 
+    # if develop or main_vX.Y branch, run diff tests
+    if [ "$branch_name" == "develop" ]; then
+       # || [ "${branch_name:0:6}" == "main_v" ]; then
+
+      run_diff=true
+
+    fi
+
+    # check commit messages for ci-skip or ci-run keywords
+    if grep -q "ci-skip-compile" <<< "$commit_msg"; then
+
+      run_compile=false
+
+    fi
+
+    if grep -q "ci-run-unit" <<< "$commit_msg"; then
+
+      run_diff=true
+
+    fi
   fi
+
 
 fi
 
-# use unit_test MET base image if running unit tests
+# if updating truth or running diff, run unit tests
+if [ "$run_update_truth" == "true" ] || [ "$run_diff" == "true" ]; then
+
+  run_unit_tests=true
+
+fi
+
+# if running unit tests, use unit_test MET base image and push image
 if [ "$run_unit_tests" == "true" ]; then
 
   met_base_image=unit_test
