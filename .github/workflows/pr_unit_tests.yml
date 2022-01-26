@@ -43,6 +43,7 @@ jobs:
       met_base_image: ${{ steps.job_status.outputs.met_base_image }}
       branch_name: ${{ steps.job_status.outputs.branch_name }}
       truth_data_version: ${{ steps.job_status.outputs.truth_data_version }}
+      input_data_version: ${{ steps.job_status.outputs.input_data_version }}
 
   compile:
     name: Compile MET
@@ -102,7 +103,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
+          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
@@ -138,7 +139,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
+          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
@@ -181,7 +182,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
+          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
@@ -222,7 +223,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
+          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
@@ -263,7 +264,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           TESTS: ${{ matrix.tests }}
-          INPUT_DATA_VERSION: develop
+          INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}
 
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2

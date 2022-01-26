@@ -6,6 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_image=minimum
+input_data_version=develop
 truth_data_version=develop
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
@@ -77,6 +78,7 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
 echo ::set-output name=met_base_image::$met_base_image
+echo ::set-output name=input_data_version::$input_data_version
 echo ::set-output name=truth_data_version::$truth_data_version
 
 echo run_compile: $run_compile
@@ -85,6 +87,7 @@ echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
 echo met_base_image: $met_base_image
+echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
 
 # get name of branch
