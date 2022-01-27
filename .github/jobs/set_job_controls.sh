@@ -28,7 +28,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
     run_update_truth=true
     run_diff=true
-    truth_data_version=${branch_name: -4}
+    truth_data_version=${branch_name:0: -4}
 
   else
 
