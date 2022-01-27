@@ -1946,7 +1946,7 @@ void process_pbfile(int i_pb) {
         << "Total Messages retained\t\t= "
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
-        << n_file_obs << "\n";
+        << (n_file_obs + n_derived_obs) << "\n";
 
    if (cal_cape) {
       mlog << Debug(3) << "\nDerived CAPE = " << cape_count
