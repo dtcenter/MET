@@ -66,14 +66,14 @@ The add, subtract, and derive commands all require that the input files be expli
          input_file_list
 
 Required arguments for the pcp_combine
---------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The Pcp-Combine tool must be run with exactly one run command (-sum, -add, -subtract, or -derive) with the corresponding additional arguments.
 
 2. The **out_file** argument indicates the name for the NetCDF file to be written.
 
 Optional arguments for pcp_combine
-----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 3. The **-field string** option defines the data to be extracted from the input files. Use this option when processing fields other than **APCP** or non-GRIB files. It can be used multiple times and output will be created for each. In general, the field string should include the **name** and **level** of the requested data and be enclosed in single quotes. It is processed as an inline configuration file and may also include data filtering, censoring, and conversion options. For example, use **-field ‘name=”ACPCP”; level=”A6”; convert(x)=x/25.4;’** to read 6-hourly accumulated convective precipitation from a GRIB file and convert from millimeters to inches. 
 
@@ -88,7 +88,7 @@ Optional arguments for pcp_combine
 8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Required arguments for the pcp_combine sum command
---------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **init_time** argument, provided in YYYYMMDD[_HH[MMSS]] format, indicates the initialization time for model data to be summed. Only files found with this initialization time will be processed. If combining observation files, Stage II or Stage IV data for example, the initialization time is not applicable. Providing a string of all zeros (00000000_000000) indicates that all files, regardless of initialization time should be processed.
 
@@ -99,19 +99,19 @@ Required arguments for the pcp_combine sum command
 4. The **out_accum** argument, in HH[MMSS] format, indicates the desired total accumulation period to be summed.
 
 Optional arguments for pcp_combine sum command
-----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-pcpdir path** option indicates the directories in which the input files reside. The contents of "**path**" will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
 
 6. The **-pcprx reg_exp** option indicates the regular expression to be used in matching files in the search directories specified. The contents of "reg_exp" will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
 
 Required arguments for the pcp_combine derive command
------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The "derive" run command must be followed by **stat_list** which is a comma-separated list of summary fields to be computed. The **stat_list** may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
 
 Input files for pcp_combine add, subtract, and derive commands
---------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The input files for the add, subtract, and derive command can be specified in one of 3 ways:
 
@@ -233,7 +233,7 @@ The usage statement for the regrid_data_plane utility is shown below:
          [-compress level]
 
 Required arguments for regrid_data_plane
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_filename** is the gridded data file to be read.
 
@@ -244,7 +244,7 @@ Required arguments for regrid_data_plane
 4. The **-field string** may be used multiple times to define the field(s) to be regridded.
 
 Optional arguments for regrid_data_plane
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-method type** option overrides the default regridding method. Default is NEAREST.
 
@@ -316,7 +316,7 @@ The usage statement for the shift_data_plane utility is shown below:
 shift_data_plane has five required arguments and can also take optional ones. 
 
 Required arguments for shift_data_plane
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_filename** is the gridded data file to be read.
 
@@ -329,7 +329,7 @@ Required arguments for shift_data_plane
 5. The **-to lat lon** specifies the ending location within the domain to define the shift. Lat is deg N, Lon is deg E.
 
 Optional arguments for shift_data_plane
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 6. The **-method type** overrides the default regridding method. Default is NEAREST.
 
@@ -383,7 +383,7 @@ The usage statement for the modis_regrid utility is shown below:
 modis_regrid has some required arguments and can also take optional ones. 
 
 Required arguments for modis_regrid
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data_file path** argument specifies the data files used to get the grid information.
 
@@ -400,7 +400,7 @@ Required arguments for modis_regrid
 7. The **modis_file** argument is the name of the MODIS input file.
 
 Optional arguments for modis_regrid
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 8. The **-units text** option specifies the units string in the global attributes section of the output file.
 
@@ -451,12 +451,12 @@ The usage statement for the WWMCA-Plot tool is shown below:
 wmmca_plot has some required arguments and can also take optional ones. 
 
 Required arguments for wwmca_plot
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **wwmca_cloud_pct_file_list** argument represents one or more WWMCA cloud percent files given on the command line. As with any command given to a UNIX shell, the user can use meta-characters as a shorthand way to specify many filenames. For each input file specified, one output PostScript plot will be created.
 
 Optional arguments for wwmca_plot
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2. The **-outdir path** option specifies the directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory.
 
@@ -489,7 +489,7 @@ The usage statement for the WWMCA-Regrid tool is shown below:
 wmmca_regrid has some required arguments and can also take optional ones.
 
 Required arguments for wwmca_regrid
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-out filename** argument specifies the name of the output netCDF file.
 
@@ -500,7 +500,7 @@ Required arguments for wwmca_regrid
 4. The **-sh filename [pt_filename]** argument specifies the southern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the southern hemisphere.
 
 Optional arguments for wwmca_regrid
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
