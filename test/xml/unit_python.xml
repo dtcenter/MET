@@ -15,7 +15,7 @@
   <!ENTITY DATA_DIR_OBS    "&INPUT_DIR;/obs_data">
 ]>
 
-<!-- Requires: unit_pb2nc.xml unit_pcp_combine.xml -->
+<!-- Requires: unit_ascii2nc.xml unit_pb2nc.xml unit_pcp_combine.xml -->
 
 <met_test>
 
@@ -378,7 +378,8 @@
 
   <!-- Invokes user-python logic to read a grid string -->
   <test name="python_numpy_grid_name_user_python">
-    <exec>&MET_BIN;/plot_data_plane</exec>
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
+          &MET_BIN;/plot_data_plane</exec>
     <env>
       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>PYTHON_GRID</name> <value>G212</value></pair>
@@ -398,7 +399,8 @@
  
   <!-- Invokes user-python logic to read point data  -->
   <test name="python_ascii2nc_user_python">
-    <exec>&MET_BIN;/ascii2nc</exec>
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
+          &MET_BIN;/ascii2nc</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
@@ -415,6 +417,7 @@
   <!-- Invokes user-python logic to read NUMPY text data -->
   <test name="python_numpy_plot_data_plane_user_python">
     <exec>export PATH='&ANACONDA_BIN;:${PATH}'; \
+          echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
           &MET_BIN;/plot_data_plane</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -434,7 +437,8 @@
 
   <!-- Invokes user-python logic to pass MPR data to Stat-Analysis  -->
   <test name="python_stat_analysis_user_python">
-    <exec>&MET_BIN;/stat_analysis</exec>
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
+          &MET_BIN;/stat_analysis</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>

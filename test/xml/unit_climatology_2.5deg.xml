@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_pb2nc.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="climatology_POINT_STAT_GFS_2.5DEG">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>GFS_CLIMO_2.5DEG</value></pair>
+      <pair><name>DAY_INTERVAL</name>  <value>31</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590315",
+                "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590315",
+                "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590415"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_climo \
+      -outdir &OUTPUT_DIR;/climatology_2.5deg -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+</met_test>

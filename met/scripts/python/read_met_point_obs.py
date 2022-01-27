@@ -8,7 +8,7 @@ This script reads the MET point observation NetCDF file like MET tools do.
 
 import os
 import sys
-import time
+from datetime import datetime
 import numpy as np
 import netCDF4 as nc
 
@@ -93,8 +93,7 @@ class nc_tools():
         return nc_tools.get_ncbyte_array_to_str(nc_var) if nc_var else []
 
 
-perf_start_time = time.time()
-perf_start_counter = time.perf_counter_ns()
+start_time = datetime.now()
 
 point_obs_data = None
 if len(sys.argv) == 1:
@@ -117,9 +116,6 @@ if point_obs_data is not None:
     if DO_PRINT_DATA:
         met_point_obs.print_point_data(met_point_data)
 
-perf_end_time = time.time()
-perf_end_counter = time.perf_counter_ns()
-perf_duration = perf_end_time - perf_start_time
-perf_duration_counter = (perf_end_counter - perf_start_counter) / 1000000000
+run_time = datetime.now() - start_time
 
-print('Done python script {s} Took walltime: {t1} & perf: {t2} seconds'.format(s=sys.argv[0], t1=perf_duration, t2=perf_duration_counter))
+print('Done python script {s} took {t}'.format(s=sys.argv[0], t=run_time))
