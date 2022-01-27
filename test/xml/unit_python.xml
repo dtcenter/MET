@@ -378,7 +378,7 @@
 
   <!-- Invokes user-python logic to read a grid string -->
   <test name="python_numpy_grid_name_user_python">
-    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE; \
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
           &MET_BIN;/plot_data_plane</exec>
     <env>
       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -399,7 +399,7 @@
  
   <!-- Invokes user-python logic to read point data  -->
   <test name="python_ascii2nc_user_python">
-    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE; \
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
           &MET_BIN;/ascii2nc</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -417,7 +417,7 @@
   <!-- Invokes user-python logic to read NUMPY text data -->
   <test name="python_numpy_plot_data_plane_user_python">
     <exec>export PATH='&ANACONDA_BIN;:${PATH}'; \
-          echo "MET_PYTHON_EXE=&MET_PYTHON_EXE; \
+          echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
           &MET_BIN;/plot_data_plane</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
@@ -437,7 +437,7 @@
 
   <!-- Invokes user-python logic to pass MPR data to Stat-Analysis  -->
   <test name="python_stat_analysis_user_python">
-    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE; \
+    <exec>echo "MET_PYTHON_EXE=&MET_PYTHON_EXE;"; \
           &MET_BIN;/stat_analysis</exec>
     <env>
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
