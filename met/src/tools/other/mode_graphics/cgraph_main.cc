@@ -2223,13 +2223,9 @@ int my_conic (const FT_Vector * control, const FT_Vector * to, void * u)
 
 {
 
-ft_user_info * info = (ft_user_info *) u;
-
 mlog << Error << "\n\n  my_conic() -> should never be called!\n\n";
 
 exit ( 1 );
-
-info->have_path = true;
 
 return ( 0 );
 

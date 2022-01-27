@@ -750,7 +750,7 @@ if ( fd >= 0 )  ::close(fd);
 
 fd = -1;
 
-memset(&Header, 0, sizeof(Header));
+Header.clear();
 
 Filename.clear();
 
