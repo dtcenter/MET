@@ -1,20 +1,21 @@
 .. _gen-ens-prod:
 
+*****************
 Gen-Ens-Prod Tool
-=================
+*****************
 
 Introduction
-____________
+------------
 
 The Gen-Ens-Prod tool generates simple ensemble products (mean, spread, probability, etc) from gridded ensemble member input files. While it processes model inputs, but it does not compare them to observations or compute statistics. However, the output products can be passed as input to the MET statistics tools for comparison against observations. Climatological mean and standard deviation data may also be provided to define thresholds based on the climatological distribution at each grid point.
 
 Note that this ensemble product generation step was provided by the Ensemble-Stat tool in earlier versions of MET. The Gen-Ens-Prod tool replaces and extends that functionality. Users are strongly encouraged to migrate ensemble product generation from Ensemble-Stat to Gen-Ens-Prod, as new features will only be added to Gen-Ens-Prod and the existing Ensemble-Stat functionality will be deprecated in a future version.
 
 Scientific and statistical aspects
-__________________________________
+----------------------------------
 
 Ensemble forecasts derived from a set of deterministic ensemble members
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 
@@ -27,17 +28,17 @@ The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble pr
 The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
 Climatology data
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g. >0) or can be defined relative to the climatological distribution at each grid point (e.g. >CDP90, for exceeding the 90-th percentile of climatology). When using climatological distribution percentile (CDP) thresholds, the climatological mean and standard deviation must be provided in the configuration file.
 
 Practical Information
-_____________________
+---------------------
 
 This section contains information about configuring and running the Gen-Ens-Prod tool. The Gen-Ens-Prod tool writes a NetCDF output file containing the requested ensemble product fields for each input field specified. If provided, the climatology data files must be gridded. All input gridded model and climatology datasets must be on the same grid. However, users may leverage the automated regridding feature in MET if the desired output grid is specified in the configuration file.
 
 gen_ens_prod usage
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^
 
 The usage statement for the Ensemble Stat tool is shown below:
 
@@ -54,7 +55,7 @@ The usage statement for the Ensemble Stat tool is shown below:
 gen_ens_prod has three required arguments and accepts several optional ones.
 
 Required arguments gen_ens_prod
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
 
@@ -65,7 +66,7 @@ Required arguments gen_ens_prod
 4. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
 
 Optional arguments for gen_ens_prod
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-ctrl file** option specifies the input file for the ensemble control member. Data for this member is included in the computation of the ensemble mean, but excluded from the spread. The control file should not appear in the **-ens** list of ensemble member files (unless processing a single file that contains all ensemble members).
 
@@ -85,7 +86,7 @@ An example of the gen_ens_prod calling sequence is shown below:
 In this example, the Gen-Ens-Prod tool derives products from the input ensemble members listed on the command line.
 
 gen_ens_prod configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The default configuration file for the Gen-Ens-Prod tool named **GenEnsProdConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -265,7 +266,7 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 14. Climatological Distribution Percentile field for each CDP threshold specified
 
 gen_ens_prod output
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 
 The Gen-Ens-Prod tools writes a gridded NetCDF output file whose file name is specified using the -out command line option. The contents of that file depend on the contents of the **ens.field** array, the **ensemble_flag** options selected, and the presence of climatology data. The NetCDF variable names are self-describing and include the name/level of the field being processed, the type of ensemble product, and any relevant threshold information. If **nc_var_str** is defined for an **ens.field** array entry, that string is included in the corresponding NetCDF output variable names.
 
