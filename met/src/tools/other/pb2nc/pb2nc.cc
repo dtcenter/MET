@@ -367,7 +367,7 @@ static int    combine_tqz_and_uv(map<float, float*>,
 static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
                           map<float, float*> pqtzuv_map_uv);
 static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
-static void   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
+static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
                          const float pbl_p, const float pbl_h, const float pbl_qm,
                          const float hdr_lat, const float hdr_lon,
                          const float hdr_elv, const time_t hdr_vld_ut,
@@ -807,6 +807,7 @@ void process_pbfile(int i_pb) {
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
    int lv, ev, ev_temp, kk, len1, len2;
+   int n_derived_obs;
 
    double   x, y;
 
@@ -844,7 +845,8 @@ void process_pbfile(int i_pb) {
    IntArray diff_file_times;
    int diff_file_time_count;
    StringArray variables_big_nlevels;
-   static const char *method_name = "process_pbfile()";
+   static const char *method_name_s = "process_pbfile()";
+   static const char *method_name = "process_pbfile() -> ";
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
@@ -881,7 +883,7 @@ void process_pbfile(int i_pb) {
 
       // Check for multiple PrepBufr files
       if(pbfile.n_elements() > 1) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "the \"-dump\" and \"-pbfile\" options may not be "
               << "used together.  Only one Bufr file may be dump "
               << "to ASCII at a time.\n\n";
@@ -894,7 +896,7 @@ void process_pbfile(int i_pb) {
 
       unit = dump_unit+i_pb;
       if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
       }
       prefix = get_short_name(pbfile[i_pb].c_str());
@@ -907,7 +909,7 @@ void process_pbfile(int i_pb) {
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
    openpb_(blk_file.c_str(), &unit);
@@ -925,7 +927,7 @@ void process_pbfile(int i_pb) {
 
    // Check for zero messages to process
    if(npbmsg <= 0 || npbmsg_total <= 0) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
@@ -936,6 +938,7 @@ void process_pbfile(int i_pb) {
    }
 
    // Initialize counts
+   n_derived_obs = 0;
    i_ret   = n_file_obs = i_msg      = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
@@ -946,7 +949,7 @@ void process_pbfile(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name << " "
+      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name_s << " "
            << (end_t-start_t)/double(CLOCKS_PER_SEC)
            << " seconds for preparing\n";
       start_t = clock();
@@ -1011,8 +1014,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      m_strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned), method_name, "prev_hdr_typ");
-      m_strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned), method_name, "prev_hdr_sid");
+      m_strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_typ");
+      m_strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_sid");
    }
 
    IMM = JMM =1;
@@ -1022,6 +1025,14 @@ void process_pbfile(int i_pb) {
 
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
+
+   // Derive quantities which can be derived from
+   // P, Q, T, Z, U, V
+   if (n_derive_gc > bufr_derive_cfgs.size()) {
+      mlog << Debug(3) << "\n" << method_name
+           << "Skip the derived variables because of not requested ("
+           << bufr_derive_cfgs.size() << ").\n\n";
+   }
 
    for (int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
@@ -1284,14 +1295,14 @@ void process_pbfile(int i_pb) {
 
       if (0 < message_type_map.count((string)hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
-         mlog << Debug(6) << "\n" << method_name << " -> "
+         mlog << Debug(6) << "\n" << method_name
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
          if (mappedMessageType.length() > HEADER_STR_LEN) max_buf = HEADER_STR_LEN;
-         m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf, method_name, "modified_hdr_typ1");
+         m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf, method_name_s, "modified_hdr_typ1");
       }
       else {
-         m_strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ), method_name, "modified_hdr_typ2");
+         m_strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ), method_name_s, "modified_hdr_typ2");
       }
       if (max_buf >= max_str_len) max_buf--;
       modified_hdr_typ[max_buf] = '\0';
@@ -1307,7 +1318,7 @@ void process_pbfile(int i_pb) {
          buf_nlev = mxr8lv;
          for(kk=0; kk<mxr8vt; kk++) {
             if (!variables_big_nlevels.has(bufr_obs_name_arr[kk], false)) {
-               mlog << Warning << "\n" << method_name << " -> "
+               mlog << Warning << "\n" << method_name
                     << "Too many vertical levels (" << nlev
                     << ") for " << bufr_obs_name_arr[kk]
                     << "). Ignored the vertical levels above " << mxr8lv << ".\n\n";
@@ -1520,40 +1531,36 @@ void process_pbfile(int i_pb) {
 
          // Derive quantities which can be derived from
          // P, Q, T, Z, U, V
-         if (n_derive_gc > bufr_derive_cfgs.size()) {
-            mlog << Debug(3) << "\n" << method_name << " -> "
-                 << "Skip the derived variables because of not requested ("
-                 << bufr_derive_cfgs.size() << ").\n\n";
-         }
-         else {
+         if (n_derive_gc <= bufr_derive_cfgs.size()) {
             for(i=0; i<n_derive_gc; i++) {
-      
+
                bufr_var_index = bufr_derive_cfgs[i].var_index;
                if(keep_bufr_obs_index(bufr_var_index)) {
-      
+
                   // Only derive PRMSL for surface message
                   if(derive_gc[i] == prmsl_grib_code &&
                      !conf_info.surface_message_types.has(hdr_typ, false))
                      continue;
-      
+
                   // Store the grib code to be derived
                   obs_arr[1] = (float)bufr_var_index;
-      
+
                   // Derive the value for the grib code
                   obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
                                                 pqtzuv_qty, hdr_lat,
                                                 quality_mark);
-      
+
                   if(is_eq(obs_arr[4], fill_value)) continue;
-      
+
                   addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                         hdr_lat, hdr_lon, hdr_elv, quality_mark,
                         OBS_BUFFER_SIZE);
-      
+
                   // Increment the current and total observations counts
                   n_file_obs++;
                   n_total_obs++;
-      
+                  n_derived_obs++;
+
                   // Increment the number of obs counter for this header
                   n_hdr_obs++;
                }
@@ -1600,10 +1607,10 @@ void process_pbfile(int i_pb) {
          if (1 < cape_level) {
             bool reverse_levels;
             float cape_val, cin_val, PLCL,PEQL;
-         
+
             cape_val = bad_data_double;
             cin_val  = bad_data_double;
-         
+
             if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
             reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
             if (reverse_levels) {
@@ -1618,11 +1625,11 @@ void process_pbfile(int i_pb) {
                   swap_value = cape_data_pres[idx];
                   cape_data_pres[idx] = cape_data_pres[buf_idx];
                   cape_data_pres[buf_idx] = swap_value;
-         
+
                   swap_value = cape_data_temp[idx];
                   cape_data_temp[idx] = cape_data_temp[buf_idx];
                   cape_data_temp[buf_idx] = swap_value;
-         
+
                   swap_value = cape_data_spfh[idx];
                   cape_data_spfh[idx] = cape_data_spfh[buf_idx];
                   cape_data_spfh[buf_idx] = swap_value;
@@ -1638,7 +1645,7 @@ void process_pbfile(int i_pb) {
                   cape_data_spfh[idx] = r8bfms * 10;
                }
             }
-         
+
             //p1d = cape_p;
             //t1d = cape_data_temp[cape_level-1];
             //q1d = cape_data_spfh[cape_level-1];
@@ -1646,15 +1653,15 @@ void process_pbfile(int i_pb) {
                      &p1d,&t1d,&q1d, static_dummy_201,
                      &cape_level, &IMM,&JMM, &cape_level,
                      &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
-         
+
             if(mlog.verbosity_level() >= 7) {
                mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE from "
                     << i_read << "-th message\n" ;
                for (int idx=0; idx<cape_level; idx++) {
-                  mlog << Debug(7) << idx << ", " << cape_data_pres[idx] << ", "
-                       << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+                  mlog << Debug(7) << method_name  << "   " << idx << ", " << cape_data_pres[idx]
+                       << ", " << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
                }
-               mlog << Debug(7) << method_name 
+               mlog << Debug(7) << method_name
                     << " calcape_(" << ivirt << "," << itype << ") cape_val: "
                     << cape_val << " cape_level: " << cape_level
                     << ", cin_val: " << cin_val
@@ -1664,10 +1671,10 @@ void process_pbfile(int i_pb) {
                     << " " << hdr_typ << " " << hdr_sid
                     << "\n\n" ;
             }
-         
+
             if (cape_val > MAX_CAPE_VALUE) {
                cape_cnt_too_big++;
-               mlog << Debug(5) << method_name 
+               mlog << Debug(5) << method_name
                     << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
                     << ", cin_val: " << cin_val
                     << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
@@ -1681,6 +1688,7 @@ void process_pbfile(int i_pb) {
                               hdr_lat, hdr_lon, hdr_elv, cape_qm,
                               OBS_BUFFER_SIZE);
                cape_count++;
+               n_derived_obs++;
                if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
             }
             else cape_cnt_missing_values++;
@@ -1747,7 +1755,7 @@ void process_pbfile(int i_pb) {
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
                if (!variables_big_nlevels.has(var_name, false)) {
-                  mlog << Warning << "\n" << method_name << " -> "
+                  mlog << Warning << "\n" << method_name
                        << "Too many vertical levels (" << nlev2
                        << ") for " << var_name
                        << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
@@ -1833,9 +1841,9 @@ void process_pbfile(int i_pb) {
          has_pbl_data = (pqtzuv_map_tq.size() > 0 && pqtzuv_map_uv.size() > 0);
          if (is_same_header && has_pbl_data) {
             float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
-            
-            insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
-                       hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
+
+            if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                           hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
             for(vector<float *>::iterator it = pqtzuv_list.begin();
                 it != pqtzuv_list.end(); ++it) {
@@ -1850,8 +1858,8 @@ void process_pbfile(int i_pb) {
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
          prev_hdr_elv = hdr_elv;
-         m_strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned), method_name, "prev_hdr_typ");
-         m_strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned), method_name, "prev_hdr_sid");
+         m_strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned), method_name_s, "prev_hdr_typ");
+         m_strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned), method_name_s, "prev_hdr_sid");
       }
 
       // If the number of observations for this header is non-zero,
@@ -1874,8 +1882,8 @@ void process_pbfile(int i_pb) {
    has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
    if (do_pbl && has_pbl_data) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
-      insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
-                 hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
+      if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                     hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
       for(vector<float *>::iterator it = pqtzuv_list.begin();
           it != pqtzuv_list.end(); ++it) {
@@ -1898,7 +1906,7 @@ void process_pbfile(int i_pb) {
 
    if(0 < diff_file_time_count && 0 < diff_file_times.n_elements()) {
       mlog << Warning << "\n" << method_name
-           << " -> The observation time should remain the same for "
+           << "The observation time should remain the same for "
            << "all " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages\n";
       mlog << Warning << method_name << "   "
            << diff_file_time_count << " messages with different reference time ("
@@ -1938,7 +1946,7 @@ void process_pbfile(int i_pb) {
         << "Total Messages retained\t\t= "
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
-        << n_file_obs << "\n";
+        << (n_file_obs + n_derived_obs) << "\n";
 
    if (cal_cape) {
       mlog << Debug(3) << "\nDerived CAPE = " << cape_count
@@ -1952,7 +1960,7 @@ void process_pbfile(int i_pb) {
 
 
    if (npbmsg == rej_vld && 0 < rej_vld) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "All messages were filtered out by valid time.\n"
            << "\tPlease adjust time range with \"-valid_beg\" and \"-valid_end\".\n"
            << "\tmin/max obs time from BUFR file: " << min_time_str
@@ -1981,17 +1989,17 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       method_end = clock();
-      cout << " PERF: " << method_name << " "
+      cout << " PERF: " << method_name_s << " "
            << (method_end-method_start)/double(CLOCKS_PER_SEC)
            << " seconds\n";
    }
 
    if(i_msg <= 0) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
+           << ((n_derived_obs > 0) ? "Saved the derived variables only. " : " ")
            << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
            << " messages retained from file: "
            << pbfile[i_pb] << "\n\n";
-      return;
    }
 
    return;
@@ -2306,7 +2314,7 @@ void process_pbfile_metadata(int i_pb) {
 
          readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
          if (0 >= nlev2) continue;
-         
+
          // Search through the vertical levels
          has_valid_data = false;
          for(lv=0; lv<nlev2; lv++) {
@@ -2814,7 +2822,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       if (0 < variableTypeMap.count(obs_arr[i])) {
          ConcatString message_types;
          StringArray typeArray = variableTypeMap[obs_arr[i]];
-         
+
          int type_cnt = typeArray.n_elements();
          for (int ii=0; ii<type_cnt; ii++) {
             if (message_types.nonempty()) message_types.add(" ");
@@ -2939,7 +2947,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          }
          interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
       }
-      float first_pres = (pqtzuv_merged == 0 ? bad_data_float : pqtzuv_merged[0]);
+      float first_pres = (pqtzuv_merged[0] == 0 ? bad_data_float : pqtzuv_merged[0]);
       pqtzuv_map_merged[first_pres] = pqtzuv_merged;
       mlog << Debug(9) << method_name << "Added " << first_pres << " to merged records\n";
 
@@ -3094,11 +3102,12 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
 
 ////////////////////////////////////////////////////////////////////////
 
-void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
+bool insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
                 const float pbl_p, const float pbl_h, const float pbl_qm,
                 const float hdr_lat, const float hdr_lon,
-                const float hdr_elv, const time_t hdr_vld_ut, 
+                const float hdr_elv, const time_t hdr_vld_ut,
                 const ConcatString &hdr_typ, const ConcatString &hdr_sid) {
+   bool added = false;
    ConcatString hdr_info;
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
             << " " << hdr_typ << " " << hdr_sid;
@@ -3124,9 +3133,13 @@ void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
               << pbl_value << ") because of the MAX PBL " << MAX_PBL
               << "  (" << hdr_info<< ")\n";
       }
-      else addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                          hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
+      else {
+         addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                        hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
+         added = true;
+      }
    }
+   return added;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3189,7 +3202,7 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
-      mlog << Error << "\n" << method_name 
+      mlog << Error << "\n" << method_name
            << "  Can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
            << ", next: " <<  prev_pqtzuv[0] << "\n\n";
@@ -3284,7 +3297,7 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
             break;
          }
       }
-      
+
       if (it_aux->first == cur_pres) {
          copy_pqtzuv(pqtzuv_merged, it_aux->second, false);
          prev_pqtzuv = pqtzuv_merged;
@@ -3383,16 +3396,18 @@ void log_pbl_input(int pbl_level, const char *method_name) {
    for (int idx=0; idx<vlevels; idx++) {
       buf.clear();
       buf << " " << pbl_data_pres[idx];
-      buf << " " << pbl_data_temp[idx];
       buf << " " << pbl_data_spfh[idx];
+      buf << " " << pbl_data_temp[idx];
       buf << " " <<  pbl_data_hgt[idx];
       buf << " " << pbl_data_ugrd[idx];
       buf << " " << pbl_data_vgrd[idx];
       log_array.add(buf.c_str());
    }
    int offset = 0;
+   mlog << Debug(PBL_DEBUG_LEVEL) << method_name
+        << "input to calpbl_ (buffer): index, P, Q, T, Z, U, V\n";
    for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
-      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    input to calpbl_: "
+      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "  "
            << offset++ << "\t" << log_array[idx] << "\n";
    }
    log_array.clear();

@@ -958,6 +958,8 @@ Point2Grid tool
 
 The Point2Grid tool takes point observations from a NetCDF output file from one of the four previously mentioned MET tools (ascii2nc, madis2nc, pb2nc, lidar2nc) and creates a gridded NetCDF file. The other point observations are GOES-16/17 input files in NetCDF format (especially, Aerosol Optical Depth. Future development will include support for reading input files not produced from MET tools.
 
+MET version 10.1 adds support for the passing point observations to point2grid using a Python script with "input_filename" which begins with the "PYTHON_NUMPY=<python_script_name> [arguments]" instead of MET point observation NetCDF input. An example of running point2grid with Python embedding is included below.
+
 
 point2grid usage
 ----------------
@@ -989,6 +991,8 @@ Required arguments for point2grid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_filename** argument indicates the name of the input NetCDF file to be processed. Currently, only NetCDF files produced from the ascii2nc, madis2nc, pb2nc, and lidar2nc are supported. And AOD dataset from GOES16/17 are supported, too. Support for additional file types will be added in future releases.
+
+The MET point observation NetCDF file name as **input_filename** argument is equivalent with "PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py netcdf_file name'.
 
 2. The **to_grid** argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
 
@@ -1040,6 +1044,21 @@ For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So t
 
 
 When processing GOES-16 data, the **-qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
+
+
+Here is an example of processing the same set of observations but using Python embedding instead:
+
+
+.. code-block:: none
+		
+		point2grid \
+		'PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py ascii2nc_edr_hourly.20130827.nc' \
+		G212 python_gridded_ascii_python.nc -config Point2GridConfig_edr \
+		-field 'name="200"; level="*"; valid_time="20130827_205959";' -method MAX -v 1
+
+The user should replace the python script with the customized python script for the custom point observation data. This is an example for the python embedding.
+
+Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 
 point2grid output

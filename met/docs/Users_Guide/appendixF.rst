@@ -257,3 +257,53 @@ The **read_ascii_mpr.py** sample script can be found in:
 • MET installation directory in *MET_BASE/python*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
+
+
+Python Embedding for Point Observations as input
+________________________________________________
+
+
+The point2grid, plot_point_obs, ensemble_stat, and point_stat tools use MET point observation NetCDF. They support the python embedding by the prefix 'PYTHON_NUMPY=" and followed by a python script name instead of the MET point observastion NetCDF filename. The customized python script is expected to extend MET_BASE/python/met_point_obs.py and to produce the python variable, **met_point_data**,  which is the dictionary of the MET point observation data. They are defined at MET_BASE/python/met_point_obs.py.
+
+
+.. _pyembed-point-obs-data:
+
+
+.. code-block:: none
+
+  met_point_data = {
+
+     'use_var_id':  Trur/False,     # obs_vid are variable index if True, otherwise GRIB codes
+
+     # Header data
+     'nhdr':        integer_value,  # number of headers
+     'pbhdr':       integer_value,  # number of PREPBUFR specific headers
+     'nhdr_typ':    integer_value,  # number of message types
+     'nhdr_sid':    integer_value,  # number of station IDs
+     'nhdr_vld':    integer_value,  # number of valid times
+     'hdr_typ':     nympy_integer_array,    # index of message type
+     'hdr_sid':     nympy_integer_array,    # index of station ID
+     'hdr_vld':     nympy_integer_array,    # index of valid time
+     'hdr_lat':     nympy_float_array,      # latitude
+     'hdr_lon':     nympy_float_array,      # longitude
+     'hdr_elv':     nympy_float_array,      # station elevation
+     'hdr_typ_table':   string_value,       # message types
+     'hdr_sid_table':   string_value,       # station IDs
+     'hdr_vld_table':   string_value,       # valid times "yyyymmdd_hhmmss"
+     'hdr_prpt_typ':    nympy_integer_array,   # optional
+     'hdr_irpt_typ':    nympy_integer_array,   # optional
+     'hdr_inst_typ':    nympy_integer_array,   # optional
+
+     # Observation data
+     'nobs':       integer_value,       # number of observation
+     'nobs_qty':   integer_value        # number of quality marks
+     'nobs_var':   integer_value        # number of variable names
+     'obs_qty':    nympy_integer_array, # index of quality mark
+     'obs_hid':    nympy_integer_array, # index of header
+     'obs_vid':    nympy_integer_array, # index of veriable or GRIB code
+     'obs_lvl':    nympy_float_array,   # pressure level
+     'obs_hgt':    nympy_float_array,   # height of observation data
+     'obs_val'     nympy_float_array,   # observatin value
+     'obs_qty_table':  string_array,    # quality marks
+     'obs_var_table':  string_array,    # variable names
+  }

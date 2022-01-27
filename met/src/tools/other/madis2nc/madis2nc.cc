@@ -3410,6 +3410,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
                                     levelsQty[i_idx],
                                     GET_NC_NAME(in_var).c_str());
          nlvl = levels[i_idx];
+         if (nlvl > maxLevels) {
+            mlog << Warning << "\n" << method_name << " The level (" << nlvl
+                 << ") at nLevels variable can not exceed dimension maxLevels (" << maxLevels<< ")\n\n";
+            nlvl = maxLevels;
+         }
          obs_arr[2] = levels[i_idx];
 
          //

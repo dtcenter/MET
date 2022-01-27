@@ -25,6 +25,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_nc_util \
 	     -I${top_builddir}/src/libcode/vx_pb_util \
 	     -I${top_builddir}/src/libcode/vx_plot_util \
+	     -I${top_builddir}/src/libcode/vx_pointdata_python \
 	     -I${top_builddir}/src/libcode/vx_ps \
 	     -I${top_builddir}/src/libcode/vx_pxm \
 	     -I${top_builddir}/src/libcode/vx_render \
@@ -67,6 +68,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_nc_util \
 	     -L${top_builddir}/src/libcode/vx_pb_util \
 	     -L${top_builddir}/src/libcode/vx_plot_util \
+	     -L${top_builddir}/src/libcode/vx_pointdata_python \
 	     -L${top_builddir}/src/libcode/vx_ps \
 	     -L${top_builddir}/src/libcode/vx_pxm \
 	     -L${top_builddir}/src/libcode/vx_render \
