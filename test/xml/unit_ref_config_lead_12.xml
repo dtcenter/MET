@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--                                                                  -->
+  <!-- Run Gen-Vx-Mask                                                  -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
+      &MET_BASE;/poly/CONUS.poly \
+      &OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc \
+      -type poly -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</grid_nc>
+    </output>
+   </test>
+ 
+  <!--                                                                  -->
+  <!-- Run PB2NC for the current lead time                              -->
+  <!--                                                                  -->
+
+  <test name="pb2nc_ndas_lead_12">
+   <exec>&MET_BIN;/pb2nc</exec>
+   <env>
+     <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
+   </env>
+   <param> \
+     &DATA_DIR_OBS;/ref_config/prepbufr/ndas/2011090300/ndas.t00z.prepbufr.tm12.nr  \
+     &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+     &CONFIG_DIR;/ref_config/PB2NCConfig \
+     -valid_beg 20110902_103000\
+     -valid_end 20110902_133000\
+     -v 2
+   </param>
+   <output>
+     <point_nc>&OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc</point_nc>
+   </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Run PCP-Combine for 3 hour accumulations                         -->
+  <!--                                                                  -->
+
+  <test name="pcp_combine_ST2ml_3hr_09_12">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -sum \
+      00000000_000000 1 20110902_120000 3 \
+      &OUTPUT_DIR;/ref_config_lead_12/pcp_combine/ST2_03h/20110902/ST2ml2011090212.03h.nc \
+      -pcpdir &DATA_DIR_OBS;/ref_config/pcp_combine/20110902
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ref_config_lead_12/pcp_combine/ST2_03h/20110902/ST2ml2011090212.03h.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="pcp_combine_wrf_3hr_09_12">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 12 \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_009.tm00 9 \      
+      &OUTPUT_DIR;/ref_config_lead_12/pcp_combine/wrf/wrfpcp03_012.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/ref_config_lead_12/pcp_combine/wrf/wrfpcp03_012.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                   -->
+  <!-- Run Point-Stat on the data needed to compute the GO Index         -->
+  <!--                                                                   -->
+
+  <test name="point_stat_lead_12_upper_air_AFWAv3.4_Noahv2.7.1">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv2.7.1/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_ADPUPA \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1/point_stat_AFWAv3.4_Noahv2.7.1_F012_ADPUPA_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_lead_12_surface_AFWAv3.4_Noahv2.7.1">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv2.7.1/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_ONLYSF \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1/point_stat_AFWAv3.4_Noahv2.7.1_F012_ONLYSF_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_lead_12_winds_AFWAv3.4_Noahv2.7.1">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv2.7.1/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_WINDS \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv2.7.1/point_stat_AFWAv3.4_Noahv2.7.1_F012_WINDS_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_lead_12_upper_air_AFWAv3.4_Noahv3.3">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_ADPUPA \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3/point_stat_AFWAv3.4_Noahv3.3_F012_ADPUPA_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_lead_12_surface_AFWAv3.4_Noahv3.3">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_ONLYSF \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3/point_stat_AFWAv3.4_Noahv3.3_F012_ONLYSF_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_lead_12_winds_AFWAv3.4_Noahv3.3">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
+      <pair><name>FCST_TIME</name>      <value>012</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
+      &OUTPUT_DIR;/ref_config_lead_12/pb2nc/NDAS_03h/20110902/prepbufr.ndas.20110902.t12z.tm12.nc \
+      &CONFIG_DIR;/ref_config/PointStatConfig_WINDS \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3 \
+      -v 2
+     </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/point_stat/AFWAv3.4_Noahv3.3/point_stat_AFWAv3.4_Noahv3.3_F012_WINDS_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Run Grid-Stat for 3 hour accumulations                           -->
+  <!--                                                                  -->
+
+  <test name="grid_stat_3hr_accum_time_12">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config_lead_12/gen_vx_mask/CONUS.nc</value></pair>
+      <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
+      <pair><name>FCST_TIME</name>      <value>12</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/ref_config_lead_12/pcp_combine/wrf/wrfpcp03_012.nc \
+      &OUTPUT_DIR;/ref_config_lead_12/pcp_combine/ST2_03h/20110902/ST2ml2011090212.03h.nc \
+      &CONFIG_DIR;/ref_config/GridStatConfig_03h \
+      -outdir &OUTPUT_DIR;/ref_config_lead_12/grid_stat -v 1
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config_lead_12/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F12_03h_120000L_20110902_120000V.stat</stat>
+    </output>
+  </test>
+
+</met_test>

@@ -68,74 +68,8 @@ void NcDataBuffer::reset_counters() {
 ///////////////////////////////////////////////////////////////////////////////
 // struct NcPointObsData
 
-NcPointObsData::NcPointObsData():
-   obs_cnt(0),
-   obs_ids((int *)0),
-   obs_hids((int *)0),
-   obs_qids((int *)0),
-   obs_lvls((float *)0),
-   obs_hgts((float *)0),
-   obs_vals((float *)0),
-   obs_arr((float *)0),
-   is_obs_array(false)
+NcPointObsData::NcPointObsData()
 {
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void NcPointObsData::clear() {
-   obs_cnt = 0;
-   is_obs_array = false;
-
-   clear_numbers();
-   clear_strings();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void NcPointObsData::clear_numbers() {
-   if (0 != obs_ids) {
-      delete [] obs_ids;
-      obs_ids = (int *)0;
-   }
-   if (0 != obs_hids) {
-      delete [] obs_hids;
-      obs_hids = (int *)0;
-   }
-   if (0 != obs_qids) {
-      delete [] obs_qids;
-      obs_qids = (int *)0;
-   }
-   if (0 != obs_lvls) {
-      delete [] obs_lvls;
-      obs_lvls = (float *)0;
-   }
-   if (0 != obs_hgts) {
-      delete [] obs_hgts;
-      obs_hgts = (float *)0;
-   }
-   if (0 != obs_vals) {
-      delete [] obs_vals;
-      obs_vals = (float *)0;
-   }
-   if (0 != obs_arr) {
-      delete [] obs_arr;
-      obs_arr = (float *)0;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void NcPointObsData::clear_strings() {
-   var_names.clear();
-   qty_names.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-float NcPointObsData::get_obs_val(int index) {
-   float obs_val = (is_obs_array ? obs_arr[index*obs_cnt+4] : obs_vals[index]);
-   return obs_val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -434,7 +368,7 @@ void NetcdfObsVars::create_pb_hdrs (NcFile *f_out, const int hdr_count) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::create_table_vars (NcFile *f_out, NcHeaderData &hdr_data,
+void NetcdfObsVars::create_table_vars (NcFile *f_out, MetPointHeader &hdr_data,
                                        NcDataBuffer &data_buffer) {
    const string method_name = "  create_table_vars()";
 
@@ -603,7 +537,7 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::read_header_data(NcHeaderData &hdr_data) {
+void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    bool is_valid_obs_nc = true;
    long nhdr_count  = get_dim_size(&hdr_dim);
    int  strl_len    = get_dim_size(&strl_dim);
@@ -970,7 +904,7 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
 
 ////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::read_pb_hdr_data(NcHeaderData &hdr_data) {
+void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
    const char *method_name = "get_nc_pb_hdr_data() -> ";
 
    int pb_hdr_count = get_dim_size(&pb_hdr_dim);
@@ -1132,26 +1066,28 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
       else if (data_buf.hdr_data_offset == data_buf.pb_hdr_data_offset) {
          int save_len = lengths[0];
          int pb_hdr_len = raw_hdr_cnt - offsets[0];
-         if (pb_hdr_len > buf_size) pb_hdr_len = buf_size;
+         if (pb_hdr_len > 0) {
+            if (pb_hdr_len > buf_size) pb_hdr_len = buf_size;
 
-         lengths[0] = pb_hdr_len;
-         if(IS_VALID_NC(hdr_prpt_typ_var) && !put_nc_data((NcVar *)&hdr_prpt_typ_var,
-                                                          data_buf.hdr_prpt_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the pb message type to the netCDF file\n\n";
-            exit(1);
+            lengths[0] = pb_hdr_len;
+            if(IS_VALID_NC(hdr_prpt_typ_var) && !put_nc_data((NcVar *)&hdr_prpt_typ_var,
+                                                             data_buf.hdr_prpt_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the pb message type to the netCDF file\n\n";
+               exit(1);
+            }
+            if(IS_VALID_NC(hdr_irpt_typ_var) && !put_nc_data((NcVar *)&hdr_irpt_typ_var,
+                                                             data_buf.hdr_irpt_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the in message type to the netCDF file\n\n";
+               exit(1);
+            }
+            if(IS_VALID_NC(hdr_inst_typ_var) && !put_nc_data((NcVar *)&hdr_inst_typ_var,
+                                                             data_buf.hdr_inst_typ_buf, lengths, offsets)) {
+               mlog << Error << "error writing the instrument type to the netCDF file\n\n";
+               exit(1);
+            }
+            lengths[0] = save_len;
+            data_buf.pb_hdr_data_offset += pb_hdr_len;
          }
-         if(IS_VALID_NC(hdr_irpt_typ_var) && !put_nc_data((NcVar *)&hdr_irpt_typ_var,
-                                                          data_buf.hdr_irpt_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the in message type to the netCDF file\n\n";
-            exit(1);
-         }
-         if(IS_VALID_NC(hdr_inst_typ_var) && !put_nc_data((NcVar *)&hdr_inst_typ_var,
-                                                          data_buf.hdr_inst_typ_buf, lengths, offsets)) {
-            mlog << Error << "error writing the instrument type to the netCDF file\n\n";
-            exit(1);
-         }
-         lengths[0] = save_len;
-         data_buf.pb_hdr_data_offset += pb_hdr_len;
       }
       else {
           mlog << Debug(6) << method_name
@@ -1166,7 +1102,7 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::write_table_vars (NcHeaderData &hdr_data, NcDataBuffer &data_buffer)
+void NetcdfObsVars::write_table_vars (MetPointHeader &hdr_data, NcDataBuffer &data_buffer)
 {
    mlog << Debug(5) << "write_table_vars() is called. valid hdr_typ_tbl_var: "
         << !IS_INVALID_NC(hdr_typ_tbl_var) << "\n";
@@ -1260,51 +1196,6 @@ void NetcdfObsVars::write_obs_var_descriptions(StringArray &descriptions) {
 
 ////////////////////////////////////////////////////////////////////////
 // End of NetcdfObsVars
-
-///////////////////////////////////////////////////////////////////////////////
-
-// struct NcHeaderData
-
-NcHeaderData::NcHeaderData()
-{
-   reset_counters();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void NcHeaderData::clear() {
-   reset_counters();
-
-   typ_array.clear();
-   sid_array.clear();
-   vld_array.clear();
-   vld_num_array.clear();
-   typ_idx_array.clear();
-   sid_idx_array.clear();
-   vld_idx_array.clear();
-   lat_array.clear();
-   lon_array.clear();
-   elv_array.clear();
-   prpt_typ_array.clear();
-   irpt_typ_array.clear();
-   inst_typ_array.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void NcHeaderData::reset_counters() {
-   valid_point_obs = false;
-   typ_len = 0;
-   sid_len = 0;
-   vld_len = 0;
-   strl_len = 0;
-   strll_len = 0;
-   hdr_count = 0;
-
-   min_vld_time = -1;
-   max_vld_time = -1;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 

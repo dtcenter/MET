@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: unit_grid_stat.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--  jobs for grid_stat output  -->
+
+  <test name="stat_analysis_CONFIG_GRID_STAT">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_gs</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_grid_stat \
+      -out &OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_filter.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_stat_sl1l2_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_stat_sl1l2_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_ctc_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_ctc_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_gs/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_out.stat</stat>
+    </output>
+  </test>
+
+</met_test>

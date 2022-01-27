@@ -49,3 +49,8 @@ export MET_TEST_RSCRIPT=/usr/local/R-4.1.2/bin/Rscript
 export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
              /usr/local/sbin:/usr/local/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
+
+# SonarQube
+export SONARQUBE_DIR=/d1/projects/SonarQube/
+export SONARQUBE_WRAPPER_BIN=$SONARQUBE_DIR/build-wrapper-linux-x86
+export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-4.6.2.2472-linux/bin
