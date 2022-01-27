@@ -8,6 +8,9 @@ __________________
 
 This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot-Point-Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
+MET version 10.1 adds support for the passing point observations to plot_point_obs using a Python scriptAn example of running plot_point_obs with Python embedding is included below.
+
+
 plot_point_obs usage
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -65,6 +68,18 @@ An example of the plot_point_obs calling sequence is shown below:
   plot_point_obs sample_pb.nc sample_data.ps
 
 In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
+
+This is an equivalent command with the python embedding. This is an example for the python embeddingt.
+
+.. code-block:: none
+
+  plot_point_obs 'PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py sample_pb.nc' sample_data.ps
+
+
+The user should replace the python script with the customized python script for the custom point observation data.
+
+Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
+
 
 plot_point_obs configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
