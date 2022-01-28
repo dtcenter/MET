@@ -2205,7 +2205,8 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
 
             bool center = false;
-            aggr.pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+            aggr.pd.set_climo_cdf_info_ptr(&aggr.cdf_info);
 
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
@@ -3086,7 +3087,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
             aggr.clear();
             bool center = false;
-            aggr.ens_pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+            aggr.ens_pd.set_climo_cdf_info_ptr(&aggr.cdf_info);
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
@@ -3141,7 +3143,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.v_na.add(n_valid);
 
          // Derive ensemble from climo mean and standard deviation
-         derive_climo_vals(m[key].ens_pd.cdf_info,
+         derive_climo_vals(&m[key].cdf_info,
                            cur.climo_mean, cur.climo_stdev, climo_vals);
 
          // Store empirical CRPS stats
