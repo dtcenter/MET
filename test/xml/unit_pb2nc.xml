@@ -14,6 +14,8 @@
 
 <!-- Requires: None -->
 
+<!-- Dependent: At least one unit test depends on the output of each of these tests. -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -75,139 +77,5 @@
       <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc</point_nc>
     </output>
   </test>
-  
-  <test name="pb2nc_NDAS_mask_sid_list">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value>"72265","72274","72364","72426"</value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_sid.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_sid.nc</point_nc>
-    </output>
-  </test>
-  
-  <test name="pb2nc_NDAS_mask_sid_file">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value>"&CONFIG_DIR;/SID_CO.txt"</value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_sid_file.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_sid_file.nc</point_nc>
-    </output>
-  </test>
-  
-  <test name="pb2nc_NDAS_mask_grid_data_cfg">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value>&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212</value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_grid_data.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_grid_data.nc</point_nc>
-    </output>
-  </test>
-  
-  <test name="pb2nc_compute_pbl_cape">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/nam.20210311.t00z.prepbufr.tm00 \
-      &OUTPUT_DIR;/pb2nc/nam.20210311.t00z.prepbufr.tm00.pbl.nc \
-      &CONFIG_DIR;/PB2NCConfig_pbl \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/nam.20210311.t00z.prepbufr.tm00.pbl.nc</point_nc>
-    </output>
-  </test>
-
-  <test name="pb2nc_NDAS_var_all">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value>"72364","72265","72274","72426","72489","14008"</value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc \
-      &CONFIG_DIR;/PB2NCConfig_all \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc</point_nc>
-    </output>
-  </test>
-
-  <test name="pb2nc_vertical_level_500">
-   <exec>&MET_BIN;/pb2nc</exec>
-   <env>
-     <pair><name>STATION_ID</name>          <value>"SC-GSP","TX-HGX","KY-HPX"</value></pair>
-     <pair><name>MASK_GRID</name>           <value></value></pair>
-     <pair><name>MASK_POLY</name>           <value></value></pair>
-     <pair><name>QUALITY_MARK_THRESH</name> <value>9</value></pair>
-   </env>
-   <param> \
-     &DATA_DIR_OBS;/bufr/nam_20170502.t00z.radwnd.tm02.bufr_d \
-     &OUTPUT_DIR;/pb2nc/nam_20170502.t00z.radwnd.tm02.bufr_d.vlevel_500.nc \
-     &CONFIG_DIR;/PB2NCConfig_vlevel -valid_end 20170501_22 \
-     -v 1 
-   </param>
-   <output>
-     <point_nc>&OUTPUT_DIR;/pb2nc/nam_20170502.t00z.radwnd.tm02.bufr_d.vlevel_500.nc</point_nc>
-   </output>
-  </test>
-  
-  <test name="pb2nc_NDAS_summary">
-    <exec>&MET_BIN;/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value>MET_BASE/poly/CONUS.poly</value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.summary.nc \
-      &CONFIG_DIR;/PB2NCConfig_summary \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.summary.nc</point_nc>
-    </output>
-  </test>
-  
 
 </met_test>
