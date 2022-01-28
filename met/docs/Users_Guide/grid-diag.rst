@@ -1,18 +1,19 @@
 .. _grid-diag:
 
+**************
 Grid-Diag Tool
-==============
+**************
 
 Introduction
-____________
+============
 
 The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms will be created for all possible pairs of variables. Masks can be used to subset the data fields spatially. The histograms are accumulated over a time series of input data files, similar to Series-Analysis.
 
 Practical information
-_____________________
+=====================
 
 grid_diag usage
-~~~~~~~~~~~~~~~
+---------------
 
 The following sections describe the usage statement, required arguments, and optional arguments for **grid_diag**.
 
@@ -53,7 +54,7 @@ Optional arguments for grid_diag
 6. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 grid_diag configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 The default configuration file for the Grid-Diag tool named **GridDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -96,7 +97,7 @@ The **name** and **level** entries in the **data** dictionary define the data to
 Grid-Diag prints a warning message if the actual range of data values falls outside the range defined for that variable in the configuration file. Any data values less than the configured range are counted in the first bin, while values greater than the configured range are counted in the last bin.
 
 grid_diag output file
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The NetCDF file has a dimension for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level.
 
