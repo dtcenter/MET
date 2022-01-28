@@ -95,6 +95,7 @@ climo_cdf = {
    cdf_bins    = 100;
    center_bins = FALSE;
    write_bins  = FALSE;
+// JHG add support for this   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,10 +124,11 @@ mask = {
 }
 
 //
-// Number of grid points to be processed concurrently.  Set smaller to use
-// less memory but increase the number of passes through the data.
+// Number of grid points to be processed concurrently. Set smaller to use less
+// memory but increase the number of passes through the data. If set <= 0, all
+// grid points are processed concurrently.
 //
-block_size = 23865;
+block_size = -9999;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point
