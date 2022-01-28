@@ -676,7 +676,12 @@ void process_scores() {
    for(i_read=0; i_read<n_reads; i_read++) {
 
       // Initialize PairDataPoint objects
-      for(i=0; i<conf_info.block_size; i++) pd_ptr[i].erase();
+      for(i=0; i<conf_info.block_size; i++) {
+        pd_ptr[i].erase();
+        // JHG, this is a bad solution that introduces a 10 second latency.
+        // Instead, recommend changing PairBase::cdf_info to a pointer
+        pd_ptr[i].set_climo_cdf_info(conf_info.cdf_info);
+      }
 
       // Starting grid point
       i_point = i_read*conf_info.block_size;

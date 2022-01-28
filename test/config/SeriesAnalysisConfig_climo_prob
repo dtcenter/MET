@@ -56,7 +56,7 @@ fcst = {
    ];
 }
 obs = {
-   cat_thresh = <273.0;
+   cat_thresh = <273.0;
 
    field = [
       {
@@ -91,6 +91,12 @@ climo_stdev = {
    file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
+climo_cdf = {
+   cdf_bins    = 100;
+   center_bins = FALSE;
+   write_bins  = FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -120,7 +126,7 @@ mask = {
 // Number of grid points to be processed concurrently.  Set smaller to use
 // less memory but increase the number of passes through the data.
 //
-block_size = 150000;
+block_size = 23865;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point
