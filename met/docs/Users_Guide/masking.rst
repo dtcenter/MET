@@ -7,12 +7,12 @@ Regional Verification using Spatial Masking
 Verification over a particular region or area of interest may be performed using "masking". Defining a masking region is simply selecting the desired set of grid points to be used. The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask and Gen-Circle-Mask tools from previous releases. It may be run to create a bitmap verification masking region to be used by many of the statistical tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. It has been enhanced to support additional types of masking region definition (e.g. tropical-cyclone track over water only). An iterative approach may be used to define complex areas by combining multiple masking regions together.
 
 Gen-Vx-Mask tool
-----------------
+================
 
 The Gen-Vx-Mask tool may be run to create a bitmap verification masking region to be used by the MET statistics tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. While the MET statistics tools can define some masking regions on the fly using polylines, doing so can be slow, especially for complex polylines containing hundreds of vertices. Using the Gen-Vx-Mask tool to create a bitmap masking region before running the other MET tools will make them run more efficiently.
 
 gen_vx_mask usage
-^^^^^^^^^^^^^^^^^
+-----------------
 
 The usage statement for the Gen-Vx-Mask tool is shown below:
 
@@ -40,7 +40,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
 gen_vx_mask has four required arguments and can take optional ones. Note, -type string (masking type) was previously optional but is now required.
 
 Required arguments for gen_vx_mask
-""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_file** argument is a gridded data file which specifies the grid definition for the domain over which the masking bitmap is to be defined. If output from gen_vx_mask, automatically read mask data as the **input_field**.
 
@@ -61,7 +61,7 @@ Required arguments for gen_vx_mask
 4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See description of supported types below.
    
 Optional arguments for gen_vx_mask
-""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-input_field string** option can be used to read existing mask data from "input_file".
 
@@ -163,6 +163,6 @@ An example of the gen_vx_mask calling sequence is shown below:
 In this example, the Gen-Vx-Mask tool will read the ASCII Lat/Lon file named **CONUS.poly** and apply the default polyline masking method to the domain on which the data in the file **sample_fcst.grib** resides. It will create a NetCDF file containing a bitmap for the domain with a value of 1 for all grid points inside the CONUS polyline and a value of 0 for all grid points outside. It will write an output NetCDF file named **CONUS_poly.nc**.
 
 Feature-Relative Methods
-------------------------
+========================
 
 This section contains a description of several methods that may be used to perform feature-relative (or event -based) evaluation. The methodology pertains to examining the environment surrounding a particular feature or event such as a tropical, extra-tropical cyclone, convective cell, snow-band, etc. Several approaches are available for these types of investigations including applying masking described above (e.g. circle or box) or using the "FORCE" interpolation method in the regrid configuration option (see :numref:`config_options`). These methods generally require additional scripting, including potentially storm-track identification, outside of MET to be paired with the features of the MET tools. METplus may be used to execute this type of analysis.  Please refer to the `METplus User's Guide <https://metplus.readthedocs.io/>`_.
