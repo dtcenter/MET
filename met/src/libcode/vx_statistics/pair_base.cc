@@ -64,9 +64,11 @@ void PairBase::clear() {
    IsPointVx = false;
 
    mask_name.clear();
-   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
-   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+
+   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -74,8 +76,6 @@ void PairBase::clear() {
    interp_wdth = 0;
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
-
-   cdf_info.clear();
 
    o_na.clear();
    x_na.clear();
@@ -114,17 +114,17 @@ void PairBase::erase() {
    IsPointVx = false;
 
    mask_name.erase();
-   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
-   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+
+   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
 
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
-
-   cdf_info.clear();
 
    o_na.erase();
    x_na.erase();
@@ -218,6 +218,15 @@ void PairBase::set_mask_llpnt_ptr(MaskLatLon *llpnt_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::set_climo_cdf_info_ptr(const ClimoCDFInfo *info_ptr) {
+
+   cdf_info_ptr = info_ptr;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::set_msg_typ(const char *c) {
 
    msg_typ = c;
@@ -266,15 +275,6 @@ void PairBase::set_interp_wdth(int n) {
 void PairBase::set_interp_shape(GridTemplateFactory::GridTemplates shape) {
 
    interp_shape = shape;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_climo_cdf_info(const ClimoCDFInfo &info) {
-
-   cdf_info = info;
 
    return;
 }
@@ -1027,22 +1027,25 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void derive_climo_vals(const ClimoCDFInfo &cdf_info,
+void derive_climo_vals(const ClimoCDFInfo *cdf_info_ptr,
                        double m, double s,
                        NumArray &climo_vals) {
 
    // Initialize
    climo_vals.erase();
 
-   // cdf_info.cdf_ta starts with >=0.0 and ends with >=1.0.
+   // Check for no work to do
+   if(!cdf_info_ptr) return;
+
+   // cdf_info_ptr->cdf_ta starts with >=0.0 and ends with >=1.0.
    // The number of bins is the number of thresholds minus 1.
 
    // Check for bad mean value
-   if(is_bad_data(m) || cdf_info.cdf_ta.n() < 2) {
+   if(is_bad_data(m) || cdf_info_ptr->cdf_ta.n() < 2) {
       return;
    }
    // Single climo bin
-   else if(cdf_info.cdf_ta.n() == 2) {
+   else if(cdf_info_ptr->cdf_ta.n() == 2) {
       climo_vals.add(m);
    }
    // Check for bad standard deviation value
@@ -1053,9 +1056,9 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
    else {
 
       // Skip the first and last thresholds
-      for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
+      for(int i=1; i<cdf_info_ptr->cdf_ta.n()-1; i++) {
          climo_vals.add(
-            normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+            normal_cdf_inv(cdf_info_ptr->cdf_ta[i].get_value(), m, s));
       }
    }
 
@@ -1064,7 +1067,7 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
+NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
                            const NumArray &mn_na, const NumArray &sd_na,
                            const SingleThresh &othresh) {
    int i, n_mn, n_sd;
@@ -1093,13 +1096,13 @@ NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
       // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
       mlog << Debug(4)
            << "Deriving climatological probabilities for threshold "
-           << othresh.get_str() << " by sampling " << cdf_info.cdf_ta.n()-2
+           << othresh.get_str() << " by sampling " << cdf_info_ptr->cdf_ta.n()-2
            << " values from the normal climatological distribution.\n";
 
       // Compute the probability by sampling from the climo distribution
       // and deriving the event frequency
       for(i=0; i<mn_na.n(); i++) {
-         derive_climo_vals(cdf_info, mn_na[i], sd_na[i], climo_vals);
+         derive_climo_vals(cdf_info_ptr, mn_na[i], sd_na[i], climo_vals);
          climo_prob.add(derive_prob(climo_vals, othresh));
       }
    }
