@@ -341,11 +341,11 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    // Conf: block_size
    block_size = conf.lookup_int(conf_key_block_size);
 
+   // Reset invalid block_sizes to bad data so that they
    if(block_size <= 0.0) {
-      mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-           << "The \"" << conf_key_block_size << "\" parameter ("
-           << block_size << ") must be greater than 0.\n\n";
-      exit(1);
+      block_size = bad_data_int;
+      mlog << Debug(3) << "Automatically setting the \""
+           << conf_key_block_size << "\" parameter to the size of the grid.\n";
    }
 
    // Conf: vld_thresh

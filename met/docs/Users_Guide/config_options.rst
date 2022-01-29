@@ -3593,6 +3593,8 @@ Computation may be memory intensive, especially for large grids.
 The "block_size" entry sets the number of grid points to be processed
 concurrently (i.e. in one pass through a time series). Smaller values
 require less memory but increase the number of passes through the data.
+If set less than or equal to 0, it is automatically reset to the number
+of grid points, and they are all processed concurrently.
 
 .. code-block:: none
 		

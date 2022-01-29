@@ -340,6 +340,9 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
    // Process masking regions
    conf_info.process_masks(grid);
 
+   // Set the block size, if needed
+   if(is_bad_data(conf_info.block_size)) conf_info.block_size = nxy;
+
    // Compute the number of reads required
    n_reads = nint(ceil((double) nxy / conf_info.block_size));
 
