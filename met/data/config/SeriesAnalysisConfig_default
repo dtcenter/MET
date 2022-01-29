@@ -89,6 +89,7 @@ climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;
    write_bins  = FALSE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

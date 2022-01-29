@@ -82,6 +82,13 @@ climo_stdev = {
    file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = FALSE;
+   direct_prob = FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //

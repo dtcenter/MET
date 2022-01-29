@@ -92,10 +92,10 @@ climo_stdev = {
 }
 
 climo_cdf = {
-   cdf_bins    = 100;
+   cdf_bins    = 1;
    center_bins = FALSE;
    write_bins  = FALSE;
-// JHG add support for this   direct_prob = FALSE;
+   direct_prob = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
