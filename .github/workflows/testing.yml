@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Testing
 
 # Compile MET and run unit tests
 # for pull requests into develop branch
@@ -82,8 +82,8 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_1a:
-    name: MET Unit Tests 1a
+  unit_1a:
+    name: Unit 1a
     runs-on: ubuntu-latest
     needs: [job_control, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
@@ -106,7 +106,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_1a
+          name: unit_1a
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -117,8 +117,8 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_1b:
-    name: MET Unit Tests 1b
+  unit_1b:
+    name: Unit 1b
     runs-on: ubuntu-latest
     needs: [job_control, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
@@ -141,7 +141,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_1b
+          name: unit_1b
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -152,8 +152,8 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_ref_config_leads:
-    name: MET Unit Tests ref_config leads
+  unit_rc_leads:
+    name: Unit RC leads
     runs-on: ubuntu-latest
     needs: [job_control, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
@@ -177,7 +177,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_ref_config_leads
+          name: unit_rc_leads
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -188,10 +188,10 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_ref_config:
-    name: MET Unit Tests ref_config
+  unit_rc:
+    name: Unit RC
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_ref_config_leads]
+    needs: [job_control, unit_rc_leads]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
@@ -204,7 +204,7 @@ jobs:
       - name: Download ref_config_leads output from artifact
         uses: actions/download-artifact@v2
         with:
-          name: unit_tests_ref_config_leads
+          name: unit_rc_leads
           path: ${{ runner.workspace }}/output
 
       - name: Run Unit Tests in Docker
@@ -217,7 +217,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_ref_config
+          name: unit_rc
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -228,10 +228,10 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_2a:
-    name: MET Unit Tests 2a
+  unit_2a:
+    name: Unit 2a
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1a]
+    needs: [job_control, unit_1a]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
@@ -247,7 +247,7 @@ jobs:
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v2
         with:
-          name: unit_tests_1a
+          name: unit_1a
           path: ${{ runner.workspace }}/output
 
       - name: Run Unit Tests in Docker
@@ -260,7 +260,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_2a
+          name: unit_2a
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -271,10 +271,10 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_tests_2b:
-    name: MET Unit Tests 2b
+  unit_2b:
+    name: Unit 2b
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1a]
+    needs: [job_control, unit_1a]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
@@ -290,7 +290,7 @@ jobs:
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v2
         with:
-          name: unit_tests_1a
+          name: unit_1a
           path: ${{ runner.workspace }}/output
 
       - name: Run Unit Tests in Docker
@@ -303,7 +303,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: unit_tests_2b
+          name: unit_2b
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -317,7 +317,7 @@ jobs:
   run_diffs:
     name: Check for Differences
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1b, unit_tests_2a, unit_tests_2b, unit_tests_ref_config]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
     if: ${{ needs.job_control.outputs.run_diff == 'true' }}
     steps:
       - name: Download data from previous jobs
@@ -326,7 +326,7 @@ jobs:
       - name: Copy test output into single directory
         run: |
           mkdir ${RUNNER_WORKSPACE}/output
-          cp -r unit_tests_*/* ${RUNNER_WORKSPACE}/output/
+          cp -r unit_*/* ${RUNNER_WORKSPACE}/output/
 
       - uses: actions/checkout@v2
 
@@ -356,7 +356,7 @@ jobs:
   update_truth:
     name: Update Truth Data
     runs-on: ubuntu-latest
-    needs: [job_control, unit_tests_1b, unit_tests_2a, unit_tests_2b, unit_tests_ref_config]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
       - uses: actions/checkout@v2
@@ -367,7 +367,7 @@ jobs:
       - name: Copy test output into single directory
         run: |
           mkdir ${RUNNER_WORKSPACE}/met_test_truth
-          cp -r unit_tests_*/* ${RUNNER_WORKSPACE}/met_test_truth/
+          cp -r unit_*/* ${RUNNER_WORKSPACE}/met_test_truth/
 
       - name: Create Docker Data Volume
         run: .github/jobs/create_docker_truth.sh
