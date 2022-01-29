@@ -1093,21 +1093,68 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
    // threshold
    else if(n_mn > 0 && n_sd > 0) {
 
-      // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
-      mlog << Debug(4)
-           << "Deriving climatological probabilities for threshold "
-           << othresh.get_str() << " by sampling " << cdf_info_ptr->cdf_ta.n()-2
-           << " values from the normal climatological distribution.\n";
+      // Need cdf_info_ptr set to proceed
+      if(!cdf_info_ptr) return(climo_prob);
 
-      // Compute the probability by sampling from the climo distribution
-      // and deriving the event frequency
-      for(i=0; i<mn_na.n(); i++) {
-         derive_climo_vals(cdf_info_ptr, mn_na[i], sd_na[i], climo_vals);
-         climo_prob.add(derive_prob(climo_vals, othresh));
+      // Derive climatological probabilities directly
+      if(cdf_info_ptr->direct_prob) {
+
+         mlog << Debug(4)
+              << "Deriving climatological probabilities for threshold "
+              << othresh.get_str() << " directly from the normal "
+              << "climatological distribution.\n";
+
+         // Directly derive the climatological probability
+         for(i=0; i<mn_na.n(); i++) {
+
+            // Check for bad data
+            if(is_bad_data(mn_na[i]) || is_bad_data(sd_na[i])) {
+               prob = bad_data_double;
+            }
+            else {
+
+               // Probability is the area to the left of the threshold value
+               prob = normal_cdf_inv(othresh.get_value(), mn_na[i], sd_na[i]);
+
+               // Adjust the probability based on the threshold type
+               switch(othresh.get_type()) {
+                  case thresh_lt:
+                  case thresh_le:
+                     break;
+                  case thresh_gt:
+                  case thresh_ge: prob = 1.0 - prob;
+                     break;
+                  case thresh_eq: prob = 0.0;
+                     break;
+                  case thresh_ne: prob = 1.0;
+                     break;
+                  default:
+                     break;
+               } // switch
+               climo_prob.add(prob);
+            }
+         }
+      }
+      // Derive climatological probabilities by sampling from the distribution
+      else {
+
+         // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
+         mlog << Debug(4)
+              << "Deriving climatological probabilities for threshold "
+              << othresh.get_str() << " by sampling "
+              << cdf_info_ptr->cdf_ta.n()-2
+              << " values from the normal climatological distribution.\n";
+
+         // Compute the probability by sampling from the climo distribution
+         // and deriving the event frequency
+         for(i=0; i<mn_na.n(); i++) {
+            derive_climo_vals(cdf_info_ptr, mn_na[i], sd_na[i], climo_vals);
+            climo_prob.add(derive_prob(climo_vals, othresh));
+         }
       }
    }
    // If only climatological mean was provided, it should already
-   // contain probabilities.  Range check the data to be sure.
+   // contain probabilities. Range check the data to be sure.
    else {
 
       // Range check climatological probability mean values

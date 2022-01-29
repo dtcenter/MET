@@ -1307,8 +1307,8 @@ over the "climo_mean" setting and then updating the "file_name" entry.
 The "climo_cdf" dictionary specifies how the the climatological mean
 ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
-within the climatological distribution. This dictionary consists of 3
-entries:
+within the climatological distribution. This dictionary consists of the
+following entries:
 
 (1)
     The "cdf_bins" entry defines the climatological bins either as an integer
@@ -1319,6 +1319,8 @@ entries:
 
 (3)
     The "write_bins" entry may be set to TRUE or FALSE.
+
+(4) The "direct_prob" entry may be set to TRUE or FALSE.
 
 MET uses the climatological mean and standard deviation to construct a normal
 PDF at each observation location. The total area under the PDF is 1, and the
@@ -1348,11 +1350,11 @@ an even number of bins can only be  uncentered. For example:
   5   centered bins (cdf_bins = 5; center_bins = TRUE;) yields:
     0.0, 0.125, 0.375, 0.625, 0.875, 1.0
 
-When multiple climatological bins are used, statistics are computed
-separately for each bin, and the average of the statistics across those bins
-is written to the output. When "write_bins" is true, the statistics for each
-bin are also written to the output. The bin number is appended to the
-contents of the VX_MASK output column.
+When multiple climatological bins are used for Point-Stat and Grid-Stat,
+statistics are computed separately for each bin, and the average of the
+statistics across those bins is written to the output. When "write_bins"
+is true, the statistics for each bin are also written to the output.
+The bin number is appended to the contents of the VX_MASK output column.
 
 Setting the number of bins to 1 effectively disables this logic by grouping
 all pairs into a single climatological bin.
@@ -1363,6 +1365,7 @@ all pairs into a single climatological bin.
      cdf_bins    = 11;    or an array of floats
      center_bins = TRUE;  or FALSE
      write_bins  = FALSE; or TRUE
+     direct_prob = FALSE; or TRUE
   }
 
 .. _climato_data:
@@ -1381,7 +1384,18 @@ directly to compute Brier Skill Score (BSS).
 When "climo_mean" and "climo_stdev" are both set to non-probability fields,
 the MET tools use the mean, standard deviation, and observation event
 threshold to derive a normal approximation of the climatological
-probabilities. Those derived probability values are used to compute BSS.
+probabilities.
+
+The "direct_prob" option controls the derivation logic. When "direct_prob" is
+true, the climatological probability is computed directly from the
+climatological distribution at each point as the area to the left of
+the event threshold value. For greater-than or greater-than-or-equal-to
+thresholds, 1.0 minus the area is used. When "direct_prob" is false, the
+"cdf_bins" values are sampled from climatological distribution. The probability
+is computed as the proportion of those samples which meet the threshold criteria.
+In this way, the number of bins impacts the resolution of the climatological
+probabilities. These derived probability values are used to compute the
+climatological Brier Score and Brier Skill Score.
 
 .. _mask_missing_flag:
 
