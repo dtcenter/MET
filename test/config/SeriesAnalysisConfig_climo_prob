@@ -82,8 +82,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   day_interval       = 1;
-   hour_interval      = 6;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
 climo_stdev = climo_mean;
