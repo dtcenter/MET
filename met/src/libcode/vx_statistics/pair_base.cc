@@ -1114,7 +1114,7 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
             else {
 
                // Probability is the area to the left of the threshold value
-               prob = normal_cdf_inv(othresh.get_value(), mn_na[i], sd_na[i]);
+               prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
 
                // Adjust the probability based on the threshold type
                switch(othresh.get_type()) {
