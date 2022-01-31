@@ -2223,7 +2223,8 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
 
-            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), false);
+            bool center = false;
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
 
             m[key] = aggr;
 
@@ -3098,7 +3099,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
 
-            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), false);
+            bool center = false;
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
 
             m[key] = aggr;
 
