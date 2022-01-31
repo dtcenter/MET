@@ -1,13 +1,14 @@
 .. _appendixA:
 
+********************************
 Appendix A FAQs & How do I ... ?
-================================
+********************************
 
 Frequently Asked Questions
-__________________________
+==========================
 
 File-IO
-~~~~~~~
+-------
 
 **Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?**
 
@@ -233,7 +234,7 @@ MET to disable the use of scientific notation. That enhancement
 is planned for a future release.
 
 Gen-Vx-Mask
-~~~~~~~~~~~
+-----------
 
 **Q. Gen-Vx-Mask - I have a list of stations to use for verification.
 I also have a poly region defined. If I specify both of these should
@@ -301,7 +302,7 @@ are obvious problems with the latitude and longitude values used
 to define that mask for Poland.
 
 Grid-Stat
-~~~~~~~~~
+---------
 
 **Q. Grid-Stat - How do I define a complex masking region?**
 
@@ -577,7 +578,7 @@ In the resulting plot, anywhere you see the pink value of 10, that's
 where gen_vx_mask has masked out the grid point.
 
 Pcp-Combine
-~~~~~~~~~~~
+-----------
 
 **Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
 
@@ -943,7 +944,7 @@ Instead of having the level as "L0", tell it to use "R735" to select
 grib record 735.
 
 Plot-Data-Plane
-~~~~~~~~~~~~~~~
+---------------
 
 **Q. Plot-Data-Plane - How do I inspect Gen-Vx-Mask output?**
 
@@ -1053,7 +1054,7 @@ In the second one, this won't appear since wind speed already exists
 in the RTMA file.
 
 Stat-Analysis
-~~~~~~~~~~~~~
+-------------
 
 **Q. Stat-Analysis - How does '-aggregate_stat' work?**
 
@@ -1234,7 +1235,7 @@ Adding the "-by FCST_VAR" option to compute stats for all variables and
 runs quickly.
 
 TC-Stat
-~~~~~~~
+-------
 
 **Q. TC-Stat - How do I use the “-by” flag to stratify results?**
 
@@ -1297,7 +1298,7 @@ To stratify your results by lead time, you could add the "-by LEAD" option.
 		-out_line_type CTC,CTS,MPR
 
 Utilities
-~~~~~~~~~
+---------
 
 **Q. Utilities - What would be an example of scripting to call MET?**
 
@@ -1426,7 +1427,7 @@ pairwise differences that are needed.
 
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
 **Q. Regrid-Data-Plane - How do I define a LatLon grid?**
 
@@ -1687,7 +1688,7 @@ from the north.
 .. _Troubleshooting:   
    
 Troubleshooting
-_______________
+===============
 
 The first place to look for help with individual commands is this
 User's Guide or the usage statements that are provided with the tools.
@@ -1833,7 +1834,7 @@ and then run "make install" and "make test" again.
   level to 4 or 5 prints much more diagnostic information to the screen. 
 
 Where to get help
-_________________
+=================
 
 If none of the above suggestions have helped solve your problem, help
 is available through the
@@ -1841,7 +1842,7 @@ is available through the
 
 
 How to contribute code
-______________________
+======================
 
 If you have code you would like to contribute, we will gladly consider
 your contribution. Please create a post in the
