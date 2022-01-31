@@ -2204,10 +2204,6 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
 
-            bool center = false;
-            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
-            aggr.pd.set_climo_cdf_info_ptr(&aggr.cdf_info);
-
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
             aggr.pd.cmn_na.clear();
@@ -2227,7 +2223,12 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
 
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), false);
+
             m[key] = aggr;
+
+            // Set the pointer after storing in the map
+            m[key].pd.set_climo_cdf_info_ptr(&m[key].cdf_info);
 
             mlog << Debug(3) << "[Case " << m.size()
                  << "] Added new case for key \""
@@ -3085,10 +3086,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
+
             aggr.clear();
-            bool center = false;
-            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
-            aggr.ens_pd.set_climo_cdf_info_ptr(&aggr.cdf_info);
+
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
@@ -3097,7 +3097,14 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
+
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), false);
+
             m[key] = aggr;
+
+            // Set the pointer after storing in the map
+            m[key].ens_pd.set_climo_cdf_info_ptr(&m[key].cdf_info);
+
             mlog << Debug(3) << "[Case " << m.size()
                  << "] Added new case for key \""
                  << key << "\".\n";
