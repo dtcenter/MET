@@ -671,21 +671,25 @@ void process_scores() {
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
 
-   // Allocate space to store the pairs for each grid point
-   pd_ptr = new PairDataPoint [conf_info.block_size];
-   for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
-
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
 
-      // Initialize PairDataPoint objects
-      for(i=0; i<conf_info.block_size; i++) {
-        pd_ptr[i].erase();
-        pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
+      // If block_size is bad data, its defined by the size of the grid
+      if(is_bad_data(conf_info.block_size)) {
+         i_point = 0;
       }
+      // Otherwise, re-initialize the PairDataPoint objects
+      else {
 
-      // Starting grid point
-      i_point = i_read*conf_info.block_size;
+         // Initialize PairDataPoint objects
+         for(i=0; i<conf_info.block_size; i++) {
+            pd_ptr[i].erase();
+            pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
+         }
+
+         // Starting grid point
+         i_point = i_read*conf_info.block_size;
+      }
 
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
@@ -701,6 +705,16 @@ void process_scores() {
 
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
+
+         // Allocate PairDataPoint objects after reading the first field
+         // since block_size can be defined relative to grid size
+         if(!pd_ptr) {
+            pd_ptr = new PairDataPoint [conf_info.block_size];
+            for(i=0; i<conf_info.block_size; i++) {
+               pd_ptr[i].extend(n_series);
+               pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            }
+         }
 
          if(i_series == 0) {
             mlog << Debug(2)
