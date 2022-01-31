@@ -670,26 +670,9 @@ void process_scores() {
    // Number of points skipped due to valid data threshold
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
-
+ 
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
-
-      // If block_size is bad data, its defined by the size of the grid
-      if(is_bad_data(conf_info.block_size)) {
-         i_point = 0;
-      }
-      // Otherwise, re-initialize the PairDataPoint objects
-      else {
-
-         // Initialize PairDataPoint objects
-         for(i=0; i<conf_info.block_size; i++) {
-            pd_ptr[i].erase();
-            pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
-         }
-
-         // Starting grid point
-         i_point = i_read*conf_info.block_size;
-      }
 
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
@@ -706,17 +689,23 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
-         // Allocate PairDataPoint objects after reading the first field
-         // since block_size can be defined relative to grid size
+         // Allocate PairDataPoint objects, if needed
          if(!pd_ptr) {
             pd_ptr = new PairDataPoint [conf_info.block_size];
-            for(i=0; i<conf_info.block_size; i++) {
-               pd_ptr[i].extend(n_series);
-               pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
-            }
+            for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
          }
 
+         // Re-initialize the PairDataPoint objects, if needed
          if(i_series == 0) {
+
+            for(i=0; i<conf_info.block_size; i++) {
+               pd_ptr[i].erase();
+               pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            }
+
+            // Starting grid point
+            i_point = i_read*conf_info.block_size;
+
             mlog << Debug(2)
                  << "Processing data pass number " << i_read + 1 << " of "
                  << n_reads << " for grid points " << i_point + 1 << " to "
