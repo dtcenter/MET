@@ -241,6 +241,15 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Determine the number of ensemble fields to be processed
    n_ens_var = parse_conf_n_vx(edict);
 
+   // Print a warning if the ensemble dictionary is not empty
+   if(n_ens_var != 0) {
+      mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
+           << "Ensemble post-processing should be moved to the "
+           << "Gen-Ens-Prod tool, which replaces the logic of the "
+           << "\"ens\" dictionary. Support for the \"ens\" dictionary "
+           << "will be deprecated and removed." << "\n\n";
+   }
+   
     // Parse the ensemble field information
    for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
 
