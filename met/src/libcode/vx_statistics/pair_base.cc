@@ -1138,6 +1138,12 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
       // Derive climatological probabilities by sampling from the distribution
       else {
 
+         if(cdf_info_ptr->cdf_ta.n() == 0) {
+            mlog << Error << "\nderive_climo_prob() -> "
+                 << "No climatological probability thresholds defined!\n\n";
+            exit(1);
+         }
+
          // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
          mlog << Debug(4)
               << "Deriving climatological probabilities for threshold "
