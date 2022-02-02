@@ -2,8 +2,9 @@
 
 .. _App_D-Confidence-Intervals:
 
+*******************************
 Appendix D Confidence Intervals
-===============================
+*******************************
 
 A single verification statistic is statistically meaningless without associated uncertainty information in accompaniment. There can be numerous sources of uncertainty associated with such a statistic including observational, physical uncertainties about the underlying processes governing the equation, sample uncertainty, etc. Although all of the sources of uncertainty can be important, the most heavily researched, and easiest to calculate, is that of sampling uncertainty. It is this source of uncertainty that can presently be obtained with MET, and the techniques for deriving these estimates are described here. Sampling uncertainty through MET is gleaned by way of confidence intervals (CIs) as these are generally most informative. A :math:`(1 - \alpha) \cdot 100\%` confidence interval is interpreted, somewhat awkwardly, in the following way. If the test were repeated 100 times (so that we have 100 such intervals), then we expect the true value of the statistics to fall inside :math:`(1-\alpha)\cdot 100` of these intervals. For example, if :math:`\alpha=0.05` then we expect the true value to fall within 95 of the intervals.
 
