@@ -83,7 +83,7 @@ For a Gaussian grid, the syntax is
 The parameters **Nx** and **Ny** are as before, while **lon_zero** defines the first longitude.
 
 Grids
-====+
+=====
 
 The majority of NCEP's pre-defined grids that reside on one of the projections listed above are implemented in MET. The user may specify one of these NCEP grids in the configuration files as "GNNN" where NNN is the 3-digit NCEP grid number. Defining a new masking grid in MET would involve modifying the vx_data_grids library and recompiling.
 
