@@ -10,7 +10,8 @@ Frequently Asked Questions
 File-IO
 -------
 
-**Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?**
+Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The main reason to run gen_vx_mask is to make the MET
@@ -24,7 +25,8 @@ recomputing the mask when each MET statistics tool is run. If the polyline
 only contains a small number of points or the grid is sparse running
 gen_vx_mask first would only save a second or two.
 
-**Q. File-IO - How do I use map_data?**
+Q. File-IO - How do I use map_data?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The MET repository includes several map data files. Users can modify which
@@ -65,7 +67,8 @@ in the configuration string on the command line:
      "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
      ]; }'
 
-**Q. FILE-IO - How can I understand the number of matched pairs?**
+Q. FILE-IO - How can I understand the number of matched pairs?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Statistics are computed on matched forecast/observation pairs data.
@@ -114,7 +117,8 @@ none of the point observations match the variable name requested
 in the configuration file. So all of the 1166 observations are rejected
 for the same reason.
 
-**Q.  FILE-IO - What types of NetCDF files can MET read?**
+Q.  FILE-IO - What types of NetCDF files can MET read?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 There are three flavors of NetCDF that MET can read directly.
@@ -138,7 +142,8 @@ While MET's point2grid tool does support some satellite data inputs, it is
 limited. Using python embedding is another option for handling new datasets
 not supported natively by MET.
 
-**Q. FILE-IO - How do I choose a time slice in a NetCDF file?**
+Q. FILE-IO - How do I choose a time slice in a NetCDF file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 When processing NetCDF files, the level information needs to be
@@ -158,7 +163,8 @@ Let's use plot_data_plane as an example:
 Assuming that the first array is the time, this will select the 6-th
 time slice of the APCP data and plot it since these indices are 0-based.
 
-**Q. FILE-IO - How do I use the UNIX time conversion?**
+Q. FILE-IO - How do I use the UNIX time conversion?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Regarding the timing information in the NetCDF variable attributes:
@@ -196,7 +202,8 @@ subset the TRMM data if needed. Look for the section of it titled
 "Output domain specification" and define the lat/lon's that needs
 to be included in the output.
 
-**Q. Does MET use a fixed-width output format for its ASCII output files?**
+Q. Does MET use a fixed-width output format for its ASCII output files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 MET does not use the Fortran-like fixed width format in its
@@ -219,7 +226,8 @@ If a fixed-width format is needed, the easiest option would be
 writing a script to post-process the MET output into the fixed-width
 format that is needed or that the code expects.
 
-**Q. Do the ASCII output files created by MET use scientific notation?**
+Q. Do the ASCII output files created by MET use scientific notation?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 By default, the ASCII output files created by MET make use of
@@ -236,10 +244,9 @@ is planned for a future release.
 Gen-Vx-Mask
 -----------
 
-**Q. Gen-Vx-Mask - I have a list of stations to use for verification.
-I also have a poly region defined. If I specify both of these should
-the result be a union of them?**
- 
+Q. Gen-Vx-Mask - I have a list of stations to use for verification. I also have a poly region defined. If I specify both of these should the result be a union of them?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 These settings are defined in the "mask" section of the Point-Stat
 configuration file. You can define masking regions in one of 3 ways,
@@ -267,7 +274,8 @@ If so, your options are:
 
 Then aggregate the results together by running a Stat-Analysis job.
 
-**Q. Gen-Vx-Mask - How do I define a masking region with a GFS file?**
+Q. Gen-Vx-Mask - How do I define a masking region with a GFS file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Grab a sample GFS file: 
@@ -304,7 +312,8 @@ to define that mask for Poland.
 Grid-Stat
 ---------
 
-**Q. Grid-Stat - How do I define a complex masking region?**
+Q. Grid-Stat - How do I define a complex masking region?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A user can define intersections and unions of multiple fields to define masks.
@@ -360,8 +369,8 @@ apply complex masking logic and then pass the output mask file
 to Grid-Stat in its configuration file.
 
 
-**Q. Grid-Stat - How do I use neighborhood methods to compute fraction
-skill score?**
+Q. Grid-Stat - How do I use neighborhood methods to compute fraction skill score?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A common application of fraction skill score (FSS) is comparing forecast
@@ -401,8 +410,8 @@ Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
 points where all NxN values contain valid data. Setting it to 0.5 only
 requires half of them.
 
-**Q. Grid-Stat - Is an example of verifying forecast probabilities?**
-
+Q. Grid-Stat - Is an example of verifying forecast probabilities?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A.
 There is an example of verifying probabilities in the test scripts
 included with the MET release. Take a look in: 
@@ -444,8 +453,8 @@ values between 0 and 1. Note that if the probability data contains
 values from 0 to 100, MET automatically divides by 100 to rescale to
 the 0 to 1 range.
 
-**Q. What is an example of using Grid-Stat with regridding and masking
-turned on?**
+Q. What is an example of using Grid-Stat with regridding and masking turned on?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Run Grid-Stat using the following commands and the attached config file 
@@ -504,9 +513,9 @@ gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
 The advantage to gen_vx_mask is that it will make grid_stat run a
 bit faster. It can be used to construct much more complex masking areas.
 
-**Q. How do I use one mask for the forecast field and a different
-mask for the observation field??**
-
+Q. How do I use one mask for the forecast field and a different mask for the observation field?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 You can't define different
 masks for the forecast and observation fields in MET tools. MET only lets you
@@ -580,7 +589,8 @@ where gen_vx_mask has masked out the grid point.
 Pcp-Combine
 -----------
 
-**Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
+Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 An example of running the MET pcp_combine tool to put NAM 3-hourly
@@ -617,9 +627,8 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
-**Q. Pcp-Combine - How do I combine 12-hour accumulated precipitation
-from two different initialization times?**
-
+Q. Pcp-Combine - How do I combine 12-hour accumulated precipitation from two different initialization times?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A. 
 The "-sum" command assumes the same initialization time. Use the "-add"
 option instead.
@@ -659,7 +668,8 @@ Here are 3 commands you could use to plot these data files:
 
 		plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
-**Q. Pcp-Combine - How do I correct a precipitation time range?**
+Q. Pcp-Combine - How do I correct a precipitation time range?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Typically, accumulated precipitation is stored in GRIB files using an
@@ -708,9 +718,8 @@ Here is an example:
 		
 The resulting file should have the accumulation listed at 24h rather than 0-24.
 
-**Pcp-Combine - How do I use Pcp-Combine as a pass-through to simply reformat
-from GRIB to NetCDF or to change output variable name?**
-
+Q. Pcp-Combine - How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A.
 The pcp_combine tool is typically used to modify the accumulation interval
 of precipitation amounts in model and/or analysis datasets. For example,
@@ -746,8 +755,8 @@ appear in the output of downstream tools:
 		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
 		forecast.nc -name CompositeReflectivity
 
-**Q. Pcp-Combine - How do I use “-pcprx" to run a project faster?**
-
+Q. Pcp-Combine - How do I use “-pcprx" to run a project faster?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A.
 To run a project faster, the “-pcprx” option may be used to narrow the
 search down to whatever regular expression you provide. Here are a two
@@ -766,8 +775,8 @@ examples:
 		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
 		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
 
-**Q. Pcp-Combine - How do I enter the time format correctly?**
-
+Q. Pcp-Combine - How do I enter the time format correctly?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A.
 Here is an **incorrect example** of running pcp_combine with sub-hourly
 accumulation intervals: 
