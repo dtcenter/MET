@@ -1995,11 +1995,16 @@ void process_pbfile(int i_pb) {
    }
 
    if(i_msg <= 0) {
-      mlog << Warning << "\n" << method_name
-           << ((n_derived_obs > 0) ? "Saved the derived variables only. " : " ")
-           << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
-           << " messages retained from file: "
-           << pbfile[i_pb] << "\n\n";
+      if (n_derived_obs > 0)
+         mlog << Debug(3) << method_name
+              << "Saved the derived variables only. No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+              << " messages retained from file: "
+              << pbfile[i_pb] << "\n";
+      else
+         mlog << Warning << "\n" << method_name
+              << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+              << " messages retained from file: "
+              << pbfile[i_pb] << "\n\n";
    }
 
    return;

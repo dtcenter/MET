@@ -84,8 +84,6 @@ mlog << Error << "\nMetPythonPointDataFile::operator=(const MetPythonPointDataFi
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 
