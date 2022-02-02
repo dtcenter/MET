@@ -172,6 +172,7 @@ MetPointDataPython::MetPointDataPython() {
 
 MetPointDataPython::MetPointDataPython(MetPointDataPython &d) {
    init_from_scratch();
+   obs_data = new MetPointObsData();
    MetPointObsData *from_obs_data = d.get_point_obs_data();
    if (from_obs_data) obs_data->assign(*from_obs_data);
    header_data.assign(*d.get_header_data());
