@@ -300,10 +300,11 @@ struct RegridInfo {
 //
 
 struct ClimoCDFInfo {
-   bool        flag;       // Flag to turn on/off climo CDF logic
-   int         n_bin;      // Number of climo CDF cdf bins
-   ThreshArray cdf_ta;     // Array of CDF thresholds
-   bool        write_bins; // Flag for writing the individual bins
+   bool        flag;        // Flag to turn on/off climo CDF logic
+   int         n_bin;       // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;      // Array of CDF thresholds
+   bool        write_bins;  // Flag for writing the individual bins
+   bool        direct_prob; // Flag for the direct computation of probs
 
    ClimoCDFInfo();
    void clear();
@@ -665,6 +666,7 @@ static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
 static const char conf_key_write_bins[]         = "write_bins";
+static const char conf_key_direct_prob[]        = "direct_prob";
 static const char conf_key_time_interp_method[] = "time_interp_method";
 static const char conf_key_day_interval[]       = "day_interval";
 static const char conf_key_hour_interval[]      = "hour_interval";

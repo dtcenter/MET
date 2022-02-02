@@ -123,6 +123,7 @@ climo_cdf = {
    cdf_bins    = 11;
    center_bins = TRUE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -57,6 +57,8 @@ class SeriesAnalysisConfInfo {
       ThreshArray      ocnt_ta;            // Continuous obs thresholds
       SetLogic         cnt_logic;          // Continuous threshold field logic
 
+      ClimoCDFInfo     cdf_info;           // Climo CDF info
+
       NumArray         ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType boot_interval;      // Bootstrap CI type
       double           boot_rep_prop;      // Bootstrap replicate proportion

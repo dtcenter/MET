@@ -116,12 +116,12 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    // Allocate memory for output pairs
    extend(pd.n_obs);
 
-   cdf_info = pd.cdf_info;
-
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
    set_msg_typ(pd.msg_typ.c_str());
    set_msg_typ_vals(pd.msg_typ_vals);
+
+   cdf_info_ptr = pd.cdf_info_ptr;
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_wdth(pd.interp_wdth);
@@ -247,7 +247,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 
    // Allocate memory for output pairs
    out_pd.extend(n_obs);
-   out_pd.set_climo_cdf_info(cdf_info);
+   out_pd.set_climo_cdf_info_ptr(cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(f_na, cmn_na);
    bool csd_flag = set_climo_flag(f_na, csd_na);
@@ -836,12 +836,12 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_climo_cdf_info(const ClimoCDFInfo &info) {
+void VxPairDataPoint::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info(info);
+            pd[i][j][k].set_climo_cdf_info_ptr(info);
          }
       }
    }
@@ -1671,8 +1671,8 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    out_pd_v.erase();
    out_pd_u.extend(pd_u.n_obs);
    out_pd_v.extend(pd_v.n_obs);
-   out_pd_u.set_climo_cdf_info(pd_u.cdf_info);
-   out_pd_v.set_climo_cdf_info(pd_v.cdf_info);
+   out_pd_u.set_climo_cdf_info_ptr(pd_u.cdf_info_ptr);
+   out_pd_v.set_climo_cdf_info_ptr(pd_v.cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
                    set_climo_flag(pd_v.f_na, pd_v.cmn_na);
@@ -1760,7 +1760,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
 
    // Allocate memory for output pairs
    out_pd.extend(pd.n_obs);
-   out_pd.set_climo_cdf_info(pd.cdf_info);
+   out_pd.set_climo_cdf_info_ptr(pd.cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);

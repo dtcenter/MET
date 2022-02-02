@@ -54,6 +54,39 @@ obs = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   direct_prob = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Confidence interval settings
 //
 ci_alpha  = [ 0.05, 0.10 ];
@@ -77,10 +110,11 @@ mask = {
 }
 
 //
-// Number of grid points to be processed concurrently.  Set smaller to use
-// less memory but increase the number of passes through the data.
+// Number of grid points to be processed concurrently. Set smaller to use less
+// memory but increase the number of passes through the data. If set <= 0, all
+// grid points are processed concurrently.
 //
-block_size = 10000;
+block_size = 169*154;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point

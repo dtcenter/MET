@@ -82,6 +82,12 @@ climo_stdev = {
    file_name = [];
 }
 
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   direct_prob = FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -108,8 +114,9 @@ mask = {
 }
 
 //
-// Number of grid points to be processed concurrently.  Set smaller to use
-// less memory but increase the number of passes through the data.
+// Number of grid points to be processed concurrently. Set smaller to use less
+// memory but increase the number of passes through the data. If set <= 0, all
+// grid points are processed concurrently.
 //
 block_size = 24000;
 

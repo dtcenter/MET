@@ -1968,8 +1968,9 @@ void process_pbfile(int i_pb) {
            << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n";
    }
    else {
-      mlog << Debug(1) << "Obs time between " << unix_to_yyyymmdd_hhmmss(min_msg_ut)
-           << " and " << unix_to_yyyymmdd_hhmmss(max_msg_ut) << "\n";
+      mlog << Debug(2) << "Finished processing input observations between "
+           << unix_to_yyyymmdd_hhmmss(min_msg_ut) << " and "
+           << unix_to_yyyymmdd_hhmmss(max_msg_ut) << ".\n";
 
       int debug_level = 5;
       if(mlog.verbosity_level() >= debug_level) {

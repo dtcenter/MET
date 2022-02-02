@@ -522,7 +522,7 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
       climo_pct.zero_out();
 
       // Derive climatological probabilities
-      if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info,
+      if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info_ptr,
                                                   pd.cmn_na, pd.csd_na,
                                                   fthresh[i]);
 

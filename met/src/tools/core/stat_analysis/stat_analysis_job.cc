@@ -972,9 +972,13 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       }
 
       //
-      // Parse the input MPR lines
+      // Aggregate the input MPR lines
       //
       aggr_mpr_lines(f, job, mpr_map, n_in, n_out);
+
+      //
+      // Write the output
+      //
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_mpr(job, *it, mpr_map, out_at, tmp_dir.c_str(), rng_ptr);
          if(!job.stat_out) write_table(out_at, sa_out);
