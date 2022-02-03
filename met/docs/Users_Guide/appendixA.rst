@@ -1021,9 +1021,9 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 		-plot_range 0 100
 
 
-Q. How do I test the variable naming convention? (Record number example)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
+Q. How do I test the variable naming convention? (Record number example.)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A.
 Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
 by running: 
