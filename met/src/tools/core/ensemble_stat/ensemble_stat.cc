@@ -1838,7 +1838,7 @@ void process_grid_vx() {
             // Initialize
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
-            pd_all.set_climo_cdf_info(conf_info.vx_opt[i].cdf_info);
+            pd_all.set_climo_cdf_info_ptr(&conf_info.vx_opt[i].cdf_info);
             pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0][0][0].ctrl_index;
             pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
 

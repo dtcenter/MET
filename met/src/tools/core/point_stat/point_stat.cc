@@ -1736,7 +1736,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       hira_pd.clear();
       hira_pd.extend(pd_ptr->n_obs);
       hira_pd.set_ens_size(gt->size());
-      hira_pd.set_climo_cdf_info(conf_info.vx_opt[i_vx].cdf_info);
+      hira_pd.set_climo_cdf_info_ptr(&conf_info.vx_opt[i_vx].cdf_info);
       f_ens.extend(gt->size());
 
       // Process each observation point
