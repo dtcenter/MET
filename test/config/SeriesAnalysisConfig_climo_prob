@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "SREF";
 
 //
 // Output description to be written
@@ -19,27 +19,26 @@ desc = "NA";
 //
 // Output observation type to be written
 //
-obtype = "ANALYS";
+obtype = "GFSANL";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Verification grid
-// May be set separately in each "field" entry
 //
 regrid = {
-   to_grid    = NONE;
-   method     = NEAREST;
-   width      = 1;
+   to_grid    = FCST;
+   method     = BILIN;
+   width      = 2;
    vld_thresh = 0.5;
    shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-censor_thresh = [];
+censor_thresh = []; 
 censor_val    = [];
-cat_thresh    = [ NA ];
+cat_thresh    = [];
 cnt_thresh    = [ NA ];
 cnt_logic     = UNION;
 
@@ -47,48 +46,55 @@ cnt_logic     = UNION;
 // Forecast and observation fields to be verified
 //
 fcst = {
+   cat_thresh = ==0.1;
 
    field = [
       {
-        name  = "APCP";
-        level = [ "A03" ];
+        name = "PROB"; level = "Z2";
+        prob = { name = "TMP"; thresh_hi = 273.0; };
       }
    ];
-
 }
-obs = fcst;
+obs = {
+   cat_thresh = <273.0;
+
+   field = [
+      {
+        name = "TMP"; level = "Z2";
+      }
+   ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Climatology data
 //
+climo_mean = obs;
 climo_mean = {
 
-   file_name = [];
-   field     = [];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
-      method     = NEAREST;
-      width      = 1;
+      method     = BILIN;
+      width      = 2;
       vld_thresh = 0.5;
-      shape      = SQUARE;
    }
 
    time_interp_method = DW_MEAN;
-   day_interval       = 31;
-   hour_interval      = 6;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [];
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
 climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;
-   direct_prob = FALSE;
+   direct_prob = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +109,7 @@ boot = {
    rep_prop = 1.0;
    n_rep    = 0;
    rng      = "mt19937";
-   seed     = "";
+   seed     = "1";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,12 +127,12 @@ mask = {
 // memory but increase the number of passes through the data. If set <= 0, all
 // grid points are processed concurrently.
 //
-block_size = 1024;
+block_size = -9999;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point
 //
-vld_thresh = 1.0;
+vld_thresh = 0.5;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -134,18 +140,18 @@ vld_thresh = 1.0;
 // Statistical output types
 //
 output_stats = {
-   fho    = [];
-   ctc    = [];
-   cts    = [];
-   mctc   = [];
-   mcts   = [];
-   cnt    = [ "TOTAL", "RMSE", "FBAR", "OBAR" ];
-   sl1l2  = [];
-   sal1l2 = [];
-   pct    = [];
-   pstd   = [];
-   pjc    = [];
-   prc    = [];
+   fho    = [ ];
+   ctc    = [ ];
+   cts    = [ ];
+   mctc   = [ ];
+   mcts   = [ ];
+   cnt    = [ ];
+   sl1l2  = [ ];
+   sal1l2 = [ ];
+   pct    = [ ];
+   pstd   = [ "TOTAL", "ROC_AUC", "BRIER", "BRIERCL", "BSS", "BSS_SMPL" ];
+   pjc    = [ ];
+   prc    = [ ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

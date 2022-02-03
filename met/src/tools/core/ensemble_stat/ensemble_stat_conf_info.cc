@@ -1032,7 +1032,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
    // Store the climo CDF info
-   vx_pd.set_climo_cdf_info(cdf_info);
+   vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the list of surface message types
    vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);

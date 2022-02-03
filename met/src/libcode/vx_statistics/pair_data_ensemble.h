@@ -272,7 +272,7 @@ class VxPairDataEnsemble {
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
 
-      void set_climo_cdf_info(const ClimoCDFInfo &);
+      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
