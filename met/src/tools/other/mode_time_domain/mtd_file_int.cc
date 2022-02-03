@@ -1206,19 +1206,19 @@ if ( Nobjects == 0 )  return;
 
 old.ObjVolume = new int [Nobjects];
 
-d = old.Data;
-
 for (j=0; j<Nobjects; ++j)  old.ObjVolume[j] = 0;
 
+d = old.Data;
+if (d) {
+   for (j=0; j<Nxyt; ++j, ++d)  {
 
-for (j=0; j<Nxyt; ++j, ++d)  {
+      k = (int) (*d);
 
-   k = (int) (*d);
+      if ( k == 0 )  continue;
 
-   if ( k == 0 )  continue;
+      old.ObjVolume[k - 1] += 1;
 
-   old.ObjVolume[k - 1] += 1;
-
+   }
 }
 
 

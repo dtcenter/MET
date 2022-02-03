@@ -972,7 +972,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
    // Store the climo CDF info
-   vx_pd.set_climo_cdf_info(cdf_info);
+   vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;

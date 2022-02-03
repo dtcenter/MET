@@ -61,12 +61,6 @@ void MetPointData::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-//void MetPointData::allocate() {
-//   obs_data.allocate();
-//}
-
-////////////////////////////////////////////////////////////////////////
-
 void MetPointData::clear() {
    if (obs_data) obs_data->clear();
    header_data.clear();
@@ -178,18 +172,10 @@ MetPointDataPython::MetPointDataPython() {
 
 MetPointDataPython::MetPointDataPython(MetPointDataPython &d) {
    init_from_scratch();
-   //obs_data = d.get_point_obs_data();
-   //header_data = d.get_header_data();
-   obs_data->assign(*d.get_point_obs_data());
+   obs_data = new MetPointObsData();
+   MetPointObsData *from_obs_data = d.get_point_obs_data();
+   if (from_obs_data) obs_data->assign(*from_obs_data);
    header_data.assign(*d.get_header_data());
-cout << "  DEBUG HS MetPointData(MetPointData &d) is called \n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) &header_data.lat_array=" << &(header_data.lat_array) << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.lat_array.n()=" << header_data.lat_array.n() << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.lon_array.n()=" << header_data.lon_array.n() << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.elv_array.n()=" << header_data.elv_array.n() << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.typ_idx_array.n()=" << header_data.typ_idx_array.n() << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.sid_idx_array.n()=" << header_data.sid_idx_array.n() << "\n";
-cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.vld_idx_array.n()=" << header_data.vld_idx_array.n() << "\n";
 }
 
 
@@ -198,17 +184,6 @@ cout << "  DEBUG HS MetPointData(MetPointData &d) header_data.vld_idx_array.n()=
 MetPointDataPython::~MetPointDataPython() {
    clear();
 }
-
-////////////////////////////////////////////////////////////////////////
-
-//void MetPointDataPython::init_from_scratch() {
-//   nobs = 0;
-//   nhdr = 0;
-//   qty_length = 0;
-//
-//   use_var_id = false;
-//   use_arr_vars = false;
-//}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -434,4 +409,3 @@ void MetPointHeader::reset_counters() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
