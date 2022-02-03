@@ -4,11 +4,15 @@ name: Testing
 # for pull requests into develop branch
 
 on:
+
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
       - develop
       - 'main_v*'
+    paths-ignore:
+      - 'met/docs/**'
+
   push:
     branches:
       - 'feature_*'
@@ -16,6 +20,8 @@ on:
       - 'develop'
       - 'develop-ref'
       - 'main_v*'
+    paths-ignore:
+      - 'met/docs/**'
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
