@@ -10,8 +10,8 @@ Frequently Asked Questions
 File-IO
 -------
 
-Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The main reason to run gen_vx_mask is to make the MET
@@ -25,8 +25,8 @@ recomputing the mask when each MET statistics tool is run. If the polyline
 only contains a small number of points or the grid is sparse running
 gen_vx_mask first would only save a second or two.
 
-Q. File-IO - How do I use map_data?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use map_data?
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The MET repository includes several map data files. Users can modify which
@@ -67,8 +67,8 @@ in the configuration string on the command line:
      "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
      ]; }'
 
-Q. FILE-IO - How can I understand the number of matched pairs?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How can I understand the number of matched pairs?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Statistics are computed on matched forecast/observation pairs data.
@@ -117,8 +117,8 @@ none of the point observations match the variable name requested
 in the configuration file. So all of the 1166 observations are rejected
 for the same reason.
 
-Q.  FILE-IO - What types of NetCDF files can MET read?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. What types of NetCDF files can MET read?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 There are three flavors of NetCDF that MET can read directly.
@@ -142,8 +142,8 @@ While MET's point2grid tool does support some satellite data inputs, it is
 limited. Using python embedding is another option for handling new datasets
 not supported natively by MET.
 
-Q. FILE-IO - How do I choose a time slice in a NetCDF file?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I choose a time slice in a NetCDF file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 When processing NetCDF files, the level information needs to be
@@ -163,8 +163,8 @@ Let's use plot_data_plane as an example:
 Assuming that the first array is the time, this will select the 6-th
 time slice of the APCP data and plot it since these indices are 0-based.
 
-Q. FILE-IO - How do I use the UNIX time conversion?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use the UNIX time conversion?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Regarding the timing information in the NetCDF variable attributes:
@@ -244,8 +244,8 @@ is planned for a future release.
 Gen-Vx-Mask
 -----------
 
-Q. Gen-Vx-Mask - I have a list of stations to use for verification. I also have a poly region defined. If I specify both of these should the result be a union of them?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. I have a list of stations to use for verification. I also have a poly region defined. If I specify both of these should the result be a union of them?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 These settings are defined in the "mask" section of the Point-Stat
@@ -274,8 +274,8 @@ If so, your options are:
 
 Then aggregate the results together by running a Stat-Analysis job.
 
-Q. Gen-Vx-Mask - How do I define a masking region with a GFS file?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I define a masking region with a GFS file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Grab a sample GFS file: 
@@ -312,8 +312,8 @@ to define that mask for Poland.
 Grid-Stat
 ---------
 
-Q. Grid-Stat - How do I define a complex masking region?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I define a complex masking region?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A user can define intersections and unions of multiple fields to define masks.
@@ -369,8 +369,8 @@ apply complex masking logic and then pass the output mask file
 to Grid-Stat in its configuration file.
 
 
-Q. Grid-Stat - How do I use neighborhood methods to compute fraction skill score?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use neighborhood methods to compute fraction skill score?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A common application of fraction skill score (FSS) is comparing forecast
@@ -410,8 +410,9 @@ Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
 points where all NxN values contain valid data. Setting it to 0.5 only
 requires half of them.
 
-Q. Grid-Stat - Is an example of verifying forecast probabilities?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. Is an example of verifying forecast probabilities?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A.
 There is an example of verifying probabilities in the test scripts
 included with the MET release. Take a look in: 
@@ -589,8 +590,8 @@ where gen_vx_mask has masked out the grid point.
 Pcp-Combine
 -----------
 
-Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I add and subtract with Pcp-Combine?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 An example of running the MET pcp_combine tool to put NAM 3-hourly
@@ -627,8 +628,9 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
-Q. Pcp-Combine - How do I combine 12-hour accumulated precipitation from two different initialization times?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I combine 12-hour accumulated precipitation from two different initialization times?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A. 
 The "-sum" command assumes the same initialization time. Use the "-add"
 option instead.
@@ -668,8 +670,8 @@ Here are 3 commands you could use to plot these data files:
 
 		plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
-Q. Pcp-Combine - How do I correct a precipitation time range?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I correct a precipitation time range?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Typically, accumulated precipitation is stored in GRIB files using an
@@ -718,8 +720,9 @@ Here is an example:
 		
 The resulting file should have the accumulation listed at 24h rather than 0-24.
 
-Q. Pcp-Combine - How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A.
 The pcp_combine tool is typically used to modify the accumulation interval
 of precipitation amounts in model and/or analysis datasets. For example,
@@ -755,8 +758,9 @@ appear in the output of downstream tools:
 		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
 		forecast.nc -name CompositeReflectivity
 
-Q. Pcp-Combine - How do I use “-pcprx" to run a project faster?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use “-pcprx" to run a project faster?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A.
 To run a project faster, the “-pcprx” option may be used to narrow the
 search down to whatever regular expression you provide. Here are a two
@@ -775,8 +779,9 @@ examples:
 		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
 		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
 
-Q. Pcp-Combine - How do I enter the time format correctly?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I enter the time format correctly?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A.
 Here is an **incorrect example** of running pcp_combine with sub-hourly
 accumulation intervals: 
@@ -806,8 +811,8 @@ time strings, like this:
 		pcp_combine -subtract forecast.grb 005500 \
 		forecast2.grb 000500 forecast.nc -field APCP		
 
-Q. Pcp-Combine - How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accumulation interval time range indicator?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accumulation interval time range indicator?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Run wgrib on the data files and the output is listed below:
@@ -865,8 +870,8 @@ Some things to point out here:
    chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
    tell that tool what variable to process.
 
-Q. Pcp_Combine - How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A. 
 Here is an example of using pcp_combine to put GFS into 24- hour intervals
@@ -931,16 +936,16 @@ This example explicitly tells pcp_combine which files to read and
 what accumulation interval (6 hours) to extract from them. The resulting
 output should be identical to the output of the "-sum" command.
 
-Q. Pcp-Combine - What is the difference between “-sum” vs. “-add”?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. What is the difference between “-sum” vs. “-add”?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The -sum and -add options both do the same thing. It's just that
 '-sum' could find files more quickly with the use of the -pcprx flag.
 This could also be accomplished by using a calling script.
 
-Q. Pcp-Combine - How do I select a specific GRIB record?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I select a specific GRIB record?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 In this example, record 735 needs to be selected. 
@@ -957,8 +962,8 @@ grib record 735.
 Plot-Data-Plane
 ---------------
 
-Q. Plot-Data-Plane - How do I inspect Gen-Vx-Mask output?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I inspect Gen-Vx-Mask output?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Check to see if the call to Gen-Vx-Mask actually did create good output
@@ -984,8 +989,8 @@ file is what the user expects. It always a good idea to start with
 plot_data_plane when working with data to make sure MET
 is plotting the data correctly and in the expected location.
 
-Q. Plot-Data-Plane - How do I specify the GRIB version?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I specify the GRIB version?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 When MET reads Gridded data files, it must determine the type of
@@ -1016,8 +1021,8 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 		-plot_range 0 100
 
 
-Q. Plot-Data-Plane - How do I test the variable naming convention? (Record number example)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I test the variable naming convention? (Record number example)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
@@ -1036,8 +1041,8 @@ contain temperature data and 2-meters. Here's some wgrib2 output:
 
 The GRIB id info has been the same between records 1 and 2.
 
-Q. Plot-Data-Plane - How do I compute and verify wind speed?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I compute and verify wind speed?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Here's how to compute and verify wind speed using MET. Good news, MET
@@ -1070,8 +1075,8 @@ in the RTMA file.
 Stat-Analysis
 -------------
 
-Q. Stat-Analysis - How does '-aggregate_stat' work?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How does '-aggregate_stat' work?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 In Stat-Analysis, there is a "-vx_mask" job filtering option. That option
@@ -1114,8 +1119,8 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
-Q. Stat-Analysis - What is the best way to average the FSS scores within several days or even several months using 'Aggregate to Average Scores'?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. What is the best way to average the FSS scores within several days or even several months using 'Aggregate to Average Scores'?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Below is the best way to aggregate together the Neighborhood Continuous
@@ -1144,8 +1149,8 @@ combination of those header column entries.
 The output is printed to the screen, or use the "-out_stat" option to
 also write the aggregated output to a file named "agg_nbrcnt.txt".
 
-Q. Stat-Analysis - How do I use '-by' to capture unique entries?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use '-by' to capture unique entries?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Here is a stat-analysis job that could be used to run, read the MPR lines,
@@ -1165,8 +1170,8 @@ to run the job separately for each unique entry found in the FCST_VAR column.
 
 The output statistics are written to "out_pstd.txt".
 
-Q. Stat-Analysis - How do I use '-filter' to refine my output?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use '-filter' to refine my output?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Here is an example of running a Stat-Analysis filter job to discard any
@@ -1197,8 +1202,8 @@ cases without having to modify the source code.
 This job reads find 56 CTS lines, but only keeps 36 of them where both
 the BASER and FMEAN columns are at least 0.05.
 
-Q. Stat-Analysis - How do I use the “-by” flag to stratify results?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use the “-by” flag to stratify results?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Adding "-by FCST_VAR" is a great way to associate a single value,
@@ -1217,8 +1222,8 @@ Run the following job on the output from Grid-Stat generated when the
 The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
-Q. Stat-Analysis - How do I speed up run times?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I speed up run times?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 By default, Stat-Analysis has two options enabled which slow it down.
@@ -1255,8 +1260,8 @@ runs quickly.
 TC-Stat
 -------
 
-Q. TC-Stat - How do I use the “-by” flag to stratify results?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use the “-by” flag to stratify results?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 To perform tropical cyclone evaluations for multiple models use the
@@ -1277,8 +1282,8 @@ all grouped together.
 This will result in all 48 hour HWFI and H3WI track forecasts to be
 aggregated (statistics and scores computed) for each model separately.
 
-Q. TC-Stat - How do I use rapid intensification verification?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I use rapid intensification verification?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 To get the most output, run something like this:
@@ -1320,8 +1325,8 @@ To stratify your results by lead time, you could add the "-by LEAD" option.
 Utilities
 ---------
 
-Q. Utilities - What would be an example of scripting to call MET?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. What would be an example of scripting to call MET?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 The following is an example of how to call MET from a bash script
@@ -1344,8 +1349,8 @@ and call convert to reformat from PostScript to PNG.
 		done
 
 
-Q. Utility - How do I convert TRMM data files?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I convert TRMM data files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Here is an example of NetCDF that the MET software is not expecting. Here
@@ -1394,8 +1399,8 @@ It may be possible that the domain of the data is smaller. Here are some options
 That tells Grid-Stat to automatically regrid the TRMM observations to
 the model domain.
 
-Q. Other Utilities - How do I convert a PostScript to png?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How do I convert a PostScript to png?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 Use the linux “convert” tool to convert a Plot-Data-Plane PostScript
@@ -1416,8 +1421,8 @@ seperate .png with the following naming convention:
 
 mode_out-0.png, mode_out-1.png, mode_out-2.png, etc.
 
-Q. Utility - How does pairwise differences using plot_tcmpr.R work?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. How does pairwise differences using plot_tcmpr.R work?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 A.
 One necessary step in computing pairwise differences is "event equalizing"
