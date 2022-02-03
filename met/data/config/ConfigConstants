@@ -88,6 +88,7 @@ AW_MEAN        = 20;
 GAUSSIAN       = 21;
 MAXGAUSS       = 22;
 GEOG_MATCH     = 23;
+HIRA           = 24;
 
 // Interpolation types
 NONE           = 1;
