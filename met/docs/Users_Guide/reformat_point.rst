@@ -104,8 +104,9 @@ For example, using an environment variable to set the **message_type** (see belo
 
 \* In the configuration file: **message_type = [ ${MSG_TYP} ];**
 
- The contents of the default pb2nc configuration file are described below.
+The contents of the default pb2nc configuration file are described below.
 
+____________________
 
 .. code-block:: none
 		
@@ -116,6 +117,7 @@ For example, using an environment variable to set the **message_type** (see belo
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
+_____________________
 
 .. code-block:: none
 		
@@ -123,6 +125,7 @@ The configuration options listed above are common to many MET tools and are desc
 
 Each PrepBUFR message is tagged with one of eighteen message types as listed in the :numref:`config_options` file. The **message_type** refers to the type of observation from which the observation value (or 'report') was derived. The user may specify a comma-separated list of message types to be retained. Providing an empty list indicates that all message types should be retained.
 
+_____________________
 
 .. code-block:: none		
 
@@ -130,6 +133,7 @@ Each PrepBUFR message is tagged with one of eighteen message types as listed in 
 
 The **message_type_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of input PrepBUFR message types to output message types. This provides a method for renaming input PrepBUFR message types.
 
+_____________________
 
 .. code-block:: none
 		
@@ -143,6 +147,7 @@ The **message_type_map** entry is an array of dictionaries, each containing a **
 
 The **message_type_group_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of message type group names to a comma-separated list of values. This map is defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify this map to define sets of message types that should be processed together as a group. The **SURFACE** entry must be present to define message types for which surface verification logic should be applied.
 
+_____________________
 
 .. code-block:: none
 		
@@ -150,6 +155,7 @@ The **message_type_group_map** entry is an array of dictionaries, each containin
 
 Each PrepBUFR message has a station identification string associated with it. The user may specify a comma-separated list of station IDs to be retained. Providing an empty list indicates that messages from all station IDs will be retained. It can be a file name containing a list of stations.
 
+_____________________
 
 .. code-block:: none
 		
@@ -158,6 +164,7 @@ Each PrepBUFR message has a station identification string associated with it. Th
 
 The **beg** and **end** variables are used to stratify the elevation (in meters) of the observations to be retained. The range shown above is set to -1000 to 100000 meters, which essentially retains every observation.
 
+_____________________
 
 .. code-block:: none
 
@@ -172,6 +179,7 @@ The **pb_report_type, in_report_type**, and **instrument_type** variables are us
 
 `PrepBUFR Code table for input report types. <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
+_____________________
 
 .. code-block:: none
 		
@@ -212,7 +220,8 @@ The **level_category** variable is used to specify a comma-separated list of Pre
    * - 7
      - Auxiliary levels generated via interpolation from spanning levels
        
-
+_____________________
+       
 .. code-block:: none
 		
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
@@ -220,6 +229,7 @@ The **level_category** variable is used to specify a comma-separated list of Pre
 
 Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, and D_CAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, and convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
 
+_____________________
 
 .. code-block:: none
 		
@@ -243,6 +253,7 @@ Each PrepBUFR message will likely contain multiple observation variables. The **
 
 The BUFR variable names are not shared with other forecast data. This map is used to convert the BUFR name to the common name, like GRIB2. It allows to share the configuration for forecast data with PB2NC observation data. If there is no mapping, the BUFR variable name will be saved to output NetCDF file.
 
+_____________________
 
 .. code-block:: none
 		
@@ -251,6 +262,7 @@ The BUFR variable names are not shared with other forecast data. This map is use
 
 Each observation has a quality mark value associated with it. The **quality_mark_thresh** is used to stratify out which quality marks will be retained. The value shown above indicates that only observations with quality marks less than or equal to 2 will be retained.
 
+_____________________
 
 .. code-block:: none
 		
@@ -259,6 +271,7 @@ Each observation has a quality mark value associated with it. The **quality_mark
 
 A PrepBUFR message may contain duplicate observations with different quality mark values. The **event_stack_flag** indicates whether to use the observations at the top of the event stack (observation values have had more quality control processing applied) or the bottom of the event stack (observation values have had no quality control processing applied). The flag value of **TOP** listed above indicates the observations with the most amount of quality control processing should be used, the **BOTTOM** option uses the data closest to raw values.
 
+_____________________
 
 .. code-block:: none
 		
@@ -538,6 +551,7 @@ The default configuration file for the ASCII2NC tool named **Ascii2NcConfig_defa
 
 The ASCII2NC configuration file is optional and only necessary when defining time summaries or message type mapping for little_r data. The contents of the default ASCII2NC configuration file are described below.
 
+_____________________
 
 .. code-block:: none
 
@@ -545,6 +559,7 @@ The ASCII2NC configuration file is optional and only necessary when defining tim
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
+_____________________
 
 .. code-block:: none
 
@@ -553,6 +568,7 @@ The configuration options listed above are common to many MET tools and are desc
 
 The **time_summary** feature was implemented to allow additional processing of observations with high temporal resolution, such as SURFRAD data every 5 minutes. This option is described in :numref:`pb2nc configuration file`.
 
+_____________________
 
 .. code-block:: none
 		
@@ -679,7 +695,7 @@ The default configuration file for the MADIS2NC tool named **Madis2NcConfig_defa
 
 The MADIS2NC configuration file is optional and only necessary when defining time summaries. The contents of the default MADIS2NC configuration file are described below.
 
-
+_____________________
 
 .. code-block:: none
 
@@ -688,7 +704,7 @@ The MADIS2NC configuration file is optional and only necessary when defining tim
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-
+_____________________
 
 .. code-block:: none
 
@@ -894,6 +910,7 @@ The default configuration file for the IODA2NC tool named **IODA2NcConfig_defaul
 
 The IODA2NC configuration file is optional and only necessary when defining filtering the input observations or defining time summaries. The contents of the default IODA2NC configuration file are described below.
 
+_____________________
 
 .. code-block:: none
 
@@ -904,7 +921,7 @@ The IODA2NC configuration file is optional and only necessary when defining filt
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-
+_____________________
 
 .. code-block:: none
 
@@ -920,12 +937,15 @@ The configuration options listed above are common to many MET tools and are desc
 
 The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
 
+_____________________
 
 .. code-block:: none
 
 		obs_name_map = [];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input IODA variable names to output variable names. The default IODA map, obs_var_map, is appended to this map.
+
+_____________________
 
 .. code-block:: none
 		
@@ -939,6 +959,7 @@ This entry is an array of dictionaries, each containing a **key** string and **v
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
 
+_____________________
 
 .. code-block:: none
 
@@ -1097,6 +1118,7 @@ The default configuration file for the point2grid tool named **Point2GridConfig_
 
 The point2grid configuration file is optional and only necessary when defining the variable name instead of GRIB code or filtering by time. The contents of the default MADIS2NC configuration file are described below.
 
+_____________________
 
 .. code-block:: none
 
@@ -1105,6 +1127,7 @@ The point2grid configuration file is optional and only necessary when defining t
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
+_____________________
 
 .. code-block:: none
 		
