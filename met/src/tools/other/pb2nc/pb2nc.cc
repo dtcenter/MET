@@ -1804,6 +1804,10 @@ void process_pbfile(int i_pb) {
                   if (is_eq(mlcape_val, 0.)) mlcape_cnt_zero_values++;
                }
                else mlcape_cnt_missing_values++;
+               if (P_bins != 0) delete [] P_bins;
+               if (T_bins != 0) delete [] T_bins;
+               if (Q_bins != 0) delete [] Q_bins;
+
             }
          }
          else if (1 < buf_nlev) cape_cnt_no_levels++;
