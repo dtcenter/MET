@@ -181,6 +181,9 @@ class NcCfFile {
       bool get_grid_from_dimensions();
       void get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                       const long lat_counts, const long lon_counts);
+
+      LatLonData get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                            const long lat_counts, const long lon_counts);
 };
 
 
