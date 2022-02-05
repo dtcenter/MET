@@ -2419,12 +2419,13 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     exit(1);
   }
 
-  LatLonData ll_data;
+  // Store spacing in LatLon data structure
+  bool swap_to_north;
+  LatLonData ll_data = get_data_from_lat_lon_vars(_yCoordVar, _xCoordVar,
+                                                  lat_counts, lon_counts,
+                                                  swap_to_north);
 
-  ll_data = get_data_from_lat_lon_vars(_yCoordVar, _xCoordVar, lat_counts, lon_counts);
-
-  // Fill in the Rotated LatLon data structure.
-
+  // Fill in the Rotated LatLon data structure
   RotatedLatLonData data;
 
   data.name = rotated_latlon_proj_type;
@@ -3044,9 +3045,13 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                           const long lat_counts, const long lon_counts) {
   static const string method_name = "NcCfFile::get_grid_from_lat_lon_vars()";
 
-  LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var, lat_counts, lon_counts);
+  bool swap_to_north;
+  LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
+                                               lat_counts, lon_counts,
+                                               swap_to_north);
+
   grid.set(data);   // resets swap_to_north to false
-  if (data.delta_lat < 0) grid.set_swap_to_north(true);
+  if (swap_to_north) grid.set_swap_to_north(true);
 }
 
 
@@ -3054,7 +3059,8 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
 
 LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
-                                                const long lat_counts, const long lon_counts) {
+                                                const long lat_counts, const long lon_counts,
+                                                bool &swap_to_north) {
   static const string method_name = "get_data_from_lat_lon_vars()";
 
   // Figure out the dlat/dlon values from the dimension variables
@@ -3185,9 +3191,14 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   data.delta_lon = dlon;
   data.Nlat = lat_counts;
   data.Nlon = lon_counts;
+
   if (dlat < 0) {
+    swap_to_north = true;
     data.delta_lat = -dlat;
     data.lat_ll = lat_values[lat_counts-1];
+  }
+  else {
+    swap_to_north = false;
   }
 
   return(data);
