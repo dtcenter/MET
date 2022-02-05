@@ -967,16 +967,16 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - Number of Forecast Simple Boundary Points
   * - fcst_simp_bdy :raw-html:`<br />` \_lat
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLatitude
+    - Forecast Simple Boundary Latitude
   * - fcst_simp_bdy :raw-html:`<br />` \_lon
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLongitude
+    - Forecast Simple Boundary Longitude
   * - fcst_simp_bdy_x
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoX-Coordinate
+    - Forecast Simple Boundary X-Coordinate
   * - fcst_simp_bdy_y
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoY-Coordinate
+    - Forecast Simple Boundary Y-Coordinate
   * - fcst_simp_hull :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Convex Hull Starting Index
