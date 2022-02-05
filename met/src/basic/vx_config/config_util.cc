@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1498,6 +1498,7 @@ void ClimoCDFInfo::clear() {
    n_bin = 0;
    cdf_ta.clear();
    write_bins = false;
+   direct_prob = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1589,8 +1590,12 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    center = cdf_dict->lookup_bool(conf_key_center_bins);
 
    // Conf: write_bins
-   // Used by Grid-Stat and Point-Stat but not by Ensemble-Stat
+   // Used by Grid-Stat and Point-Stat
+   // Not used by Ensemble-Stat or Series-Analysis
    info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins, false, false);
+
+   // Conf: direct_prob
+   info.direct_prob = cdf_dict->lookup_bool(conf_key_direct_prob, false, false);
 
    // Check that at least one value is provided
    if(bins.n() == 0) {

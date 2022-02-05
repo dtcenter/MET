@@ -10,9 +10,9 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
-<met_test>
+<!-- Requires: unit_ascii2nc.xml -->
 
-  <!--  Depends on unit_ascii2nc to generate dup_test.nc obs file -->
+<met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>false</exit_on_fail>
@@ -27,11 +27,11 @@
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
       &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       &CONFIG_DIR;/PointStatConfig_dup \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/duplicate_flag -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_NONE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_NONE_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/duplicate_flag/point_stat_DUP_NONE_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/duplicate_flag/point_stat_DUP_NONE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -45,11 +45,11 @@
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
       &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       &CONFIG_DIR;/PointStatConfig_dup \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/duplicate_flag -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_UNIQUE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_UNIQUE_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/duplicate_flag/point_stat_DUP_UNIQUE_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/duplicate_flag/point_stat_DUP_UNIQUE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 

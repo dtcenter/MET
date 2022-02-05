@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -219,7 +219,7 @@ class VxPairDataPoint {
 
       void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
-      void set_climo_cdf_info(const ClimoCDFInfo &);
+      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
       void set_msg_typ_sfc(const StringArray &);
       void set_msg_typ_lnd(const StringArray &);

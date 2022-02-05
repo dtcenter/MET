@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -2114,10 +2114,10 @@ void process_madis_profiler(NcFile *&f_in) {
       dim[1] = nlvl;
       get_nc_data(&var_levels, (float *)levels_arr, dim, cur);
 
-      if (IS_VALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, (char *)uComponentQty_arr, buf_size, i_hdr_s);
+      if (IS_VALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, (char *)uComponentQty_arr, dim, cur);
       else memset(uComponentQty_arr, 0, buf_size*dim[1]*sizeof(char));
 
-      if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr, buf_size, i_hdr_s);
+      if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr, dim, cur);
       else memset(vComponentQty_arr, 0, buf_size*dim[1]*sizeof(char));
 
       get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur, "uComponent");
@@ -3410,6 +3410,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
                                     levelsQty[i_idx],
                                     GET_NC_NAME(in_var).c_str());
          nlvl = levels[i_idx];
+         if (nlvl > maxLevels) {
+            mlog << Warning << "\n" << method_name << " The level (" << nlvl
+                 << ") at nLevels variable can not exceed dimension maxLevels (" << maxLevels<< ")\n\n";
+            nlvl = maxLevels;
+         }
          obs_arr[2] = levels[i_idx];
 
          //

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -209,7 +209,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
-   cdf_info       = pd.cdf_info;
+   cdf_info_ptr   = pd.cdf_info_ptr;
 
    cmn_na         = pd.cmn_na;
    csd_na         = pd.csd_na;
@@ -345,15 +345,15 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
 
-   if(cmn_flag && cdf_info.cdf_ta.n() == 2) {
+   if(cmn_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() == 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to the "
            << "climatological mean.\n";
    }
-   else if(cmn_flag && csd_flag && cdf_info.cdf_ta.n() > 2) {
+   else if(cmn_flag && csd_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() > 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to a "
-           << cdf_info.cdf_ta.n() - 2
+           << cdf_info_ptr->cdf_ta.n() - 2
            << "-member climatological ensemble.\n";
    }
    else {
@@ -468,7 +468,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Derive ensemble from climo mean and standard deviation
-         derive_climo_vals(cdf_info, cmn_na[i], csd_na[i], cur_clm);
+         derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
@@ -785,7 +785,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    pd.ssvar_bin_size  = ssvar_bin_size;
    pd.obs_error_entry = obs_error_entry;
    pd.obs_error_flag  = obs_error_flag;
-   pd.cdf_info        = cdf_info;
+   pd.cdf_info_ptr    = cdf_info_ptr;
 
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
@@ -1306,12 +1306,12 @@ void VxPairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_climo_cdf_info(const ClimoCDFInfo &info) {
+void VxPairDataEnsemble::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info(info);
+            pd[i][j][k].set_climo_cdf_info_ptr(info);
          }
       }
    }

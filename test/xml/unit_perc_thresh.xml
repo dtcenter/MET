@@ -12,6 +12,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_pcp_combine.xml -->
+
 <met_test>
 
   <!--                                                                  -->

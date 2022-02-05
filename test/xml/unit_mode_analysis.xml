@@ -10,12 +10,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_mode.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-
-  <!--  depends on unit_mode.xml  -->
 
   <test name="mode_analysis_BYCASE_SIMPLE">
     <exec>&MET_BIN;/mode_analysis</exec>

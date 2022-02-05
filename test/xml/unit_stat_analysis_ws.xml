@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: unit_wavelet_stat.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="stat_analysis_AGG_ISC">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.stat \
+      -job aggregate -line_type ISC \
+      -fcst_var APCP_12 -fcst_thresh '>0.0' -vx_mask TILE1 -vx_mask TILE2 \
+      -dump_row &OUTPUT_DIR;/stat_analysis_ws/AGG_ISC_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis_ws/AGG_ISC_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis_ws/AGG_ISC.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_ws/AGG_ISC_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ws/AGG_ISC_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis_ws/AGG_ISC.out</exist>
+    </output>
+  </test>
+
+</met_test>

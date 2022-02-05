@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1336,7 +1336,7 @@ const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
 
-for (r=0; r<r_start; ++r)  {
+for (r=0; r<Nrows; ++r)  {
 
    left[r] = right[r] = 0;
 

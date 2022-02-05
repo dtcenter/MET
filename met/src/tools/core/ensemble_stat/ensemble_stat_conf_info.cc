@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -241,6 +241,15 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Determine the number of ensemble fields to be processed
    n_ens_var = parse_conf_n_vx(edict);
 
+   // Print a warning if the ensemble dictionary is not empty
+   if(n_ens_var != 0) {
+      mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
+           << "Ensemble post-processing should be moved to the "
+           << "Gen-Ens-Prod tool, which replaces the logic of the "
+           << "\"ens\" dictionary. Support for the \"ens\" dictionary "
+           << "will be deprecated and removed." << "\n\n";
+   }
+   
     // Parse the ensemble field information
    for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
 
@@ -1023,7 +1032,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
    // Store the climo CDF info
-   vx_pd.set_climo_cdf_info(cdf_info);
+   vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the list of surface message types
    vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);

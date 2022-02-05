@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -762,7 +762,7 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cdf_info,
+      else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
                                                   pd.cmn_na, pd.csd_na,
                                                   pct_info.othresh);
    }
