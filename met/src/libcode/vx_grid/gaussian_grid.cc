@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -370,19 +370,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString GaussianGrid::serialize() const
+ConcatString GaussianGrid::serialize(const char *sep) const
 
 {
     
 ConcatString a;
 char junk[256];
 
-a << "Projection: Gaussian";
+a << "Projection: Gaussian" << sep;
 
 snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny;
 
    //
    //  done

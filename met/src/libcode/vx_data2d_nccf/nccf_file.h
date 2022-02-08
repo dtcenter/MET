@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -181,6 +181,10 @@ class NcCfFile {
       bool get_grid_from_dimensions();
       void get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                       const long lat_counts, const long lon_counts);
+
+      LatLonData get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                            const long lat_counts, const long lon_counts,
+                                            bool &swap_to_north);
 };
 
 

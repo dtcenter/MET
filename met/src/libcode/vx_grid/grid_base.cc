@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -900,13 +900,13 @@ return ( rep->name() );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Grid::serialize() const
+ConcatString Grid::serialize(const char *sep) const
 
 {
 
 ConcatString s;
 
-if ( rep )  s = rep->serialize();
+if ( rep )  s = rep->serialize(sep);
 
 return ( s );
 
