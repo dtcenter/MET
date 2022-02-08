@@ -64,7 +64,7 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       void dump(ostream &, int = 0) const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
 

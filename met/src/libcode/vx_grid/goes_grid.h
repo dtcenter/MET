@@ -66,7 +66,7 @@ class GoesImagerGrid : public GridRep {
 
       void dump(ostream &, int = 0) const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info () const;
 

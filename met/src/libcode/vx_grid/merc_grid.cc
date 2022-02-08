@@ -503,29 +503,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString MercatorGrid::serialize() const
+ConcatString MercatorGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: Mercator";
+a << "Projection: Mercator" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), " Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk;
-snprintf(junk, sizeof(junk), " Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk;
+snprintf(junk, sizeof(junk), "Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk << sep;
+snprintf(junk, sizeof(junk), "Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk;
-snprintf(junk, sizeof(junk), " Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk;
+snprintf(junk, sizeof(junk), "Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk << sep;
+snprintf(junk, sizeof(junk), "Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Mx: %.4f", Mx);   a << junk;
-snprintf(junk, sizeof(junk), " My: %.4f", My);   a << junk;
+snprintf(junk, sizeof(junk), "Mx: %.4f", Mx);   a << junk << sep;
+snprintf(junk, sizeof(junk), "My: %.4f", My);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Bx: %.4f", Bx);   a << junk;
-snprintf(junk, sizeof(junk), " By: %.4f", By);   a << junk;
+snprintf(junk, sizeof(junk), "Bx: %.4f", Bx);   a << junk << sep;
+snprintf(junk, sizeof(junk), "By: %.4f", By);   a << junk;
 
    //
    //  done

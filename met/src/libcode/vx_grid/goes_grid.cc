@@ -307,17 +307,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString GoesImagerGrid::serialize() const
+ConcatString GoesImagerGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: GoesImager";
+a << "Projection: GoesImager" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny;
 
 //snprintf(junk, sizeof(junk), " Lat_LL: %.3f", Lat_LL);   a << junk;
 //snprintf(junk, sizeof(junk), " Lon_LL: %.3f", Lon_LL);   a << junk;
