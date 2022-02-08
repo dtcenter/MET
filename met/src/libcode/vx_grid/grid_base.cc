@@ -900,13 +900,13 @@ return ( rep->name() );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Grid::serialize() const
+ConcatString Grid::serialize(const char *sep) const
 
 {
 
 ConcatString s;
 
-if ( rep )  s = rep->serialize();
+if ( rep )  s = rep->serialize(sep);
 
 return ( s );
 

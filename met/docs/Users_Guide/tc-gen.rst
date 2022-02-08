@@ -64,7 +64,7 @@ Required arguments for tc_gen
 
 3. The **-shape source** argument is the path to one or more NHC genesis warning area shapefiles, an ASCII file list containing them, or a top-level directory with files matching the regular expression "gtwo_areas.*.shp". The genesis warning areas and corresponding 2, 5, and 7 day probability values area verified against the **-track** data.
 
-Note: The **-genesis**, **-edeck**, or **-shape** options must be used at least once.
+Note: At least one of the **-genesis**, **-edeck**, or **-shape** command line options are required.
 
 4. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g. CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
 

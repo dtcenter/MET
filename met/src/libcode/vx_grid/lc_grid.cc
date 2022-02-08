@@ -551,29 +551,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString LambertGrid::serialize() const
+ConcatString LambertGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: Lambert Conformal";
+a << "Projection: Lambert Conformal" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), " Lat_LL: %.3f", Lat_LL);   a << junk;
-snprintf(junk, sizeof(junk), " Lon_LL: %.3f", Lon_LL);   a << junk;
+snprintf(junk, sizeof(junk), "Lat_LL: %.3f", Lat_LL);   a << junk << sep;
+snprintf(junk, sizeof(junk), "Lon_LL: %.3f", Lon_LL);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Lon_orient: %.3f", Lon_orient);   a << junk;
+snprintf(junk, sizeof(junk), "Lon_orient: %.3f", Lon_orient);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Alpha: %.3f", Alpha);   a << junk;
+snprintf(junk, sizeof(junk), "Alpha: %.3f", Alpha);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Cone: %.3f", Cone);   a << junk;
+snprintf(junk, sizeof(junk), "Cone: %.3f", Cone);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Bx: %.4f", Bx);   a << junk;
-snprintf(junk, sizeof(junk), " By: %.4f", By);   a << junk;
+snprintf(junk, sizeof(junk), "Bx: %.4f", Bx);   a << junk << sep;
+snprintf(junk, sizeof(junk), "By: %.4f", By);   a << junk;
 
    //
    //  done
