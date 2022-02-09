@@ -251,6 +251,21 @@ interp = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// HiRA verification method
+// May be set separately in each "obs.field" entry
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {

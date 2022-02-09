@@ -119,6 +119,7 @@ class EnsembleStatVxOpt {
       NumArray       ci_alpha;           // Alpha value for confidence intervals
 
       InterpInfo     interp_info;        // Interpolation (smoothing) information
+      HiRAInfo       hira_info;          // HiRA verification logic
 
       double         ssvar_bin_size;     // SSVAR bin size
       double         phist_bin_size;     // PHIST bin size
@@ -155,6 +156,8 @@ class EnsembleStatVxOpt {
       int get_n_mask_area() const;
 
       int get_n_o_thresh()  const;
+      int get_n_hira_ens()  const;
+      int get_n_hira_prob() const;
       int get_n_cdf_bin()   const;
       int get_n_ci_alpha()  const;
 };
@@ -245,24 +248,29 @@ class EnsembleStatConfInfo {
       void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
-      int get_n_ens_var()    const;
-      int get_max_n_thresh() const;
-      int get_n_nbrhd()      const;
-      int get_n_vx()         const;
+      int get_n_ens_var() const;
+      int get_n_nbrhd()   const;
+      int get_n_vx()      const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
       int n_txt_row(int i) const;
       int n_stat_row()     const;
+
+      // Maximum across all verification tasks
+      int get_max_n_thresh()    const;
+      int get_max_n_hira_ens()  const;
+      int get_max_n_hira_prob() const;
+
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
 inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
 inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
+inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
 inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
