@@ -151,7 +151,7 @@ Install the Required Libraries
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to include the path to the library files.
 
 Set Environment Variables
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 The MET build uses environment variables to specify the locations of the needed external libraries. For each library, there is a set of three environment variables to describe the locations: $MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
 
@@ -190,7 +190,7 @@ The following environment variables should also be set:
 For ease of use, you should define these in your .cshrc or equivalent file.
 
 Configure and Execute the Build
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------
 
 Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
 
@@ -302,7 +302,7 @@ regions to benefit from thread-parallel execution. Runtime environment variable
 Run the configure script with the **-help** argument to see the full list of configuration options.
 
 Make Targets
-^^^^^^^^^^^^
+------------
 
 The autoconf utility provides some standard make targets for the users. In MET, the following standard targets have been implemented and tested:
 
