@@ -1570,10 +1570,11 @@ void VL1L2Info::calc_ncep_stats() {
 
    DIR_ABSERR   = fabs(DIR_ERR);
 
+   char buffer [512];
+   int buf_len = sprintf(buffer, "vf_bar=%25.18e, uo_bar=%25.18e, uf_bar=%25.18e, vo_bar=%25.18e",
+                         vf_bar, uo_bar, uf_bar, vo_bar);
    mlog << Debug(9) << method_name << "DIR_ERR=" << DIR_ERR
-        << " from vf_bar=" << vf_bar << ", uo_bar=" << uo_bar
-        << ", uf_bar=" << uf_bar << ", vo_bar=" << vo_bar
-        << "\n";
+        << " from " << buffer << "\n";
 
    return;
 }
