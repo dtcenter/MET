@@ -66,11 +66,12 @@ class MetNcFile {
          //  time
          //
 
-      unixtime ValidTime;
+      //JAP
+      //unixtime ValidTime;
 
-      unixtime InitTime;
+      //unixtime InitTime;
 
-      int      lead_time () const;   //  seconds
+      //int      lead_time () const;   //  seconds
 
 
          //
