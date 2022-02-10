@@ -1,8 +1,8 @@
 .. _overview:
 
-###############
+***************
 Overview of MET
-###############
+***************
 
 Purpose and organization of the User's Guide
 ============================================
