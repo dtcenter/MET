@@ -88,6 +88,7 @@ def main():
 
     print(f'\n{LINE_BREAK}\n'.join(error_text_list))
 
+    print("End of script")
 
 if __name__ == "__main__":
     main()
