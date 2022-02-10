@@ -1534,6 +1534,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 void VL1L2Info::calc_ncep_stats() {
    double u_diff, v_diff;
    int n = vcount;
+   const char *method_name = "VL1L2Info::calc_ncep_stats() -> ";
 
    u_diff       = uf_bar - uo_bar;
    v_diff       = vf_bar - vo_bar;
@@ -1568,6 +1569,11 @@ void VL1L2Info::calc_ncep_stats() {
    DIR_ERR      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
 
    DIR_ABSERR   = fabs(DIR_ERR);
+
+   mlog << Debug(9) << method_name << "DIR_ERR=" << DIR_ERR
+        << " from vf_bar=" << vf_bar << ", uo_bar=" << uo_bar
+        << ", uf_bar=" << uf_bar << ", vo_bar=" << vo_bar
+        << "\n";
 
    return;
 }
