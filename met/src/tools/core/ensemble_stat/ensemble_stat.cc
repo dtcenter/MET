@@ -132,6 +132,9 @@ static void do_ecnt              (const EnsembleStatVxOpt &,
 static void do_rps               (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
+static void do_hira_ens          (const EnsembleStatVxOpt &,
+                                  const SingleThresh &,
+                                  const PairDataEnsemble *);
 
 static void clear_counts();
 static void track_counts(EnsVarInfo *, const DataPlane &, bool);
@@ -1498,6 +1501,12 @@ void process_point_scores() {
                      }
                   }
 
+                  // Apply HiRA ensemble verification logic
+                  if(conf_info.vx_opt[i].hira_info.flag) {
+                     do_hira_ens(conf_info.vx_opt[i],
+                                 conf_info.vx_opt[i].othr_ta[m], &pd);
+                  }
+
                } // end for m
 
                // Write out the unfiltered ORANK lines
@@ -2142,6 +2151,18 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void do_hira_ens(const EnsembleStatVxOpt &vx_opt,
+                 const SingleThresh &othresh,
+                 const PairDataEnsemble *pd_ptr) {
+
+   mlog << Debug(1) << "JHG, in do_hira_ens!\n";
+// JHG work here!
+   return;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
