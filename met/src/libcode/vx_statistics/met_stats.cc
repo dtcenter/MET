@@ -1534,7 +1534,6 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 void VL1L2Info::calc_ncep_stats() {
    double u_diff, v_diff;
    int n = vcount;
-   const char *method_name = "VL1L2Info::calc_ncep_stats() -> ";
 
    u_diff       = uf_bar - uo_bar;
    v_diff       = vf_bar - vo_bar;
