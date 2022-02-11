@@ -179,8 +179,6 @@ void NcVarInfo::dump(ostream & out, int depth) const
 
 {
 
-ConcatString time_str;
-
 Indent prefix(depth);
 
 out << prefix << "var = ";
@@ -205,11 +203,11 @@ else                              out << "(nul)";
 if ( units_att.length() > 0 )     out << '\"' << units_att << '\"';
 else                              out << "(nul)";
 
-time_str = unix_to_yyyymmdd_hhmmss(ValidTime);
-out << prefix << "ValidTime = " << time_str << " (" << ValidTime << ")\n";
+out << prefix << "ValidTime = " << unix_to_yyyymmdd_hhmmss(ValidTime)
+              << " (" << ValidTime << ")\n";
 
-time_str = unix_to_yyyymmdd_hhmmss(InitTime);
-out << prefix << "InitTime  = " << time_str << " (" << InitTime  << ")\n";
+out << prefix << "InitTime  = " << unix_to_yyyymmdd_hhmmss(InitTime)
+              << " (" << InitTime  << ")\n";
 
 out << prefix << "AccumTime = " << AccumTime;
 
@@ -251,9 +249,7 @@ int NcVarInfo::lead_time() const
 
 {
 
-unixtime dt = ValidTime - InitTime;
-
-return ( (int) dt );
+return ( (int) (ValidTime - InitTime) );
 
 }
 
