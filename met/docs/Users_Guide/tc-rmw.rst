@@ -1,18 +1,19 @@
 .. _tc-rmw:
 
+***********
 TC-RMW Tool
-===========
+***********
 
 Introduction
-____________
+============
 
 The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
 
 Practical information
-_____________________
+=====================
 
 tc_rmw usage
-~~~~~~~~~~~~
+------------
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_rmw.
 
@@ -47,7 +48,7 @@ Optional arguments for tc_rmw
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 tc_rmw configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The default configuration file for the TC-RMW tool named **TCRMWConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -123,7 +124,7 @@ _______________________
 The **rmw_scale** parameter overrides the **max_range_km** parameter. When this is set the radial grid spacing will be **rmw_scale** in units of the RMW, which varies along the storm track.
 
 tc_rmw output file
-~~~~~~~~~~~~~~~~~~
+------------------
 
 The NetCDF output file contains the following dimensions:
 

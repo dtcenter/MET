@@ -59,19 +59,7 @@ class MetNcFile {
 
       void dump(ostream &, int = 0) const;
 
-
       NcFile * Nc;      //  allocated
-
-         //
-         //  time
-         //
-
-      unixtime ValidTime;
-
-      unixtime InitTime;
-
-      int      lead_time () const;   //  seconds
-
 
          //
          //  dimensions
