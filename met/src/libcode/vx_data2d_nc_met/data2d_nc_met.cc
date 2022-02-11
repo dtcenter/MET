@@ -219,13 +219,14 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcMetDataFile::index(VarInfo &vinfo) {
-   DataPlane dp;
 
-   if( !data_plane( vinfo, dp ) ) return(-1);
+   NcVarInfo *ncinfo = MetNc->find_var_name( vinfo.name().c_str() );
 
-   if( ( vinfo.valid() != 0         && dp.valid() != vinfo.valid() ) ||
-       ( vinfo.init() != 0          && dp.lead()  != vinfo.init()  ) ||
-       ( !is_bad_data(vinfo.lead()) && dp.lead()  != vinfo.lead()  ) )
+   if( !ncinfo ) return(-1);
+
+   if( ( vinfo.valid() != 0         && ncinfo->ValidTime   != vinfo.valid() ) ||
+       ( vinfo.init() != 0          && ncinfo->InitTime    != vinfo.init()  ) ||
+       ( !is_bad_data(vinfo.lead()) && ncinfo->lead_time() != vinfo.lead()  ) )
       return(-1);
 
    return(0);
