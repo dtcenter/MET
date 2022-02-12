@@ -1,6 +1,6 @@
-============
+############
 User's Guide
-============
+############
 
 **Foreword: A note to MET users**
 

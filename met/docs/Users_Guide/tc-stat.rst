@@ -1,27 +1,28 @@
 .. _tc-stat:
 
+************
 TC-Stat Tool
-============
+************
 
 Introduction
-____________
+============
 
 The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this user's guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw job** processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
 
 .. _Statistical-aspects:
 
 Statistical aspects
-___________________
+===================
 
 Filter TCST lines
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The TC-Stat tool can be used to simply filter specific lines of the TCST file based on user-defined filtering criteria. All of the TCST lines that are retained from one or more files are written out to a single output file. The output file is also in TCST format.
 
 Filtering options are outlined below in :numref:`tc_stat-configuration-file` (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
 
 Summary statistics for columns
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 The TC-Stat tool can be used to produce summary information for a single column of data. After the user specifies the specific column of interest, and any other relevant search criteria, summary information is produced from values in that column of data. The summary statistics produced are listed in :numref:`table_columnar_output_summary_tc_stat`.
 
@@ -52,14 +53,14 @@ Time-Series Independence
 The time-series independence evaluates effective forecast separation time using the Siegel method, by comparing the number of runs above and below the mean error to an expected value. This calculation expects the columns in the summary job to be a time series. The output includes the forecast hour interval and the number of hours to independence.
 
 Rapid Intensification/Weakening
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 The TC-Stat tool can be used to read TCMPR lines and compare the occurrence of rapid intensification (i.e. increase in intensity) or weakening (i.e. decrease in intensity) between the adeck and bdeck. The rapid intensification or weakening is defined by the change of maximum wind speed (i.e. **AMAX_WIND** and **BMAX_WIND** columns) over a specified amount of time. Accurately forecasting large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
 Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e. each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run.
 
 Probability of Rapid Intensification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 The TC-Stat tool can be used to accumulate multiple PROBRIRW lines and derive probabilistic statistics summarizing performance. The PROBRIRW line contains a probabilistic forecast for a specified intensity change along with the actual intensity change that occurred in the BEST track. Accurately forecasting the likelihood of large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
@@ -68,12 +69,12 @@ Users may specify several job command options to configure the behavior of this 
 .. _Practical-information-1:
 
 Practical information
-_____________________
+=====================
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_stat.
 
 tc_stat usage
-~~~~~~~~~~~~~
+-------------
 
 The usage statement for tc_stat is shown below:
 
@@ -370,7 +371,7 @@ _________________________
 .. _tc_stat-output:
 
 tc_stat output
-~~~~~~~~~~~~~~
+--------------
 
 The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each tc_stat job command is listed below.
 

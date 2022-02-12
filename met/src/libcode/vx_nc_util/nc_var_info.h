@@ -63,7 +63,13 @@ class NcVarInfo {
 
       ConcatString units_att;
 
+      unixtime ValidTime;
+
+      unixtime InitTime;
+
       int AccumTime; // seconds
+
+      int lead_time () const;   //  seconds
 
       int Ndims;
 

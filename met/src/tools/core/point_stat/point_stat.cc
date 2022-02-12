@@ -99,6 +99,7 @@
 //   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
+//   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1797,11 +1798,13 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          continue;
       }
 
+      // Compute the pair values
+      hira_pd.compute_pair_vals(rng_ptr);
+
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
 
          // Compute ensemble statistics
-         hira_pd.compute_pair_vals(rng_ptr);
          ECNTInfo ecnt_info;
          ecnt_info.set(hira_pd);
 
@@ -1813,9 +1816,6 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Write out the ORANK line
       if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
-
-         // Compute ensemble statistics
-         hira_pd.compute_pair_vals(rng_ptr);
 
          write_orank_row(shc, &hira_pd,
             conf_info.vx_opt[i_vx].output_flag[i_orank],

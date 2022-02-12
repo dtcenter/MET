@@ -1,10 +1,11 @@
 .. _overview:
 
+***************
 Overview of MET
-===============
+***************
 
 Purpose and organization of the User's Guide
-____________________________________________
+============================================
 
 The goal of this User's Guide is to provide basic information for users of the Model Evaluation Tools (MET) to enable them to apply MET to their datasets and evaluation studies. MET was originally designed for application to the post-processed output of the `Weather Research and Forecasting (WRF) <https://www.mmm.ucar.edu/weather-research-and-forecasting-model>`_ model. However, MET may also be used for the evaluation of forecasts from other models or applications, including the `Unified Forecast System (UFS) <http://www.ufscommunity.org>`_, and the `System for Integrated Modeling of the Atmosphere (SIMA) <https://wiki.ucar.edu/display/SIMA/>`_ if certain file format definitions (described in this document) are followed.
 
@@ -13,7 +14,7 @@ The MET User's Guide is organized as follows. :numref:`overview` provides an ove
 The remainder of this section includes information about the context for MET development, as well as information on the design principles used in developing MET. In addition, this section includes an overview of the MET package and its specific modules.
 
 The Developmental Testbed Center (DTC)
-______________________________________
+======================================
 
 MET has been developed, and will be maintained and enhanced, by the `Developmental Testbed Center (DTC) <http://www.dtcenter.org/>`_. The main goal of the DTC is to serve as a bridge between operations and research, to facilitate the activities of these two important components of the numerical weather prediction (NWP) community. The DTC provides an environment that is functionally equivalent to the operational environment in which the research community can test model enhancements; the operational community benefits from DTC testing and evaluation of models before new models are implemented operationally. MET serves both the research and operational communities in this way - offering capabilities for researchers to test their own enhancements to models and providing a capability for the DTC to evaluate the strengths and weaknesses of advances in NWP prior to operational implementation.
 
@@ -22,7 +23,7 @@ The MET package is available to DTC staff, visitors, and collaborators, as well 
 .. _MET-goals:
 
 MET goals and design philosophy
-_______________________________
+===============================
 
 The primary goal of MET development is to provide a state-of-the-art verification package to the NWP community. By "state-of-the-art" we mean that MET will incorporate newly developed and advanced verification methodologies, including new methods for diagnostic and spatial verification and new techniques provided by the verification and modeling communities. MET also utilizes and replicates the capabilities of existing systems for verification of NWP forecasts. For example, the MET package replicates existing National Center for Environmental Prediction (NCEP) operational verification capabilities (e.g., I/O, methods, statistics, data types). MET development will take into account the needs of the NWP community - including operational centers and the research and development community. Some of the MET capabilities include traditional verification approaches for standard surface and upper air variables (e.g., Equitable Threat Score, Mean Squared Error), confidence intervals for verification measures, and spatial forecast verification methods. In the future, MET will include additional state-of-the-art and new methodologies.
 
@@ -31,7 +32,7 @@ The MET package has been designed to be modular and adaptable. For example, indi
 The MET code and documentation is maintained by the DTC in Boulder, Colorado. The MET package is freely available to the modeling, verification, and operational communities, including universities, governments, the private sector, and operational modeling and prediction centers.
 
 MET components
-______________
+==============
 
 The major components of the MET package are represented in :numref:`overview-figure`. The main stages represented are input, reformatting, plotting, intermediate output, statistical analyses, and output and aggregation/analysis. The MET-TC package functions independently of the other MET modules, as indicated in the Figure. Each of these stages is described further in later sections. For example, the input and output formats are discussed in :numref:`data_io` as well as in the sections associated with each of the statistics modules. MET input files are represented on the far left.
 
@@ -74,12 +75,12 @@ The following sections of this MET User's Guide contain usage statements for eac
 .. include:: release-notes.rst
 
 Future development plans
-________________________
+========================
 
 MET is an evolving verification software package. New capabilities are planned in controlled, successive version releases. Bug fixes and user-identified problems will be addressed as they are found and posted to the known issues section of the `MET User Support web page <https://dtcenter.org/community-code/model-evaluation-tools-met/user-support>`_. Plans are also in place to incorporate many new capabilities and options in future releases of MET. Please refer to the issues listed in the `MET GitHub repository <https://github.com/dtcenter/MET/issues>`_ to see our development priorities for upcoming releases.
 
 Code support
-____________
+============
 
 MET support is provided through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_. We will endeavor to respond to requests for help in a timely fashion. In addition, information about MET and tools that can be used with MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
 
@@ -90,7 +91,7 @@ We welcome comments and suggestions for improvements to MET, especially informat
 The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 Fortify
-_______
+=======
 
 Requirements from various government agencies that use MET have resulted in our code being analyzed by Fortify, a proprietary static source code analyzer owned by HP Enterprise Security Products. Fortify analyzes source code to identify for security risks, memory leaks, uninitialized variables, and other such weaknesses and bad coding practices. Fortify categorizes any issues it finds as low priority, high priority, or critical, and reports these issues back to the developers for them to address. A development cycle is thus established, with Fortify analyzing code and reporting back to the developers, who then make changes in the source code to address these issues, and hand the new code off to Fortify again for re-analysis. The goal is to drive the counts of both high priority and critical issues down to zero.
 

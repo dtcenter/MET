@@ -1,14 +1,15 @@
 .. _data_io:
 
+************
 MET Data I/O
-============
+************
 
 Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this section. Both the input and output file formats are described in this section. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
 
 .. _Input data formats:
 
 Input data formats
-__________________
+==================
 
 The MET package can handle multiple gridded input data formats: GRIB version 1, GRIB version 2, and NetCDF files following the Climate and Forecast (CF) conventions, containing WRF output post-processed using wrf_interp, or produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF GRIB tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
 
@@ -19,7 +20,7 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
 Requirements for CF Compliant NetCDF
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 The MET tools use following attributes and variables for input CF Compliant NetCDF data.
 
@@ -124,7 +125,7 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
       "degreesE"
 
 Performance with NetCDF input data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 There is no limitation on the NetCDF file size. The size of the data variables matters more than the file size. The NetCDF API loads the metadata first upon opening the NetCDF file. It's similar for accessing data variables. There are two API calls: getting the metadata and getting the actual data. The memory is allocated and consumed at the second API call (getting the actual data).
 
@@ -133,14 +134,14 @@ The dimensions of the data variables matter. MET requests the NetCDF data needs 
 .. _Intermediate data formats:
 
 Intermediate data formats
-_________________________
+=========================
 
 MET uses NetCDF as an intermediate file format. The MET tools which write gridded output files write to a common gridded NetCDF file format. The MET tools which write point output files write to a common point observation NetCDF file format.
 
 .. _Output data formats:
 
 Output data formats
-___________________
+===================
 
 The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, PostScript plots, and png plots from the Plot-Mode-Field utility.
 
@@ -161,7 +162,7 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs, a
 .. _Data format summary:
 
 Data format summary
-___________________
+===================
 
 The following is a summary of the input and output formats for each of the tools currently in MET. The output listed is the maximum number of possible output files. Generally, the type of output files generated can be controlled by the configuration files and/or the command line options:
 
@@ -367,7 +368,7 @@ The following is a summary of the input and output formats for each of the tools
 .. _Configuration File Details:
   
 Configuration File Details
-__________________________
+==========================
 
 Part of the strength of MET is the leveraging of capability across tools. There are several configuration options that are common to many of the tools.
 
