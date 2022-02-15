@@ -332,8 +332,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          }
 
          // Keep track of the maximum number of thresholds
-         if(ens_info->cat_ta.n_elements() > max_n_thresh) {
-            max_n_thresh = ens_info->cat_ta.n_elements();
+         if(ens_info->cat_ta.n() > max_n_thresh) {
+            max_n_thresh = ens_info->cat_ta.n();
          }
       }
 
@@ -580,7 +580,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name_area.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -599,7 +599,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -618,7 +618,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
 
          // Process new station ID mask
          if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
@@ -652,7 +652,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n_elements() == 0) {
+      if(vx_opt[i].mask_name.n() == 0) {
          mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
               << "At least one grid, polyline or station ID masking "
               << "region must be provided for verification task number "
@@ -1019,11 +1019,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_index) {
-   int i, n;
-   int n_msg_typ = msg_typ.n_elements();
-   int n_mask    = mask_name.n_elements();
-   int n_interp  = interp_info.n_interp;
+   int i, j, n;
+   int n_msg_typ = msg_typ.n();
+   int n_mask    = mask_name.n();
    StringArray sa;
+
+   // Interpolation methods + HiRA methods
+   int n_interp  = interp_info.n_interp;
+   if(hira_info.flag) n_interp += hira_info.width.n();
 
    // Setup the VxPairDataEnsemble object with these dimensions:
    // [n_msg_typ][n_mask][n_interp]
@@ -1068,36 +1071,36 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    for(i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
-      if(sa.n_elements() == 0) sa.add(msg_typ[i]);
+      if(sa.n() == 0) sa.add(msg_typ[i]);
       vx_pd.set_msg_typ_vals(i, sa);
    }
 
    // Define the masking information: grid, poly, sid
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n_elements(); i++) {
+   for(i=0; i<mask_grid.n(); i++) {
       n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n_elements(); i++) {
-      n = i + mask_grid.n_elements();
+   for(i=0; i<mask_poly.n(); i++) {
+      n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n_elements(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements();
+   for(i=0; i<mask_sid.n(); i++) {
+      n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
    for(i=0; i<(int) mask_llpnt.size(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
+      n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
@@ -1106,6 +1109,14 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
       vx_pd.set_interp_thresh(interp_info.vld_thresh);
+   }
+
+   // Append the HiRA methods
+   for(i=0; i<hira_info.width.n(); i++) {
+      j = n_interp + i;
+      vx_pd.set_interp(j, InterpMthd_Nbrhd, hira_info.width[i],
+                       hira_info.shape);
+      vx_pd.set_interp_thresh(hira_info.vld_thresh);
    }
 
    // After sizing VxPairDataEnsemble, add settings for each array element

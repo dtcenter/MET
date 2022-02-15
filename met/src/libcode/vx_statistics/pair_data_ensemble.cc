@@ -1296,7 +1296,18 @@ void VxPairDataEnsemble::set_ens_size(int n) {
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_ens_size(n);
+
+            // Handle HiRA neighborhoods
+            if(pd[i][j][k].interp_mthd == InterpMthd_Nbrhd) {
+               GridTemplateFactory gtf;
+               GridTemplate* gt = gtf.buildGT(pd[i][j][k].interp_shape,
+                                              pd[i][j][k].interp_wdth,
+                                              false);
+               pd[i][j][k].set_ens_size(n*gt->size());
+            }
+            else {
+               pd[i][j][k].set_ens_size(n);
+            }
          }
       }
    }
