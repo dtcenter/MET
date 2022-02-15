@@ -1,28 +1,29 @@
 .. _stat-analysis:
 
+******************
 Stat-Analysis Tool
-==================
+******************
 
 Introduction
-____________
+============
 
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this section.
 
 MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding is shown in :numref:`stat_analysis-usage`.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 The Stat-Analysis tool can perform a variety of analyses, and each type of analysis is called a "job". The job types include the ability to (i) aggregate results over a user-specified time; (ii) stratify statistics based on time of day, model initialization time, lead-time, model run identifier, output filename, or wavelet decomposition scale; and (iii) compute specific verification indices such as the GO Index [1]_
 and wind direction statistics. Future functionality may include information about time-trends and/or calculations based on climatology (e.g., anomaly correlation). This section summarizes the capabilities of the supported Stat-Analysis jobs.
 
 Filter STAT lines
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The Stat-Analysis "filter" job simply filters out specific STAT lines based on user-specified search criteria. All of the STAT lines that are retained from one or many files are written to a single output file. The output file for filtered STAT lines must be specified using the **-dump_row** job command option.
 
 Summary statistics for columns
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 The Stat-Analysis "summary" job produces summary information for columns of data. After the user specifies the column(s) of interest and any other relevant search criteria, summary information is produced from values in those column(s) of data. The summary statistics produced are: mean, standard deviation, minimum, maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile range, the range, and both weighted and unweighted means using the logic prescribed by the World Meteorological Organization (WMO).
 
@@ -37,12 +38,12 @@ The **-derive** job command option can be used to perform the derivation of stat
 .. _StA_Aggregated-values-from:
 
 Aggregated values from multiple STAT lines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 The Stat-Analysis "aggregate" job aggregates values from multiple STAT lines of the same type. The user may specify the specific line type of interest and any other relevant search criteria. The Stat-Analysis tool then creates sums of each of the values in all lines matching the search criteria. The aggregated data are output as the same line type as the user specified. The STAT line types which may be aggregated in this way are the contingency table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and other (ISC, ECNT, RPS, RHIST, PHIST, RELP, NBRCNT, SSVAR, and GRAD) line types.
 
 Aggregate STAT lines and produce aggregated statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------
 
 The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
 
@@ -53,7 +54,7 @@ When aggregating the matched pair line type (MPR) and computing an output contin
 .. _StA_Skill-Score-Index:
 
 Skill Score Index
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill score indices by weighting scores for meteorological fields at different levels and lead times. Pre-defined configuration files are provided for the GO Index and CBS Index which are special cases of the highly configurable skill score index job.
 
@@ -92,7 +93,7 @@ When running a skill score index job using the "-out_stat" job command option, a
 .. _StA_Go-Index:
 
 GO Index
-~~~~~~~~
+--------
 
 The "go_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The GO Index is a weighted average of 48 skill scores of RMSE statistics for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are listed in :numref:`compute_GO_Index` and are defined by the default "STATAnalysisConfig_GO_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index.
 
@@ -190,7 +191,7 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
 .. _StA_CBS-Index:
 
 CBS Index
-~~~~~~~~~
+---------
 
 The "cbs_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The CBS Index is a weighted average of 40 skill scores of RMSE statistics for mean sea level pressure, height, and wind speed at multiple levels computed over the northern hemisphere, southern hemisphere and the tropics. The variables, levels, lead times, and regions included in the index are listed in :numref:`compute_CBS_Index` and are defined by the default "STATAnalysisConfig_CBS_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables for each level, lead time, and masking region must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_CBS_Index` to compute values for the CBS Index.
 
@@ -232,12 +233,12 @@ The "cbs_index" job is a special case of the "ss_index" job, described in :numre
     - x
 
 Ramp Events
-~~~~~~~~~~~
+-----------
 
 The Stat-Analysis "ramp" job identifies ramp events (large increases or decreases in values over a time window) in both the forecast and observation data. It categorizes these events as hits, misses, false alarms, or correct negatives by applying a configurable matching time window and computes the corresponding categorical statistics.
 
 Wind Direction Statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold.
 
@@ -258,14 +259,14 @@ Once the appropriate lines have been generated for each verification time of int
 2. For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into a single line of partial sums where the weight for each line is determined by the number of points it represents. From this aggregated line, the mean forecast wind direction, observation wind direction, and the associated error are computed and written out.
 
 Practical information
-_____________________
+=====================
 
 The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
 
 .. _stat_analysis-usage:
 
 stat_analysis usage
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The usage statement for the Stat-Analysis tool is shown below:
 
@@ -331,7 +332,7 @@ In this example, rather than passing the MPR output lines from Point-Stat direct
 .. _stat_analysis-configuration-file:
 
 stat_analysis configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
 
@@ -692,7 +693,7 @@ These job command options are analogous to the options listed above but apply wh
 When processing input ORANK lines and writing output RHIST or PHIST lines, this option defines the output histogram bin width to be used.
 
 stat-analysis tool output
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The output generated by the Stat-Analysis tool contains statistics produced by the analysis. It also records information about the analysis job that produced the output for each line. Generally, the output is printed to the screen. However, it can be redirected to an output file using the "**-out**" option. The format of output from each STAT job command is described below.
 
