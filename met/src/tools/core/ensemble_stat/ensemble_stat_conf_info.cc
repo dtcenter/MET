@@ -230,13 +230,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
 
    // If no ensemble member IDs were provided, add an empty string
-   if(ens_member_ids.n() == 0) {
-      ens_member_ids.add("");
-   }
+   if(ens_member_ids.n() == 0) ens_member_ids.add("");
 
    // Conf: ens.field
    edict = conf.lookup_array(conf_key_ens_field);
-
 
    // Determine the number of ensemble fields to be processed
    n_ens_var = parse_conf_n_vx(edict);
@@ -273,7 +270,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          // Set the current dictionary
          next_var->set_dict(i_edict);
 
-
          // Dump the contents of the current VarInfo
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)
@@ -296,7 +292,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
             input_info.file_list = ens_files;
             ens_info->add_input(input_info);
          } // end for k
-
       } // end for j
 
       // Get field info for control member if set
@@ -315,7 +310,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       }
 
       // Conf: ens_nc_var_str
-      ens_info->nc_var_str =parse_conf_string(&i_edict, conf_key_nc_var_str, false);
+      ens_info->nc_var_str = parse_conf_string(&i_edict, conf_key_nc_var_str, false);
 
       // Conf: ens_nc_pairs
       // Only parse thresholds if probabilities are requested
@@ -366,11 +361,11 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
 
    // Conf: nbrhd_prob
-   nbrhd_prob = parse_conf_nbrhd(edict, conf_key_nbrhd_prob);
+   nbrhd_prob = parse_conf_nbrhd(&conf, conf_key_nbrhd_prob);
    n_nbrhd = nbrhd_prob.width.n();
 
    // Conf: nmep_smooth 
-   nmep_smooth = parse_conf_interp(edict, conf_key_nmep_smooth);
+   nmep_smooth = parse_conf_interp(&conf, conf_key_nmep_smooth);
 
    // Loop through the neighborhood probability smoothing options
    for(i=0; i<nmep_smooth.n_interp; i++) {
