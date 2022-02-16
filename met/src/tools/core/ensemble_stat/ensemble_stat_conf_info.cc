@@ -1105,18 +1105,20 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    }
 
    // Define the interpolation methods
-   for(i=0; i<n_interp; i++) {
+   for(i=0; i<interp_info.n_interp; i++) {
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
       vx_pd.set_interp_thresh(interp_info.vld_thresh);
    }
 
    // Append the HiRA methods
-   for(i=0; i<hira_info.width.n(); i++) {
-      j = n_interp + i;
-      vx_pd.set_interp(j, InterpMthd_Nbrhd, hira_info.width[i],
-                       hira_info.shape);
-      vx_pd.set_interp_thresh(hira_info.vld_thresh);
+   if(hira_info.flag) {
+      for(i=0; i<hira_info.width.n(); i++) {
+         j = interp_info.n_interp + i;
+         vx_pd.set_interp(j, InterpMthd_Nbrhd, hira_info.width[i],
+                          hira_info.shape);
+         vx_pd.set_interp_thresh(hira_info.vld_thresh);
+      }
    }
 
    // After sizing VxPairDataEnsemble, add settings for each array element
@@ -1242,6 +1244,14 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          exit(1);
    }
 
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatVxOpt::get_n_interp() const {
+   int n = interp_info.n_interp;
+   if(hira_info.flag) n += hira_info.width.n();
    return(n);
 }
 

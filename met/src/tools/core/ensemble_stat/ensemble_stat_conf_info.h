@@ -164,13 +164,12 @@ class EnsembleStatVxOpt {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
-inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
-inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());        }
-inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
-inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
-inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
-inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
+inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());        }
+inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());      }
+inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n()); }
+inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());        }
+inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);     }
+inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());       }
 
 ////////////////////////////////////////////////////////////////////////
 
