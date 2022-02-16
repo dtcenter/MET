@@ -1276,7 +1276,7 @@ void VxPairDataEnsemble::set_interp(int i_interp,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
-                                     int width, GridTemplateFactory::GridTemplates shape) {
+                                    int width, GridTemplateFactory::GridTemplates shape) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
@@ -1635,9 +1635,10 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
-   int i, j, k, l;
-   int f_lvl_blw, f_lvl_abv;
+   int i, j, k, l, m;
+   int f_lvl_blw, f_lvl_abv, i_mem;
    double to_lvl, fcst_v;
+   NumArray fcst_na;
 
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
@@ -1648,8 +1649,23 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
 
+            // Only apply HiRA to single levels
+            if(pd[0][0][k].interp_mthd == InterpMthd_Nbrhd &&
+               fcst_dpa.n_planes() != 1 ) {
+
+               mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
+                    << "the \"" << interpmthd_to_string(pd[0][0][k].interp_mthd)
+                    << "\" interpolation method only applies when verifying a "
+                    << "single level, not " << fcst_dpa.n_planes()
+                    << " levels.\n\n";
+               continue;
+            }
+
             // Process each of the observations
             for(l=0; l<pd[i][j][k].n_obs; l++) {
+
+               // Initialize
+               fcst_na.erase();
 
                // Interpolate using the observation pressure level or height
                to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
@@ -1666,46 +1682,83 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                   find_vert_lvl(fcst_dpa, to_lvl, f_lvl_blw, f_lvl_abv);
                }
 
-               // Compute the interpolated ensemble value
-               fcst_v = compute_interp(fcst_dpa,
-                           pd[i][j][k].x_na[l],
-                           pd[i][j][k].y_na[l],
-                           pd[i][j][k].o_na[l],
-                           pd[i][j][k].cmn_na[l],
-                           pd[i][j][k].csd_na[l],
-                           pd[0][0][k].interp_mthd,
-                           pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape,
-                           gr.wrap_lon(),
-                           interp_thresh, spfh_flag,
-                           fcst_info->get_var_info()->level().type(),
-                           to_lvl, f_lvl_blw, f_lvl_abv);
+               // Extract the HiRA neighborhood of values
+               if(pd[0][0][k].interp_mthd == InterpMthd_Nbrhd) {
 
-               // Store the ensemble mean
-               if(mn) {
-                  pd[i][j][k].mn_na.add(fcst_v);
+                  // For HiRA, set the ensemble mean to bad data
+                  if(mn) {
+                     fcst_na.erase();
+                     fcst_na.add(bad_data_double);
+                  }
+                  // Otherwise, retrieve all the neighborhood values
+                  // using a valid threshold of 0
+                  else {
+                     get_interp_points(fcst_dpa,
+                        pd[i][j][k].x_na[l],
+                        pd[i][j][k].y_na[l],
+                        pd[0][0][k].interp_mthd,
+                        pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape,
+                        gr.wrap_lon(),
+                        0, spfh_flag,
+                        fcst_info->get_var_info()->level().type(),
+                        to_lvl, f_lvl_blw, f_lvl_abv,
+                        fcst_na);
+                  }
                }
-               // Store the ensemble member values
+               // Otherwise, get a single interpolated ensemble value
                else {
-
-                  // Track unperturbed ensemble variance sums
-                  // Exclude the control member from the variance
-                  if(member != pd[i][j][k].ctrl_index) {
-                     pd[i][j][k].add_ens_var_sums(l, fcst_v);
-                  }
-
-                  // Apply observation error perturbation, if requested
-                  if(obs_error_info->flag) {
-                     fcst_v = add_obs_error_inc(
-                                 obs_error_info->rng_ptr, FieldType_Fcst,
-                                 pd[i][j][k].obs_error_entry[l],
-                                 pd[i][j][k].o_na[l], fcst_v);
-                  }
-
-                  // Store perturbed ensemble member value
-                  pd[i][j][k].add_ens(member, fcst_v);
+                  fcst_na.add(compute_interp(fcst_dpa,
+                     pd[i][j][k].x_na[l],
+                     pd[i][j][k].y_na[l],
+                     pd[i][j][k].o_na[l],
+                     pd[i][j][k].cmn_na[l],
+                     pd[i][j][k].csd_na[l],
+                     pd[0][0][k].interp_mthd,
+                     pd[0][0][k].interp_wdth,
+                     pd[0][0][k].interp_shape,
+                     gr.wrap_lon(),
+                     interp_thresh, spfh_flag,
+                     fcst_info->get_var_info()->level().type(),
+                     to_lvl, f_lvl_blw, f_lvl_abv));
                }
-            }
+
+               // Store the single ensemble value or HiRA neighborhood
+               for(m=0; m<fcst_na.n(); m++) {
+
+                  // Store the ensemble mean
+                  if(mn) {
+                     pd[i][j][k].mn_na.add(fcst_na[m]);
+                  }
+                  // Store the ensemble member values
+                  else {
+
+                     // Track unperturbed ensemble variance sums
+                     // Exclude the control member from the variance
+                     if(member != pd[i][j][k].ctrl_index) {
+                        pd[i][j][k].add_ens_var_sums(l, fcst_na[m]);
+                     }
+
+                     // Apply observation error perturbation, if requested
+                     if(obs_error_info->flag) {
+                        fcst_v = add_obs_error_inc(
+                                    obs_error_info->rng_ptr, FieldType_Fcst,
+                                    pd[i][j][k].obs_error_entry[l],
+                                    pd[i][j][k].o_na[l], fcst_na[m]);
+                     }
+                     else {
+                        fcst_v = fcst_na[m];
+                     }
+
+                     // Determine index of ensemble member
+                     i_mem = member * fcst_na.n() + m;
+
+                     // Store perturbed ensemble member value
+                     pd[i][j][k].add_ens(i_mem, fcst_v);
+                  }
+
+               } // end for m - fcst_na
+            } // end for l - n_obs
          } // end for k - n_interp
       } // end for j - n_mask
    } // end for i - n_msg_typ
