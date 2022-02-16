@@ -628,6 +628,10 @@ void PairDataEnsemble::compute_ssvar() {
    ssvar_bin_map bins;
    NumArray cur;
 
+   // HiRA stores the ensemble mean as bad data
+   // Do not compute SSVAR when bad data is present
+   if(mn_na.has(bad_data_double)) return;
+
    // Check number of points
    if(o_na.n() != mn_na.n()) {
       mlog << Error << "\nPairDataEnsemble::compute_ssvar() -> "
