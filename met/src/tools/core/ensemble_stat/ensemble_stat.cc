@@ -618,8 +618,13 @@ void process_n_vld() {
    n_vx_vld.clear();
 
    // Loop through the ensemble fields to be processed
-   var_it = conf_info.ens_input.begin();
-   n_ens_inputs = (*var_it)->inputs_n();
+   if(conf_info.ens_input.size() > 0) {
+      var_it = conf_info.ens_input.begin();
+      n_ens_inputs = (*var_it)->inputs_n();
+   }
+   else {
+      n_ens_inputs = 0;
+   }
 
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
