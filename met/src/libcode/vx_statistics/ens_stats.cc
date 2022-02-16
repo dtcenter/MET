@@ -177,8 +177,8 @@ void ECNTInfo::clear() {
 
    othresh.clear();
    n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp   = bad_data_double;
-   crps_gaus  = crpscl_gaus = crpss_gaus  = bad_data_double;
+   crps_emp   = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
    ign        = bad_data_double;
    me         = rmse       = spread      = bad_data_double;
    me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
