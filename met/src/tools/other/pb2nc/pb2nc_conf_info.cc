@@ -25,6 +25,18 @@ using namespace std;
 #include "grib_strings.h"
 #include "vx_log.h"
 
+
+////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
+
+   const char *key_name = (0 != dict->lookup_array(conf_key_obs_prepbufr_map, false, false))
+                          ? conf_key_obs_prepbufr_map : conf_key_old_prepbufr_map;
+   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, (const char *)key_name);
+   parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
+   return m;
+}
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class PB2NCConfInfo
@@ -85,14 +97,42 @@ void PB2NCConfInfo::clear() {
 void PB2NCConfInfo::read_config(const char *default_file_name,
                                 const char *user_file_name) {
 
+   int warning_code = 0;
+   bool use_bad_one = true;
+   string bad_file_names;
+
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    conf.read(default_file_name);
+   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+      warning_code = 1;
+      bad_file_names = default_file_name;
+      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+   }
 
    // Read the user-specified config file
    conf.read(user_file_name);
+   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+      warning_code = 2;
+      if (0 < bad_file_names.length()) bad_file_names += " and ";
+      bad_file_names += user_file_name;
+      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+   }
+
+   if (0 < warning_code) {
+      string ignored_message = " ";
+
+      if (!use_bad_one) {
+         ignored_message = " (Ignored \"";
+         ignored_message += conf_key_old_prepbufr_map;
+         ignored_message += "\" key)";
+      }
+      mlog << Warning << "\nPlease rename the configuration key \""
+           << conf_key_old_prepbufr_map << "\" to \"" << conf_key_obs_prepbufr_map
+           << "\" at " << bad_file_names << ignored_message << "\n\n";
+   }
 
    return;
 }

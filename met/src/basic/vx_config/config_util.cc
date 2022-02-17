@@ -24,6 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
+static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1085,14 +1086,6 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
 map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
-   parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
-   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

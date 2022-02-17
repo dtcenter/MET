@@ -3470,7 +3470,7 @@ of the forecast the observation is used to verify.
 		
   obs_bufr_map = [];
 
-obs_prefbufr_map
+obs_prepbufr_map
 """"""""""""""""
 
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
@@ -3481,7 +3481,7 @@ abbreviations to the output.
 
 .. code-block:: none
 		
-  obs_prefbufr_map = [
+  obs_prepbufr_map = [
      { key = "POB";     val = "PRES";  },
      { key = "QOB";     val = "SPFH";  },
      { key = "TOB";     val = "TMP";   },
