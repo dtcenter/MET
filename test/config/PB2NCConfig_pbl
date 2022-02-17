@@ -106,7 +106,7 @@ obs_bufr_map = [];
 // abbreviations in the output.  This default map is appended to obs_bufr_map.
 // This should not typically be overridden.
 //
-obs_prefbufr_map = [
+obs_prepbufr_map = [
    { key = "POB";     val = "PRES";  },
    { key = "QOB";     val = "SPFH";  },
    { key = "TOB";     val = "TMP";   },

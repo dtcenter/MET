@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -3174,7 +3174,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                   pbl_data_hgt[index]  = pqtzuv[3];
                   pbl_data_ugrd[index] = pqtzuv[4];
                   pbl_data_vgrd[index] = pqtzuv[5];
-                  mlog << Debug(5) << method_name << "Force to add "
+                  mlog << Debug(6) << method_name << "Force to add "
                        << pres_level << " into " << index << "\n";
                   index--;
                }
@@ -3194,11 +3194,11 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
 
          if (hgt_cnt < pbl_level) {
             hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
-            mlog << Debug(4) << method_name << "interpolate Z (HGT)\n";
+            mlog << Debug(6) << method_name << "interpolate Z (HGT)\n";
          }
          if (spfh_cnt < pbl_level) {
             spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
-            mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
+            mlog << Debug(6) << method_name << "interpolate Q (SPFH)\n";
          }
 
          if ((spfh_cnt>0) && (pbl_level>0)) {

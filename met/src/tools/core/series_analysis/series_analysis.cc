@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -670,9 +670,10 @@ void process_scores() {
    // Number of points skipped due to valid data threshold
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
- 
+
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
+      i_point = 0;
 
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {

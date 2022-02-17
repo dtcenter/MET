@@ -36,6 +36,8 @@ if [ $? != 0 ]; then
 fi
 
 if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
+  cat ${LOCAL_LOG_DIR}/copy_diff_files.log
+
   echo "ERROR: Differences exist in the output"
 
   # only exit non-zero (job fails) if not updating truth data

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -571,7 +571,7 @@ static const char conf_key_message_type_group_map[] = "message_type_group_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
 static const char conf_key_obs_name_map[]      = "obs_name_map";
-static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
+static const char conf_key_obs_prepbufr_map[]  = "obs_prepbufr_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
 static const char conf_key_boot_interval[]     = "boot.interval";

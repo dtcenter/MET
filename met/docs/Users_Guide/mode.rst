@@ -1,12 +1,13 @@
 .. _mode:
 
+*********
 MODE Tool
-=========
+*********
 
 .. _MODE_Introduction:
 
 Introduction
-____________
+============
 
 This section provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in :ref:`Davis et al. (2006a,b) <Davis-2006>`, :ref:`Brown et al. (2007) <Brown-2007>` and :ref:`Bullock et al. (2016) <Bullock-2016>`.
 
@@ -17,12 +18,12 @@ MODE may be used in a generalized way to compare any two fields. For simplicity,
 .. _MODE_Scientific-and-statistical:
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
 
 Resolving objects
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The process used for resolving objects in a raw data field is called *convolution thresholding*. The raw data field is first convolved with a simple filter function as follows:
 
@@ -58,7 +59,7 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 
 
 Attributes
-~~~~~~~~~~
+----------
 
 Object attributes are defined both for single objects and for object pairs. One of the objects in a pair is from the forecast field and the other is taken from the observed field. 
 
@@ -81,7 +82,7 @@ All the attributes discussed so far are defined for single objects. Once these a
 Several area measures are also used for pair attributes. **Union Area** is the total area that is in either one (or both) of the two objects. **Intersection Area** is the area that is inside both objects simultaneously. **Symmetric Difference** is the area inside at least one object, but not inside both.
 
 Fuzzy logic
-~~~~~~~~~~~
+-----------
 
 Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (*e.g.*, intersection area), low values indicate low interest, and high values indicate more interest.
 
@@ -98,19 +99,19 @@ This total interest value is then thresholded, and pairs of objects that have to
 Another merging method is available in MODE, which can be used instead of, or along with, the fuzzy logic based merging just described. Recall that the convolved field is thresholded to produce the mask field. A second (lower) threshold can be specified so that objects that are separated at the higher threshold but joined at the lower threshold are merged.
 
 Summary statistics
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to :numref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
 Practical information
-_____________________
+=====================
 
 This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. The requirement of having all gridded fields using the same grid specification has been removed with METv5.1. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
 
 MODE provides the capability to select a single model variable/level from which to derive objects to be analyzed. MODE was developed and tested using accumulated precipitation. However, the code has been generalized to allow the use of any gridded model and observation field. Based on the options specified in the configuration file, MODE will define a set of simple objects in the model and observation fields. It will then compute an interest value for each pair of objects across the fields using a fuzzy engine approach. Those interest values are thresholded, and any pairs of objects above the threshold will be matched/merged. Through the configuration file, MODE offers a wide range of flexibility in how the objects are defined, processed, matched, and merged.
 
 mode usage
-~~~~~~~~~~
+----------
 
 The usage statement for the MODE tool is listed below:
 
@@ -177,7 +178,7 @@ In Example 2, the MODE tool will verify the model data in the sample_fcst.nc Net
 .. _MODE-configuration-file:
 
 mode configuration file
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
@@ -493,7 +494,7 @@ When MODE is run on global grids, this parameter specifies how many grid squares
 .. _MODE-output:
 
 mode output
-~~~~~~~~~~~
+-----------
 
 MODE produces output in ASCII, NetCDF, and PostScript formats.
 
@@ -967,16 +968,16 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - Number of Forecast Simple Boundary Points
   * - fcst_simp_bdy :raw-html:`<br />` \_lat
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLatitude
+    - Forecast Simple Boundary Latitude
   * - fcst_simp_bdy :raw-html:`<br />` \_lon
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLongitude
+    - Forecast Simple Boundary Longitude
   * - fcst_simp_bdy_x
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoX-Coordinate
+    - Forecast Simple Boundary X-Coordinate
   * - fcst_simp_bdy_y
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoY-Coordinate
+    - Forecast Simple Boundary Y-Coordinate
   * - fcst_simp_hull :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Convex Hull Starting Index

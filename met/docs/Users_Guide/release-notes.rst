@@ -1,12 +1,12 @@
-MET release notes
-_________________
+MET Release Notes
+=================
 
 When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
 MET Version 10.1.0-beta5 release notes (20220114)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 * Enhancements:
 
@@ -27,7 +27,7 @@ MET Version 10.1.0-beta5 release notes (20220114)
    * Fix IODA2NC to handle the same input file being provided multiple times (`#1965 <https://github.com/dtcenter/MET/issues/1965>`_).
 
 MET Version 10.1.0-beta4 release notes (20211117)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 * Enhancements:
 
@@ -48,7 +48,7 @@ MET Version 10.1.0-beta4 release notes (20211117)
    * Enhance the documentation with meta-data that is expected by MET for netCDF (`#1949 <https://github.com/dtcenter/MET/issues/1949>`_).
 
 MET Version 10.1.0-beta3 release notes (20211006)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 * New tools:
 
@@ -79,7 +79,7 @@ MET Version 10.1.0-beta3 release notes (20211006)
    * Reduce the Security hotspots from SonarQube (`#1903 <https://github.com/dtcenter/MET/issues/1903>`_).
 
 MET Version 10.1.0-beta2 release notes (20210901)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 * New output:
 
@@ -116,7 +116,7 @@ MET Version 10.1.0-beta2 release notes (20210901)
    * Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).
 
 MET Version 10.1.0-beta1 release notes (20210613)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 * Add the HSS_EC statistic to the MCTS line type and a configurable option for its computation (`#1749 <http://github.com/dtcenter/MET/issues/1749>`_).
 * Implement a common API for reading and writing the common NetCDF point observation file format (`#1402 <http://github.com/dtcenter/MET/issues/1402>`_ and `#1581 <http://github.com/dtcenter/MET/issues/1581>`_).
@@ -127,7 +127,7 @@ MET Version 10.1.0-beta1 release notes (20210613)
 * Add anchors to link directly to configuration items in the MET User's Guide (`#1811 <http://github.com/dtcenter/MET/issues/1811>`_).
 
 MET Version 10.0.0 release notes (20210510)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 * Repository and build:
   

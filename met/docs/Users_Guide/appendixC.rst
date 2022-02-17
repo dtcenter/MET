@@ -1,13 +1,14 @@
 .. _appendixC:
 
+********************************
 Appendix C Verification Measures
-================================
+********************************
 
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 
 Which statistics are the same, but with different names?
-________________________________________________________
+========================================================
 
 .. list-table:: Statistics in MET and other names they have been published under.
   :widths: auto
@@ -52,7 +53,7 @@ ________________________________________________________
 .. _categorical variables:
 
 MET verification measures for categorical (dichotomous) variables
-_________________________________________________________________
+=================================================================
 
 
 The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_2X2`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_2X2` are counts of the number of occurrences of the four possible combinations of forecasts and observations. 
@@ -94,12 +95,12 @@ The values in :numref:`table_2X2` can also be used to compute the F, O, and H re
 The categorical verification measures produced by the Point-Stat and Grid-Stat tools are described in the following subsections. They are presented in the order shown in :numref:`table_PS_format_info_FHO` through :numref:`table_PS_format_info_CTS_cont`.
 
 TOTAL
-~~~~~
+-----
 
 The total number of forecast-observation pairs, **T**.
 
 Base rate
-~~~~~~~~~
+---------
 
 Called "O_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
@@ -108,7 +109,7 @@ Called "BASER" in CTS output :numref:`table_PS_format_info_CTS`
 The base rate is defined as :math:`\bar{o} = \frac{n_{11} + n_{01}}{T} = \frac{n_{.1}}{T}.` This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
 
 Mean forecast
-~~~~~~~~~~~~~
+-------------
 
 Called "F_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
@@ -119,7 +120,7 @@ The mean forecast value is defined as :math:`\bar{f} = \frac{n_{11} + n_{10}}{T}
 This statistic is comparable to the base rate and is the relative frequency of occurrence of a forecast of the event (i.e., **f = 1**). The mean forecast is equivalent to the "F" value computed by the NCEP Verification System.
 
 Accuracy
-~~~~~~~~
+--------
 
 Called "ACC" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -130,7 +131,7 @@ Accuracy for a 2x2 contingency table is defined as
 That is, it is the proportion of forecasts that were either hits or correct rejections - the fraction that were correct. Accuracy ranges from 0 to 1; a perfect forecast would have an accuracy value of 1. Accuracy should be used with caution, especially for rare events, because it can be strongly influenced by large values of :math:`\mathbf{n_{00}}`.
 
 Frequency Bias
-~~~~~~~~~~~~~~
+--------------
 
 Called "FBIAS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -141,7 +142,7 @@ Frequency Bias is the ratio of the total number of forecasts of an event to the 
 A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates the event was forecasted too frequently and a value less than 1 indicates the event was not forecasted frequently enough.
 
 H_RATE
-~~~~~~
+------
 
 Called "H_RATE" in FHO output :numref:`table_PS_format_info_FHO`
 
@@ -158,7 +159,7 @@ H_RATE is defined as
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
 
 Probability of Detection (POD)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "PODY" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -170,7 +171,7 @@ POD is defined as
 It is the fraction of events that were correctly forecasted to occur. POD is also known as the hit rate. POD ranges from 0 to 1; a perfect forecast would have POD = 1.
 
 Probability of False Detection (POFD)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Called "POFD" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -182,7 +183,7 @@ POFD is defined as
 It is the proportion of non-events that were forecast to be events. POFD is also often called the False Alarm Rate. POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 
 Probability of Detection of the non-event (PODn)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Called "PODN" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -193,7 +194,7 @@ PODn is defined as
 It is the proportion of non-events that were correctly forecasted to be non-events. Note that PODn = 1 - POFD. PODn ranges from 0 to 1. Like POD, a perfect forecast would have PODn = 1.
 
 False Alarm Ratio (FAR)
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Called "FAR" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -204,7 +205,7 @@ FAR is defined as
 It is the proportion of forecasts of the event occurring for which the event did not occur. FAR ranges from 0 to 1; a perfect forecast would have FAR = 0.
 
 Critical Success Index (CSI)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Called "CSI" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -215,7 +216,7 @@ CSI is defined as
 It is the ratio of the number of times the event was correctly forecasted to occur to the number of times it was either forecasted or occurred. CSI ignores the "correct rejections" category (i.e., :math:`\mathbf{n_{00}}`). CSI is also known as the Threat Score (TS). CSI can also be written as a nonlinear combination of POD and FAR, and is strongly related to Frequency Bias and the Base Rate.
 
 Gilbert Skill Score (GSS)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 Called "GSS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -230,7 +231,7 @@ where
 GSS is also known as the Equitable Threat Score (ETS). GSS values range from -1/3 to 1. A no-skill forecast would have GSS = 0; a perfect forecast would have GSS = 1.
 
 Hanssen-Kuipers Discriminant (HK)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Called "HK" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -243,7 +244,7 @@ More simply, HK = POD :math:`-` POFD.
 HK is also known as the True Skill Statistic (TSS) and less commonly (although perhaps more properly) as the Peirce Skill Score. HK measures the ability of the forecast to discriminate between (or correctly classify) events and non-events. HK values range between -1 and 1. A value of 0 indicates no skill; a perfect forecast would have HK = 1.
 
 Heidke Skill Score (HSS)
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Called "HSS" in CTS output :numref:`table_PS_format_info_CTS` and "HSS" in MCTS output :numref:`table_PS_format_info_MCTS`
 
@@ -270,7 +271,7 @@ where H is the number of forecasts in the correct category and E is the expected
 HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
 
 Heidke Skill Score - Expected Correct (HSS_EC)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 Called "HSS_EC" in MCTS output :numref:`table_PS_format_info_MCTS`
 
@@ -283,7 +284,7 @@ The C_2 value is user-configurable with a default value of T divided by the numb
 HSS_EC can range from minus infinity to 1. A perfect forecast would have HSS_EC = 1.
 
 Odds Ratio (OR)
-~~~~~~~~~~~~~~~
+---------------
 
 Called "ODDS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -294,14 +295,14 @@ OR measures the ratio of the odds of a forecast of the event being correct to th
 OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (:ref:`Stephenson, 2000 <Stephenson-2000>`).
 
 Logarithm of the Odds Ratio (LODDS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Called "LODDS" in CTS output :numref:`table_PS_format_info_CTS`
 
 LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (:ref:`Stephenson, 2000 <Stephenson-2000>`). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
 
 Odds Ratio Skill Score (ORSS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Called "ORSS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -312,7 +313,7 @@ ORSS is a skill score based on the odds ratio. ORSS is defined as
 ORSS is sometimes also referred to as Yule's Q. (:ref:`Stephenson, 2000 <Stephenson-2000>`).
 
 Extreme Dependency Score (EDS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "EDS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -323,7 +324,7 @@ The extreme dependency score measures the association between forecast and obser
 EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (:ref:`Stephenson et al., 2008 <Stephenson-2008>`).
 
 Extreme Dependency Index (EDI)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "EDI" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -336,7 +337,7 @@ where *H* and *F* are the Hit Rate and False Alarm Rate, respectively.
 EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Symmetric Extreme Dependency Score (SEDS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Called "SEDS" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -347,7 +348,7 @@ The symmetric extreme dependency score measures the association between forecast
 SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Symmetric Extremal Dependency Index (SEDI)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Called "SEDI" in CTS output :numref:`table_PS_format_info_CTS`
 
@@ -360,14 +361,14 @@ where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_
 SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Bias Adjusted Gilbert Skill Score (GSS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 Called "BAGSS" in CTS output :numref:`table_PS_format_info_CTS`
 
 BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (:ref:`Brill and Mesinger, 2009 <Brill-2009>`).
 
 Economic Cost Loss Relative Value (ECLV)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 Included in ECLV output :numref:`table_PS_format_info_ECLV`
 
@@ -382,14 +383,14 @@ For cost / loss ratio above the base rate, the ECLV is defined as:
 .. math:: \text{ECLV } = \frac{(cl \ast (h + f)) + m - b}{b \ast (cl - 1)}.
 
 MET verification measures for continuous variables
-__________________________________________________
+==================================================
 
 For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
 Mean forecast
-~~~~~~~~~~~~~
+-------------
 
 Called "FBAR" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -398,7 +399,7 @@ Called "FBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 The sample mean forecast, FBAR, is defined as :math:`\bar{f} = \frac{1}{n} \sum_{i=1}^{n} f_i`.
 
 Mean observation
-~~~~~~~~~~~~~~~~
+----------------
 
 Called "OBAR" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -407,7 +408,7 @@ Called "OBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 The sample mean observation is defined as :math:`\bar{o} = \frac{1}{n} \sum_{i=1}^{n} o_i`.
 
 Forecast standard deviation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 Called "FSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -418,7 +419,7 @@ The sample variance of the forecasts is defined as
 The forecast standard deviation is defined as :math:`s_f = \sqrt{s_f^2}`.
 
 Observation standard deviation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "OSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -429,7 +430,7 @@ The sample variance of the observations is defined as
 The observed standard deviation is defined as :math:`s_o = \sqrt{s_o^2}`.
 
 Pearson Correlation Coefficient
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "PR_CORR" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -440,7 +441,7 @@ The Pearson correlation coefficient, **r**, measures the strength of linear asso
 **r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 Spearman rank correlation coefficient :math:`(\rho_{s})`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
 
@@ -453,7 +454,7 @@ A simpler formulation of the Spearman-rank correlation is based on differences b
 Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 Kendall's Tau statistic ( :math:`\tau`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 Called "KT_CORR" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -466,7 +467,7 @@ where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the num
 Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated. 
 
 Mean Error (ME)
-~~~~~~~~~~~~~~~
+---------------
 
 Called "ME" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -477,7 +478,7 @@ The Mean Error, ME, is a measure of overall bias for continuous variables; in pa
 A perfect forecast has ME = 0.
 
 Mean Error Squared (ME2)
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Called "ME2" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -486,21 +487,21 @@ The Mean Error Squared, ME2, is provided to give a complete breakdown of MSE in 
 A perfect forecast has ME2 = 0.
 
 Multiplicative Bias
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Called "MBIAS" in CNT output :numref:`table_PS_format_info_CNT`
 
 Multiplicative bias is simply the ratio of the means of the forecasts and the observations: :math:`\text{MBIAS} = \bar{f} / \bar{o}`
 
 Mean-squared error (MSE)
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Called "MSE" in CNT output :numref:`table_PS_format_info_CNT`
 
 MSE measures the average squared error of the forecasts. Specifically, :math:`\text{MSE} = \frac{1}{n}\sum (f_{i} - o_{i})^{2}`.
 
 Root-mean-squared error (RMSE)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -508,7 +509,7 @@ RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}
 
 
 Scatter Index (SI)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Called "SI" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -517,12 +518,12 @@ SI is the ratio of the root mean squared error to the average observation value,
 Smaller values of SI indicate better agreement between the model and observations (less scatter on scatter plot).
 
 Standard deviation of the error
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "ESTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
 Bias-Corrected MSE
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Called "BCMSE" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -535,7 +536,7 @@ The standard deviation of the error, :math:`s_{f-o}`, is :math:`s_{f-o} = \sqrt{
 Note that the square of the standard deviation of the error (ESTDEV2) is sometimes called the "Bias-corrected MSE" (BCMSE) because it removes the effect of overall bias from the forecast-observation squared differences.
 
 Mean Absolute Error (MAE)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 Called "MAE" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -544,7 +545,7 @@ The Mean Absolute Error (MAE) is defined as :math:`\text{MAE} = \frac{1}{n} \sum
 MAE is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAE = 0.
 
 InterQuartile Range of the Errors (IQR)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 Called "IQR" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -553,7 +554,7 @@ The InterQuartile Range of the Errors (IQR) is the difference between the 75th a
 IQR is another estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have IQR = 0.
 
 Median Absolute Deviation (MAD)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "MAD" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -562,7 +563,7 @@ The Median Absolute Deviation (MAD) is defined as :math:`\text{MAD} = \text{medi
 MAD is an estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAD = 0.
 
 Mean Squared Error Skill Score
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "MSESS" in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -571,27 +572,28 @@ The Mean Squared Error Skill Score is one minus the ratio of the forecast MSE to
 .. math:: \text{MSESS} = 1 - \frac{\text{MSE}_f}{\text{MSE}_r}
 
 Root-mean-squared Forecast Anomaly
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Called "RMSFA" in CNT output :numref:`table_PS_format_info_CNT`
 
 RMSFA is the square root of the average squared forecast anomaly. Specifically, :math:`\text{RMSFA} = \sqrt{\frac{1}{n} \sum(f_{i} - c_{i})^2}`.
 
 Root-mean-squared Observation Anomaly
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Called "RMSOA" in CNT output :numref:`table_PS_format_info_CNT`
 
 RMSOA is the square root of the average squared observation anomaly. Specifically, :math:`\text{RMSOA} = \sqrt{\frac{1}{n} \sum(o_{i} - c_{i})^2}`.
 
 Percentiles of the errors
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
+
 Called "E10", "E25", "E50", "E75", "E90" in CNT output :numref:`table_PS_format_info_CNT`
 
 Percentiles of the errors provide more information about the distribution of errors than can be obtained from the mean and standard deviations of the errors. Percentiles are computed by ordering the errors from smallest to largest and computing the rank location of each percentile in the ordering, and matching the rank to the actual value. Percentiles can also be used to create box plots of the errors. In MET, the 0.10th, 0.25th, 0.50th, 0.75th, and 0.90th quantile values of the errors are computed.
 
 Anomaly Correlation Coefficient
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "ANOM_CORR" and "ANOM_CORR_UNCNTR" for centered and uncentered versions in CNT output :numref:`table_PS_format_info_CNT`
 
@@ -616,7 +618,7 @@ The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
 Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 :numref:`table_PS_format_info_SL1L2`, :numref:`table_PS_format_info_SAL1L2`, :numref:`table_PS_format_info_VL1L2`, and :numref:`table_PS_format_info_VAL1L2`
 
@@ -627,7 +629,7 @@ The partial sums can be accumulated over individual cases to produce statistics 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
 Scalar L1 and L2 values
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
@@ -647,7 +649,7 @@ These statistics are simply the 1st and 2nd moments of the forecasts, observatio
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be derived from these moments.
 
 Scalar anomaly L1 and L2 values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output :numref:`table_PS_format_info_SAL1L2`
 
@@ -665,7 +667,7 @@ Computation of these statistics requires a climatological value, c. These statis
   \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
 
 Vector L1 and L2 values
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR" in VL1L2 output :numref:`table_PS_format_info_VL1L2`
 
@@ -687,7 +689,7 @@ These statistics are the moments for wind vector values, where **u** is the E-W 
   \text{UVOOBAR} = \text{Mean}(u_o^2 + v_o^2) = \frac{1}{n} \sum_{i=1}^n (u_{oi}^2 + v_{oi}^2)
 
 Vector anomaly L1 and L2 values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR" in VAL1L2 output :numref:`table_PS_format_info_VAL1L2`
 
@@ -710,7 +712,7 @@ These statistics require climatological values for the wind vector components, :
   \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
 
 Gradient values
-~~~~~~~~~~~~~~~
+---------------
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :numref:`table_GS_format_info_GRAD`
 
@@ -752,7 +754,7 @@ where the weights are applied at each grid location, with values assigned accord
 
 
 MET verification measures for probabilistic forecasts
-_____________________________________________________
+=====================================================
 
 The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the midpoint value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (:ref:`Bradley, 2008 <Bradley-2008>`); the joint distribution, calibration-refinement, likelihood-base rate (:ref:`Wilks, 2011 <Wilks-2011>`); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
 
@@ -795,7 +797,7 @@ The verification statistics for probabilistic forecasts of dichotomous variables
 
 
 Reliability
-~~~~~~~~~~~
+-----------
 
 Called "RELIABILITY" in PSTD output :numref:`table_PS_format_info_PSTD`
 
@@ -804,7 +806,8 @@ A component of the Brier score. Reliability measures the average difference betw
 .. math:: \text{Reliability} = \frac{1}{T} \sum n_i (p_i - \bar{o}_i)^2
 
 Resolution
-~~~~~~~~~~
+----------
+
 Called "RESOLUTION" in PSTD output :numref:`table_PS_format_info_PSTD`
 
 A component of the Brier score that measures how well forecasts divide events into subsets with different outcomes. Larger values of resolution are best since it is desirable for event frequencies in the subsets to be different than the overall event frequency.
@@ -812,7 +815,7 @@ A component of the Brier score that measures how well forecasts divide events in
 .. math:: \text{Resolution} = \frac{1}{T} n_{i.}(\bar{o}_i - \bar{o})^2
 
 Uncertainty
-~~~~~~~~~~~
+-----------
 
 Called "UNCERTAINTY" in PSTD output :numref:`table_PS_format_info_PSTD`
 
@@ -821,7 +824,7 @@ A component of the Brier score. For probabilistic forecasts, uncertainty is a fu
 .. math:: \text{Uncertainty} = \frac{n_{.1}}{T}(1 - \frac{n_{.1}}{T})
 
 Brier score
-~~~~~~~~~~~
+-----------
 
 Called "BRIER" in PSTD output :numref:`table_PS_format_info_PSTD`
 
@@ -838,7 +841,7 @@ BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3)
 This score is sensitive to the base rate or climatological frequency of the event. Forecasts of rare events can have a good BS without having any actual skill. Since Brier score is a measure of error, smaller values are better.
 
 Brier Skill Score (BSS)
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Called "BSS" and "BSS_SMPL" in PSTD output :numref:`table_PS_format_info_PSTD`
 
@@ -849,7 +852,7 @@ BSS is a skill score based on the Brier Scores of the forecast and a reference f
 BSS is computed using the climatology specified in the configuration file while BSS_SMPL is computed using the sample climatology of the current set of observations.
 
 OY_TP - Observed Yes Total Proportion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Called "OY_TP" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -858,7 +861,7 @@ This is the cell probability for row **i**, column **j=1** (observed event), a p
 .. math:: \text{OYTP}(i) = \frac{n_{i1}}{T} = \text{probability}(o_{i1})
 
 ON_TP - Observed No Total Proportion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 Called "ON_TP" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -867,7 +870,7 @@ This is the cell probability for row **i**, column **j=0** (observed non-event),
 .. math:: \text{ONTP}(i) = \frac{n_{i0}}{T} = \text{probability}(o_{i0})
 
 Calibration
-~~~~~~~~~~~
+-----------
 
 Called "CALIBRATION" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -876,7 +879,7 @@ Calibration is the conditional probability of an event given each probability fo
 .. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
 Refinement
-~~~~~~~~~~
+----------
 
 Called "REFINEMENT" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -885,7 +888,7 @@ The relative frequency associated with each forecast probability, sometimes call
 .. math:: \text{Refinement}(i) = \frac{n_{i.}}{T} = \text{probability}(p_i)
 
 Likelihood
-~~~~~~~~~~
+----------
 
 Called "LIKELIHOOD" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -896,7 +899,7 @@ Likelihood is the conditional probability for each forecast category (row) given
 Likelihood values are also used to create "discrimination" plots that compare the distribution of forecast values for events to the distribution of forecast values for non-events. These plots show how well the forecasts categorize events and non-events. The distribution of forecast values for non-events can be derived from the POFD values computed by MET for the user-specified thresholds.
 
 Base Rate
-~~~~~~~~~
+---------
 
 Called "BASER" in PJC output :numref:`table_PS_format_info_PJC`
 
@@ -905,7 +908,7 @@ This is the probability of an event for each forecast category :math:`p_i` (row)
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
 Reliability diagram
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The reliability diagram is a plot of the observed frequency of events versus the forecast probability of those events, with the range of forecast probabilities divided into categories.
 
@@ -918,7 +921,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 	    Example of Reliability Diagram
 
 Receiver operating characteristic
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 MET produces hit rate (POD) and false alarm rate (POFD) values for each user-specified threshold. This information can be used to create a scatter plot of POFD vs. POD. When the points are connected, the plot is generally referred to as the receiver operating characteristic (ROC) curve (also called the "relative operating characteristic" curve). See the area under the ROC curve (AUC) entry for related information.
 
@@ -933,7 +936,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 	    Example of ROC Curve
 
 Area Under the ROC curve (AUC)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Called "ROC_AUC" in PSTD output :numref:`table_PS_format_info_PSTD`
 
@@ -946,10 +949,10 @@ The area under the curve can be estimated in a variety of ways. In MET, the simp
 .. _App_C-ensemble:
 
 MET verification measures for ensemble forecasts
-________________________________________________
+================================================
 
 RPS
-~~~
+---
 
 Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
 
@@ -967,7 +970,7 @@ To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 
 where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012<Todter-2012>`).  Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
 
 CRPS
-~~~~
+----
 
 Called "CRPS", "CRPSCL", "CRPS_EMP", and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
@@ -986,7 +989,7 @@ The overall CRPS is calculated as the average of the individual measures. In equ
 The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS.
 
 CRPS Skill Score
-~~~~~~~~~~~~~~~~
+----------------
 
 Called "CRPSS" and "CRPSS_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
@@ -997,7 +1000,7 @@ The continuous ranked probability skill score (CRPSS) is similar to the MSESS an
 For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
 
 IGN
-~~~
+---
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
@@ -1008,14 +1011,14 @@ The ignorance score (IGN) is the negative logarithm of a predictive probability 
 Accumulation of the ignorance score for many forecasts is via the average of individual ignorance scores. This average ignorance score is the value output by the MET software. Like many error statistics, the IGN is negatively oriented, so smaller numbers indicate better forecasts.
 
 PIT
-~~~
+---
 
 Called "PIT" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
 The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (:ref:`Dawid, 1984 <Dawid-1984>`). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
 
 RANK
-~~~~
+----
 
 Called "RANK" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
@@ -1024,7 +1027,7 @@ The rank of an observation, compared to all members of an ensemble forecast, is 
 The rank histogram does not provide information about the accuracy of ensemble forecasts. Further, examination of "rank" only makes sense for ensembles of a fixed size. Thus, if ensemble members are occasionally unavailable, the rank histogram should not be used. The PIT may be used instead.
 
 SPREAD
-~~~~~~
+------
 
 Called "SPREAD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
@@ -1035,7 +1038,7 @@ The ensemble spread for a single observation is the standard deviation of the en
 Note that prior to met-9.0.1, the ensemble spread of a spatial masking region was computed as the average of the spread values within that region. This algorithm was corrected in met-9.0.1 to average the ensemble variance values prior to computing the square root.
 
 MET verification measures for neighborhood methods
-__________________________________________________
+==================================================
 
 The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size.
 
@@ -1072,14 +1075,14 @@ All of these measures are defined in :numref:`categorical variables`.
 In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean (2008) <Roberts-2008>`.  :ref:`Roberts and Lean (2008) <Roberts-2008>` also present an application of the methodology.
 
 Fractions Brier Score
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Called "FBS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The Fractions Brier Score (FBS) is defined as :math:`\text{FBS} = \frac{1}{N} \sum_N [\langle P_f\rangle_s - \langle P_o\rangle_s]^2`, where N is the number of neighborhoods; :math:`\langle P_{f} \rangle_{s}` is the proportion of grid boxes within a forecast neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have forecast events); and :math:`\langle P_{o}\rangle_{s}` is the proportion of grid boxes within an observed neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have observed events).
 
 Fractions Skill Score
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Called "FSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
@@ -1090,28 +1093,28 @@ The Fractions Skill Score (FSS) is defined as
 where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
 
 Asymptotic Fractions Skill Score
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Called "AFSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The Asymptotic Fractions Skill Score (AFSS) is a special case of the Fractions Skill score where the entire domain is used as the single neighborhood. This provides the user with information about the overall frequency bias of forecasts versus observations. The formula is the same as for FSS above, but with N=1 and the neighborhood size equal to the domain.
 
 Uniform Fractions Skill Score
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Called "UFSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total observed events across the grid. UFSS represents the FSS that would be obtained at the grid scale from a forecast with a fraction/probability equal to the total observed event proportion at every point. The formula is :math:`UFSS = (1 + f_o)/2` (i.e., halfway between perfect skill and random forecast skill) where :math:`f_o` is the total observed event proportion (i.e. observation rate).
 
 Forecast Rate
-~~~~~~~~~~~~~
+-------------
 
 Called "F_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with forecast events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts.
 
 Observation Rate
-~~~~~~~~~~~~~~~~
+----------------
 
 Called "O_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
@@ -1120,7 +1123,7 @@ The overall proportion of grid points with observed events to total grid points 
 .. _App_C-distance_maps:
 
 MET verification measures for distance map methods
-__________________________________________________
+==================================================
 
 The distance map statistics include Baddeley's :math:`\Delta` Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 
@@ -1139,7 +1142,7 @@ It has been argued in :ref:`Gilleland (2017) <Gilleland-2017>` that the second p
 The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's :math:`\Delta` Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 
 Baddeley's :math:`\Delta` Metric and Hausdorff Distance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------
 
 Called "BADDELEY" and "HAUSDORFF" in the DMAP 
 output :numref:`table_GS_format_info_DMAP`
@@ -1155,7 +1158,7 @@ In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm o
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
 Mean-error Distance
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Called "MED_FO", "MED_OF", "MED_MIN", "MED_MAX", and "MED_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
@@ -1178,7 +1181,7 @@ From the distance map perspective, MED *(A,B)* is the average of the values in :
 The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
 Pratt's Figure of Merit
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Called "FOM_FO", "FOM_OF", "FOM_MIN", "FOM_MAX", and "FOM_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
@@ -1193,7 +1196,7 @@ Note that :math:`d(s,A)` in the denominator is summed only over the grid squares
 The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 
 Zhu's Measure
-~~~~~~~~~~~~~
+-------------
 
 Called "ZHU_FO", "ZHU_OF", "ZHU_MIN", "ZHU_MAX", and "ZHU_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
@@ -1208,7 +1211,7 @@ The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forec
 .. _App_C-gbeta:
 
 :math:`G` and :math:`G_\beta`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Called "G" and "GBETA" in the DMAP output :numref:`table_GS_format_info_DMAP`
 
@@ -1229,7 +1232,7 @@ where :math:`\beta > 0` is a user-chosen parameter with a default value of :math
 The range for :math:`G_\beta` is 0 to 1, with a score of 1 indicating a perfect forecast.
 
 Calculating Percentiles
-_______________________
+=======================
 
 Several of the MET tools make use of percentiles in one way or another. Percentiles can be used as part of the internal computations of a tool, or can be written out as elements of some of the standard verification statistics. There are several widely-used conventions for calculating percentiles however, so in this section we describe how percentiles are calculated in MET.
 

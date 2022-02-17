@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -98,7 +98,7 @@ struct NetcdfObsVars {
    NcDim obs_arr_dim ; // Observation array width (V1.0, not used from V1.2)
    NcDim obs_dim     ; // Observation array length (V1.0)
    NcDim hdr_dim     ; // Header array length (V1.0)
-   NcDim pb_hdr_dim  ; // PrefBufr Header array length (V1.2)
+   NcDim pb_hdr_dim  ; // PrepfBufr Header array length (V1.2)
 
    NcVar hdr_typ_tbl_var ; // Message type (string) (V1.1)
    NcVar hdr_sid_tbl_var ; // Station ID (string) (V1.1)

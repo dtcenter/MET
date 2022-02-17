@@ -1,18 +1,19 @@
 .. _ensemble-stat:
 
+******************
 Ensemble-Stat Tool
-==================
+******************
 
 Introduction
-____________
+============
 
 The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. Climatological mean and standard deviation data may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in :numref:`Appendix C, Section %s <App_C-ensemble>`.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 Ensemble forecasts derived from a set of deterministic ensemble members
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 
@@ -23,7 +24,7 @@ The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble pr
 The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
 Ensemble statistics
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (:ref:`Hamill, 2001 <Hamill-2001>`). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
 
@@ -34,7 +35,7 @@ The relative position (RELP) is a count of the number of times each ensemble mem
 The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
 Climatology data
-~~~~~~~~~~~~~~~~
+----------------
 
 The Ensemble-Stat output includes at least three statistics computed relative to external climatology data. The climatology is defined by mean and standard deviation fields, and typically both are required in the computation of ensemble skill score statistics. MET assumes that the climatology follows a normal distribution, defined by the mean and standard deviation at each point.
 
@@ -43,7 +44,7 @@ When computing the CRPS skill score for (:ref:`Gneiting et al., 2004 <Gneiting-2
 The climatological distribution is also used for the RPSS. The forecast RPS statistic is computed from a probabilistic contingency table in which the probabilities are derived from the ensemble member values. In a simliar fashion, the climatogical probability for each observed value is derived from the climatological distribution. The area of the distribution to the left of the observed value is interpreted as the climatological probability. These climatological probabilities are also evaluated using a probabilistic contingency table from which the reference RPS score is computed. The skill scores are derived by comparing the forecast statistic to the reference climatology statistic.
 
 Ensemble observation error
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>`. can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
@@ -52,12 +53,12 @@ Normal and uniform are common choices for the observation error distribution. Th
 Observation errors differ according to instrument, temporal and spatial representation, and variable type. Unfortunately, many observation errors have not been examined or documented in the literature. Those that have usually lack information regarding their distributions and approximate parameters. Instead, a range or typical value of observation error is often reported and these are often used as an estimate of the standard deviation of some distribution. Where possible, it is recommended to use the appropriate type and size of perturbation for the observation to prevent spurious results.
 
 Practical Information
-_____________________
+=====================
 
 This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology data files must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`.
 
 ensemble_stat usage
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The usage statement for the Ensemble Stat tool is shown below:
 
@@ -125,7 +126,7 @@ An example of the ensemble_stat calling sequence is shown below:
 In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
 ensemble_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
@@ -455,7 +456,7 @@ Refer to the description of the **boot** entry in :numref:`config_options` for m
 
 
 ensemble_stat output
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 ensemble_stat can produce output in STAT, ASCII, and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 

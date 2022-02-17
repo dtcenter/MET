@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,6 +22,10 @@
 #include "config_file.h"
 #include "data_file_type.h"
 #include "config_gaussian.h"
+
+////////////////////////////////////////////////////////////////////////
+
+static const char conf_key_old_prepbufr_map[] = "obs_prefbufr_map";    // for backward compatibility
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,13 +52,13 @@ extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString> parse_conf_key_value_map(
                             Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
+extern void            parse_add_conf_key_value_map(
+                            Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern map<ConcatString,StringArray>
                        parse_conf_message_type_group_map(Dictionary *dict);
 extern map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
-extern map<ConcatString,ConcatString>
-                       parse_conf_obs_bufr_map(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_obs_name_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);

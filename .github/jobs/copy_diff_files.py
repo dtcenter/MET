@@ -9,18 +9,22 @@ DIFF_DIR = os.environ['MET_TEST_DIFF']
 
 LOG_DIR = '/met/logs'
 
+LINE_BREAK = '# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #'
+
 def get_files_with_diffs(log_file):
     files_to_copy = set()
+    error_text_list = []
 
     with open(log_file, 'r') as file_handle:
         file_content = file_handle.read()
 
     missing_section, *test_sections = file_content.split(
-      '\n# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n'
+      f'\n{LINE_BREAK}\n'
     )
 
     # parse list of missing files
     if 'ERROR:' in missing_section:
+        error_text_list.append(missing_section)
         for missing_group in missing_section.split('ERROR:')[1:]:
             dir_str, *rel_paths = missing_group.splitlines()
             dir_str = dir_str.split()[1]
@@ -36,13 +40,14 @@ def get_files_with_diffs(log_file):
 
     # parse file paths out of sections that have errors
     error_sections = [item for item in test_sections if 'ERROR:' in item]
+    error_text_list.extend(error_sections)
     for error_section in error_sections:
         for line in error_section.splitlines():
             for item in line.split():
                 if OUTPUT_DIR in item or TRUTH_DIR in item:
                     files_to_copy.add(item)
 
-    return files_to_copy
+    return files_to_copy, error_text_list
 
 def copy_files_to_diff_dir(files_to_copy):
 
@@ -69,12 +74,21 @@ def copy_files_to_diff_dir(files_to_copy):
             os.makedirs(output_dir)
         shutil.copyfile(filename, output_path)
 
+
 def main():
     log_file = os.path.join(LOG_DIR, 'comp_dir.log')
     print(f"Parsing {log_file}")
-    all_files_to_copy = get_files_with_diffs(log_file)
+    all_files_to_copy, error_text_list = get_files_with_diffs(log_file)
 
     copy_files_to_diff_dir(all_files_to_copy)
+
+    # print error summary
+    if error_text_list:
+        print("\n\n**************\nERROR SUMMARY:\n**************\n")
+
+    print(f'\n{LINE_BREAK}\n'.join(error_text_list))
+
+    print("End of script")
 
 if __name__ == "__main__":
     main()
