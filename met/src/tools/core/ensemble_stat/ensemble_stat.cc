@@ -2342,7 +2342,8 @@ void setup_txt_files() {
    }
 
    // Get the maximum number of ensemble members, including HiRA
-   max_n_ens = n_vx_vld.max() * conf_info.get_max_n_hira_ens();
+   max_n_ens = n_vx_vld.max();
+   if(conf_info.get_hira_flag()) max_n_ens *= conf_info.get_max_n_hira_ens();
 
    // Get the maximum number of data columns
    max_col  = max(get_n_orank_columns(max_n_ens+1),

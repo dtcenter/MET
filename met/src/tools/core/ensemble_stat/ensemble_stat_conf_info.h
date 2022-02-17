@@ -261,6 +261,8 @@ class EnsembleStatConfInfo {
       int get_max_n_hira_ens()  const;
       int get_max_n_hira_prob() const;
 
+      bool get_hira_flag() const;
+
       int get_compression_level();
 };
 

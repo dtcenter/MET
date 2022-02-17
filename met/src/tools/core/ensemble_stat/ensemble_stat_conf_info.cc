@@ -720,6 +720,22 @@ int EnsembleStatConfInfo::get_max_n_hira_prob() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool EnsembleStatConfInfo::get_hira_flag() const {
+   int i;
+   bool flag = false;
+
+   for(i=0; i<n_vx; i++) {
+      if(vx_opt[i].hira_info.flag) {
+         flag = true;
+         break;
+      }
+   }
+
+   return(flag);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class EnsembleStatVxOpt
 //
