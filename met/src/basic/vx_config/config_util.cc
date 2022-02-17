@@ -2279,6 +2279,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
