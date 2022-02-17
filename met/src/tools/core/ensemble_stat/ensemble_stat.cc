@@ -64,7 +64,7 @@
 //   032    10/07/21  Halley Gotway  MET #1905 Add -ctrl option.
 //   033    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   034    01/14/21  McCabe         MET #1695 All members in one file.
-//   035    02/15/22  Halley Gotway  MET #1583 Add HiRA.
+//   035    02/15/22  Halley Gotway  MET #1583 Add HiRA option.
 //
 ////////////////////////////////////////////////////////////////////////
 
