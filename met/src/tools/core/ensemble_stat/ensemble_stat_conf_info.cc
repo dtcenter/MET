@@ -98,10 +98,11 @@ void EnsembleStatConfInfo::clear() {
    ens_input.clear();
 
    // Reset counts
-   n_ens_var    = 0;
-   n_nbrhd      = 0;
-   n_vx         = 0;
-   max_n_thresh = 0;
+   n_ens_var     = 0;
+   n_nbrhd       = 0;
+   n_vx          = 0;
+   max_n_thresh  = 0;
+   max_hira_size = 0;
 
    return;
 }
@@ -132,7 +133,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           StringArray * ens_files,
                                           StringArray * fcst_files,
                                           bool use_ctrl) {
-   int i,j, n_ens_files;
+   int i, j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *edict  = (Dictionary *) 0;
@@ -248,7 +249,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
    
     // Parse the ensemble field information
-   for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
+   for(i=0,max_n_thresh=0,max_hira_size=0; i<n_ens_var; i++) {
 
       EnsVarInfo * ens_info = new EnsVarInfo();
 
@@ -445,6 +446,17 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          if(!point_vx) {
             vx_opt[i].msg_typ.clear();
             vx_opt[i].msg_typ.add(obtype);
+         }
+
+         // Track the maximum HiRA size
+         for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
+            if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
+               GridTemplateFactory gtf;
+               GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
+                                              vx_opt[i].interp_info.width[j],
+                                              false);
+               max_hira_size = max(max_hira_size, gt->size());
+            }
          }
       }
 
@@ -700,42 +712,6 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size, int ctrl_index) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatConfInfo::get_max_n_hira_ens() const {
-   int i, n;
-
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
-
-   return(n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatConfInfo::get_max_n_hira_prob() const {
-   int i, n;
-
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
-
-   return(n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool EnsembleStatConfInfo::get_hira_flag() const {
-   int i;
-   bool flag = false;
-
-   for(i=0; i<n_vx; i++) {
-      if(vx_opt[i].hira_info.flag) {
-         flag = true;
-         break;
-      }
-   }
-
-   return(flag);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for class EnsembleStatVxOpt
 //
@@ -785,7 +761,6 @@ void EnsembleStatVxOpt::clear() {
 
    ci_alpha.clear();
    interp_info.clear();
-   hira_info.clear();
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
@@ -958,9 +933,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: interp
    interp_info = parse_conf_interp(&odict, conf_key_interp);
 
-   // Conf: hira
-   hira_info = parse_conf_hira(&odict);
-
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
 
@@ -1033,11 +1005,8 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    int i, j, n;
    int n_msg_typ = msg_typ.n();
    int n_mask    = mask_name.n();
-   StringArray sa;
-
-   // Interpolation methods + HiRA methods
    int n_interp  = interp_info.n_interp;
-   if(hira_info.flag) n_interp += hira_info.width.n();
+   StringArray sa;
 
    // Setup the VxPairDataEnsemble object with these dimensions:
    // [n_msg_typ][n_mask][n_interp]
@@ -1122,16 +1091,6 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
       vx_pd.set_interp_thresh(interp_info.vld_thresh);
    }
 
-   // Append the HiRA methods
-   if(hira_info.flag) {
-      for(i=0; i<hira_info.width.n(); i++) {
-         j = interp_info.n_interp + i;
-         vx_pd.set_interp(j, InterpMthd_Nbrhd, hira_info.width[i],
-                          hira_info.shape);
-         vx_pd.set_interp_thresh(hira_info.vld_thresh);
-      }
-   }
-
    // After sizing VxPairDataEnsemble, add settings for each array element
    vx_pd.set_ssvar_bin_size(ssvar_bin_size);
    vx_pd.set_phist_bin_size(phist_bin_size);
@@ -1197,13 +1156,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
               get_n_o_thresh() * get_n_ci_alpha();
 
-         // Maximum number of HiRA ECNT and RPS lines possible =
-         //    Point Vx: Message Types * Masks * HiRA widths * Alphas
-         if(hira_info.flag) {
-            n += get_n_msg_typ() * get_n_mask() * hira_info.width.n() *
-                 get_n_ci_alpha();
-         }
-
          break;
 
       case(i_rhist):
@@ -1216,12 +1168,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
               get_n_o_thresh();
 
-         // Maximum number of HiRA RHIST, PHIST, and RELP lines possible =
-         //    Point Vx: Message Types * Masks * HiRA widths
-         if(hira_info.flag) {
-            n += get_n_msg_typ() * get_n_mask() * hira_info.width.n();
-         }
-
          break;
 
       case(i_orank):
@@ -1232,12 +1178,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          // Number of ORANK lines possible =
          //    Number of pairs * Obs Thresholds
          n = vx_pd.get_n_pair() * get_n_o_thresh();
-
-         // Number of HiRA ORANK lines possible =
-         //    Number of pairs * Obs Thresholds * HiRA widths
-         if(hira_info.flag) {
-            n += vx_pd.get_n_pair() * get_n_o_thresh() * hira_info.width.n();
-         }
 
          break;
 
@@ -1256,27 +1196,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    return(n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatVxOpt::get_n_interp() const {
-   int n = interp_info.n_interp;
-   if(hira_info.flag) n += hira_info.width.n();
-   return(n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatVxOpt::get_n_hira_ens() const {
-   int n = (hira_info.flag ? hira_info.width.max() : 0);
-   return(n*n);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatVxOpt::get_n_hira_prob() const {
-   return(hira_info.flag ? hira_info.cov_ta.n() : 0);
 }
 
 ////////////////////////////////////////////////////////////////////////

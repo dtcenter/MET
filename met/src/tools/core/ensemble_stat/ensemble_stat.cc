@@ -1392,13 +1392,6 @@ void process_point_scores() {
                                       conf_info.vx_opt[i].interp_info.shape);
                   shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
                }
-               // Store the HiRA method and width being applied
-               else {
-                  m = l - conf_info.vx_opt[i].interp_info.n_interp;
-                  shc.set_interp_mthd(InterpMthd_Nbrhd,
-                                      conf_info.vx_opt[i].hira_info.shape);
-                  shc.set_interp_wdth(conf_info.vx_opt[i].hira_info.width[m]);
-               }
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
 
@@ -2343,7 +2336,9 @@ void setup_txt_files() {
 
    // Get the maximum number of ensemble members, including HiRA
    max_n_ens = n_vx_vld.max();
-   if(conf_info.get_hira_flag()) max_n_ens *= conf_info.get_max_n_hira_ens();
+   if(conf_info.get_max_hira_size() > 0) {
+      max_n_ens *= conf_info.get_max_hira_size();
+   }
 
    // Get the maximum number of data columns
    max_col  = max(get_n_orank_columns(max_n_ens+1),

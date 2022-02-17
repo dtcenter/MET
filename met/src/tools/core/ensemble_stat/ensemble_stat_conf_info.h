@@ -119,7 +119,6 @@ class EnsembleStatVxOpt {
       NumArray       ci_alpha;           // Alpha value for confidence intervals
 
       InterpInfo     interp_info;        // Interpolation (smoothing) information
-      HiRAInfo       hira_info;          // HiRA verification logic
 
       double         ssvar_bin_size;     // SSVAR bin size
       double         phist_bin_size;     // PHIST bin size
@@ -156,20 +155,19 @@ class EnsembleStatVxOpt {
       int get_n_mask_area() const;
 
       int get_n_o_thresh()  const;
-      int get_n_hira_ens()  const;
-      int get_n_hira_prob() const;
       int get_n_cdf_bin()   const;
       int get_n_ci_alpha()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());        }
-inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());      }
-inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n()); }
-inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());        }
-inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);     }
-inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());       }
+inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
+inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
+inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());        }
+inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
+inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
+inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
+inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -180,8 +178,9 @@ class EnsembleStatConfInfo {
       void init_from_scratch();
 
       // Ensemble processing
-      int n_ens_var;    // Number of ensemble fields to be processed
-      int max_n_thresh; // Maximum number of ensemble thresholds
+      int n_ens_var;     // Number of ensemble fields to be processed
+      int max_n_thresh;  // Maximum number of ensemble thresholds
+      int max_hira_size; // Maximum size of a HiRA neighborhoods
 
       // Ensemble verification
       int n_vx;         // Number of ensemble fields to be verified
@@ -197,21 +196,21 @@ class EnsembleStatConfInfo {
       MetConfig conf;
 
       // Store data parsed from the Ensemble-Stat configuration object
-      ConcatString        model;            // Model name
-      ConcatString        obtype;           // Observation type
+      ConcatString         model;           // Model name
+      ConcatString         obtype;          // Observation type
 
       vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
 
-      NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
-      int                 n_nbrhd;          // Number of neighborhood sizes
-      InterpInfo          nmep_smooth;      // Neighborhood maximum smoothing information
+      NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
+      int                  n_nbrhd;         // Number of neighborhood sizes
+      InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
 
-      EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
+      EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
 
-      double              vld_ens_thresh;   // Required ratio of valid input files
-      double              vld_data_thresh;  // Required ratio of valid data for each point
+      double               vld_ens_thresh;  // Required ratio of valid input files
+      double               vld_data_thresh; // Required ratio of valid data for each point
 
       // Message type groups that should be processed together
       map<ConcatString,StringArray> msg_typ_group_map;
@@ -257,22 +256,20 @@ class EnsembleStatConfInfo {
       int n_stat_row()     const;
 
       // Maximum across all verification tasks
-      int get_max_n_thresh()    const;
-      int get_max_n_hira_ens()  const;
-      int get_max_n_hira_prob() const;
-
-      bool get_hira_flag() const;
+      int get_max_n_thresh()  const;
+      int get_max_hira_size() const;
 
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
-inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
-inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
+inline int EnsembleStatConfInfo::get_n_ens_var()     const { return(n_ens_var);             }
+inline int EnsembleStatConfInfo::get_n_nbrhd()       const { return(n_nbrhd);               }
+inline int EnsembleStatConfInfo::get_n_vx()          const { return(n_vx);                  }
+inline int EnsembleStatConfInfo::get_max_n_thresh()  const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_max_hira_size() const { return(max_hira_size);         }
+inline int EnsembleStatConfInfo::get_compression_level()   { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
 
