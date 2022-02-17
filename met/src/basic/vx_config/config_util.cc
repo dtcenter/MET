@@ -140,9 +140,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";

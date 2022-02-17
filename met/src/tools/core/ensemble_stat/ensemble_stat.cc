@@ -1768,11 +1768,12 @@ void process_grid_vx() {
          if(mthd == InterpMthd_DW_Mean ||
             mthd == InterpMthd_LS_Fit  ||
             mthd == InterpMthd_Bilin   ||
-            mthd == InterpMthd_Nbrhd) {
+            mthd == InterpMthd_Nbrhd   ||
+            mthd == InterpMthd_HiRA) {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
-                 << mthd_str << " smoothing option not supported for "
-                 << "gridded observations.\n\n";
+                 << mthd_str << " option not supported for "
+                 << "smoothing gridded observations.\n\n";
             continue;
          }
 
