@@ -1689,10 +1689,10 @@ This dictionary may include the following entries:
     * MAXGAUSS    for the maximum value followed by a Gaussian smoother
     
     * GEOG_MATCH  for the nearest grid point where the land/sea mask
-      and geography criteria are satisfied.
+      and geography criteria are satisfied
 
-    * HIRA        to use all neighborhood points to define a
-    spatial ensemble of points in Ensemble-Stat.
+    * HIRA        for all neighborhood points to define a spatial
+      ensemble (only in Ensemble-Stat)
 
     The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
     interpolating to point locations. For grid-to-grid comparisons, the
