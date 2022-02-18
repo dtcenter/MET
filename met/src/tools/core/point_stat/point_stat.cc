@@ -1221,7 +1221,7 @@ void process_scores() {
                // Appy HiRA verification and write ensemble output
                do_hira_ens(i, pd_ptr);
 
-            } // end HiRA for probabilities
+            } // end HiRA for ensembles
 
             // Apply HiRA probabilistic verification logic
             if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&

@@ -249,6 +249,10 @@ interp = {
       {
          method = NEAREST;
          width  = 1;
+      },
+      {
+         method = HIRA;
+         width  = 2;
       }
    ];
 }

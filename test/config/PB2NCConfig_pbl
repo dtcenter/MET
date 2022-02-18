@@ -92,7 +92,7 @@ level_category = [0, 1, 4, 5, 6];
 // Use obs_bufr_map to rename variables in the output.
 // If empty, process all available variables.
 //
-obs_bufr_var = ["D_CAPE", "D_PBL"];
+obs_bufr_var = ["D_CAPE", "D_PBL", "D_MLCAPE"];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -120,6 +120,7 @@ obs_prepbufr_map = [
    { key = "D_PBL";   val = "HPBL";  },
    { key = "D_PRMSL"; val = "PRMSL"; },
    { key = "D_CAPE";  val = "CAPE";  },
+   { key = "D_MLCAPE";  val = "MLCAPE";  },
    { key = "TDO";     val = "DPT";   },
    { key = "PMO";     val = "PRMSL"; },
    { key = "TOCC";    val = "TCDC";  },

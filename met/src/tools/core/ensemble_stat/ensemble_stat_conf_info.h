@@ -178,8 +178,9 @@ class EnsembleStatConfInfo {
       void init_from_scratch();
 
       // Ensemble processing
-      int n_ens_var;    // Number of ensemble fields to be processed
-      int max_n_thresh; // Maximum number of ensemble thresholds
+      int n_ens_var;     // Number of ensemble fields to be processed
+      int max_n_thresh;  // Maximum number of ensemble thresholds
+      int max_hira_size; // Maximum size of a HiRA neighborhoods
 
       // Ensemble verification
       int n_vx;         // Number of ensemble fields to be verified
@@ -195,21 +196,21 @@ class EnsembleStatConfInfo {
       MetConfig conf;
 
       // Store data parsed from the Ensemble-Stat configuration object
-      ConcatString        model;            // Model name
-      ConcatString        obtype;           // Observation type
+      ConcatString         model;           // Model name
+      ConcatString         obtype;          // Observation type
 
       vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
 
-      NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
-      int                 n_nbrhd;          // Number of neighborhood sizes
-      InterpInfo          nmep_smooth;      // Neighborhood maximum smoothing information
+      NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
+      int                  n_nbrhd;         // Number of neighborhood sizes
+      InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
 
-      EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
+      EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
 
-      double              vld_ens_thresh;   // Required ratio of valid input files
-      double              vld_data_thresh;  // Required ratio of valid data for each point
+      double               vld_ens_thresh;  // Required ratio of valid input files
+      double               vld_data_thresh; // Required ratio of valid data for each point
 
       // Message type groups that should be processed together
       map<ConcatString,StringArray> msg_typ_group_map;
@@ -245,25 +246,30 @@ class EnsembleStatConfInfo {
       void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
-      int get_n_ens_var()    const;
-      int get_max_n_thresh() const;
-      int get_n_nbrhd()      const;
-      int get_n_vx()         const;
+      int get_n_ens_var() const;
+      int get_n_nbrhd()   const;
+      int get_n_vx()      const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
       int n_txt_row(int i) const;
       int n_stat_row()     const;
+
+      // Maximum across all verification tasks
+      int get_max_n_thresh()  const;
+      int get_max_hira_size() const;
+
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
-inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
-inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
+inline int EnsembleStatConfInfo::get_n_ens_var()     const { return(n_ens_var);             }
+inline int EnsembleStatConfInfo::get_n_nbrhd()       const { return(n_nbrhd);               }
+inline int EnsembleStatConfInfo::get_n_vx()          const { return(n_vx);                  }
+inline int EnsembleStatConfInfo::get_max_n_thresh()  const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_max_hira_size() const { return(max_hira_size);         }
+inline int EnsembleStatConfInfo::get_compression_level()   { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
 

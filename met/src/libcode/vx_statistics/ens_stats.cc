@@ -177,8 +177,8 @@ void ECNTInfo::clear() {
 
    othresh.clear();
    n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp   = bad_data_double;
-   crps_gaus  = crpscl_gaus = crpss_gaus  = bad_data_double;
+   crps_emp   = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
    ign        = bad_data_double;
    me         = rmse       = spread      = bad_data_double;
    me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
@@ -228,6 +228,9 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Store the number of ensemble members
    n_ens = pd.n_ens;
 
+   // HiRA data has no ensemble mean
+   bool skip_mean = pd.mn_na.has(bad_data_double);
+
    // Compute empirical CRPS scores
    crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
@@ -257,31 +260,10 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       }
    }
 
-   // Compute ME and RMSE values
-   fbar = obar = ffbar = oobar = fobar = 0.0;
-   for(i=0; i<pd.n_obs; i++) {
+   // Compute ensemble mean based statistics
+   if(!skip_mean) {
 
-      if(pd.skip_ba[i]) continue;
-
-      // Track running sums
-      w      = pd.wgt_na[i]/w_sum;
-      obar  += w *  pd.o_na[i];
-      oobar += w *  pd.o_na[i] *  pd.o_na[i];
-      fbar  += w * pd.mn_na[i];
-      ffbar += w * pd.mn_na[i] * pd.mn_na[i];
-      fobar += w * pd.mn_na[i] *  pd.o_na[i];
-   }
-
-   // Derive ME and RMSE from partial sums
-   me   = fbar - obar;
-   rmse = sqrt(ffbar + oobar - 2.0*fobar);
-
-   // Compute the square root of the average variance
-   spread = square_root(pd.var_na.wmean(pd.wgt_na));
- 
-   // If observation error was specified, compute ME_OERR and RMSE_OERR
-   if(pd.has_obs_error()) {
-
+      // Compute ME and RMSE values
       fbar = obar = ffbar = oobar = fobar = 0.0;
       for(i=0; i<pd.n_obs; i++) {
 
@@ -289,21 +271,53 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
          // Track running sums
          w      = pd.wgt_na[i]/w_sum;
-         obar  += w *       pd.o_na[i];
-         oobar += w *       pd.o_na[i] *       pd.o_na[i];
-         fbar  += w * pd.mn_oerr_na[i];
-         ffbar += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
-         fobar += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+         obar  += w *  pd.o_na[i];
+         oobar += w *  pd.o_na[i] *  pd.o_na[i];
+         fbar  += w * pd.mn_na[i];
+         ffbar += w * pd.mn_na[i] * pd.mn_na[i];
+         fobar += w * pd.mn_na[i] *  pd.o_na[i];
       }
 
-      // Derive ME_OERR and RMSE_OERR from partial sums
-      me_oerr   = fbar - obar;
-      rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
+      // Derive ME and RMSE from partial sums
+      me   = fbar - obar;
+      rmse = sqrt(ffbar + oobar - 2.0*fobar);
+
+      // If observation error was specified, compute ME_OERR and RMSE_OERR
+      if(pd.has_obs_error()) {
+
+         fbar = obar = ffbar = oobar = fobar = 0.0;
+         for(i=0; i<pd.n_obs; i++) {
+
+            if(pd.skip_ba[i]) continue;
+
+            // Track running sums
+            w      = pd.wgt_na[i]/w_sum;
+            obar  += w *       pd.o_na[i];
+            oobar += w *       pd.o_na[i] *       pd.o_na[i];
+            fbar  += w * pd.mn_oerr_na[i];
+            ffbar += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
+            fobar += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+         }
+
+         // Derive ME_OERR and RMSE_OERR from partial sums
+         me_oerr   = fbar - obar;
+         rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
+      }
+      else {
+         me_oerr   = bad_data_double;
+         rmse_oerr = bad_data_double;
+      }
    }
+   // Set ensemble mean based statistics to bad data
    else {
+      me        = bad_data_double;
+      rmse      = bad_data_double;
       me_oerr   = bad_data_double;
       rmse_oerr = bad_data_double;
    }
+
+   // Compute the square root of the average variance
+   spread = square_root(pd.var_na.wmean(pd.wgt_na));
 
    // Compute the square root of the average perturbed variance
    spread_oerr = square_root(pd.var_oerr_na.wmean(pd.wgt_na));

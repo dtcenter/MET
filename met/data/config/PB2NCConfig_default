@@ -121,7 +121,8 @@ obs_prepbufr_map = [
    { key = "D_MIXR";  val = "MIXR";  },
    { key = "D_PRMSL"; val = "PRMSL"; },
    { key = "D_PBL";   val = "PBL";   },
-   { key = "D_CAPE";  val = "CAPE";  }
+   { key = "D_CAPE";  val = "CAPE";  },
+   { key = "D_MLCAPE";  val = "MLCAPE";  }
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
