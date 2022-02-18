@@ -43,7 +43,6 @@ class DataPlane {
 
       int Nx;
       int Ny;
-
       int Nxy;   //  Nx*Ny
 
       unixtime InitTime;      // Initialization time in unixtime
@@ -86,6 +85,8 @@ class DataPlane {
 
       int      nx() const;
       int      ny() const;
+      int      nxy() const;
+
       bool     is_empty() const;
       bool     is_all_bad_data() const;
       int      n_good_data() const;
@@ -107,6 +108,9 @@ class DataPlane {
       void threshold(const SingleThresh &);
       void convert  (const UserFunc_1Arg &);
       void censor   (const ThreshArray &, const NumArray &);
+
+      void anomaly         (const DataPlane &);
+      void standard_anomaly(const DataPlane &, const DataPlane &);
 
       void replace_bad_data(const double value);
 
@@ -131,8 +135,9 @@ class DataPlane {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int DataPlane::nx() const { return (Nx); }
-inline int DataPlane::ny() const { return (Ny); }
+inline int DataPlane::nx()  const { return (Nx);  }
+inline int DataPlane::ny()  const { return (Ny);  }
+inline int DataPlane::nxy() const { return (Nxy); }
 
 inline bool DataPlane::is_empty() const { return (Nxy == 0); }
 
