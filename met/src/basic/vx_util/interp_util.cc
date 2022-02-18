@@ -1020,6 +1020,7 @@ double compute_sfc_interp(const DataPlane &dp,
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
               << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+         exit(1);
    }
 
    delete gt;

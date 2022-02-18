@@ -84,7 +84,7 @@ jobs = [
    "-job aggregate      -line_type GRAD                                          -vx_mask DTC165   -vx_mask DTC166 -by FCST_VAR      -dump_row ${TEST_OUT_DIR}/stat_analysis/job_aggregate_GRAD.stat",
    "-job aggregate      -line_type ISC                        -fcst_thresh >0.0  -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row ${TEST_OUT_DIR}/stat_analysis/job_aggregate_ISC.stat",
    "-job aggregate      -line_type RHIST                      -obtype MC_PCP     -vx_mask HUC4_1605 -vx_mask HUC4_1803 -vx_mask HUC4_1804 -vx_mask HUC4_1805 -vx_mask HUC4_1806 -dump_row ${TEST_OUT_DIR}/stat_analysis/job_aggregate_RHIST.stat",
-   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC     -vx_mask HUC4_1605 -vx_mask HUC4_1803 -vx_mask HUC4_1804 -vx_mask HUC4_1805 -vx_mask HUC4_1806 -dump_row ${TEST_OUT_DIR}/stat_analysis/job_aggregate_stat_ORANK_RHIST.stat"
+   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC     -vx_mask HUC4_1605,HUC4_1803,HUC4_1804,HUC4_1805,HUC4_1806 -by INTERP_MTHD,INTERP_PNTS -dump_row ${TEST_OUT_DIR}/stat_analysis/job_aggregate_stat_ORANK_RHIST.stat"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

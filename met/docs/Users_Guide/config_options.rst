@@ -610,7 +610,7 @@ using the following entries:
     * MAXGAUSS    to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
-    The BEST and GEOG_MATCH interpolation options are not valid for regridding.
+    The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
 
 * The "width" entry specifies a regridding width, when applicable.
   - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
@@ -1689,7 +1689,10 @@ This dictionary may include the following entries:
     * MAXGAUSS    for the maximum value followed by a Gaussian smoother
     
     * GEOG_MATCH  for the nearest grid point where the land/sea mask
-      and geography criteria are satisfied.
+      and geography criteria are satisfied
+
+    * HIRA        for all neighborhood points to define a spatial
+      ensemble (only in Ensemble-Stat)
 
     The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
     interpolating to point locations. For grid-to-grid comparisons, the

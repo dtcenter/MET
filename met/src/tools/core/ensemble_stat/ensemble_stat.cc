@@ -64,6 +64,7 @@
 //   032    10/07/21  Halley Gotway  MET #1905 Add -ctrl option.
 //   033    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   034    01/14/21  McCabe         MET #1695 All members in one file.
+//   035    02/15/22  Halley Gotway  MET #1583 Add HiRA option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -617,15 +618,20 @@ void process_n_vld() {
    n_vx_vld.clear();
 
    // Loop through the ensemble fields to be processed
-   var_it = conf_info.ens_input.begin();
-   n_ens_inputs = (*var_it)->inputs_n();
+   if(conf_info.ens_input.size() > 0) {
+      var_it = conf_info.ens_input.begin();
+      n_ens_inputs = (*var_it)->inputs_n();
+   }
+   else {
+      n_ens_inputs = 0;
+   }
 
    for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Loop through the ensemble inputs
       for(i_ens=n_vld=0; i_ens < n_ens_inputs; i_ens++) {
 
-         // get file and VarInfo to process
+         // Get file and VarInfo to process
          ens_file = (*var_it)->get_file(i_ens);
          var_info = (*var_it)->get_var_info(i_ens);
 
@@ -1276,7 +1282,7 @@ int process_point_ens(int i_ens, int &n_miss) {
          info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(i_ens);
       }
 
-      // if not processing mean, get file based on current vx and ensemble index
+      // If not processing mean, get file based on current vx and ensemble index
       if(!is_ens_mean) ens_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(i_ens);
 
       // Read the gridded data from the input forecast file
@@ -1381,9 +1387,11 @@ void process_point_scores() {
             for(l=0; l<conf_info.vx_opt[i].get_n_interp(); l++) {
 
                // Store the interpolation method and width being applied
-               shc.set_interp_mthd(conf_info.vx_opt[i].interp_info.method[l],
-                                   conf_info.vx_opt[i].interp_info.shape);
-               shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
+               if(l<conf_info.vx_opt[i].interp_info.n_interp) {
+                  shc.set_interp_mthd(conf_info.vx_opt[i].interp_info.method[l],
+                                      conf_info.vx_opt[i].interp_info.shape);
+                  shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
+               }
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
 
@@ -1497,7 +1505,6 @@ void process_point_scores() {
                         }
                      }
                   }
-
                } // end for m
 
                // Write out the unfiltered ORANK lines
@@ -1746,7 +1753,7 @@ void process_grid_vx() {
       }
 
       // Loop through and apply each of the smoothing operations
-      for(j=0; j<conf_info.vx_opt[i].get_n_interp(); j++) {
+      for(j=0; j<conf_info.vx_opt[i].interp_info.n_interp; j++) {
 
          // Store current settings
          ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
@@ -1761,11 +1768,12 @@ void process_grid_vx() {
          if(mthd == InterpMthd_DW_Mean ||
             mthd == InterpMthd_LS_Fit  ||
             mthd == InterpMthd_Bilin   ||
-            mthd == InterpMthd_Nbrhd) {
+            mthd == InterpMthd_Nbrhd   ||
+            mthd == InterpMthd_HiRA) {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
-                 << mthd_str << " smoothing option not supported for "
-                 << "gridded observations.\n\n";
+                 << mthd_str << " option not supported for "
+                 << "smoothing gridded observations.\n\n";
             continue;
          }
 
@@ -2306,7 +2314,7 @@ void setup_nc_file(unixtime valid_ut, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, n, n_phist_bin, n_vld, max_col;
+   int  i, n, n_phist_bin, max_n_ens, max_col;
    ConcatString tmp_str;
 
    // Check to see if the text files have already been set up
@@ -2327,16 +2335,19 @@ void setup_txt_files() {
       n_phist_bin = (n > n_phist_bin ? n : n_phist_bin);
    }
 
-   // Store the maximum number of valid verification fields
-   n_vld    = n_vx_vld.max();
+   // Get the maximum number of ensemble members, including HiRA
+   max_n_ens = n_vx_vld.max();
+   if(conf_info.get_max_hira_size() > 0) {
+      max_n_ens *= conf_info.get_max_hira_size();
+   }
 
    // Get the maximum number of data columns
-   max_col  = max(get_n_orank_columns(n_vld+1),
-                  get_n_rhist_columns(n_vld));
+   max_col  = max(get_n_orank_columns(max_n_ens+1),
+                  get_n_rhist_columns(max_n_ens));
    max_col  = max(max_col, get_n_phist_columns(n_phist_bin));
    max_col  = max(max_col, n_ecnt_columns);
    max_col  = max(max_col, n_ssvar_columns);
-   max_col  = max(max_col, get_n_relp_columns(n_vld));
+   max_col  = max(max_col, get_n_relp_columns(max_n_ens));
    max_col += n_header_columns;
 
    // Initialize file stream
@@ -2387,7 +2398,7 @@ void setup_txt_files() {
          switch(i) {
 
             case(i_rhist):
-               max_col = get_n_rhist_columns(n_vld+1) + n_header_columns + 1;
+               max_col = get_n_rhist_columns(max_n_ens+1) + n_header_columns + 1;
                break;
 
             case(i_phist):
@@ -2395,11 +2406,11 @@ void setup_txt_files() {
                break;
 
             case(i_relp):
-               max_col = get_n_relp_columns(n_vld) + n_header_columns + 1;
+               max_col = get_n_relp_columns(max_n_ens) + n_header_columns + 1;
                break;
 
             case(i_orank):
-               max_col = get_n_orank_columns(n_vld) + n_header_columns + 1;
+               max_col = get_n_orank_columns(max_n_ens) + n_header_columns + 1;
                break;
 
             default:
@@ -2415,7 +2426,7 @@ void setup_txt_files() {
          switch(i) {
 
             case(i_rhist):
-               write_rhist_header_row(1, n_vld+1, txt_at[i], 0, 0);
+               write_rhist_header_row(1, max_n_ens+1, txt_at[i], 0, 0);
                break;
 
             case(i_phist):
@@ -2423,11 +2434,11 @@ void setup_txt_files() {
                break;
 
             case(i_relp):
-               write_relp_header_row(1, n_vld, txt_at[i], 0, 0);
+               write_relp_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
             case(i_orank):
-               write_orank_header_row(1, n_vld, txt_at[i], 0, 0);
+               write_orank_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
             default:

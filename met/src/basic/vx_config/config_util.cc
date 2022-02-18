@@ -141,9 +141,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -2272,6 +2273,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i

@@ -17,6 +17,8 @@ Ensemble forecasts derived from a set of deterministic ensemble members
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 
+Typically an ensemble is constructed by selecting a single forecast value from each member for each observation. When the High Resolution Assessment (HiRA) interpolation method is chosen, all of the nearby neighborhood points surrounding each observation from each member are used. Therefore, processing an N-member ensemble using a HiRA neighborhood of size M produces ensemble output with size N*M. This approach fully leverages information from all nearby grid points to evaluate the ensemble quality.
+
 The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. MET will create the ensemble relative frequency as the proportion of ensemble members forecasting some event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be :math:`5/10=0.5`. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
 
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
@@ -160,6 +162,8 @@ ____________________
   version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+
+Note that the **HIRA** interpolation method is only supported in Ensemble-Stat.
 
 _____________________
 
