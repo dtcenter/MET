@@ -122,7 +122,8 @@ inline int GenEnsProdConfInfo::get_compression_level() { return(conf.nc_compress
 class GenEnsProdVarInfo: public EnsVarInfo {
 
 public:
-    GenEnsProdNcOutInfo nc_info;  // Ensemble product outputs
+    NormalizeType       normalize_flag; // Ensemble normalization logic
+    GenEnsProdNcOutInfo nc_info;        // Ensemble product outputs
 };
 
 #endif   /*  __GEN_ENS_PROD_CONF_INFO_H__  */

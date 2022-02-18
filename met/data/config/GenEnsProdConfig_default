@@ -36,10 +36,11 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-nc_var_str    = "";
+censor_thresh  = [];
+censor_val     = [];
+cat_thresh     = [];
+nc_var_str     = "";
+normalize_flag = NONE;
 
 //
 // Ensemble fields to be processed

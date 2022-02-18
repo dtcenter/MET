@@ -141,9 +141,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -2272,6 +2273,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -2833,6 +2835,47 @@ ConcatString matchtype_to_string(MatchType type) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+NormalizeType int_to_normalizetype(int v) {
+   NormalizeType t = NormalizeType_None;
+
+   // Convert integer to enumerated NormalizeType
+        if(v == conf_const.lookup_int(conf_val_none))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(conf_val_climo_anom))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(conf_val_climo_std_anom)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(conf_val_fcst_anom))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(conf_val_fcst_std_anom))  t = NormalizeType_FcstStdAnom;
+   else {
+      mlog << Error << "\nint_to_normalizetype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString normalizetype_to_string(NormalizeType type) {
+   ConcatString s;
+
+   // Convert enumerated NormalizeType to string
+   switch(type) {
+      case(NormalizeType_None):         s = conf_val_none;           break;
+      case(NormalizeType_ClimoAnom):    s = conf_val_climo_anom;     break;
+      case(NormalizeType_ClimoStdAnom): s = conf_val_climo_std_anom; break;
+      case(NormalizeType_FcstAnom):     s = conf_val_fcst_anom;      break;
+      case(NormalizeType_FcstStdAnom):  s = conf_val_fcst_std_anom;  break;
+      default:
+         mlog << Error << "\nnormalizetype_to_string() -> "
+              << "Unexpected NormalizeType value of " << type << ".\n\n";
+         exit(1);
+   }
+
+   return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DistType int_to_disttype(int v) {
    DistType t = DistType_None;
 
@@ -2976,6 +3019,37 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
    }
 
    return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NormalizeType parse_conf_normalize_flag(Dictionary *dict) {
+   NormalizeType t = NormalizeType_None;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_normalize_type() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_normalize_flag);
+
+   // Convert integer to enumerated WaveletType
+        if(v == conf_const.lookup_int(conf_val_none))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(conf_val_climo_anom))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(conf_val_climo_std_anom)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(conf_val_fcst_anom))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(conf_val_fcst_std_anom))  t = NormalizeType_FcstStdAnom;
+   else {
+      mlog << Error << "\nparse_conf_normalize_flag() -> "
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_normalize_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

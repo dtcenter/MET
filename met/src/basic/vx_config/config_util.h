@@ -78,6 +78,7 @@ extern map<ConcatString,ThreshArray>
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 extern StringArray     parse_conf_ens_member_ids(Dictionary *dict);
+extern NormalizeType   parse_conf_normalize_flag(Dictionary *dict);
 
 extern void         check_mask_names(const StringArray &);
 
@@ -118,6 +119,9 @@ extern ConcatString obssummary_to_string(ObsSummary, int);
 
 extern MatchType    int_to_matchtype(int);
 extern ConcatString matchtype_to_string(MatchType);
+
+extern NormalizeType int_to_normalizetype(int);
+extern ConcatString  normalizetype_to_string(NormalizeType);
 
 extern DistType     int_to_disttype(int);
 extern DistType     string_to_disttype(const char *);
