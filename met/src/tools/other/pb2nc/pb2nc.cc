@@ -3048,10 +3048,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
            << " from TQ (" << tq_count << ") and UV (" << uv_count
            << ")\n";
 
-      if (pbl_level <= 1) {
+      if (pbl_level <= 0) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because of " << (pbl_level == 1) ? "only one record " : "an empty list"
-              << " after combining TQZ and UV\n";
+              << "Skip CALPBL because of an empty list after combining TQZ and UV\n";
+      }
+      else if (pbl_level == 1) {
+         mlog << Debug(4) << method_name
+              << "Skip CALPBL because of only one available record after combining TQZ and UV\n";
       }
       else {
          // Order all observations by pressure from bottom to top
