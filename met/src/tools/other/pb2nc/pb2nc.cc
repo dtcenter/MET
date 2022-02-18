@@ -264,7 +264,6 @@ static const char *derived_mlcape = "D_MLCAPE";
 static const char *derived_cape = "D_CAPE";
 static const char *derived_pbl  = "D_PBL";
 static const float MLCAPE_INTERVAL = 3000.;
-static bool        use_CAPE_BIN = false;
 
 static double bufr_obs[mxr8lv][mxr8pm];
 static double bufr_obs_extra[mxr8lv][mxr8pm];
@@ -1706,90 +1705,25 @@ void process_pbfile(int i_pb) {
                }
                else cape_cnt_missing_values++;
             }
+
             if (cal_mlcape) {
-               int input_levels;
                float mlcape_val =  bad_data_float;
-               float *p_values, *t_values, *q_values;
-               float *P_bins = 0;
-               float *T_bins = 0;
-               float *Q_bins = 0;
 
-               input_levels = cape_level;
-               if (use_CAPE_BIN) {
-                  int p_levels = (cape_data_pres[cape_level-1] - cape_data_pres[0]) / MLCAPE_INTERVAL + 1;
-                  if (p_levels > 1) {
-                     float p_upper;
-                     int idx_mlcape, counts[p_levels];
-                     P_bins = new float [p_levels];
-                     T_bins = new float [p_levels];
-                     Q_bins = new float [p_levels];
-
-                     idx_mlcape = 0;
-                     p_upper = MLCAPE_INTERVAL;
-                     for (int idx=0; idx<cape_level; idx++) {
-                        if(cape_data_pres[idx] < 0.) continue;
-                        if(cape_data_pres[idx] > p_upper) {
-                           for (int idx2=1; idx2<cape_level; idx2++) {
-                             p_upper += MLCAPE_INTERVAL;
-                             if (cape_data_pres[idx] < p_upper) {
-                                idx_mlcape++;
-                                break;
-                             }
-                           }
-                        }
-                        if(cape_data_pres[idx] <= p_upper) {
-                           counts[idx_mlcape]++;
-                           P_bins[idx_mlcape] += cape_data_pres[idx];
-                           T_bins[idx_mlcape] += cape_data_temp[idx];
-                           Q_bins[idx_mlcape] += cape_data_spfh[idx];
-                        }
-                     }
-                     input_levels = idx_mlcape + 1;
-                     if (idx_mlcape > 0) {
-                        for (int idx=0; idx<input_levels; idx++) {
-                          if (counts[idx] > 0) {
-                             P_bins[idx] /= counts[idx];
-                             T_bins[idx] /= counts[idx];
-                             Q_bins[idx] /= counts[idx];
-                          }
-                        }
-                     }
-                     p_values = P_bins;
-                     t_values = T_bins;
-                     q_values = Q_bins;
-                  }
-               }
-               else {
-                  p_values = (float *)cape_data_pres;
-                  t_values = (float *)cape_data_temp;
-                  q_values = (float *)cape_data_spfh;
-               }
-
-               if(p_values != 0) {
-                  // The second last seems to be better than the average of last two or three
-                  p1d = p_values[input_levels-2];
-                  t1d = t_values[input_levels-2];
-                  q1d = q_values[input_levels-2];
-                  ivirt = 0;
-                  itype = 2;
-                  calcape_(&ivirt,&itype, t_values, q_values, p_values,
-                           &p1d,&t1d,&q1d, static_dummy_201,
-                           &input_levels, &IMM,&JMM, &input_levels,
-                           &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
-                  ivirt = 1;
-                  calcape_(&ivirt,&itype, t_values, q_values, p_values,
-                           &p1d,&t1d,&q1d, static_dummy_201,
-                           &input_levels, &IMM,&JMM, &input_levels,
-                           &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
-                  if (mlcape_val>0 && cape_val>0) mlcape_val = (mlcape_val + cape_val) / 2;
-               }
-
+               ivirt = 1;
+               itype = 2;
+               // The second last seems to be better than the average of last two or three
+               p1d = cape_data_pres[cape_level-2];
+               t1d = cape_data_temp[cape_level-2];
+               q1d = cape_data_spfh[cape_level-2];
+               calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
+                        &p1d,&t1d,&q1d, static_dummy_201,
+                        &cape_level, &IMM,&JMM, &cape_level,
+                        &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
                if (mlcape_val > MAX_CAPE_VALUE) {
                   mlcape_cnt_too_big++;
                   mlog << Debug(5) << method_name
-                       << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
-                       << ", cin_val: " << cin_val
-                       << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+                       << " Ignored ML_cape: " << mlcape_val << " cape_level: "
+                       << cape_level << "\n";
                }
                else if (mlcape_val >= 0) {
                   obs_arr[1] = mlcape_code;
@@ -1804,10 +1738,6 @@ void process_pbfile(int i_pb) {
                   if (is_eq(mlcape_val, 0.)) mlcape_cnt_zero_values++;
                }
                else mlcape_cnt_missing_values++;
-               if (P_bins != 0) delete [] P_bins;
-               if (T_bins != 0) delete [] T_bins;
-               if (Q_bins != 0) delete [] Q_bins;
-
             }
          }
          else if (1 < buf_nlev) cape_cnt_no_levels++;
@@ -3118,9 +3048,10 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
            << " from TQ (" << tq_count << ") and UV (" << uv_count
            << ")\n";
 
-      if (pbl_level <= 0) {
+      if (pbl_level <= 1) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because an empty list after combining TQZ and UV\n";
+              << "Skip CALPBL because of " << (pbl_level == 1) ? "only one record " : "an empty list"
+              << " after combining TQZ and UV\n";
       }
       else {
          // Order all observations by pressure from bottom to top
