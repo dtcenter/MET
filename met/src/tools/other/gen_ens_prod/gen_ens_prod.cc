@@ -1074,14 +1074,7 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append the normalization info, if used
-   if(ens_info->normalize != NormalizeType_None &&
-      strcmp(type_str, "CLIMO_MEAN")  != 0           &&
-      strcmp(type_str, "CLIMO_STDEV") != 0) {
-     var_str << "_" << normalizetype_to_string(ens_info->normalize);
-   }
-
-   // Append nc_var_str config file entry
+   // Append nc_var_str config file entry, if specified
    cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
@@ -1137,12 +1130,7 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append the normalization info, if used
-   if(ens_info->normalize != NormalizeType_None) {
-     var_str << "_" << normalizetype_to_string(ens_info->normalize);
-   }
-
-   // Append nc_var_str config file entry
+   // Append nc_var_str config file entry, if specified
    cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
@@ -1225,11 +1213,6 @@ void add_var_att_local(GenEnsProdVarInfo *ens_info,
 
    if(is_int) add_att(nc_var, "_FillValue", bad_data_int);
    else       add_att(nc_var, "_FillValue", bad_data_float);
-
-   if(ens_info->normalize != NormalizeType_None) {
-      add_att(nc_var, "normalize",
-              (string)normalizetype_to_string(ens_info->normalize));
-   }
 
    // Write out times
    write_netcdf_var_times(nc_var, dp);
