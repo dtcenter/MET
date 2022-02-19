@@ -626,8 +626,9 @@ static void normalize_data(DataPlane &dp, NormalizeType t,
    if((t == NormalizeType_ClimoAnom || t == NormalizeType_ClimoStdAnom) &&
       dp.nxy() != cmn_dp.nxy()) {
       mlog << Error << "\nnormalize_data()-> "
-           << "the climatology mean field is required for "
-           << normalizetype_to_string(t) << "!\n\n";
+           << "the climatology mean field is required when "
+           << conf_key_normalize_flag << " = "
+           << normalizetype_to_string(t) << ".\n\n";
       exit(1);
    }
 
@@ -635,8 +636,9 @@ static void normalize_data(DataPlane &dp, NormalizeType t,
    if(t == NormalizeType_ClimoStdAnom &&
       dp.nxy() != csd_dp.nxy()) {
       mlog << Error << "\nnormalize_data()-> "
-           << "the climatology standard deviation field is required for "
-           << normalizetype_to_string(t) << "!\n\n";
+           << "the climatology standard deviation field is required when "
+           << conf_key_normalize_flag << " = "
+           << normalizetype_to_string(t) << ".\n\n";
       exit(1);
    }
 
