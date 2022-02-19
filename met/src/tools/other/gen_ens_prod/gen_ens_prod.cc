@@ -75,7 +75,7 @@ static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
 static void write_ens_data_plane(GenEnsProdVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
-static void add_var_att_local(VarInfo *, NcVar *, bool is_int,
+static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
                               const DataPlane &, const char *, const char *);
 
 static void clean_up();
@@ -1064,6 +1064,11 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
+   // Append the normalization info, if used
+   if(ens_info->normalize_flag != NormalizeType_None) {
+     var_str << "_" << normalizetype_to_string(ens_info->normalize_flag);
+   }
+
    // Append nc_var_str config file entry
    cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
@@ -1098,7 +1103,7 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
    }
 
    // Add the variable attributes
-   add_var_att_local(ens_info->get_var_info(), &ens_var, false, dp,
+   add_var_att_local(ens_info, &ens_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -1119,6 +1124,11 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
                        const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
+
+   // Append the normalization info, if used
+   if(ens_info->normalize_flag != NormalizeType_None) {
+     var_str << "_" << normalizetype_to_string(ens_info->normalize_flag);
+   }
 
    // Append nc_var_str config file entry
    cs = ens_info->nc_var_str;
@@ -1145,7 +1155,7 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
             << type_str;
 
    // Add the variable attributes
-   add_var_att_local(ens_info->get_var_info(), &ens_var, true, dp,
+   add_var_att_local(ens_info, &ens_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -1181,11 +1191,13 @@ void write_ens_data_plane(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, 
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
+void add_var_att_local(GenEnsProdVarInfo *ens_info,
+                       NcVar *nc_var, bool is_int,
                        const DataPlane &dp,
                        const char *name_str,
                        const char *long_name_str) {
    ConcatString att_str;
+   VarInfo *info = ens_info->get_var_info();
 
    // Construct the long name
    att_str << cs_erase
@@ -1201,6 +1213,11 @@ void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
 
    if(is_int) add_att(nc_var, "_FillValue", bad_data_int);
    else       add_att(nc_var, "_FillValue", bad_data_float);
+
+   if(ens_info->normalize_flag != NormalizeType_None) {
+      add_att(nc_var, "normalize_flag",
+              (string)normalizetype_to_string(ens_info->normalize_flag));
+   }
 
    // Write out times
    write_netcdf_var_times(nc_var, dp);
