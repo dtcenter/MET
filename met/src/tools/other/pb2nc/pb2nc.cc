@@ -1667,6 +1667,8 @@ void process_pbfile(int i_pb) {
             }
 
             if (cal_cape) {
+               ivirt = 1;
+               itype = 1;
                calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
                         &p1d,&t1d,&q1d, static_dummy_201,
                         &cape_level, &IMM,&JMM, &cape_level,
