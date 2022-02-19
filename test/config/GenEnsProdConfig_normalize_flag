@@ -36,11 +36,11 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh  = [];
-censor_val     = [];
-cat_thresh     = [];
-nc_var_str     = "";
-normalize_flag = NONE;
+censor_thresh = [];
+censor_val    = [];
+normalize     = NONE;
+cat_thresh    = [];
+nc_var_str    = "";
 
 //
 // Ensemble fields to be processed
@@ -53,11 +53,11 @@ ens = {
    level = "Z2";
 
    field = [
-      { normalize_flag = NONE;           },
-      { normalize_flag = CLIMO_ANOM;     },
-      { normalize_flag = CLIMO_STD_ANOM; },
-      { normalize_flag = FCST_ANOM;      },
-      { normalize_flag = FCST_STD_ANOM;  }
+      { normalize  = NONE;                                          },
+      { normalize  = CLIMO_ANOM;     nc_var_str = "CLIMO_ANOM";     }, 
+      { normalize  = CLIMO_STD_ANOM; nc_var_str = "CLIMO_STD_ANOM"; },
+      { normalize  = FCST_ANOM;      nc_var_str = "FCST_ANOM";      },
+      { normalize  = FCST_STD_ANOM;  nc_var_str = "FCST_STD_ANOM";  }
    ];
 }
 

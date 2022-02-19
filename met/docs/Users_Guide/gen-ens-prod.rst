@@ -181,9 +181,9 @@ _____________________
 
 .. code-block:: none
 
-  normalize_flag = NONE;
+  normalize = NONE;
 
-The **normalize_flag** option defines if and how the input ensemble member data should be normalized. Options are provided to normalize relative to an external climatology, specified using the **climo_mean** and **climo_stdev** dictionaries, or relative to current ensemble data being processed. The anomaly is computed by subtracting the (climatological or ensemble) mean from each ensemble memeber. The standard anomaly is computed by also dividing the anomaly by the (climatological or ensemble) standard deviation. Values for the **normalize_flag** option are described below:
+The **normalize** option defines if and how the input ensemble member data should be normalized. Options are provided to normalize relative to an external climatology, specified using the **climo_mean** and **climo_stdev** dictionaries, or relative to current ensemble forecast being processed. The anomaly is computed by subtracting the (climatological or ensemble) mean from each ensemble memeber. The standard anomaly is computed by dividing the anomaly by the (climatological or ensemble) standard deviation. Values for the **normalize** option are described below:
 
 • **NONE** (default) to skip the normalization step and process the raw ensemble member data.
 
@@ -191,11 +191,11 @@ The **normalize_flag** option defines if and how the input ensemble member data 
 
 • **CLIMO_STD_ANOM** to subtract the climatological mean field and divide by the climatological standard deviation.
 
-• **FCST_ANOM** to subtract the ensemble mean field.
+• **FCST_ANOM** to subtract the current ensemble mean field.
 
-• **FCST_STD_ANOM** to subtract the ensemble mean field and divide by the ensemble standard deviation.
+• **FCST_STD_ANOM** to subtract the current ensemble mean field and divide by the current ensemble standard deviation.
 
-Note that the **normalize_flag** option may be specified separately for each entry in the **ens.field** array.
+Note that the **normalize** option may be specified separately for each entry in the **ens.field** array.
 
 _______________________
 

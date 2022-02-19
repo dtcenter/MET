@@ -3023,18 +3023,18 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NormalizeType parse_conf_normalize_flag(Dictionary *dict) {
+NormalizeType parse_conf_normalize(Dictionary *dict) {
    NormalizeType t = NormalizeType_None;
    int v;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_normalize_type() -> "
+      mlog << Error << "\nparse_conf_normalize() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
    // Get the integer flag value for the current entry
-   v = dict->lookup_int(conf_key_normalize_flag);
+   v = dict->lookup_int(conf_key_normalize);
 
    // Convert integer to enumerated WaveletType
         if(v == conf_const.lookup_int(conf_val_none))           t = NormalizeType_None;
@@ -3043,9 +3043,9 @@ NormalizeType parse_conf_normalize_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_fcst_anom))      t = NormalizeType_FcstAnom;
    else if(v == conf_const.lookup_int(conf_val_fcst_std_anom))  t = NormalizeType_FcstStdAnom;
    else {
-      mlog << Error << "\nparse_conf_normalize_flag() -> "
+      mlog << Error << "\nparse_conf_normalize() -> "
            << "Unexpected config file value of " << v << " for \""
-           << conf_key_normalize_flag << "\".\n\n";
+           << conf_key_normalize << "\".\n\n";
       exit(1);
    }
 

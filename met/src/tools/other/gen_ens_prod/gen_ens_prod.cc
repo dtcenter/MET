@@ -17,7 +17,7 @@
 //   000    09/10/21  Halley Gotway  MET #1904 Initial version.
 //   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   002    01/14/21  McCabe         MET #1695 All members in one file.
-//   003    02/17/22  Halley Gotway  MET #1918 Add normalize_flag.
+//   003    02/17/22  Halley Gotway  MET #1918 Add normalize config option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -292,9 +292,9 @@ void process_ensemble() {
 
       // Print out the normalization flag
       cs << cs_erase;
-      if((*var_it)->normalize_flag != NormalizeType_None) {
-         cs << " with normalize_flag = "
-            << normalizetype_to_string((*var_it)->normalize_flag);
+      if((*var_it)->normalize != NormalizeType_None) {
+         cs << " with normalize = "
+            << normalizetype_to_string((*var_it)->normalize);
       }
       cs << "\n";
 
@@ -347,8 +347,8 @@ void process_ensemble() {
                         i_var, ens_valid_ut, grid);
 
             // Compute the ensemble summary data, if needed
-            if((*var_it)->normalize_flag == NormalizeType_FcstAnom ||
-               (*var_it)->normalize_flag == NormalizeType_FcstStdAnom ) {
+            if((*var_it)->normalize == NormalizeType_FcstAnom ||
+               (*var_it)->normalize == NormalizeType_FcstStdAnom ) {
                get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
             }
             else {
@@ -375,8 +375,8 @@ void process_ensemble() {
                }
 
                // Normalize, if requested
-               if((*var_it)->normalize_flag != NormalizeType_None) {
-                  normalize_data(ctrl_dp, (*var_it)->normalize_flag,
+               if((*var_it)->normalize != NormalizeType_None) {
+                  normalize_data(ctrl_dp, (*var_it)->normalize,
                                  cmn_dp, csd_dp, emn_dp, esd_dp);
                }
 
@@ -395,8 +395,8 @@ void process_ensemble() {
          } // end if need_reset
 
          // Normalize, if requested
-         if((*var_it)->normalize_flag != NormalizeType_None) {
-            normalize_data(ens_dp, (*var_it)->normalize_flag,
+         if((*var_it)->normalize != NormalizeType_None) {
+            normalize_data(ens_dp, (*var_it)->normalize,
                            cmn_dp, csd_dp, emn_dp, esd_dp);
          }
 
@@ -627,7 +627,7 @@ static void normalize_data(DataPlane &dp, NormalizeType t,
       dp.nxy() != cmn_dp.nxy()) {
       mlog << Error << "\nnormalize_data()-> "
            << "the climatology mean field is required when "
-           << conf_key_normalize_flag << " = "
+           << conf_key_normalize << " = "
            << normalizetype_to_string(t) << ".\n\n";
       exit(1);
    }
@@ -637,7 +637,7 @@ static void normalize_data(DataPlane &dp, NormalizeType t,
       dp.nxy() != csd_dp.nxy()) {
       mlog << Error << "\nnormalize_data()-> "
            << "the climatology standard deviation field is required when "
-           << conf_key_normalize_flag << " = "
+           << conf_key_normalize << " = "
            << normalizetype_to_string(t) << ".\n\n";
       exit(1);
    }
@@ -1075,10 +1075,10 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
    ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append the normalization info, if used
-   if(ens_info->normalize_flag != NormalizeType_None &&
+   if(ens_info->normalize != NormalizeType_None &&
       strcmp(type_str, "CLIMO_MEAN")  != 0           &&
       strcmp(type_str, "CLIMO_STDEV") != 0) {
-     var_str << "_" << normalizetype_to_string(ens_info->normalize_flag);
+     var_str << "_" << normalizetype_to_string(ens_info->normalize);
    }
 
    // Append nc_var_str config file entry
@@ -1138,8 +1138,8 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
    ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append the normalization info, if used
-   if(ens_info->normalize_flag != NormalizeType_None) {
-     var_str << "_" << normalizetype_to_string(ens_info->normalize_flag);
+   if(ens_info->normalize != NormalizeType_None) {
+     var_str << "_" << normalizetype_to_string(ens_info->normalize);
    }
 
    // Append nc_var_str config file entry
@@ -1226,9 +1226,9 @@ void add_var_att_local(GenEnsProdVarInfo *ens_info,
    if(is_int) add_att(nc_var, "_FillValue", bad_data_int);
    else       add_att(nc_var, "_FillValue", bad_data_float);
 
-   if(ens_info->normalize_flag != NormalizeType_None) {
-      add_att(nc_var, "normalize_flag",
-              (string)normalizetype_to_string(ens_info->normalize_flag));
+   if(ens_info->normalize != NormalizeType_None) {
+      add_att(nc_var, "normalize",
+              (string)normalizetype_to_string(ens_info->normalize));
    }
 
    // Write out times

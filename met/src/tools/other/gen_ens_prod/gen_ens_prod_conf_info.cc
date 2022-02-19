@@ -257,8 +257,8 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       // Keep track of the maximum number of thresholds
       if(ens_info->cat_ta.n() > max_n_cat) max_n_cat = ens_info->cat_ta.n();
 
-      // Conf: normalize_flag
-      ens_info->normalize_flag = parse_conf_normalize_flag(&i_edict);
+      // Conf: normalize
+      ens_info->normalize = parse_conf_normalize(&i_edict);
 
       // Conf: ensemble_flag
       ens_info->nc_info = parse_nc_info(&i_edict);

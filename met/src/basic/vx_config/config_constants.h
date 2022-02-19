@@ -770,7 +770,7 @@ static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
 // Gen-Ens-Prod specific parameter key names
 //
 
-static const char conf_key_normalize_flag[]   = "normalize_flag";
+static const char conf_key_normalize[]   = "normalize";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";
