@@ -281,7 +281,7 @@ void process_ensemble() {
    DataPlane emn_dp, esd_dp;
    unixtime max_init_ut = bad_data_ll;
    VarInfo *var_info;
-   ConcatString ens_file;
+   ConcatString cs, ens_file;
 
    // Loop through each of the ensemble fields to be processed
    vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
@@ -290,10 +290,18 @@ void process_ensemble() {
       // Need to reinitialize counts and sums for each ensemble field
       need_reset = true;
 
+      // Print out the normalization flag
+      cs << cs_erase;
+      if((*var_it)->normalize_flag != NormalizeType_None) {
+         cs << " with normalize_flag = "
+            << normalizetype_to_string((*var_it)->normalize_flag);
+      }
+      cs << "\n";
+
       var_info = (*var_it)->get_var_info();
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing ensemble field: "
-           << (*var_it)->raw_magic_str << "\n";
+           << (*var_it)->raw_magic_str << cs;
 
       n_ens_inputs = (*var_it)->inputs_n();
       for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
@@ -442,9 +450,9 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
       exit(1);
    }
 
-   mlog << Debug(3)
+   mlog << Debug(2)
         << "Computing the ensemble mean and standard deviation for "
-        << ens_info->raw_magic_str << "\n";
+        << ens_info->raw_magic_str << ".\n";
 
    // Loop over the ensemble inputs
    for(i_ens=0; i_ens < ens_info->inputs_n(); i_ens++) {
@@ -495,7 +503,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
    // Read ensemble control member data, if provided
    if(ctrl_file.nonempty()) {
-      VarInfo *var_info = ens_info->get_ctrl(i_ens);
+      VarInfo *var_info = ens_info->get_ctrl(0);
 
       // Error out if missing
       if(!get_data_plane(ctrl_file.c_str(), etype,
@@ -1065,7 +1073,9 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
    ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append the normalization info, if used
-   if(ens_info->normalize_flag != NormalizeType_None) {
+   if(ens_info->normalize_flag != NormalizeType_None &&
+      strcmp(type_str, "CLIMO_MEAN")  != 0           &&
+      strcmp(type_str, "CLIMO_STDEV") != 0) {
      var_str << "_" << normalizetype_to_string(ens_info->normalize_flag);
    }
 
