@@ -260,8 +260,10 @@ static const char *airnow_aux_vars = "TPHR QCIND";
 // Pick the latter one if exists multiuple variables
 static const char *bufr_avail_sid_names = "SID SAID RPID";
 static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
+static const char *derived_mlcape = "D_MLCAPE";
 static const char *derived_cape = "D_CAPE";
 static const char *derived_pbl  = "D_PBL";
+static const float MLCAPE_INTERVAL = 3000.;
 
 static double bufr_obs[mxr8lv][mxr8pm];
 static double bufr_obs_extra[mxr8lv][mxr8pm];
@@ -511,6 +513,7 @@ void initialize() {
    prepbufr_derive_vars.add("D_MIXR");
    prepbufr_derive_vars.add("D_PRMSL");
    prepbufr_derive_vars.add("D_CAPE");
+   prepbufr_derive_vars.add("D_MLCAPE");
    prepbufr_derive_vars.add("D_PBL");
 
    for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
@@ -982,10 +985,13 @@ void process_pbfile(int i_pb) {
    int itype = 1;   // itype 1: where a parcel is lifted from the ground
                     // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
+   int mlcape_code = -1;
    float p1d,t1d,q1d;
    int IMM, JMM;
-   int cape_level=0, cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs=0;
-   int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
+   int cape_level, cape_count, cape_cnt_too_big, cape_cnt_surface_msgs;
+   int cape_cnt_no_levels, cape_cnt_missing_values, cape_cnt_zero_values;
+   int mlcape_count, mlcape_cnt_too_big;
+   int mlcape_cnt_missing_values, mlcape_cnt_zero_values;
    float cape_p, cape_h;
    float cape_qm = bad_data_float;
 
@@ -997,8 +1003,9 @@ void process_pbfile(int i_pb) {
 
    bool has_pbl_data;
    bool do_pbl = false;
-   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code, false);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code, false);
+   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code, false);
+   bool cal_mlcape = bufr_obs_name_arr.has(derived_mlcape, mlcape_code, false);
 
    bool     is_same_header;
    unixtime prev_hdr_vld_ut = (unixtime) 0;
@@ -1010,6 +1017,10 @@ void process_pbfile(int i_pb) {
 
    // Initialize
    prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
+   cape_level = cape_count = cape_cnt_too_big = 0;
+   cape_cnt_no_levels = cape_cnt_missing_values = cape_cnt_zero_values = 0;
+   mlcape_count = mlcape_cnt_too_big = 0;
+   mlcape_cnt_missing_values = mlcape_cnt_zero_values = 0;
 
    if (cal_pbl) {
       is_same_header = false;
@@ -1327,7 +1338,7 @@ void process_pbfile(int i_pb) {
          }
       }
 
-      if (cal_cape) {
+      if (cal_cape || cal_mlcape) {
          cape_level = 0;
       }
 
@@ -1471,7 +1482,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[4] += c_to_k;
                }
 
-               if (cal_cape) {
+               if (cal_cape || cal_mlcape) {
                   if(grib_code == pres_grib_code) {
                      is_cape_input = true;
                      if (cape_level < MAX_CAPE_LEVEL) cape_data_pres[cape_level] = obs_arr[4];
@@ -1567,7 +1578,7 @@ void process_pbfile(int i_pb) {
             } // end for i
          }
 
-         if (cal_cape) {
+         if (cal_cape || cal_mlcape) {
             if (cape_member_cnt >= 3) cape_level++;
          }
 
@@ -1603,7 +1614,7 @@ void process_pbfile(int i_pb) {
          }
       } // end for lv
 
-      if (cal_cape) {
+      if (cal_cape || cal_mlcape) {
          if (1 < cape_level) {
             bool reverse_levels;
             float cape_val, cin_val, PLCL,PEQL;
@@ -1646,14 +1657,6 @@ void process_pbfile(int i_pb) {
                }
             }
 
-            //p1d = cape_p;
-            //t1d = cape_data_temp[cape_level-1];
-            //q1d = cape_data_spfh[cape_level-1];
-            calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
-                     &p1d,&t1d,&q1d, static_dummy_201,
-                     &cape_level, &IMM,&JMM, &cape_level,
-                     &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
-
             if(mlog.verbosity_level() >= 7) {
                mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE from "
                     << i_read << "-th message\n" ;
@@ -1661,37 +1664,83 @@ void process_pbfile(int i_pb) {
                   mlog << Debug(7) << method_name  << "   " << idx << ", " << cape_data_pres[idx]
                        << ", " << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
                }
-               mlog << Debug(7) << method_name
-                    << " calcape_(" << ivirt << "," << itype << ") cape_val: "
-                    << cape_val << " cape_level: " << cape_level
-                    << ", cin_val: " << cin_val
-                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL
-                    << "   lat: " << hdr_lat << ", lon: " << hdr_lon
-                    << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
-                    << " " << hdr_typ << " " << hdr_sid
-                    << "\n\n" ;
             }
 
-            if (cape_val > MAX_CAPE_VALUE) {
-               cape_cnt_too_big++;
-               mlog << Debug(5) << method_name
-                    << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
-                    << ", cin_val: " << cin_val
-                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+            if (cal_cape) {
+               ivirt = 1;
+               itype = 1;
+               calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
+                        &p1d,&t1d,&q1d, static_dummy_201,
+                        &cape_level, &IMM,&JMM, &cape_level,
+                        &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+
+               if(mlog.verbosity_level() >= 7) {
+                  mlog << Debug(7) << method_name
+                       << " calcape_(" << ivirt << "," << itype << ") cape_val: "
+                       << cape_val << " cape_level: " << cape_level
+                       << ", cin_val: " << cin_val
+                       << ", PLCL: " << PLCL << ", PEQL: " << PEQL
+                       << "   lat: " << hdr_lat << ", lon: " << hdr_lon
+                       << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                       << " " << hdr_typ << " " << hdr_sid
+                       << "\n\n" ;
+               }
+
+               if (cape_val > MAX_CAPE_VALUE) {
+                  cape_cnt_too_big++;
+                  mlog << Debug(5) << method_name
+                       << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
+                       << ", cin_val: " << cin_val
+                       << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+               }
+               else if (cape_val >= 0) {
+                  obs_arr[1] = cape_code;
+                  obs_arr[2] = cape_p;
+                  obs_arr[3] = cape_h;
+                  obs_arr[4] = cape_val; // observation value
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                                 hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                                 OBS_BUFFER_SIZE);
+                  cape_count++;
+                  n_derived_obs++;
+                  if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
+               }
+               else cape_cnt_missing_values++;
             }
-            else if (cape_val >= 0) {
-               obs_arr[1] = cape_code;
-               obs_arr[2] = cape_p;
-               obs_arr[3] = cape_h;
-               obs_arr[4] = cape_val; // observation value
-               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                              hdr_lat, hdr_lon, hdr_elv, cape_qm,
-                              OBS_BUFFER_SIZE);
-               cape_count++;
-               n_derived_obs++;
-               if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
+
+            if (cal_mlcape) {
+               float mlcape_val =  bad_data_float;
+
+               ivirt = 1;
+               itype = 2;
+               // The second last seems to be better than the average of last two or three
+               p1d = cape_data_pres[cape_level-2];
+               t1d = cape_data_temp[cape_level-2];
+               q1d = cape_data_spfh[cape_level-2];
+               calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
+                        &p1d,&t1d,&q1d, static_dummy_201,
+                        &cape_level, &IMM,&JMM, &cape_level,
+                        &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+               if (mlcape_val > MAX_CAPE_VALUE) {
+                  mlcape_cnt_too_big++;
+                  mlog << Debug(5) << method_name
+                       << " Ignored ML_cape: " << mlcape_val << " cape_level: "
+                       << cape_level << "\n";
+               }
+               else if (mlcape_val >= 0) {
+                  obs_arr[1] = mlcape_code;
+                  obs_arr[2] = cape_p;
+                  obs_arr[3] = cape_h;
+                  obs_arr[4] = mlcape_val; // observation value
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                                 hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                                 OBS_BUFFER_SIZE);
+                  mlcape_count++;
+                  n_derived_obs++;
+                  if (is_eq(mlcape_val, 0.)) mlcape_cnt_zero_values++;
+               }
+               else mlcape_cnt_missing_values++;
             }
-            else cape_cnt_missing_values++;
          }
          else if (1 < buf_nlev) cape_cnt_no_levels++;
          else cape_cnt_surface_msgs++;
@@ -1948,13 +1997,13 @@ void process_pbfile(int i_pb) {
         << "Total observations retained or derived\t= "
         << (n_file_obs + n_derived_obs) << "\n";
 
-   if (cal_cape) {
-      mlog << Debug(3) << "\nDerived CAPE = " << cape_count
-           << "\tZero = " << cape_cnt_zero_values
+   if (cal_cape || cal_mlcape) {
+      mlog << Debug(3) << "\nDerived CAPE = " << (cape_count + mlcape_count)
+           << "\tZero = " << (cape_cnt_zero_values + mlcape_cnt_zero_values)
            << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
            << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
-           << "\n\tfiltered: " << cape_cnt_missing_values << ", "
-           << cape_cnt_too_big
+           << "\n\tfiltered: " << (cape_cnt_missing_values + mlcape_cnt_missing_values) << ", "
+           << (cape_cnt_too_big + mlcape_cnt_too_big)
            << "\n";
    }
 
@@ -3003,7 +3052,11 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
 
       if (pbl_level <= 0) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because an empty list after combining TQZ and UV\n";
+              << "Skip CALPBL because of an empty list after combining TQZ and UV\n";
+      }
+      else if (pbl_level == 1) {
+         mlog << Debug(4) << method_name
+              << "Skip CALPBL because of only one available record after combining TQZ and UV\n";
       }
       else {
          // Order all observations by pressure from bottom to top
@@ -3057,7 +3110,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                   pbl_data_hgt[index]  = pqtzuv[3];
                   pbl_data_ugrd[index] = pqtzuv[4];
                   pbl_data_vgrd[index] = pqtzuv[5];
-                  mlog << Debug(5) << method_name << "Force to add "
+                  mlog << Debug(6) << method_name << "Force to add "
                        << pres_level << " into " << index << "\n";
                   index--;
                }
@@ -3077,11 +3130,11 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
 
          if (hgt_cnt < pbl_level) {
             hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
-            mlog << Debug(4) << method_name << "interpolate Z (HGT)\n";
+            mlog << Debug(6) << method_name << "interpolate Z (HGT)\n";
          }
          if (spfh_cnt < pbl_level) {
             spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
-            mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
+            mlog << Debug(6) << method_name << "interpolate Q (SPFH)\n";
          }
 
          if ((spfh_cnt>0) && (pbl_level>0)) {

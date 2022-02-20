@@ -94,7 +94,7 @@ obs_bufr_map = [];
 // This map is for PREPBUFR. It will be added into obs_bufr_map.
 // Please do not override this map.
 //
-obs_prefbufr_map = [
+obs_prepbufr_map = [
    { key = "POB";     val = "PRES";  },
    { key = "QOB";     val = "SPFH";  },
    { key = "TOB";     val = "TMP";   },

@@ -227,7 +227,7 @@ _____________________
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 
 
-Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, and D_CAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, and convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
+Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, D_CAPE, and D_MLCAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, convective available potential energy, and mixed layer convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
 
 _____________________
 
@@ -248,6 +248,7 @@ _____________________
 		{ key = 'D_PRMSL';  val = 'PRMSL'; },
 		{ key = 'D_PBL';    val = 'PBL';   },
 		{ key = 'D_CAPE';   val = 'CAPE';  }
+		{ key = 'D_MLCAPE'; val = 'MLCAPE';  }
 		];
 
 

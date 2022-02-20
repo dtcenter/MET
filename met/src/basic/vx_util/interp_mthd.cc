@@ -44,6 +44,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       case(InterpMthd_Gaussian):    out = interpmthd_gaussian_str;    break;
       case(InterpMthd_MaxGauss):    out = interpmthd_maxgauss_str;    break;
       case(InterpMthd_Geog_Match):  out = interpmthd_geog_match_str;  break;
+      case(InterpMthd_HiRA):        out = interpmthd_hira_str;        break;
 
       case(InterpMthd_None):
       default:                      out = interpmthd_none_str;        break;
@@ -77,6 +78,7 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_gaussian_str  )  == 0) m = InterpMthd_Gaussian;
    else if(strcmp(mthd_str, interpmthd_maxgauss_str  )  == 0) m = InterpMthd_MaxGauss;
    else if(strcmp(mthd_str, interpmthd_geog_match_str)  == 0) m = InterpMthd_Geog_Match;
+   else if(strcmp(mthd_str, interpmthd_hira_str)        == 0) m = InterpMthd_HiRA;
    else                                                       m = InterpMthd_None;
 
    return(m);

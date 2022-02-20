@@ -24,6 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
+static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -140,9 +141,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -1084,14 +1086,6 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
 map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
-   parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
-   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2279,6 +2273,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i

@@ -330,8 +330,6 @@ void MetNcFile::dump(ostream & out, int depth) const
 {
 
 int j, k;
-int month, day, year, hour, minute, second;
-char junk[256];
 Indent prefix(depth);
 Indent p2(depth + 1);
 Indent p3(depth + 2);
@@ -359,12 +357,6 @@ out << prefix << "\n";
 
 out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
 out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
-
-out << prefix << "\n";
-
-snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
-
-out << junk << "\n";
 
 out << prefix << "\n";
 
