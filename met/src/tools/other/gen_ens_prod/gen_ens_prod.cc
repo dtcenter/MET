@@ -57,9 +57,6 @@ static void process_ensemble();
 
 static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
-static void normalize_data(DataPlane &, NormalizeType,
-                           const DataPlane &, const DataPlane &,
-                           const DataPlane &, const DataPlane &);
 
 static void clear_counts();
 static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
@@ -377,7 +374,7 @@ void process_ensemble() {
                // Normalize, if requested
                if((*var_it)->normalize != NormalizeType_None) {
                   normalize_data(ctrl_dp, (*var_it)->normalize,
-                                 cmn_dp, csd_dp, emn_dp, esd_dp);
+                                 &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
                }
 
                // Apply current data to the running sums and counts
@@ -397,7 +394,7 @@ void process_ensemble() {
          // Normalize, if requested
          if((*var_it)->normalize != NormalizeType_None) {
             normalize_data(ens_dp, (*var_it)->normalize,
-                           cmn_dp, csd_dp, emn_dp, esd_dp);
+                           &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
          }
 
          // Apply current data to the running sums and counts
@@ -611,67 +608,6 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
    return(found);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void normalize_data(DataPlane &dp, NormalizeType t,
-                           const DataPlane &cmn_dp, const DataPlane &csd_dp,
-                           const DataPlane &emn_dp, const DataPlane &esd_dp) {
-
-   mlog << Debug(3) << "Normalizing ensemble data using "
-        << normalizetype_to_string(t) << ".\n";
-
-   // Check for climo mean
-   if((t == NormalizeType_ClimoAnom || t == NormalizeType_ClimoStdAnom) &&
-      dp.nxy() != cmn_dp.nxy()) {
-      mlog << Error << "\nnormalize_data()-> "
-           << "the climatology mean field is required when "
-           << conf_key_normalize << " = "
-           << normalizetype_to_string(t) << ".\n\n";
-      exit(1);
-   }
-
-   // Check for climo standard deviation
-   if(t == NormalizeType_ClimoStdAnom &&
-      dp.nxy() != csd_dp.nxy()) {
-      mlog << Error << "\nnormalize_data()-> "
-           << "the climatology standard deviation field is required when "
-           << conf_key_normalize << " = "
-           << normalizetype_to_string(t) << ".\n\n";
-      exit(1);
-   }
-
-   // Supported types
-   switch(t) {
-
-      case NormalizeType_None:
-         break;
-
-      case NormalizeType_ClimoAnom:
-         dp.anomaly(cmn_dp);
-         break;
-
-      case NormalizeType_ClimoStdAnom:
-         dp.standard_anomaly(cmn_dp, csd_dp);
-         break;
-
-      case NormalizeType_FcstAnom:
-         dp.anomaly(emn_dp);
-         break;
-
-      case NormalizeType_FcstStdAnom:
-         dp.standard_anomaly(emn_dp, esd_dp);
-         break;
-
-      default:
-         mlog << Error << "\nnormalize_data()-> "
-              << "unexpected NormalizeType value ("
-              << t << ")\n\n";
-         exit(1);
-   } // end switch
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

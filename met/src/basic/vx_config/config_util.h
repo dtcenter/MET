@@ -22,6 +22,7 @@
 #include "config_file.h"
 #include "data_file_type.h"
 #include "config_gaussian.h"
+#include "normalize.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -119,9 +120,6 @@ extern ConcatString obssummary_to_string(ObsSummary, int);
 
 extern MatchType    int_to_matchtype(int);
 extern ConcatString matchtype_to_string(MatchType);
-
-extern NormalizeType int_to_normalizetype(int);
-extern ConcatString  normalizetype_to_string(NormalizeType);
 
 extern DistType     int_to_disttype(int);
 extern DistType     string_to_disttype(const char *);

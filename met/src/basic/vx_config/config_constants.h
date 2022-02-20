@@ -472,20 +472,6 @@ enum MatchType {
 };
 
 ////////////////////////////////////////////////////////////////////////
-
-//
-// Enumeration for normalization options
-//
-
-enum NormalizeType {
-   NormalizeType_None,         // No normalization
-   NormalizeType_ClimoAnom,    // Subtract climo mean
-   NormalizeType_ClimoStdAnom, // Subtract climo mean and divide by standard deviation
-   NormalizeType_FcstAnom,     // Subtract ensemble mean
-   NormalizeType_FcstStdAnom   // Subtract ensemble mean and divide by standard deviation
-};
-
-////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
 //
@@ -779,12 +765,6 @@ static const char conf_val_chisquared[]  = "CHISQUARED";
 static const char conf_val_gamma[]       = "GAMMA";
 static const char conf_val_uniform[]     = "UNIFORM";
 static const char conf_val_beta[]        = "BETA";
-
-// Normalization options
-static const char conf_val_climo_anom[]     = "CLIMO_ANOM";
-static const char conf_val_climo_std_anom[] = "CLIMO_STD_ANOM";
-static const char conf_val_fcst_anom[]      = "FCST_ANOM";
-static const char conf_val_fcst_std_anom[]  = "FCST_STD_ANOM";
 
 //
 // STAT-Analysis specific parameter key names

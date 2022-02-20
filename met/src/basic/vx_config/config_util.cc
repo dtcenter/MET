@@ -2835,47 +2835,6 @@ ConcatString matchtype_to_string(MatchType type) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NormalizeType int_to_normalizetype(int v) {
-   NormalizeType t = NormalizeType_None;
-
-   // Convert integer to enumerated NormalizeType
-        if(v == conf_const.lookup_int(conf_val_none))           t = NormalizeType_None;
-   else if(v == conf_const.lookup_int(conf_val_climo_anom))     t = NormalizeType_ClimoAnom;
-   else if(v == conf_const.lookup_int(conf_val_climo_std_anom)) t = NormalizeType_ClimoStdAnom;
-   else if(v == conf_const.lookup_int(conf_val_fcst_anom))      t = NormalizeType_FcstAnom;
-   else if(v == conf_const.lookup_int(conf_val_fcst_std_anom))  t = NormalizeType_FcstStdAnom;
-   else {
-      mlog << Error << "\nint_to_normalizetype() -> "
-           << "Unexpected value of " << v << ".\n\n";
-      exit(1);
-   }
-
-   return(t);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-ConcatString normalizetype_to_string(NormalizeType type) {
-   ConcatString s;
-
-   // Convert enumerated NormalizeType to string
-   switch(type) {
-      case(NormalizeType_None):         s = conf_val_none;           break;
-      case(NormalizeType_ClimoAnom):    s = conf_val_climo_anom;     break;
-      case(NormalizeType_ClimoStdAnom): s = conf_val_climo_std_anom; break;
-      case(NormalizeType_FcstAnom):     s = conf_val_fcst_anom;      break;
-      case(NormalizeType_FcstStdAnom):  s = conf_val_fcst_std_anom;  break;
-      default:
-         mlog << Error << "\nnormalizetype_to_string() -> "
-              << "Unexpected NormalizeType value of " << type << ".\n\n";
-         exit(1);
-   }
-
-   return(s);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 DistType int_to_disttype(int v) {
    DistType t = DistType_None;
 
@@ -3036,16 +2995,15 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_normalize);
 
-   // Convert integer to enumerated WaveletType
-        if(v == conf_const.lookup_int(conf_val_none))           t = NormalizeType_None;
-   else if(v == conf_const.lookup_int(conf_val_climo_anom))     t = NormalizeType_ClimoAnom;
-   else if(v == conf_const.lookup_int(conf_val_climo_std_anom)) t = NormalizeType_ClimoStdAnom;
-   else if(v == conf_const.lookup_int(conf_val_fcst_anom))      t = NormalizeType_FcstAnom;
-   else if(v == conf_const.lookup_int(conf_val_fcst_std_anom))  t = NormalizeType_FcstStdAnom;
+   // Convert integer to enumerated NormalizeType
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
    else {
       mlog << Error << "\nparse_conf_normalize() -> "
-           << "Unexpected config file value of " << v << " for \""
-           << conf_key_normalize << "\".\n\n";
+           << "Unexpected value of " << v << ".\n\n";
       exit(1);
    }
 
