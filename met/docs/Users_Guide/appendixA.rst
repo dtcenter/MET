@@ -1777,7 +1777,7 @@ Try the following 2 things:
 		
 		  MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
 
-After doing that, please try recompiling MET. If it fails, please submit the following log files: "make_install.log" as well as "config.log".them to `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_
+After doing that, please try recompiling MET. If it fails, please submit the following log files: "make_install.log" as well as "config.log" with a new post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 Command line double quotes
