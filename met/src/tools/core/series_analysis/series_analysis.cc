@@ -769,7 +769,7 @@ void process_scores() {
               << "PairDataPoint is not set. Skip computing statistics for each grid point in the block.\n";
          continue;
       }
-      
+
       // Compute statistics for each grid point in the block
       for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
 
