@@ -10,8 +10,8 @@ input_data_version=develop
 truth_data_version=develop
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
-
-  # only run diff logic if pull request INTO
+    
+  # only run diff logic if pull request INTO 
   # branches not ending with -ref
   if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
 
