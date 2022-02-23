@@ -39,7 +39,7 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "field" entry
+// May be set separately in each "ens.field" entry
 //
 censor_thresh = [];
 censor_val    = [];
@@ -99,7 +99,13 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "field" entry
+// May be set separately in each "fcst.field" entry
+//
+prob_cat_thresh = [];
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
 //
 eclv_points = 0.05;
 
@@ -165,12 +171,6 @@ message_type_group_map = [
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
-//
-// Categorical thresholds to define ensemble probabilities
-// May be set separately in each "fcst.field" entry
-//
-prob_cat_thresh = [];
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -204,6 +204,8 @@ climo_stdev = {
 climo_cdf = {
    cdf_bins    = 10;
    center_bins = FALSE;
+   write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

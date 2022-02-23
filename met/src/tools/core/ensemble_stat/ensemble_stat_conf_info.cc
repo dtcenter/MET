@@ -697,20 +697,20 @@ int EnsembleStatConfInfo::n_stat_row() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::get_max_n_cat_thresh() const {
+int EnsembleStatConfInfo::get_max_n_prob_cat_thresh() const {
    int i, n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_cat_thresh());
 
    return(n);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::get_max_n_prob_thresh() const {
+int EnsembleStatConfInfo::get_max_n_prob_pct_thresh() const {
    int i, n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_thresh());
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_pct_thresh());
 
    return(n);
 }
@@ -797,9 +797,8 @@ void EnsembleStatVxOpt::clear() {
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
 
-   fcat_ta.clear();
-   ocat_ta.clear();
-   pcat_ta.clear();
+   prob_cat_ta.clear();
+   prob_pct_ta.clear();
 
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
@@ -983,24 +982,12 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: phist_bin_size
    phist_bin_size = odict.lookup_double(conf_key_phist_bin);
 
-   // Conf: fcat_thresh
-   fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
-
-   // Conf: ocat_thresh
-   ocat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
-
-   // Check for equal threshold length
-   if(fcat_ta.n() != ocat_ta.n()) {
-      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The number of thresholds for each field in \"fcst."
-           << conf_key_cat_thresh
-           << "\" must match the number of thresholds for each "
-           << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
-      exit(1);
-   }
-
    // Conf: prob_cat_thresh
-   pcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
+   prob_cat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
+
+   // Conf: prob_pct_thresh
+   prob_pct_ta = fdict.lookup_thresh_array(conf_key_prob_pct_thresh);
+   prob_pct_ta = string_to_prob_thresh(prob_pct_ta.get_str().c_str());
 
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&odict);
@@ -1164,9 +1151,7 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    //
    // Check if percentile thresholds were requested
    //
-   if(!othr_ta.need_perc() &&
-      !fcat_ta.need_perc() &&
-      !ocat_ta.need_perc()) return;
+   if(!othr_ta.need_perc() && !prob_cat_ta.need_perc()) return;
 
    //
    // Sort the input arrays
@@ -1183,9 +1168,10 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    // Compute percentiles, passing the observation thresholds in for
    // the fcst and obs slots.
    //
-   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   othr_ta.set_perc(&fsort, &osort, &csort,
+                    &othr_ta, &othr_ta);
+   prob_cat_ta.set_perc(&fsort, &osort, &csort,
+                        &prob_cat_ta, &prob_cat_ta);
 
    return;
 }
@@ -1254,7 +1240,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds
          //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_cat_thresh();
+              get_n_prob_cat_thresh();
          break;
 
       case(i_pstd):
@@ -1263,7 +1249,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Alphas
          //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Alphas
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_cat_thresh() * get_n_ci_alpha();
+              get_n_prob_cat_thresh() * get_n_ci_alpha();
          break;
 
       case(i_eclv):
@@ -1272,7 +1258,8 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds
          //     Grid Vx:                 Masks * Interpolations * Probability Thresholds
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_thresh() * get_n_prob_thresh();
+              get_n_prob_cat_thresh() * get_n_prob_cat_thresh();
+         break;
 
       default:
          mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "

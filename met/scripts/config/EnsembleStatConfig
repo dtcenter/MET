@@ -110,6 +110,17 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "fcst.field" entry
+//
+prob_cat_thresh = [];
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+eclv_points = 0.05;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -270,6 +281,11 @@ output_flag = {
    orank = BOTH;
    ssvar = BOTH;
    relp  = BOTH;
+   pct   = BOTH;
+   pstd  = BOTH;
+   pjc   = BOTH;
+   prc   = BOTH;
+   eclv  = BOTH;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

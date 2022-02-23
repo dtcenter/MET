@@ -131,9 +131,8 @@ class EnsembleStatVxOpt {
       double         ssvar_bin_size;     // SSVAR bin size
       double         phist_bin_size;     // PHIST bin size
 
-      ThreshArray    fcat_ta;            // Forecast categorical thresholds to derive probabilities
-      ThreshArray    ocat_ta;            // Observation categorical thresholds for verifying events
-      ThreshArray    pcat_ta;            // Categorical thresholds to evaluate derived probabilities
+      ThreshArray    prob_cat_ta;        // Categorical thresholds for probabilities, including RPS
+      ThreshArray    prob_pct_ta;        // PCT thresholds
 
       DuplicateType  duplicate_flag;     // Duplicate observations
       ObsSummary     obs_summary;        // Summarize observations
@@ -165,11 +164,11 @@ class EnsembleStatVxOpt {
       int get_n_mask()      const;
       int get_n_mask_area() const;
 
-      int get_n_obs_thresh()  const;
-      int get_n_cat_thresh()  const;
-      int get_n_prob_thresh() const;
+      int get_n_obs_thresh()      const;
+      int get_n_prob_cat_thresh() const;
+      int get_n_prob_pct_thresh() const;
 
-      int get_n_eclv_points()  const;
+      int get_n_eclv_points() const;
       int get_n_cdf_bin()     const;
       int get_n_ci_alpha()    const;
 };
@@ -181,9 +180,9 @@ inline int EnsembleStatVxOpt::get_n_interp()      const { return(interp_info.n_i
 inline int EnsembleStatVxOpt::get_n_mask()        const { return(mask_name.n());        }
 inline int EnsembleStatVxOpt::get_n_mask_area()   const { return(mask_name_area.n());   }
 
-inline int EnsembleStatVxOpt::get_n_obs_thresh()  const { return(othr_ta.n());          }
-inline int EnsembleStatVxOpt::get_n_cat_thresh()  const { return(ocat_ta.n());          }
-inline int EnsembleStatVxOpt::get_n_prob_thresh() const { return(pcat_ta.n());          }
+inline int EnsembleStatVxOpt::get_n_obs_thresh()      const { return(othr_ta.n());      }
+inline int EnsembleStatVxOpt::get_n_prob_cat_thresh() const { return(prob_cat_ta.n());  }
+inline int EnsembleStatVxOpt::get_n_prob_pct_thresh() const { return(prob_pct_ta.n());  }
 
 inline int EnsembleStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
 inline int EnsembleStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);       }
@@ -276,11 +275,11 @@ class EnsembleStatConfInfo {
       int n_stat_row()     const;
 
       // Maximum across all verification tasks
-      int get_max_n_ens_thresh()  const;
-      int get_max_hira_size()     const;
-      int get_max_n_cat_thresh()  const;
-      int get_max_n_prob_thresh() const;
-      int get_max_n_eclv_points() const;
+      int get_max_n_ens_thresh()      const;
+      int get_max_hira_size()         const;
+      int get_max_n_prob_cat_thresh() const;
+      int get_max_n_prob_pct_thresh() const;
+      int get_max_n_eclv_points()     const;
 
       int get_compression_level();
 };
