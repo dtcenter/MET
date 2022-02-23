@@ -112,13 +112,13 @@ static int          ctrl_file_index = bad_data_int; // Control member file index
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
-static int          grid_obs_flag = 0;
+static bool         grid_obs_flag = false;
 
 static StringArray  point_obs_file_list;
-static int          point_obs_flag = 0;
+static bool         point_obs_flag = false;
 
 static GrdFileType  otype   = FileType_None;
-static int          vx_flag = 0;
+static bool         vx_flag = false;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;

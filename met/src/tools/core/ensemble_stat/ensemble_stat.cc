@@ -143,9 +143,11 @@ static ConcatString get_ens_mn_var_name(int);
 static void setup_nc_file   (unixtime, const char *);
 static void setup_txt_files ();
 static void setup_table     (AsciiTable &);
-
 static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
+
+static void write_txt_files(const EnsembleStatVxOpt &,
+                            const PairDataEnsemble &, bool);
 static void write_ens_nc(EnsVarInfo *, int, DataPlane &);
 static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
                                 const char *, const char *);
@@ -478,8 +480,13 @@ void process_command_line(int argc, char **argv) {
        conf_info.output_flag[i_phist] != STATOutputType_None ||
        conf_info.output_flag[i_ssvar] != STATOutputType_None ||
        conf_info.output_flag[i_relp]  != STATOutputType_None ||
-       conf_info.output_flag[i_orank] != STATOutputType_None)) vx_flag = 1;
-   else                                                        vx_flag = 0;
+       conf_info.output_flag[i_orank] != STATOutputType_None ||
+       conf_info.output_flag[i_pct]   != STATOutputType_None ||
+       conf_info.output_flag[i_pstd]  != STATOutputType_None ||
+       conf_info.output_flag[i_pjc]   != STATOutputType_None ||
+       conf_info.output_flag[i_prc]   != STATOutputType_None ||
+       conf_info.output_flag[i_eclv]  != STATOutputType_None)) vx_flag = true;
+   else                                                        vx_flag = false;
 
    // Process ensemble mean information
    ens_mean_flag = false;
@@ -1324,7 +1331,7 @@ void process_point_scores() {
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
    PairDataEnsemble pd;
    ConcatString cs;
-   int i, j, k, l, m, n;
+   int i, j, k, l;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1417,6 +1424,11 @@ void process_point_scores() {
                // Compute observation ranks and pair values
                pd_ptr->compute_pair_vals(conf_info.rng_ptr);
 
+               // Write the stat output
+               write_txt_files(conf_info.vx_opt[i], *pd_ptr, true);
+
+/* JHG delete me for point scores
+
                // Process each filtering threshold
                for(m=0; m<conf_info.vx_opt[i].othr_ta.n(); m++) {
 
@@ -1507,22 +1519,7 @@ void process_point_scores() {
                      }
                   }
                } // end for m
-
-               // Write out the unfiltered ORANK lines
-               if(conf_info.output_flag[i_orank] != STATOutputType_None) {
-
-                  // Set the header column
-                  shc.set_obs_thresh(na_str);
-
-                  write_orank_row(shc, pd_ptr,
-                     conf_info.output_flag[i_orank],
-                     stat_at, i_stat_row,
-                     txt_at[i_orank], i_txt_row[i_orank]);
-
-                  // Reset the observation valid time
-                  shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
-                  shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
-               }
+ JHG end */
 
             } // end for l
          } // end for k
@@ -1535,7 +1532,7 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   int i, j, k, l, m, n_miss, i_file;
+   int i, j, k, n_miss, i_file;
    bool found;
    MaskPlane  mask_mp;
    DataPlane *fcst_dp = (DataPlane *) 0;
@@ -1885,6 +1882,11 @@ void process_grid_vx() {
                write_orank_nc(pd_all, obs_dp, i, j, k);
             }
 
+            // Write the stat output
+            write_txt_files(conf_info.vx_opt[i], pd_all, false);
+
+/* JHG delete me for gridded scores
+
             // Process each filtering threshold
             for(l=0; l<conf_info.vx_opt[i].othr_ta.n(); l++) {
 
@@ -1981,7 +1983,7 @@ void process_grid_vx() {
                }
 
             } // end for l
-
+ JHG end */
          } // end for k
       } // end for j
    } // end for i
@@ -2548,6 +2550,161 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
    // Append the suffix
    str << suffix;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_txt_files(const EnsembleStatVxOpt &vx_opt,
+                     const PairDataEnsemble &pd_all,
+                     bool is_point_vx) {
+   int i, j;
+   PairDataEnsemble pd;
+
+   // Process each observation filtering threshold
+   for(i=0; i<vx_opt.othr_ta.n(); i++) {
+
+      // Set the header column
+      shc.set_obs_thresh(vx_opt.othr_ta[i]);
+
+      // Subset pairs using the current obs_thresh
+      pd = pd_all.subset_pairs_obs_thresh(vx_opt.othr_ta[i]);
+
+      // Continue if there are no points
+      if(pd.n_obs == 0) continue;
+
+      // Create output text files, if needed
+      setup_txt_files();
+
+      // Compute ECNT scores
+      if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
+         do_ecnt(vx_opt, vx_opt.othr_ta[i], &pd);
+      }
+
+      // Compute RPS scores
+      if(vx_opt.output_flag[i_rps] != STATOutputType_None) {
+         do_rps(vx_opt, vx_opt.othr_ta[i], &pd);
+      }
+
+      // Write RHIST counts
+      if(vx_opt.output_flag[i_rhist] != STATOutputType_None) {
+
+         pd.compute_rhist();
+
+         if(pd.rhist_na.sum() > 0) {
+            write_rhist_row(shc, &pd,
+               vx_opt.output_flag[i_rhist],
+               stat_at, i_stat_row,
+               txt_at[i_rhist], i_txt_row[i_rhist]);
+         }
+      }
+
+      // Write PHIST counts if greater than 0
+      if(vx_opt.output_flag[i_phist] != STATOutputType_None) {
+
+         pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
+         pd.compute_phist();
+
+         if(pd.phist_na.sum() > 0) {
+            write_phist_row(shc, &pd,
+               vx_opt.output_flag[i_phist],
+               stat_at, i_stat_row,
+               txt_at[i_phist], i_txt_row[i_phist]);
+         }
+      }
+
+      // Write RELP counts
+      if(vx_opt.output_flag[i_relp] != STATOutputType_None) {
+
+         pd.compute_relp();
+
+         if(pd.relp_na.sum() > 0) {
+            write_relp_row(shc, &pd,
+               vx_opt.output_flag[i_relp],
+               stat_at, i_stat_row,
+               txt_at[i_relp], i_txt_row[i_relp]);
+         }
+      }
+
+      // Write SSVAR scores
+      if(vx_opt.output_flag[i_ssvar] != STATOutputType_None) {
+
+         pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
+         pd.compute_ssvar();
+
+         // Make sure there are bins to process
+         if(pd.ssvar_bins) {
+
+            // Add rows to the output AsciiTables for SSVAR
+            stat_at.add_rows(pd.ssvar_bins[0].n_bin *
+                             vx_opt.ci_alpha.n());
+
+            if(vx_opt.output_flag[i_ssvar] == STATOutputType_Both) {
+               txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
+                                        vx_opt.ci_alpha.n());
+            }
+
+            // Write the SSVAR data for each alpha value
+            for(j=0; j<vx_opt.ci_alpha.n(); j++) {
+               write_ssvar_row(shc, &pd, vx_opt.ci_alpha[j],
+                  vx_opt.output_flag[i_ssvar],
+                  stat_at, i_stat_row,
+                  txt_at[i_ssvar], i_txt_row[i_ssvar]);
+            }
+         }
+      }
+
+   } // end for i
+
+   // Derive probabilities for each threshold
+   for(i=0; i<vx_opt.ocat_ta.n(); i++) {
+
+      // Initialize PCTInfo object
+      PCTInfo pct_info;
+      pct_info.fthresh = vx_opt.pcat_ta;
+      pct_info.othresh = vx_opt.ocat_ta[i];
+      pct_info.allocate_n_alpha(vx_opt.get_n_ci_alpha());
+
+      for(j=0; j<vx_opt.get_n_ci_alpha(); j++) {
+         pct_info.alpha[j] = vx_opt.ci_alpha[j];
+      }
+
+/* JHG need to define this function
+      // Compute the probabilistic counts and statistics
+      compute_pctinfo(pd_all, vx_opt.fcat_ta[i],
+                      vx_opt.output_flag[i_pstd],
+                      pct_info);
+*/
+
+      // Set the header columns
+      ConcatString cs;
+      cs << cs_erase << "PROB(" << shc.get_fcst_var()
+         << vx_opt.fcat_ta[i].get_str() << ")";
+      shc.set_fcst_var(cs);
+      shc.set_fcst_thresh(vx_opt.pcat_ta);
+      shc.set_obs_thresh(vx_opt.ocat_ta[i]);
+
+// JHG write probabilistic outputs here
+
+   } // end for i
+
+   // Write out the unfiltered ORANK lines for point verification
+   if(is_point_vx &&
+      vx_opt.output_flag[i_orank] != STATOutputType_None) {
+
+      // Set the header column
+      shc.set_obs_thresh(na_str);
+
+      write_orank_row(shc, &pd_all,
+         vx_opt.output_flag[i_orank],
+         stat_at, i_stat_row,
+         txt_at[i_orank], i_txt_row[i_orank]);
+
+      // Reset the observation valid time
+      shc.set_obs_valid_beg(vx_opt.vx_pd.beg_ut);
+      shc.set_obs_valid_end(vx_opt.vx_pd.end_ut);
+   }
 
    return;
 }
@@ -3257,7 +3414,7 @@ void usage() {
 void set_grid_obs(const StringArray & a)
 {
    grid_obs_file_list.add(a[0]);
-   grid_obs_flag = 1;
+   grid_obs_flag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3265,7 +3422,7 @@ void set_grid_obs(const StringArray & a)
 void set_point_obs(const StringArray & a)
 {
    point_obs_file_list.add(a[0]);
-   point_obs_flag = 1;
+   point_obs_flag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
