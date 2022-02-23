@@ -753,6 +753,12 @@ static const char conf_key_dist_parm[]        = "dist_parm";
 static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";
 static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
 
+//
+// Gen-Ens-Prod specific parameter key names
+//
+
+static const char conf_key_normalize[]   = "normalize";
+
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";
 static const char conf_val_exponential[] = "EXPONENTIAL";

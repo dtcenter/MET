@@ -704,7 +704,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
             mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
-                 << "Please email met_help@ucar.edu.\n\n";
+                 << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions\n\n";
             exit(1);
          }
 

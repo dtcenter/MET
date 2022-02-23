@@ -1017,7 +1017,7 @@ void process_pbfile(int i_pb) {
 
    // Initialize
    prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
-   cape_level = cape_count = cape_cnt_too_big = 0;
+   cape_level = cape_count = cape_cnt_too_big = cape_cnt_surface_msgs = 0;
    cape_cnt_no_levels = cape_cnt_missing_values = cape_cnt_zero_values = 0;
    mlcape_count = mlcape_cnt_too_big = 0;
    mlcape_cnt_missing_values = mlcape_cnt_zero_values = 0;
