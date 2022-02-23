@@ -261,6 +261,11 @@ output_flag = {
    orank = NONE;
    ssvar = NONE;
    relp  = NONE;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

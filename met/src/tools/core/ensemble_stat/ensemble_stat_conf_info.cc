@@ -98,11 +98,12 @@ void EnsembleStatConfInfo::clear() {
    ens_input.clear();
 
    // Reset counts
-   n_ens_var     = 0;
-   n_nbrhd       = 0;
-   n_vx          = 0;
-   max_n_thresh  = 0;
-   max_hira_size = 0;
+   n_ens_var        = 0;
+   n_nbrhd          = 0;
+   max_n_ens_thresh = 0;
+   n_vx             = 0;
+   max_hira_size    = 0;
+   max_n_cat_thresh = 0;
 
    return;
 }
@@ -249,7 +250,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
    
     // Parse the ensemble field information
-   for(i=0,max_n_thresh=0,max_hira_size=0; i<n_ens_var; i++) {
+   for(i=0,max_n_ens_thresh=0; i<n_ens_var; i++) {
 
       EnsVarInfo * ens_info = new EnsVarInfo();
 
@@ -328,8 +329,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          }
 
          // Keep track of the maximum number of thresholds
-         if(ens_info->cat_ta.n() > max_n_thresh) {
-            max_n_thresh = ens_info->cat_ta.n();
+         if(ens_info->cat_ta.n() > max_n_ens_thresh) {
+            max_n_ens_thresh = ens_info->cat_ta.n();
          }
       }
 
@@ -430,7 +431,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       }
 
       // Parse settings for each verification task
-      for(i=0; i<n_vx; i++) {
+      for(i=0,max_hira_size=0; i<n_vx; i++) {
 
          // Get the current dictionaries
          i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -764,7 +765,10 @@ void EnsembleStatVxOpt::clear() {
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
-   prob_cat_ta.clear();
+
+   fcat_ta.clear();
+   ocat_ta.clear();
+   pcat_ta.clear();
 
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
@@ -945,8 +949,24 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: phist_bin_size
    phist_bin_size = odict.lookup_double(conf_key_phist_bin);
 
+   // Conf: fcat_thresh
+   fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
+
+   // Conf: ocat_thresh
+   ocat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
+
+   // Check for equal threshold length
+   if(fcat_ta.n() != ocat_ta.n()) {
+      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+           << "The number of thresholds for each field in \"fcst."
+           << conf_key_cat_thresh
+           << "\" must match the number of thresholds for each "
+           << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
+      exit(1);
+   }
+
    // Conf: prob_cat_thresh
-   prob_cat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
+   pcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&odict);
@@ -1107,7 +1127,12 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
 
 void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 
-   if(!othr_ta.need_perc()) return;
+   //
+   // Check if percentile thresholds were requested
+   //
+   if(!othr_ta.need_perc() &&
+      !fcat_ta.need_perc() &&
+      !ocat_ta.need_perc()) return;
 
    //
    // Sort the input arrays
@@ -1125,6 +1150,8 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    // the fcst and obs slots.
    //
    othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
 
    return;
 }
@@ -1154,8 +1181,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds * Alphas
          //     Grid Vx:                 Masks * Interpolations * Obs Thresholds * Alphas
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_o_thresh() * get_n_ci_alpha();
-
+              get_n_obs_thresh() * get_n_ci_alpha();
          break;
 
       case(i_rhist):
@@ -1166,8 +1192,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds
          //     Grid Vx:                 Masks * Interpolations * Obs Thresholds
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_o_thresh();
-
+              get_n_obs_thresh();
          break;
 
       case(i_orank):
@@ -1177,8 +1202,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
 
          // Number of ORANK lines possible =
          //    Number of pairs * Obs Thresholds
-         n = vx_pd.get_n_pair() * get_n_o_thresh();
-
+         n = vx_pd.get_n_pair() * get_n_obs_thresh();
          break;
 
       case(i_ssvar):
@@ -1187,6 +1211,34 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          // to accomodate the SSVAR output
          n = 0;
          break;
+
+      case(i_pct):
+      case(i_pjc):
+      case(i_prc):
+
+         // Maximum number of PCT, PJC, and PRC lines possible =
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds
+         n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
+              get_n_cat_thresh();
+         break;
+
+      case(i_pstd):
+
+         // Maximum number of PSTD lines possible =
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Alphas
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Alphas
+         n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
+              get_n_cat_thresh() * get_n_ci_alpha();
+         break;
+
+      case(i_eclv):
+
+         // Maximum number of ECLV lines possible =
+         //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds
+         //     Grid Vx:                 Masks * Interpolations * Probability Thresholds
+         n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
+              get_n_prob_thresh() * get_n_prob_thresh();
 
       default:
          mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "

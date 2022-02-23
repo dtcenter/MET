@@ -66,25 +66,25 @@ static const char * default_config_filename =
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
    "ecnt",  "rps",   "rhist", "phist",
-   "orank", "ssvar", "relp"
+   "orank", "ssvar", "relp",  "pct",
+   "pstd",  "pjc",   "prc",   "eclv"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
    ecnt_columns,  rps_columns,   rhist_columns,
    phist_columns, orank_columns, ssvar_columns,
-   relp_columns
+   relp_columns,  pct_columns,   pstd_columns,
+   pjc_columns,   prc_columns,   eclv_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
    n_ecnt_columns,  n_rps_columns,   n_rhist_columns,
    n_phist_columns, n_orank_columns, n_ssvar_columns,
-   n_relp_columns
+   n_relp_columns,  n_pct_columns,   n_pstd_columns,
+   n_pjc_columns,   n_prc_columns,   n_eclv_columns
 };
-
-// Maximum number of GRIB records
-static const int max_n_rec = 300;
 
 ////////////////////////////////////////////////////////////////////////
 //

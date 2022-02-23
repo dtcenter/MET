@@ -65,6 +65,7 @@
 //   033    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   034    01/14/21  McCabe         MET #1695 All members in one file.
 //   035    02/15/22  Halley Gotway  MET #1583 Add HiRA option.
+//   036    02/20/22  Halley Gotway  MET #1259 Write probabilistic statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -403,10 +404,10 @@ void process_command_line(int argc, char **argv) {
    shc.set_model(conf_info.model.c_str());
 
    // Allocate arrays to store threshold counts
-   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_thresh()];
-   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_thresh()];
+   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_ens_thresh()];
+   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_ens_thresh()];
 
-   for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+   for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
       thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
    }
 
@@ -2126,7 +2127,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // Store observation filering threshold
    rps_info.othresh = othresh;
-   rps_info.set_prob_cat_thresh(vx_opt.prob_cat_ta);
+   rps_info.set_prob_cat_thresh(vx_opt.pcat_ta);
 
    // If prob_cat_thresh is empty and climo data is available,
    // use climo_cdf thresholds instead
@@ -2165,7 +2166,7 @@ void clear_counts() {
    stdev_sum_na.set_const(0.0, nxy);
    stdev_ssq_na.set_const(0.0, nxy);
 
-   for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+   for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
       thresh_cnt_na[i].set_const(0.0, nxy);
       for(j=0; j<conf_info.get_n_nbrhd(); j++) {
          thresh_nbrhd_cnt_na[i][j].set_const(0.0, nxy);
@@ -3121,14 +3122,14 @@ void clean_up() {
 
    // Deallocate threshold count arrays
    if(thresh_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+      for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
          thresh_cnt_na[i].clear();
       }
       delete [] thresh_cnt_na;
       thresh_cnt_na = (NumArray *) 0;
    }
    if(thresh_nbrhd_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+      for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
          for(j=0; j<conf_info.get_n_nbrhd(); j++) {
             thresh_nbrhd_cnt_na[i][j].clear();
          }
