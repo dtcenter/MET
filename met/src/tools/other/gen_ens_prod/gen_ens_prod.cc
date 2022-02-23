@@ -17,6 +17,7 @@
 //   000    09/10/21  Halley Gotway  MET #1904 Initial version.
 //   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   002    01/14/21  McCabe         MET #1695 All members in one file.
+//   003    02/17/22  Halley Gotway  MET #1918 Add normalize config option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +54,8 @@ using namespace std;
 static void process_command_line(int, char **);
 static void process_grid(const Grid &);
 static void process_ensemble();
+
+static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
@@ -69,7 +72,7 @@ static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
 static void write_ens_data_plane(GenEnsProdVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
-static void add_var_att_local(VarInfo *, NcVar *, bool is_int,
+static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
                               const DataPlane &, const char *, const char *);
 
 static void clean_up();
@@ -267,6 +270,296 @@ void process_grid(const Grid &fcst_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_ensemble() {
+   int i_var, i_ens, n_ens_vld, n_ens_inputs;
+   bool need_reset;
+   DataPlane ens_dp, ctrl_dp;
+   DataPlane cmn_dp, csd_dp;
+   DataPlane emn_dp, esd_dp;
+   unixtime max_init_ut = bad_data_ll;
+   VarInfo *var_info;
+   ConcatString cs, ens_file;
+
+   // Loop through each of the ensemble fields to be processed
+   vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
+   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
+
+      // Need to reinitialize counts and sums for each ensemble field
+      need_reset = true;
+
+      // Print out the normalization flag
+      cs << cs_erase;
+      if((*var_it)->normalize != NormalizeType_None) {
+         cs << " with normalize = "
+            << normalizetype_to_string((*var_it)->normalize);
+      }
+      cs << "\n";
+
+      var_info = (*var_it)->get_var_info();
+      mlog << Debug(2) << "\n" << sep_str << "\n\n"
+           << "Processing ensemble field: "
+           << (*var_it)->raw_magic_str << cs;
+
+      n_ens_inputs = (*var_it)->inputs_n();
+      for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
+
+         // Get file and VarInfo to process
+         ens_file = (*var_it)->get_file(i_ens);
+         var_info = (*var_it)->get_var_info(i_ens);
+
+         // Skip bad data files
+         if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
+
+         mlog << Debug(3) << "\n"
+              << "Reading field: "
+              << var_info->magic_str() << "\n";
+
+         // Read data and track the valid data count
+         if(!get_data_plane(ens_file.c_str(), etype,
+                            var_info, ens_dp)) {
+            mlog << Warning << "\nprocess_ensemble() -> "
+                 << "ensemble field \"" << var_info->magic_str()
+                 << "\" not found in file \"" << ens_file << "\"\n\n";
+            continue;
+         }
+         else {
+            n_ens_vld++;
+         }
+
+         // Reinitialize for the current variable
+         if(need_reset) {
+
+            need_reset = false;
+
+            // Reset the running sums and counts
+            clear_counts();
+
+            // Read climatology data for this field
+            cmn_dp = read_climo_data_plane(
+                        conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                        i_var, ens_valid_ut, grid);
+
+            csd_dp = read_climo_data_plane(
+                        conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                        i_var, ens_valid_ut, grid);
+
+            // Compute the ensemble summary data, if needed
+            if((*var_it)->normalize == NormalizeType_FcstAnom ||
+               (*var_it)->normalize == NormalizeType_FcstStdAnom ) {
+               get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
+            }
+            else {
+               emn_dp.erase();
+               esd_dp.erase();
+            }
+
+            // Read ensemble control member data, if provided
+            if(ctrl_file.nonempty()) {
+               VarInfo *ctrl_info = (*var_it)->get_ctrl(i_ens);
+
+               mlog << Debug(3) << "\n"
+                    << "Reading control field: "
+                    << ctrl_info->magic_str() << "\n";
+
+               // Error out if missing
+               if(!get_data_plane(ctrl_file.c_str(), etype,
+                                  ctrl_info, ctrl_dp)) {
+                  mlog << Error << "\nprocess_ensemble() -> "
+                       << "control member ensemble field \""
+                       << ctrl_info->magic_str()
+                       << "\" not found in file \"" << ctrl_file << "\"\n\n";
+                  exit(1);
+               }
+
+               // Normalize, if requested
+               if((*var_it)->normalize != NormalizeType_None) {
+                  normalize_data(ctrl_dp, (*var_it)->normalize,
+                                 &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
+               }
+
+               // Apply current data to the running sums and counts
+               track_counts(*var_it, ctrl_dp, true, cmn_dp, csd_dp);
+
+            } // end if ctrl_file
+
+            mlog << Debug(3)
+                 << "Found " << (ctrl_dp.is_empty() ? 0 : 1)
+                 << " control member, " << (cmn_dp.is_empty() ? 0 : 1)
+                 << " climatology mean, and " << (csd_dp.is_empty() ? 0 : 1)
+                 << " climatology standard deviation field(s) for \""
+                 << var_info->magic_str() << "\".\n";
+
+         } // end if need_reset
+
+         // Normalize, if requested
+         if((*var_it)->normalize != NormalizeType_None) {
+            normalize_data(ens_dp, (*var_it)->normalize,
+                           &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
+         }
+
+         // Apply current data to the running sums and counts
+         track_counts(*var_it, ens_dp, false, cmn_dp, csd_dp);
+
+         // Keep track of the maximum initialization time
+         if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
+            max_init_ut = ens_dp.init();
+         }
+
+      } // end for it
+
+      // Check for too much missing data
+      if(((double) n_ens_vld/n_ens_inputs) < conf_info.vld_ens_thresh) {
+         mlog << Error << "\nprocess_ensemble() -> "
+              << n_ens_vld << " of " << n_ens_inputs
+	      << " (" << (double)n_ens_vld/n_ens_inputs << ")"
+              << " fields found for \"" << (*var_it)->get_var_info()->magic_str()
+              << "\" does not meet the threshold specified by \""
+              << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
+              << ") in the configuration file.\n\n";
+         exit(1);
+      }
+
+      // Write out the ensemble information to a NetCDF file
+      ens_dp.set_init(max_init_ut);
+      write_ens_nc(*var_it, n_ens_vld, ens_dp, cmn_dp, csd_dp);
+
+   } // end for var_it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
+                        DataPlane &emn_dp, DataPlane &esd_dp) {
+   int i_ens, nxy, j;
+   double ens;
+   NumArray emn_cnt_na, emn_sum_na;
+   NumArray esd_cnt_na, esd_sum_na, esd_ssq_na;
+   VarInfo *var_info;
+   ConcatString ens_file;
+   DataPlane ens_dp;
+
+   // Check for null pointer
+   if(!ens_info) {
+      mlog << Error << "\nget_ens_mean_stdev() -> "
+           << "null pointer!\n\n";
+      exit(1);
+   }
+
+   mlog << Debug(2)
+        << "Computing the ensemble mean and standard deviation for "
+        << ens_info->raw_magic_str << ".\n";
+
+   // Loop over the ensemble inputs
+   for(i_ens=0; i_ens < ens_info->inputs_n(); i_ens++) {
+
+      // Get file and VarInfo to process
+      ens_file = ens_info->get_file(i_ens);
+      var_info = ens_info->get_var_info(i_ens);
+
+      // Skip bad data files
+      if(!ens_file_vld[ens_info->get_file_index(i_ens)]) continue;
+
+      // Read data and track the valid data count
+      if(!get_data_plane(ens_file.c_str(), etype,
+                         var_info, ens_dp)) {
+         mlog << Warning << "\nget_ens_mean_stdev() -> "
+              << "ensemble field \"" << var_info->magic_str()
+              << "\" not found in file \"" << ens_file << "\"\n\n";
+         continue;
+      }
+
+      // Initialize sums, if needed
+      if(emn_cnt_na.n() == 0) {
+         nxy = ens_dp.nx()*ens_dp.ny();
+         emn_cnt_na.set_const(0.0, nxy);
+         emn_sum_na = emn_cnt_na;
+         esd_cnt_na = emn_cnt_na;
+         esd_sum_na = emn_cnt_na;
+         esd_ssq_na = emn_cnt_na;
+      }
+
+      // Update the counts and sums
+      for(j=0; j<nxy; j++) {
+
+         ens = ens_dp.buf()[j];
+
+         // Skip bad data
+         if(is_bad_data(ens) || is_bad_data(emn_sum_na[j])) continue;
+
+         // Update counts and sums
+         emn_cnt_na.buf()[j] += 1;
+         emn_sum_na.buf()[j] += ens;
+         esd_cnt_na.buf()[j] += 1;
+         esd_sum_na.buf()[j] += ens;
+         esd_ssq_na.buf()[j] += ens*ens;
+
+      } // end for j
+   } // end for i_ens
+
+   // Read ensemble control member data, if provided
+   if(ctrl_file.nonempty()) {
+      VarInfo *var_info = ens_info->get_ctrl(0);
+
+      // Error out if missing
+      if(!get_data_plane(ctrl_file.c_str(), etype,
+                         var_info, ens_dp)) {
+         mlog << Error << "\nget_ens_mean_stdev() -> "
+              << "control member ensemble field \""
+              << var_info->magic_str()
+              << "\" not found in file \"" << ctrl_file << "\"\n\n";
+         exit(1);
+      }
+
+      // Update counts and sums
+      for(j=0; j<nxy; j++) {
+
+         ens = ens_dp.buf()[j];
+
+         // Skip bad data
+         if(is_bad_data(ens) || is_bad_data(emn_sum_na[j])) continue;
+
+         // Update counts and sums
+         emn_cnt_na.buf()[j] += 1;
+         emn_sum_na.buf()[j] += ens;
+
+      } // end for j
+   } // end if ctrl
+
+   // Compute the ensemble mean and standard deviation
+   emn_dp.set_size(ens_dp.nx(), ens_dp.ny());
+   esd_dp.set_size(ens_dp.nx(), ens_dp.ny());
+
+   for(j=0; j<nxy; j++) {
+
+      // Ensemble mean
+      if(is_bad_data(emn_sum_na.buf()[j]) ||
+         is_eq(emn_cnt_na.buf()[j], 0.0)) {
+         emn_dp.buf()[j] = bad_data_double;
+      }
+      else {
+         emn_dp.buf()[j] = emn_sum_na.buf()[j] / emn_cnt_na.buf()[j];
+      }
+
+      // Ensemble standard deviation
+      if(is_bad_data(esd_sum_na.buf()[j]) ||
+         is_eq(esd_cnt_na.buf()[j], 0.0)) {
+         esd_dp.buf()[j] = bad_data_double;
+      }
+      else {
+         esd_dp.buf()[j] = compute_stdev(
+                              esd_sum_na[j], esd_ssq_na[j],
+                              nint(esd_cnt_na[j]));
+      }
+
+   } // end for j
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_data_plane(const char *infile, GrdFileType ftype,
                     VarInfo *info, DataPlane &dp) {
    bool found;
@@ -319,134 +612,6 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_ensemble() {
-   int i_var, i_ens, n_ens_vld, n_ens_inputs;
-   bool need_reset;
-   DataPlane ens_dp, ctrl_dp, cmn_dp, csd_dp;
-   unixtime max_init_ut = bad_data_ll;
-   VarInfo * var_info;
-   ConcatString ens_file;
-
-   // Loop through each of the ensemble fields to be processed
-   vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
-   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
-
-      // Need to reinitialize counts and sums for each ensemble field
-      need_reset = true;
-
-      var_info = (*var_it)->get_var_info();
-      mlog << Debug(2) << "\n" << sep_str << "\n\n"
-           << "Processing ensemble field: "
-           << (*var_it)->raw_magic_str << "\n";
-
-      n_ens_inputs = (*var_it)->inputs_n();
-      for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
-
-         // get file and VarInfo to process
-         ens_file = (*var_it)->get_file(i_ens);
-         var_info = (*var_it)->get_var_info(i_ens);
-
-         // Skip bad data files
-         if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
-
-         mlog << Debug(3) << "\n"
-              << "Reading field: "
-              << var_info->magic_str() << "\n";
-
-         // Read data and track the valid data count
-         if(!get_data_plane(ens_file.c_str(), etype,
-                            var_info, ens_dp)) {
-            mlog << Warning << "\nprocess_ensemble() -> "
-                 << "ensemble field \"" << var_info->magic_str()
-                 << "\" not found in file \"" << ens_file << "\"\n\n";
-            continue;
-         }
-         else {
-            n_ens_vld++;
-         }
-
-         // Reinitialize for the current variable
-         if(need_reset) {
-
-            need_reset = false;
-
-            // Reset the running sums and counts
-            clear_counts();
-
-            // Read climatology data for this field
-            cmn_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                        i_var, ens_valid_ut, grid);
-
-            csd_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                        i_var, ens_valid_ut, grid);
-
-            // Read ensemble control member data, if provided
-            if(ctrl_file.nonempty()) {
-               VarInfo * ctrl_info = (*var_it)->get_ctrl(i_ens);
-
-               mlog << Debug(3) << "\n"
-                    << "Reading control field: "
-                    << ctrl_info->magic_str() << "\n";
-
-               // Error out if missing
-               if(!get_data_plane(ctrl_file.c_str(), etype,
-                                  ctrl_info, ctrl_dp)) {
-                  mlog << Error << "\nprocess_ensemble() -> "
-                       << "control member ensemble field \""
-                       << ctrl_info->magic_str()
-                       << "\" not found in file \"" << ctrl_file << "\"\n\n";
-                  exit(1);
-               }
-
-               // Apply current data to the running sums and counts
-               track_counts(*var_it, ctrl_dp, true, cmn_dp, csd_dp);
-
-            } // end if ctrl_file
-
-            mlog << Debug(3)
-                 << "Found " << (ctrl_dp.is_empty() ? 0 : 1)
-                 << " control member, " << (cmn_dp.is_empty() ? 0 : 1)
-                 << " climatology mean, and " << (csd_dp.is_empty() ? 0 : 1)
-                 << " climatology standard deviation field(s) for \""
-                 << var_info->magic_str() << "\".\n";
-
-         } // end if need_reset
-
-         // Apply current data to the running sums and counts
-         track_counts(*var_it, ens_dp, false, cmn_dp, csd_dp);
-
-         // Keep track of the maximum initialization time
-         if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
-            max_init_ut = ens_dp.init();
-         }
-
-      } // end for it
-
-      // Check for too much missing data
-      if(((double) n_ens_vld/n_ens_inputs) < conf_info.vld_ens_thresh) {
-         mlog << Error << "\nprocess_ensemble() -> "
-              << n_ens_vld << " of " << n_ens_inputs
-	      << " (" << (double)n_ens_vld/n_ens_inputs << ")"
-              << " fields found for \"" << (*var_it)->get_var_info()->magic_str()
-              << "\" does not meet the threshold specified by \""
-              << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
-              << ") in the configuration file.\n\n";
-         exit(1);
-      }
-
-      // Write out the ensemble information to a NetCDF file
-      ens_dp.set_init(max_init_ut);
-      write_ens_nc(*var_it, n_ens_vld, ens_dp, cmn_dp, csd_dp);
-
-   } // end for var_it
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void clear_counts() {
    int i, j;
 
@@ -471,7 +636,7 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(GenEnsProdVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl,
+void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_ctrl,
                   const DataPlane &cmn_dp, const DataPlane &csd_dp) {
    int i, j, k;
    double ens, cmn, csd;
@@ -582,7 +747,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(GenEnsProdVarInfo * ens_info, int n_ens_vld,
+void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                   const DataPlane &ens_dp,
                   const DataPlane &cmn_dp,
                   const DataPlane &csd_dp) {
@@ -839,13 +1004,13 @@ void write_ens_nc(GenEnsProdVarInfo * ens_info, int n_ens_vld,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(GenEnsProdVarInfo * ens_info, float *ens_data, const DataPlane &dp,
+void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append nc_var_str config file entry
+   // Append nc_var_str config file entry, if specified
    cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
@@ -879,7 +1044,7 @@ void write_ens_var_float(GenEnsProdVarInfo * ens_info, float *ens_data, const Da
    }
 
    // Add the variable attributes
-   add_var_att_local(ens_info->get_var_info(), &ens_var, false, dp,
+   add_var_att_local(ens_info, &ens_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -895,13 +1060,13 @@ void write_ens_var_float(GenEnsProdVarInfo * ens_info, float *ens_data, const Da
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(GenEnsProdVarInfo * ens_info, int *ens_data, const DataPlane &dp,
+void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
-   // Append nc_var_str config file entry
+   // Append nc_var_str config file entry, if specified
    cs = ens_info->nc_var_str;
    if(cs.length() > 0) var_str << "_" << cs;
 
@@ -926,7 +1091,7 @@ void write_ens_var_int(GenEnsProdVarInfo * ens_info, int *ens_data, const DataPl
             << type_str;
 
    // Add the variable attributes
-   add_var_att_local(ens_info->get_var_info(), &ens_var, true, dp,
+   add_var_att_local(ens_info, &ens_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -942,7 +1107,7 @@ void write_ens_var_int(GenEnsProdVarInfo * ens_info, int *ens_data, const DataPl
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_data_plane(GenEnsProdVarInfo * ens_info, const DataPlane &ens_dp, const DataPlane &dp,
+void write_ens_data_plane(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, const DataPlane &dp,
                           const char *type_str, const char *long_name_str) {
 
    // Allocate memory for this data
@@ -962,11 +1127,13 @@ void write_ens_data_plane(GenEnsProdVarInfo * ens_info, const DataPlane &ens_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
+void add_var_att_local(GenEnsProdVarInfo *ens_info,
+                       NcVar *nc_var, bool is_int,
                        const DataPlane &dp,
                        const char *name_str,
                        const char *long_name_str) {
    ConcatString att_str;
+   VarInfo *info = ens_info->get_var_info();
 
    // Construct the long name
    att_str << cs_erase

@@ -46,15 +46,18 @@ nc_var_str    = "";
 // Ensemble fields to be processed
 //
 ens = {
-   ens_thresh = 1.0;
+   ens_thresh = 0.80;
    vld_thresh = 1.0;
 
+   name  = "TMP";
+   level = "Z2";
+
    field = [
-      {
-         name       = "APCP";
-         level      = "A03";
-         cat_thresh = [ >0.0, >=5.0 ];
-      }
+      { normalize  = NONE;                                          },
+      { normalize  = CLIMO_ANOM;     nc_var_str = "CLIMO_ANOM";     }, 
+      { normalize  = CLIMO_STD_ANOM; nc_var_str = "CLIMO_STD_ANOM"; },
+      { normalize  = FCST_ANOM;      nc_var_str = "FCST_ANOM";      },
+      { normalize  = FCST_STD_ANOM;  nc_var_str = "FCST_STD_ANOM";  }
    ];
 }
 
@@ -97,10 +100,10 @@ nmep_smooth = {
 //
 // Climatology data
 //
+climo_mean = ens;
 climo_mean = {
 
-   file_name = [];
-   field     = [];
+   file_name = [ "${CLIMO_MEAN_FILE}" ];
 
    regrid = {
       method     = NEAREST;
@@ -110,13 +113,13 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   day_interval       = 31;
+   day_interval       = 1;
    hour_interval      = 6;
 }
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [];
+   file_name = [ "${CLIMO_STDEV_FILE}" ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,17 +132,17 @@ ensemble_flag = {
    latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
    min       = TRUE;
    max       = TRUE;
-   range     = TRUE;
-   vld_count = TRUE;
-   frequency = TRUE;
+   range     = FALSE;
+   vld_count = FALSE;
+   frequency = FALSE;
    nep       = FALSE;
    nmep      = FALSE;
-   climo     = FALSE;
-   climo_cdp = FALSE;
+   climo     = TRUE;
+   climo_cdp = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
