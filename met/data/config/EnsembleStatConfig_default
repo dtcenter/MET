@@ -99,6 +99,11 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "field" entry
+//
+eclv_points = 0.05;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {

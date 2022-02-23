@@ -98,12 +98,12 @@ void EnsembleStatConfInfo::clear() {
    ens_input.clear();
 
    // Reset counts
-   n_ens_var        = 0;
-   n_nbrhd          = 0;
-   max_n_ens_thresh = 0;
-   n_vx             = 0;
-   max_hira_size    = 0;
-   max_n_cat_thresh = 0;
+   n_ens_var         = 0;
+   n_nbrhd           = 0;
+   max_n_ens_thresh  = 0;
+
+   n_vx              = 0;
+   max_hira_size     = 0;
 
    return;
 }
@@ -697,6 +697,36 @@ int EnsembleStatConfInfo::n_stat_row() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int EnsembleStatConfInfo::get_max_n_cat_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatConfInfo::get_max_n_prob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatConfInfo::get_max_n_eclv_points() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size, int ctrl_index) {
 
    // This should be called after process_masks()
@@ -758,6 +788,7 @@ void EnsembleStatVxOpt::clear() {
 
    msg_typ.clear();
    othr_ta.clear();
+   eclv_points.clear();
    cdf_info.clear();
 
    ci_alpha.clear();
@@ -927,6 +958,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: othr_thresh
    othr_ta = process_perc_thresh_bins(
                 odict.lookup_thresh_array(conf_key_obs_thresh));
+
+   // Conf: eclv_points
+   eclv_points = parse_conf_eclv_points(&odict);
 
    // Conf: climo_cdf
    cdf_info = parse_conf_climo_cdf(&odict);

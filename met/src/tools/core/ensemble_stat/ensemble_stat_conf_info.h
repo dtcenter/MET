@@ -117,7 +117,11 @@ class EnsembleStatVxOpt {
       StringArray    mask_name_area;     // Masking area (grid + poly) region names
 
       StringArray    msg_typ;            // Verifying message types
+
       ThreshArray    othr_ta;            // Observation filtering thresholds
+
+      NumArray       eclv_points;        // ECLV points
+
       ClimoCDFInfo   cdf_info;           // Climo CDF info
 
       NumArray       ci_alpha;           // Alpha value for confidence intervals
@@ -164,6 +168,8 @@ class EnsembleStatVxOpt {
       int get_n_obs_thresh()  const;
       int get_n_cat_thresh()  const;
       int get_n_prob_thresh() const;
+
+      int get_n_eclv_points()  const;
       int get_n_cdf_bin()     const;
       int get_n_ci_alpha()    const;
 };
@@ -174,9 +180,12 @@ inline int EnsembleStatVxOpt::get_n_msg_typ()     const { return(msg_typ.n());  
 inline int EnsembleStatVxOpt::get_n_interp()      const { return(interp_info.n_interp); }
 inline int EnsembleStatVxOpt::get_n_mask()        const { return(mask_name.n());        }
 inline int EnsembleStatVxOpt::get_n_mask_area()   const { return(mask_name_area.n());   }
+
 inline int EnsembleStatVxOpt::get_n_obs_thresh()  const { return(othr_ta.n());          }
 inline int EnsembleStatVxOpt::get_n_cat_thresh()  const { return(ocat_ta.n());          }
 inline int EnsembleStatVxOpt::get_n_prob_thresh() const { return(pcat_ta.n());          }
+
+inline int EnsembleStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
 inline int EnsembleStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);       }
 inline int EnsembleStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n());         }
 
@@ -193,9 +202,8 @@ class EnsembleStatConfInfo {
       int max_n_ens_thresh; // Maximum number of ensemble thresholds
 
       // Ensemble verification
-      int n_vx;             // Number of ensemble fields to be verified
-      int max_hira_size;    // Maximum size of a HiRA neighborhoods
-      int max_n_cat_thresh; // Maximum number of categorical thresholds
+      int n_vx;              // Number of ensemble fields to be verified
+      int max_hira_size;     // Maximum size of a HiRA neighborhoods
 
    public:
 
@@ -268,9 +276,11 @@ class EnsembleStatConfInfo {
       int n_stat_row()     const;
 
       // Maximum across all verification tasks
-      int get_max_n_ens_thresh() const;
-      int get_max_hira_size()    const;
-      int get_max_n_cat_thresh() const;
+      int get_max_n_ens_thresh()  const;
+      int get_max_hira_size()     const;
+      int get_max_n_cat_thresh()  const;
+      int get_max_n_prob_thresh() const;
+      int get_max_n_eclv_points() const;
 
       int get_compression_level();
 };
@@ -282,7 +292,6 @@ inline int EnsembleStatConfInfo::get_n_nbrhd()          const { return(n_nbrhd);
 inline int EnsembleStatConfInfo::get_n_vx()             const { return(n_vx);                  }
 inline int EnsembleStatConfInfo::get_max_n_ens_thresh() const { return(max_n_ens_thresh);      }
 inline int EnsembleStatConfInfo::get_max_hira_size()    const { return(max_hira_size);         }
-inline int EnsembleStatConfInfo::get_max_n_cat_thresh() const { return(max_n_cat_thresh);      }
 inline int EnsembleStatConfInfo::get_compression_level()      { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////

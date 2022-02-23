@@ -2315,7 +2315,7 @@ void setup_nc_file(unixtime valid_ut, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, n, n_phist_bin, max_n_ens, max_col;
+   int  i, n, n_phist_bin, n_prob, n_eclv, max_n_ens, max_col;
    ConcatString tmp_str;
 
    // Check to see if the text files have already been set up
@@ -2329,6 +2329,10 @@ void setup_txt_files() {
    // Setup the output STAT file
    //
    /////////////////////////////////////////////////////////////////////
+
+   // Maximum number of probability thresholds
+   n_prob = conf_info.get_max_n_prob_thresh();
+   n_eclv = conf_info.get_max_n_eclv_points();
 
    // Compute the number of PHIST bins
    for(i=n_phist_bin=0; i<conf_info.get_n_vx(); i++) {
@@ -2349,6 +2353,7 @@ void setup_txt_files() {
    max_col  = max(max_col, n_ecnt_columns);
    max_col  = max(max_col, n_ssvar_columns);
    max_col  = max(max_col, get_n_relp_columns(max_n_ens));
+   max_col  = max(max_col, get_n_pjc_columns(n_prob));
    max_col += n_header_columns;
 
    // Initialize file stream
@@ -2414,6 +2419,26 @@ void setup_txt_files() {
                max_col = get_n_orank_columns(max_n_ens) + n_header_columns + 1;
                break;
 
+            case(i_pct):
+               max_col = get_n_pct_columns(n_prob) + n_header_columns + 1;
+               break;
+
+            case(i_pstd):
+               max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
+               break;
+
+            case(i_pjc):
+               max_col = get_n_pjc_columns(n_prob) + n_header_columns + 1;
+               break;
+
+            case(i_prc):
+               max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
+               break;
+
+            case(i_eclv):
+               max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
+               break;
+
             default:
                max_col = n_txt_columns[i]  + n_header_columns + 1;
                break;
@@ -2440,6 +2465,26 @@ void setup_txt_files() {
 
             case(i_orank):
                write_orank_header_row(1, max_n_ens, txt_at[i], 0, 0);
+               break;
+
+            case(i_pct):
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+               break;
+
+            case(i_pstd):
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+               break;
+
+            case(i_pjc):
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+               break;
+
+            case(i_prc):
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
+               break;
+
+            case(i_eclv):
+               write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 
             default:
