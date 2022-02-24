@@ -2981,3 +2981,33 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+NormalizeType parse_conf_normalize(Dictionary *dict) {
+   NormalizeType t = NormalizeType_None;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_normalize);
+
+   // Convert integer to enumerated NormalizeType
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
+   else {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////

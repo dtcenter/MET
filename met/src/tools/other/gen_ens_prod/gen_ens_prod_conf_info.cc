@@ -62,10 +62,9 @@ void GenEnsProdConfInfo::clear() {
    desc.clear();
 
    for(; var_it != ens_input.end(); var_it++) {
-
      if(*var_it) { delete *var_it; }
-
    }
+
    ens_input.clear();
    cdf_info.clear();
    nbrhd_prob.clear();
@@ -257,6 +256,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
 
       // Keep track of the maximum number of thresholds
       if(ens_info->cat_ta.n() > max_n_cat) max_n_cat = ens_info->cat_ta.n();
+
+      // Conf: normalize
+      ens_info->normalize = parse_conf_normalize(&i_edict);
 
       // Conf: ensemble_flag
       ens_info->nc_info = parse_nc_info(&i_edict);

@@ -10,8 +10,8 @@ input_data_version=develop
 truth_data_version=develop
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
-
-  # only run diff logic if pull request INTO
+    
+  # only run diff logic if pull request INTO 
   # branches not ending with -ref
   if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
 
@@ -36,25 +36,37 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     if [ "$branch_name" == "develop" ] ||
        [ "${branch_name:0:6}" == "main_v" ]; then
 
-      run_diff=true
-      truth_data_version=${branch_name}
+       run_diff=true
+       truth_data_version=${branch_name}
 
     fi
 
+    # check commit messages for skip or force keywords                                                                         
+    if grep -q "ci-skip-all" <<< "$commit_msg"; then
+
+       run_compile=false
+       run_push=false
+       run_unit_tests=false
+       run_diff=false
+       run_update_truth=false
+
+    fi    
+    
     # check commit messages for ci-skip or ci-run keywords
     if grep -q "ci-skip-compile" <<< "$commit_msg"; then
 
-      run_compile=false
+       run_compile=false
 
     fi
 
     if grep -q "ci-run-unit" <<< "$commit_msg"; then
 
-      run_diff=true
+       run_diff=true
 
     fi
+    
   fi
-
+  
 fi
 
 # if updating truth or running diff, run unit tests

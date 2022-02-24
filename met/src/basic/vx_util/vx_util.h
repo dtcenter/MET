@@ -44,6 +44,7 @@
 #include "long_array.h"
 #include "make_path.h"
 #include "memory.h"
+#include "normalize.h"
 #include "num_array.h"
 #include "ordinal.h"
 #include "roman_numeral.h"

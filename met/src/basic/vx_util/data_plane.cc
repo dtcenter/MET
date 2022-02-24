@@ -406,23 +406,71 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::anomaly(const DataPlane &mn) {
 
-void DataPlane::replace_bad_data(const double value)
+   // Check dimensions
+   if(Nxy != mn.Nxy) {
+      mlog << Error << "\nDataPlane::anomaly() -> "
+           << "the data dimensions do not match: ("
+           << Nx << ", " << Ny << ") != ("
+           << mn.Nx << ", " << mn.Ny << ")!\n\n";
+      exit(1);
+   }
 
-{
+   // Subtract the mean
+   for(int i=0; i<Nxy; i++) {
+      if(is_bad_data(Data[i]) || is_bad_data(mn.Data[i])) {
+         Data[i] = bad_data_double;
+      }
+      else {
+         Data[i] -= mn.Data[i];
+      }
+   }
 
-int j;
-
-for (j=0; j<Nxy; ++j)  {
-
-   if ( is_bad_data(Data[j]) )  Data[j] = value;
-
+   return;
 }
 
-return;
+///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::standard_anomaly(const DataPlane &mn,
+                                 const DataPlane &sd) {
+
+   // Check dimensions
+   if(Nxy != mn.Nxy || Nxy != sd.Nxy) {
+      mlog << Error << "\nDataPlane::standard_anomaly() -> "
+           << "the data dimensions do not match: ("
+           << Nx << ", " << Ny << ") != ("
+           << mn.Nx << ", " << mn.Ny << ") != ("
+           << sd.Nx << ", " << sd.Ny << ")!\n\n";
+      exit(1);
+   }
+
+   // Subtract the mean and divide by the standard deviation
+   for(int i=0; i<Nxy; i++) {
+      if(is_bad_data(Data[i])    ||
+         is_bad_data(mn.Data[i]) ||
+         is_bad_data(sd.Data[i]) ||
+         is_eq(sd.Data[i], 0.0)) {
+         Data[i] = bad_data_double;
+      }
+      else {
+         Data[i] = (Data[i] - mn.Data[i])/sd.Data[i];
+      }
+   }
+
+   return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::replace_bad_data(const double value) {
+
+   for(int i=0; i<Nxy; i++) {
+      if(is_bad_data(Data[i])) Data[i] = value;
+   }
+
+   return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -38,6 +38,7 @@ regrid = {
 //
 censor_thresh = [];
 censor_val    = [];
+normalize     = NONE;
 cat_thresh    = [];
 nc_var_str    = "";
 

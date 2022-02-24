@@ -662,6 +662,7 @@ void process_scores() {
    VarInfo *obs_info  = (VarInfo *) 0;
    PairDataPoint *pd_ptr = (PairDataPoint *) 0;
    DataPlane fcst_dp, obs_dp;
+   const char *method_name = "process_scores() ";
 
    // Climatology mean and standard deviation
    DataPlane cmn_dp, csd_dp;
@@ -762,6 +763,12 @@ void process_scores() {
          } // end for i
 
       } // end for i_series
+
+      if(0 == pd_ptr) {
+         mlog << Debug(3) << method_name
+              << "PairDataPoint is not set. Skip computing statistics for each grid point in the block.\n";
+         continue;
+      }
 
       // Compute statistics for each grid point in the block
       for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
