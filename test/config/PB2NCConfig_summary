@@ -81,10 +81,10 @@ obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB",
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Mapping of BUFR variable name to GRIB name. The default map is defined at
-// obs_prepbufr_map. It will be replaced/expended by obs_bufr_map. 
+// Mapping of input BUFR variable names to output variables names.
+// The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
 //
-//obs_bufr_map = [];
+obs_bufr_map = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
