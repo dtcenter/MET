@@ -63,6 +63,7 @@ void NcDataBuffer::reset_counters() {
    hdr_data_offset = 0;
    pb_hdr_count = 0;
    pb_hdr_data_offset = 0;
+   prev_hdr_vld = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -988,6 +989,7 @@ void NetcdfObsVars::reset(bool _use_var_id) {
    deflate_level = 0;
    hdr_cnt     = 0;     // header array length (fixed dimension if hdr_cnt > 0)
    obs_cnt     = 0;     // obs. array length (fixed dimension if obs_cnt > 0)
+   raw_hdr_cnt = 0;
    //hdr_str_len = 0;    // string length for header (message) type header
 }
 
