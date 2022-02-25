@@ -451,6 +451,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
         << "Computing the ensemble mean and standard deviation for "
         << ens_info->raw_magic_str << ".\n";
 
+   nxy = 0;
    // Loop over the ensemble inputs
    for(i_ens=0; i_ens < ens_info->inputs_n(); i_ens++) {
 
