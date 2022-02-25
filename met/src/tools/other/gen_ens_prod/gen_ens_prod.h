@@ -14,7 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    09/10/21  Halley Gotway   Initial version (MET #1904).
+//   000    09/10/21  Halley Gotway   MET #1904 Initial version.
 //
 ////////////////////////////////////////////////////////////////////////
 
