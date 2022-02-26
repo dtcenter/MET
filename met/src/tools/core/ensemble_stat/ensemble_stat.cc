@@ -143,12 +143,15 @@ static ConcatString get_ens_mn_var_name(int);
 static void setup_nc_file   (unixtime, const char *);
 static void setup_txt_files ();
 static void setup_table     (AsciiTable &);
-static void build_outfile_name(unixtime, const char *,
-                               ConcatString &);
+static void build_outfile_name(unixtime, const char *, ConcatString &);
 
 static void write_txt_files(const EnsembleStatVxOpt &,
                             const PairDataEnsemble &, bool);
+
 static void do_pct(const EnsembleStatVxOpt &, const PairDataEnsemble &);
+static void do_pct_cat_thresh(const EnsembleStatVxOpt &, const PairDataEnsemble &);
+static void do_pct_cdp_thresh(const EnsembleStatVxOpt &, const PairDataEnsemble &);
+static void write_pct_info(const EnsembleStatVxOpt &, const PCTInfo *, int);
 
 static void write_ens_nc(EnsVarInfo *, int, DataPlane &);
 static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
@@ -1938,7 +1941,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // Store observation filering threshold
    rps_info.othresh = othresh;
-   rps_info.set_prob_cat_thresh(vx_opt.prob_cat_ta);
+   rps_info.set_prob_cat_thresh(vx_opt.fcat_ta);
 
    // If prob_cat_thresh is empty and climo data is available,
    // use climo_cdf thresholds instead
@@ -2497,26 +2500,55 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(const EnsembleStatVxOpt &vx_opt, const PairDataEnsemble &pd_ens) {
-   int i, j, k;
-   int i_obs, i_ens, n_vld, n_thr, n_bin;
+void do_pct(const EnsembleStatVxOpt &vx_opt,
+            const PairDataEnsemble &pd_ens) {
+
+   // Flag to indicate the presence of valid climo data
+   bool have_climo = (pd_ens.cmn_na.n_valid() > 0 &&
+                      pd_ens.csd_na.n_valid() > 0);
+
+   // If forecast probability thresholds were specified, use them.
+   if(vx_opt.fcat_ta.n() > 0) {
+      mlog << Debug(2)
+           << "Computing Probabilistic Statistics for "
+           << vx_opt.fcat_ta.n()
+           << " categorical thresholds.\n";
+      do_pct_cat_thresh(vx_opt, pd_ens);
+   }
+   // Otherwise, if climo data is available and bins were requested,
+   // use climo_cdf thresholds instead.
+   else if(have_climo && vx_opt.cdf_info.cdf_ta.n() > 0) {
+      mlog << Debug(2)
+           << "Computing Probabilistic Statistics for "
+           << vx_opt.cdf_info.cdf_ta.n()
+           << " climatological distribution thresholds.\n";
+      do_pct_cdp_thresh(vx_opt, pd_ens);
+   }
+
+   // Otherwise, no work to be done.
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
+                       const PairDataEnsemble &pd_ens) {
+   int i, i_thr, i_bin, i_obs, i_ens;
+   int n_vld, n_evt, n_bin;
    PCTInfo *pct_info = (PCTInfo *) 0;
    PairDataPoint pd_pnt, pd;
    ConcatString fcst_var_cs, cs;
-
-   mlog << Debug(2)
-        << "Computing Probabilistic Statistics.\n";
 
    // Derive a PairDataPoint object from the PairDataEnsemble input
    pd_pnt.extend(pd_ens.n_obs);
 
    // Determine the number of climo CDF bins
-   n_bin = (pd_pnt.cmn_na.n_valid() > 0 && pd_pnt.csd_na.n_valid() > 0 ?
+   n_bin = (pd_ens.cmn_na.n_valid() > 0 && pd_ens.csd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
       mlog << Debug(2)
-           << "Applying " << n_bin << " climatology bins.\n";
+           << "Subsetting pairs into " << n_bin << " climatology bins.\n";
    }
 
    // Allocate memory
@@ -2526,14 +2558,14 @@ void do_pct(const EnsembleStatVxOpt &vx_opt, const PairDataEnsemble &pd_ens) {
    fcst_var_cs = shc.get_fcst_var();
 
    // Process each probability threshold
-   for(i=0; i<vx_opt.prob_cat_ta.n(); i++) {
+   for(i_thr=0; i_thr<vx_opt.fcat_ta.n(); i_thr++) {
 
       // Set the header columns
       cs << cs_erase << "PROB(" << fcst_var_cs
-         << vx_opt.prob_cat_ta[i].get_str() << ")";
+         << vx_opt.fcat_ta[i_thr].get_str() << ")";
       shc.set_fcst_var(cs);
-      shc.set_fcst_thresh(vx_opt.prob_pct_ta);
-      shc.set_obs_thresh(vx_opt.prob_cat_ta[i]);
+      shc.set_fcst_thresh(vx_opt.fpct_ta);
+      shc.set_obs_thresh(vx_opt.ocat_ta[i_thr]);
 
       // Re-initialize
       pd_pnt.erase();
@@ -2542,19 +2574,19 @@ void do_pct(const EnsembleStatVxOpt &vx_opt, const PairDataEnsemble &pd_ens) {
       for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
 
          // Initialize counts
-         n_vld = n_thr = 0;
+         n_vld = n_evt = 0;
 
          // Derive the ensemble probability
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               if(vx_opt.prob_cat_ta[i].check(pd_ens.e_na[i_ens][i_obs])) n_thr++;
+               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs])) n_evt++;
             }
          } // end for i_ens
 
          // Store the probability if enough valid data is present
          if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
-            pd_pnt.add_grid_pair((double) n_thr / n_vld, pd_ens.o_na[i_obs],
+            pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
                                  pd_ens.cmn_na[i_obs], pd_ens.csd_na[i_obs],
                                  pd_ens.wgt_na[i_obs]);
          }
@@ -2562,99 +2594,195 @@ void do_pct(const EnsembleStatVxOpt &vx_opt, const PairDataEnsemble &pd_ens) {
       } // end for i_obs
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(i_bin=0; i_bin<n_bin; i_bin++) {
 
          // Initialize
-         pct_info[j].clear();
+         pct_info[i_bin].clear();
 
          // Apply climo CDF bins logic to subset pairs
          if(n_bin > 1) pd = subset_climo_cdf_bin(pd_pnt,
-                               vx_opt.cdf_info.cdf_ta, j);
+                               vx_opt.cdf_info.cdf_ta, i_bin);
          else          pd = pd_pnt;
 
          // Store thresholds
-         pct_info[j].fthresh = vx_opt.prob_pct_ta;
-         pct_info[j].othresh = vx_opt.prob_cat_ta[i];
-         pct_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
+         pct_info[i_bin].fthresh = vx_opt.fpct_ta;
+         pct_info[i_bin].othresh = vx_opt.ocat_ta[i_thr];
+         pct_info[i_bin].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
-         for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
-            pct_info[j].alpha[k] = vx_opt.ci_alpha[k];
+         for(i=0; i<vx_opt.get_n_ci_alpha(); i++) {
+            pct_info[i_bin].alpha[i] = vx_opt.ci_alpha[i];
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
+         compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[i_bin]);
 
-         // Check for no matched pairs to process
-         if(pd.n_obs == 0) continue;
+      } // end for i_bin
 
-         // Write out PCT
-         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pct] != STATOutputType_None) {
-            write_pct_row(shc, pct_info[j],
-               vx_opt.output_flag[i_pct],
-               j, n_bin, stat_at, i_stat_row,
-               txt_at[i_pct], i_txt_row[i_pct]);
-         }
+      // Write the probabilistic output
+      write_pct_info(vx_opt, pct_info, n_bin);
 
-         // Write out PSTD
-         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pstd] != STATOutputType_None) {
-            write_pstd_row(shc, pct_info[j],
-               vx_opt.output_flag[i_pstd],
-               j, n_bin, stat_at, i_stat_row,
-               txt_at[i_pstd], i_txt_row[i_pstd]);
-         }
-
-         // Write out PJC
-         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pjc] != STATOutputType_None) {
-            write_pjc_row(shc, pct_info[j],
-               vx_opt.output_flag[i_pjc],
-               j, n_bin, stat_at, i_stat_row,
-               txt_at[i_pjc], i_txt_row[i_pjc]);
-         }
-
-         // Write out PRC
-         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_prc] != STATOutputType_None) {
-            write_prc_row(shc, pct_info[j],
-               vx_opt.output_flag[i_prc],
-               j, n_bin, stat_at, i_stat_row,
-               txt_at[i_prc], i_txt_row[i_prc]);
-         }
-
-         // Write out ECLV
-         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_eclv] != STATOutputType_None) {
-            write_eclv_row(shc, pct_info[j], vx_opt.eclv_points,
-               vx_opt.output_flag[i_eclv],
-               j, n_bin, stat_at, i_stat_row,
-               txt_at[i_eclv], i_txt_row[i_eclv]);
-         }
-      } // end for j (n_bin)
-
-      // Write the mean of the climo CDF bins
-      if(n_bin > 1) {
-
-         PCTInfo pct_mean;
-         compute_pct_mean(pct_info, n_bin, pct_mean);
-
-         // Write out PSTD
-         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
-            write_pstd_row(shc, pct_mean,
-               vx_opt.output_flag[i_pstd],
-               -1, n_bin, stat_at, i_stat_row,
-               txt_at[i_pstd], i_txt_row[i_pstd]);
-         }
-      } // end if n_bin > 1
-
-   } // end for i (ocnt_ta)
+   } // end for i_ta
 
    // Reset the forecast variable name
    shc.set_fcst_var(fcst_var_cs);
 
    // Dealloate memory
    if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
+                       const PairDataEnsemble &pd_ens) {
+   int i, i_thr, i_bin, i_obs, i_ens;
+   int n_vld, n_evt, n_bin;
+   PCTInfo *pct_info = (PCTInfo *) 0;
+   PairDataPoint pd_pnt, pd;
+   ThreshArray cdp_thresh;
+
+   // Derive a PairDataPoint object from the PairDataEnsemble input
+   pd_pnt.extend(pd_ens.n_obs);
+
+   // Derive the climo distribution percentile thresholds
+   cdp_thresh = derive_cdp_thresh(vx_opt.cdf_info.cdf_ta);
+   n_bin      = cdp_thresh.n();
+
+   mlog << Debug(2) << "Applying " << n_bin
+        << " climatological distribution percentile thresholds.\n";
+
+   // Allocate memory
+   pct_info = new PCTInfo [n_bin];
+
+   // Process each probability threshold
+   for(i_bin=0; i_bin<n_bin; i_bin++) {
+
+      // Set the header columns
+      shc.set_fcst_thresh(vx_opt.fpct_ta);
+      shc.set_obs_thresh(cdp_thresh[i_bin]);
+
+      // Re-initialize
+      pd_pnt.erase();
+
+      // Process the observations
+      for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
+
+         // Initialize counts
+         n_vld = n_evt = 0;
+
+         // Derive the ensemble probability
+         for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
+            if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
+               n_vld++;
+               if(cdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs])) n_evt++;
+            }
+         } // end for i_ens
+
+         // Store the probability if enough valid data is present
+         if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
+            pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
+                                 pd_ens.cmn_na[i_obs], pd_ens.csd_na[i_obs],
+                                 pd_ens.wgt_na[i_obs]);
+         }
+
+      } // end for i_obs
+
+      // Initialize
+      pct_info[i_bin].clear();
+
+      // Store thresholds
+      pct_info[i_bin].fthresh = vx_opt.fpct_ta;
+      pct_info[i_bin].othresh = cdp_thresh[i_bin];
+      pct_info[i_bin].allocate_n_alpha(vx_opt.get_n_ci_alpha());
+
+      for(i=0; i<vx_opt.get_n_ci_alpha(); i++) {
+         pct_info[i_bin].alpha[i] = vx_opt.ci_alpha[i];
+      }
+
+      // Compute the probabilistic counts and statistics
+      compute_pctinfo(pd_pnt, vx_opt.output_flag[i_pstd], pct_info[i_bin]);
+
+   } // end for i_bin
+
+   // Write the probabilistic output
+   write_pct_info(vx_opt, pct_info, n_bin);
+
+   // Dealloate memory
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_pct_info(const EnsembleStatVxOpt &vx_opt,
+                    const PCTInfo *pct_info, int n_bin) {
+
+   // Write output for each bin
+   for(int i_bin=0; i_bin<n_bin; i_bin++) {
+
+      // Write out PCT
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_pct] != STATOutputType_None) {
+         write_pct_row(shc, pct_info[i_bin],
+            vx_opt.output_flag[i_pct],
+            i_bin, n_bin, stat_at, i_stat_row,
+            txt_at[i_pct], i_txt_row[i_pct]);
+      }
+
+      // Write out PSTD
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         write_pstd_row(shc, pct_info[i_bin],
+            vx_opt.output_flag[i_pstd],
+            i_bin, n_bin, stat_at, i_stat_row,
+            txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+
+      // Write out PJC
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_pjc] != STATOutputType_None) {
+         write_pjc_row(shc, pct_info[i_bin],
+            vx_opt.output_flag[i_pjc],
+            i_bin, n_bin, stat_at, i_stat_row,
+            txt_at[i_pjc], i_txt_row[i_pjc]);
+      }
+
+      // Write out PRC
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_prc] != STATOutputType_None) {
+         write_prc_row(shc, pct_info[i_bin],
+            vx_opt.output_flag[i_prc],
+            i_bin, n_bin, stat_at, i_stat_row,
+            txt_at[i_prc], i_txt_row[i_prc]);
+      }
+
+      // Write out ECLV
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+         write_eclv_row(shc, pct_info[i_bin], vx_opt.eclv_points,
+            vx_opt.output_flag[i_eclv],
+            i_bin, n_bin, stat_at, i_stat_row,
+            txt_at[i_eclv], i_txt_row[i_eclv]);
+      }
+
+   } // end for i_bin
+
+   // Write the mean of the climo CDF bins
+   if(n_bin > 1) {
+
+      PCTInfo pct_mean;
+      compute_pct_mean(pct_info, n_bin, pct_mean);
+
+      // Write out PSTD
+      if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         write_pstd_row(shc, pct_mean,
+            vx_opt.output_flag[i_pstd],
+            -1, n_bin, stat_at, i_stat_row,
+            txt_at[i_pstd], i_txt_row[i_pstd]);
+      }
+   } // end if n_bin > 1
 
    return;
 }

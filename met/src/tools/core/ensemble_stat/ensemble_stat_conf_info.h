@@ -131,8 +131,9 @@ class EnsembleStatVxOpt {
       double         ssvar_bin_size;     // SSVAR bin size
       double         phist_bin_size;     // PHIST bin size
 
-      ThreshArray    prob_cat_ta;        // Categorical thresholds for probabilities, including RPS
-      ThreshArray    prob_pct_ta;        // PCT thresholds
+      ThreshArray    fcat_ta;            // Forecast categorical probability-definition thresholds, including RPS
+      ThreshArray    ocat_ta;            // Observation categorical event-definition thresholds
+      ThreshArray    fpct_ta;            // Forecast PCT thresholds
 
       DuplicateType  duplicate_flag;     // Duplicate observations
       ObsSummary     obs_summary;        // Summarize observations
@@ -181,8 +182,8 @@ inline int EnsembleStatVxOpt::get_n_mask()        const { return(mask_name.n());
 inline int EnsembleStatVxOpt::get_n_mask_area()   const { return(mask_name_area.n());   }
 
 inline int EnsembleStatVxOpt::get_n_obs_thresh()      const { return(othr_ta.n());      }
-inline int EnsembleStatVxOpt::get_n_prob_cat_thresh() const { return(prob_cat_ta.n());  }
-inline int EnsembleStatVxOpt::get_n_prob_pct_thresh() const { return(prob_pct_ta.n());  }
+inline int EnsembleStatVxOpt::get_n_prob_cat_thresh() const { return(fcat_ta.n());      }
+inline int EnsembleStatVxOpt::get_n_prob_pct_thresh() const { return(fpct_ta.n());      }
 
 inline int EnsembleStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
 inline int EnsembleStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);       }

@@ -99,9 +99,13 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "fcst.field" entry
+// May be set separately in each "fcst.field" and "obs.field" entry
 //
 prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
 prob_pct_thresh = [ ==0.25 ];
 
 //

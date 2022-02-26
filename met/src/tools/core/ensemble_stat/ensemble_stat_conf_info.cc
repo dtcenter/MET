@@ -797,8 +797,9 @@ void EnsembleStatVxOpt::clear() {
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
 
-   prob_cat_ta.clear();
-   prob_pct_ta.clear();
+   fcat_ta.clear();
+   ocat_ta.clear();
+   fpct_ta.clear();
 
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
@@ -983,11 +984,22 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    phist_bin_size = odict.lookup_double(conf_key_phist_bin);
 
    // Conf: prob_cat_thresh
-   prob_cat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
+   fcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
+   ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
+
+   // The number of thresholds must match
+   if(fcat_ta.n() != ocat_ta.n()) {
+      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+           << "The number of forecast (" << fcat_ta.n()
+           << ") and observation (" << ocat_ta.n()
+           << ") probability category thresholds in \""
+           << conf_key_prob_cat_thresh << "\" must match.\n\n";
+      exit(1);
+   }
 
    // Conf: prob_pct_thresh
-   prob_pct_ta = fdict.lookup_thresh_array(conf_key_prob_pct_thresh);
-   prob_pct_ta = string_to_prob_thresh(prob_pct_ta.get_str().c_str());
+   fpct_ta = fdict.lookup_thresh_array(conf_key_prob_pct_thresh);
+   fpct_ta = string_to_prob_thresh(fpct_ta.get_str().c_str());
 
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&odict);
@@ -1151,7 +1163,9 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    //
    // Check if percentile thresholds were requested
    //
-   if(!othr_ta.need_perc() && !prob_cat_ta.need_perc()) return;
+   if(!othr_ta.need_perc() &&
+      !fcat_ta.need_perc() &&
+      !ocat_ta.need_perc()) return;
 
    //
    // Sort the input arrays
@@ -1165,13 +1179,12 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    csort.sort_array();
 
    //
-   // Compute percentiles, passing the observation thresholds in for
-   // the fcst and obs slots.
+   // Compute percentiles, passing the observation filtering
+   // thresholds in for the fcst and obs slots.
    //
-   othr_ta.set_perc(&fsort, &osort, &csort,
-                    &othr_ta, &othr_ta);
-   prob_cat_ta.set_perc(&fsort, &osort, &csort,
-                        &prob_cat_ta, &prob_cat_ta);
+   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
 
    return;
 }
