@@ -403,6 +403,7 @@ void MetPointHeader::reset_counters() {
    strl_len = 0;
    strll_len = 0;
    hdr_count = 0;
+   hdr_type_count = 0;
 
    min_vld_time = -1;
    max_vld_time = -1;
