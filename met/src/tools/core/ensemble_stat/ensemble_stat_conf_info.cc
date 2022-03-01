@@ -1254,6 +1254,10 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
               get_n_prob_cat_thresh();
+         if(i_txt_row==i_pct) {
+            cout << "JHG: for i_pct, n_row = " << n
+                 << ", get_n_prob_cat_thresh() = " << get_n_prob_cat_thresh() << "\n";
+         }
          break;
 
       case(i_pstd):
@@ -1282,6 +1286,15 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatVxOpt::get_n_prob_cat_thresh() const {
+
+   // Probability categories can be defined by the prob_cat_thresh or
+   // climo_cdf.bins configuration file options.
+   return(max(fcat_ta.n(), cdf_info.cdf_ta.n()));
 }
 
 ////////////////////////////////////////////////////////////////////////

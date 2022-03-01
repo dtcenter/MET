@@ -151,7 +151,7 @@ static void write_txt_files(const EnsembleStatVxOpt &,
 static void do_pct(const EnsembleStatVxOpt &, const PairDataEnsemble &);
 static void do_pct_cat_thresh(const EnsembleStatVxOpt &, const PairDataEnsemble &);
 static void do_pct_cdp_thresh(const EnsembleStatVxOpt &, const PairDataEnsemble &);
-static void write_pct_info(const EnsembleStatVxOpt &, const PCTInfo *, int);
+static void write_pct_info(const EnsembleStatVxOpt &, const PCTInfo *, int, bool);
 
 static void write_ens_nc(EnsVarInfo *, int, DataPlane &);
 static void write_ens_var_float(EnsVarInfo *, float *, const DataPlane &,
@@ -2168,6 +2168,7 @@ void setup_txt_files() {
    max_col  = max(max_col, n_ssvar_columns);
    max_col  = max(max_col, get_n_relp_columns(max_n_ens));
    max_col  = max(max_col, get_n_pjc_columns(n_prob));
+   max_col  = max(max_col, get_n_eclv_columns(n_eclv));
    max_col += n_header_columns;
 
    // Initialize file stream
@@ -2509,19 +2510,11 @@ void do_pct(const EnsembleStatVxOpt &vx_opt,
 
    // If forecast probability thresholds were specified, use them.
    if(vx_opt.fcat_ta.n() > 0) {
-      mlog << Debug(2)
-           << "Computing Probabilistic Statistics for "
-           << vx_opt.fcat_ta.n()
-           << " categorical thresholds.\n";
       do_pct_cat_thresh(vx_opt, pd_ens);
    }
    // Otherwise, if climo data is available and bins were requested,
    // use climo_cdf thresholds instead.
    else if(have_climo && vx_opt.cdf_info.cdf_ta.n() > 0) {
-      mlog << Debug(2)
-           << "Computing Probabilistic Statistics for "
-           << vx_opt.cdf_info.cdf_ta.n()
-           << " climatological distribution thresholds.\n";
       do_pct_cdp_thresh(vx_opt, pd_ens);
    }
 
@@ -2538,6 +2531,10 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    PCTInfo *pct_info = (PCTInfo *) 0;
    PairDataPoint pd_pnt, pd;
    ConcatString fcst_var_cs, cs;
+
+   mlog << Debug(2)
+        << "Computing Probabilistic Statistics for "
+        << vx_opt.fcat_ta.n() << " categorical thresholds.\n";
 
    // Derive a PairDataPoint object from the PairDataEnsemble input
    pd_pnt.extend(pd_ens.n_obs);
@@ -2580,7 +2577,9 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs])) n_evt++;
+               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs],
+                                              pd_ens.cmn_na[i_obs],
+                                              pd_ens.csd_na[i_obs])) n_evt++;
             }
          } // end for i_ens
 
@@ -2619,7 +2618,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
       } // end for i_bin
 
       // Write the probabilistic output
-      write_pct_info(vx_opt, pct_info, n_bin);
+      write_pct_info(vx_opt, pct_info, n_bin, true);
 
    } // end for i_ta
 
@@ -2649,7 +2648,8 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    cdp_thresh = derive_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    n_bin      = cdp_thresh.n();
 
-   mlog << Debug(2) << "Applying " << n_bin
+   mlog << Debug(2)
+        << "Computing Probabilistic Statistics for " << cdp_thresh.n()
         << " climatological distribution percentile thresholds.\n";
 
    // Allocate memory
@@ -2675,7 +2675,9 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               if(cdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs])) n_evt++;
+               if(cdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs],
+                                          pd_ens.cmn_na[i_obs],
+                                          pd_ens.csd_na[i_obs])) n_evt++;
             }
          } // end for i_ens
 
@@ -2706,7 +2708,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    } // end for i_bin
 
    // Write the probabilistic output
-   write_pct_info(vx_opt, pct_info, n_bin);
+   write_pct_info(vx_opt, pct_info, n_bin, false);
 
    // Dealloate memory
    if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
@@ -2717,7 +2719,8 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_pct_info(const EnsembleStatVxOpt &vx_opt,
-                    const PCTInfo *pct_info, int n_bin) {
+                    const PCTInfo *pct_info, int n_bin,
+                    bool sum_total) {
 
    // Write output for each bin
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2773,7 +2776,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
    if(n_bin > 1) {
 
       PCTInfo pct_mean;
-      compute_pct_mean(pct_info, n_bin, pct_mean);
+      compute_pct_mean(pct_info, n_bin, pct_mean, sum_total);
 
       // Write out PSTD
       if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {

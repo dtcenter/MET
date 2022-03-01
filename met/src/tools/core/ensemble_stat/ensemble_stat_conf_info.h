@@ -182,7 +182,6 @@ inline int EnsembleStatVxOpt::get_n_mask()        const { return(mask_name.n());
 inline int EnsembleStatVxOpt::get_n_mask_area()   const { return(mask_name_area.n());   }
 
 inline int EnsembleStatVxOpt::get_n_obs_thresh()      const { return(othr_ta.n());      }
-inline int EnsembleStatVxOpt::get_n_prob_cat_thresh() const { return(fcat_ta.n());      }
 inline int EnsembleStatVxOpt::get_n_prob_pct_thresh() const { return(fpct_ta.n());      }
 
 inline int EnsembleStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
