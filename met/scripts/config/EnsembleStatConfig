@@ -26,7 +26,6 @@ obtype = "MC_PCP";
 
 //
 // Verification grid
-// May be set separately in each "field" entry
 //
 regrid = {
    to_grid    = NONE;
@@ -158,16 +157,16 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type   = [];
-sid_inc        = [];
-sid_exc        = [];
-obs_thresh     = [ NA ];
-obs_quality_inc  = [];
-obs_quality_exc  = [];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
-skip_const     = FALSE;
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
 
 //
 // Observation error options
