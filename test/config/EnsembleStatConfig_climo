@@ -255,11 +255,11 @@ output_flag = {
    orank = BOTH;
    ssvar = STAT;
    relp  = STAT;
-   pct   = NONE;
-   pstd  = NONE;
-   pjc   = NONE;
-   prc   = NONE;
-   eclv  = NONE;
+   pct   = BOTH;
+   pstd  = BOTH;
+   pjc   = BOTH;
+   prc   = BOTH;
+   eclv  = BOTH;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
