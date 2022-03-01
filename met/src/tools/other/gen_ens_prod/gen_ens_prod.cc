@@ -319,9 +319,9 @@ void process_ensemble() {
          // Skip bad data files
          if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
 
-         mlog << Debug(3) << "\n"
-              << "Reading field: "
-              << var_info->magic_str() << "\n";
+         mlog << Debug(3)
+              << "\nReading ensemble field \""
+              << var_info->magic_str() << "\".\n";
 
          // Read data and track the valid data count
          if(!get_data_plane(ens_file.c_str(), etype,
@@ -458,9 +458,17 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
       setenv(met_ens_member_id, ens_info->get_ens_member_id(i_ens).c_str(), 1);
    }
 
+   mlog << Debug(4)
+        << "Reading climatology mean data for ensemble field \""
+        << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
+
    cmn_dp = read_climo_data_plane(
                conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                i_var, ens_valid_ut, grid);
+
+   mlog << Debug(4)
+        << "Reading climatology standard deviation data for ensemble field \""
+        << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
 
    csd_dp = read_climo_data_plane(
                conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
