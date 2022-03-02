@@ -5,6 +5,49 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 `MET GitHub issues. <https://github.com/dtcenter/MET/issues>`_
 
+MET Version 10.1.0-beta6 release notes (20220302)
+-------------------------------------------------
+
+* Enhancements:
+
+   * **Enhance Ensemble-Stat to compute probabilistic statistics for user-defined or climatology-based thresholds** (`#1259 <https://github.com/dtcenter/MET/issues/1259>`_).
+   * **Enhance Ensemble-Stat to apply the HiRA method to ensembles** (`#1583 <https://github.com/dtcenter/MET/issues/1583>`_ and `#2045 <https://github.com/dtcenter/MET/issues/2045>`_).
+   * **Enhance Ensemble-Stat, Point-Stat, Plot-Point-Obs, and Point2Grid to support python embedding of point observations** (`#1844 <https://github.com/dtcenter/MET/issues/1844>`_).
+   * **Enhance Gen-Ens-Prod to standardize ensemble members relative to climatology** (`#1918 <https://github.com/dtcenter/MET/issues/1918>`_).
+   * Enhance PB2NC to derive Mixed-Layer CAPE (MLCAPE) (`#1824 <https://github.com/dtcenter/MET/issues/1824>`_).
+   * Enhance Series-Analysis to compute the BRIERCL statistic from the PSTD line type (`#2003 <https://github.com/dtcenter/MET/issues/2003>`_).
+   * Enhance the MET library code to read Rotated Lat/Lon data from CF-compliant NetCDF files (`#1055 <https://github.com/dtcenter/MET/issues/1055>`_).
+
+* Configuration:
+
+   * Update the PB2NC configuration to correct the obs_prefbufr_map name as obs_prepbufr_map (`#2044 <https://github.com/dtcenter/MET/issues/2044>`_).
+   * Add entries to the default obs_prepbufr_map setting (`#2070 <https://github.com/dtcenter/MET/issues/2070>`_).
+
+* Bugfixes:
+
+   * Fix the MET library code to correclty parse timing information from Grid-Stat NetCDF matched pairs output files (`#2040 <https://github.com/dtcenter/MET/issues/2040>`_).
+   * Fix MADIS2NC to correctly parse MADIS profiler quality flag values (`#2028 <https://github.com/dtcenter/MET/issues/2028>`_).
+
+* Testing:
+
+   * **Implement Continuous Integration with GH-Actions in MET** (`#1546 <https://github.com/dtcenter/MET/issues/1546>`_).
+   * Write a script to automate SonarQube static code analysis runs in the nightly build (`#2020 <https://github.com/dtcenter/MET/issues/2020>`_).
+   * Investigate nightly build output wind direction differences caused by machine precision (`#2027 <https://github.com/dtcenter/MET/issues/2027>`_).
+
+* Logging:
+
+   * Enhance PB2NC to reduce redundant verbosity level 3 log messages (`#2015 <https://github.com/dtcenter/MET/issues/2015>`_).
+   * Print a warning message about switching from Ensemble-Stat to Gen-Ens-Prod (`#1907 <https://github.com/dtcenter/MET/issues/1907>`_).
+   * Update error messages to redirect users from the MET-Help desk to METplus Discussions (`#2054 <https://github.com/dtcenter/MET/issues/2054>`_).
+
+* Repository and installation:
+
+   * Update the copyright year of the source code to 2022 (`#2013 <https://github.com/dtcenter/MET/issues/2013>`_).
+
+* Documentation:
+
+   * Enhance the documentation to follow the standard for sections (`#1998 <https://github.com/dtcenter/MET/issues/1998>`_).
+
 MET Version 10.1.0-beta5 release notes (20220114)
 -------------------------------------------------
 
