@@ -892,6 +892,12 @@ int EnsVarInfo::get_file_index(int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString EnsVarInfo::get_ens_member_id(int index) {
+   return inputs[index].ens_member_id;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
    ConcatString magic_str;
 
