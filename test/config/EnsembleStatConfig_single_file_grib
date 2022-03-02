@@ -26,7 +26,6 @@ obtype = "ANALYS";
 
 //
 // Verification grid
-// May be set separately in each "field" entry
 //
 regrid = {
    to_grid    = NONE;
@@ -39,7 +38,7 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "field" entry
+// May be set separately in each "ens.field" entry
 //
 censor_thresh = [];
 censor_val    = [];
@@ -56,9 +55,9 @@ ens = {
    field = [
       {
          name       = "PRMSL";
-	 level      = "L0";
-	 lead_time  = "06";
-	 GRIB_ens   = "MET_ENS_MEMBER_ID";
+         level      = "L0";
+         lead_time  = "06";
+         GRIB_ens   = "MET_ENS_MEMBER_ID";
       }
    ];
 }
@@ -100,16 +99,30 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+eclv_points = 0.05;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
-
    field = [
       {
          name       = "PRMSL";
-	 level      = "L0";
-	 lead_time  = "06";
-	 GRIB_ens   = "MET_ENS_MEMBER_ID";
+         level      = "L0";
+         lead_time  = "06";
+         GRIB_ens   = "MET_ENS_MEMBER_ID";
       }
    ];
 }
@@ -118,9 +131,9 @@ obs = {
    field = [
       {
          name       = "PRMSL";
-	 level      = "L0";
-	 lead_time  = "06";
-	 GRIB_ens   = "hi_res_ctl";
+         level      = "L0";
+         lead_time  = "06";
+         GRIB_ens   = "hi_res_ctl";
       }
    ];
 }
@@ -130,16 +143,16 @@ obs = {
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type   = [ "ADPUPA" ];
-sid_inc        = [];
-sid_exc        = [];
-obs_thresh     = [ NA ];
-obs_quality_inc  = [];
-obs_quality_exc  = [];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
-skip_const     = FALSE;
+message_type    = [ "ADPUPA" ];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
 
 //
 // Observation error options
@@ -172,12 +185,6 @@ message_type_group_map = [
 //
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
-
-//
-// Categorical thresholds to define ensemble probabilities
-// May be set separately in each "fcst.field" entry
-//
-prob_cat_thresh = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -212,6 +219,8 @@ climo_stdev = {
 climo_cdf = {
    cdf_bins    = 10;
    center_bins = FALSE;
+   write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +260,7 @@ ci_alpha  = [ 0.05 ];
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
-   shape  = SQUARE;
+   shape      = SQUARE;
 
    type = [
       {
@@ -274,6 +283,11 @@ output_flag = {
    orank = NONE;
    ssvar = NONE;
    relp  = NONE;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

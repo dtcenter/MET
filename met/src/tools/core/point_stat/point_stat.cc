@@ -158,7 +158,6 @@ static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
 static void do_hira_ens  (              int, const PairDataPoint *);
 static void do_hira_prob (              int, const PairDataPoint *);
 
-
 static void finish_txt_files();
 
 static void clean_up();

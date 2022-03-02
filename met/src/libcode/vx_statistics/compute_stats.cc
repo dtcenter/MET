@@ -1249,7 +1249,7 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_pct_mean(const PCTInfo *cnt_info, int n,
-                      PCTInfo &pct_mean) {
+                      PCTInfo &pct_mean, bool sum_total) {
    int i;
    NumArray na;
 
@@ -1267,9 +1267,10 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
    pct_mean.allocate_n_alpha(1);
    pct_mean.alpha[0] = bad_data_double;
 
-   // Compute the sum of the totals
+   // Compute the sum or mean of the totals
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].total);
-   pct_mean.total = na.sum();
+   if(sum_total) pct_mean.total = na.sum();
+   else          pct_mean.total = na.mean();
 
    // Compute means of statistics
 

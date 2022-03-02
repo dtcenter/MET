@@ -465,22 +465,7 @@ void RPSInfo::set_prob_cat_thresh(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
-   SingleThresh st;
-   fthresh.clear();
-
-   for(int i=0; i<ta.n(); i++) {
-
-      // Skip 0.0 and 1.0
-      if(is_eq(ta[i].get_value(), 0.0) ||
-         is_eq(ta[i].get_value(), 1.0)) continue;
-
-      // Add CDP thresholds
-      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
-
-      fthresh.add(st);
-   }
-
-   return;
+   fthresh = derive_cdp_thresh(ta);
 }
 
 ////////////////////////////////////////////////////////////////////////
