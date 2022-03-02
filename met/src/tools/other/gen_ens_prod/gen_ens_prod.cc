@@ -55,6 +55,8 @@ static void process_command_line(int, char **);
 static void process_grid(const Grid &);
 static void process_ensemble();
 
+static void get_climo_mean_stdev(GenEnsProdVarInfo *, int,
+                                 bool, int, DataPlane &, DataPlane &);
 static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
@@ -272,7 +274,7 @@ void process_grid(const Grid &fcst_grid) {
 
 void process_ensemble() {
    int i_var, i_ens, n_ens_vld, n_ens_inputs;
-   bool need_reset;
+   bool need_reset, set_climo_ens_mem_id;
    DataPlane ens_dp, ctrl_dp;
    DataPlane cmn_dp, csd_dp;
    DataPlane emn_dp, esd_dp;
@@ -286,6 +288,13 @@ void process_ensemble() {
 
       // Need to reinitialize counts and sums for each ensemble field
       need_reset = true;
+
+      // When normalizing relative to climatology with MET_ENS_MEMBER_ID set,
+      // read climatology separately for each member
+      set_climo_ens_mem_id =
+         (conf_info.ens_member_ids.n() > 1) &&
+         ((*var_it)->normalize == NormalizeType_ClimoAnom ||
+          (*var_it)->normalize == NormalizeType_ClimoStdAnom);
 
       // Print out the normalization flag
       cs << cs_erase;
@@ -310,9 +319,9 @@ void process_ensemble() {
          // Skip bad data files
          if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
 
-         mlog << Debug(3) << "\n"
-              << "Reading field: "
-              << var_info->magic_str() << "\n";
+         mlog << Debug(3)
+              << "\nReading ensemble field \""
+              << var_info->magic_str() << "\".\n";
 
          // Read data and track the valid data count
          if(!get_data_plane(ens_file.c_str(), etype,
@@ -335,17 +344,13 @@ void process_ensemble() {
             clear_counts();
 
             // Read climatology data for this field
-            cmn_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                        i_var, ens_valid_ut, grid);
-
-            csd_dp = read_climo_data_plane(
-                        conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                        i_var, ens_valid_ut, grid);
+            get_climo_mean_stdev((*var_it), i_var,
+                                 set_climo_ens_mem_id,
+                                 i_ens, cmn_dp, csd_dp);
 
             // Compute the ensemble summary data, if needed
             if((*var_it)->normalize == NormalizeType_FcstAnom ||
-               (*var_it)->normalize == NormalizeType_FcstStdAnom ) {
+               (*var_it)->normalize == NormalizeType_FcstStdAnom) {
                get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
             }
             else {
@@ -371,6 +376,13 @@ void process_ensemble() {
                   exit(1);
                }
 
+               // Read climo data with MET_ENS_MEMBER_ID set
+               if(set_climo_ens_mem_id) {
+                  get_climo_mean_stdev((*var_it), i_var,
+                                       set_climo_ens_mem_id, i_ens,
+                                       cmn_dp, csd_dp);
+               }
+
                // Normalize, if requested
                if((*var_it)->normalize != NormalizeType_None) {
                   normalize_data(ctrl_dp, (*var_it)->normalize,
@@ -390,6 +402,13 @@ void process_ensemble() {
                  << var_info->magic_str() << "\".\n";
 
          } // end if need_reset
+
+         // Read climo data with MET_ENS_MEMBER_ID set
+         if(set_climo_ens_mem_id) {
+             get_climo_mean_stdev((*var_it), i_var,
+                                  set_climo_ens_mem_id, i_ens,
+                                  cmn_dp, csd_dp);
+         }
 
          // Normalize, if requested
          if((*var_it)->normalize != NormalizeType_None) {
@@ -411,7 +430,7 @@ void process_ensemble() {
       if(((double) n_ens_vld/n_ens_inputs) < conf_info.vld_ens_thresh) {
          mlog << Error << "\nprocess_ensemble() -> "
               << n_ens_vld << " of " << n_ens_inputs
-	      << " (" << (double)n_ens_vld/n_ens_inputs << ")"
+              << " (" << (double)n_ens_vld/n_ens_inputs << ")"
               << " fields found for \"" << (*var_it)->get_var_info()->magic_str()
               << "\" does not meet the threshold specified by \""
               << conf_key_ens_ens_thresh << "\" (" << conf_info.vld_ens_thresh
@@ -424,6 +443,41 @@ void process_ensemble() {
       write_ens_nc(*var_it, n_ens_vld, ens_dp, cmn_dp, csd_dp);
 
    } // end for var_it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
+                          bool set_ens_mem_id, int i_ens,
+                          DataPlane &cmn_dp, DataPlane &csd_dp) {
+
+   // Set the MET_ENS_MEMBER_ID environment variable
+   if(set_ens_mem_id) {
+      setenv(met_ens_member_id, ens_info->get_ens_member_id(i_ens).c_str(), 1);
+   }
+
+   mlog << Debug(4)
+        << "Reading climatology mean data for ensemble field \""
+        << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
+
+   cmn_dp = read_climo_data_plane(
+               conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+               i_var, ens_valid_ut, grid);
+
+   mlog << Debug(4)
+        << "Reading climatology standard deviation data for ensemble field \""
+        << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
+
+   csd_dp = read_climo_data_plane(
+               conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+               i_var, ens_valid_ut, grid);
+
+   // Unset the MET_ENS_MEMBER_ID environment variable
+   if(set_ens_mem_id) {
+      unsetenv(met_ens_member_id);
+   }
 
    return;
 }
