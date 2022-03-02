@@ -213,6 +213,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          input_info.var_info = next_var;
          input_info.file_index = 0;
          input_info.file_list = ens_files;
+         input_info.ens_member_id = ens_member_ids[j];
          ens_info->add_input(input_info);
 
          // Add InputInfo to ens info list for each ensemble file provided
@@ -221,6 +222,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
             input_info.var_info = NULL;
             input_info.file_index = k;
             input_info.file_list = ens_files;
+            input_info.ens_member_id = ens_member_ids[j];
             ens_info->add_input(input_info);
          } // end for k
 

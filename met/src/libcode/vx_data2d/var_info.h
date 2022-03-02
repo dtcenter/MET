@@ -258,9 +258,10 @@ inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
 //
 
 struct InputInfo {
-   VarInfo * var_info;      // Variable information to read
-   int file_index;          // Index in file_list of file to read
-   StringArray * file_list; // Array of files (unallocated)
+   VarInfo * var_info;         // Variable information to read
+   int file_index;             // Index in file_list of file to read
+   StringArray * file_list;    // Array of files (unallocated)
+   ConcatString ens_member_id; // MET_ENS_MEMBER_ID string
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,6 +293,7 @@ class EnsVarInfo {
       VarInfo * get_var_info(int index=0);
       ConcatString get_file(int index=0);
       int get_file_index(int index=0);
+      ConcatString get_ens_member_id(int index=0);
 
       ConcatString nc_var_str;      // Ensemble variable name strings
       ThreshArray cat_ta;           // Ensemble categorical thresholds
