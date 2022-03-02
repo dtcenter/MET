@@ -53,8 +53,6 @@ class GenesisInfo : public TrackInfo {
 
       void assign(const GenesisInfo &);
 
-      bool IsSet;
-
       // Genesis Information
       int      GenesisIndex;
       unixtime GenesisTime;

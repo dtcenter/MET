@@ -38,7 +38,7 @@ regrid = {
 //
 censor_thresh = [];
 censor_val    = [];
-normalize     = NONE;
+normalize     = CLIMO_STD_ANOM;
 cat_thresh    = [];
 nc_var_str    = "";
 
@@ -47,14 +47,14 @@ nc_var_str    = "";
 //
 ens = {
    file_type = NETCDF_NCCF;
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
+   ens_thresh = 0.3;
+   vld_thresh = 0.3;
 
    field = [
       {
          name       = "fcst";
          level      = "(MET_ENS_MEMBER_ID,0,*,*)";
-         cat_thresh = [ >0.0, >=5.0 ];
+         cat_thresh = [ <-0.43, >-0.43&&<=0.43, >0.43 ];
       }
    ];
 }
@@ -63,8 +63,8 @@ ens = {
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
-ens_member_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
-control_id = "0";
+ens_member_ids = ["0","1","2"];
+control_id = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -98,10 +98,15 @@ nmep_smooth = {
 //
 // Climatology data
 //
-climo_mean = ens;
 climo_mean = {
 
-   file_name = [];
+   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   field     = [
+      {
+         name  = "series_cnt_FBAR";
+         level = "(*,*)";
+      }
+   ];
 
    regrid = {
       method     = NEAREST;
@@ -111,13 +116,19 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   day_interval       = 31;
-   hour_interval      = 6;
+   day_interval       = NA;
+   hour_interval      = NA;
 }
 
-climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [];
+
+   file_name = [ "${CLIMO_STDEV_FILE}" ];
+   field     = [
+      {
+         name  = "series_cnt_FSTDEV";
+         level = "(*,*)";
+      }
+   ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,12 +141,12 @@ ensemble_flag = {
    latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = TRUE;
-   vld_count = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
+   min       = FALSE;
+   max       = FALSE;
+   range     = FALSE;
+   vld_count = FALSE;
    frequency = TRUE;
    nep       = FALSE;
    nmep      = FALSE;

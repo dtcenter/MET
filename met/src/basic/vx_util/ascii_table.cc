@@ -1002,9 +1002,10 @@ if ( DoCommaString )  {
 
    p = strchr(junk, '.');
 
-   if ( p )  *p = (char) 0;
-
-   ++p;
+   if ( p ) {
+      *p = (char) 0;
+      ++p;
+   }
 
    X = atol(junk);
 
@@ -1014,7 +1015,7 @@ if ( DoCommaString )  {
 
    s << j2;
 
-   if ( Precision > 0 )  s << '.' << p;
+   if ( Precision > 0 && p )  s << '.' << p;
 
    set_entry(r, c, s.string());
 

@@ -139,7 +139,7 @@ if ( tf_left )  return ( true );
 
 const bool tf_right = right_child->check(x, cmn, csd);
 
-return ( tf_left || tf_right );
+return ( tf_right );
 
 }
 

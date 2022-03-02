@@ -173,6 +173,18 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
     ];
   }
 
+This replacement behavior can also be applied to climatology file name entry, in the 
+climo_mean and climo_stdev dictionaries.
+
+.. code-block:: none
+
+  climo_mean = {
+     file_name = ["/path/to/file/memberMET_ENS_MEMBER_ID-mean.nc"];
+     }
+     
+This substitution method can only be used if **ens_member_ids** has at least one entry 
+and the **normalize** option is set to **CLIMO_ANOM** or **CLIMO_STD_ANOM**.
+
 **control_id** is a string that is substituted in the same way as the **ens_member_ids** values
 to read a control member. This value is only used when the **-ctrl** command line argument is
 used. The value should not be found in the **ens_member_ids** array.

@@ -157,5 +157,21 @@
     </output>
   </test>
 
+  <test name="gen_ens_prod_CLIMO_ANOM_ENS_MEMBER_ID">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_MODEL;/CPC_NMME/memberMET_ENS_MEMBER_ID-climo.nc</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_MODEL;/CPC_NMME/memberMET_ENS_MEMBER_ID-climo.nc</value></pair>
+    </env>
+    <param> \
+      -ens    &DATA_DIR_MODEL;/CPC_NMME/CFSv2.tmp2m.198201.fcst.nc \
+      -config &CONFIG_DIR;/GenEnsProdConfig_climo_anom_ens_member_id \
+      -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_CLIMO_ANOM_ENS_MEMBER_ID.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_CLIMO_ANOM_ENS_MEMBER_ID.nc</grid_nc>
+    </output>
+  </test>
 
 </met_test>
