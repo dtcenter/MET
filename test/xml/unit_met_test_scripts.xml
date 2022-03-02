@@ -461,10 +461,18 @@
       -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_rps.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ssvar.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_relp.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_eclv.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ens.nc</grid_nc>
       <exist>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.nc</exist>
