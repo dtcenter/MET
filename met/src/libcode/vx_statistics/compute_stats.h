@@ -68,7 +68,7 @@ extern void   compute_i_mean_stdev(const NumArray &,
 
 extern void compute_sl1l2_mean(const SL1L2Info *, int, SL1L2Info &);
 extern void compute_cnt_mean  (const CNTInfo *,   int, CNTInfo &);
-extern void compute_pct_mean  (const PCTInfo *,   int, PCTInfo &);
+extern void compute_pct_mean  (const PCTInfo *,   int, PCTInfo &, bool sum_total=true);
 extern void compute_ecnt_mean (const ECNTInfo *,  int, ECNTInfo &);
 
 ////////////////////////////////////////////////////////////////////////

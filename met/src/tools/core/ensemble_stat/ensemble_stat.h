@@ -66,25 +66,25 @@ static const char * default_config_filename =
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
    "ecnt",  "rps",   "rhist", "phist",
-   "orank", "ssvar", "relp"
+   "orank", "ssvar", "relp",  "pct",
+   "pstd",  "pjc",   "prc",   "eclv"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
    ecnt_columns,  rps_columns,   rhist_columns,
    phist_columns, orank_columns, ssvar_columns,
-   relp_columns
+   relp_columns,  pct_columns,   pstd_columns,
+   pjc_columns,   prc_columns,   eclv_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
    n_ecnt_columns,  n_rps_columns,   n_rhist_columns,
    n_phist_columns, n_orank_columns, n_ssvar_columns,
-   n_relp_columns
+   n_relp_columns,  n_pct_columns,   n_pstd_columns,
+   n_pjc_columns,   n_prc_columns,   n_eclv_columns
 };
-
-// Maximum number of GRIB records
-static const int max_n_rec = 300;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -112,13 +112,13 @@ static int          ctrl_file_index = bad_data_int; // Control member file index
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
-static int          grid_obs_flag = 0;
+static bool         grid_obs_flag = false;
 
 static StringArray  point_obs_file_list;
-static int          point_obs_flag = 0;
+static bool         point_obs_flag = false;
 
 static GrdFileType  otype   = FileType_None;
-static int          vx_flag = 0;
+static bool         vx_flag = false;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;

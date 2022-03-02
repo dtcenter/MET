@@ -19,7 +19,7 @@ Ensemble forecasts are often created as a set of deterministic forecasts. The en
 
 Typically an ensemble is constructed by selecting a single forecast value from each member for each observation. When the High Resolution Assessment (HiRA) interpolation method is chosen, all of the nearby neighborhood points surrounding each observation from each member are used. Therefore, processing an N-member ensemble using a HiRA neighborhood of size M produces ensemble output with size N*M. This approach fully leverages information from all nearby grid points to evaluate the ensemble quality.
 
-The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. MET will create the ensemble relative frequency as the proportion of ensemble members forecasting some event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be :math:`5/10=0.5`. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
+The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. For each categorical threshold (cat_thresh) listed for each field array entry of the ensemble dictionary (ens.field), MET will create the ensemble relative frequency as the proportion of ensemble members forecasting that event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be :math:`5/10=0.5`. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
 
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
 
@@ -35,6 +35,10 @@ Often, the goal of ensemble forecasting is to reproduce the distribution of obse
 The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
 
 The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
+
+The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative freqencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from the this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
+
+Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs. 
 
 Climatology data
 ----------------
@@ -150,6 +154,7 @@ ____________________
   ci_alpha       = [ 0.05 ];
   interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
                      type = [ { method = NEAREST; width = 1; } ]; }
+  eclv_points    = [];
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;
@@ -301,33 +306,42 @@ ____________________
 
   ens_ssvar_bin_size = 1.0;
   ens_phist_bin_size = 0.05;
-  prob_cat_thresh    = [];
 
 
 Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Ensemble-Stat tool.
 
-
 The **ens** and **fcst** dictionaries do not need to include the same fields. Users may specify any number of ensemble fields to be summarized, but generally there are many fewer fields with verifying observations available. The **ens** dictionary specifies the fields to be summarized while the **fcst** dictionary specifies the fields to be verified.
-
 
 The **obs** dictionary looks very similar to the **fcst** dictionary. If verifying against point observations which are assigned GRIB1 codes, the observation section must be defined following GRIB1 conventions. When verifying GRIB1 forecast data, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However, when verifying non-GRIB1 forecast data, users will need to specify the **fcst** and **obs** sections separately.
 
-
 The **ens_ssvar_bin_size** and **ens_phist_bin_size** specify the width of the categorical bins used to accumulate frequencies for spread-skill-variance or probability integral transform statistics, respectively.
 
+____________________
 
-The **prob_cat_thresh** entry is an array of thresholds to be applied in the computation of the RPS line type. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatological mean and standard deviation data is provided, the **climo_cdf** thresholds will be used instead. If no climatology data is provided, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined.
+.. code-block:: none
+
+  prob_cat_thresh = [];
+  prob_pct_thresh = [];
+
+
+The **prob_cat_thresh** entry is an array of thresholds. It is applied both to the computation of the RPS line type as well as the when generating probabilistic output line types. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatological mean and standard deviation data is provided, the **climo_cdf** thresholds will be used instead. If no climatology data is provided, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined. When probabilistic output line types are requested, for each **prob_cat_thresh** threshold listed, ensemble relative frequencies are derived and verified against the point and/or gridded observations.
+
+The **prob_pct_thresh** entry is an array of thresholds which define the Nx2 probabilistic contingency table used to evaluate probability forecasts. It can be specified separately for each **fcst.field** entry. These thresholds must span the range [0, 1]. A shorthand notation to create equal bin widths is provided. For example, the following setting creates 4 probability bins of width 0.25 from 0 to 1.
+
+.. code-block:: none
+
+  prob_cat_thresh = [ ==0.25 ];
 
 __________________
 
 .. code-block:: none
 
   obs_error = {
-  flag             = FALSE;
-  dist_type        = NONE;
-  dist_parm        = [];
-  inst_bias_scale  = 1.0;
-  inst_bias_offset = 0.0;
+     flag             = FALSE;
+     dist_type        = NONE;
+     dist_parm        = [];
+     inst_bias_scale  = 1.0;
+     inst_bias_offset = 0.0;
   }
 
 
@@ -353,13 +367,18 @@ _________________
 .. code-block:: none
 
   output_flag = {
-  ecnt  = NONE;
-  rps   = NONE;
-  rhist = NONE;
-  phist = NONE;
-  orank = NONE;
-  ssvar = NONE;
-  relp  = NONE;
+     ecnt  = NONE;
+     rps   = NONE;
+     rhist = NONE;
+     phist = NONE;
+     orank = NONE;
+     ssvar = NONE;
+     relp  = NONE;
+     pct   = NONE;
+     pstd  = NONE;
+     pjc   = NONE;
+     prc   = NONE;
+     eclv  = NONE;
   }
 
 
@@ -380,12 +399,22 @@ The **output_flag** array controls the type of output that is generated. Each fl
 
 7. **RELP** for Relative Position Counts
 
+8. **PCT** for Contingency Table counts for derived ensemble relative frequencies
+
+9. **PSTD** for Probabilistic statistics for dichotomous outcomes for derived ensemble relative frequencies
+
+10. **PJC** for Joint and Conditional factorization for derived ensemble relative frequencies
+
+11. **PRC** for Receiver Operating Characteristic for derived ensemble relative frequencies
+
+12. **ECLV** for Economic Cost/Loss Relative Value for derived ensemble relative frequencies
+
 _____________________
 
 .. code-block:: none
 		
-     ensemble_flag = {
-          latlon    = TRUE;
+  ensemble_flag = {
+     latlon    = TRUE;
 	  mean      = TRUE;
 	  stdev     = TRUE;
 	  minus     = TRUE;
@@ -399,7 +428,7 @@ _____________________
 	  nmep      = FALSE;
 	  rank      = TRUE;
 	  weight    = FALSE;
-      }
+  }
 
 The **ensemble_flag** specifies which derived ensemble fields should be calculated and output. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
 
