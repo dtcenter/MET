@@ -2618,7 +2618,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
       } // end for i_bin
 
       // Write the probabilistic output
-      write_pct_info(vx_opt, pct_info, n_bin, true);
+      write_pct_info(vx_opt, pct_info, n_bin, false);
 
    } // end for i_ta
 
@@ -2708,7 +2708,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    } // end for i_bin
 
    // Write the probabilistic output
-   write_pct_info(vx_opt, pct_info, n_bin, false);
+   write_pct_info(vx_opt, pct_info, n_bin, true);
 
    // Dealloate memory
    if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
@@ -2720,7 +2720,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
 void write_pct_info(const EnsembleStatVxOpt &vx_opt,
                     const PCTInfo *pct_info, int n_bin,
-                    bool sum_total) {
+                    bool cdp_thresh) {
 
    // Write output for each bin
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2776,7 +2776,16 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
    if(n_bin > 1) {
 
       PCTInfo pct_mean;
-      compute_pct_mean(pct_info, n_bin, pct_mean, sum_total);
+
+      // For non-CDP thresholds, sum the total counts
+      compute_pct_mean(pct_info, n_bin, pct_mean, !cdp_thresh);
+
+      // For CDP thresholds, reset the OBS_THRESH column to ==1/n_bin
+      // to indicate the number of climatological bins used
+      if(cdp_thresh) {
+         pct_mean.othresh.set((double) 100.0/vx_opt.cdf_info.n_bin,
+                              thresh_eq, perc_thresh_climo_dist);
+      }
 
       // Write out PSTD
       if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
