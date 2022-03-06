@@ -154,7 +154,7 @@ void process_command_line(int argc, char **argv) {
            << "\"-ens\" option.\n\n";
       exit(1);
    }
-   if(config_file.length() == 0) {
+   if(out_file.length() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output file must be set using the "
            << "\"-out\" option.\n\n";
