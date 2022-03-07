@@ -1825,7 +1825,12 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
          }
          // Otherwise, resize the existing table
          else {
-            txt_at[i].expand(n_rows, n_cols);
+            int need_rows = max(txt_at[i].nrows(), i_txt_row[i] + n_rows);
+            int need_cols = max(txt_at[i].ncols(), n_cols);
+
+            if(need_rows > txt_at[i].nrows() || need_cols > txt_at[i].ncols()) {
+               txt_at[i].expand(need_rows, need_cols);
+            }
          }
       } // end if
    } // end for i
@@ -1851,7 +1856,12 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    }
    // Otherwise, resize the existing table
    else {
-      stat_at.expand(stat_rows, stat_cols);
+      int need_rows = max(stat_at.nrows(), i_stat_row + stat_rows);
+      int need_cols = max(stat_at.ncols(), stat_cols);
+
+      if(need_rows > stat_at.nrows() || need_cols > stat_at.ncols()) {
+        stat_at.expand(need_rows, need_cols);
+      }
    }
 
    return;
