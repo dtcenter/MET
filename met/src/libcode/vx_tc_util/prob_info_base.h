@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -50,6 +50,7 @@ class ProbInfoBase {
       // Location information
       double       Lat;
       double       Lon;
+      double       DLand;
 
       // Probability information
       int          NProb;
@@ -93,6 +94,7 @@ class ProbInfoBase {
       int                  valid_hour()     const;
       double               lat()            const;
       double               lon()            const;
+      double               dland()          const;
       int                  n_prob()         const;
       double               prob(int i)      const;
       double               prob_item(int i) const;
@@ -101,11 +103,11 @@ class ProbInfoBase {
          //  do stuff
          //
 
-      virtual void initialize(const ATCFProbLine &);
+      virtual void initialize(const ATCFProbLine &, double);
       virtual bool is_match  (const ATCFProbLine &) const;
               bool is_match  (const TrackInfo    &) const;
               bool has       (const ATCFProbLine &) const;
-      virtual bool add       (const ATCFProbLine &, bool check_dup = false);
+      virtual bool add       (const ATCFProbLine &, double, bool check_dup = false);
       virtual void set       (const TCStatLine &);
 
 };
@@ -123,6 +125,7 @@ inline unixtime             ProbInfoBase::valid()          const { return(ValidT
 inline int                  ProbInfoBase::valid_hour()     const { return(unix_to_sec_of_day(ValidTime)); }
 inline double               ProbInfoBase::lat()            const { return(Lat);                           }
 inline double               ProbInfoBase::lon()            const { return(Lon);                           }
+inline double               ProbInfoBase::dland()          const { return(DLand);                         }
 inline int                  ProbInfoBase::n_prob()         const { return(NProb);                         }
 inline double               ProbInfoBase::prob(int i)      const { return(Prob[i]);                       }
 inline double               ProbInfoBase::prob_item(int i) const { return(ProbItem[i]);                   }

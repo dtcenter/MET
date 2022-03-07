@@ -1,12 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,19 +74,21 @@ enum STATJobType {
 
    stat_job_go_index  = 4, // Compute the GO Index.
 
-   stat_job_ss_index  = 5, // Compute the Skill Score Index.
+   stat_job_cbs_index = 5, // Compute the CBS Index.
 
-   stat_job_ramp      = 6, // Time-series ramp evaluation.
+   stat_job_ss_index  = 6, // Compute the Skill Score Index.
 
-   no_stat_job_type   = 7  // Default value
+   stat_job_ramp      = 7, // Time-series ramp evaluation.
+
+   no_stat_job_type   = 8  // Default value
 };
 
-static const int n_statjobtypes = 8;
+static const int n_statjobtypes = 9;
 
 static const char * const statjobtype_str[n_statjobtypes] = {
    "filter",         "summary",  "aggregate",
-   "aggregate_stat", "go_index", "ss_index",
-   "ramp",           "NA"
+   "aggregate_stat", "go_index", "cbs_index",
+   "ss_index",       "ramp",     "NA"
 };
 
 extern const char *statjobtype_to_string(const STATJobType);
@@ -131,6 +131,7 @@ class STATAnalysisJob {
       void parse_job_command(const char *);
       void add_column_thresh(const char *, const char *);
 
+      void set_job_type (const STATJobType);
       int  set_job_type (const char *);
       void set_dump_row (const char *);
       void set_stat_file(const char *);
@@ -324,6 +325,21 @@ class STATAnalysisJob {
       char *boot_seed;
 
       //
+      // Name of the skill score index being computed
+      //
+      ConcatString ss_index_name;
+
+      //
+      // Required ratio of valid skill score index terms
+      //
+      double ss_index_vld_thresh;
+
+      //
+      // MCTS HSS Expected Correct rate
+      //
+      double hss_ec_value;
+
+      //
       // Rank correlation flag
       //
       int rank_corr_flag;
@@ -339,6 +355,8 @@ class STATAnalysisJob {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+inline void STATAnalysisJob::set_job_type  (const STATJobType t) { job_type = t; return; }
 
 inline void STATAnalysisJob::set_precision (int p)  { precision = p; return; }
 inline int  STATAnalysisJob::get_precision () const { return(precision);     }

@@ -37,6 +37,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                thresh_array.cc thresh_array.h \
                make_path.cc make_path.h \
                memory.cc memory.h \
+               normalize.cc normalize.h \
                ordinal.cc ordinal.h \
                roman_numeral.cc roman_numeral.h \
                string_fxns.cc string_fxns.h \
@@ -69,6 +70,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                GridOffset.h GridOffset.cc \
                observation.h observation.cc \
                stat_column_defs.h \
+               handle_openmp.h handle_openmp.cc \
                RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}

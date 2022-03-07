@@ -77,7 +77,8 @@ obs = fcst;
 //
 sid_inc        = [];
 sid_exc        = [];
-obs_quality    = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_percentile = 50;
@@ -199,6 +200,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE; // Only for HiRA
+   orank  = NONE; // Only for HiRA
    rps    = NONE; // Only for HiRA
    eclv   = BOTH;
    mpr    = BOTH;
@@ -209,6 +211,6 @@ output_flag = {
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

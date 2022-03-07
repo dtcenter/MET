@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -64,7 +64,6 @@ switch ( info.method )  {
            << "bad interpolation method ... "
            << interpmthd_to_string(info.method) << "\n\n";
       exit(1);
-      break;
 
 }   //  switch info.method
 
@@ -134,6 +133,7 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
+
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -145,14 +145,14 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
       xf = nint(x_from);
       yf = nint(y_from);
 
-      if ( (xf < 0) || (xf >= from_grid.nx()) || (yf < 0) || (yf >= from_grid.ny()) )  {
-
+      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon() ) ||
+              yf < 0 || yf >= from_grid.ny() )  {
          value = bad_data_float;
-
-      } else {
-         value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
-                                     info.method, info.width, info.shape, info.vld_thresh);
-
+      }
+      else  {
+         value = compute_horz_interp(from_data, x_from, y_from,
+                    bad_data_double, info.method, info.width,
+                    info.shape, from_grid.wrap_lon(), info.vld_thresh);
       }
 
       to_data.put(value, xt, yt);
@@ -328,6 +328,7 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
+
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -339,15 +340,14 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
       xf = nint(x_from);
       yf = nint(y_from);
 
-      if ( (xf < 0) || (xf >= from_grid.nx()) ||
-           (yf < 0) || (yf >= from_grid.ny()) )  {
-
+      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon() ) ||
+              yf < 0 || yf >= from_grid.ny() )  {
          value = bad_data_float;
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from,
                     bad_data_double, InterpMthd_Max, info.width,
-                    info.shape, info.vld_thresh);
+                    info.shape, from_grid.wrap_lon(), info.vld_thresh);
       }
 
       to_data.put(value, xt, yt);

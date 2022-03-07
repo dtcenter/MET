@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -535,20 +535,6 @@ for (j=0; j<Nfields; ++j)  {
 
 }
 
-/*
-for (j=0; j<ncols; ++j)  {
-
-   m = table.col_width(j);
-
-   memset(junk, 0, sizeof(junk));
-
-   for (k=0; k<m; ++k)  junk[k] = underline_char;
-
-   table.set_entry(1, j, junk);
-
-};
-*/
-
 table.line_up_decimal_points();
 
 table.underline_row(1, underline_char);
@@ -587,7 +573,6 @@ void SummaryJob::do_job(const StringArray & mode_files)
 int j;
 const int Nfields = columns.n_elements();
 const int Nfiles  = mode_files.n_elements();
-ConcatString junk;
 AsciiTable t;
 
 
@@ -621,11 +606,9 @@ for (j=0; j<Nfiles; ++j)  {
 
 }
 
-comma_string(n_lines_read, junk);
-mlog << Debug(2) << "Total mode lines read = " << junk << "\n";
-
-comma_string(n_lines_kept, junk);
-mlog << Debug(2) << "Total mode lines kept = " << junk << "\n";
+mlog << Debug(2)
+     << "Total mode lines read = " << n_lines_read << "\n"
+     << "Total mode lines kept = " << n_lines_kept << "\n";
 
    //
    //  output
@@ -989,7 +972,6 @@ void ByCaseJob::do_job(const StringArray & mode_files)
 
 int j;
 const int Nfiles = mode_files.n_elements();
-ConcatString junk;
 int n_valid_times;
 
 
@@ -1023,7 +1005,6 @@ for (j=0; j<n_valid_times; ++j)  {
 
 }
 
-
    //
    //  loop through the files
    //
@@ -1034,11 +1015,9 @@ for (j=0; j<Nfiles; ++j)  {
 
 }
 
-comma_string(n_lines_read, junk);
-mlog << Debug(2) << "Total mode lines read = " << junk << "\n";
-
-comma_string(n_lines_kept, junk);
-mlog << Debug(2) << "Total mode lines kept = " << junk << "\n";
+mlog << Debug(2)
+     << "Total mode lines read = " << n_lines_read << "\n"
+     << "Total mode lines kept = " << n_lines_kept << "\n";
 
    //
    //  output

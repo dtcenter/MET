@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,6 +19,7 @@
 #include "atcf_prob_line.h"
 #include "prob_info_base.h"
 #include "prob_rirw_info.h"
+#include "prob_gen_info.h"
 
 #include "vx_util.h"
 
@@ -36,6 +37,7 @@ class ProbInfoArray {
       void assign(const ProbInfoArray &);
 
       vector<ProbRIRWInfo> ProbRIRW;
+      vector<ProbGenInfo>  ProbGen;
 
    public:
 
@@ -58,21 +60,27 @@ class ProbInfoArray {
       const ProbInfoBase * operator[](int) const;
 
       int n_prob_rirw() const;
-      const ProbRIRWInfo & prob_rirw(int) const;
+      ProbRIRWInfo & prob_rirw(int);
+
+      int n_prob_gen() const;
+      ProbGenInfo & prob_gen(int);
+
+      int n_technique() const;
 
          //
          //  do stuff
          //
 
-      bool add(const ATCFProbLine &, bool check_dup = false);
+      bool add(const ATCFProbLine &, double dland, bool check_dup = false);
       void add(const ProbRIRWInfo &);
-
+      void add(const ProbGenInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int ProbInfoArray::n_probs()     const { return(ProbRIRW.size()); }
-inline int ProbInfoArray::n_prob_rirw() const { return(ProbRIRW.size()); }
+inline int ProbInfoArray::n_probs()     const { return(ProbRIRW.size() + ProbGen.size()); }
+inline int ProbInfoArray::n_prob_rirw() const { return(ProbRIRW.size());                  }
+inline int ProbInfoArray::n_prob_gen()  const { return(ProbGen.size());                   }
 
 ////////////////////////////////////////////////////////////////////////
 

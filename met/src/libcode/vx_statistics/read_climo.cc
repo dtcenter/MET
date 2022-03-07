@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -242,6 +242,12 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
             continue;
          }
       }
+
+      // Print log message for matching record
+      mlog << Debug(4)
+           << "Found matching " << cur_ut_cs << " \""
+           << info->magic_str() << "\" climatology field in file \""
+           << climo_file << "\".\n"; 
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {

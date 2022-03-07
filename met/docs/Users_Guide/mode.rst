@@ -1,12 +1,13 @@
 .. _mode:
 
+*********
 MODE Tool
-=========
+*********
 
 .. _MODE_Introduction:
 
 Introduction
-____________
+============
 
 This section provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in :ref:`Davis et al. (2006a,b) <Davis-2006>`, :ref:`Brown et al. (2007) <Brown-2007>` and :ref:`Bullock et al. (2016) <Bullock-2016>`.
 
@@ -17,12 +18,12 @@ MODE may be used in a generalized way to compare any two fields. For simplicity,
 .. _MODE_Scientific-and-statistical:
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
 
 Resolving objects
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The process used for resolving objects in a raw data field is called *convolution thresholding*. The raw data field is first convolved with a simple filter function as follows:
 
@@ -30,7 +31,7 @@ The process used for resolving objects in a raw data field is called *convolutio
 
 In this formula, :math:`f` is the raw data field, :math:`\phi` is the filter function, and :math:`C` is the resulting convolved field. The variables :math:`(x, y)` and :math:`(u, v)` are grid coordinates. The filter function :math:`\phi` is a simple circular filter determined by a radius of influence :math:`R` , and a height :math:`H` :
 
-.. math:: \phi (x,y) = \begin{eqnarray}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
+.. math:: \phi (x,y) = \begin{align}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{align}
 
 The parameters :math:`R` and :math:`H` are not independent. They are related by the requirement that the integral of :math:`\phi` over the grid be unity: 
 
@@ -40,13 +41,13 @@ Thus, the radius of influence :math:`R` is the only tunable parameter in the con
 
 Once the convolved field :math:`C` is in hand, it is thresholded to create a mask field :math:`M` :
 
-.. math:: M(x,y) = \begin{eqnarray}\begin{cases} 1 &\text{if } C(x,y)\ge T\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
+.. math:: M(x,y) = \begin{align}\begin{cases} 1 &\text{if } C(x,y)\ge T\\ 0 &\text{otherwise.} \end{cases}\end{align}
 
 where :math:`T` is the threshold. The objects are the connected regions where :math:`M = 1` . Finally, the raw data are restored to object interiors to obtain the object field :math:`F` :
 
 .. math:: F(x,y)=M(x,y)f(x,y).
 
-Thus, two parameters — the radius of influence :math:`R`, and the threshold :math:`T` — control the entire process of resolving objects in the raw data field.
+Thus, two parameters - the radius of influence :math:`R`, and the threshold :math:`T` - control the entire process of resolving objects in the raw data field.
 
 An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. It shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part (b) shows the convolved field, and part (c) shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
@@ -58,7 +59,7 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 
 
 Attributes
-~~~~~~~~~~
+----------
 
 Object attributes are defined both for single objects and for object pairs. One of the objects in a pair is from the forecast field and the other is taken from the observed field. 
 
@@ -81,7 +82,7 @@ All the attributes discussed so far are defined for single objects. Once these a
 Several area measures are also used for pair attributes. **Union Area** is the total area that is in either one (or both) of the two objects. **Intersection Area** is the area that is inside both objects simultaneously. **Symmetric Difference** is the area inside at least one object, but not inside both.
 
 Fuzzy logic
-~~~~~~~~~~~
+-----------
 
 Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (*e.g.*, intersection area), low values indicate low interest, and high values indicate more interest.
 
@@ -98,19 +99,19 @@ This total interest value is then thresholded, and pairs of objects that have to
 Another merging method is available in MODE, which can be used instead of, or along with, the fuzzy logic based merging just described. Recall that the convolved field is thresholded to produce the mask field. A second (lower) threshold can be specified so that objects that are separated at the higher threshold but joined at the lower threshold are merged.
 
 Summary statistics
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to :numref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
 Practical information
-_____________________
+=====================
 
 This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. The requirement of having all gridded fields using the same grid specification has been removed with METv5.1. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
 
 MODE provides the capability to select a single model variable/level from which to derive objects to be analyzed. MODE was developed and tested using accumulated precipitation. However, the code has been generalized to allow the use of any gridded model and observation field. Based on the options specified in the configuration file, MODE will define a set of simple objects in the model and observation fields. It will then compute an interest value for each pair of objects across the fields using a fuzzy engine approach. Those interest values are thresholded, and any pairs of objects above the threshold will be matched/merged. Through the configuration file, MODE offers a wide range of flexibility in how the objects are defined, processed, matched, and merged.
 
 mode usage
-~~~~~~~~~~
+----------
 
 The usage statement for the MODE tool is listed below:
 
@@ -148,7 +149,7 @@ Optional arguments for mode
 
 7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the MODE calling sequence is listed below:
 
@@ -177,7 +178,7 @@ In Example 2, the MODE tool will verify the model data in the sample_fcst.nc Net
 .. _MODE-configuration-file:
 
 mode configuration file
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
@@ -479,6 +480,8 @@ _____________________
 
 Each component of the pairs information in the NetCDF file can be turned on or off. The old syntax is still supported: **TRUE** means accept the defaults, **FALSE** means no NetCDF output is generated. NetCDF output can also be turned off by setting all the individual dictionary flags to false.
 
+The nc_pairs_flag is described in :numref:`grid_stat-configuration-file`
+
 
 _____________________
 
@@ -491,7 +494,7 @@ When MODE is run on global grids, this parameter specifies how many grid squares
 .. _MODE-output:
 
 mode output
-~~~~~~~~~~~
+-----------
 
 MODE produces output in ASCII, NetCDF, and PostScript formats.
 
@@ -641,7 +644,7 @@ This first file uses the following naming convention:
 
 where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the forecast variable and vertical level being used, *OBS\_VAR\_LVL* is the observation variable and vertical level being used, *HHMMSSL* indicates the forecast lead time, *YYYYMMDD\_HHMMSSV* indicates the forecast valid time, and *HHMMSSA* indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the *ct\_stats\_flag* option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40–51 and fill data in columns 19–39.
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19-39 and fill data in columns 40-51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40-51 and fill data in columns 19-39.
 
 These object identifiers are described in :numref:`MODE_object_attribute`. 
 
@@ -965,16 +968,16 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - Number of Forecast Simple Boundary Points
   * - fcst_simp_bdy :raw-html:`<br />` \_lat
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLatitude
+    - Forecast Simple Boundary Latitude
   * - fcst_simp_bdy :raw-html:`<br />` \_lon
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoLongitude
+    - Forecast Simple Boundary Longitude
   * - fcst_simp_bdy_x
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoX-Coordinate
+    - Forecast Simple Boundary X-Coordinate
   * - fcst_simp_bdy_y
     - fcst_simp_bdy
-    - Forecast Simple Boundary PoY-Coordinate
+    - Forecast Simple Boundary Y-Coordinate
   * - fcst_simp_hull :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Convex Hull Starting Index

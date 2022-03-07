@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -238,8 +238,9 @@ int n, k;
 char line2[1024];
 char * s = line2;
 char * c = (char *) 0;
+const char *method_name = "parse_line() -> ";
 
-strncpy(line2, line, sizeof(line2));
+m_strncpy(line2, line, sizeof(line2), method_name);
 
    //
    // check to make sure it's got a double quote in it
@@ -278,7 +279,7 @@ cout << '\"' << c << "\" ";
 c = strtok(s, ",\"");
 c = strtok(s, ",\"[");
 
-k = strlen(c) - 1;
+k = m_strlen(c) - 1;
 
 if ( c[k] == ' ' )  c[k] = (char) 0;
 

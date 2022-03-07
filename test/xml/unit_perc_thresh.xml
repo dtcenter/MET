@@ -12,6 +12,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_pcp_combine.xml -->
+
 <met_test>
 
   <!--                                                                  -->
@@ -81,6 +83,28 @@
       <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_nbrcts.txt</stat>
       <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_nbrcnt.txt</stat>
       <grid_nc>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Grid-Stat FBIAS                                                  -->
+  <!--                                                                  -->
+  
+  <test name="perc_thresh_fbias_GRID_STAT">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>PERC_THRESH_FBIAS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_fbias_perc_thresh \
+      -outdir &OUTPUT_DIR;/perc_thresh -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_FBIAS_240000L_20120410_000000V_cts.txt</stat>
     </output>
   </test>
 

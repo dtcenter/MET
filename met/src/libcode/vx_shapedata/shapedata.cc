@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -497,7 +497,7 @@ double ShapeData::get_attr(const ConcatString &attr_name,
    else if(strcasecmp(attr_name.c_str(), "COMPLEXITY") == 0) {
       attr_val = complexity();
    }
-   else if(strncasecmp(attr_name.c_str(), "INTENSITY_", strlen("INTENSITY_")) == 0) {
+   else if(strncasecmp(attr_name.c_str(), "INTENSITY_", m_strlen("INTENSITY_")) == 0) {
       StringArray sa = attr_name.split("_");
       attr_val = intensity_percentile(raw_ptr, atoi(sa[1].c_str()), precip_flag);
    }
@@ -1801,7 +1801,6 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          mlog << Error << "\nboundary_step() -> "
               << "bad direction: " << direction << "\n\n";
          exit(1);
-         break;
    }
 
    //
@@ -1836,7 +1835,6 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
               << "bad step case: "
               << get_step_case(lr, ur, ul, ll) << "\n\n";
          exit(1);
-         break;
    }
 
    return;

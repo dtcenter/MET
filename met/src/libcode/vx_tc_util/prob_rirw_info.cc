@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -149,11 +149,11 @@ int ProbRIRWInfo::rirw_window() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIRWInfo::initialize(const ATCFProbLine &l) {
+void ProbRIRWInfo::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
 
-   ProbInfoBase::initialize(l);
+   ProbInfoBase::initialize(l, dland);
 
    Value    = parse_int(l.get_item(ProbRIRWValueOffset).c_str());
    Initials =           l.get_item(ProbRIRWInitialsOffset);
@@ -169,14 +169,15 @@ bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
 
    if(!ProbInfoBase::is_match(l)) return(false);
 
-   return(Value   == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
-          RIRWBeg == parse_int(l.get_item(ProbRIRWBegOffset).c_str())   &&
-          RIRWEnd == parse_int(l.get_item(ProbRIRWEndOffset).c_str()));
+   return(ValidTime == l.valid() &&
+          Value     == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
+          RIRWBeg   == parse_int(l.get_item(ProbRIRWBegOffset).c_str()) &&
+          RIRWEnd   == parse_int(l.get_item(ProbRIRWEndOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
@@ -190,7 +191,7 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l);
+   if(Type == NoATCFLineType) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return(false);

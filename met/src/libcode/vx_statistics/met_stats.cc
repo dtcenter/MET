@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -431,6 +431,7 @@ void CTSInfo::compute_ci() {
 double CTSInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
+   // Find the statistic by name
         if(strcmp(stat_name, "TOTAL") == 0) v = cts.n();
    else if(strcmp(stat_name, "BASER") == 0) v = cts.baser();
    else if(strcmp(stat_name, "FMEAN") == 0) v = cts.fmean();
@@ -457,6 +458,11 @@ double CTSInfo::get_stat(const char *stat_name) {
            << "unknown categorical statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
+   }
+ 
+   // Return bad data for 0 pairs 
+   if(cts.n() == 0 && strcmp(stat_name, "TOTAL") != 0) {
+      v = bad_data_double;
    }
 
    return(v);
@@ -523,6 +529,7 @@ void MCTSInfo::clear() {
    acc.clear();
    hk.clear();
    hss.clear();
+   hss_ec.clear();
    ger.clear();
 
    return;
@@ -545,6 +552,7 @@ void MCTSInfo::assign(const MCTSInfo &c) {
    acc = c.acc;
    hk = c.hk;
    hss = c.hss;
+   hss_ec = c.hss_ec;
    ger = c.ger;
 
    return;
@@ -569,6 +577,7 @@ void MCTSInfo::allocate_n_alpha(int i) {
       acc.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
+      hss_ec.allocate_n_alpha(n_alpha);
       ger.allocate_n_alpha(n_alpha);
    }
 
@@ -623,10 +632,11 @@ void MCTSInfo::add(double f, double o, double cmn, double csd) {
 
 void MCTSInfo::compute_stats() {
 
-   acc.v = cts.gaccuracy();
-   hk.v  = cts.gkuiper();
-   hss.v = cts.gheidke();
-   ger.v = cts.gerrity();
+   acc.v    = cts.gaccuracy();
+   hk.v     = cts.gkuiper();
+   hss.v    = cts.gheidke();
+   hss_ec.v = cts.gheidke_ec(cts.ec_value());
+   ger.v    = cts.gerrity();
 
    return;
 }
@@ -731,6 +741,7 @@ void CNTInfo::clear() {
    msess.clear();
    bcmse.clear();
    rmse.clear();
+   si.clear();
    e10.clear();
    e25.clear();
    e50.clear();
@@ -779,6 +790,7 @@ void CNTInfo::assign(const CNTInfo &c) {
    msess            = c.msess;
    bcmse            = c.bcmse;
    rmse             = c.rmse;
+   si               = c.si;
    e10              = c.e10;
    e25              = c.e25;
    e50              = c.e50;
@@ -829,6 +841,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       msess.allocate_n_alpha(n_alpha);
       bcmse.allocate_n_alpha(n_alpha);
       rmse.allocate_n_alpha(n_alpha);
+      si.allocate_n_alpha(n_alpha);
       e10.allocate_n_alpha(n_alpha);
       e25.allocate_n_alpha(n_alpha);
       e50.allocate_n_alpha(n_alpha);
@@ -994,6 +1007,7 @@ void CNTInfo::compute_ci() {
 double CNTInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
+   // Find the statistic by name
         if(strcmp(stat_name, "TOTAL"           ) == 0) v = n;
    else if(strcmp(stat_name, "FBAR"            ) == 0) v = fbar.v;
    else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = fstdev.v;
@@ -1012,6 +1026,7 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "MSE"             ) == 0) v = mse.v;
    else if(strcmp(stat_name, "BCMSE"           ) == 0) v = bcmse.v;
    else if(strcmp(stat_name, "RMSE"            ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
    else if(strcmp(stat_name, "E10"             ) == 0) v = e10.v;
    else if(strcmp(stat_name, "E25"             ) == 0) v = e25.v;
    else if(strcmp(stat_name, "E50"             ) == 0) v = e50.v;
@@ -1030,6 +1045,11 @@ double CNTInfo::get_stat(const char *stat_name) {
            << "unknown continuous statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
+   }
+
+   // Return bad data for 0 pairs 
+   if(n == 0 && strcmp(stat_name, "TOTAL") != 0) {
+      v = bad_data_double;
    }
 
    return(v);
@@ -2404,6 +2424,27 @@ void PCTInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PCTInfo::set_fthresh(const ThreshArray &ta) {
+
+   // Expand the probability thresholds, as needed
+   fthresh = string_to_prob_thresh(ta.get_str().c_str());
+
+   // Validate the threshold settings
+   check_prob_thresh(fthresh, true);
+
+   // Store the values in an array
+   NumArray prob_vals;
+   for(int i=0; i<fthresh.n(); i++) prob_vals.add(fthresh[i].get_value());
+
+   // Set the PCT size and thresholds
+   pct.set_size(prob_vals.n() - 1);
+   pct.set_thresholds(prob_vals.vals());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PCTInfo::compute_stats() {
 
    total       = pct.n();
@@ -2734,11 +2775,12 @@ void DMAPInfo::clear() {
 
    fthresh.clear();
    othresh.clear();
-   total    = fy = oy = 0;
+   total    = fy = oy = foy = 0;
    baddeley = hausdorff = bad_data_double;
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
+   g        = gbeta  = bad_data_double;
 
    return;
 }
@@ -2746,10 +2788,12 @@ void DMAPInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void DMAPInfo::reset_options() {
-   baddeley_p = 2;          // Exponent for lp-norm
-   baddeley_max_dist = 5.0; // Maximum distance constant
-   fom_alpha = 0.1;         // FOM Alpha
-   zhu_weight = 0.5;        // Zhu Weight
+   baddeley_p = 2;                      // Exponent for lp-norm
+   baddeley_max_dist = bad_data_double; // Maximum distance constant
+   fom_alpha = 0.1;                     // FOM Alpha
+   zhu_weight = 0.5;                    // Zhu Weight
+   beta_value = bad_data_double;        // G-Beta Value
+   n_full_points = bad_data_int;        // Number of FULL domain points
 
    return;
 }
@@ -2766,6 +2810,7 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    total = c.total;
    fy    = c.fy;
    oy    = c.oy;
+   foy   = c.foy;
 
    baddeley  = c.baddeley;
    hausdorff = c.hausdorff;
@@ -2788,10 +2833,14 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    zhu_max  = c.zhu_max;
    zhu_mean = c.zhu_mean;
 
+   g     = c.g;
+   gbeta = c.gbeta;
+
    baddeley_p = c.baddeley_p;
    baddeley_max_dist = c.baddeley_max_dist;
    fom_alpha  = c.fom_alpha;
    zhu_weight = c.zhu_weight;
+   beta_value = c.beta_value;
 
    return;
 }
@@ -2808,7 +2857,7 @@ double DMAPInfo::fbias() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+   
 void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
                    const NumArray &fdmap_na, const NumArray &odmap_na,
                    const NumArray &fthr_na,  const NumArray &othr_na) {
@@ -2821,6 +2870,14 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
            << "count mismatch ("
            << fdmap_na.n() << ", " << odmap_na.n() << ", "
            << fthr_na.n()  << ", " << othr_na.n() << ")\n\n";
+      exit(1);
+   }
+
+   // Check that beta_value has been set
+   if(is_bad_data(beta_value) || beta_value <= 0.0) {
+      mlog << Error << "\nDMAPInfo::set() -> "
+           << "the beta_value (" << beta_value
+           << ") must be greater than 0!\n\n";
       exit(1);
    }
 
@@ -2844,27 +2901,28 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
    non_zero_count = 0;
 
-   mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
-        << ", baddeley_max_dist=" << baddeley_max_dist
-        << ", fom_alpha=" << fom_alpha
-        << ", zhu_weight=" << zhu_weight << "\n";
-
    for (int i=0; i<fdmap_na.n(); i++) {
 
       // Skip bad data
       if (is_bad_data(fdmap_na[i]) || is_bad_data(odmap_na[i]) ||
           is_bad_data(fthr_na[i])  || is_bad_data(othr_na[i])) continue;
 
+      // Forecast event
       if (fthr_na[i] > 0) {
          fy++;
          med_of_sum += odmap_na[i];
          fom_of_sum += 1 / (1 + odmap_na[i] * odmap_na[i] * fom_alpha);
       }
+
+      // Observation
       if (othr_na[i] > 0) {
          oy++;
          med_fo_sum += fdmap_na[i];
          fom_fo_sum += 1 / (1 + fdmap_na[i] * fdmap_na[i] * fom_alpha);
       }
+
+      // Forecast and observation event
+      if (fthr_na[i] > 0 && othr_na[i] > 0) foy++;
 
       sum_event_diff += (fthr_na[i] - othr_na[i]) * (fthr_na[i] - othr_na[i]);
 
@@ -2929,26 +2987,67 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       zhu_mean = (zhu_fo + zhu_of) / 2;
    }
 
-   mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
-        << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
-        << "\n\tmed_fo=" << med_fo << ", med_of=" << med_of
-        << ", med_min=" << med_min << ", med_max=" << med_max << ", med_mean=" << med_mean
-        << "\n\tfom_fo=" << fom_fo << ", fom_of=" << fom_of
-        << ", fom_min=" << fom_min << ", fom_max=" << fom_max << ", fom_mean=" << fom_mean
-        << "\n\tzhu_fo=" << zhu_fo << ", zhu_of=" << zhu_of
-        << ", zhu_min=" << zhu_min << ", zhu_max=" << zhu_max << ", zhu_mean=" << zhu_mean
+   // G and G-Beta
+   // Reference:
+   //   Gilleland, E.: Novel measures for summarizing high-resolution forecast performance,
+   //     Adv. Stat. Clim. Meteorol. Oceanogr., 7, 13–34,
+   //     https://doi.org/10.5194/ascmo-7-13-2021, 2021.
+
+   // If not set by the user, default maximum distance to the number of pairs
+   double max_dist = (is_bad_data(baddeley_max_dist) ?
+                      (double) total : baddeley_max_dist);
+
+   double g_med_fo = (oy == 0 ? max_dist : med_fo);
+   double g_med_of = (fy == 0 ? max_dist : med_of);
+   int    g_y1     = fy + oy - 2 * foy;
+   double g_y2     = g_med_fo * oy + g_med_of * fy;
+   double g_y      = g_y1 * g_y2;
+   g               = pow(g_y, 1.0 / 3.0);
+
+   // Only compute GBETA over the full verification domain.
+   // Report bad data for masking regions.
+   if(total == n_full_points) {
+      gbeta = max(1.0 - g_y / beta_value, 0.0);
+   }
+   else {
+      gbeta = beta_value = bad_data_double;
+   }
+
+   // Dump debug distance map info
+   mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
+        << ", baddeley_max_dist=" << baddeley_max_dist
+        << ", fom_alpha=" << fom_alpha
+        << ", zhu_weight=" << zhu_weight
+        << ", beta_value=" << beta_value
+        << ", n_full_points=" << n_full_points
         << "\n";
+
+   mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", nfo=" << foy << ", total=" << total
+        << "\n\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
+        << "\n\tmed_fo=" << med_fo   << ", med_of="    << med_of
+        << ", med_min="  << med_min  << ", med_max="   << med_max << ", med_mean="   << med_mean
+        << "\n\tfom_fo=" << fom_fo   << ", fom_of="    << fom_of
+        << ", fom_min="  << fom_min  << ", fom_max="   << fom_max << ", fom_mean="   << fom_mean
+        << "\n\tzhu_fo=" << zhu_fo   << ", zhu_of="    << zhu_of
+        << ", zhu_min="  << zhu_min  << ", zhu_max="   << zhu_max << ", zhu_mean="   << zhu_mean
+        << "\n\ty1="     << g_y1     << ", y2="        << g_y2    << ", y="          << g_y
+        << "\n\tg="      << g        << ", gbeta="     << gbeta
+        << "\n";
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dist,
-                           const double _fom_alpha, const double _zhu_weight) {
+                           const double _fom_alpha, const double _zhu_weight,
+                           const double _beta_value, const int _n_full_points) {
    baddeley_p = _baddeley_p;
    baddeley_max_dist = _baddeley_max_dist;
    fom_alpha = _fom_alpha;
    zhu_weight = _zhu_weight;
+   beta_value = _beta_value;
+   n_full_points = _n_full_points;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2958,9 +3057,10 @@ void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dis
 ////////////////////////////////////////////////////////////////////////
 
 int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len + 1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_message_type() ";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(msg_typ_str, " ");
@@ -2972,18 +3072,18 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
    msg_typ_arr = new char * [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, msg_typ_str);
+   m_strncpy(tmp_str, msg_typ_str, max_str_len, method_name);
 
    // Tokenize the string and store the double values
    c = strtok(tmp_str, " ");
-   msg_typ_arr[0] = new char [strlen(c)+1];
-   strcpy(msg_typ_arr[0], c);
+   msg_typ_arr[0] = m_strcpy2(c, method_name, "msg_typ_arr[0]");
 
+   char a_var_name[512+1];
    // Parse remaining tokens
    for(i=1; i<n; i++) {
       c = strtok(0, " ");
-      msg_typ_arr[i] = new char [strlen(c)+1];
-      strcpy(msg_typ_arr[i], c);
+      snprintf(a_var_name, 512, "msg_typ_arr[%d]", i);
+      msg_typ_arr[i] = m_strcpy2(c, method_name, a_var_name);
    }
 
    return(n);
@@ -2992,9 +3092,10 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
 ////////////////////////////////////////////////////////////////////////
 
 int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len+1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_dbl_list()";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(dbl_str, " ");
@@ -3006,7 +3107,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    dbl_arr = new double [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, dbl_str);
+   m_strcpy(tmp_str, dbl_str, method_name);
 
    // Tokenize the string and store the double values
    c = strtok(tmp_str, " ");
@@ -3021,9 +3122,10 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
 ////////////////////////////////////////////////////////////////////////
 
 int parse_int_list(const char *int_str, int *&int_arr) {
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len+1];
    char *c = (char *) 0;
    int n, i;
+   const char *method_name = "parse_int_list()";
 
    // Compute the number of tokens in the string based on " "
    n = num_tokens(int_str, " ");
@@ -3035,7 +3137,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    int_arr = new int [n];
 
    // Initialize the temp string for use in tokenizing
-   strcpy(tmp_str, int_str);
+   m_strcpy(tmp_str, int_str, method_name);
 
    // Tokenize the string and store the integer values
    c = strtok(tmp_str, " ");

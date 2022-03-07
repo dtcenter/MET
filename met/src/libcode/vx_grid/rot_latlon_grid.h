@@ -1,7 +1,5 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,13 +64,13 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       void dump(ostream &, int = 0) const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 
@@ -84,7 +82,8 @@ class RotatedLatLonGrid : public LatLonGrid {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
+inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 );    }
+inline bool   RotatedLatLonGrid::wrap_lon() const { return ( wrapLon ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +93,3 @@ inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

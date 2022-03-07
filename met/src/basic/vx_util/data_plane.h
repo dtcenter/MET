@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -43,7 +43,6 @@ class DataPlane {
 
       int Nx;
       int Ny;
-
       int Nxy;   //  Nx*Ny
 
       unixtime InitTime;      // Initialization time in unixtime
@@ -86,8 +85,11 @@ class DataPlane {
 
       int      nx() const;
       int      ny() const;
+      int      nxy() const;
+
       bool     is_empty() const;
       bool     is_all_bad_data() const;
+      int      n_good_data() const;
 
       unixtime init() const;
       unixtime valid() const;
@@ -107,9 +109,12 @@ class DataPlane {
       void convert  (const UserFunc_1Arg &);
       void censor   (const ThreshArray &, const NumArray &);
 
+      void anomaly         (const DataPlane &);
+      void standard_anomaly(const DataPlane &, const DataPlane &);
+
       void replace_bad_data(const double value);
 
-      int  two_to_one(int x, int y) const;
+      int  two_to_one(int x, int y, bool to_north=true) const;
       void one_to_two(int n, int &x, int &y) const;
 
       bool s_is_on(int x, int y) const;
@@ -130,8 +135,9 @@ class DataPlane {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int DataPlane::nx() const { return (Nx); }
-inline int DataPlane::ny() const { return (Ny); }
+inline int DataPlane::nx()  const { return (Nx);  }
+inline int DataPlane::ny()  const { return (Ny);  }
+inline int DataPlane::nxy() const { return (Nxy); }
 
 inline bool DataPlane::is_empty() const { return (Nxy == 0); }
 

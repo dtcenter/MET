@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,6 +57,8 @@ class ThreshArray {
       void add(const ThreshArray &);
       void add_css(const char *);
 
+      void set(const SingleThresh &);
+
       void parse_thresh_str(const char *);
 
       int n_elements() const;
@@ -101,8 +103,8 @@ extern ConcatString prob_thresh_to_string    (const ThreshArray &);
 extern bool         check_prob_thresh        (const ThreshArray &, bool error_out = true);
 extern ThreshArray  process_perc_thresh_bins (const ThreshArray &);
 extern ThreshArray  process_rps_cdp_thresh   (const ThreshArray &);
+extern ThreshArray  derive_cdp_thresh        (const ThreshArray &);
 extern ConcatString write_css                (const ThreshArray &);
-
 
 ////////////////////////////////////////////////////////////////////////
 

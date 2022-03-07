@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -124,7 +124,6 @@ ConcatString get_grib_level_list_str(int k, int grib_level)
                  << "unexpected value for k: " << k
                  << "\n\n";
             exit(1);
-            break;
 
       }   //  switch
 
@@ -265,8 +264,10 @@ int str_to_grib_code(const char *c, int &pcode, double &pthresh_lo, double &pthr
 int str_to_grib_code(const char *c, int &pcode,
                      double &pthresh_lo, double &pthresh_hi, int ptv) {
    int gc = bad_data_int;
-   char tmp_str[512];
+   const int buf_len = 512;
+   char tmp_str[buf_len + 1];
    char *ptr = (char *) 0, *save_ptr = (char *) 0;
+   const char *method_name = "str_to_grib_code() -> ";
 
    // Parse out strings of the form:
    //    PROB
@@ -274,11 +275,11 @@ int str_to_grib_code(const char *c, int &pcode,
    //    PROB(string>lo)
    //    PROB(string<hi)
 
-   strcpy(tmp_str, c);
+   m_strncpy(tmp_str, c, buf_len, method_name);
 
    // Retrieve the first token containing the GRIB code info
    if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
-      mlog << Error << "\nstr_to_grib_code() -> "
+      mlog << Error << "\n" << method_name
            << "problems parsing the string \""
            << c << "\".\n\n";
       exit(1);
@@ -305,9 +306,11 @@ int str_to_grib_code(const char *c, int &pcode,
 int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
                      int ptv) {
    int gc = bad_data_int, i, n_lt, n_gt;
-   char tmp_str[512];
+   const int buf_len = 512;
+   char tmp_str[buf_len + 1];
    char *ptr = (char *) 0, *save_ptr = (char *) 0;
    SingleThresh st;
+   const char *method_name = "str_to_prob_info()";
 
    // Parse out strings of the form:
    //    lo<string<hi
@@ -318,11 +321,11 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
    pthresh_lo = pthresh_hi = bad_data_double;
 
    // Count the number of '<' or '>' characters
-   for(i=0, n_lt=0, n_gt=0; i<(int)strlen(c); i++) {
+   for(i=0, n_lt=0, n_gt=0; i<(int)m_strlen(c); i++) {
       if(c[i] == '<') n_lt++;
       if(c[i] == '>') n_gt++;
    }
-   strcpy(tmp_str, c);
+   m_strncpy(tmp_str, c, buf_len, method_name);
 
    // Single inequality
    if(n_lt + n_gt == 1) {

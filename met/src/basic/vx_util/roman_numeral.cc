@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -49,13 +49,14 @@ void roman_numeral(int n, char * out, const int lower_case_flag)
 
 {
 
+const char *method_name = "roman_numeral() -> ";
    //
    //  range check
    //
 
 if ( (n < roman_numeral_min) || (n > roman_numeral_max) )  {
 
-   mlog << Error << "\nroman_numeral() -> range check error!\n\n";
+   mlog << Error << "\n" << method_name << "range check error!\n\n";
 
    exit ( 1 );
 
@@ -94,7 +95,7 @@ rn_add(c, n,   1,   rn_1,   rn_5,   rn_10);
 if ( lower_case_flag )  {
 
    int j;
-   const int k = strlen(s);
+   const int k = m_strlen(s);
 
    for (j=0; j<k; ++j)  {
 
@@ -109,7 +110,7 @@ if ( lower_case_flag )  {
    //  done
    //
 
-strcpy(out, s);
+m_strcpy(out, s, method_name);
 
 return;
 
@@ -178,7 +179,6 @@ switch ( n/modulus )  {
    default:  //  shouldn't ever happen
       mlog << Error << "\nrn_add() -> can't handle integer " << n << "\n";
       exit ( 1 );
-      break;
 
 }   // switch
 

@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -35,7 +35,7 @@ using namespace std;
 
 static const char netcdf_magic  [] = "CDF";
 static const char hdf_magic     [] = "HDF";
-static const int  netcdf_magic_len = strlen(netcdf_magic);
+static const int  netcdf_magic_len = m_strlen(netcdf_magic);
 
 static const string nccf_att_name   = "Conventions";
 static const string nccf_att_name_l = "conventions";

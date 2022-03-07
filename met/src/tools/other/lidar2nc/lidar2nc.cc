@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -60,19 +60,20 @@ using namespace std;
 
 #include "calipso_5km.h"
 #include "nc_obs_util.h"
+#include "nc_point_obs_out.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-struct NcHeaderData *header_data = get_hdr_data_buffer();
 
 static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int na_len = strlen(na_str);
+static const int na_len = m_strlen(na_str);
 
-static NetcdfObsVars obs_vars;
 static IntArray    valid_times;
+
+static NcFile *ncf;
+static MetNcPointObsOut nc_point_obs;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +97,7 @@ static void set_compress  (const StringArray &);
 
 static void process_calipso_file (NcFile *, const char * filename);
 
-static void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value = -1);
+static void write_nc_record(const float * f, int qc_value = -1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,8 @@ if ( output_filename.empty() )  usage();
    //  open the output file
    //
 
-static NcFile *ncf = open_ncfile(output_filename.text(), true);
+ncf = open_ncfile(output_filename.text(), true);
+nc_point_obs.set_netcdf(ncf);
 
    //
    //  process the lidar file
@@ -146,6 +148,7 @@ mlog << Debug(1) << "Processing Lidar File: " << cline[0] << "\n";
 
 process_calipso_file(ncf, cline[0].c_str());
 
+nc_point_obs.close();
 
    //
    //  done
@@ -249,7 +252,6 @@ switch ( hdf_type )  {
            << program_name << ": hdf_type_to_nc_type() -> unrecognized hdf data type ... "
            << hdf_type << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -261,7 +263,6 @@ return ( t );
 
 ////////////////////////////////////////////////////////////////////////
 
-
 void process_calipso_file(NcFile * out, const char * filename)
 
 {
@@ -271,7 +272,7 @@ int hdf_sd_id;
 int n_data;
 NcDim nc_dim;
 NcVar nc_lat_var, nc_lon_var, nc_data_var, nc_time_var;
-
+const char *method_name = "process_calipso_file() ";
 
    //
    //  open hdf file
@@ -317,7 +318,7 @@ buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
 
 
-mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
+mlog << Debug(1) << method_name << "Writing MET File:\t" << output_filename << "\n";
 
 
    //
@@ -330,23 +331,18 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    //
    //  add the variables to the netcdf file
    //
-
+   int obs_cnt = 0;
    bool use_var_id = false;
-   init_nc_dims_vars_config(obs_vars, use_var_id);
-   obs_vars.attr_agl = true;
-   create_nc_hdr_vars(obs_vars, out, n_data, deflate_level);
-   create_nc_obs_vars(obs_vars, out, deflate_level, use_var_id);
-
-   if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
-      NcDim str_dim;
-      string dim_name = GET_NC_NAME(obs_vars.strl2_dim);
-      str_dim = get_nc_dim(&obs_vars.hdr_typ_var, dim_name);
-   }
+   NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();
+   nc_point_obs.init_buffer();
+   nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
+   //nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
+   nc_point_obs.init_netcdf(obs_cnt, nhdr_dim_size, program_name);
+   mlog << Debug(4) << method_name << " hdr_dim: " << nhdr_dim_size << "\n";
 
    //
    //  global attributes for netcdf output file
    //
-
 const unixtime now = time(0);
 int month, day, year, hour, minute, second;
 ConcatString s;
@@ -385,8 +381,7 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-header_data->typ_array.add(hdr_typ_string);
-obs_vars.hdr_typ_var.putVar(ibuf);
+obs_vars->hdr_typ_var.putVar(ibuf);
 
    //
    //  populate the hdr_sid variable
@@ -394,23 +389,12 @@ obs_vars.hdr_typ_var.putVar(ibuf);
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-header_data->sid_array.add(na_str);
-obs_vars.hdr_sid_var.putVar(ibuf);
+obs_vars->hdr_sid_var.putVar(ibuf);
+nc_point_obs.add_header_strings(hdr_typ_string, na_str);
 
    //
    //  populate the obs_qty variable
    //
-/*
-memset(buf, 0, buf_size);
-
-for (j=0; j<n_data; ++j)  {
-
-   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
-
-}
-
-obs_qty_var.putVar(cbuf);
-*/
    //
    //  populate the hdr_arr variable
    //
@@ -435,9 +419,9 @@ for (j=0; j<n_data; ++j)  {
 
 }   //  for j
 
-obs_vars.hdr_lat_var.putVar(fhdr_lat_buf);
-obs_vars.hdr_lon_var.putVar(fhdr_lon_buf);
-obs_vars.hdr_elv_var.putVar(fhdr_elv_buf);
+obs_vars->hdr_lat_var.putVar(fhdr_lat_buf);
+obs_vars->hdr_lon_var.putVar(fhdr_lon_buf);
+obs_vars->hdr_elv_var.putVar(fhdr_elv_buf);
 
 delete [] fhdr_lat_buf;
 delete [] fhdr_lon_buf;
@@ -473,14 +457,15 @@ for (j=0; j<n_data; ++j)  {
 
       v_idx = valid_times.n_elements();
       valid_times.add(t);
-      header_data->vld_array.add(junk);
+      //header_data.vld_array.add(junk);
+      nc_point_obs.add_header_vld(junk);
    }
    ibuf[j] = v_idx;
 
 }   //  for j
 
 
-obs_vars.hdr_vld_var.putVar(ibuf);
+obs_vars->hdr_vld_var.putVar(ibuf);
 
 delete[] ibuf;
  
@@ -502,62 +487,60 @@ for (j=0; j<n_data; ++j)  {
    //
 
    obs.get_n_layers_record              (j, f);
-      write_nc_record                   (obs_vars, f);
+      write_nc_record                   (f);
 
    if ( obs.n_layers == 0 )  continue;
 
    for (layer=0; layer<(obs.n_layers); ++layer)  {
 
       obs.get_layer_base_record         (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_layer_top_record          (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_opacity_record            (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_cad_score_record          (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_ice_water_record          (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_subtype_record            (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_cloud_aerosol_qa_record   (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
       obs.get_h_average_record          (j, layer, f);
-         write_nc_record                (obs_vars, f);
+         write_nc_record                (f);
 
            /////////////////////////////////
 
 
                  obs.get_feature_type_record   (j, layer, f);
       qc_value = obs.get_feature_type_qa_value (layer);
-         write_nc_record                       (obs_vars, f, qc_value);
+         write_nc_record                       (f, qc_value);
 
                  obs.get_ice_water_record      (j, layer, f);
       qc_value = obs.get_ice_water_qa_value    (layer);
-         write_nc_record                       (obs_vars, f, qc_value);
+         write_nc_record                       (f, qc_value);
 
    }   //  for layer
 
    obs.get_base_base_record  (j, f);
-      write_nc_record        (obs_vars, f);
+      write_nc_record        (f);
 
    obs.get_top_top_record    (j, f);
-      write_nc_record        (obs_vars, f);
+      write_nc_record        (f);
 
 }   //  for j
 
-   write_nc_observation(obs_vars);
-
-   create_nc_table_vars(obs_vars, out);
-
-   write_nc_table_vars(obs_vars);
+StringArray obs_names, obs_units, obs_descs;
+nc_point_obs.write_to_netcdf(obs_names, obs_units, obs_descs);
+nc_point_obs.close();
 
    //
    //  close hdf file
@@ -584,8 +567,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value)
-
+void write_nc_record(const float * f, int qc_value)
 {
 
    //
@@ -596,15 +578,15 @@ void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value)
    //  write obs_qty record
    //
 
-if ( qc_value < 0 )  {
-   write_nc_observation(obs_vars, f, na_str);
-} else {
-   char junk[HEADER_STR_LEN];
-   snprintf(junk, sizeof(junk), "%d", qc_value);
-   write_nc_observation(obs_vars, f, junk);
-}
-
-return;
+   if ( qc_value < 0 )  {
+      nc_point_obs.write_observation(f, na_str);
+   } else {
+      char junk[HEADER_STR_LEN];
+      snprintf(junk, sizeof(junk), "%d", qc_value);
+      nc_point_obs.write_observation(f, junk);
+   }
+   
+   return;
 
 }
 

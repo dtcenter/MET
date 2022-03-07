@@ -9,6 +9,8 @@
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
 ]>
 
+<!-- Requires: unit_tc_dland.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -16,7 +18,9 @@
 
   <test name="tc_pairs_ALAL2010">
     <env>
-      <pair><name>LEAD_REQ</name> <value></value></pair>
+      <pair><name>VALID_INC</name>   <value></value></pair>
+      <pair><name>WRITE_VALID</name> <value></value></pair>
+      <pair><name>LEAD_REQ</name>    <value></value></pair>
     </env>
     <exec>&MET_BIN;/tc_pairs</exec>
     <param> \
@@ -70,6 +74,9 @@
 
   <test name="tc_pairs_PROBRIRW">
     <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>WRITE_VALID</name> <value></value></pair>
+    </env>
     <param> \
       -edeck &DATA_DIR;/edeck/*2015*.dat \
       -bdeck &DATA_DIR;/bdeck/*2015*.dat \
@@ -100,7 +107,9 @@
 
   <test name="tc_pairs_LEAD_REQ">
     <env>
-      <pair><name>LEAD_REQ</name> <value>"96","108"</value></pair>
+      <pair><name>VALID_INC</name>   <value></value></pair>
+      <pair><name>WRITE_VALID</name> <value></value></pair>
+      <pair><name>LEAD_REQ</name>    <value>"96","108"</value></pair>
     </env>
     <exec>&MET_BIN;/tc_pairs</exec>
     <param> \
@@ -113,6 +122,44 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_pairs/alal2010_LEAD_REQ.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_pairs_WRITE_VALID">
+    <env>
+      <pair><name>VALID_INC</name>   <value>"20100814_12", "20100815_00"</value></pair>
+      <pair><name>WRITE_VALID</name> <value>"20100815_00"</value></pair>
+      <pair><name>LEAD_REQ</name>    <value></value></pair>
+    </env>
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <param> \
+      -adeck &DATA_DIR;/adeck/*2010.dat \
+      -bdeck &DATA_DIR;/bdeck/*2010.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_ALAL2010 \
+      -out &OUTPUT_DIR;/tc_pairs/alal2010_WRITE_VALID \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_WRITE_VALID.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2010_WRITE_VALID.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_pairs_WRITE_VALID_PROBRIRW">
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>WRITE_VALID</name> <value>"20150512"</value></pair>
+    </env>
+    <param> \
+      -edeck &DATA_DIR;/edeck/*2015*.dat \
+      -bdeck &DATA_DIR;/bdeck/*2015*.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_PROBRIRW \
+      -out &OUTPUT_DIR;/tc_pairs/alal2015_WRITE_VALID \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_WRITE_VALID_PROBRIRW.log \
+      -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2015_WRITE_VALID_PROBRIRW.tcst</stat>
     </output>
   </test>
 

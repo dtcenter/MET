@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1412,7 +1412,6 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::read() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
@@ -1614,17 +1613,12 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::do_startfontmetrics() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
    if ( tok.keyword  == afm_keyword_EndFontMetrics )  break;
 
 }   //  while
-
-
-
-
 
 
 return;
@@ -1681,19 +1675,12 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::do_startcharmetrics() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
-
    if ( tok.keyword == afm_keyword_EndCharMetrics )  break;
 
-
 }   //  while
-
-
-
-
 
 
 return;
@@ -1746,7 +1733,6 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::do_startkerndata() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
@@ -1755,10 +1741,6 @@ while ( (*in) >> line )  {
 
 
 }   //  while
-
-
-
-
 
 
 return;
@@ -1821,22 +1803,13 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::do_startkernpairs() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
 
    if ( tok.keyword == afm_keyword_EndKernPairs )  break;
 
-
 }   //  while
-
-
-
-
-
-
-
 
 return;
 
@@ -1894,18 +1867,12 @@ while ( (*in) >> line )  {
          mlog << Error << "\nAfm::do_startcomposites() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
    }   //  switch
 
    if ( tok.keyword == afm_keyword_EndComposites )  break;
 
 }   //  while
-
-
-
-
-
 
 return;
 
@@ -1992,7 +1959,6 @@ while ( 1 )  {
          mlog << Error << "\nAfm::do_c(AfmLine &) -> bad token (2)\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
 
    }   //  switch
@@ -2096,19 +2062,12 @@ while ( 1 )  {
          mlog << Error << "\nAfm::do_c(AfmLine &) -> bad token (2)\n\n";
          tok.dump(cerr);
          exit ( 1 );
-         break;
 
 
    }   //  switch
 
 
 }   //  while
-
-
-
-
-
-
 
 return;
 
@@ -2324,9 +2283,9 @@ if ( s )  { delete [] s;  s = (char *) 0; }
 
 if ( !text )  return;
 
-s = new char [1 + strlen(text)];
+const char *method_name = "afm set_string()";
 
-strcpy(s, text);
+s = m_strcpy2(text, method_name);
 
 
 return;

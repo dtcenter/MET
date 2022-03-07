@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -69,8 +69,6 @@ int main(int argc, char * argv [])
   FILE *output_file;
   if ((output_file = met_fopen(output_filepath, "w")) == 0)
   {
-//    mlog << Error << "\n" << method_name << " -> "
-//	 << "error opening output file" << output_filepath << endl;
     cerr << "Error opening output file: " << output_filepath << endl;
 
     exit(1);
@@ -89,8 +87,8 @@ int main(int argc, char * argv [])
   double max_edr;
   
   while (input_file.getNextRecord(aircraft_id, time_obs,
-				  latitude, longitude, altitude,
-				  qc_confidence, med_edr, max_edr))
+                                  latitude, longitude, altitude,
+                                  qc_confidence, med_edr, max_edr))
   {
     // Construct the time string
 
@@ -98,7 +96,7 @@ int main(int argc, char * argv [])
     if (time_struct == 0)
     {
 //      mlog << Error << "\n" << method_name << " -> "
-//	   << "error converting time value to time structure" << endl;
+//           << "error converting time value to time structure" << endl;
       cerr << "Error converting time value to time structure" << endl;
       fclose(output_file);
       exit(1);
@@ -108,23 +106,23 @@ int main(int argc, char * argv [])
     
     snprintf(time_obs_string, sizeof(time_obs_string), 
          "%04d%02d%02d_%02d%02d%02d",
-	    time_struct->tm_year + 1900, time_struct->tm_mon + 1,
-	    time_struct->tm_mday,
-	    time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
+            time_struct->tm_year + 1900, time_struct->tm_mon + 1,
+            time_struct->tm_mday,
+            time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
     
     // Write the observations.
 
     fprintf(output_file, "MEDEDR %10s %s %10.4f %10.4f %8.2f %3d %8.2f %8.2f %8.2f %8.2f\n",
-	    aircraft_id.c_str(), time_obs_string,
-	    latitude, longitude, altitude * FEET_TO_M,
-	    MED_EDR_GRIB_CODE, MISSING_DATA_VALUE, altitude,
-	    qc_confidence, med_edr);
+            aircraft_id.c_str(), time_obs_string,
+            latitude, longitude, altitude * FEET_TO_M,
+            MED_EDR_GRIB_CODE, MISSING_DATA_VALUE, altitude,
+            qc_confidence, med_edr);
     
     fprintf(output_file, "MAXEDR %10s %s %10.4f %10.4f %8.2f %3d %8.2f %8.2f %8.2f %8.2f\n",
-	    aircraft_id.c_str(), time_obs_string,
-	    latitude, longitude, altitude * FEET_TO_M,
-	    MAX_EDR_GRIB_CODE, MISSING_DATA_VALUE, altitude,
-	    qc_confidence, max_edr);
+            aircraft_id.c_str(), time_obs_string,
+            latitude, longitude, altitude * FEET_TO_M,
+            MAX_EDR_GRIB_CODE, MISSING_DATA_VALUE, altitude,
+            qc_confidence, max_edr);
     
   }
   fclose(output_file);  

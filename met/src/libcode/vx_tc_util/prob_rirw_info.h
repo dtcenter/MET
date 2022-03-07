@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -69,9 +69,9 @@ class ProbRIRWInfo : public ProbInfoBase {
          //  do stuff
          //
 
-      void initialize(const ATCFProbLine &);
+      void initialize(const ATCFProbLine &, double);
       bool is_match  (const ATCFProbLine &) const;
-      bool add       (const ATCFProbLine &, bool check_dup = false);
+      bool add       (const ATCFProbLine &, double, bool check_dup = false);
       void set       (const TCStatLine &);
 
 };

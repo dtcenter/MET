@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -512,6 +512,7 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
     data_azi_mean = new double[grid.range_n()];
 
     for(int ir = 0; ir < grid.range_n(); ir++) {
+        data_azi_mean[ir] = 0.;
         for(int ia = 0; ia < grid.azimuth_n(); ia++) {
             int i = ir * grid.azimuth_n() + ia;
             int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;

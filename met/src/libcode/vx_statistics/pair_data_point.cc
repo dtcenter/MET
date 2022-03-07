@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -97,11 +97,11 @@ void PairDataPoint::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::extend(int n, bool exact) {
+void PairDataPoint::extend(int n) {
 
-   PairBase::extend(n, exact);
+   PairBase::extend(n);
 
-   f_na.extend(n, exact);
+   f_na.extend(n);
 
    return;
 }
@@ -116,12 +116,12 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    // Allocate memory for output pairs
    extend(pd.n_obs);
 
-   cdf_info = pd.cdf_info;
-
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
    set_msg_typ(pd.msg_typ.c_str());
    set_msg_typ_vals(pd.msg_typ_vals);
+
+   cdf_info_ptr = pd.cdf_info_ptr;
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_wdth(pd.interp_wdth);
@@ -247,7 +247,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 
    // Allocate memory for output pairs
    out_pd.extend(n_obs);
-   out_pd.set_climo_cdf_info(cdf_info);
+   out_pd.set_climo_cdf_info_ptr(cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(f_na, cmn_na);
    bool csd_flag = set_climo_flag(f_na, csd_na);
@@ -372,7 +372,8 @@ void VxPairDataPoint::clear() {
    climo_sd_dpa.clear();
    sid_inc_filt.clear();
    sid_exc_filt.clear();
-   obs_qty_filt.clear();
+   obs_qty_inc_filt.clear();
+   obs_qty_exc_filt.clear();
    mpr_column.clear();
    mpr_thresh.clear();
 
@@ -433,7 +434,8 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    sid_inc_filt = vx_pd.sid_inc_filt;
    sid_exc_filt = vx_pd.sid_exc_filt;
-   obs_qty_filt = vx_pd.obs_qty_filt;
+   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
+   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
 
    mpr_column = vx_pd.mpr_column;
    mpr_thresh = vx_pd.mpr_thresh;
@@ -629,9 +631,18 @@ void VxPairDataPoint::set_sid_exc_filt(const StringArray &sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_obs_qty_filt(const StringArray &sa) {
+void VxPairDataPoint::set_obs_qty_inc_filt(const StringArray &sa) {
 
-   obs_qty_filt = sa;
+   obs_qty_inc_filt = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_obs_qty_exc_filt(const StringArray &sa) {
+
+   obs_qty_exc_filt = sa;
 
    return;
 }
@@ -825,12 +836,12 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_climo_cdf_info(const ClimoCDFInfo &info) {
+void VxPairDataPoint::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info(info);
+            pd[i][j][k].set_climo_cdf_info_ptr(info);
          }
       }
    }
@@ -899,7 +910,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       rej_sid++;
       return;
    }
-
+   
    // Check whether the GRIB code for the observation matches
    // the specified code
    if((var_name != 0) && (0 < strlen(var_name))) {
@@ -912,19 +923,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       rej_var++;
       return;
    }
-
-   // Check if the observation quality flag is included in the list
-   if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
-      bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++) {
-         if(obs_qty == obs_qty_filt[i]) qty_match = true;
-      }
-      if(!qty_match) {
-         rej_qty++;
-         return;
-      }
+   
+   // Check the observation quality include and exclude options
+   if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
+      (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
+      rej_qty++;
+      return;
    }
-
+   
    // Check whether the observation time falls within the valid time
    // window
    if(hdr_ut < beg_ut || hdr_ut > end_ut) {
@@ -961,8 +967,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    y = nint(obs_y);
 
    // Check if the observation's lat/lon is on the grid
-   if(x < 0 || x >= gr.nx() ||
-      y < 0 || y >= gr.ny()) {
+   if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
+        y < 0 || y >= gr.ny()) {
+
       mlog << Debug(4)
            << "For " << fcst_info->magic_str() << " versus "
            << obs_info->magic_str()
@@ -977,13 +984,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // Check for a large topography difference
-   if(sfc_info.topo_ptr && msg_typ_sfc.has(hdr_typ_str)) {
+   if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
 
       // Interpolate model topography to observation location
       double topo = compute_horz_interp(
                        *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
                         InterpMthd_Bilin, 2,
-                        GridTemplateFactory::GridTemplate_Square, 1.0);
+                        GridTemplateFactory::GridTemplate_Square,
+                        gr.wrap_lon(), 1.0);
 
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
@@ -1043,7 +1051,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // falls within the requested range.
    else {
 
-      if(!msg_typ_sfc.has(hdr_typ_str) &&
+      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info->level().lower() ||
           obs_hgt > obs_info->level().upper())) {
          rej_lvl++;
@@ -1097,7 +1105,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // type, set the observation level value to bad data so that it's not
    // used in the duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      msg_typ_sfc.has(hdr_typ_str)) {
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 
@@ -1159,7 +1167,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
                        bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape,
+                       pd[0][0][k].interp_shape, gr.wrap_lon(),
                        interp_thresh, spfh_flag,
                        fcst_info->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
@@ -1186,8 +1194,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
                        bad_data_double, bad_data_double,
-                       pd[0][0][k].interp_mthd,  pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape,
+                       pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                       pd[0][0][k].interp_shape, gr.wrap_lon(),
                        interp_thresh, spfh_flag,
                        fcst_info->level().type(),
                        to_lvl, csd_lvl_blw, csd_lvl_abv);
@@ -1200,7 +1208,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // For surface verification, apply land/sea and topo masks
             if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-               (msg_typ_sfc.has(hdr_typ_str))) {
+               (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
 
                bool is_land = msg_typ_lnd.has(hdr_typ_str);
 
@@ -1216,14 +1224,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
                fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
                            pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape, interp_thresh, sfc_info,
-                           is_land);
+                           pd[0][0][k].interp_shape, gr.wrap_lon(),
+                           interp_thresh, sfc_info, is_land);
             }
             // Otherwise, compute interpolated value
             else {
                fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, cmn_v, csd_v,
                            pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape,
+                           pd[0][0][k].interp_shape, gr.wrap_lon(),
                            interp_thresh, spfh_flag,
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);
@@ -1233,8 +1241,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                mlog << Debug(4)
                     << "For " << fcst_info->magic_str() << " versus "
                     << obs_info->magic_str()
-                    << ", skipping observation due to bad data in the interpolated "
-                    << "forecast value:\n"
+                    << ", skipping observation due to bad data in the "
+                    << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
+                    << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
+                    << ") interpolated forecast value:\n"
                     << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
                     << "\n";
@@ -1476,7 +1486,6 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
          mlog << Error << "\ncheck_fo_thresh() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(status);
@@ -1662,8 +1671,8 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    out_pd_v.erase();
    out_pd_u.extend(pd_u.n_obs);
    out_pd_v.extend(pd_v.n_obs);
-   out_pd_u.set_climo_cdf_info(pd_u.cdf_info);
-   out_pd_v.set_climo_cdf_info(pd_v.cdf_info);
+   out_pd_u.set_climo_cdf_info_ptr(pd_u.cdf_info_ptr);
+   out_pd_v.set_climo_cdf_info_ptr(pd_v.cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
                    set_climo_flag(pd_v.f_na, pd_v.cmn_na);
@@ -1751,7 +1760,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
 
    // Allocate memory for output pairs
    out_pd.extend(pd.n_obs);
-   out_pd.set_climo_cdf_info(pd.cdf_info);
+   out_pd.set_climo_cdf_info_ptr(pd.cdf_info_ptr);
 
    bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
@@ -1803,7 +1812,7 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
                                  const char *var_name) {
    ConcatString obs_cs, name;
 
-   if((var_name != 0) && (0 < strlen(var_name))) name = var_name;
+   if((var_name != 0) && (0 < m_strlen(var_name))) name = var_name;
    else                                          name = obs_arr[1];
 
    //

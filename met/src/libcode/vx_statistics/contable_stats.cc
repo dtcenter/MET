@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -775,7 +775,8 @@ double ContingencyTable::gaccuracy() const {
 
    if ( Nrows != Ncols )  {
 
-      mlog << Error << "\nContingencyTable::gaccuracy() -> table not square!\n\n";
+      mlog << Error << "\nContingencyTable::gaccuracy() -> "
+           << "table not square!\n\n";
 
       exit ( 1 );
 
@@ -795,13 +796,14 @@ double ContingencyTable::gaccuracy() const {
 ////////////////////////////////////////////////////////////////////////
 
 
-double ContingencyTable::gheidke()const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
+double ContingencyTable::gheidke() const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
 
 {
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\nContingencyTable::gheidke() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke() -> "
+        << "table not square!\n\n";
 
    exit ( 1 );
 
@@ -811,7 +813,8 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\nContingencyTable::gheidke() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke() -> "
+        << "table empty!\n\n";
 
    exit ( 1 );
 
@@ -876,15 +879,32 @@ return ( ans );
 
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  Reference:
+//  Ou et al., 2016: Sensitivity of Calibrated Week-2 Probabilistic
+//     Forecast Skill to Reforecast Sampling of the NCEP Global
+//     Ensemble Forecast System.
+//     Weather and Forecasting, 31, 1093-1107.
+//
+////////////////////////////////////////////////////////////////////////
 
-
-double ContingencyTable::gkuiper()const  //  Reference: Eq. 7.13, page 250 in Wilks, 1st Ed.
+double ContingencyTable::gheidke_ec(double ec_value) const
 
 {
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\nContingencyTable::gkuiper() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
+        << "table not square!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ec_value < 0.0 || ec_value >= 1.0 )  {
+
+   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
+        << "ec_value (" << ec_value << ") must be >=0 and <1.0!\n\n";
 
    exit ( 1 );
 
@@ -894,7 +914,73 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\nContingencyTable::gkuiper() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
+        << "table empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+int j, sum;
+double num, denom, ans;
+
+   //
+   //  sum counts on the diagonal
+   //
+
+for (j=0, sum=0; j<Nrows; ++j)  {
+
+   sum += (*E)[rc_to_n(j, j)];
+
+}
+
+   //
+   //  expected correct by chance
+   //
+
+const double ec = (double) N * ec_value;
+
+num   = (double) sum - ec;
+denom = (double) N - ec;
+
+   //
+   //  result
+   //
+
+if (is_eq(denom, 0.0)) ans = bad_data_double;
+else                   ans = num/denom;
+
+   //
+   //  done
+   //
+
+return ( ans );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double ContingencyTable::gkuiper() const  //  Reference: Eq. 7.13, page 250 in Wilks, 1st Ed.
+
+{
+
+if ( Nrows != Ncols )  {
+
+   mlog << Error << "\nContingencyTable::gkuiper() -> "
+        << "table not square!\n\n";
+
+   exit ( 1 );
+
+}
+
+const int N = total();
+
+if ( N == 0 )  {
+
+   mlog << Error << "\nContingencyTable::gkuiper() -> "
+        << "table empty!\n\n";
 
    exit ( 1 );
 
@@ -982,7 +1068,8 @@ double ContingencyTable::gerrity() const  //  Reference: Pages 84-91 in
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\nContingencyTable::gerrity() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gerrity() -> "
+        << "table not square!\n\n";
 
    exit ( 1 );
 
@@ -992,7 +1079,8 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\nContingencyTable::gerrity() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gerrity() -> "
+        << "table empty!\n\n";
 
    exit ( 1 );
 

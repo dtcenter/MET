@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -91,7 +91,7 @@ inline GribError::GribError(int ErrType, int LineNo, const char *FileName, const
 
    filename = FileName;
 
-   strcpy(message, Message);
+   m_strcpy(message, Message, "GribError::GribError()", "message");
 
 }
 

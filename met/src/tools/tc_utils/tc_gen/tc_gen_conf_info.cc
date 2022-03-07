@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -150,6 +150,7 @@ void TCGenVxOpt::clear() {
    ValidBeg = ValidEnd = (unixtime) 0;
    InitHour.clear();
    Lead.clear();
+   VxMaskConf.clear();
    VxMaskName.clear();
    VxPolyMask.clear();
    VxGridMask.clear();
@@ -164,6 +165,7 @@ void TCGenVxOpt::clear() {
    OpsHitBeg = OpsHitEnd = bad_data_int;
    DiscardFlag = false;
    DevFlag = OpsFlag = false;
+   ProbGenThresh.clear();
    CIAlpha = bad_data_double;
    OutputMap.clear();
    NcInfo.clear();
@@ -227,8 +229,9 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    }
 
    // Conf: vx_mask
-   if(nonempty(dict.lookup_string(conf_key_vx_mask).c_str())) {
-      file_name = replace_path(dict.lookup_string(conf_key_vx_mask));
+   VxMaskConf = dict.lookup_string(conf_key_vx_mask);
+   if(VxMaskConf.nonempty()) {
+      file_name = replace_path(VxMaskConf);
       mlog << Debug(2) << "Masking File: " << file_name << "\n";
       parse_poly_mask(file_name, VxPolyMask, VxGridMask, VxAreaMask,
                       VxMaskName);
@@ -288,7 +291,12 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
            << " must be set to true!\n\n";
       exit(1);
    }
-   
+
+   // Conf: prob_genesis_thresh
+   ProbGenThresh = dict.lookup_thresh_array(conf_key_prob_genesis_thresh);
+   ProbGenThresh = string_to_prob_thresh(ProbGenThresh.get_str().c_str());
+   check_prob_thresh(ProbGenThresh);
+
    // Conf: ci_alpha
    CIAlpha = dict.lookup_double(conf_key_ci_alpha);
 
@@ -353,7 +361,8 @@ void TCGenVxOpt::process_basin_mask(const Grid &basin_grid,
       if(!basin_abbr.has(VxBasinMask[i], j)) {
          mlog << Error << "\nTCGenConfInfo::process_basin_mask() -> "
               << "\"" << VxBasinMask[i]
-              << "\" is not a valid basin name!\n\n";
+              << "\" is not a valid basin name ("
+              << write_css(basin_abbr) << ")!\n\n";
          exit(1);
       }
 
@@ -501,6 +510,116 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
    if((DLandThresh.get_type() != no_thresh_type) &&
       (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
       keep = false;
+
+   // Return the keep status
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
+   bool keep = true;
+
+   // ATCF ID processed elsewhere
+
+   // Check storm id
+   if(StormId.n() > 0 &&
+      !has_storm_id(StormId, gi.basin(), gi.cyclone(), gi.init()))
+      keep = false;
+
+   // Check storm name: no included in genesis probabilities
+
+   // Initialization time
+   if((InitBeg     > 0 &&  InitBeg >   gi.init())  ||
+      (InitEnd     > 0 &&  InitEnd <   gi.init())  ||
+      (InitInc.n() > 0 && !InitInc.has(gi.init())) ||
+      (InitExc.n() > 0 &&  InitExc.has(gi.init())))
+      keep = false;
+
+   // Initialization hours
+   if(InitHour.n() > 0 && !InitHour.has(gi.init_hour()))
+      keep = false;
+
+   // Lead and valid times:
+   // ProbGenInfo objects can contain multiple lead/valid times.
+   // Do not filter by them here.
+
+   // Poly masking
+   if(VxPolyMask.n_points() > 0 &&
+     !VxPolyMask.latlon_is_inside(gi.lat(), gi.lon()))
+      keep = false;
+
+   // Area masking
+   if(!VxAreaMask.is_empty()) {
+      double x, y;
+      VxGridMask.latlon_to_xy(gi.lat(), -1.0*gi.lon(), x, y);
+      if(x < 0 || x >= VxGridMask.nx() ||
+         y < 0 || y >= VxGridMask.ny()) {
+         keep = false;
+      }
+      else {
+         keep = VxAreaMask(nint(x), nint(y));
+      }
+   }
+
+   // Distance to land
+   if((DLandThresh.get_type() != no_thresh_type) &&
+      (is_bad_data(gi.dland()) || !DLandThresh.check(gi.dland())))
+      keep = false;
+
+   // Return the keep status
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const GenShapeInfo &gsi) const {
+   bool keep = true;
+
+   // ATCF ID and storm name do not apply
+
+   // Initialization time
+   if((InitBeg     > 0 &&  InitBeg >   gsi.issue_time())  ||
+      (InitEnd     > 0 &&  InitEnd <   gsi.issue_time())  ||
+      (InitInc.n() > 0 && !InitInc.has(gsi.issue_time())) ||
+      (InitExc.n() > 0 &&  InitExc.has(gsi.issue_time())))
+      keep = false;
+
+   // Initialization hours
+   if(InitHour.n() > 0 && !InitHour.has(gsi.issue_hour()))
+      keep = false;
+
+   // Lead and valid times:
+   // GenShapeInfo objects contain multiple lead/valid times.
+   // Do not filter by them here.
+
+   // If VxMaskConf set, filter spatially by the center of the shape
+   if(keep && VxMaskConf.nonempty()) {
+
+      // Poly masking: use center lat/lon
+      if(VxPolyMask.n_points() > 0 &&
+        !VxPolyMask.latlon_is_inside(gsi.center_lat(), gsi.center_lon()))
+         keep = false;
+
+      // Area masking: use center lat/lon
+      if(!VxAreaMask.is_empty()) {
+         double x, y;
+         VxGridMask.latlon_to_xy(gsi.center_lat(), -1.0*gsi.center_lon(), x, y);
+         if(x < 0 || x >= VxGridMask.nx() ||
+            y < 0 || y >= VxGridMask.ny()) {
+            keep = false;
+         }
+         else {
+            keep = VxAreaMask(nint(x), nint(y));
+         }
+      }
+   }
+   // Otherwise, if VxBasinMask set, filter by the GenShapeArea basin
+   else if(keep && VxBasinMask.n() > 0) {
+      keep = VxBasinMask.has(gsi.basin());
+   }
+
+   // Distance to land does not apply
 
    // Return the keep status
    return(keep);
@@ -824,6 +943,18 @@ STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int TCGenConfInfo::get_max_n_prob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<VxOpt.size(); i++) {
+      n = max(n, VxOpt[i].ProbGenThresh.n());
+   }
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class GenCTCInfo
 //
@@ -1130,6 +1261,188 @@ void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
          inc_pnt(gi[i].lat(), gi[i].lon(), s);
       }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class ProbGenPCTInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::ProbGenPCTInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ProbGenPCTInfo::~ProbGenPCTInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::clear() {
+
+   DefaultPCT.clear();
+
+   Model.clear();
+   VarName.clear();
+   VxMask.clear();
+
+   InitBeg = InitEnd = (unixtime) 0;
+   BestBeg = BestEnd = (unixtime) 0;
+
+   PCTMap.clear();
+   ProbGenMap.clear();
+   GenShapeMap.clear();
+   ProbIdxMap.clear();
+   BestGenMap.clear();
+   BestEvtMap.clear();
+
+   VxOpt = (const TCGenVxOpt *) 0;
+   LeadTimes.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::set_vx_opt(const TCGenVxOpt *vx_opt) {
+
+   if(!vx_opt) return;
+
+   // Store pointer
+   VxOpt = vx_opt;
+
+   // Setup the default PCTInfo object
+   DefaultPCT.set_fthresh(VxOpt->ProbGenThresh);
+   DefaultPCT.allocate_n_alpha(1);
+   DefaultPCT.alpha[0] = VxOpt->CIAlpha;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::add_probgen(const ProbGenInfo &pgi, int index,
+                                 const GenesisInfo *bgi, bool is_event) {
+   unixtime ut;
+
+   // Store the model and variable names
+   if(Model.empty())   Model   = pgi.technique();
+   if(VarName.empty()) VarName = prob_genesis_name;
+   if(VxMask.empty())  VxMask  = (VxOpt->VxMaskName.empty() ?
+                                  na_str : VxOpt->VxMaskName);
+
+   // Track the range of forecast initalization times
+   ut = pgi.init();
+   if(InitBeg == 0 || InitBeg > ut) InitBeg = ut;
+   if(InitEnd == 0 || InitEnd < ut) InitEnd = ut;
+
+   // Track the range of verifying BEST genesis events
+   if(bgi) {
+      ut = bgi->genesis_time();
+      if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
+      if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
+   }
+
+   // Current lead time and probability value
+   int lead_hr = nint(pgi.prob_item(index));
+   double prob = pgi.prob(index) / 100.0;
+
+   // Add new map entries, if needed
+   if(!LeadTimes.has(lead_hr)) {
+
+      LeadTimes.add(lead_hr);
+      vector<const ProbGenInfo *> empty_pgi;
+      vector<int>                 empty_idx;
+      vector<const GenesisInfo *> empty_bgi;
+      vector<bool>                empty_evt;
+
+      PCTMap    [lead_hr] = DefaultPCT;
+      ProbGenMap[lead_hr] = empty_pgi;
+      ProbIdxMap[lead_hr] = empty_idx;
+      BestGenMap[lead_hr] = empty_bgi;
+      BestEvtMap[lead_hr] = empty_evt;
+   }
+
+   // Update map entries
+   ProbGenMap[lead_hr].push_back(&pgi);
+   ProbIdxMap[lead_hr].push_back(index);
+   BestGenMap[lead_hr].push_back(bgi);
+   BestEvtMap[lead_hr].push_back(is_event);
+
+   // Increment counts
+   if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
+   else         PCTMap[lead_hr].pct.inc_nonevent(prob);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ProbGenPCTInfo::add_genshape(const GenShapeInfo &gsi, int index,
+                                  const GenesisInfo *bgi, bool is_event) {
+   unixtime ut;
+   int lead_hr;
+
+   // Store the model and variable names
+   if(Model.empty())   Model   = "OPER";
+   if(VarName.empty()) VarName = genesis_shape_name;
+   if(VxMask.empty())  VxMask  = (VxOpt->VxMaskName.empty() ?
+                                  na_str : VxOpt->VxMaskName);
+
+   // Track the range of forecast issue times
+   ut = gsi.issue_time();
+   if(InitBeg == 0 || InitBeg > ut) InitBeg = ut;
+   if(InitEnd == 0 || InitEnd < ut) InitEnd = ut;
+
+   // Track the range of verifying BEST genesis events
+   if(bgi) {
+      ut = bgi->genesis_time();
+      if(BestBeg == 0 || BestBeg > ut) BestBeg = ut;
+      if(BestEnd == 0 || BestEnd < ut) BestEnd = ut;
+   }
+
+   // Add new map entries, if needed
+   lead_hr = gsi.lead_sec(index)/sec_per_hour;
+   if(!LeadTimes.has(lead_hr)) {
+
+      LeadTimes.add(lead_hr);
+      vector<const GenShapeInfo *> empty_gsi;
+      vector<int>                  empty_idx;
+      vector<const GenesisInfo *>  empty_bgi;
+      vector<bool>                 empty_evt;
+
+      PCTMap    [lead_hr]  = DefaultPCT;
+      GenShapeMap[lead_hr] = empty_gsi;
+      ProbIdxMap[lead_hr]  = empty_idx;
+      BestGenMap[lead_hr]  = empty_bgi;
+      BestEvtMap[lead_hr]  = empty_evt;
+   }
+
+   // Update map entries
+   GenShapeMap[lead_hr].push_back(&gsi);
+   ProbIdxMap[lead_hr].push_back(index);
+   BestGenMap[lead_hr].push_back(bgi);
+   BestEvtMap[lead_hr].push_back(is_event);
+
+   // Increment counts
+   if(is_event) PCTMap[lead_hr].pct.inc_event   (gsi.prob_val(index));
+   else         PCTMap[lead_hr].pct.inc_nonevent(gsi.prob_val(index));
 
    return;
 }

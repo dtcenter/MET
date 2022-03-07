@@ -14,7 +14,8 @@ bin_PROGRAMS    = stat_analysis
 stat_analysis_SOURCES = stat_analysis.cc \
 	aggr_stat_line.cc \
 	parse_stat_line.cc \
-	stat_analysis_job.cc
+	stat_analysis_job.cc \
+	skill_score_index_job.cc
 stat_analysis_CPPFLAGS = ${MET_CPPFLAGS}
 stat_analysis_LDFLAGS = ${MET_LDFLAGS}
 stat_analysis_LDADD = -lvx_stat_out \
@@ -47,4 +48,5 @@ stat_analysis_LDADD = -lvx_stat_out \
 EXTRA_DIST = stat_analysis.h \
 	parse_stat_line.h \
 	aggr_stat_line.h \
-	stat_analysis_job.h
+	stat_analysis_job.h \
+	skill_score_index_job.h

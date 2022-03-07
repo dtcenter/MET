@@ -48,6 +48,8 @@ fcst = {
    message_type = [ "ADPSFC" ];
    sid_inc      = [];
    sid_exc      = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
 
    field = [
       {
@@ -204,6 +206,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = STAT;
    mpr    = BOTH;
@@ -214,6 +217,6 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

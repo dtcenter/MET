@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -37,8 +37,6 @@ class StringArray {
 
       std::vector<std::string> s;
 
-      int  Nalloc;
-
       int  MaxLength;
 
       bool IgnoreCase;
@@ -65,6 +63,8 @@ class StringArray {
       void add(const StringArray &);
 
       void add_css(const std::string);
+
+      void set(const std::string);
 
       void set(int i, const std::string);
 

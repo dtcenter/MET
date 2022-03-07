@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -148,11 +148,10 @@ class CgraphBase : public PSfile {
          //  import images
          //
 
-      virtual void import(const Ppm &, double x, double y, double u, double v, double _scale = 1.0);
-      virtual void import(const Ppm &, double x, double y, double u, double v, double x_scale, double y_scale);
+      virtual void import_image(const Ppm &, double x, double y, double u, double v, double _scale = 1.0);
+      virtual void import_image(const Ppm &, double x, double y, double u, double v, double x_scale, double y_scale);
 
          //  this is implemented in the CGraph2 class
-      // virtual void import(const Ppm &, const Box &, const ViewGravity);
 
          //
          //  Type 1 fonts
@@ -308,9 +307,9 @@ class Cgraph : public CgraphBase {
          //  import images
          //
 
-      void import(const Ppm &, double x, double y, double u, double v, double _scale = 1.0);
-      void import(const Ppm &, double x, double y, double u, double v, double x_scale, double y_scale);
-      void import(const Ppm &, const Box &, const ViewGravity);
+      void import_image(const Ppm &, double x, double y, double u, double v, double _scale = 1.0);
+      void import_image(const Ppm &, double x, double y, double u, double v, double x_scale, double y_scale);
+      void import_image(const Ppm &, const Box &, const ViewGravity);
 
          //
          //  text rendering

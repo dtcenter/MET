@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -110,6 +110,16 @@ if ( Nrows != t.Nrows || Ncols != t.Ncols )  {
 
 }
 
+if ( !is_eq(ECvalue, t.ECvalue) )  {
+
+   mlog << Error << "\nContingencyTable::operator+=() -> "
+        << "the expected correct values do not match: "
+        << ECvalue << " != " << t.ECvalue << "\n\n";
+
+   exit ( 1 );
+
+}
+
 if ( E )  {
    for ( int i=0; i<E->size(); ++i )  (*E)[i] += (*t.E)[i];
 }
@@ -137,7 +147,8 @@ void ContingencyTable::clear()
 {
     if (E) delete E;
     E = new vector<int>();
-    
+
+    ECvalue = bad_data_double;
     Name.clear();
     Nrows = Ncols = 0;
     
@@ -160,6 +171,7 @@ void ContingencyTable::assign(const ContingencyTable & t)
     
     if (E) delete E;
     E = new vector<int>(*(t.E));
+    ECvalue = t.ECvalue;
     Name = t.Name;
     
     //
@@ -198,14 +210,14 @@ int r, c;
 Indent prefix(depth);
 ConcatString junk;
 
-out << prefix << "Name  = ";
+out << prefix << "Name    = ";
 
 if ( Name.length() > 0 )  out << '\"' << Name << "\"\n";
 else                      out << "(nul)\n";
 
-out << prefix << "Nrows = " << Nrows << "\n";
-out << prefix << "Ncols = " << Ncols << "\n";
-
+out << prefix << "Nrows   = " << Nrows << "\n";
+out << prefix << "Ncols   = " << Ncols << "\n";
+out << prefix << "ECvalue = " << ECvalue << "\n";
 out << prefix << "\n";
 
 if ( E->empty() )  { out.flush();  return; }
@@ -342,13 +354,20 @@ for (c=1; c<Ncols; ++c)  {
 
    for (k=0; k<c; ++k)  c_table += 2*hpad + col_width[k] + 1;
 
-   for (r_table=1; r_table<(h - 1); ++r_table)  {
+   if (c_table < w) {
 
-      n = table_rc_to_n(r_table, c_table, w, h);
+      for (r_table=1; r_table<(h - 1); ++r_table)  {
 
-      table[n] = v_sep;
+         n = table_rc_to_n(r_table, c_table, w, h);
 
+         table[n] = v_sep;
 
+      }
+
+   }
+   else {
+      mlog << Warning << "\nContingencyTable::dump() -> "
+           << "c_table (" << c_table << ") is greater then w (" << w << ")\n\n";
    }
 
 }
@@ -452,6 +471,16 @@ void ContingencyTable::set_size(int N)
 
 ContingencyTable::set_size(N, N);
 
+   //
+   //  if square, set default expected correct value
+   //
+
+if ( N > 0 )  {
+
+   ECvalue = 1.0 / N;
+
+}
+
 return;
 
 }
@@ -488,6 +517,24 @@ Ncols = NC;
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ContingencyTable::set_ec_value(double v)
+
+{
+
+   //
+   //  do not override the default value with bad data
+   //
+
+if ( !is_bad_data(v) )  ECvalue = v;
 
 return;
 
@@ -1705,7 +1752,8 @@ return ( t );
 
 
 ////////////////////////////////////////////////////////////////////////
-
+// r_table < h
+// c_table < w
 
 int table_rc_to_n(int r_table, int c_table, int w, int h)
 

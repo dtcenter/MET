@@ -1,20 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const bool do_name_len_decl              = true;
-
-static const bool echo_pound_define_after_endif = true;
-
-static const char copyright_filename         [] = "copyright_notice.txt";   //  relative to MET_BASE_DIR
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,43 +23,22 @@ using namespace std;
 #include <cmath>
 
 #include "code.h"
+#include "enum_to_string.h"
 
+#include "str_wrappers.h"
 #include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
+static const bool do_name_len_decl              = true;
+
+static const bool echo_pound_define_after_endif = true;
+
+static const char copyright_filename         [] = "copyright_notice.txt";   //  relative to MET_BASE_DIR
+
 static const char * sep = "////////////////////////////////////////////////////////////////////////\n";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  these have external linkage
-   //
-
-
-extern bool do_prefix;
-
-extern const char * header_suffix;
-
-extern bool do_angle_brackets;
-
-extern bool do_array;
-
-extern bool do_reverse;
-
-extern bool do_concat_string;
-
-extern bool verbose;
-
-extern unixtime generation_gmt;
-
-extern const char * header_filename;
-
-extern const char * program_name;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,7 +80,7 @@ char upper[256];
 char pound_define[256];
 char junk[256];
 int len, scope_len, max_len;
-char * len_name = (char *) 0;
+char * len_name = (char *) NULL;
 
 
 //    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
@@ -121,12 +90,12 @@ max_len = 0;
 
 
 
-if ( e.scope() )  scope_len = strlen(e.scope()) + 2;   //  includes "::"
+if ( e.scope() )  scope_len = m_strlen(e.scope()) + 2;   //  includes "::"
 else              scope_len = 0;
 
 for (j=0; j<(e.n_ids()); ++j)  {
 
-   len = strlen(e.id(j));
+   len = m_strlen(e.id(j));
 
    len += scope_len;
 
@@ -265,11 +234,6 @@ if ( do_array )  {
 
 }
 
-// f << "#endif   //  " << pound_define << "\n"
-//   << "\n\n"
-//   << sep
-//   << "\n\n";
-
 f << "#endif";
 
 if ( echo_pound_define_after_endif )  f << "   /*  " << pound_define << "  */\n";
@@ -285,7 +249,7 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) 0; }
+if ( len_name )  { delete [] len_name;  len_name = (char *) NULL; }
 
 return;
 
@@ -301,7 +265,6 @@ void write_cs_header(const EnumInfo & e)
 
 if ( e.n_ids() == 0 )  return;
 
-int j;
 ofstream f;
 char filename[256];
 char lower[256];
@@ -309,7 +272,7 @@ char upper[256];
 char pound_define[256];
 char junk[256];
 int len, scope_len, max_len;
-char * len_name = (char *) 0;
+char * len_name = (char *) NULL;
 
 
 //    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
@@ -319,12 +282,12 @@ max_len = 0;
 
 
 
-if ( e.scope() )  scope_len = strlen(e.scope()) + 2;   //  includes "::"
+if ( e.scope() )  scope_len = m_strlen(e.scope()) + 2;   //  includes "::"
 else              scope_len = 0;
 
-for (j=0; j<(e.n_ids()); ++j)  {
+for (int j=0; j<(e.n_ids()); ++j)  {
 
-   len = strlen(e.id(j));
+   len = m_strlen(e.id(j));
 
    len += scope_len;
 
@@ -486,7 +449,7 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) 0; }
+if ( len_name )  { delete [] len_name;  len_name = (char *) NULL; }
 
 return;
 
@@ -766,7 +729,7 @@ for (j=0; j<(e.n_ids()); ++j)  {
    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
    else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
 
-   k = strlen(e.id(j));
+   k = m_strlen(e.id(j));
 
    out << "   " << "case " << full_id << ":   ";
 
@@ -850,7 +813,7 @@ for (j=0; j<(e.n_ids()); ++j)  {
    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
    else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
 
-   k = strlen(e.id(j));
+   k = m_strlen(e.id(j));
 
    out << "   " << "case " << full_id << ":   ";
 
@@ -927,7 +890,7 @@ n = e.n_ids();
 
 for (j=0; j<n; ++j)  {
 
-   k = strlen(e.id(j));
+   k = m_strlen(e.id(j));
 
    if ( j == 0 )   out << "     ";
    else            out << "else ";
@@ -991,7 +954,7 @@ void make_lowercase(const char * in, char * out)
 
 int j, k;
 
-k = strlen(in);
+k = m_strlen(in);
 
 for (j=0; j<k; ++j)  {
 
@@ -1016,7 +979,7 @@ void make_uppercase(const char * in, char * out)
 
 int j, k;
 
-k = strlen(in);
+k = m_strlen(in);
 
 for (j=0; j<k; ++j)  {
 
@@ -1045,7 +1008,7 @@ unixtime t;
 char junk[256];
 const char * ampm = "am";
 const char * zone = "MST";
-const char * short_name = (const char *) 0;
+const char * short_name = (const char *) NULL;
 
 
 
@@ -1080,7 +1043,7 @@ snprintf(junk, sizeof(junk), "%s %d, %d   %d:%02d %s %s",
    //  strip the leading path from header_filename
    //
 
-j = strlen(header_filename) - 1;
+j = m_strlen(header_filename) - 1;
 
 while ( (j >= 0) && (header_filename[j] != '/') )  --j;
 
@@ -1118,10 +1081,11 @@ void patch_name(char * len_name)
 
 int j, n;
 int pos;
-char * new_name = (char *) 0;
+char * new_name = (char *) NULL;
 char c;
+const char *method_name = "patch_name() -> ";
 
-n = strlen(len_name);
+n = m_strlen(len_name);
 
 new_name = new char [n + 1];
 
@@ -1151,14 +1115,14 @@ for (j=0; j<n; ++j)  {
 
 new_name[pos++] = (char) 0;
 
-strcpy(len_name, new_name);
+m_strcpy(len_name, new_name, method_name);
 
 
    //
    //  done
    //
 
-if ( new_name )  { delete [] new_name;  new_name = (char *) 0; }
+if ( new_name )  { delete [] new_name;  new_name = (char *) NULL; }
 
 return;
 
@@ -1196,7 +1160,7 @@ for (j=0; j<=jmax; ++j)  {
 
    f << "   ";
 
-   for (k=strlen(e.id(j)); k<max_len; ++k)  f.put(' ');
+   for (k=m_strlen(e.id(j)); k<max_len; ++k)  f.put(' ');
 
    f << "//  # " << j;
 

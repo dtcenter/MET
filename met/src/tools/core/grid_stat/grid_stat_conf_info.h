@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -186,9 +186,11 @@ class GridStatVxOpt {
       int              baddeley_p;        // Exponent for lp-norm
       double           baddeley_max_dist; // Maximum distance constant
       double           fom_alpha;         // FOM Alpha
-      double           zhu_weight;        // Zhu Weight 
+      double           zhu_weight;        // Zhu Weight
+      UserFunc_1Arg    beta_value_fx;     // G-Beta Value Function
 
-      bool             rank_corr_flag;   // Flag for computing rank correlations
+      double           hss_ec_value;      // MCTS HSS expected correct value
+      bool             rank_corr_flag;    // Flag for computing rank correlations
 
       // Output file options
       STATOutputType    output_flag[n_txt]; // Flag for each output line type

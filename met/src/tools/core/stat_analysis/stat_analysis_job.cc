@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -42,6 +42,7 @@
 //                    -out_stat, but not both.
 //   021    04/12/21  Halley Gotway   MET #1735 Support multiple 
 //                    -out_thresh and -out_line_type options.
+//   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,13 +114,26 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
 
    job.out_alpha       = c.lookup_double(conf_key_out_alpha, false);
 
-   boot_info         = parse_conf_boot(&c);
+   boot_info           = parse_conf_boot(&c);
    job.boot_interval   = boot_info.interval;
    job.boot_rep_prop   = boot_info.rep_prop;
    job.n_boot_rep      = boot_info.n_rep;
    job.set_boot_rng(boot_info.rng.c_str());
    job.set_boot_seed(boot_info.seed.c_str());
 
+   job.ss_index_name       = c.lookup_string(conf_key_ss_index_name);
+   job.ss_index_vld_thresh = c.lookup_double(conf_key_ss_index_vld_thresh);
+
+   // Check that ss_index_vld_thresh is in [0, 1].
+   if(job.ss_index_vld_thresh < 0.0 ||
+      job.ss_index_vld_thresh > 1.0) {
+      mlog << Error << "\nset_job_from_config() -> "
+           << "\"" << conf_key_ss_index_vld_thresh << "\" ("
+           << job.ss_index_vld_thresh << ") must be set between 0 and 1.\n\n";
+      throw(1);
+   }
+
+   job.hss_ec_value    = c.lookup_double(conf_key_hss_ec_value);
    job.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    job.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
 
@@ -188,7 +202,10 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
       job.job_type != stat_job_summary   &&
       job.job_type != stat_job_aggr      &&
       job.job_type != stat_job_aggr_stat &&
-      job.job_type != stat_job_ramp) {
+      job.job_type != stat_job_ramp      &&
+      job.job_type != stat_job_go_index  &&
+      job.job_type != stat_job_cbs_index &&
+      job.job_type != stat_job_ss_index) {
       mlog << Warning << "\nThe -by option is ignored for the \""
            << statjobtype_to_string(job.job_type) << "\" job type.\n\n";
    }
@@ -224,9 +241,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
          break;
 
       case(stat_job_go_index):
-         do_job_go_index(jobstring, f, job, n_in, n_out, sa_out);
-         break;
-
+      case(stat_job_cbs_index):
       case(stat_job_ss_index):
          do_job_ss_index(jobstring, f, job, n_in, n_out, sa_out);
          break;
@@ -367,7 +382,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
-      mlog << Warning << "\ndo_job_aggr() -> "
+      mlog << Warning << "\ndo_job_summary() -> "
            << "no matching STAT lines found for job: " << jobstring
            << "\n\n";
       return;
@@ -957,9 +972,13 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       }
 
       //
-      // Parse the input MPR lines
+      // Aggregate the input MPR lines
       //
       aggr_mpr_lines(f, job, mpr_map, n_in, n_out);
+
+      //
+      // Write the output
+      //
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_mpr(job, *it, mpr_map, out_at, tmp_dir.c_str(), rng_ptr);
          if(!job.stat_out) write_table(out_at, sa_out);
@@ -3931,75 +3950,100 @@ void write_job_ramp_cols(const STATAnalysisJob &job, AsciiTable &at,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// The do_job_go_index() routine is used to compute the GO Index.
-// The GO Index is a special case of the Skill Score Index consisting
-// of a predefined set of variables, levels, lead times, statistics,
-// and weights.
-// For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
-// - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
-// - Dewpoint Temperature at the surface(b), 850(b), 700(b), 400(b) mB
-// - Temperature at the surface(b), 400(a) mB
-// - Height at 400(a) mB
-// - Sea Level Pressure(b)
-// Where (a) means weights of 4, 3, 2, 1 for the lead times, and
-//       (b) means weights of 8, 6, 4, 2 for the lead times.
-// The RMSE values are dervied from the partial sums in the SL1L2 lines.
-//
-////////////////////////////////////////////////////////////////////////
 
-void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
-                     STATAnalysisJob &job, int &n_in, int &n_out,
-                     ofstream *sa_out) {
-   double go_index;
-   AsciiTable out_at;
+void write_job_ss_index(STATAnalysisJob &job,
+                        map<ConcatString, AggrSSIndexInfo> &m,
+                        AsciiTable &at) {
+   map<ConcatString, AggrSSIndexInfo>::iterator it;
+   int n_row, n_col, r, c;
+   StatHdrColumns shc;
+   SSIDXData ssidx_data;
 
    //
-   // Compute the GO Index as a special case of the Skill Score Index
+   // Setup the output table
    //
-   go_index = compute_ss_index(jobstring, f, job, n_in, n_out);
+   n_row = 1 + m.size();
+   n_col = 1 + job.by_column.n() + n_ssidx_columns;
 
    //
-   // Check for no matching STAT lines
+   // Prepare the output
    //
-   if(n_out == 0) {
-      mlog << Warning << "\ndo_job_go_index() -> "
-           << "no matching STAT lines found for job: " << jobstring
-           << "\n\n";
-      return;
+   if(job.stat_out) {
+      job.setup_stat_file(n_row, 0);
+   }
+   else {
+      write_job_aggr_hdr(job, n_row, n_col, at);
+      c = 1 + job.by_column.n();
+      write_header_row(ssidx_columns, n_ssidx_columns, 0, at, 0, c);
    }
 
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, 2);
-   setup_table(out_at, 1, job.get_precision());
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_go_columns, n_job_go_columns, 0, out_at, 0, 1);
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
-   // Write the data row
+   // Loop through the map
    //
-   out_at.set_entry(1, 0,  "GO_INDEX:");
-   out_at.set_entry(1, 1,  go_index);
+   for(it = m.begin(), r=1; it != m.end(); it++) {
 
-   //
-   // Write the Ascii Table and the job command line
-   //
-   write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
+      //
+      // Format the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, job.by_column,
+                                   job.hdr_name, job.hdr_value, stat_ssidx);
+
+      //
+      // Set FCST/OBS_VAR = skill score index type
+      // Set FCST/OBS_UNITS = FCST/OBS_LEV = NA
+      //
+      shc.set_fcst_var(it->second.job_info.ss_index_name);
+      shc.set_obs_var(it->second.job_info.ss_index_name);
+      shc.set_fcst_units(na_str);
+      shc.set_obs_units(na_str);
+      shc.set_fcst_lev(na_str);
+      shc.set_obs_lev(na_str);
+
+      //
+      // Retrieve the SSIDXData
+      //
+      ssidx_data = it->second.job_info.compute_ss_index();
+
+      //
+      // Skip empty output
+      //
+      if(ssidx_data.n_vld == 0) continue;
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // SSIDX output line
+      //
+      if(job.stat_out) {
+         write_header_cols(shc, job.stat_at, job.stat_row);
+         write_ssidx_cols(ssidx_data, job.stat_at,
+                          job.stat_row++, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, it->second.job_info.ss_index_name);
+         write_case_cols(it->first, at, r, c);
+         write_ssidx_cols(ssidx_data, at, r++, c);
+      }
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 //
-// The do_job_ss_index() routine is used to compute the generalized
-// Skill Score Index.  This job can be configured to compute a weighted
-// average of skill scores derived from a configurable set of variables,
-// levels, lead times, and statistics.  The skill score index is
-// computed using two models, a forecast model and a reference model.
-// For each statistic in the index, a skill score is computed as:
+// The do_job_ss_index() routine is used to compute the GO Index,
+// CBS Index, or generalized Skill Score Index. This job can be
+// configured to compute a weighted average of skill scores derived
+// from a configurable set of variables, levels, lead times, and
+// statistics. The skill score index is computed using two models,
+// a forecast model and a reference model. For each statistic in
+// the index, a skill score is computed as:
 //   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
 // Where S is the statistic.
 // Next, a weighted average is computed over all the skill scores.
@@ -4012,13 +4056,23 @@ void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
 void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &job, int &n_in, int &n_out,
                      ofstream *sa_out) {
-   double ss_index;
+   map<ConcatString, AggrSSIndexInfo> ssidx_map;
    AsciiTable out_at;
+
+   //
+   // Store the output line type
+   //
+   job.out_line_type.add(stat_ssidx_str);
 
    //
    // Compute the Skill Score Index
    //
-   ss_index = compute_ss_index(jobstring, f, job, n_in, n_out);
+   aggr_ss_index(f, job, ssidx_map, n_in, n_out);
+
+   //
+   // Write the output
+   //
+   write_job_ss_index(job, ssidx_map, out_at);
 
    //
    // Check for no matching STAT lines
@@ -4031,24 +4085,11 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Get the column names
-   //
-   out_at.set_size(2, 2);
-   setup_table(out_at, 1, job.get_precision());
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_ss_columns, n_job_ss_columns, 0, out_at, 0, 1);
-
-   //
-   // Write the data row
-   //
-   out_at.set_entry(1, 0,  "SS_INDEX:");
-   out_at.set_entry(1, 1,  ss_index);
-
-   //
-   // Write the Ascii Table and the job command line
+   // Write the ASCII Table and the job command line
+   // If -out_stat was specified, do not write output
    //
    write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
+   if(!job.stat_out) write_table(out_at, sa_out);
 
    return;
 }
@@ -4237,551 +4278,6 @@ void write_line(const ConcatString &str, ofstream *sa_out) {
    else       cout      << str << "\n" << flush;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
-                        STATAnalysisJob &job, int &n_in, int &n_out) {
-   STATLine line;
-   SL1L2Info si;
-   TTContingencyTable ct;
-   CNTInfo fcst_cnt, ref_cnt;
-   bool keep;
-   int i, n_terms;
-   double fcst_stat, ref_stat, ss, ss_sum, weight_sum;
-   double ss_avg, ss_index;
-
-   //
-   // Check that the -model option has been supplied exactly 2 times.
-   // The first is the forecast model and the second is the reference.
-   //
-   if(job.model.n() != 2) {
-      mlog << Error << "\ncompute_ss_index() -> "
-           << "this job may only be called when the \"-model\" option "
-           << "has been used exactly twice to specify the forecast "
-           << "model followed by the reference model: "
-           << jobstring << "\n\n";
-      throw(1);
-   }
-
-   //
-   // Use the length of the fcst_var array to infer the number of terms.
-   //
-   if((n_terms = job.fcst_var.n()) < 1) {
-      mlog << Error << "\ncompute_ss_index() -> "
-           << "you must define the Skill Score Index to be computed "
-           << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
-           << "\"-line_type\", \"-column\", and \"-weight\" options: "
-           << jobstring << "\n\n";
-      throw(1);
-   }
-
-   //
-   // Check that the required elements are of the same length.
-   //
-   if(n_terms != job.fcst_lev.n()  ||
-      n_terms != job.fcst_lead.n() ||
-      n_terms != job.line_type.n() ||
-      n_terms != job.column.n()    ||
-      n_terms != job.weight.n()) {
-      mlog << Error << "\ncompute_ss_index() -> "
-           << "all filtering parameters for defining the Skill Score "
-           << "Index must be of the same length.  Check \"-fcst_var\", "
-           << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
-           << "\"-column\", and \"-weight\" options: "
-           << jobstring << "\n\n";
-      throw(1);
-   }
-
-   //
-   // Define arrays of jobs for each term in the Skill Score Index.
-   // Separate arrays for the forecast and reference models.
-   //
-   STATAnalysisJob *fcst_job = (STATAnalysisJob *) 0, *ref_job = (STATAnalysisJob *) 0;
-   fcst_job = new STATAnalysisJob [n_terms];
-   ref_job  = new STATAnalysisJob [n_terms];
-
-   //
-   // Define arrays of objects to store the partial sums or contingency
-   // table counts for each term in the Skill Score Index.
-   //
-   SL1L2Info *fcst_si = (SL1L2Info *) 0,  *ref_si = (SL1L2Info *) 0;
-   CTSInfo   *fcst_cts = (CTSInfo *) 0, *ref_cts = (CTSInfo *) 0;
-   fcst_si  = new SL1L2Info [n_terms];
-   ref_si   = new SL1L2Info [n_terms];
-   fcst_cts = new CTSInfo   [n_terms];
-   ref_cts  = new CTSInfo   [n_terms];
-
-
-   //
-   // Define array of line types to be aggregated for each term in the
-   // Skill Score Index.
-   //
-   STATLineType *job_lt = (STATLineType *) 0;
-   job_lt = new STATLineType [n_terms];
-
-   //
-   // Arrays to keep track of the number of stat lines per term
-   //
-   NumArray n_fcst_lines, n_ref_lines;
-
-   mlog << Debug(3) << "Forecast Model  = " << job.model[0] << "\n"
-        << "Reference Model = " << job.model[1] << "\n";
-
-   //
-   // Set up the job for each term in the index.
-   //
-   for(i=0; i<n_terms; i++) {
-
-      //
-      // Initialize the counts
-      //
-      n_fcst_lines.add(0);
-      n_ref_lines.add(0);
-
-      //
-      // Initialize to the full Skill Score Index job
-      //
-      fcst_job[i] = job;
-
-      //
-      // model
-      //
-      fcst_job[i].model.clear();
-      fcst_job[i].model.add(job.model[0]);
-
-      //
-      // fcst_lead
-      //
-      if(job.fcst_lead.n() == n_terms) {
-         fcst_job[i].fcst_lead.clear();
-         fcst_job[i].fcst_lead.add(job.fcst_lead[i]);
-      }
-
-      //
-      // obs_lead
-      //
-      if(job.obs_lead.n() == n_terms) {
-         fcst_job[i].obs_lead.clear();
-         fcst_job[i].obs_lead.add(job.obs_lead[i]);
-      }
-
-      //
-      // fcst_init_hour
-      //
-      if(job.fcst_init_hour.n() == n_terms) {
-         fcst_job[i].fcst_init_hour.clear();
-         fcst_job[i].fcst_init_hour.add(job.fcst_init_hour[i]);
-      }
-
-      //
-      // obs_init_hour
-      //
-      if(job.obs_init_hour.n() == n_terms) {
-         fcst_job[i].obs_init_hour.clear();
-         fcst_job[i].obs_init_hour.add(job.obs_init_hour[i]);
-      }
-
-      //
-      // fcst_var
-      //
-      if(job.fcst_var.n() == n_terms) {
-         fcst_job[i].fcst_var.clear();
-         fcst_job[i].fcst_var.add(job.fcst_var[i]);
-      }
-
-      //
-      // obs_var
-      //
-      if(job.obs_var.n() == n_terms) {
-         fcst_job[i].obs_var.clear();
-         fcst_job[i].obs_var.add(job.obs_var[i]);
-      }
-
-      //
-      // fcst_lev
-      //
-      if(job.fcst_lev.n() == n_terms) {
-         fcst_job[i].fcst_lev.clear();
-         fcst_job[i].fcst_lev.add(job.fcst_lev[i]);
-      }
-
-      //
-      // obs_lev
-      //
-      if(job.obs_lev.n() == n_terms) {
-         fcst_job[i].obs_lev.clear();
-         fcst_job[i].obs_lev.add(job.obs_lev[i]);
-      }
-
-      //
-      // obtype
-      //
-      if(job.obtype.n() == n_terms) {
-         fcst_job[i].obtype.clear();
-         fcst_job[i].obtype.add(job.obtype[i]);
-      }
-
-      //
-      // vx_mask
-      //
-      if(job.vx_mask.n() == n_terms) {
-         fcst_job[i].vx_mask.clear();
-         fcst_job[i].vx_mask.add(job.vx_mask[i]);
-      }
-
-      //
-      // interp_mthd
-      //
-      if(job.interp_mthd.n() == n_terms) {
-         fcst_job[i].interp_mthd.clear();
-         fcst_job[i].interp_mthd.add(job.interp_mthd[i]);
-      }
-
-      //
-      // interp_pnts
-      //
-      if(job.interp_pnts.n() == n_terms) {
-         fcst_job[i].interp_pnts.clear();
-         fcst_job[i].interp_pnts.add(job.interp_pnts[i]);
-      }
-
-      //
-      // fcst_thresh
-      //
-      if(job.fcst_thresh.n() == n_terms) {
-         fcst_job[i].fcst_thresh.clear();
-         fcst_job[i].fcst_thresh.add(job.fcst_thresh[i]);
-      }
-
-      //
-      // obs_thresh
-      //
-      if(job.obs_thresh.n() == n_terms) {
-         fcst_job[i].obs_thresh.clear();
-         fcst_job[i].obs_thresh.add(job.obs_thresh[i]);
-      }
-
-      //
-      // line_type
-      //
-      if(job.line_type.n() == n_terms) {
-         fcst_job[i].line_type.clear();
-         fcst_job[i].line_type.add(job.line_type[i]);
-
-         job_lt[i] = string_to_statlinetype(job.line_type[i].c_str());
-         if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
-            if ( fcst_job )  { delete [] fcst_job;  fcst_job = 0; }
-            if ( ref_job  )  { delete [] ref_job;   ref_job  = 0; }
-            if ( fcst_si  )  { delete [] fcst_si;   fcst_si  = 0; }
-            if ( ref_si   )  { delete [] ref_si;    ref_si   = 0; }
-            if ( fcst_cts )  { delete [] fcst_cts;  fcst_cts = 0; }
-            if ( ref_cts  )  { delete [] ref_cts;   ref_cts  = 0; }
-            if ( job_lt   )  { delete [] job_lt;    job_lt   = 0; }
-            mlog << Error << "\ncompute_ss_index() -> "
-                 << "a Skill Score Index can only be computed using "
-                 << "statistics derived from SL1L2 or CTC line types."
-                 << "\n\n";
-            throw(1);
-         }
-      }
-
-      //
-      // column
-      //
-      if(job.column.n() == n_terms) {
-         fcst_job[i].column.clear();
-         fcst_job[i].column.add(job.column[i]);
-      }
-
-      //
-      // weight
-      //
-      if(job.weight.n() == n_terms) {
-         fcst_job[i].weight.clear();
-         fcst_job[i].weight.add(job.weight[i]);
-      }
-
-      //
-      // Set the reference model job identical to the forecast model
-      // job but with a different model name.
-      //
-      ref_job[i] = fcst_job[i];
-      ref_job[i].model.set(0, job.model[1]);
-
-   } // end for i
-
-   //
-   // Process the STAT lines
-   //
-   n_in = n_out = 0;
-   while(f >> line) {
-
-      if(line.is_header()) continue;
-
-      n_in++;
-
-      //
-      // Loop through the jobs to see if this line should be kept
-      //
-      keep = 0;
-      for(i=0; i<n_terms; i++) {
-
-         //
-         // Check the forecast model job
-         //
-         if(fcst_job[i].is_keeper(line)) {
-            keep = 1;
-            n_fcst_lines.set(i, n_fcst_lines[i]+1);
-
-            if(job_lt[i] == stat_sl1l2) {
-               si.clear();
-               parse_sl1l2_line(line, si);
-               fcst_si[i] += si;
-            }
-            else if(job_lt[i] == stat_ctc) {
-               ct.zero_out();
-               parse_ctc_ctable(line, ct);
-               fcst_cts[i].cts.set_fy_oy(fcst_cts[i].cts.fy_oy() +
-                                         ct.fy_oy());
-               fcst_cts[i].cts.set_fy_on(fcst_cts[i].cts.fy_on() +
-                                         ct.fy_on());
-               fcst_cts[i].cts.set_fn_oy(fcst_cts[i].cts.fn_oy() +
-                                         ct.fn_oy());
-               fcst_cts[i].cts.set_fn_on(fcst_cts[i].cts.fn_on() +
-                                         ct.fn_on());
-            }
-         } // end if fcst_job
-
-         //
-         // Check the reference model job
-         //
-         if(ref_job[i].is_keeper(line)) {
-            keep = 1;
-            n_ref_lines.set(i, n_ref_lines[i]+1);
-
-            if(job_lt[i] == stat_sl1l2) {
-               si.clear();
-               parse_sl1l2_line(line, si);
-               ref_si[i] += si;
-            }
-            else if(job_lt[i]== stat_ctc) {
-               ct.zero_out();
-               parse_ctc_ctable(line, ct);
-               ref_cts[i].cts.set_fy_oy(ref_cts[i].cts.fy_oy() +
-                                        ct.fy_oy());
-               ref_cts[i].cts.set_fy_on(ref_cts[i].cts.fy_on() +
-                                        ct.fy_on());
-               ref_cts[i].cts.set_fn_oy(ref_cts[i].cts.fn_oy() +
-                                        ct.fn_oy());
-               ref_cts[i].cts.set_fn_on(ref_cts[i].cts.fn_on() +
-                                        ct.fn_on());
-            }
-         } // end if ref_job
-      } // end for i
-
-      //
-      // Write line to dump file
-      //
-      if(keep) {
-         job.dump_stat_line(line);
-         n_out++;
-      }
-
-   } // end while
-
-   //
-   // Loop through the terms and compute a skill score for each.
-   //
-   ss_sum = weight_sum = 0.0;
-   for(i=0; i<n_terms; i++) {
-
-      //
-      // Compute continuous stats for the current term
-      //
-      if(job_lt[i] == stat_sl1l2) {
-         fcst_cnt.clear();
-         compute_cntinfo(fcst_si[i], 0, fcst_cnt);
-         ref_cnt.clear();
-         compute_cntinfo(ref_si[i], 0, ref_cnt);
-      }
-      //
-      // Compute categorical stats for the current term
-      //
-      else if(job_lt[i]== stat_ctc) {
-         fcst_cts[i].compute_stats();
-         ref_cts[i].compute_stats();
-      }
-
-      //
-      // Extract the statistic to be used in defining the skill score.
-      // Continuous (only stats derived from SL1L2 lines):
-      //    PR_CORR, ME, ESTDEV, MBIAS, MSE, BCRMSE, RMSE
-      // Categorical:
-      //    BASER, FMEAN, ACC, FBIAS, PODY, PODN, POFD, FAR, CSI, GSS,
-      //    HK, HSS, ODDS
-      //
-
-      fcst_stat = ref_stat = bad_data_double;
-
-      if(strcasecmp(fcst_job[i].column[0].c_str(), "PR_CORR") == 0) {
-         fcst_stat = fcst_cnt.pr_corr.v;
-         ref_stat  = ref_cnt.pr_corr.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ME") == 0) {
-         fcst_stat = fcst_cnt.me.v;
-         ref_stat  = ref_cnt.me.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ESTDEV") == 0) {
-         fcst_stat = fcst_cnt.estdev.v;
-         ref_stat  = ref_cnt.estdev.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MBIAS") == 0) {
-         fcst_stat = fcst_cnt.mbias.v;
-         ref_stat  = ref_cnt.mbias.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MSE") == 0) {
-         fcst_stat = fcst_cnt.mse.v;
-         ref_stat  = ref_cnt.mse.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "BCRMSE") == 0) {
-         fcst_stat = fcst_cnt.bcmse.v;
-         ref_stat  = ref_cnt.bcmse.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "RMSE") == 0) {
-         fcst_stat = fcst_cnt.rmse.v;
-         ref_stat  = ref_cnt.rmse.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "BASER") == 0) {
-         fcst_stat = fcst_cts[i].baser.v;
-         ref_stat  = ref_cts[i].baser.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FMEAN") == 0) {
-         fcst_stat = fcst_cts[i].fmean.v;
-         ref_stat  = ref_cts[i].fmean.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ACC") == 0) {
-         fcst_stat = fcst_cts[i].acc.v;
-         ref_stat  = ref_cts[i].acc.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FBIAS") == 0) {
-         fcst_stat = fcst_cts[i].fbias.v;
-         ref_stat  = ref_cts[i].fbias.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "PODY") == 0) {
-         fcst_stat = fcst_cts[i].pody.v;
-         ref_stat  = ref_cts[i].pody.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "PODN") == 0) {
-         fcst_stat = fcst_cts[i].podn.v;
-         ref_stat  = ref_cts[i].podn.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "POFD") == 0) {
-         fcst_stat = fcst_cts[i].pofd.v;
-         ref_stat  = ref_cts[i].pofd.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FAR") == 0) {
-         fcst_stat = fcst_cts[i].far.v;
-         ref_stat  = ref_cts[i].far.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "CSI") == 0) {
-         fcst_stat = fcst_cts[i].csi.v;
-         ref_stat  = ref_cts[i].csi.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "GSS") == 0) {
-         fcst_stat = fcst_cts[i].gss.v;
-         ref_stat  = ref_cts[i].gss.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "HK") == 0) {
-         fcst_stat = fcst_cts[i].hk.v;
-         ref_stat  = ref_cts[i].hk.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "HSS") == 0) {
-         fcst_stat = fcst_cts[i].hss.v;
-         ref_stat  = ref_cts[i].hss.v;
-      }
-      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ODDS") == 0) {
-         fcst_stat = fcst_cts[i].odds.v;
-         ref_stat  = ref_cts[i].odds.v;
-      }
-
-      //
-      // Check for conditions when a skill score cannot be computed.
-      //
-      if(nint(n_fcst_lines[i]) == 0 || nint(n_ref_lines[i]) == 0   ||
-         is_bad_data(fcst_stat)     || is_bad_data(ref_stat) ||
-         is_eq(ref_stat, 0.0)) {
-         ss = bad_data_double;
-      }
-      //
-      // Compute the skill score and keep a running sum of the skill
-      // scores and weights.
-      //
-      else {
-         ss = 1.0 - (fcst_stat*fcst_stat)/(ref_stat*ref_stat);
-         ss_sum     += ss*fcst_job[i].weight[0];
-         weight_sum += fcst_job[i].weight[0];
-      }
-
-      mlog << Debug(3) << "Skill Score Index Term " << i+1
-           << ": fcst_var = " << fcst_job[i].fcst_var[0]
-           << ", fcst_lev = " << fcst_job[i].fcst_lev[0]
-           << ", fcst_lead_sec = " << fcst_job[i].fcst_lead[0]
-           << ", line_type = " << fcst_job[i].line_type[0]
-           << ", column = " << fcst_job[i].column[0]
-           << ", n_fcst = " << n_fcst_lines[i]
-           << ", n_ref = " << n_ref_lines[i]
-           << ", fcst = " << fcst_stat
-           << ", ref = " << ref_stat
-           << ", skill = " << ss
-           << ", weight = " << fcst_job[i].weight[0] << "\n";
-
-      //
-      // Check the the number of aggregated lines differ.
-      //
-      if(nint(n_fcst_lines[i]) != nint(n_ref_lines[i])) {
-         mlog << Warning << "\ncompute_ss_index() -> "
-              << "the number of aggregated forecast and reference lines "
-              << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
-              << ") for term " << i+1 << ".\n\n";
-      }
-
-      if(is_bad_data(ss)) {
-         mlog << Warning << "\ncompute_ss_index() -> "
-              << "can't compute skill score for term " << i+1 << ".\n\n";
-      }
-
-   } // end for i
-
-   //
-   // Compute the weighted average of the skill scores.
-   //
-   if(is_eq(weight_sum, 0.0)) ss_avg = bad_data_double;
-   else                       ss_avg = ss_sum/weight_sum;
-
-   //
-   // Compute the Skill Score Index value.
-   //
-   if(is_bad_data(ss_avg) ||
-      is_eq(ss_avg, 1.0)) ss_index = bad_data_double;
-   else                   ss_index = sqrt(1.0/(1.0 - ss_avg));
-
-   mlog << Debug(3) << "Skill Score Index Weighted Average = " << ss_avg << "\n"
-        << "Skill Score Index Value = " << ss_index << "\n";
-
-   //
-   // Clean up allocated memory.
-   //
-   if(fcst_job) { delete [] fcst_job; fcst_job = (STATAnalysisJob *) 0; }
-   if(ref_job)  { delete [] ref_job;  ref_job  = (STATAnalysisJob *) 0; }
-   if(fcst_si)  { delete [] fcst_si;  fcst_si  = (SL1L2Info *)       0; }
-   if(ref_si)   { delete [] ref_si;   ref_si   = (SL1L2Info *)       0; }
-   if(fcst_cts) { delete [] fcst_cts; fcst_cts = (CTSInfo *)         0; }
-   if(ref_cts)  { delete [] ref_cts;  ref_cts  = (CTSInfo *)         0; }
-   if(job_lt)   { delete [] job_lt;   job_lt   = (STATLineType *)    0; }
-
-   return(ss_index);
 }
 
 ////////////////////////////////////////////////////////////////////////

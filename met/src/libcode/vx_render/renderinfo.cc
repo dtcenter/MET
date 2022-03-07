@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,7 +157,7 @@ void RenderInfo::add_filter(const int k)
 {
 
 
-if ( Nfilters > max_filters )  {
+if ( Nfilters >= max_filters )  {
 
    mlog << Error << "\nRenderInfo::add_filter() -> "
         << "too many filters!\n\n";

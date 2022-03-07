@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -54,32 +54,42 @@ static const char * atcf_gen_reg_exp = "atcf_gen";
 // ATCF file name regular expression 
 static const char * atcf_reg_exp = ".dat";
 
+// Genesis shapefile regular expression
+static const char * gen_shp_reg_exp = "gtwo_areas.*.shp";
+
 // Default configuration file name
 static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   fho_columns, ctc_columns, cts_columns, genmpr_columns
+   fho_columns, ctc_columns,   cts_columns,
+   pct_columns, pstd_columns,  pjc_columns,
+   prc_columns, genmpr_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_fho_columns, n_ctc_columns, n_cts_columns, n_genmpr_columns
+   n_fho_columns, n_ctc_columns,   n_cts_columns,
+   n_pct_columns, n_pstd_columns,  n_pjc_columns,
+   n_prc_columns, n_genmpr_columns
 };
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "fho", "ctc", "cts", "genmpr"
+   "fho", "ctc", "cts", "pct", "pstd", "pjc", "prc", "genmpr"
 };
-
-const ConcatString genesis_name    ("GENESIS");
-const ConcatString genesis_dev_name("GENESIS_DEV");
-const ConcatString genesis_ops_name("GENESIS_OPS");
 
 // Maximum Best track cyclone number to be processed
 // Cyclone numbers > 50 are for testing or invests
 static const int max_best_cyclone_number = 50;
+
+// 2, 5, and 7 days shapefile probabilities
+static const int max_n_shape_prob = 3;
+static const int shape_prob_lead_hr[max_n_shape_prob] = {
+   48, 120, 168
+};
+static const int shape_prob_search_sec = 168*sec_per_hour;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -89,7 +99,9 @@ static const int max_best_cyclone_number = 50;
 
 // Input files
 static StringArray   genesis_source, genesis_model_suffix;
-static StringArray   track_source, track_model_suffix;
+static StringArray   edeck_source,   edeck_model_suffix;
+static StringArray   shape_source;
+static StringArray   track_source,   track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;
 

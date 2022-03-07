@@ -1,10 +1,8 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -162,6 +160,8 @@ void IcodeCell::assign(const IcodeCell & icc)
 
 {
 
+const char *method_name = "IcodeCell::assign() -> ";
+
 i = icc.i;
 
 d = icc.d;
@@ -170,17 +170,13 @@ type = icc.type;
 
 if ( type == identifier )  {
 
-   name = new char [1 + strlen(icc.name)];
-
-   strcpy(name, icc.name);
+   name = m_strcpy2(icc.name, method_name, "name");
 
 }
 
 if ( type == character_string )  {
 
-   text = new char [1 + strlen(icc.text)];
-
-   strcpy(text, icc.text);
+   text = m_strcpy2(icc.text, method_name, "text");
 
 }
 
@@ -262,7 +258,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::as_double() const -> bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -289,7 +284,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::as_int() const -> bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -392,7 +386,6 @@ switch ( type )  {
    default:
       cerr << "\n\n  IcodeCell::dump() -> unrecognized type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -416,13 +409,13 @@ void IcodeCell::set_identifier(const char * Text)
 
 {
 
+const char *method_name = "IcodeCell::set_identifier() -> ";
+
 clear();
 
 type = identifier;
 
-name = new char [1 + strlen(Text)];
-
-strcpy(name, Text);
+name = m_strcpy2(Text, method_name);
 
 
 return;
@@ -437,17 +430,13 @@ void IcodeCell::set_string(const char * Text)
 
 {
 
-clear();
+const char *method_name = "IcodeCell::set_string() -> ";
 
-const int n = strlen(Text);
+clear();
 
 type = character_string;
 
-text = new char [1 + n];
-
-strcpy(text, Text);
-
-text[n] = 0;
+text = m_strcpy2(Text, method_name);
 
 
 return;

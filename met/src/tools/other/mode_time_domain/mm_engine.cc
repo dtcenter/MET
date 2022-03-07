@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -190,7 +190,7 @@ void MM_Engine::do_match_merge()
 
 {
 
-int j, k, n;
+int j, k;
 int f_i, o_i;
 
 
@@ -234,30 +234,31 @@ for (j=0; j<(graph.n_fcst()); ++j)  {
 
 const EquivalenceClass * eq = 0;
 
-
 N_Composites = 0;
+IntArray index_list;
 
 for (j=0; j<(part.n_elements()); ++j)  {
 
    eq = part(j);
 
    if ( eq->n_elements() <= 1 )  continue;
+
+   index_list.add(j);
 
    ++N_Composites;
 
 }   //  for j
 
-if ( N_Composites > 0 )  comp_to_eq = new int [N_Composites];
+if ( N_Composites > 0 ) {
 
-n = 0;
+   if ( comp_to_eq ) delete [] comp_to_eq;
+   comp_to_eq = new int [index_list.n()];
 
-for (j=0; j<(part.n_elements()); ++j)  {
+   for (j=0; j<index_list.n(); ++j)  {
 
-   eq = part(j);
-
-   if ( eq->n_elements() <= 1 )  continue;
-
-   comp_to_eq[n++] = j;
+      comp_to_eq[j] = index_list[j];
+   
+   }
 
 }
 

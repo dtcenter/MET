@@ -14,7 +14,6 @@ using namespace std;
 
 #include "vx_log.h"
 #include "empty_string.h"
-#include "string_fxns.h"
 
 #include "python3_util.h"
 #include "python3_script.h"
@@ -245,10 +244,10 @@ void Python3_Script::import_read_tmp_ascii_py(void)
 
 {
 
-ConcatString module;
+ConcatString py_module;
 
-module << cs_erase
-       << replace_path(read_tmp_ascii_py);
+py_module << cs_erase
+          << replace_path(read_tmp_ascii_py);
 
 ConcatString command;
 
@@ -256,14 +255,14 @@ run_python_string("import sys");
 
 command << cs_erase
         << "sys.path.append(\""
-        << module.dirname().c_str()
+        << py_module.dirname().c_str()
         << "\")";
 
 mlog << Debug(3) << command << "\n";
 
 run_python_string(command.text());
 
-mlog << Debug(2) << "Importing " << module << "\n";
+mlog << Debug(2) << "Importing " << py_module << "\n";
 
 ConcatString path = "read_tmp_ascii";
 

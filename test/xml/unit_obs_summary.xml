@@ -10,9 +10,9 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
-<met_test>
+<!-- Requires: unit_ascii2nc.xml -->
 
-  <!--  Depends on unit_ascii2nc to generate dup_test.nc obs file -->
+<met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>false</exit_on_fail>
@@ -21,11 +21,11 @@
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
     &DATA_DIR_OBS;/ascii/obs_sum_test_qty.txt \
-    &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+    &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
     -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/obs_sum_test.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/obs_summary/obs_sum_test.nc</point_nc>
     </output>
   </test>
   
@@ -38,13 +38,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NONE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NONE_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_NONE_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_NONE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -57,13 +57,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NEAREST_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NEAREST_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_NEAREST_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_NEAREST_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -76,13 +76,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MIN_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MIN_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MIN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MIN_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -95,13 +95,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MAX_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MAX_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MAX_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MAX_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -114,13 +114,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UW_MEAN_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_UW_MEAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_UW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
   
@@ -133,13 +133,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_DW_MEAN_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_DW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_DW_MEAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_DW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -152,13 +152,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MEDIAN_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MEDIAN_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MEDIAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_MEDIAN_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -171,13 +171,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_PERC_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_PERC_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_PERC_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_PERC_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -188,13 +188,13 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &OUTPUT_DIR;/obs_summary/obs_sum_test.nc \
       &CONFIG_DIR;/PointStatConfig_obs_summary_all \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/obs_summary -v 3
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/obs_summary/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
   

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,6 +71,9 @@ void TCPairsConfInfo::clear() {
    InitExc.clear();
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
+   ValidInc.clear();
+   ValidExc.clear();
+   WriteValid.clear();
    InitMaskName.clear();
    InitPolyMask.clear();
    InitGridMask.clear();
@@ -171,6 +174,21 @@ void TCPairsConfInfo::process_config() {
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
+
+   // Conf: ValidInc
+   sa = Conf.lookup_string_array(conf_key_valid_inc);
+   for(i=0; i<sa.n_elements(); i++)
+      ValidInc.add(timestring_to_unix(sa[i].c_str()));
+
+   // Conf: ValidExc
+   sa = Conf.lookup_string_array(conf_key_valid_exc);
+   for(i=0; i<sa.n_elements(); i++)
+      ValidExc.add(timestring_to_unix(sa[i].c_str()));
+
+   // Conf: WriteValid
+   sa = Conf.lookup_string_array(conf_key_write_valid);
+   for(i=0; i<sa.n_elements(); i++)
+      WriteValid.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);

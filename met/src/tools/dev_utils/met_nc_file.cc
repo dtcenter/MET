@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -62,9 +62,9 @@ MetNcFile::~MetNcFile()
 
 
 bool MetNcFile::readFile(const int desired_grib_code,
-			 const string &desired_station_id,
-			 const string &desired_message_type,
-			 vector< SDObservation > &observations)
+                         const string &desired_station_id,
+                         const string &desired_message_type,
+                         vector< SDObservation > &observations)
 {
   static const string method_name = "MetNcFile::readFile()";
 
@@ -77,7 +77,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   if (!_ncFile || IS_INVALID_NC_P(_ncFile))
   {
     mlog << Error << "\n" << method_name << " -> trouble opening netCDF file "
-	 << _filePath << "\n\n";
+         << _filePath << "\n\n";
     //_ncFile->close();
     delete _ncFile;
     _ncFile = (NcFile *) 0;
@@ -184,7 +184,6 @@ bool MetNcFile::readFile(const int desired_grib_code,
   long lengths[2] = { 1, 1 };
   
   lengths[0] = hdr_buf_size;
-  lengths[1] = strl_count;
 
   //
   // Get the corresponding header message type
@@ -256,8 +255,6 @@ bool MetNcFile::readFile(const int desired_grib_code,
       break;
 
     // Read the current observation quality flag
-    //strncpy(obs_qty_str, obs_qty_str_block[i_offset], strl_count);
-      
 
     // Get the header index and variable type for this observation.
 
@@ -279,21 +276,24 @@ bool MetNcFile::readFile(const int desired_grib_code,
     char station_id_buffer[max_str_len];
     char hdr_vld_buffer[max_str_len];
     // Read the corresponding header type for this observation
-    str_length = strlen(hdr_typ_str_full[hdr_index]);
+    str_length = m_strlen(hdr_typ_str_full[hdr_index]);
     if (str_length > typ_len) str_length = typ_len;
-    strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length);
+    m_strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length,
+              method_name.c_str(), "message_type_buffer");
     message_type_buffer[str_length] = bad_data_char;
 
     // Read the corresponding header Station ID for this observation
-    str_length = strlen(hdr_sid_str_full[hdr_index]);
+    str_length = m_strlen(hdr_sid_str_full[hdr_index]);
     if (str_length > sid_len) str_length = sid_len;
-    strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length);
+    m_strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length,
+              method_name.c_str(), "station_id_buffer");
     station_id_buffer[str_length] = bad_data_char;
 
     // Read the corresponding valid time for this observation
-    str_length = strlen(hdr_vld_str_full[hdr_index]);
+    str_length = m_strlen(hdr_vld_str_full[hdr_index]);
     if (str_length > vld_len) str_length = vld_len;
-    strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length);
+    m_strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length,
+              method_name.c_str(), "hdr_vld_buffer");
     hdr_vld_buffer[str_length] = bad_data_char;
     
 

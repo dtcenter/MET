@@ -107,21 +107,24 @@ obs_bufr_map = [];
 // abbreviations in the output.  This default map is appended to obs_bufr_map.
 // This should not typically be overridden.
 //
-obs_prefbufr_map = [
-   { key = "POB";     val = "PRES";  },
-   { key = "QOB";     val = "SPFH";  },
-   { key = "TOB";     val = "TMP";   },
-   { key = "ZOB";     val = "HGT";   },
-   { key = "UOB";     val = "UGRD";  },
-   { key = "VOB";     val = "VGRD";  },
-   { key = "D_DPT";   val = "DPT";   },
-   { key = "D_WDIR";  val = "WDIR";  },
-   { key = "D_WIND";  val = "WIND";  },
-   { key = "D_RH";    val = "RH";    },
-   { key = "D_MIXR";  val = "MIXR";  },
-   { key = "D_PRMSL"; val = "PRMSL"; },
-   { key = "D_PBL";   val = "PBL";   },
-   { key = "D_CAPE";  val = "CAPE";  }
+obs_prepbufr_map = [
+   { key = "POB";      val = "PRES";   },
+   { key = "QOB";      val = "SPFH";   },
+   { key = "TOB";      val = "TMP";    },
+   { key = "ZOB";      val = "HGT";    },
+   { key = "UOB";      val = "UGRD";   },
+   { key = "VOB";      val = "VGRD";   },
+   { key = "HOVI";     val = "VIS";    },
+   { key = "TOCC";     val = "TCDC";   },
+   { key = "D_DPT";    val = "DPT";    },
+   { key = "D_WDIR";   val = "WDIR";   },
+   { key = "D_WIND";   val = "WIND";   },
+   { key = "D_RH";     val = "RH";     },
+   { key = "D_MIXR";   val = "MIXR";   },
+   { key = "D_PRMSL";  val = "PRMSL";  },
+   { key = "D_PBL";    val = "PBL";    },
+   { key = "D_CAPE";   val = "CAPE";   },
+   { key = "D_MLCAPE"; val = "MLCAPE"; }
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,6 +156,6 @@ time_summary = {
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir = "/tmp";
-version = "V10.0.0";
+version = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

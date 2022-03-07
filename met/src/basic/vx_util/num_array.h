@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,12 +21,7 @@
 #include <iostream>
 
 #include "concat_string.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int num_array_alloc_inc = 1000;
+#include "is_bad_data.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,11 +35,7 @@ class NumArray {
 
       void assign(const NumArray &);
 
-      double * e;
-
-      int Nelements;
-
-      int Nalloc;
+      vector<double> e;
 
       bool Sorted;
 
@@ -59,15 +50,15 @@ class NumArray {
 
       void erase();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       void dump(ostream &, int depth = 0) const;
 
       double operator[](int) const;
 
       const double * vals() const;
-      double * buf() const;
-
+      double * buf();
+      
       int has(int, bool forward=true)    const;
       int has(double, bool forward=true) const;
 
@@ -79,8 +70,11 @@ class NumArray {
       void add_css(const char *);
       void add_css_sec(const char *);
 
+      void set(int);
+      void set(double);
       void set(int, int);
       void set(int, double);
+      void set_const(double, int);
 
       // Increment value
       void inc(int, int);
@@ -114,6 +108,9 @@ class NumArray {
       double mean_sqrt() const;
       double mean_fisher() const;
 
+      double variance(int skip_index = bad_data_int) const;
+      double stdev(int skip_index = bad_data_int) const;
+
       double wmean(const NumArray &) const;
       double wmean_sqrt(const NumArray &) const;
       double wmean_fisher(const NumArray &) const;
@@ -124,12 +121,12 @@ class NumArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int            NumArray::n_elements()         const { return ( Nelements ); }
-inline int            NumArray::n         ()         const { return ( Nelements ); }
-inline const double * NumArray::vals()               const { return ( e );         }
-inline       double * NumArray::buf()                const { return ( e );         }
-inline void           NumArray::inc(int i, int v)          { e[i] += v; return;    }
-inline void           NumArray::inc(int i, double v)       { e[i] += v; return;    }
+inline int            NumArray::n_elements()         const { return ( e.size() ); }
+inline int            NumArray::n         ()         const { return ( e.size() ); }
+inline const double * NumArray::vals()               const { return ( e.data() ); }
+inline       double * NumArray::buf()                      { return ( e.data() ); }
+inline void           NumArray::inc(int i, int v)          { e[i] += v; return;   }
+inline void           NumArray::inc(int i, double v)       { e[i] += v; return;   }
 
 
 ////////////////////////////////////////////////////////////////////////

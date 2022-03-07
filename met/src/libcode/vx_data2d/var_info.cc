@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -790,3 +790,132 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class EnsVarInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+EnsVarInfo::EnsVarInfo() {
+   ctrl_info = NULL;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+EnsVarInfo::~EnsVarInfo() {
+   clear();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+EnsVarInfo::EnsVarInfo(const EnsVarInfo &f) {
+
+   clear();
+
+   assign(f);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::clear() {
+   vector<InputInfo>::const_iterator it;
+   for(it = inputs.begin(); it != inputs.end(); it++) {
+      if((*it).var_info) { delete (*it).var_info; }
+   }
+
+   if(ctrl_info) { delete ctrl_info; }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::assign(const EnsVarInfo &v) {
+
+   // Copy
+   inputs        = v.inputs;
+   ctrl_info     = v.ctrl_info;
+
+   nc_var_str    = v.nc_var_str;
+   cat_ta        = v.cat_ta;
+   raw_magic_str = v.raw_magic_str;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::add_input(InputInfo input) {
+   inputs.push_back(input);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsVarInfo::inputs_n() {
+   return inputs.size();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
+   ctrl_info = ctrl;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+VarInfo * EnsVarInfo::get_ctrl(int index) {
+   if(ctrl_info) {
+      return ctrl_info;
+   }
+   return inputs[index].var_info;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+VarInfo * EnsVarInfo::get_var_info(int index) {
+   if(inputs[index].var_info) {
+      return inputs[index].var_info;
+   }
+   return inputs[0].var_info;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString EnsVarInfo::get_file(int index) {
+   int file_index = inputs[index].file_index;
+   return (*inputs[index].file_list)[file_index];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsVarInfo::get_file_index(int index) {
+   return inputs[index].file_index;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString EnsVarInfo::get_ens_member_id(int index) {
+   return inputs[index].ens_member_id;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
+   ConcatString magic_str;
+
+   ConcatString name = i_edict.lookup_string("name");
+   ConcatString level = i_edict.lookup_string("level", false);
+
+   if(level.empty()) {
+      return name;
+   }
+
+   if(level[0] != '(') {
+      magic_str << name << "/" << level;
+   } else {
+      magic_str << name << level;
+   }
+
+   return magic_str;
+
+}
+
+////////////////////////////////////////////////////////////////////////

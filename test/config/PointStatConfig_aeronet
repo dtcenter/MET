@@ -54,10 +54,12 @@ fcst = {
 }
 
 obs = {
-   message_type = [ "AERONET_AOD_MEAN_010000" ];
-   sid_inc      = [];
-   sid_exc      = [];
-
+   message_type    = [ "AERONET_AOD_MEAN_010000" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+   
    field = [
       {
         name       = "AOD";
@@ -193,6 +195,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = NONE;
    mpr    = STAT;
@@ -200,11 +203,10 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

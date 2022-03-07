@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -243,41 +243,26 @@ void setup() {
     // Initialize statistical data cube lists
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
 
-        // Size data cubes
-        DataCube* data_count_2d = new DataCube();
-        DataCube* data_count_3d = new DataCube();
-        DataCube* data_mean_2d = new DataCube();
-        DataCube* data_mean_3d = new DataCube();
-        DataCube* data_stdev_2d = new DataCube();
-        DataCube* data_stdev_3d = new DataCube();
-        DataCube* data_max_2d = new DataCube();
-        DataCube* data_max_3d = new DataCube();
-        DataCube* data_min_2d = new DataCube();
-        DataCube* data_min_3d = new DataCube();
-
-        data_count_2d->set_size(n_range, n_azimuth, 1);
-        data_count_3d->set_size(n_range, n_azimuth, n_level);
-        data_mean_2d->set_size(n_range, n_azimuth, 1);
-        data_mean_3d->set_size(n_range, n_azimuth, n_level);
-        data_stdev_2d->set_size(n_range, n_azimuth, 1);
-        data_stdev_3d->set_size(n_range, n_azimuth, n_level);
-        data_max_2d->set_size(n_range, n_azimuth, 1);
-        data_max_3d->set_size(n_range, n_azimuth, n_level);
-        data_min_2d->set_size(n_range, n_azimuth, 1);
-        data_min_3d->set_size(n_range, n_azimuth, n_level);
-
-        data_count_2d->set_constant(0);
-        data_count_3d->set_constant(0);
-        data_mean_2d->set_constant(0);
-        data_mean_3d->set_constant(0);
-        data_stdev_2d->set_constant(0);
-        data_stdev_3d->set_constant(0);
-        data_max_2d->set_constant(-1.0e6);
-        data_max_3d->set_constant(-1.0e6);
-        data_min_2d->set_constant(1.0e6);
-        data_min_3d->set_constant(1.0e6);
-
         if (data_n_dims[i_var] == 2) {
+            // Size data cubes
+            DataCube* data_count_2d = new DataCube();
+            DataCube* data_mean_2d = new DataCube();
+            DataCube* data_stdev_2d = new DataCube();
+            DataCube* data_max_2d = new DataCube();
+            DataCube* data_min_2d = new DataCube();
+
+            data_count_2d->set_size(n_range, n_azimuth, 1);
+            data_mean_2d->set_size(n_range, n_azimuth, 1);
+            data_stdev_2d->set_size(n_range, n_azimuth, 1);
+            data_max_2d->set_size(n_range, n_azimuth, 1);
+            data_min_2d->set_size(n_range, n_azimuth, 1);
+
+            data_count_2d->set_constant(0);
+            data_mean_2d->set_constant(0);
+            data_stdev_2d->set_constant(0);
+            data_max_2d->set_constant(-1.0e6);
+            data_min_2d->set_constant(1.0e6);
+
             data_counts.push_back(data_count_2d);
             data_means.push_back(data_mean_2d);
             data_stdevs.push_back(data_stdev_2d);
@@ -285,6 +270,25 @@ void setup() {
             data_maxs.push_back(data_max_2d);
         }
         if (data_n_dims[i_var] == 3) {
+            // Size data cubes
+            DataCube* data_count_3d = new DataCube();
+            DataCube* data_mean_3d = new DataCube();
+            DataCube* data_stdev_3d = new DataCube();
+            DataCube* data_max_3d = new DataCube();
+            DataCube* data_min_3d = new DataCube();
+
+            data_count_3d->set_size(n_range, n_azimuth, n_level);
+            data_mean_3d->set_size(n_range, n_azimuth, n_level);
+            data_stdev_3d->set_size(n_range, n_azimuth, n_level);
+            data_max_3d->set_size(n_range, n_azimuth, n_level);
+            data_min_3d->set_size(n_range, n_azimuth, n_level);
+
+            data_count_3d->set_constant(0);
+            data_mean_3d->set_constant(0);
+            data_stdev_3d->set_constant(0);
+            data_max_3d->set_constant(-1.0e6);
+            data_min_3d->set_constant(1.0e6);
+
             data_counts.push_back(data_count_3d);
             data_means.push_back(data_mean_3d);
             data_stdevs.push_back(data_stdev_3d);

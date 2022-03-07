@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,6 +71,9 @@ class PairBase {
       MaskLatLon    *mask_llpnt_ptr; // Pointer to Lat/Lon thresholds
                                      // which is not allocated
 
+      const ClimoCDFInfo *cdf_info_ptr; // Pointer to climo distribution info
+                                        // which is not allocated
+
       //////////////////////////////////////////////////////////////////
 
       ConcatString msg_typ;          // Name of the verifying message type
@@ -81,9 +84,6 @@ class PairBase {
       int        interp_wdth;
       GridTemplateFactory::GridTemplates interp_shape;
 
-      // Climo distribution info
-      ClimoCDFInfo cdf_info;
-   
       // Point and Grid Observation Information
       NumArray    o_na;    // Observation value [n_obs]
       NumArray    x_na;    // X [n_obs]
@@ -119,7 +119,7 @@ class PairBase {
       void clear();
       void erase();
 
-      void extend(int, bool exact = true); // Allocate memory for expected size
+      void extend(int); // Allocate memory for expected size
 
       bool is_point_vx() const;
 
@@ -128,6 +128,8 @@ class PairBase {
       void set_mask_sid_ptr(StringArray *);
       void set_mask_llpnt_ptr(MaskLatLon *);
 
+      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
+
       void set_msg_typ(const char *);
       void set_msg_typ_vals(const StringArray &);
 
@@ -135,8 +137,6 @@ class PairBase {
       void set_interp_mthd(InterpMthd);
       void set_interp_wdth(int);
       void set_interp_shape(GridTemplateFactory::GridTemplates);
-
-      void set_climo_cdf_info(const ClimoCDFInfo &);
 
       void set_fcst_ut(unixtime ut);
       void set_check_unique(bool check);
@@ -197,6 +197,7 @@ extern double compute_interp(const DataPlaneArray &dpa,
                              const double obs_v, const double cmn, const double csd,
                              const InterpMthd method, const int width,
                              const GridTemplateFactory::GridTemplates shape,
+                             const bool wrap_lon,
                              const double thresh,
                              const bool spfh_flag, const LevelType lvl_typ,
                              const double to_lvl, const int i_blw, const int i_abv,
@@ -206,6 +207,7 @@ extern void get_interp_points(const DataPlaneArray &dpa,
                               const double obs_x, const double obs_y,
                               const InterpMthd method, const int width,
                               const GridTemplateFactory::GridTemplates shape,
+                              const bool wrap_lon,
                               const double thresh,
                               const bool spfh_flag, const LevelType lvl_typ,
                               const double to_lvl, const int i_blw, const int i_abv,
@@ -213,10 +215,10 @@ extern void get_interp_points(const DataPlaneArray &dpa,
 
 extern bool set_climo_flag(const NumArray &, const NumArray &);
 
-extern void derive_climo_vals(const ClimoCDFInfo &,
+extern void derive_climo_vals(const ClimoCDFInfo *,
                               double, double, NumArray &);
 
-extern NumArray derive_climo_prob(const ClimoCDFInfo &,
+extern NumArray derive_climo_prob(const ClimoCDFInfo *,
                                   const NumArray &, const NumArray &,
                                   const SingleThresh &);
 

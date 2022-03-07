@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -369,9 +369,11 @@ status = get_double_data(sst, n0, n1, dt);
 
 if ( !status || (dt < 0.0) )  {
 
-   mlog << Error
-        << "\n\n  ModisFile::open(const char *) -> bad scan start time ("
-        << dt << ") in file \"" << _filename << "\"\n\n";
+   if ( status ) {
+      mlog << Error
+           << "\n\n  ModisFile::open(const char *) -> bad scan start time ("
+           << dt << ") in file \"" << _filename << "\"\n\n";
+   }
 
    close();
 
@@ -794,12 +796,10 @@ double ModisFile::lat(int n0, int n1) const
 
 {
 
-double v;
+double v = bad_data_double;
 float f[2];
 
-(void) get_float_data(Latitude, n0, n1, f[0]);
-
-v = f[0];
+if (get_float_data(Latitude, n0, n1, f[0])) v = f[0];
 
 return ( v );
 
@@ -813,14 +813,16 @@ double ModisFile::lon(int n0, int n1) const
 
 {
 
-double v;
+double v = bad_data_double;
 float f[2];
 
-(void) get_float_data(Longitude, n0, n1, f[0]);
+if (get_float_data(Longitude, n0, n1, f[0])) {
 
-v = f[0];
+   v = f[0];
 
-v = -v;   //  west longitude positive
+   v = -v;   //  west longitude positive
+
+}
 
 return ( v );
 
@@ -881,22 +883,22 @@ switch ( NumberType )  {
 
     case nt_int_8:
        status = get_int8_data   (Field, n0, n1, c);
-       value = (double) c;
+       if (status) value = (double) c;
        break;
 
     case nt_int_16:       
        status = get_int16_data  (Field, n0, n1, s);
-       value = (double) s;
+       if (status) value = (double) s;
        break;
 
     case nt_float_32:
        status = get_float_data (Field, n0, n1, f);
-       value = (double) f;
+       if (status) value = (double) f;
        break;
 
     case nt_float_64:
        status = get_double_data (Field, n0, n1, d);
-       value = d;
+       if (status) value = d;
        break;
 
 
@@ -907,7 +909,6 @@ switch ( NumberType )  {
            << "\n\n";
 
       exit ( 1 );
-      break;
 
 }   //  switch
 

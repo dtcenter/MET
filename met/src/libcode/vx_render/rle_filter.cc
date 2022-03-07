@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,7 +76,6 @@ switch ( mode )  {
    default:
       mlog << Error << "\nRunLengthEncodeFilter::eat(unsigned char) -> bad mode\n\n";
       exit ( 1 );
-      break;
 
 }
 

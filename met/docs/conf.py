@@ -20,11 +20,11 @@ print(sys.path)
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Halley Gotway, J., K. Newman, H. Soh, J. Opatz, T. Jensen, J. Prestopnik, L. Goodrich, D. Fillmore, B. Brown, R. Bullock, T. Fowler'
-version = 'develop'
+version = '10.1.0-beta6'
 verinfo = version
 release = f'{version}'
-release_year = '2021'
-release_date = f'{release_year}-05-10'
+release_year = '2022'
+release_date = f'{release_year}-03-02'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -32,8 +32,60 @@ copyright = f'{release_year}, {author}'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx']
+# Adding 'sphinx_panels' to use drop-down menus in appendixA. 
+extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx_panels',]
 
+# settings for ReadTheDocs PDF creation
+latex_engine = 'pdflatex'
+latex_theme = 'manual'
+latex_logo = os.path.join('_static','met_logo_2019_09.png')
+latex_show_pagerefs = True
+latex_master_doc = 'Users_Guide/index'
+
+latex_elements = {
+   # The paper size ('letterpaper' or 'a4paper').
+   #
+   'papersize': 'letterpaper',
+   'releasename':"{version}",
+   'fncychap': '\\usepackage{fncychap}',
+   'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
+   'inputenc': '\\usepackage[utf8]{inputenc}',
+   'fontenc': '\\usepackage[LGR,T1]{fontenc}',
+                                                     
+   'figure_align':'H',
+   'pointsize': '11pt',
+                                        
+   'preamble': r'''
+       \usepackage{charter}
+       \usepackage[defaultsans]{lato}
+       \usepackage{inconsolata}
+       \setcounter{secnumdepth}{4}
+       \setcounter{tocdepth}{4}
+    ''',
+                                                                            
+    'sphinxsetup': \
+        'hmargin={0.7in,0.7in}, vmargin={1in,1in}, \
+        verbatimwithframe=true, \
+        TitleColor={rgb}{0,0,0}, \
+        HeaderFamily=\\rmfamily\\bfseries, \
+        InnerLinkColor={rgb}{0,0,1}, \
+        OuterLinkColor={rgb}{0,0,1}',
+        'maketitle': '\\sphinxmaketitle',  
+#        'tableofcontents': ' ',
+        'printindex': ' '
+}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    (latex_master_doc, 
+     'users_guide.tex', 
+     'MET User\'s Guide',
+     ' ', 
+     'manual')
+]
+    
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -112,6 +112,9 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
          ct.set_entry(i, j, atoi(l.get_item(col_str)));
       }
    }
+
+   // EC_VALUE
+   ct.set_ec_value(atof(l.get_item("EC_VALUE")));
 
    return;
 }

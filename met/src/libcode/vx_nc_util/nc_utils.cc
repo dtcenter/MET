@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -129,6 +129,9 @@ bool get_att_value(const NcAtt *att, double &att_val) {
 int get_att_value_int(const NcAtt *att) {
    int value = bad_data_int;
    static const char *method_name = "get_att_value_int(NcAtt) -> ";
+
+   if (IS_INVALID_NC_P(att)) return value;
+
    switch (att->getType().getId()) {
       case NC_BYTE:
          ncbyte b_value;
@@ -221,7 +224,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
 
 long long get_att_value_llong(const NcAtt *att) {
    long long value = bad_data_int;
-   att->getValues(&value);
+   if (IS_VALID_NC_P(att)) att->getValues(&value);
    return value;
 }
 
@@ -229,7 +232,7 @@ long long get_att_value_llong(const NcAtt *att) {
 
 double get_att_value_double(const NcAtt *att) {
    double value = bad_data_double;
-   att->getValues(&value);
+   if (IS_VALID_NC_P(att)) att->getValues(&value);
    return value;
 }
 
@@ -1030,7 +1033,7 @@ char get_char_val(NcVar *var, const int index) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index,
-                    const int len, ConcatString &tmp_cs) {
+                             const int len, ConcatString &tmp_cs) {
    NcVar var = get_var(nc, var_name);
 
    return (get_string_val(&var, index, len, tmp_cs));
@@ -1039,10 +1042,29 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString* get_string_val(NcVar *var, const int index,
-                    const int len, ConcatString &tmp_cs) {
+                             const int len, ConcatString &tmp_cs) {
    char tmp_str[len];
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_string_val() ";
+
+   if (2 != get_dim_count(var)) {
+      mlog << Error << "\n" << method_name << GET_NC_NAME_P(var)
+           << " is not a two dimensional variablle. start offset and count: ("
+           << index << ", " << len << ").\n\n";
+      exit(1);
+   }
+   else {
+      int dim_size1 = get_dim_size(var, 0);
+      int dim_size2 = get_dim_size(var, 1);
+      if ((index > dim_size1) || (len > dim_size2)) {
+         mlog << Error << "\n" << method_name << "The start offset and count ("
+              << index << ", " << len << ") exceeds the dimension size ("
+              << dim_size1 << ", " << dim_size2 << ") for the variable "
+              << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+   }
 
    //
    // Retrieve the character array value from the NetCDF variable.
@@ -1074,9 +1096,29 @@ int get_int_var(NcVar * var, const int index) {
    int k;
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_int_var() ";
 
    k = bad_data_int;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (0 >= dim_size) {
+         if ((index > 0) && (0 >= dim_size)) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (index > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
       var->getVar(start, count, &k);
@@ -1095,6 +1137,25 @@ double get_nc_time(NcVar * var, const int index) {
 
    k = bad_data_double;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (0 >= dim_size) {
+         if (index > 0) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (index > dim_size) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
 
@@ -1160,9 +1221,29 @@ float get_float_var(NcVar * var, const int index) {
    float k;
    std::vector<size_t> start;
    std::vector<size_t> count;
+   const char *method_name = "get_float_var() -> ";
 
    k = bad_data_float;
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
+      int dim_size = get_dim_size(var, dim_idx);
+      if (0 >= dim_size) {
+         if (index > 0) {
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << index << ") should be 0 because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if ((index > dim_size) && (0 < dim_size)){
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The start offset ("
+              << index << ") exceeds the dimension " << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
+
       start.push_back(index);
       count.push_back(1);
       var->getVar(start, count, &k);
@@ -1228,6 +1309,7 @@ bool get_nc_data(NcVar *var, int *data) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long *curs) ";
 
    if (IS_VALID_NC_P(var)) {
       std::vector<size_t> start;
@@ -1235,6 +1317,15 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
 
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
+         int dim_size = get_dim_size(var, idx);
+         if ((curs[idx] > dim_size) && (0 < dim_size)) {
+            NcDim nc_dim = get_nc_dim(var, idx);
+            mlog << Error << "\n" << method_name << "The start offset ("
+                 << curs[idx] << ") exceeds the dimension[" << idx << "] " << dim_size << " "
+                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
          start.push_back((size_t)curs[idx]);
          count.push_back((size_t)1);
       }
@@ -1265,12 +1356,31 @@ bool get_nc_data(NcVar *var, int *data, const long *curs) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cur) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long dim, const long cur) ";
 
    if (IS_VALID_NC_P(var)) {
+      int dim_idx = 0;
       std::vector<size_t> start;
       std::vector<size_t> count;
       start.push_back((size_t)cur);
       count.push_back((size_t)dim);
+      int dim_size = get_dim_size(var, dim_idx);
+      if (0 >= dim_size) {
+         if ((cur > 0) || (dim > 1)) {
+            mlog << Error << "\n" << method_name << "The start offset and count ("
+                 << cur << ", " << dim << ") should be (0, 1) because of no dimension at the variable "
+                 << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+      }
+      else if (((cur+dim) > dim_size) && (0 < dim_size)) {
+         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         mlog << Error << "\n" << method_name << "The start offset and count ("
+              << cur << " + " << dim << ") exceeds the dimension " << dim_size << " "
+              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+         exit(1);
+      }
 
       for (int idx1=0; idx1<dim; idx1++) {
          data[idx1] = bad_data;
@@ -1289,26 +1399,7 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cu
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
-   bool return_status = false;
-
-   if (IS_VALID_NC_P(var)) {
-      std::vector<size_t> start;
-      std::vector<size_t> count;
-      start.push_back((size_t)cur);
-      count.push_back((size_t)dim);
-
-      for (int idx1=0; idx1<dim; idx1++) {
-         data[idx1] = bad_data_int;
-      }
-
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(start, count, data);
-      return_status = true;
-   }
-   return(return_status);
+   return(_get_nc_data(var, data, bad_data_int, dim, cur));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1316,6 +1407,7 @@ bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
 template <typename T>
 bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
    bool return_status = false;
+   const char *method_name = "_get_nc_data(const long *dims, const long *curs) ";
 
    if (IS_VALID_NC_P(var)) {
       std::vector<size_t> start;
@@ -1324,6 +1416,17 @@ bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long 
       int data_size = 1;
       int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
+         int dim_size = get_dim_size(var, idx);
+         if ((curs[idx]+dims[idx]) > dim_size) {
+            NcDim nc_dim = get_nc_dim(var, idx);
+            mlog << Error << "\n" << method_name << "The start offset and count ("
+                 << curs[idx] << ", " << dims[idx] << ") exceeds the dimension["
+                 << idx << "] " << dim_size << " "
+                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
+                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
+            exit(1);
+         }
+
          start.push_back((size_t)curs[idx]);
          count.push_back((size_t)dims[idx]);
          data_size *= dims[idx];
@@ -1432,6 +1535,18 @@ bool get_nc_data(NcVar *var, float *data) {
       int type_id = GET_NC_TYPE_ID_P(var);
       if (NcType::nc_FLOAT == type_id) {
          var->getVar(data);
+      }
+      else if (NcType::nc_DOUBLE == type_id) {
+         int cell_count = 1;
+         for (int idx=0; idx<var->getDimCount();idx++) {
+            cell_count *= get_dim_size(var, idx);
+         }
+         double *double_data = new double[cell_count];
+         var->getVar(double_data);
+         for (int idx=0; idx<cell_count; idx++) {
+            data[idx] = (float)double_data[idx];
+         }
+         delete [] double_data;
       }
       else {
          int cell_count = 1;
@@ -1545,6 +1660,8 @@ bool get_nc_data(NcVar *var, float *data) {
                   if (IS_VALID_NC_P(att_fill_value)) {
                      fill_value = get_att_value_char(att_fill_value);
                   }
+
+                  var->getVar(packed_data);
 
                   if (unsigned_value) {
                      int value;
@@ -2743,7 +2860,6 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
          mlog << Error << "\ncopy_nc_att(NcFile, NcVar, attr_name) -> "
               << "Does not copy this type \"" << dataType << "\" global NetCDF attribute.\n\n";
          exit(1);
-         break;
       }
    }
    if(from_att) delete from_att;
@@ -2779,7 +2895,6 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
               << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
               << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
          exit(1);
-         break;
       }
    }
    if(from_att) delete from_att;
@@ -2819,7 +2934,6 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
             mlog << Error << "\ncopy_nc_atts(NcFile) -> "
                  << "Does not copy this type \"" << dataType << "\" global NetCDF attributes.\n\n";
             exit(1);
-            break;
          }
       }
    }
@@ -2871,7 +2985,6 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
                  << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
                  << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
             exit(1);
-            break;
          }
       }
    }
@@ -2971,7 +3084,6 @@ void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
            << "Does not copy this type \"" << dataType << "\" NetCDF data from \""
            << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
       exit(1);
-      break;
    }
 }
 

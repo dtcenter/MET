@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -671,7 +671,6 @@ while ( pos < (v.length()) )  {
               << celltype_to_string(cell.type)
               << "\"\n\n";
          exit ( 1 );
-         break;
 
 
    }   //  switch

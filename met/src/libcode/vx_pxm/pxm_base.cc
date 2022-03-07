@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -110,6 +110,7 @@ return;
 void PxmBase::copy_common(const PxmBase & p)
 
 {
+const char *method_name = "PxmBase::copy_common() ";
 
 if ( this == &p )  return;
 
@@ -130,23 +131,21 @@ Ncols = p.Ncols;
 
 if ( p.Name )  {
 
-   Name = new char [1 + strlen(p.Name)];
-
-   strcpy(Name, p.Name);
+   Name = m_strcpy2(p.Name, method_name, "Name");
 
 }
 
 if ( p.Ncomments > 0 )  {
 
    int j;
+   char a_var_name[512+1];
 
    Ncomments = p.Ncomments;
 
    for (j=0; j<Ncomments; ++j)  {
 
-      Comment[j] = new char [1 + strlen(p.Comment[j])];
-
-      strcpy(Comment[j], p.Comment[j]);
+      snprintf(a_var_name, 512, "Comment[%d]", j);
+      Comment[j] = m_strcpy2(p.Comment[j], method_name, a_var_name);
 
    }
 
@@ -219,7 +218,7 @@ if ( !Name )  return ( (const char *) 0 );
 
 int j;
 
-j = strlen(Name) - 1;
+j = m_strlen(Name) - 1;
 
 while ( (j >= 0) && (Name[j] != '/') )  --j;
 
@@ -259,17 +258,17 @@ void PxmBase::add_comment(const char * text)
 
 {
 
+const char *method_name = "PxmBase::add_comment(const char *) -> ";
+
 if ( Ncomments >= max_comments )  {
 
-   mlog << Error << "\nvoid PxmBase::add_comment(const char *) -> too meny comments!\n\n";
+   mlog << Error << "\n" << method_name << "too meny comments!\n\n";
 
    exit ( 1 );
 
 }
 
-Comment[Ncomments] = new char [1 + strlen(text)];
-
-strcpy(Comment[Ncomments], text);
+Comment[Ncomments] = m_strcpy2(text, method_name, "Comment");
 
 ++Ncomments;
 

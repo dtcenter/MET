@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -308,6 +308,14 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::set_keep(int i, int val) {
+
+   // Check range
+   if(i < 0 || i >= NPoints) {
+      mlog << Error
+           << "\nTrackPairInfo::set_keep(int, int) -> "
+           << "range check error for index value " << i << "\n\n";
+      exit(1);
+   }
 
    Keep.set(i, val);
 
@@ -780,13 +788,23 @@ TrackPairInfo TrackPairInfo::keep_subset() const {
    TrackPairInfo tpi;
 
    // Loop over the points
-   for(i=0; i<NLines; i++) {
+   for(i=0; i<NPoints; i++) {
 
       // Check the retention status
       if(Keep[i] == 0) continue;
 
-      // Add the current track pair point
-      tpi.add(Line[i]);
+      // Add from TC-Stat line data
+      if(NLines == NPoints) {
+         tpi.add(Line[i]);
+      }
+      // Otherwise, add from TC-Pairs track pair
+      else {
+         if(tpi.n_points() == 0) tpi.initialize(ADeck, BDeck);
+         tpi.add(ADeck[i], BDeck[i],
+                 ADeckDLand[i], BDeckDLand[i],
+                 TrackErr[i], XErr[i], YErr[i],
+                 AlongTrackErr[i], CrossTrackErr[i]);
+      }
    }
 
    return(tpi);
@@ -1004,6 +1022,28 @@ void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
 
    // Loop through the track pairs
    for(i=0; i<NPairs; i++) Pair[i].add_watch_warn(ww_sid, ww_type, ww_ut);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfoArray::subset_write_valid(const TimeArray &ta) {
+
+   // Check for no work to do
+   if(ta.n() == 0) return;
+
+   // Check each point for requested valid times
+   int i, j, keep;
+   for(i=0; i<NPairs; i++) {
+      for(j=0; j<Pair[i].n_points(); j++) {
+         keep = (ta.has(Pair[i].valid(j)) ? 1 : 0);
+         Pair[i].set_keep(j, keep);
+      }
+
+      // Subset the track
+      Pair[i] = Pair[i].keep_subset();
+   }
 
    return;
 }

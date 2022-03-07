@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -45,6 +45,27 @@ static SmartBuffer Buf;
    //
    //  Code for struct ShpPolyRecord
    //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ShpPolyRecord::clear()
+
+{
+
+   memset(&rh, 0, sizeof(rh));
+   memset(&bbox, 0, sizeof(bbox));
+
+   shape_type = bad_data_int;
+
+   n_parts  = 0;
+   n_points = 0;
+
+   parts.clear();
+   points.clear();
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -2,11 +2,18 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-development})], [met_help@ucar.edu], [], [http://dtcenter.org/community-code/model-evaluation-tools-met])
+AC_INIT([MET], [m4_esyscmd_s(echo ${MET_BUILD_VERSION:-development})], [https://github.com/dtcenter/METplus/discussions], [], [http://dtcenter.org/community-code/model-evaluation-tools-met])
 AC_CONFIG_SRCDIR([src/tools/tc_utils/tc_dland/tc_dland.cc])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
+
+# OpenMP
+
+AC_OPENMP()
+
+CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 #
 # Look for the NetCDF library
@@ -484,6 +491,27 @@ if test "x$ENABLE_ENSEMBLE_STAT" = "xyes"; then
 else
     AC_MSG_NOTICE([ensemble_stat will not be compiled])
 fi
+
+# gen_ens_prod
+
+AC_ARG_ENABLE(gen_ens_prod,
+          [AS_HELP_STRING([--disable-gen_ens_prod], [Disable compilation of gen_ens_prod])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GEN_ENS_PROD="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_ens_prod) ;;
+   esac],
+  [ENABLE_GEN_ENS_PROD="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_GEN_ENS_PROD], [test "x$ENABLE_GEN_ENS_PROD" = "xyes"])
+
+if test "x$ENABLE_GEN_ENS_PROD" = "xyes"; then
+    AC_DEFINE([ENABLE_GEN_ENS_PROD], [], ["build gen_ens_prod"])
+    AC_MSG_NOTICE([gen_ens_prod will be compiled])
+else
+    AC_MSG_NOTICE([gen_ens_prod will not be compiled])
+fi
+
 
 # gen_vx_mask
 
@@ -1015,7 +1043,7 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python3_utils ${MET_PYTHON_LD}"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
@@ -1213,6 +1241,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_python3_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/libcode/vx_bool_calc/Makefile
+                 src/libcode/vx_pointdata_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile
@@ -1227,6 +1256,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
                  src/tools/other/lidar2nc/Makefile
+                 src/tools/other/gen_ens_prod/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/gis_utils/Makefile
                  src/tools/other/ioda2nc/Makefile

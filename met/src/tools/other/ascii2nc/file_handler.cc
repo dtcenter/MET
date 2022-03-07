@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,7 +76,7 @@ FileHandler::~FileHandler()
 
 bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
 {
-  nc_obs_initialize();
+  nc_point_obs.init_buffer();
 
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
@@ -156,15 +156,12 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   if (!_writeObservations())
     return false;
 
-  // Add variable names
-  if (use_var_id) write_obs_var_names(obs_vars, obs_names);
-
   // Close the netCDF file.
 
   _closeNetcdf();
 
-  mlog << Debug(2) << "Finished processing " << obs_vars.obs_cnt
-       << " observations for " << obs_vars.hdr_cnt << " headers.\n";
+  mlog << Debug(2) << "Finished processing " << nc_point_obs.get_obs_cnt()
+       << " observations for " << nc_point_obs.get_hdr_cnt() << " headers.\n";
 
   return true;
 }
@@ -249,16 +246,15 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   init_nc_dims_vars_config(obs_vars, use_var_id);
-   obs_vars.attr_agl   = true;
+   nc_point_obs.set_netcdf(_ncFile, true);
+   // Note: use_var_id was set by the handler
+   nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
+   nc_point_obs.set_nc_out_data(_observations, &summary_obs, _summaryInfo);
 
-   nc_out_data.processed_hdr_cnt = 0;
-   nc_out_data.deflate_level = deflate_level;
-   nc_out_data.observations = _observations;
-   nc_out_data.summary_obs = &summary_obs;
-   nc_out_data.summary_info = _summaryInfo;
+   int obs_cnt, hdr_cnt;
+   nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
+   nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, _programName);
 
-   init_netcdf_output(_ncFile, obs_vars, nc_out_data, _programName);
 
    //
    // Initialize the header and observation record counters
@@ -269,48 +265,6 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    return true;
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-//bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
-//                                const ConcatString &hdr_sid,
-//                                const time_t hdr_vld,
-//                                double lat, double lon, double elv) {
-//   //
-//   // Increment header count before writing
-//   //
-//   _hdrNum++;
-//   write_nc_header(obs_vars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
-//
-//   return true;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
-//                                const ConcatString &qty) {
-//   float obs_arr[OBS_ARRAY_LEN];
-//   ConcatString obs_qty;
-//
-//   //
-//   // Increment observation count before writing
-//   //
-//   _obsNum++;
-//
-//   //
-//   // Build the observation array
-//   //
-//   obs_arr[0] = _hdrNum; // Index of header
-//   obs_arr[1] = gc;    // GRIB code corresponding to the observation type
-//   obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
-//   obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
-//   obs_arr[4] = obs;   // Observation value
-//
-//   obs_qty = (qty.length() == 0 ? na_str : qty.text());
-//   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
-//
-//   return true;
-//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -383,14 +337,8 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  write_observations(_ncFile, obs_vars, nc_out_data);
-
-  int var_count = (use_var_id ? obs_names.n_elements() : 0);
-  if (var_count > 0) {
-    int unit_count = 0;
-    create_nc_obs_name_vars (obs_vars, _ncFile, var_count, unit_count, deflate_level);
-    write_obs_var_names(obs_vars, obs_names);
-  }
+  StringArray descs, units;
+  nc_point_obs.write_to_netcdf(obs_names, units, descs);
 
   return true;
 }

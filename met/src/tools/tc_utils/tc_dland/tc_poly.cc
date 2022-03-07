@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -217,7 +217,7 @@ void TCPolyArray::extend(int n, bool exact) {
    if(!exact) {
       int k = n/tc_poly_array_alloc_inc;
 
-      if(n%num_array_alloc_inc) k++;
+      if(n%tc_poly_array_alloc_inc) k++;
 
       n = k*tc_poly_array_alloc_inc;
    }
@@ -353,6 +353,7 @@ double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
 bool operator>>(istream & in, TCPoly & p) {
    int i, n;
    double x, y;
+   const char *method_name = "TCPolyArray::operator>> -> ";
 
    p.clear();
 
@@ -370,7 +371,7 @@ bool operator>>(istream & in, TCPoly & p) {
    // NNN is the 3-digit number of points
    // AAAAAAAA is the 8-character name of the region
    n = atoi(a[0].c_str());
-   strncpy(name, line.c_str()+4, 8);
+   m_strncpy(name, line.c_str()+4, 8, method_name, "name", true);
    name[8] = '\0';
    name_cs = name;
    name_cs.ws_strip();

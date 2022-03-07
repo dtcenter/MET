@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -53,6 +53,8 @@ class ContingencyTable {
       int Nrows;
       int Ncols;
 
+      double ECvalue;
+
       ConcatString Name;
 
    public:
@@ -82,6 +84,7 @@ class ContingencyTable {
       virtual void set_size(int);
       virtual void set_size(int NR, int NC);
 
+      void set_ec_value(double);
       void set_name(const char *);
 
          //
@@ -91,6 +94,7 @@ class ContingencyTable {
       int nrows() const;
       int ncols() const;
 
+      double ec_value() const;
       ConcatString name() const;
 
          //
@@ -125,6 +129,7 @@ class ContingencyTable {
 
       virtual double gaccuracy () const;
       virtual double gheidke   () const;
+      virtual double gheidke_ec(double) const;
       virtual double gkuiper   () const;
       virtual double gerrity   () const;
 
@@ -137,7 +142,8 @@ class ContingencyTable {
 inline int ContingencyTable::nrows() const { return ( Nrows ); }
 inline int ContingencyTable::ncols() const { return ( Ncols ); }
 
-inline ConcatString ContingencyTable::name() const { return ( Name ); }
+inline double       ContingencyTable::ec_value() const { return ( ECvalue ); }
+inline ConcatString ContingencyTable::name()     const { return ( Name );    }
 
 
 ////////////////////////////////////////////////////////////////////////

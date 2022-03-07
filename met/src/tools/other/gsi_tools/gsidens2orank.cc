@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -289,7 +289,7 @@ void process_conv_data(ConvData &d, int i_mem) {
 
       // Check for duplicates
       if(!is_bad_data(ens_pd.e_na[i_mem][i_obs])) {
-         mlog << Warning
+         mlog << Debug(4) 
               << "\nSkipping duplicate entry for ensemble member "
               << i_mem + 1 << " case \"" << key << "\"\n\n";
          return;
@@ -470,7 +470,7 @@ void process_rad_data(RadData &d, int i_mem) {
 
       // Check for duplicates
       if(!is_bad_data(ens_pd.e_na[i_mem][i_obs])) {
-         mlog << Warning
+         mlog << Debug(4) 
               << "\nSkipping duplicate entry for ensemble member "
               << i_mem + 1 << " case \"" << key << "\"\n\n";
          return;

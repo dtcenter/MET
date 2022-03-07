@@ -92,38 +92,18 @@ level_category = [0, 1, 4, 5, 6];
 // Use obs_bufr_map to rename variables in the output.
 // If empty, process all available variables.
 //
-obs_bufr_var = ["D_CAPE", "D_PBL"];
+obs_bufr_var = ["D_CAPE", "D_PBL", "D_MLCAPE"];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of input BUFR variable names to output variables names.
 // The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
 //
-obs_bufr_map = [];
-
-//
-// Default mapping for PREPBUFR.  Replace input BUFR variable names with GRIB
-// abbreviations in the output.  This default map is appended to obs_bufr_map.
-// This should not typically be overridden.
-//
-obs_prefbufr_map = [
-   { key = "POB";     val = "PRES";  },
-   { key = "QOB";     val = "SPFH";  },
-   { key = "TOB";     val = "TMP";   },
-   { key = "UOB";     val = "UGRD";  },
-   { key = "VOB";     val = "VGRD";  },
-   { key = "D_DPT";   val = "DPT";   },
-   { key = "D_WDIR";  val = "WDIR";  },
-   { key = "D_WIND";  val = "WIND";  },
-   { key = "D_RH";    val = "RH";    },
-   { key = "D_MIXR";  val = "MIXR";  },
+obs_bufr_map = [
    { key = "D_PBL";   val = "HPBL";  },
-   { key = "D_PRMSL"; val = "PRMSL"; },
-   { key = "D_CAPE";  val = "CAPE";  },
    { key = "TDO";     val = "DPT";   },
    { key = "PMO";     val = "PRMSL"; },
-   { key = "TOCC";    val = "TCDC";  },
-   { key = "HOVI";    val = "VIS";   },
    { key = "CEILING"; val = "HGT";   },
    { key = "MXGS";    val = "GUST";  }
 ];

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -128,7 +128,7 @@ class MCTSInfo {
       ThreshArray      fthresh;
       ThreshArray      othresh;
 
-      CIInfo acc, hk, hss, ger;
+      CIInfo acc, hk, hss, hss_ec, ger;
 
       void clear();
       void allocate_n_alpha(int);
@@ -185,6 +185,9 @@ class CNTInfo {
       CIInfo e10, e25, e50, e75, e90, eiqr;
       CIInfo mad;
 
+      // Scatter Index
+      CIInfo si;
+      
       int n_ranks, frank_ties, orank_ties;
 
       void clear();
@@ -543,6 +546,7 @@ class PCTInfo {
 
       void clear();
       void allocate_n_alpha(int);
+      void set_fthresh(const ThreshArray &);
       void compute_stats();
       void compute_ci();
 };
@@ -606,6 +610,8 @@ class DMAPInfo {
       double baddeley_max_dist;    // Maximum distance constant
       double fom_alpha;            // FOM Alpha
       double zhu_weight;           // Zhu Weight
+      double beta_value;           // G-Beta Value
+      int    n_full_points;        // Number of FULL domain points
 
    public:
 
@@ -619,7 +625,7 @@ class DMAPInfo {
       SingleThresh othresh;
 
       // Counts
-      int total, fy, oy;
+      int total, fy, oy, foy;
 
       // Distance metrics
       double baddeley, hausdorff;
@@ -633,6 +639,9 @@ class DMAPInfo {
       // Zhu Metric
       double zhu_fo, zhu_of, zhu_min, zhu_max, zhu_mean;
 
+      // G and G-Beta
+      double g, gbeta;
+
       // Compute statistics
       double fbias() const; // fbias = fy / oy
 
@@ -642,10 +651,43 @@ class DMAPInfo {
                const NumArray &fthr_na,  const NumArray &othr_na);
 
       void set_options(const int _baddeley_p, const double _baddeley_max_dist,
-                       const double _fom_alpha, const double _zhu_weight);
+                       const double _fom_alpha, const double _zhu_weight,
+                       const double _beta_value, const int _n_full_points);
+
+      // Get functions
+      double get_beta_value() const; 
 
       void clear();
       void reset_options();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline double DMAPInfo::get_beta_value() const { return(beta_value); }
+
+////////////////////////////////////////////////////////////////////////
+//
+// Structure to store the Skill Score Index output
+//
+////////////////////////////////////////////////////////////////////////
+
+struct SSIDXData {
+
+   // Skill score index name
+   ConcatString ss_index_name;
+
+   // Forecast and reference model names
+   ConcatString fcst_model;
+   ConcatString ref_model;
+
+   // List of unique initialization times
+   TimeArray init_time;
+
+   // Number of terms and number valid
+   int n_term, n_vld;
+
+   // Skill score index value
+   double ss_index;
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -43,12 +43,13 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 {
 
 int j;
-char junk[1024];
+const int buf_len = 1024;
+char junk[buf_len + 1];
 ConcatString label, thresh_str;
 ConcatString tmp1_str, tmp2_str, tmp3_str;
 int i, mon, day, yr, hr, minute, sec;
 unixtime t;
-
+const char *method_name = "ModePsFile::do_page_1()";
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -412,10 +413,12 @@ text_y -= 2.0*TextSep;
    // Accumulation time
    //
 
-strcpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str());
+m_strncpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str(),
+          buf_len, method_name, "fcst_raw->data.accum()");
 t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
 
-strcpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str());
+m_strncpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str(),
+          buf_len, method_name, "obs_raw->data.accum()");
 t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 

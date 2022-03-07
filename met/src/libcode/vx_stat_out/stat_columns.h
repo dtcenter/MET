@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -188,6 +188,8 @@ extern void write_orank_cols (const PairDataEnsemble *, int,
 extern void write_ssvar_cols (const PairDataEnsemble *, int, double,
                               AsciiTable &, int, int);
 extern void write_relp_cols  (const PairDataEnsemble *,
+                              AsciiTable &, int, int);
+extern void write_ssidx_cols (const SSIDXData &,
                               AsciiTable &, int, int);
 
 // Setup column justification for STAT AsciiTable objects

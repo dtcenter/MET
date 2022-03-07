@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -601,23 +601,33 @@ void get_percentiles(DistributionPercentiles &ptile,
                      const int perc, const bool precip_flag)
 
 {
-   int i, x, y, count, n_values;
+   int i, x, y, n_values;
    int nx, ny;
    double *v = (double *) 0;
+   double *v_tmp = (double *) 0;
+   const char *method_name = "get_percentiles() -> ";
 
    nx = raw.data.nx();
    ny = raw.data.ny();
 
+   v_tmp = new double[nx*ny];
+   if(!v_tmp) {
+      mlog << Error << "\n" << method_name << "memory allocation error, v_tmp\n\n";
+      exit(1);
+   }
+
    //
    // Count values.
-   // Only check precipitation for values greater than zero.
+   // Only collect precipitation values greater than zero.
    //
    n_values = 0;
    for(x=0; x<nx; ++x) {
       for(y=0; y<ny; ++y) {
          if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
-            (!precip_flag || (precip_flag && raw.data(x, y) > 0))) ++n_values;
+            (!precip_flag || (precip_flag && raw.data(x, y) > 0))) {
+            v_tmp[n_values++] = (double)(raw.data(x, y));
+         }
       }
    }
 
@@ -627,25 +637,15 @@ void get_percentiles(DistributionPercentiles &ptile,
    v = new double [n_values];
 
    if(!v) {
-      mlog << Error << "\nget_percentiles() -> "
-           << "memory allocation error\n\n";
+      mlog << Error << "\n" << method_name << "memory allocation error\n\n";
       exit(1);
    }
 
    //
    // Fill values
    //
-   count = 0;
-   for(x=0; x<nx; ++x) {
-      for(y=0; y<ny; ++y) {
-         if((mask.s_is_on(x, y)) &&
-            (raw.is_valid_xy(x, y)) &&
-            (!precip_flag || (precip_flag && raw.data(x, y) > 0))) {
-
-            v[count++] = (double) (raw.data(x, y));
-         }
-      }
-   }
+   for(x=0; x<n_values; ++x)
+      v[x] = v_tmp[x];
 
    //
    // Sort
@@ -685,6 +685,7 @@ void get_percentiles(DistributionPercentiles &ptile,
    //
    // Free memory
    //
+   if(v_tmp) { delete [] v_tmp;  v_tmp = (double *) 0; }
    if(v) { delete [] v;  v = (double *) 0; }
 
    //

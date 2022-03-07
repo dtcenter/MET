@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -472,10 +472,9 @@ switch ( plot_field )  {
       n_obs  = mode_in.n_obs_clus_objs();
       break;
 
-      default:
+   default:
       mlog << Error << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -537,7 +536,7 @@ if ( do_anno )   fill_box(whole_box, anno_bg_color, plot);
 
 get_data_ppm(mode_in, image);
 
-plot.import(image, map_box.left(), map_box.bottom(), 0.0, 0.0, 1.0);
+plot.import_image(image, map_box.left(), map_box.bottom(), 0.0, 0.0, 1.0);
 
    //
    //  draw the map
@@ -1112,7 +1111,7 @@ if ( e->type() != StringType )  {
 
 }
 
-s = *(e->string_value());
+s = e->string_value();
 
 return ( s );
 
@@ -1329,7 +1328,6 @@ switch ( plot_field )  {
    default:
       mlog << Error << "\n\n  " << program_name << ": annotate() -> bad plot field\n\n";
       exit ( 1 );
-      break;
 
 }
 

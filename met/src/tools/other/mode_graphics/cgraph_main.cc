@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -292,7 +292,6 @@ switch ( Ptype )  {
            << cgraphbase_plottype_to_string(Ptype) 
            << " is not yet supported.\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -811,7 +810,7 @@ FT_UInt previous;
 FT_Glyph_Metrics * metrics = (FT_Glyph_Metrics *) 0;
 FT_Vector k_delta;
 const bool use_kerning = DoKerning && FT_HAS_KERNING(face);
-const char * new_string = (const char *) 0;
+const char * new_string = (const char *) NULL;
 bool first_char = false;
 bool last_char  = false;
 double x_bearing, y_bearing, advance;
@@ -825,7 +824,7 @@ Wct_Info * info = wct_info;
 if ( DoLigatures )  remap_string(face, s, new_string);
 else                new_string = s;
 
-const int N = strlen(new_string);
+const int N = m_strlen(new_string);
 
 if ( N >= max_wct_infos )  {
 
@@ -1035,7 +1034,6 @@ if ( render_flag )  {
             mlog << Error << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
                  << fill_flag << " is not supported\n\n";
             exit ( 1 );
-            break;
 
 
       }   //  switch
@@ -1050,7 +1048,8 @@ if ( render_flag )  {
    //  done
    //
 
-if ( DoLigatures )  { delete [] new_string;  new_string = (char *) 0; }
+if ( DoLigatures ) delete [] new_string;
+new_string = (char *) 0;
 
 return;
 
@@ -1121,11 +1120,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CgraphBase::import(const Ppm & ppm, double x, double y, double u, double v, double _scale)
+void CgraphBase::import_image(const Ppm & ppm, double x, double y, double u, double v, double _scale)
 
 {
 
-import(ppm, x, y, u, v, _scale, _scale);
+import_image(ppm, x, y, u, v, _scale, _scale);
 
 return;
 
@@ -1135,7 +1134,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CgraphBase::import(const Ppm & ppm, double x, double y, double u, double v, double x_scale, double y_scale)
+void CgraphBase::import_image(const Ppm & ppm, double x, double y, double u, double v, double x_scale, double y_scale)
 
 {
 
@@ -1461,7 +1460,6 @@ switch ( k )  {
    default:
       mlog << Error << "\n\n  CgraphBase::setlinecap(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1495,7 +1493,6 @@ switch ( k )  {
    default:
       mlog << Error << "\n\n  CgraphBase::setlinejoin(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1757,7 +1754,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::import(const Ppm & ppm, const Box & b, const ViewGravity g)
+void Cgraph::import_image(const Ppm & ppm, const Box & b, const ViewGravity g)
 
 {
 
@@ -1786,7 +1783,7 @@ if ( g == fill_viewport )  {
 
 }
 
-import(ppm, x, y, u, v, x_scale, y_scale);
+import_image(ppm, x, y, u, v, x_scale, y_scale);
 
 return;
 
@@ -1796,11 +1793,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::import(const Ppm & ppm, double x, double y, double u, double v, double _scale)
+void Cgraph::import_image(const Ppm & ppm, double x, double y, double u, double v, double _scale)
 
 {
 
-import(ppm, x, y, u, v, _scale, _scale);
+import_image(ppm, x, y, u, v, _scale, _scale);
 
 return;
 
@@ -1810,7 +1807,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::import(const Ppm & ppm, double x, double y, double u, double v, double x_scale, double y_scale)
+void Cgraph::import_image(const Ppm & ppm, double x, double y, double u, double v, double x_scale, double y_scale)
 
 {
 
@@ -2117,8 +2114,8 @@ if ( empty(in) )  {
 
 int j, k;
 char c0, c1;
-const int N = strlen(in);
-char * s = (char *) 0;
+const int N = m_strlen(in);
+char * s = (char *) NULL;
 FT_UInt fi_glyph_index = 0;
 FT_UInt fl_glyph_index = 0;
 
@@ -2164,7 +2161,7 @@ while ( j < N )  {
    //  done
    //
 
-out = s;  s = (char *) 0;
+out = s;  s = (char *) NULL;
 
 return;
 
@@ -2226,13 +2223,9 @@ int my_conic (const FT_Vector * control, const FT_Vector * to, void * u)
 
 {
 
-ft_user_info * info = (ft_user_info *) u;
-
 mlog << Error << "\n\n  my_conic() -> should never be called!\n\n";
 
 exit ( 1 );
-
-info->have_path = true;
 
 return ( 0 );
 

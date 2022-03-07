@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -49,7 +49,7 @@ class PairDataPoint : public PairBase {
       void clear();
       void erase();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
@@ -128,8 +128,9 @@ class VxPairDataPoint {
 
       StringArray sid_inc_filt;  // Station ID inclusion list
       StringArray sid_exc_filt;  // Station ID exclusion list
-      StringArray obs_qty_filt;  // Observation quality markers
-
+      StringArray obs_qty_inc_filt;  // Observation quality include markers
+      StringArray obs_qty_exc_filt;  // Observation quality exclude markers
+      
       //////////////////////////////////////////////////////////////////
 
       StringArray mpr_column;    // Names of MPR columns or diffs of columns
@@ -199,8 +200,9 @@ class VxPairDataPoint {
 
       void set_sid_inc_filt(const StringArray &);
       void set_sid_exc_filt(const StringArray &);
-      void set_obs_qty_filt(const StringArray &);
-
+      void set_obs_qty_inc_filt(const StringArray &);
+      void set_obs_qty_exc_filt(const StringArray &);
+      
       // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
 
@@ -217,7 +219,7 @@ class VxPairDataPoint {
 
       void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
-      void set_climo_cdf_info(const ClimoCDFInfo &);
+      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
       void set_msg_typ_sfc(const StringArray &);
       void set_msg_typ_lnd(const StringArray &);

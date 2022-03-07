@@ -12,6 +12,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <!--                                                                  -->
@@ -31,7 +33,7 @@
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_CONUS_mask.nc \
-      -v 1
+      -type poly -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_CONUS_mask.nc</grid_nc>
@@ -48,7 +50,7 @@
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_g008.grib \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_MERCATOR_CONUS_mask.nc \
-      -v 1
+      -type poly -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_MERCATOR_CONUS_mask.nc</grid_nc>
@@ -65,7 +67,7 @@
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/POLY_NAM_LAMBERT_CONUS_mask.nc \
-      -v 1
+      -type poly -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_NAM_LAMBERT_CONUS_mask.nc</grid_nc>
@@ -82,7 +84,7 @@
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
       &MET_BASE;/poly/NWC.poly \
       &OUTPUT_DIR;/gen_vx_mask/POLY_HMT_STEREO_NWC_mask.nc \
-      -v 1
+      -type poly -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_HMT_STEREO_NWC_mask.nc</grid_nc>
@@ -100,7 +102,7 @@
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &MET_BASE;/poly/NAK.poly \
       &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_NAK_mask.nc \
-      -v 1
+      -type poly -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_NAK_mask.nc</grid_nc>
@@ -122,6 +124,41 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_NAM_HMT_STEREO_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- GRID: named grids                                                -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID_NAMED_GRIDS">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      G004 G130 \
+      &OUTPUT_DIR;/gen_vx_mask/GRID_NAMED_GRIDS_mask.nc \
+      -type grid -name G130_grid \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_NAMED_GRIDS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- GRID: grid specification strings                                 -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID_SPEC_STRINGS">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      "latlon 720 361 -90 0 0.5 0.5" \
+      "latlon 200 100 -40 -50 0.5 0.5" \
+      &OUTPUT_DIR;/gen_vx_mask/GRID_SPEC_STRINGS_mask.nc \
+      -type grid -name grid_spec \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_SPEC_STRINGS_mask.nc</grid_nc>
     </output>
   </test>
 
@@ -435,6 +472,28 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/PYTHON_FCST_or_OBS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- DATA: For MET issue #1891, use GRIB1 and GRIB2 inputs to replace -->
+  <!--       2-m temperature over water with bad data.                  -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_DATA_TWO_FILE_TYPES">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_TWO_FILE_TYPES.nc \
+      -type data \
+      -input_field 'name="TMP";  level="Z2"; file_type=GRIB1;' \
+      -mask_field  'name="LAND"; level="L0";' \
+      -name TMP_2M_LAND \
+      -thresh lt0.5 -value -9999 -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_TWO_FILE_TYPES.nc</grid_nc>
     </output>
   </test>
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,6 +57,8 @@ class SeriesAnalysisConfInfo {
       ThreshArray      ocnt_ta;            // Continuous obs thresholds
       SetLogic         cnt_logic;          // Continuous threshold field logic
 
+      ClimoCDFInfo     cdf_info;           // Climo CDF info
+
       NumArray         ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType boot_interval;      // Bootstrap CI type
       double           boot_rep_prop;      // Bootstrap replicate proportion
@@ -72,6 +74,7 @@ class SeriesAnalysisConfInfo {
 
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
+      double           hss_ec_value;       // MCTS HSS expected correct value
       bool             rank_corr_flag;     // Flag for computing rank correlations
 
       ConcatString     tmp_dir;            // Directory for temporary files

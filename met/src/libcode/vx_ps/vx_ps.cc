@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -290,7 +290,6 @@ switch ( Orientation )  {
       mlog << Error << "\nvoid PSfile::do_prolog() -> bad document orientation ... "
            << documentorientation_to_string(Orientation) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -303,7 +302,6 @@ switch ( Media )  {
       mlog << Error << "\nvoid PSfile::do_prolog() -> bad document media ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -708,7 +706,6 @@ switch ( fill_flag )  {
       mlog << Error << "\nPSfile::write_single_node() -> "
            << "unrecognized fill flag: \"" << fill_flag << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1154,7 +1151,6 @@ switch ( Media )  {
       mlog << Error << "\nPSfile::set_media(DocumentMedia) -> bad media size ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
-      break;
 
 }
 
@@ -1469,7 +1465,6 @@ switch ( f )  {
       mlog << Error << "\n\n  PSfile::set_family(FontFamily) -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -1697,6 +1692,8 @@ void base_8_string(int k, char * out)
 
 {
 
+const char *method_name = "base_8_string() -> ";
+
 if ( k < 0 )  k += 256;
 
 char junk[256];
@@ -1715,7 +1712,7 @@ while ( k )  {
 }
 
 
-strcpy(out, junk + pos);
+m_strcpy(out, junk + pos, method_name);
 
 return;
 
@@ -1786,37 +1783,41 @@ if ( j < 0 )  {
 
 AfmCharMetrics & cm = afm.cm[j];
 
-   //
-   //  ligature?
-   //
+if (m_strlen(c) > 1) {
 
-LigatureInfo lig;
+      //
+      //  ligature?
+      //
 
-if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
+   LigatureInfo lig;
 
-   handle_ligature(lig, afm, cur);
+   if ( c[1] && afm.has_ligature(c[0], c[1], lig) )  {
+   
+      handle_ligature(lig, afm, cur);
 
-   c += 2;
+      c += 2;
 
-   return;
+      return;
 
-}
+   }
 
-   //
-   //  is it the start of a kern pair?
-   //
+      //
+      //  is it the start of a kern pair?
+      //
 
-KPX kp;
+   KPX kp;
 
-if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
+   if ( c[1] && afm.has_kern_pair(c[0], c[1], kp) )  {
 
-   cur->add_char(cm);
+      cur->add_char(cm);
 
-   handle_kern_pair(kp, afm, cur);
+      handle_kern_pair(kp, afm, cur);
 
-   ++c;
+      ++c;
 
-   return;
+      return;
+
+   }
 
 }
 
@@ -1971,7 +1972,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_roman() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2005,7 +2005,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_italic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2039,7 +2038,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_bold() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -2073,7 +2071,6 @@ switch ( f )  {
       mlog << Error << "\n\n  ff_to_bolditalic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

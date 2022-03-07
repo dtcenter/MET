@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "info.h"
+#include "str_wrappers.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,17 +94,17 @@ void EnumInfo::init_from_scratch()
 
 {
 
-s = (char **) 0;
+s = (char **) NULL;
 
-Name = (char *) 0;
+Name = (char *) NULL;
 
-LowerCaseName = (char *) 0;
+LowerCaseName = (char *) NULL;
 
-Scope = (char *) 0;
+Scope = (char *) NULL;
 
-U_Scope = (char *) 0;
+U_Scope = (char *) NULL;
 
-Header = (char *) 0;
+Header = (char *) NULL;
 
 Nalloc = Nids = 0;
 
@@ -126,21 +127,21 @@ int j;
 
 for (j=0; j<Nids; ++j)  {
 
-   if ( s[j] )  { delete [] s[j];  s[j] = (char *) 0; }
+   if ( s[j] )  { delete [] s[j];  s[j] = (char *) NULL; }
 
 }
 
-delete [] s;   s = (char **) 0;
+delete [] s;   s = (char **) NULL;
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+if ( Name )  { delete [] Name;  Name = (char *) NULL; }
 
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) 0; }
+if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) NULL; }
 
-if ( Scope )  { delete [] Scope;  Scope = (char *) 0; }
+if ( Scope )  { delete [] Scope;  Scope = (char *) NULL; }
 
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) 0; }
+if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) NULL; }
 
-if ( Header )  { delete [] Header;  Header = (char *) 0; }
+if ( Header )  { delete [] Header;  Header = (char *) NULL; }
 
 Nalloc = Nids = 0;
 
@@ -198,7 +199,7 @@ n = (n + enuminfo_alloc_increment - 1)/enuminfo_alloc_increment;
 n *= enuminfo_alloc_increment;
 
 int j;
-char ** u = (char **) 0;
+char ** u = (char **) NULL;
 
 u = s;
 
@@ -212,7 +213,7 @@ if ( !s )  {
 
 }
 
-for (j=0; j<n; ++j)  s[j] = (char *) 0;
+for (j=0; j<n; ++j)  s[j] = (char *) NULL;
 
 if ( u )  {
 
@@ -267,7 +268,7 @@ max_len = 0;
 
 for (j=0; j<Nids; ++j)  {
 
-   k = strlen(s[j]);
+   k = m_strlen(s[j]);
 
    if ( k > max_len )  max_len = k;
 
@@ -287,14 +288,15 @@ void EnumInfo::add_id(const char * text)
 {
 
 int k;
+const char *method_name = "EnumInfo::add_id() -> ";
 
 extend(Nids + 1);
 
-k = strlen(text);
+k = m_strlen(text);
 
 s[Nids] = new char [1 + k];
 
-strncpy(s[Nids], text, k);
+m_strncpy(s[Nids], text, k, method_name);
 
 s[Nids][k] = (char) 0;   //  just to make sure
 
@@ -311,26 +313,27 @@ return;
 void EnumInfo::set_name(const char * text)
 
 {
+const char *method_name = "EnumInfo::set_name() -> ";
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+if ( Name )  { delete [] Name;  Name = (char *) NULL; }
 
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) 0; }
+if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) NULL; }
 
 if ( !text )  return;
 
 int j, k;
 
-k = strlen(text);
+k = m_strlen(text);
 
 Name = new char [1 + k];
 
 LowerCaseName = new char [1 + k];
 
-strncpy(Name, text, k);
+m_strncpy(Name, text, k, method_name, "Name");
 
 Name[k] = (char) 0;   //  just to make sure
 
-strncpy(LowerCaseName, text, k);
+m_strncpy(LowerCaseName, text, k, method_name, "LowerCaseName");
 
 LowerCaseName[k] = (char) 0;   //  just to make sure
 
@@ -349,12 +352,12 @@ return;
 
 
 void EnumInfo::set_scope(const char * text)
-
 {
+const char *method_name = "EnumInfo::set_scope() -> ";
 
-if ( Scope )  { delete [] Scope;  Scope = (char *) 0; }
+if ( Scope )  { delete [] Scope;  Scope = (char *) NULL; }
 
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) 0; }
+if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) NULL; }
 
 if ( !text )  return;
 
@@ -362,11 +365,11 @@ int j, k, m;
 char c;
 
 
-k = strlen(text);
+k = m_strlen(text);
 
 Scope = new char [1 + k];
 
-strncpy(Scope, text, k);
+m_strncpy(Scope, text, k, method_name);
 
 Scope[k] = (char) 0;   //  just to make sure
 
@@ -399,16 +402,17 @@ return;
 void EnumInfo::set_header(const char * text)
 
 {
+const char *method_name = "EnumInfo::set_header() -> ";
 
-if ( Header )  { delete [] Header;  Header = (char *) 0; }
+if ( Header )  { delete [] Header;  Header = (char *) NULL; }
 
 int k;
 
-k = strlen(text);
+k = m_strlen(text);
 
 Header = new char [1 + k];
 
-strncpy(Header, text, k);
+m_strncpy(Header, text, k, method_name);
 
 Header[k] = (char) 0;   //  just to make sure
 

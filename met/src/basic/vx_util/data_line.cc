@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -522,6 +522,8 @@ bool DataLine::read_single_text_line(LineDataFile * ldf)
 
 {
 
+if ( !ldf )  return ( false );
+
 #ifdef  WITH_PYTHON
 
 PyLineDataFile * pldf = dynamic_cast<PyLineDataFile *>(ldf);
@@ -530,7 +532,7 @@ if ( pldf )  {
 
    const bool status = read_py_single_text_line(pldf);
 
-	return ( status );
+   return ( status );
 
 }
 

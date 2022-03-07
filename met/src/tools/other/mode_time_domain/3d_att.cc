@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1261,7 +1261,8 @@ moments = mask.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
-   mlog << Error << "\n\n  calc_3d_single_atts() -> empty object!\n\n";
+   mlog << Error << "\n\ncalc_3d_single_atts() -> "
+        << "empty object!\n\n";
 
    exit ( 1 );
 
@@ -1322,16 +1323,22 @@ for (j=0,x_old=0,y_old=0; j<nt; ++j)  {
 
    mask.calc_2d_centroid_at_t(t, xbar_2d, ybar_2d);
 
-   if ( j == 0 )  {
+   //
+   //  distance from the old to current (x, y)
+   //
 
-       x_old = xbar_2d;
-       y_old = ybar_2d;
+   if ( j > 0 )  {
 
-   } else {
- 
       dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
 
-   }   //  else
+   }
+
+   //
+   //  update old (x, y) with current
+   //
+
+   x_old = xbar_2d;
+   y_old = ybar_2d;
 
 }
 
@@ -1347,7 +1354,8 @@ values = new float [Vol];
 
 if ( !values )  {
 
-   mlog << Error << "\n\n  calc_3d_single_atts() -> memory allocation error\n\n";
+   mlog << Error << "\n\ncalc_3d_single_atts() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -1389,8 +1397,6 @@ a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
    //
 
 if ( values )  { delete [] values;  values = 0; }
-
-// a.dump(cout);
 
 return ( a );
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -843,10 +843,12 @@ bool TableFlatFile::read(const char * filename)
 ifstream in;
 ConcatString line;
 int n_lines;
+bool status = false;
+const char *method_name = "TableFlatFile::read(const char *) -> ";
 
 if ( empty(filename) )  {
 
-   mlog << Error << "\nTableFlatFile::read(const char *) ->"
+   mlog << Error << "\n" << method_name
         << "empty filename!\n\n";
 
    exit ( 1 );
@@ -863,7 +865,7 @@ met_open(in, filename);
 
 if ( !in )  {
 
-   mlog << Error << "\nTableFlatFile::read(const char *) -> "
+   mlog << Error << "\n" << method_name
         << "unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
@@ -880,11 +882,11 @@ line.chomp('\n');
 
 line.ws_strip();
 
-     if ( line == "GRIB1" )  { return ( read_grib1(in, filename, n_lines - 1) ); }
-else if ( line == "GRIB2" )  { return ( read_grib2(in, filename, n_lines - 1) ); }
+     if ( line == "GRIB1" ) status = read_grib1(in, filename, n_lines - 1);
+else if ( line == "GRIB2" ) status = read_grib2(in, filename, n_lines - 1);
 else {
 
-   mlog << Error << "\nTableFlatFile::read(const char *) -> "
+   mlog << Error << "\n" << method_name
         << "unable unrecognized format spec \""
         << line << "\" in file \"" << filename << "\"\n\n";
 
@@ -898,7 +900,7 @@ else {
 
 in.close();
 
-return ( false );
+return ( status );
 
 }
 

@@ -1,7 +1,5 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -184,12 +182,12 @@ int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
 string c;
 NcVar v;
-
+const char *method_name = "PinterpFile::open() -> ";
 
 close();
 
 Nc = open_ncfile(filename);
-mlog << Debug(5) << "\nPinterpFile::open() -> "
+mlog << Debug(5) << "\n" << method_name
      << "opend  \"" << filename << "\".\n\n";
 
 if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
@@ -245,7 +243,7 @@ if ( has_var(Nc, times_var_name) ) {
    for (j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
       get_string_val(&v, j, str_len, tmp_time_str);
-      strncpy ( time_str, tmp_time_str.c_str(), str_len );
+      m_strncpy( time_str, tmp_time_str.c_str(), str_len, method_name, "time_str", true);
       time_str[str_len] = '\0';
 
       // Check for leading blank
@@ -256,7 +254,7 @@ if ( has_var(Nc, times_var_name) ) {
 
          if(sscanf(time_str, "%4d-%2d-%2d_%2d:%2d:%2d",
                    &year, &month, &day, &hour, &minute, &second) != 6) {
-            mlog << Error << "\nPinterpFile::open() -> "
+            mlog << Error << "\n" << method_name
                  << "error parsing time string \"" << time_str << "\".\n\n";
             return ( false );
          }

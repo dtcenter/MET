@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -61,6 +61,9 @@ class TCPairsConfInfo {
       NumArray  InitHour;
       NumArray  LeadReq;
       unixtime  ValidBeg, ValidEnd;
+      TimeArray ValidInc;
+      TimeArray ValidExc;
+      TimeArray WriteValid;
 
       // Polyline masking regions
       ConcatString InitMaskName;

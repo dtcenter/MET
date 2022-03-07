@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -202,6 +202,11 @@ void STATAnalysisJob::clear() {
    boot_interval  = bad_data_int;
    boot_rep_prop  = bad_data_double;
    n_boot_rep     = bad_data_int;
+
+   ss_index_name.clear();
+   ss_index_vld_thresh = bad_data_double;
+
+   hss_ec_value   = bad_data_double;
    rank_corr_flag = false;
    vif_flag       = false;
 
@@ -344,6 +349,10 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    boot_rep_prop        = aj.boot_rep_prop;
    n_boot_rep           = aj.n_boot_rep;
 
+   ss_index_name        = aj.ss_index_name;
+   ss_index_vld_thresh  = aj.ss_index_vld_thresh;
+
+   hss_ec_value         = aj.hss_ec_value;
    rank_corr_flag       = aj.rank_corr_flag;
    vif_flag             = aj.vif_flag;
 
@@ -625,6 +634,15 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "boot_seed = "
        << boot_seed << "\n";
+
+   out << prefix << "ss_index_name = "
+       << ss_index_name << "\n";
+
+   out << prefix << "ss_index_vld_thresh = "
+       << ss_index_vld_thresh << "\n";
+
+   out << prefix << "hss_ec_value = "
+       << hss_ec_value << "\n";
 
    out << prefix << "rank_corr_flag = "
        << rank_corr_flag << "\n";
@@ -1055,9 +1073,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    StringArray col_value;
    ConcatString thresh_cs;
    int i, n;
+   const char *method_name = "STATAnalysisJob::parse_job_command()";
 
    // If jobstring is null, simply return;
-   if(jobstring) n = strlen(jobstring);
+   if(jobstring) n = m_strlen(jobstring);
    else          return;
 
    // Job Command Line Array
@@ -1066,11 +1085,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Create a temporary copy of the jobstring for use in parsing
    //
-   const int line_size = n + 1;
-   line = new char [line_size];
-   memset(line, 0, line_size);
-   strncpy(line, jobstring, line_size);
-   line[line_size - 1] = (char) 0;
+
+   line = m_strcpy2(jobstring, method_name);
+   if (!line) return;
 
    lp = line;
 
@@ -1601,6 +1618,18 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          set_boot_seed(jc_array[i+1].c_str());
          i++;
       }
+      else if(jc_array[i] == "-ss_index_name") {
+         ss_index_name = jc_array[i+1].c_str();
+         i++;
+      }
+      else if(jc_array[i] == "-ss_index_vld_thresh") {
+         ss_index_vld_thresh = atof(jc_array[i+1].c_str());
+         i++;
+      }
+      else if(jc_array[i] == "-hss_ec_value") {
+         hss_ec_value = atof(jc_array[i+1].c_str());
+         i++;
+      }
       else if(jc_array[i] == "-rank_corr_flag") {
          rank_corr_flag = atoi(jc_array[i+1].c_str());
          i++;
@@ -1672,9 +1701,9 @@ void STATAnalysisJob::set_dump_row(const char *c) {
 
    if(!c) return;
 
-   dump_row = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_dump_row()";
 
-   strcpy(dump_row, c);
+   dump_row = m_strcpy2(c, method_name, "dump_row");
 
    return;
 }
@@ -1687,9 +1716,9 @@ void STATAnalysisJob::set_stat_file(const char *c) {
 
    if(!c) return;
 
-   stat_file = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_stat_file()";
 
-   strcpy(stat_file, c);
+   stat_file = m_strcpy2(c, method_name, "stat_file");
 
    return;
 }
@@ -1783,9 +1812,9 @@ void STATAnalysisJob::set_boot_rng(const char *c) {
 
    if(!c) return;
 
-   boot_rng = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   strcpy(boot_rng, c);
+   boot_rng = m_strcpy2(c, method_name, "boot_rng");
 
    return;
 }
@@ -1798,9 +1827,9 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
 
    if(!c) return;
 
-   boot_seed = new char [strlen(c) + 1];
+   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   strcpy(boot_seed, c);
+   boot_seed = m_strcpy2(c, method_name, "boot_seed");
 
    return;
 }
@@ -1960,12 +1989,12 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  c = n_orank_columns;        break;
          case stat_ssvar:  c = n_ssvar_columns;        break;
          case stat_genmpr: c = n_genmpr_columns;       break;
+         case stat_ssidx:  c = n_ssidx_columns;        break;
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
                  << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
                  << "\"!\n\n";
             exit(1);
-            break;
       }
       if(c > n_col) n_col = c;
    }
@@ -2031,6 +2060,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
          case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
          case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+         case stat_ssidx:  write_header_row       (ssidx_columns, n_ssidx_columns, 1,       stat_at, 0, 0); break;
 
          //
          // Write only header columns for unspecified line type
@@ -2043,7 +2073,6 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
                  << "unexpected stat line type \"" << statlinetype_to_string(out_lt)
                  << "\"!\n\n";
             exit(1);
-            break;
       }
 
       //
@@ -2757,7 +2786,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
          if(boot_seed) {
-            if(strlen(boot_seed) == 0) {
+            if(m_strlen(boot_seed) == 0) {
                js << "-boot_seed '' ";
             }
             else {
@@ -2765,6 +2794,27 @@ ConcatString STATAnalysisJob::get_jobstring() const {
             }
          }
       }
+   }
+
+   // Jobs which compute the skill score index
+   if(job_type == stat_job_go_index  ||
+      job_type == stat_job_cbs_index ||
+      job_type == stat_job_ss_index) {
+
+      // ss_index_name
+      js << "-ss_index_name " << ss_index_name << " ";
+
+      // ss_index_vld_thresh
+      js << "-ss_index_vld_thresh " << ss_index_vld_thresh << " ";
+   }
+
+   // Jobs which write MCTC or MCTS output
+   if(!is_bad_data(hss_ec_value) &&
+      (out_line_type.has(stat_mctc_str) ||
+       out_line_type.has(stat_mcts_str))) {
+
+      // hss_ec_value
+      js << "-hss_ec_value " << hss_ec_value << " ";
    }
 
    // Jobs which compute rank correlations
@@ -2853,8 +2903,9 @@ const char * statjobtype_to_string(const STATJobType t) {
 ////////////////////////////////////////////////////////////////////////
 
 void statjobtype_to_string(const STATJobType t, char *out) {
+   const char *method_name = "statjobtype_to_string() -> ";
 
-   strcpy(out, statjobtype_to_string(t));
+   m_strcpy(out, statjobtype_to_string(t), method_name);
 
    return;
 }
@@ -2875,8 +2926,10 @@ STATJobType string_to_statjobtype(const char *str) {
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
       t = stat_job_go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
-      t = stat_job_ss_index;
+      t = stat_job_cbs_index;
    else if(strcasecmp(str, statjobtype_str[6]) == 0)
+      t = stat_job_ss_index;
+   else if(strcasecmp(str, statjobtype_str[7]) == 0)
       t = stat_job_ramp;
    else
       t = no_stat_job_type;

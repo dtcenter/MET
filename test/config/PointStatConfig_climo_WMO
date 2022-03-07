@@ -42,6 +42,8 @@ eclv_points  = 0.05;
 message_type = [ "ADPUPA" ];
 sid_inc      = [];
 sid_exc      = [];
+obs_quality_inc = [];
+obs_quality_exc = [];
 
 //
 // Forecast and observation fields to be verified
@@ -119,6 +121,7 @@ climo_cdf = {
    cdf_bins    = 3;
    center_bins = TRUE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +213,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = BOTH;
+   orank  = NONE;
    rps    = BOTH;
    eclv   = NONE;
    mpr    = BOTH;
@@ -217,11 +221,10 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

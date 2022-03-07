@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -453,3 +453,20 @@ bool ProbRIRWPairInfoArray::add(const ProbRIRWInfo &p, const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ProbRIRWPairInfoArray::subset_write_valid(const TimeArray &ta) {
+
+   // Check for no work to do
+   if(ta.n() == 0) return;
+
+   ProbRIRWPairInfoArray new_pairs;
+   for(int i=0; i<Pairs.size(); i++) {
+      if(ta.has(Pairs[i].prob_rirw().valid())) new_pairs.add(Pairs[i]);
+   }
+
+   // Save the subset
+   *this = new_pairs;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

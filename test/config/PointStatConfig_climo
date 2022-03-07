@@ -44,10 +44,12 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_inc    = [];
-   sid_exc    = [];
-   cat_thresh = [];
-   message_type = [ "ADPSFC" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+   cat_thresh      = [];
+   message_type    = [ "ADPSFC" ];
 
    field = [
       {
@@ -171,6 +173,7 @@ climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,6 +265,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = NONE;
    mpr    = BOTH;
@@ -269,11 +273,10 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

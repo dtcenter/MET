@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,7 +58,6 @@ extern ConcatString str_format(const char *fmt, ...);
 extern ConcatString str_trim(const ConcatString str);
 
 extern int parse_thresh_index(const char *str);
-
 
 ////////////////////////////////////////////////////////////////////////
 

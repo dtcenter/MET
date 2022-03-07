@@ -13,6 +13,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <!--                                                                  -->
@@ -23,7 +25,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!--                                                                  -->
-  <!-- gen_vx_mask                                                    -->
+  <!-- gen_vx_mask                                                      -->
   <!--                                                                  -->
 
   <test name="test_all_gen_vx_mask_1">
@@ -32,7 +34,7 @@
       &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc \
-      -v 2
+      -type poly -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc</grid_nc>
@@ -49,6 +51,23 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_circles.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- gen_ens_prod                                                     -->
+  <!--                                                                  -->
+
+  <test name="test_all_gen_ens_prod">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <param> \
+      -ens &MET_DATA;/sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+      -config &MET_SCRIPTS;/config/GenEnsProdConfig \
+      -out &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc</grid_nc>
     </output>
   </test>
 
@@ -442,10 +461,18 @@
       -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_rps.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ssvar.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_relp.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_eclv.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ens.nc</grid_nc>
       <exist>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.nc</exist>

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -215,6 +215,7 @@ class TrackPairInfoArray {
 
       void add(const TrackPairInfo &);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
+      void subset_write_valid(const TimeArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////

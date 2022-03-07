@@ -90,6 +90,14 @@ jobs = [
    "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
     -line_type MPR -out_line_type ECLV,CTC,CTS \
     -out_thresh >273,>278 -out_eclv_points 0.1",
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -out_line_type MCTC \
+    -out_thresh >273,>275,>277 \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_mctc.stat",
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -out_line_type MCTS \
+    -out_thresh >273,>275,>277 -hss_ec_value 0.50 \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_mcts.stat",
    "-job filter -fcst_var TMP -fcst_lev Z2 \
     -line_type MPR -mask_sid ${CONFIG_DIR}/SID_CO.txt \
     -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat",
@@ -115,9 +123,18 @@ boot = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Skill score index options
+//
+ss_index_name       = "SS_INDEX";
+ss_index_vld_thresh = 1.0;
+
+////////////////////////////////////////////////////////////////////////////////
+
+hss_ec_value   = NA;
 rank_corr_flag = TRUE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

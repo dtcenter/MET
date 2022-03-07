@@ -193,11 +193,13 @@ out_valid_mask = "";
 jobs = [
    "-job filter   -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_filter_ee.tcst",
    "-job summary  -column TK_ERR -by AMODEL -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_summary_tk_err.tcst",
-   "-job probrirw -column_thresh RIRW_WINDOW ==24 -by AMODEL -probrirw_thresh 30 -probrirw_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_probrirw.tcst"
+   "-job probrirw -column_thresh RIRW_WINDOW ==24 -by AMODEL -probrirw_thresh 30 -probrirw_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_probrirw.tcst",
+   "-job summary  -column TK_ERR -by AMODEL,LEAD -amodel GPMI,GPMN -event_equal TRUE",
+   "-job summary  -column TK_ERR -by AMODEL,LEAD -amodel GPMI,GPMN,MISSING -event_equal TRUE"
 ];
 
 //
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V10.0.0";
+version = "V10.1.0";

@@ -1,28 +1,29 @@
 .. _point-stat:
 
+***************
 Point-Stat Tool
-===============
+***************
 
 Introduction
-____________
+============
 
 The Point-Stat tool provides verification statistics for forecasts at observation points (as opposed to over gridded analyses). The Point-Stat tool matches gridded forecasts to point observation locations and supports several different interpolation options. The tool then computes continuous, categorical, spatial, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
 Scientific and statistical aspects of the Point-Stat tool are discussed in the following section. Practical aspects of the Point-Stat tool are described in :numref:`tc-stat_practical-information`.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, :numref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`Appendix C, Section %s <appendixC>`. :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
 
 .. _matching-methods:
 
 Interpolation/matching methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
-In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to **SURFACE** in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. 
+In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to **SURFACE** in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
 
 To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
 
@@ -119,9 +120,9 @@ The forecast value at P is chosen as the grid point inside the interpolation are
 .. _PS_HiRA_framework:
 
 HiRA framework
-~~~~~~~~~~~~~~
+--------------
 
-The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (:ref:`Mittermaier, 2014 <Mittermaier-2014>`). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the **output_flag** dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
+The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (:ref:`Mittermaier, 2014 <Mittermaier-2014>`). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in three ways. First, the ensemble continuous statistics (ECNT), the observation rank statistics (ORANK) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), observation rank statistics (ORANK) or ranked probability score (RPS) line types in the **output_flag** dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated.
 
@@ -138,7 +139,7 @@ Often, the neighborhood size is chosen so that multiple models to be compared ha
 .. _PS_Statistical-measures:
 
 Statistical measures
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and at Collaboration for Australian Weather and Climate Research.  Forecast Verification - `Issues, Methods and FAQ web page. <https://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_
 
@@ -177,7 +178,7 @@ Often, the sample climatology is used as a reference by a skill score. The sampl
 .. _PS_Statistical-confidence-intervals:
 
 Statistical confidence intervals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 A single summary score gives an indication of the forecast performance, but it is a single realization from a random process that neglects uncertainty in the score's estimate. That is, it is possible to obtain a good score, but it may be that the "good" score was achieved by chance and does not reflect the "true" score. Therefore, when interpreting results from a verification analysis, it is imperative to analyze the uncertainty in the realized scores. One good way to do this is to utilize confidence intervals. A confidence interval indicates that if the process were repeated many times, say 100, then the true score would fall within the interval :math:`100(1-\alpha)\%` of the time. Typical values of :math:`\alpha` are 0.01, 0.05, and 0.10. The Point-Stat tool allows the user to select one or more specific :math:`\alpha`-values to use.
 
@@ -248,14 +249,14 @@ For more information on confidence intervals pertaining to verification measures
 .. _tc-stat_practical-information:
 
 Practical information
-_____________________
+=====================
 
 The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
 If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Point-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts.
 
 point_stat usage
-~~~~~~~~~~~~~~~~
+----------------
 
 The usage statement for the Point-Stat tool is shown below:
 
@@ -286,7 +287,7 @@ Required arguments for point_stat
 Optional arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. 
+4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. The python embedding will be activated if the **file** begines with 'PYTHON_NUMPY=" and followed by a python script name.
 
 5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
@@ -309,7 +310,7 @@ An example of the point_stat calling sequence is shown below:
 In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the **PointStatConfig file**.
 
 point_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -337,11 +338,13 @@ ________________________
   mpr_column     = [];
   mpr_thresh     = [];
   eclv_points    = 0.05;
+  hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;
-  obs_quality    = [];
+  obs_quality_inc  = [];
+  obs_quality_exc  = [];
   obs_summary    = NONE;
   obs_perc_value = 50;
   message_type_group_map = [...];
@@ -424,6 +427,7 @@ ________________________
      pjc    = BOTH;
      prc    = BOTH;
      ecnt   = BOTH;  // Only for HiRA
+     orank  = BOTH;  // Only for HiRA
      rps    = BOTH;  // Only for HiRA
      eclv   = BOTH;
      mpr    = BOTH;
@@ -449,9 +453,9 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 9. **VL1L2** for Vector L1L2 Partial Sums
 
-10. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
+10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table counts for Probabilistic forecasts
 
@@ -463,13 +467,15 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 16. **ECNT** for Ensemble Continuous Statistics is only computed for the HiRA methodology
 
-17. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
+17. **ORANK** for Ensemble Matched Pair Information when point observations are supplied for the HiRA methodology
 
-18. **ECLV** for Economic Cost/Loss Relative Value
+18. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
 
-19. **MPR** for Matched Pair data
+19. **ECLV** for Economic Cost/Loss Relative Value
 
-Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
+20. **MPR** for Matched Pair data
+
+Note that the FHO and CTC line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
 
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 
@@ -478,7 +484,7 @@ If all line types corresponding to a particular verification method are set to N
 .. _point_stat-output:
 
 point_stat output
-~~~~~~~~~~~~~~~~~
+-----------------
 
 point_stat produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files will be written to the default output directory or the directory specified using the "-outdir" command line option.
 
@@ -488,13 +494,13 @@ point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-
 
 The output ASCII files are named similarly:
 
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv, sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, orank, rps, eclv, sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
 
-The first set of header columns are common to all of the output files generated by the Point-Stat tool. Tables describing the contents of the header columns and the contents of the additional columns for each line type are listed in the following tables. The ECNT line type is described in :numref:`table_ES_header_info_es_out_ECNT`. The RPS line type is described in :numref:`table_ES_header_info_es_out_RPS`.
+The first set of header columns are common to all of the output files generated by the Point-Stat tool. Tables describing the contents of the header columns and the contents of the additional columns for each line type are listed in the following tables. The ECNT line type is described in :numref:`table_ES_header_info_es_out_ECNT`. The ORANK line type is described in :numref:`table_ES_header_info_es_out_ORANK`. The RPS line type is described in :numref:`table_ES_header_info_es_out_RPS`.
 
 .. _table_PS_header_info_point-stat_out:
 
-.. list-table:: Header information for each file point-stat outputs.
+.. list-table:: Common STAT header columns.
   :widths: auto
   :header-rows: 2
 
@@ -693,7 +699,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CTS_cont:
 
-.. list-table::  Format information for CTS (Contingency Table Statistics) output line type, continued from above
+.. list-table:: Format information for CTS (Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 2
 
@@ -740,7 +746,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CNT:
 
-.. list-table:: Format information for CNT(Continuous Statistics) output line type.
+.. list-table:: Format information for CNT (Continuous Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -799,7 +805,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CNT_cont:
 
-.. list-table::  Format information for CNT(Continuous Statistics) output line type continued from above table
+.. list-table:: Format information for CNT (Continuous Statistics) output line type continued from above table
   :widths: auto
   :header-rows: 2
 
@@ -851,6 +857,10 @@ The first set of header columns are common to all of the output files generated 
   * - 120-122
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
+  * - 123-125
+    - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
+    - Scatter Index including bootstrap upper and lower confidence limits
+      
 
 .. _table_PS_format_info_MCTC:
 
@@ -873,9 +883,12 @@ The first set of header columns are common to all of the output files generated 
   * - 26
     - N_CAT
     - Dimension of the contingency table
-  * - 27
+  * - 28
     - Fi_Oj
     - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
+  * - \*
+    - EC_VALUE
+    - Expected correct rate, used for MCTS HSS_EC
 
 
 .. role:: raw-html(raw)
@@ -914,6 +927,12 @@ The first set of header columns are common to all of the output files generated 
   * - 38-40
     - GER, :raw-html:`<br />` GER_BCL, :raw-html:`<br />` GER_BCU
     - Gerrity Score and bootstrap confidence limits
+  * - 41-43
+    - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
+    - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+  * - 44
+    - EC_VALUE
+    - Expected correct rate, used for MCTS HSS_EC
 
 .. _table_PS_format_info_PCT:
 
@@ -1081,7 +1100,7 @@ The first set of header columns are common to all of the output files generated 
   * - 29
     - POFD_i
     - Probability of false detection when forecast is greater than the ith probability thresholds (repeated)
-  * - *
+  * - \*
     - THRESH_n
     - Last probability threshold value
 
@@ -1281,7 +1300,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_VCNT:
 
-.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
   :header-rows: 2
 
@@ -1297,58 +1316,58 @@ The first set of header columns are common to all of the output files generated 
   * - 25
     - TOTAL
     - Total number of data points
-  * - 26–28
+  * - 26-28
     - FBAR
     - Mean value of forecast wind speed
-  * - 29–31
+  * - 29-31
     - OBAR
     - Mean value of observed wind speed
-  * - 32–34
+  * - 32-34
     - FS_RMS
     - Root mean square forecast wind speed
-  * - 35–37
+  * - 35-37
     - OS_RMS
     - Root mean square observed wind speed
-  * - 38–40
+  * - 38-40
     - MSVE
     - Mean squared length of the vector difference between the forecast and observed winds
-  * - 41–43
+  * - 41-43
     - RMSVE
     - Square root of MSVE
-  * - 45–46
+  * - 45-46
     - FSTDEV
     - Standard deviation of the forecast wind speed
-  * - 47–49
+  * - 47-49
     - OSTDEV
     - Standard deviation of the observed wind field
-  * - 50–52
+  * - 50-52
     - FDIR
     - Direction of the average forecast wind vector
-  * - 53–55
+  * - 53-55
     - ODIR
     - Direction of the average observed wind vector
-  * - 56–58
+  * - 56-58
     - FBAR_SPEED
     - Length (speed) of the average forecast wind vector
-  * - 59–61
+  * - 59-61
     - OBAR_SPEED
     - Length (speed) of the average observed wind vector
-  * - 62–64
+  * - 62-64
     - VDIFF_SPEED
     - Length (speed) of the vector difference between the average forecast and average observed wind vectors
-  * - 65–67
+  * - 65-67
     - VDIFF_DIR
     - Direction of the vector difference between the average forecast and average wind vectors
-  * - 68–70
+  * - 68-70
     - SPEED_ERR
     - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O)
-  * - 71–73
+  * - 71-73
     - SPEED_ABSERR
     - Absolute value of SPEED_ERR
-  * - 74–76
+  * - 74-76
     - DIR_ERR
     - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector
-  * - 77–79
+  * - 77-79
     - DIR_ABSERR
     - Absolute value of DIR_ABSERR
 

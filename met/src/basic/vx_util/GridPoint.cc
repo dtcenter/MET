@@ -1,47 +1,23 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1990 - 2021
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
-// ** Boulder, Colorado, USA
-// ** BSD licence applies - redistribution and use in source and binary
-// ** forms, with or without modification, are permitted provided that
-// ** the following conditions are met:
-// ** 1) If the software is modified to produce derivative works,
-// ** such modified software should be clearly marked, so as not
-// ** to confuse it with the version available from UCAR.
-// ** 2) Redistributions of source code must retain the above copyright
-// ** notice, this list of conditions and the following disclaimer.
-// ** 3) Redistributions in binary form must reproduce the above copyright
-// ** notice, this list of conditions and the following disclaimer in the
-// ** documentation and/or other materials provided with the distribution.
-// ** 4) Neither the name of UCAR nor the names of its contributors,
-// ** if any, may be used to endorse or promote products derived from
-// ** this software without specific prior written permission.
-// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
-// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-// RCS info
-//   $Author: dixon $
-//   $Locker:  $
-//   $Date: 2016/03/03 18:19:27 $
-//   $Id: GridPoint.cc,v 1.7 2016/03/03 18:19:27 dixon Exp $
-//   $Revision: 1.7 $
-//   $State: Exp $
-
-/**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**/
-/*********************************************************************
- * GridPoint.cc: class implementing grid index points.
- *
- * RAP, NCAR, Boulder CO
- *
- * January 1999
- *
- * Nancy Rehak
- *
- *********************************************************************/
+///////////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   GridPoint.cc
+//
+//   Description:
+//      Class implementing grid index points.
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//   000    01-01-99  Rehak           Initial version.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 
@@ -52,42 +28,39 @@
 #include <GridPoint.h>
 using namespace std;
 
-/**********************************************************************
- * Constructors
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(int cur_x, int cur_y)
 {
   setPoint(cur_x, cur_y);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(GridPoint *point)
 {
   setPoint(point);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::GridPoint(GridPoint *point, GridOffset *offset)
 {
   setPoint(point, offset);
 }
 
-
-/**********************************************************************
- * Destructor
- */
+///////////////////////////////////////////////////////////////////////////////
 
 GridPoint::~GridPoint(void)
 {
 }
 
-
-/**********************************************************************
- * rotate() - Rotate the point about the origin by the given angle.
- *            The angle value must be given in degrees.
- */
-
+///////////////////////////////////////////////////////////////////////////////
+//
+// Rotate the point about the origin by the given angle.
+// The angle value must be given in degrees.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void GridPoint::rotate(const double angle)
 {
@@ -103,7 +76,4 @@ void GridPoint::rotate(const double angle)
   y = (int)(new_y + 0.5);
 }
 
-
-/**********************************************************************
- *              Private Member Functions                              *
- **********************************************************************/
+///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -38,8 +38,15 @@ using namespace std;
 #include "vx_regrid.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "nc_obs_util.h"
+#include "nc_point_obs_in.h"
 
 #include "point2grid_conf_info.h"
+
+#ifdef WITH_PYTHON
+#include "data2d_nc_met.h"
+#include "pointdata_python.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,6 +58,7 @@ static const int TYPE_OBS      = 1;     // MET Point Obs NetCDF (from xxx2nc)
 static const int TYPE_NCCF     = 2;     // CF NetCDF with time and lat/lon variables
 static const int TYPE_GOES     = 5;
 static const int TYPE_GOES_ADP = 6;
+static const int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
 
 static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
 static const int        DefaultInterpWdth = 2;
@@ -118,14 +126,19 @@ static NcDim  lon_dim ;
 static void process_command_line(int, char **);
 static void process_data_file();
 static void process_point_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, const Grid fr_grid, const Grid to_grid);
+                               VarInfo *, const Grid to_grid);
+#ifdef WITH_PYTHON
+static void process_point_python(string python_command, MetConfig &config,
+                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray);
+#endif
 static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, Met2dDataFile *fr_mtddf, const Grid to_grid);
+                                    VarInfo *, Met2dDataFile *fr_mtddf,
+                                    const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname);
 static void write_nc_int(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname);
+                         const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage();
 static void set_field(const StringArray &);
@@ -263,11 +276,26 @@ void process_command_line(int argc, char **argv) {
    OutputFilename = cline[2];
 
    // Check if the input file
-   if ( !file_exists(InputFilename.c_str()) ) {
-      mlog << Error << "\n" << method_name
-           << "file does not exist \"" << InputFilename << "\"\n\n";
-      exit(1);
+   bool use_python = false;
+#ifdef WITH_PYTHON
+   string python_command = InputFilename;
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
    }
+   else
+#endif
+      if ( !file_exists(InputFilename.c_str()) ) {
+         mlog << Error << "\n" << method_name
+              << "file does not exist \"" << InputFilename << "\"\n\n";
+         exit(1);
+      }
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -326,7 +354,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_data_file() {
-   DataPlane fr_dp;
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    ConcatString run_cs;
@@ -346,18 +373,42 @@ void process_data_file() {
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
-   nc_in = open_ncfile(InputFilename.c_str());
-   
-   // Get the obs type before opening NetCDF
-   int obs_type = get_obs_type(nc_in);
-   bool goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-
-   if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
-   
-   // Read the input data file
+   bool goes_data = false;
+   bool use_python = false;
+   int obs_type = TYPE_UNKNOWN;
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
-   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+#ifdef WITH_PYTHON
+   string python_command = InputFilename;
+   MetPointData *met_point_obs = 0;
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
+
+      python_command = python_command.substr(offset+1);
+      obs_type = TYPE_PYTHON;
+      fr_mtddf = new MetNcMetDataFile();
+   }
+   else
+#endif
+   {
+      nc_in = open_ncfile(InputFilename.c_str());
+
+      // Get the obs type before opening NetCDF
+      obs_type = get_obs_type(nc_in);
+      goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+
+      if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
+
+      // Read the input data file
+      fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+   }
 
    if(!fr_mtddf) {
       mlog << Error << "\n" << method_name
@@ -383,7 +434,11 @@ void process_data_file() {
    // For python types read the first field to set the grid
 
    // Determine the "from" grid
+#ifdef WITH_PYTHON
+   if (!use_python) fr_grid = fr_mtddf->grid();
+#else
    fr_grid = fr_mtddf->grid();
+#endif
 
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
@@ -409,12 +464,17 @@ void process_data_file() {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in, config, vinfo, fr_grid, to_grid);
+      process_point_file(nc_in, config, vinfo, to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
       process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
+#ifdef WITH_PYTHON
+   else if (TYPE_PYTHON == obs_type) {
+      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+   }
+#endif
    else {
       mlog << Error << "\n" << method_name
            << "Please check the input file. Only supports GOES, MET point obs, "
@@ -598,8 +658,8 @@ IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                        const Grid fr_grid, const Grid to_grid) {
+void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
+                            const Grid to_grid) {
    int nhdr, nobs;
    int nx, ny, var_count, to_count, var_count2;
    int idx, hdr_idx;
@@ -612,22 +672,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   bool use_var_id = true;
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
-   static const char *method_name = "process_point_file() -> ";
-
-   if (!get_dim(nc_in, ConcatString(nc_dim_nhdr), nhdr, true)) {
-      mlog << Error << "\n" << method_name
-           << "can not find the header dimension\"" << nc_dim_nhdr << "\".\n\n";
-      exit(1);
-   }
-   if (!get_dim(nc_in, ConcatString(nc_dim_nobs), nobs, true)) {
-      mlog << Error << "\n" << method_name
-           << "can not find the obs dimension\"" << nc_dim_nobs << "\".\n\n";
-      exit(1);
-   }
+   static const char *method_name = "process_point_met_data() -> ";
+   static const char *method_name_s = "process_point_met_data()";
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -636,70 +685,33 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       usage();
    }
 
-   int *obs_ids = new int[nobs];       // grib_code or var_id
-   int *obs_hids = new int[nobs];
+//   MetNcPointObsIn nc_point_obs;
+   MetPointHeader *header_data = met_point_obs->get_header_data();
+   MetPointObsData *obs_data = met_point_obs->get_point_obs_data();
+
+   nhdr = met_point_obs->get_hdr_cnt();
+   nobs = met_point_obs->get_obs_cnt();
+   bool empty_input = (nhdr == 0 && nobs == 0);
+   bool use_var_id = met_point_obs->is_using_var_id();
+
    float *hdr_lats = new float[nhdr];
    float *hdr_lons = new float[nhdr];
-   float *obs_lvls = new float[nobs];
-   float *obs_hgts = new float[nobs];
-   float *obs_vals = new float[nobs];
-   int *hdr_typ_ids = new int[nhdr];
-   int *hdr_vld_ids = new int[nhdr];
-   int *obs_qty_ids = new int[nobs];
    IntArray var_index_array;
    IntArray valid_time_array;
-   StringArray qc_tables;
-   StringArray var_names;
-   StringArray hdr_types;
-   StringArray hdr_valid_times;
+   StringArray qc_tables = met_point_obs->get_qty_data();
+   StringArray var_names = met_point_obs->get_var_names();
+   StringArray hdr_valid_times = header_data->vld_array;
+   hdr_valid_times.sort();
 
-   if (!get_nc_data_string_array(nc_in, nc_var_hdr_typ_tbl, &hdr_types)) exit(1);
+   met_point_obs->get_lats(hdr_lats);
+   met_point_obs->get_lons(hdr_lons);
+
    // Check the message types
-   prepare_message_types(hdr_types);
+   prepare_message_types(header_data->typ_array);
 
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
-   bool empty_input = (nhdr == 0 && nobs == 0);
-   NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
-   if (IS_VALID_NC(obs_vid_var)) {
-      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids);
-      if (success_to_read) success_to_read = get_nc_data_string_array(nc_in, nc_var_obs_var, &var_names);
-   }
-   else {
-      use_var_id = false;
-      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_gc, obs_ids, false);
-      if (!success_to_read) {
-         mlog << Error << "\n" << method_name
-              << "\"" << InputFilename << "\" is very old format. Not supported\n\n";
-      }
-   }
 
-   if (!empty_input) {
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
-      if (success_to_read)
-         success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
-      if (success_to_read)
-         success_to_read = get_nc_data_string_array(
-               nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
-      if (success_to_read)
-         success_to_read = get_nc_data_string_array(
-               nc_in, nc_var_obs_qty_tbl, &qc_tables);
-   }
    if (success_to_read) {
       bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
@@ -755,14 +767,15 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
             }
             else {
-               char grib_code[128];
+               const int TMP_BUF_LEN = 128;
+               char grib_code[TMP_BUF_LEN + 1];
                var_idx_or_gc = atoi(vname.c_str());
-               sprintf(grib_code, "%d", var_idx_or_gc);
+               snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
                if (vname != grib_code) {
                   ConcatString var_id = conf_info.get_var_id(vname);
                   if( var_id.nonempty() ) {
                      var_idx_or_gc = atoi(var_id.c_str());
-                     sprintf(grib_code, "%d", var_idx_or_gc);
+                     snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
                   }
                   else {
                      exit_by_field_name_error = true;
@@ -772,7 +785,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                else {
                   bool not_found_grib_code = true;
                   for (idx=0; idx<nobs; idx++) {
-                     if (var_idx_or_gc == obs_ids[idx]) {
+                     if (var_idx_or_gc == obs_data->obs_ids[idx]) {
                         not_found_grib_code = false;
                         break;
                      }
@@ -797,10 +810,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                log_msg << "GRIB codes: ";
                IntArray grib_codes;
                for (idx=0; idx<nobs; idx++) {
-                  if (!grib_codes.has(obs_ids[idx])) {
-                     grib_codes.add(obs_ids[idx]);
+                  if (!grib_codes.has(obs_data->obs_ids[idx])) {
+                     grib_codes.add(obs_data->obs_ids[idx]);
                      if (0 < idx) log_msg << ", ";
-                     log_msg << obs_ids[idx];
+                     log_msg << obs_data->obs_ids[idx];
                   }
                }
             }
@@ -827,8 +840,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          requested_valid_time = valid_time;
          if (0 < valid_time) {
             valid_beg_ut = valid_end_ut = valid_time;
-            if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-            if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+            if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+            if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
             for(idx=0; idx<hdr_valid_times.n(); idx++) {
                obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
                if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
@@ -876,29 +889,29 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          var_count = var_count2 = to_count = 0;
          filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
          for (idx=0; idx < nobs; idx++) {
-            if (var_idx_or_gc == obs_ids[idx]) {
+            if (var_idx_or_gc == obs_data->obs_ids[idx]) {
                var_count2++;
-               hdr_idx = obs_hids[idx];
+               hdr_idx = obs_data->obs_hids[idx];
                if (0 < valid_time_array.n() &&
-                     !valid_time_array.has(hdr_vld_ids[hdr_idx])) {
+                     !valid_time_array.has(header_data->vld_idx_array[hdr_idx])) {
                   filtered_by_time++;
                   continue;
                }
 
-               if(!keep_message_type(hdr_typ_ids[hdr_idx])) {
+               if(!keep_message_type(header_data->typ_idx_array[hdr_idx])) {
                   filtered_by_msg_type++;
                   continue;
                }
 
                // Filter by QC flag
-               if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
+               if (has_qc_flags && !qc_idx_array.has(obs_data->obs_qids[idx])) {
                   filtered_by_qc++;
                   continue;
                }
 
                var_index_array.add(idx);
                var_count++;
-               if (is_eq(obs_vals[idx], 0.)) obs_count_zero_from++;
+               if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
                else obs_count_non_zero_from++;
             }
          }
@@ -909,7 +922,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
          cellMapping = new IntArray[nx * ny];
          if( get_grid_mapping(to_grid, cellMapping, var_index_array,
-                              obs_hids, hdr_lats, hdr_lons) ) {
+                              obs_data->obs_hids, hdr_lats, hdr_lons) ) {
             int from_index;
             IntArray cellArray;
             NumArray dataArray;
@@ -945,8 +958,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      dataArray.extend(cellArray.n());
                      for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
-                        data_value = obs_vals[from_index];
-                        if (is_eq(data_value, bad_data_float)) continue;
+                        data_value = obs_data->get_obs_val(from_index);
+                        if (is_bad_data(data_value)) continue;
 
                         if(mlog.verbosity_level() >= 4) {
                            if (from_min_value > data_value) from_min_value = data_value;
@@ -1111,22 +1124,110 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
    }
 
-   delete [] obs_ids;
-   delete [] obs_hids;
    delete [] hdr_lats;
    delete [] hdr_lons;
-   delete [] obs_lvls;
-   delete [] obs_hgts;
-   delete [] obs_vals;
-   delete [] hdr_typ_ids;
-   delete [] hdr_vld_ids;
-   delete [] obs_qty_ids;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+                        const Grid to_grid) {
+   int nhdr, nobs;
+   int nx, ny, var_count, to_count, var_count2;
+   int idx, hdr_idx;
+   int var_idx_or_gc;
+   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
+   ConcatString vname, vname_cnt, vname_mask;
+   DataPlane fr_dp, to_dp;
+   DataPlane cnt_dp, mask_dp;
+   DataPlane prob_dp, prob_mask_dp;
+   NcVar var_obs_gc, var_obs_var;
+
+   clock_t start_clock =  clock();
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
+   unixtime requested_valid_time, valid_time;
+   static const char *method_name = "process_point_file() -> ";
+   static const char *method_name_s = "process_point_file()";
+
+   // Check for at least one configuration string
+   if(FieldSA.n() < 1) {
+      mlog << Error << "\n" << method_name
+           << "The -field option must be used at least once!\n\n";
+      usage();
+   }
+
+   MetNcPointObsIn nc_point_obs;
+   nc_point_obs.set_netcdf(nc_in, true);
+   // Read the dimensions and variables
+   nc_point_obs.read_dim_headers();
+   nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
+   // Read all obs data to compute the cell mapping
+   nc_point_obs.read_obs_data();
+   process_point_met_data(&nc_point_obs, config, vinfo, to_grid);
+
+   nc_point_obs.close();
+
+   mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+#ifdef WITH_PYTHON
+
+void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
+                          const Grid to_grid, bool use_xarray) {
+   int nhdr, nobs;
+   int nx, ny, var_count, to_count, var_count2;
+   int idx, hdr_idx;
+   int var_idx_or_gc;
+   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
+   ConcatString vname, vname_cnt, vname_mask;
+   DataPlane fr_dp, to_dp;
+   DataPlane cnt_dp, mask_dp;
+   DataPlane prob_dp, prob_mask_dp;
+   NcVar var_obs_gc, var_obs_var;
+
+   clock_t start_clock =  clock();
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
+   unixtime requested_valid_time, valid_time;
+   static const char *method_name = "process_point_python() -> ";
+   static const char *method_name_s = "process_point_python()";
+
+   // Check for at least one configuration string
+   if(FieldSA.n() < 1) {
+      mlog << Error << "\n" << method_name
+           << "The -field option must be used at least once!\n\n";
+      usage();
+   }
+
+   MetPythonPointDataFile met_point_file;
+   if(!met_point_file.open(python_command.c_str(), use_xarray)) {
+      met_point_file.close();
+
+      mlog << Error << "\n" << method_name
+           << "trouble getting point observation file from python command "
+           << python_command << "\n\n";
+
+      exit(1);
+   }
+
+   MetPointData *met_point_obs = met_point_file.get_met_point_data();
+   process_point_met_data(met_point_obs, config, vinfo, to_grid);
+
+   met_point_file.close();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
    return;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1144,7 +1245,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
    int from_size = fr_grid.nx() * fr_grid.ny();
-   static const char *method_name = "process_point_file_with_latlon() -> ";
+   static const char *method_name = "process_point_nccf_file() -> ";
 
    NcVar var_lat = get_nc_var_lat(nc_in);
    NcVar var_lon = get_nc_var_lon(nc_in);
@@ -1166,14 +1267,12 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       usage();
    }
 
-   bool is_2d_time = false;
    unixtime valid_time = bad_data_int;
    valid_beg_ut = valid_end_ut = conf_info.valid_time;
    
    NcVar time_var = get_nc_var_time(nc_in);
    if( IS_VALID_NC(time_var) ) {
       if( 1 < get_dim_count(&time_var) ) {
-         is_2d_time = true;
          double max_time = bad_data_double;
          skip_times = new bool[from_size];
          valid_times = new double[from_size];
@@ -1183,8 +1282,8 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
             unixtime ref_ut = (unixtime) 0;
             unixtime tmp_time;
             if( conf_info.valid_time > 0 ) {
-               if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-               if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+               if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+               if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
                ref_ut = get_reference_unixtime(&time_var, sec_per_unit, no_leap_year);
             }
             for (int i=0; i<from_size; i++) {
@@ -1261,7 +1360,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
                float value = to_dp.get(x, y);
-               if (!is_eq(value, bad_data_float) &&
+               if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
                   prob_dp.set(1, x, y);
@@ -1331,10 +1430,11 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       exit(1);
    }
    else {
+      bool is_to_north = !fr_grid.get_swap_to_north();
       float *from_data = new float[from_data_size];
       for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
-            int offset = fr_dp.two_to_one(xIdx,yIdx);
+            int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
             from_data[offset] = fr_dp.get(xIdx,yIdx);
          }
       }
@@ -1362,13 +1462,12 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             int offset = to_dp.two_to_one(xIdx,yIdx);
             cellArray = cellMapping[offset];
             if (0 < cellArray.n()) {
-               int valid_cnt = 0;
                dataArray.clear();
                dataArray.extend(cellArray.n());
                for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                   from_index = cellArray[dIdx];
                   data_value = from_data[from_index];
-                  if (is_eq(data_value, bad_data_float)) {
+                  if (is_bad_data(data_value)) {
                      missing_cnt++;
                      continue;
                   }
@@ -1379,14 +1478,13 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                      if (from_min_value > data_value) from_min_value = data_value;
                      if (from_max_value < data_value) from_max_value = data_value;
                   }
-      
-                  valid_cnt++;
                }
-      
+
                if (0 < dataArray.n()) {
-                  int data_cnt = dataArray.n();
                   float to_value;
-                  if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
+                  int data_cnt = dataArray.n();
+                  if (1 == data_cnt) to_value = dataArray[0];
+                  else if (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
                   else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
                   else if (RGInfo.method == InterpMthd_Median) {
                      dataArray.sort_array();
@@ -1398,12 +1496,23 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       
                   to_dp.set(to_value, xIdx, yIdx);
                   to_cell_cnt++;
-                  mlog << Debug(9) << method_name
-                       <<   "max: " << dataArray.max()
-                       << ", min: " << dataArray.min()
-                       << ", mean: " << dataArray.sum()/data_cnt
-                       << " from " << valid_cnt << " out of "
-                       << data_cnt << " data values.\n";
+                  if(mlog.verbosity_level() >= 9) {
+                     double to_lat, to_lon;
+                     to_grid.xy_to_latlon(xIdx,yIdx, to_lat, to_lon);
+                     to_lon *= -1;
+                     if (1 == data_cnt)
+                        mlog << Debug(9) << method_name
+                             << "value: " << to_value << " to (" << to_lon << ", " << to_lat
+                             << ") from offset " << from_index << ".\n";
+                     else
+                        mlog << Debug(9) << method_name
+                             <<   "value: " << to_value
+                             << ", max: " << dataArray.max()
+                             << ", min: " << dataArray.min()
+                             << ", mean: " << dataArray.sum()/data_cnt
+                             << " from " << data_cnt << " (out of " << cellArray.n()
+                             << ") data values to (" << to_lon << ", " << to_lat << ").\n";
+                  }
                }
             }
             else {
@@ -1670,7 +1779,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
                float value = to_dp.get(x, y);
-               if (!is_eq(value, bad_data_float) &&
+               if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
                   prob_dp.set(1, x, y);
@@ -1734,7 +1843,7 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    for (int idx=0; idx<data_size; idx++) {
       if (cnt_printed < 10 && latitudes[idx] > MISSING_LATLON
           && longitudes[idx] > MISSING_LATLON) {
-         mlog << Debug(7) << method_name << "index: " << idx <<  " lat: "
+         mlog << Debug(11) << method_name << "index: " << idx <<  " lat: "
               << latitudes[idx] << ", lon: " << longitudes[idx] << "\n";
          cnt_printed++;
       }
@@ -1839,8 +1948,9 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times) {
+      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
    double x, y;
+   double to_ll_lat, to_ll_lon;
    float lat, lon;
    int idx_x, idx_y, to_offset;
    int count_in_grid = 0;
@@ -1856,11 +1966,14 @@ static void get_grid_mapping_latlon(
    for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
    for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
 
+   to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
+   mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
+   
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
-   for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
-      for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
-         int coord_offset = from_dp.two_to_one(yIdx, xIdx);
+   for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+      for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+         int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if( skip_times != 0 && skip_times[coord_offset] ) continue;
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
@@ -1873,6 +1986,12 @@ static void get_grid_mapping_latlon(
             mapping_indices[coord_offset] = to_offset;
             to_cell_counts[to_offset] += 1;
             count_in_grid++;
+            if(mlog.verbosity_level() >= 15) {
+               double to_lat, to_lon;
+               to_grid.xy_to_latlon(idx_x, idx_y, to_lat, to_lon);
+               mlog << Debug(15) << method_name << " [" << xIdx << "," << yIdx << "] to " << coord_offset
+                    << " (" << lon << ", " << lat << ") to (" << (to_lon*-1) << ", " << to_lat << ")\n";
+            }
          }
       }
    }
@@ -1906,7 +2025,7 @@ static void get_grid_mapping_latlon(
    // Build cell mapping
    for (int xIdx=0; xIdx<data_size; xIdx++) {
       to_offset = mapping_indices[xIdx];
-      if( to_offset == bad_data_int ) continue;
+      if( is_bad_data(to_offset) ) continue;
       if( to_offset < 0 || to_offset >= to_size ) {
          mlog << Error << "\n" << method_name
               << "the mapped cell is out of range: "
@@ -1960,6 +2079,7 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       exit(1);
    }
    else if (data_size > 0) {
+      int last_idx = data_size - 1;
       float *latitudes  = new float[data_size];
       float *longitudes = new float[data_size];
       status = get_nc_data(&var_lat, latitudes);
@@ -1967,7 +2087,16 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes, from_lat_count,
-                                 from_lon_count, skip_times);
+                                 from_lon_count, skip_times,
+                                 !fr_grid.get_swap_to_north());
+
+         if (is_eq(latitudes[0], latitudes[last_idx]) ||
+             is_eq(longitudes[0], longitudes[last_idx])) {
+            mlog << Warning << "\n" << method_name << "same latitude or longitude. lat[0]="
+                 << latitudes[0] << " lat[" << last_idx << "]=" << latitudes[last_idx]
+                 << " lon[0]=" << longitudes[0] << " lon[" << last_idx << "]="
+                 << longitudes[last_idx] << "\n\n";
+         }
       }
       if( latitudes )  delete [] latitudes;
       if( longitudes ) delete [] longitudes;
@@ -1997,7 +2126,7 @@ static unixtime find_valid_time(NcVar time_var) {
       }
    }
 
-   if (valid_time == bad_data_int) {
+   if (is_bad_data(valid_time)) {
       mlog << Error << "\n" << method_name
            << "trouble finding time variable from \""
            << InputFilename << "\"\n\n";
@@ -2178,7 +2307,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count, 0);
+                                 longitudes, from_lat_count, from_lon_count, 0,
+                                 !fr_grid.get_swap_to_north());
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
@@ -2419,7 +2549,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
                data_value = from_data[from_index];
-               if (is_eq(data_value, bad_data_float)) {
+               if (is_bad_data(data_value)) {
                   missing_count++;
                   continue;
                }

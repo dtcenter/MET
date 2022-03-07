@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,34 +66,25 @@ static const char * default_config_filename =
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
    "ecnt",  "rps",   "rhist", "phist",
-   "orank", "ssvar", "relp"
+   "orank", "ssvar", "relp",  "pct",
+   "pstd",  "pjc",   "prc",   "eclv"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
    ecnt_columns,  rps_columns,   rhist_columns,
    phist_columns, orank_columns, ssvar_columns,
-   relp_columns
+   relp_columns,  pct_columns,   pstd_columns,
+   pjc_columns,   prc_columns,   eclv_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
    n_ecnt_columns,  n_rps_columns,   n_rhist_columns,
    n_phist_columns, n_orank_columns, n_ssvar_columns,
-   n_relp_columns
+   n_relp_columns,  n_pct_columns,   n_pstd_columns,
+   n_pjc_columns,   n_prc_columns,   n_eclv_columns
 };
-
-// Maximum number of GRIB records
-static const int max_n_rec = 300;
-
-// Point observation header length
-static const int hdr_arr_len = 3;
-
-// Point observation header types lengths
-static const int hdr_typ_arr_len = 3;
-
-// Point observation values length
-static const int obs_arr_len = 5;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -102,27 +93,32 @@ static const int obs_arr_len = 5;
 ////////////////////////////////////////////////////////////////////////
 
 // Input Ensemble files
-static int          n_ens;         // Number of ensemble members
-static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens]
+static int          n_ens_files;   // Number of ensemble members
+static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens_files]
 static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
 
-static StringArray  ens_file_list;
-static IntArray     ens_file_vld;
+static StringArray  ens_file_list;  // Array of ensemble input files
+static StringArray  fcst_file_list; // Array of ensemble input files including control
+static IntArray     ens_file_vld;   // Array of ensemble file valid status
+static IntArray     fcst_file_vld;  // Array of forecast file valid status
 static GrdFileType  etype = FileType_None;
 
 static bool         ens_mean_flag; // Flag for ensemble mean processing
 static ConcatString ens_mean_user; // User-specified ensemble mean data file
 static ConcatString ens_mean_file; // Computed ensemble mean output file
 
+static ConcatString ctrl_file;     // Control member file
+static int          ctrl_file_index = bad_data_int; // Control member file index
+
 // Input Observation files
 static StringArray  grid_obs_file_list;
-static int          grid_obs_flag = 0;
+static bool         grid_obs_flag = false;
 
 static StringArray  point_obs_file_list;
-static int          point_obs_flag = 0;
+static bool         point_obs_flag = false;
 
 static GrdFileType  otype   = FileType_None;
-static int          vx_flag = 0;
+static bool         vx_flag = false;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
@@ -130,11 +126,11 @@ static ConcatString         config_file;
 static ConcatString         out_file;
 
 // Optional arguments
-static unixtime     ens_valid_ut        = (unixtime) 0;
-static NumArray     ens_lead_na;
+static unixtime ens_valid_ut = (unixtime) 0;
+static NumArray ens_lead_na;
 
-static unixtime     obs_valid_beg_ut    = (unixtime) 0;
-static unixtime     obs_valid_end_ut    = (unixtime) 0;
+static unixtime obs_valid_beg_ut = (unixtime) 0;
+static unixtime obs_valid_end_ut = (unixtime) 0;
 
 static ConcatString out_dir;
 
@@ -188,9 +184,10 @@ static Met2dDataFileFactory mtddf_factory;
 static StatHdrColumns shc;
 
 // Arrays to store running sums and counts
-static NumArray count_na, min_na, max_na, sum_na, sum_sq_na;
-static NumArray *thresh_count_na = (NumArray *) 0; // [n_thresh]
-static NumArray **thresh_nbrhd_count_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
+static NumArray cnt_na, min_na, max_na, sum_na;
+static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
+static NumArray *thresh_cnt_na = (NumArray *) 0; // [n_thresh]
+static NumArray **thresh_nbrhd_cnt_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

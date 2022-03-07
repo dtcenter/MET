@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -137,6 +137,7 @@ enum STATLineType {
    stat_grad,
    stat_dmap,
    stat_genmpr,
+   stat_ssidx,
    stat_header,
 
    no_stat_line_type
@@ -181,6 +182,7 @@ static const char stat_orank_str[]  = "ORANK";
 static const char stat_ssvar_str[]  = "SSVAR";
 static const char stat_relp_str[]   = "RELP";
 static const char stat_genmpr_str[] = "GENMPR";
+static const char stat_ssidx_str[]  = "SSIDX";
 static const char stat_header_str[] = "LINE_TYPE";
 static const char stat_na_str[]     = "NA";
 
@@ -298,10 +300,11 @@ struct RegridInfo {
 //
 
 struct ClimoCDFInfo {
-   bool        flag;       // Flag to turn on/off climo CDF logic
-   int         n_bin;      // Number of climo CDF cdf bins
-   ThreshArray cdf_ta;     // Array of CDF thresholds
-   bool        write_bins; // Flag for writing the individual bins
+   bool        flag;        // Flag to turn on/off climo CDF logic
+   int         n_bin;       // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;      // Array of CDF thresholds
+   bool        write_bins;  // Flag for writing the individual bins
+   bool        direct_prob; // Flag for the direct computation of probs
 
    ClimoCDFInfo();
    void clear();
@@ -533,6 +536,8 @@ static const char conf_key_message_type[]      = "message_type";
 static const char conf_key_sid_inc[]           = "sid_inc";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
+static const char conf_key_obs_qty_inc[]       = "obs_quality_inc";
+static const char conf_key_obs_qty_exc[]       = "obs_quality_exc";
 static const char conf_key_convert[]           = "convert";
 static const char conf_key_censor_thresh[]     = "censor_thresh";
 static const char conf_key_censor_val[]        = "censor_val";
@@ -566,7 +571,7 @@ static const char conf_key_message_type_group_map[] = "message_type_group_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
 static const char conf_key_obs_name_map[]      = "obs_name_map";
-static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
+static const char conf_key_obs_prepbufr_map[]  = "obs_prepbufr_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
 static const char conf_key_boot_interval[]     = "boot.interval";
@@ -591,6 +596,7 @@ static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_obs_summary[]       = "obs_summary";
 static const char conf_key_percentile[]        = "obs_perc_value";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
+static const char conf_key_hss_ec_value[]      = "hss_ec_value";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
 static const char conf_key_met_data_dir[]      = "met_data_dir";
@@ -627,6 +633,8 @@ static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
+static const char conf_key_control_id[]        = "control_id";
+static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 
 //
 // Entries to override file metadata 
@@ -664,6 +672,7 @@ static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
 static const char conf_key_write_bins[]         = "write_bins";
+static const char conf_key_direct_prob[]        = "direct_prob";
 static const char conf_key_time_interp_method[] = "time_interp_method";
 static const char conf_key_day_interval[]       = "day_interval";
 static const char conf_key_hour_interval[]      = "hour_interval";
@@ -697,6 +706,7 @@ static const char conf_key_baddeley_p[]          = "baddeley_p";
 static const char conf_key_baddeley_max_dist[]   = "baddeley_max_dist";
 static const char conf_key_fom_alpha[]           = "fom_alpha";
 static const char conf_key_zhu_weight[]          = "zhu_weight";
+static const char conf_key_beta_value[]          = "beta_value";
 
 //
 // Wavelet-Stat specific parameter key names
@@ -742,11 +752,18 @@ static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
 static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
+static const char conf_key_prob_pct_thresh[]  = "prob_pct_thresh";
 static const char conf_key_obs_error[]        = "obs_error";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";
 static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";
 static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
+
+//
+// Gen-Ens-Prod specific parameter key names
+//
+
+static const char conf_key_normalize[]   = "normalize";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";
@@ -760,39 +777,41 @@ static const char conf_val_beta[]        = "BETA";
 // STAT-Analysis specific parameter key names
 //
 
-static const char conf_key_fcst_lead[]         = "fcst_lead";
-static const char conf_key_obs_lead[]          = "obs_lead";
-static const char conf_key_fcst_valid_beg[]    = "fcst_valid_beg";
-static const char conf_key_fcst_valid_end[]    = "fcst_valid_end";
-static const char conf_key_fcst_valid_hour[]   = "fcst_valid_hour";
-static const char conf_key_obs_valid_beg[]     = "obs_valid_beg";
-static const char conf_key_obs_valid_end[]     = "obs_valid_end";
-static const char conf_key_obs_valid_hour[]    = "obs_valid_hour";
-static const char conf_key_fcst_init_beg[]     = "fcst_init_beg";
-static const char conf_key_fcst_init_end[]     = "fcst_init_end";
-static const char conf_key_fcst_init_hour[]    = "fcst_init_hour";
-static const char conf_key_obs_init_beg[]      = "obs_init_beg";
-static const char conf_key_obs_init_end[]      = "obs_init_end";
-static const char conf_key_obs_init_hour[]     = "obs_init_hour";
-static const char conf_key_fcst_var[]          = "fcst_var";
-static const char conf_key_obs_var[]           = "obs_var";
-static const char conf_key_fcst_units[]        = "fcst_units";
-static const char conf_key_obs_units[]         = "obs_units";
-static const char conf_key_fcst_lev[]          = "fcst_lev";
-static const char conf_key_obs_lev[]           = "obs_lev";
-static const char conf_key_vx_mask[]           = "vx_mask";
-static const char conf_key_interp_mthd[]       = "interp_mthd";
-static const char conf_key_interp_pnts[]       = "interp_pnts";
-static const char conf_key_fcst_thresh[]       = "fcst_thresh";
-static const char conf_key_obs_thresh[]        = "obs_thresh";
-static const char conf_key_alpha[]             = "alpha";
-static const char conf_key_line_type[]         = "line_type";
-static const char conf_key_column[]            = "column";
-static const char conf_key_out_alpha[]         = "out_alpha";
-static const char conf_key_vif_flag[]          = "vif_flag";
-static const char conf_key_wmo_sqrt_stats[]    = "wmo_sqrt_stats";
-static const char conf_key_wmo_fisher_stats[]  = "wmo_fisher_stats";
-static const char conf_key_jobs[]              = "jobs";
+static const char conf_key_fcst_lead[]           = "fcst_lead";
+static const char conf_key_obs_lead[]            = "obs_lead";
+static const char conf_key_fcst_valid_beg[]      = "fcst_valid_beg";
+static const char conf_key_fcst_valid_end[]      = "fcst_valid_end";
+static const char conf_key_fcst_valid_hour[]     = "fcst_valid_hour";
+static const char conf_key_obs_valid_beg[]       = "obs_valid_beg";
+static const char conf_key_obs_valid_end[]       = "obs_valid_end";
+static const char conf_key_obs_valid_hour[]      = "obs_valid_hour";
+static const char conf_key_fcst_init_beg[]       = "fcst_init_beg";
+static const char conf_key_fcst_init_end[]       = "fcst_init_end";
+static const char conf_key_fcst_init_hour[]      = "fcst_init_hour";
+static const char conf_key_obs_init_beg[]        = "obs_init_beg";
+static const char conf_key_obs_init_end[]        = "obs_init_end";
+static const char conf_key_obs_init_hour[]       = "obs_init_hour";
+static const char conf_key_fcst_var[]            = "fcst_var";
+static const char conf_key_obs_var[]             = "obs_var";
+static const char conf_key_fcst_units[]          = "fcst_units";
+static const char conf_key_obs_units[]           = "obs_units";
+static const char conf_key_fcst_lev[]            = "fcst_lev";
+static const char conf_key_obs_lev[]             = "obs_lev";
+static const char conf_key_vx_mask[]             = "vx_mask";
+static const char conf_key_interp_mthd[]         = "interp_mthd";
+static const char conf_key_interp_pnts[]         = "interp_pnts";
+static const char conf_key_fcst_thresh[]         = "fcst_thresh";
+static const char conf_key_obs_thresh[]          = "obs_thresh";
+static const char conf_key_alpha[]               = "alpha";
+static const char conf_key_line_type[]           = "line_type";
+static const char conf_key_column[]              = "column";
+static const char conf_key_out_alpha[]           = "out_alpha";
+static const char conf_key_vif_flag[]            = "vif_flag";
+static const char conf_key_wmo_sqrt_stats[]      = "wmo_sqrt_stats";
+static const char conf_key_wmo_fisher_stats[]    = "wmo_fisher_stats";
+static const char conf_key_jobs[]                = "jobs";
+static const char conf_key_ss_index_name[]       = "ss_index_name";
+static const char conf_key_ss_index_vld_thresh[] = "ss_index_vld_thresh";
 
 //
 // MODE specific parameter key names
@@ -1016,6 +1035,7 @@ static const char conf_key_valid_end[]                = "valid_end";
 static const char conf_key_valid_inc[]                = "valid_inc";
 static const char conf_key_valid_exc[]                = "valid_exc";
 static const char conf_key_valid_hour[]               = "valid_hour";
+static const char conf_key_write_valid[]              = "write_valid";
 static const char conf_key_lead[]                     = "lead";
 static const char conf_key_lead_req[]                 = "lead_req";
 static const char conf_key_init_mask[]                = "init_mask";
@@ -1070,7 +1090,10 @@ static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
 
-// TC-Gen config options
+//
+// TC-Gen specific parameter key names
+//
+
 static const char conf_key_init_freq[]                       = "init_freq";
 static const char conf_key_valid_freq[]                      = "valid_freq";
 static const char conf_key_fcst_hr_window[]                  = "fcst_hr_window";
@@ -1091,6 +1114,7 @@ static const char conf_key_ops_hit_window[]                  = "ops_hit_window";
 static const char conf_key_discard_init_post_genesis_flag[]  = "discard_init_post_genesis_flag";
 static const char conf_key_dev_method_flag[]                 = "dev_method_flag";
 static const char conf_key_ops_method_flag[]                 = "ops_method_flag";
+static const char conf_key_prob_genesis_thresh[]             = "prob_genesis_thresh";
 static const char conf_key_fcst_fy_oy[]                      = "fcst_fy_oy";
 static const char conf_key_fcst_fy_on[]                      = "fcst_fy_on";
 static const char conf_key_fcst_tracks[]                     = "fcst_tracks";
@@ -1104,6 +1128,7 @@ static const char conf_key_nc_pairs_grid[]                   = "nc_pairs_grid";
 //
 // TC-RMW specific parameter key names
 //
+
 static const char conf_key_n_range[]     = "n_range";
 static const char conf_key_n_azimuth[]   = "n_azimuth";
 static const char conf_key_max_range[]   = "max_range_km";
@@ -1208,7 +1233,6 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
-
 
 ////////////////////////////////////////////////////////////////////////
 

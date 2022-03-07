@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -315,44 +315,3 @@ ConcatString s;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//bool is_same_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
-//      const float hdr_lat, const float hdr_lon, const float hdr_elv) {
-//   bool new_header =
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[0],hdr_lat) ||
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[1], hdr_lon) ||
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[2], hdr_elv) ||
-//         0 != strcmp(nc_data_buffer.prev_hdr_typ_buf, hdr_typ) ||
-//         0 != strcmp(nc_data_buffer.prev_hdr_sid_buf, hdr_sid) ||
-//         0 != strcmp(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
-//   if (new_header) {
-//      strcpy(nc_data_buffer.prev_hdr_typ_buf, hdr_typ);
-//      strcpy(nc_data_buffer.prev_hdr_sid_buf, hdr_sid);
-//      strcpy(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
-//      nc_data_buffer.prev_hdr_arr_buf[0] = hdr_lat;
-//      nc_data_buffer.prev_hdr_arr_buf[1] = hdr_lon;
-//      nc_data_buffer.prev_hdr_arr_buf[2] = hdr_elv;
-//   }
-//   return new_header;
-//}
-//
-//bool is_same_header (const char *hdr_typ, const char *hdr_sid, const unixtime hdr_vld,
-//      const float hdr_lat, const float hdr_lon, const float hdr_elv) {
-//   bool new_header =
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[0],hdr_lat) ||
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[1], hdr_lon) ||
-//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[2], hdr_elv) ||
-//         0 != strcmp(nc_data_buffer.prev_hdr_typ_buf, hdr_typ) ||
-//         0 != strcmp(nc_data_buffer.prev_hdr_sid_buf, hdr_sid) ||
-//         !is_eq(nc_data_buffer.prev_hdr_vld, hdr_vld);
-//   if (new_header) {
-//      strcpy(nc_data_buffer.prev_hdr_typ_buf, hdr_typ);
-//      strcpy(nc_data_buffer.prev_hdr_sid_buf, hdr_sid);
-//      nc_data_buffer.prev_hdr_vld = hdr_vld;
-//      nc_data_buffer.prev_hdr_arr_buf[0] = hdr_lat;
-//      nc_data_buffer.prev_hdr_arr_buf[1] = hdr_lon;
-//      nc_data_buffer.prev_hdr_arr_buf[2] = hdr_elv;
-//   }
-//   return new_header;
-//}
-
-///////////////////////////////////////////////////////////////////////////////

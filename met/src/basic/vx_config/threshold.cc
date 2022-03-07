@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -139,7 +139,7 @@ if ( tf_left )  return ( true );
 
 const bool tf_right = right_child->check(x, cmn, csd);
 
-return ( tf_left || tf_right );
+return ( tf_right );
 
 }
 
@@ -857,7 +857,6 @@ switch ( op )  {
       mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
            << "bad op ... " << op << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -935,10 +934,11 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 
 {
 
-int i, count;
+int i;
 double ptile, diff;
 NumArray data;
 const NumArray * ptr = 0;
+bool fbias_fcst = false;
 
    //
    //  handle sample percentile types
@@ -973,14 +973,16 @@ else if ( Ptype == perc_thresh_freq_bias )  {
         fthr->get_ptype() == no_perc_thresh_type   &&
         fthr->get_type()  != thresh_complex )  {
 
+      fbias_fcst = false;
+
       ptr = optr;
       op  = fthr->get_type();
       PT  = fptr->compute_percentile(fthr->get_value(),
                                      is_inclusive(fthr->get_type()));
 
       mlog << Debug(3)
-           << "The forecast threshold \"" << fthr->get_str()
-           << "\" includes " << PT * 100.0 << "% of the data.\n";
+           << "The forecast threshold value \"" << fthr->get_str()
+           << "\" represents the " << PT * 100.0 << "-th percentile.\n";
 
    }
 
@@ -992,14 +994,16 @@ else if ( Ptype == perc_thresh_freq_bias )  {
              othr->get_ptype() == no_perc_thresh_type   &&
              othr->get_type()  != thresh_complex )  {
 
+      fbias_fcst = true;
+
       ptr = fptr;
       op  = othr->get_type();
       PT  = optr->compute_percentile(othr->get_value(),
                                      is_inclusive(othr->get_type()));
 
       mlog << Debug(3)
-           << "The observation threshold \"" << othr->get_str()
-           << "\" includes " << PT * 100.0 << "% of the data.\n";
+           << "The observation threshold value \"" << othr->get_str()
+           << "\" represents the " << PT * 100.0 << "-th percentile.\n";
 
    }
 
@@ -1030,7 +1034,8 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
    PT *= 100.0;
 
-}
+} // end else if PT == perc_thresh_freq_bias
+
    //
    //  nothing to do
    //
@@ -1083,7 +1088,7 @@ if ( data.n() == 0 )  {
         << " threshold \"" << s
         << "\" because no valid data was provided.\n\n";
 
-      exit ( 1 );
+   exit ( 1 );
 
 }
 else  {
@@ -1094,6 +1099,64 @@ else  {
 
    s.strip_paren();
    abbr_s.strip_paren();
+
+   //
+   //  parse the frequency bias value from the threshold string
+   //
+
+   if ( Ptype == perc_thresh_freq_bias )  {
+
+      ConcatString fs = s;
+
+      fs.replace("==FBIAS", " ", false);
+
+      double fbias_val = atof(fs.c_str());
+
+      //
+      //  range check requested bias value
+      //
+
+      if ( fbias_val <= 0.0 )  {
+
+         mlog << Error << "\nSimple_Node::set_perc() -> "
+              << "the requested frequency bias value (" << fbias_val
+              << ") must be > 0 in threshold \"" << s << "\".\n\n";
+
+      }
+
+      //
+      //  adjust PT by the requested frequency bias amount
+      //
+
+      double PT_new = 0.;
+
+      if ( fbias_fcst )  {
+               if ( op == thresh_le || op == thresh_lt )  PT_new = PT * fbias_val;
+          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT / fbias_val;     
+      }
+      else  {
+               if ( op == thresh_le || op == thresh_lt )  PT_new = PT / fbias_val;
+          else if ( op == thresh_ge || op == thresh_gt )  PT_new = PT * fbias_val;     
+      }
+
+      if ( PT_new > 100.0 )  {
+         mlog << Warning << "\nSimple_Node::set_perc() -> "
+              << "For " << (fbias_fcst ? "forecast" : "observation" )
+              << " threshold \"" << s << "\" the required percentile of "
+              << PT_new << " exceeds the maximum possible value. "
+              << "Resetting to 100.\n\n";
+         
+         PT_new = 100.0;
+      }
+
+      mlog << Debug(3)
+           << "For " << (fbias_fcst ? "forecast" : "observation" )
+           << " threshold \"" << s << "\" with type \"" << thresh_type_str[op]
+           << "\" update the requested percentile from " << PT << " to "
+           << PT_new << ".\n";
+
+      PT = PT_new;
+   }
 
    //
    //  compute the percentile and update the strings
@@ -1118,27 +1181,16 @@ else  {
    //  compute the actual percentile and check tolerance
    //
 
-   if ( op == thresh_le || op == thresh_ge || op == thresh_eq )  {
-
-      for ( i=count=0; i<data.n(); i++ )  if ( data[i] <= T ) count++;
-
-   }
-   else  {
-
-      for ( i=count=0; i<data.n(); i++ )  if ( data[i] <  T ) count++;
-
-   }
-
-   ptile = (double) count / data.n();
+   ptile = data.compute_percentile(T, is_inclusive(op));
    diff  = abs(PT / 100.0 - ptile);
 
    if ( !is_eq(PT / 100.0, ptile, perc_thresh_default_tol) )  {
 
       mlog << Warning << "\nSimple_Node::set_perc() -> "
            << "the requested percentile (" << PT
-           << "%) for threshold \"" << s
+           << ") for threshold \"" << s
            << "\" differs from the actual percentile ("
-           << ptile * 100.0 << ") by " << diff * 100.0 << "%.\n"
+           << ptile * 100.0 << ") by " << diff * 100.0 << ".\n"
            << "This is common for small samples or data that contains "
            << "ties.\n\n";
 
@@ -1147,8 +1199,8 @@ else  {
 
       mlog << Debug(3)
            << "The requested percentile (" << PT
-           << "%) for threshold threshold \"" << s
-           << "\" includes " << ptile * 100.0 << "% of the data.\n";
+           << ") for threshold \"" << s << "\" includes "
+           << ptile * 100.0 << "% of the data.\n";
 
    }
 
@@ -1202,7 +1254,6 @@ if ( Ptype == perc_thresh_climo_dist )  {
               << "threshold to a probability!\n\n";
 
          exit ( 1 );
-         break;
 
    }  // switch
 }

@@ -1,14 +1,15 @@
 .. _data_io:
 
+************
 MET Data I/O
-============
+************
 
 Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this section. Both the input and output file formats are described in this section. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
 
 .. _Input data formats:
 
 Input data formats
-__________________
+==================
 
 The MET package can handle multiple gridded input data formats: GRIB version 1, GRIB version 2, and NetCDF files following the Climate and Forecast (CF) conventions, containing WRF output post-processed using wrf_interp, or produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF GRIB tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
 
@@ -18,17 +19,129 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 
 Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
+Requirements for CF Compliant NetCDF
+------------------------------------
+
+The MET tools use following attributes and variables for input CF Compliant NetCDF data.
+
+1. The global attribute "Conventions".
+
+2. The "`standard_name <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#standard-name>`_" and "`units <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#units>`_" attributes for coordinate variables. The "`axis <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#time-axis-ex>`_" attribute ("T" or "time") must exist as the time variable if the "standard_name" attribute does not exist.
+
+3. The "`coordinates <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#coordinate-types>`_" attribute for the data variables. It contains the coordinate variable names.
+
+4. The "`grid_mapping <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#appendix-grid-mappings>`_" attribute for the data variables for projections and the matching grid mapping variable (optional for the latitude_longitude projection).
+
+5. The gridded data should be evenly spaced horizontally and vertically.
+
+6. (Optional) the "`forecast_reference_time <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#scalar-coordinate-variables>`_" variable for init_time.
+
+MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
+
+The grid mapping variable contains the projection information. The grid mapping variable can be found by looking at the variable attribute "grid_mapping" from the data variables. The "standard_name" attribute is used to filter out the coordinate variables like time, latitude, and longitude variables. The value of the "grid_mapping" attribute is the name of the grid mapping variable. Four projections are supported with grid mapping variables: latitude_longitude, lambert_conformal_conic, polar_stereographic, and geostationary. In case of the latitude_longitude projection, the latitude and longitude variable names should be the same as the dimension names and the "units" attribute should be valid.
+
+Here are examples for the grid mapping variable ("edr" is the data variable):
+
+**Example 1: grid mapping for latitude_longitude projection**
+
+.. code-block:: none
+
+    float edr(time, z, lat, lon) ;
+            edr:units = "m^(2/3) s^-1" ;
+            edr:long_name = "Median eddy dissipation rate" ;
+            edr:coordinates = "lat lon" ;
+            edr:_FillValue = -9999.f ;
+            edr:grid_mapping = "grid_mapping" ;
+    int grid_mapping ;
+            grid_mapping:grid_mapping_name = "latitude_longitude" ;
+            grid_mapping:semi_major_axis = 6371000. ;
+            grid_mapping:inverse_flattening = 0 ;
+
+
+**Example 2: grid mapping for lambert_conformal_conic projection**
+
+.. code-block:: none
+
+    float edr(time, z, y, x) ;
+            edr:units = "m^(2/3) s^-1" ;
+            edr:long_name = "Eddy dissipation rate" ;
+            edr:coordinates = "lat lon" ;
+            edr:_FillValue = -9999.f ;
+            edr:grid_mapping = "grid_mapping" ;
+    int grid_mapping ;
+            grid_mapping:grid_mapping_name = "lambert_conformal_conic" ;
+            grid_mapping:standard_parallel = 25. ;
+            grid_mapping:longitude_of_central_meridian = -95. ;
+            grid_mapping:latitude_of_projection_origin = 25. ;
+            grid_mapping:false_easting = 0 ;
+            grid_mapping:false_northing = 0 ;
+            grid_mapping:GRIB_earth_shape = "spherical" ;
+            grid_mapping:GRIB_earth_shape_code = 0 ;
+
+When the grid mapping variable is not available, MET detects the latitude_longitude projection in following order:
+
+1. the lat/lon projection from the dimensions
+
+2. the lat/lon projection from the "coordinates" attribute from the data variable
+
+3. the lat/lon projection from the latitude and longitude variables by the "standard_name" attribute
+
+MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed in the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon”.
+
+If there are no latitude and longitude variables from dimensions, MET gets coordinate variable names from the "coordinates" attribute. The matching coordinate variables should have the proper "units" attribute.
+
+MET gets the time, latitude, and longitude variables by looking at the standard name: "time", "latitude", and "longitude" as the last option.
+
+MET gets the valid time from the time variable and the "forecast_reference_time" variable for the init_time. If the time variable does not exist, it can come from the file name. MET supports only two cases:
+
+1. TRMM_3B42_3hourly_filename (3B42.<yyyymmdd>.<hh>.7.G3.nc)
+
+2. TRMM_3B42_daily_filename (3B42_daily.<yyyy>.<mm>.<dd>.7.G3.nc)
+
+.. list-table:: Valid strings for the "units" attribute.
+  :widths: auto
+  :header-rows: 1
+
+  * - time
+    - latitude
+    - longitude
+  * - "seconds since YYYY-MM-DD HH:MM:SS",
+      "minutes since YYYY-MM-DD HH:MM:SS",
+      "hours since YYYY-MM-DD HH:MM:SS",
+      "days since YYYY-MM-DD HH:MM:SS",
+      Accepts "Y", "YY", "YYY", "M", "D", "HH", and "HH:MM".
+      "HH:MM:SS" is optional
+    - "degrees_north",
+      "degree_north",
+      "degree_N",
+      "degrees_N",
+      "degreeN",
+      "degreesN"
+    - "degrees_east",
+      "degree_east",
+      "degree_E",
+      "degrees_E",
+      "degreeE",
+      "degreesE"
+
+Performance with NetCDF input data
+----------------------------------
+
+There is no limitation on the NetCDF file size. The size of the data variables matters more than the file size. The NetCDF API loads the metadata first upon opening the NetCDF file. It's similar for accessing data variables. There are two API calls: getting the metadata and getting the actual data. The memory is allocated and consumed at the second API call (getting the actual data).
+
+The dimensions of the data variables matter. MET requests the NetCDF data needs based on: 1) loading and processing a data plane, and 2) loading and processing the next data plane. This means an extra step for slicing with one more dimension in the NetCDF input data. The performance is quite different if the compression is enabled with high resolution data. NetCDF does compression per variable. The variables can have different compression levels (0 to 9).  A value of 0 means no compression, and 9 is the highest level of compression possible. The number for decompression is the same between one more and one less dimension NetCDF input files (combined VS separated). The difference is the amount of data to be decompressed which requires more memory. For example, let's assume the time dimension is 30. NetCDF data with one less dimension (no time dimension) does decompression 30 times for nx by ny dataset. NetCDF with one more dimension does compression 30 times for 30 by nx by ny dataset and slicing for target time offset. So it's better to have multiple NetCDF files with one less dimension than a big file with bigger variable data if compressed. If the compression is not enabled, the file size will be much bigger requiring more disk space.
+
 .. _Intermediate data formats:
 
 Intermediate data formats
-_________________________
+=========================
 
 MET uses NetCDF as an intermediate file format. The MET tools which write gridded output files write to a common gridded NetCDF file format. The MET tools which write point output files write to a common point observation NetCDF file format.
 
 .. _Output data formats:
 
 Output data formats
-___________________
+===================
 
 The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, PostScript plots, and png plots from the Plot-Mode-Field utility.
 
@@ -49,7 +162,7 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs, a
 .. _Data format summary:
 
 Data format summary
-___________________
+===================
 
 The following is a summary of the input and output formats for each of the tools currently in MET. The output listed is the maximum number of possible output files. Generally, the type of output files generated can be controlled by the configuration files and/or the command line options:
 
@@ -92,7 +205,7 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **Pcp-Combine Tool**
 
-    * **Input**: Two or more gridded model or observation files (in GRIB format for “sum” command, or any gridded file for “add”, “subtract”, and “derive” commands) containing data (often accumulated precipitation) to be combined.
+    * **Input**: Two or more gridded model or observation files (in GRIB format for "sum" command, or any gridded file for "add", "subtract", and "derive" commands) containing data (often accumulated precipitation) to be combined.
 
     * **Output**: One NetCDF file containing output for the requested operation(s).
 
@@ -142,7 +255,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One gridded model file, one gridded observation file, and one configuration file.
 
-    * **Output**: One STAT file containing the “ISC” line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
+    * **Output**: One STAT file containing the "ISC" line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
 
 #. **GSID2MPR Tool**
 
@@ -160,7 +273,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
 
-    * **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the “-out” option or redirected to a STAT output file using the “-out_stat” option.
+    * **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the "-out" option or redirected to a STAT output file using the "-out_stat" option.
 
 #. **Series-Analysis Tool**
 
@@ -184,7 +297,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more MODE object statistics files from the MODE tool and, optionally, one configuration file containing specification for the analysis job(s) to be run on the object data.
 
-    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the "-out" option.
 
 #. **MODE-TD Tool**
 
@@ -208,7 +321,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Input**: One or more TCSTAT output files output from the TC-Pairs tool and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the TCSTAT data.
 
-    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    * **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the "-out" option.
 
 #. **TC-Gen Tool**
 
@@ -255,7 +368,7 @@ The following is a summary of the input and output formats for each of the tools
 .. _Configuration File Details:
   
 Configuration File Details
-__________________________
+==========================
 
 Part of the strength of MET is the leveraging of capability across tools. There are several configuration options that are common to many of the tools.
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -565,7 +565,7 @@ double decode_lat_lon(const unsigned char * p, int n)
 
 int i, parity;
 double answer;
-unsigned char c[3];
+unsigned char c[n];
 
    //
    //  For all of the lat/lon parameters, the leftmost bit indicates the

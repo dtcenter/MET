@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    int ens_application, ens_type, ens_number, vinfo_ens_type;
    int vinfo_ens_number;
    unixtime ut, init_ut, valid_ut;
+   const char *method_name = "is_prelim_match() -> ";
 
    int p_code, code_for_lookup= vinfo.field_rec ();
    double p_thresh_lo, p_thresh_hi;
@@ -110,8 +111,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          }
 
          char *ens_number_str = new char[vinfo_ens.length()];
-         strncpy(ens_number_str, vinfo_ens.text()+1,
-                 (size_t) vinfo_ens.length());
+         m_strncpy(ens_number_str, vinfo_ens.text()+1,
+                 (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          // if the string is numeric
@@ -123,7 +124,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) ||
              is_bad_data(vinfo_ens_type) ) {
-            mlog << Error << "\nis_prelim_match() -> "
+            mlog << Error << "\n" << method_name
                  << "unrecognized GRIB_ens value '" << vinfo_ens
                  << "' should be '" << conf_key_grib_ens_hi_res_ctl
                  << "' or '" << conf_key_grib_ens_low_res_ctl
@@ -179,7 +180,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ) {
-         mlog << Error << "\nis_prelim_match() -> "
+         mlog << Error << "\n" << method_name
               << "either name or GRIB1_ptv and GRIB1_code must be "
               << "specified in field information\n\n";
          exit(1);
@@ -190,7 +191,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          //if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter, tab) )
          {
-            mlog << Error << "\nis_prelim_match() -> "
+            mlog << Error << "\n" << method_name
                  << "no parameter found with matching GRIB1_ptv ("
                  << vinfo_ptv << ") " << "GRIB1_code ("
                  << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
@@ -664,7 +665,6 @@ void read_pds(const GribRecord &r, int &bms_flag,
               << "unexpected time unit of "
               << (int) pds->fcst_unit << ".\n\n";
          exit(1);
-         break;
    }
 
    //
@@ -735,7 +735,6 @@ void read_pds(const GribRecord &r, int &bms_flag,
               << "unexpected time range indicator of "
               << (int) pds->tri << ".\n\n";
          exit(1);
-         break;
    }
 
    return;

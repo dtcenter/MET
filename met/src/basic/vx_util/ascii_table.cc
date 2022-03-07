@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -980,6 +980,7 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 {
 
 ConcatString str;
+const char *method_name = "AsciiTable::set_entry() -> ";
 
 if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
 else  {
@@ -993,7 +994,7 @@ fix_float(str);
 
 if ( DoCommaString )  {
    char junk[256];
-   strncpy(junk, str.c_str(), str.length());
+   m_strncpy(junk, str.c_str(), str.length(), method_name);
    char * p = (char *) 0;
    long X;
    ConcatString s;
@@ -1001,9 +1002,10 @@ if ( DoCommaString )  {
 
    p = strchr(junk, '.');
 
-   if ( p )  *p = (char) 0;
-
-   ++p;
+   if ( p ) {
+      *p = (char) 0;
+      ++p;
+   }
 
    X = atol(junk);
 
@@ -1013,7 +1015,7 @@ if ( DoCommaString )  {
 
    s << j2;
 
-   if ( Precision > 0 )  s << '.' << p;
+   if ( Precision > 0 && p )  s << '.' << p;
 
    set_entry(r, c, s.string());
 
@@ -1319,6 +1321,13 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
    exit ( 1 );
 }
 
+   //
+   // Line up the decimals in the data starting in row 2.
+   // For two or fewer rows, there is no work to do.
+   //
+
+if ( Nrows <= 2 )  return;
+
 int left[Nrows];
 int right[Nrows];
 
@@ -1327,23 +1336,24 @@ int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
+
+for (r=0; r<Nrows; ++r)  {
+
+   left[r] = right[r] = 0;
+
+}
+
 for (c=0; c<Ncols; ++c)  {
 
       //  get the pad size for that column
+
+   max_left = max_right = -5;  // negative value as the minimum offset of the text
 
    for (r=r_start; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
       n_figures(e[n], left[r], right[r]);
-
-   }
-
-   max_left  = left  [r_start];
-   max_right = right [r_start];
-
-   for (r=r_start+1; r<Nrows; ++r)  {
-
       if ( left  [r] > max_left  )  max_left  =  left[r];
       if ( right [r] > max_right )  max_right = right[r];
 
@@ -1525,7 +1535,7 @@ out[field_width] = (char) 0;   //  end-of-string marker
 
 if ( !text )  return;
 
-len = strlen(text);
+len = m_strlen(text);
 
 if ( len == 0 )  return;
 
@@ -1692,27 +1702,29 @@ void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString check_hdr_str(const ConcatString s, bool space_to_underscore) {
-   ConcatString s_tmp = s;
+ConcatString check_hdr_str(const ConcatString &col_name,
+                           const ConcatString &col_value,
+                           bool space_to_underscore) {
+   ConcatString cs_tmp = col_value;
 
-   if(space_to_underscore) s_tmp.replace(" ", "_", false);
+   if(space_to_underscore) cs_tmp.replace(" ", "_", false);
 
    // Check for empty string
-   if(s_tmp.length() == 0) {
+   if(cs_tmp.length() == 0) {
       mlog << Warning << "\ncheck_hdr_str() -> "
-           << "null string!\n\n";
+           << "output header column " << to_upper(col_name) << " is empty!\n\n";
       return(na_string);
    }
 
    // Check for embedded whitespace
-   if(check_reg_exp(ws_reg_exp, s_tmp.c_str())) {
+   if(check_reg_exp(ws_reg_exp, cs_tmp.c_str())) {
       mlog << Error << "\ncheck_hdr_str() -> "
-           << "output header column value (\"" << s_tmp
-           << "\") should contain no embedded whitespace!\n\n";
+           << "output header column " << to_upper(col_name) << " value (\""
+           << cs_tmp << "\") should contain no embedded whitespace!\n\n";
       exit(1);
    }
 
-   return(s_tmp);
+   return(cs_tmp);
 }
 
 

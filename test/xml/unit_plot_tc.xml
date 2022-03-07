@@ -7,9 +7,9 @@
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
 ]>
 
-<met_test>
+<!-- Requires: unit_tc_pairs.xml -->
 
-  <!-- Dependency: unit_tc_pairs.xml -->
+<met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>

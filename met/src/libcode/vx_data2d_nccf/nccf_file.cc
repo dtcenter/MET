@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -179,8 +179,8 @@ bool NcCfFile::open(const char * filepath)
   // calling program. In the case of this example, we just exit with
   // an NC_ERR error code.
 
-  //FIXME: Commented out with NetcDf4 enabling
-  //NcError err(NcError::silent_nonfatal);
+  // FIXME: Commented out with NetCDF4 enabling
+  // NcError err(NcError::silent_nonfatal);
 
   // Open the file
 
@@ -375,6 +375,7 @@ bool NcCfFile::open(const char * filepath)
         }
       }
     }
+    delete [] time_values;
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
@@ -739,7 +740,7 @@ void NcCfFile::dump(ostream & out, int depth) const
   if (AccumTime > 0) {
     unix_to_mdyhms(AccumTime, month, day, year, hour, minute, second);
     snprintf(junk, sizeof(junk), "%2d:%02d:%02d (%d seconds)",
-             hour, minute, second, AccumTime);
+             hour, minute, second, (int)AccumTime);
     out << prefix << "Accum Time = ";
     out << junk << "\n";
     out << prefix << "\n";
@@ -1123,7 +1124,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
            << " bad type [" << GET_NC_TYPE_NAME_P(v)
            << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
       exit ( 1 );
-      break;
   
   }   //  switch
 
@@ -2267,15 +2267,190 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Reference:
+//   https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#_rotated_pole
+//
+////////////////////////////////////////////////////////////////////////
 
 
 void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_mapping_var)
 {
   static const string method_name = "NcCfFile::get_grid_mapping_rotated_latitude_longitude()";
 
-  mlog << Error << "\n" << method_name << " -> "
-       << "Rotated latitude longitude grid not handled in MET.\n\n";
-  exit(1);
+  // grid_north_pole_latitude
+
+  NcVarAtt *grid_np_lat_att = get_nc_att(
+    grid_mapping_var, (string)"grid_north_pole_latitude");
+  if (IS_INVALID_NC_P(grid_np_lat_att))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Cannot get grid_north_pole_latitude attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // grid_north_pole_longitude
+
+  NcVarAtt *grid_np_lon_att = get_nc_att(
+    grid_mapping_var, (string)"grid_north_pole_longitude");
+  if (IS_INVALID_NC_P(grid_np_lon_att))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Cannot get grid_north_pole_longitude attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // Look for the grid_latitude and grid_longitude dimensions
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // These dimensions are identified by the standard_name attribute
+
+    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    if (IS_INVALID_NC(coord_var))
+      continue;
+
+    const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
+    if (IS_INVALID_NC_P(std_name_att)) {
+      if (std_name_att) delete std_name_att;
+      continue;
+    }
+
+    ConcatString dim_standard_name;
+    if (!get_att_value_chars(std_name_att, dim_standard_name)) {
+      if (std_name_att) delete std_name_att;
+      continue;
+    }
+
+    if (std_name_att) delete std_name_att;
+
+    // See if this is a grid_latitude or grid_longitude dimension
+
+    if (dim_standard_name == "grid_latitude")
+    {
+      if (_yDim == 0)
+      {
+        _yDim = _dims[dim_num];
+
+        y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
+
+        for (int var_num = 0; var_num < Nvars; ++var_num)
+        {
+          if ( Var[var_num].name == GET_NC_NAME_P(_yDim))
+          {
+            _yCoordVar = Var[var_num].var;
+            break;
+          }
+        }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for grid_latitude, using \""
+             << GET_NC_NAME_P(_yCoordVar) << "\".\n\n";
+      }
+    }
+
+    if (dim_standard_name == "grid_longitude")
+    {
+      if (_xDim == 0)
+      {
+        _xDim = _dims[dim_num];
+
+        x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
+        for (int var_num = 0; var_num < Nvars; ++var_num)
+        {
+          if ( Var[var_num].name == GET_NC_NAME_P(_xDim))
+          {
+            _xCoordVar = Var[var_num].var;
+            break;
+          }
+        }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for grid_longitude, using \""
+             << GET_NC_NAME_P(_xCoordVar) << "\".\n\n";
+      }
+    }
+
+  }
+
+  if (_xDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X dimension (degrees_east) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y dimension (degrees_north) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  long lon_counts = _xDim->getSize();
+  long lat_counts = _yDim->getSize();
+  if (get_data_size(_xCoordVar) != lon_counts ||
+      get_data_size(_yCoordVar) != lat_counts)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    exit(1);
+  }
+
+  // Store spacing in LatLon data structure
+  bool swap_to_north;
+  LatLonData ll_data = get_data_from_lat_lon_vars(_yCoordVar, _xCoordVar,
+                                                  lat_counts, lon_counts,
+                                                  swap_to_north);
+
+  // Fill in the Rotated LatLon data structure
+  RotatedLatLonData data;
+
+  data.name = rotated_latlon_proj_type;
+
+  // Derive south pole location from the north pole
+  data.true_lat_south_pole = -1.0 * get_att_value_double(grid_np_lat_att);
+  double np_lon = rescale_lon(get_att_value_double(grid_np_lon_att));
+  data.true_lon_south_pole = rescale_lon(-1.0 * (180.0 - fabs(np_lon)));
+
+  // Copied from the LatLon data structure
+  data.rot_lat_ll = ll_data.lat_ll;
+  data.rot_lon_ll = ll_data.lon_ll;
+  data.delta_rot_lat = ll_data.delta_lat;
+  data.delta_rot_lon = ll_data.delta_lon;
+
+  // Grid dimension
+  data.Nlon = _xDim->getSize();
+  data.Nlat = _yDim->getSize();
+
+  data.aux_rotation = 0;
+
+  grid.set(data);
+
+  if(grid_np_lat_att) delete grid_np_lat_att;
+  if(grid_np_lon_att) delete grid_np_lon_att;
 }
 
 
@@ -2576,7 +2751,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   ConcatString scene_id;
   if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
     char* scene_id_str = new char[scene_id.length()+1];
-    strncpy(scene_id_str, scene_id.text(), scene_id.length());
+    m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
     scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
   }
@@ -2865,17 +3040,36 @@ bool NcCfFile::get_grid_from_dimensions()
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                           const long lat_counts, const long lon_counts) {
   static const string method_name = "NcCfFile::get_grid_from_lat_lon_vars()";
+
+  bool swap_to_north;
+  LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
+                                               lat_counts, lon_counts,
+                                               swap_to_north);
+
+  grid.set(data);   // resets swap_to_north to false
+  if (swap_to_north) grid.set_swap_to_north(true);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                                const long lat_counts, const long lon_counts,
+                                                bool &swap_to_north) {
+  static const string method_name = "get_data_from_lat_lon_vars()";
 
   // Figure out the dlat/dlon values from the dimension variables
 
   long x_size = get_data_size(lon_var);
   long y_size = get_data_size(lat_var);
   long latlon_counts = lon_counts*lat_counts;
-  bool two_dim_corrd = (x_size == latlon_counts) && (y_size == latlon_counts );
-  if( !two_dim_corrd && (x_size != lon_counts || y_size != lat_counts))
+  bool two_dim_coord = (x_size == latlon_counts) && (y_size == latlon_counts );
+  if( !two_dim_coord && (x_size != lon_counts || y_size != lat_counts))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
@@ -2885,7 +3079,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   double lat_values[lat_counts];
   double lon_values[lon_counts];
   bool lat_first = false;
-  if (two_dim_corrd) {
+  if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
     long cur[2], length[2];
     cur[0] = cur[1] = 0;
@@ -2908,6 +3102,11 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   double dlat = lat_values[1] - lat_values[0];
   double dlon = rescale_lon(lon_values[1] - lon_values[0]);
+  mlog << Debug(7) << method_name << " -> lat[0]=" << lat_values[0]
+       << " lat[" << (lat_counts-1) << "]=" << lat_values[lat_counts-1]
+       << " dlat=" << dlat << " lon[0]=" << lon_values[0]
+       << " lon[" << (lon_counts-1) << "]=" << lon_values[lon_counts-1]
+       << " dlon=" << dlon << "\n";
 
   ConcatString point_nccf;
   bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
@@ -2987,19 +3186,24 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   data.name = latlon_proj_type;
   data.lat_ll = lat_values[0];
-  data.lon_ll = -lon_values[0];
+  data.lon_ll = rescale_lon(-lon_values[0]);
   data.delta_lat = dlat;
   data.delta_lon = dlon;
   data.Nlat = lat_counts;
   data.Nlon = lon_counts;
+
   if (dlat < 0) {
+    swap_to_north = true;
     data.delta_lat = -dlat;
     data.lat_ll = lat_values[lat_counts-1];
   }
+  else {
+    swap_to_north = false;
+  }
 
-  grid.set(data);   // resets swap_to_north to false
-  if (dlat < 0) grid.set_swap_to_north(true);
+  return(data);
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////

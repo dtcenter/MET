@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -136,7 +136,7 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual double rot_grid_to_earth(int x, int y) const = 0;
 
-      virtual bool is_global() const = 0;
+      virtual bool wrap_lon() const = 0;
 
       virtual void shift_right(int) = 0;
 
@@ -162,13 +162,13 @@ class GridRep : public GridInterface {
 
       virtual void dump(ostream &, int = 0) const = 0;
 
-      virtual ConcatString serialize() const = 0;
+      virtual ConcatString serialize(const char *sep=" ") const = 0;
 
       virtual GridInfo info() const = 0;
 
       virtual double rot_grid_to_earth(int x, int y) const = 0;
 
-      virtual bool is_global() const = 0;
+      virtual bool wrap_lon() const = 0;
 
       virtual void shift_right(int) = 0;
 
@@ -240,13 +240,13 @@ class Grid : public GridInterface {
 
       ConcatString name() const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 

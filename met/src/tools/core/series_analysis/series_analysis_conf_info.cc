@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -68,6 +68,7 @@ void SeriesAnalysisConfInfo::clear() {
    fcnt_ta.clear();
    ocnt_ta.clear();
    cnt_logic = SetLogic_None;
+   cdf_info.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -81,6 +82,7 @@ void SeriesAnalysisConfInfo::clear() {
    mask_area.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
+   hss_ec_value = bad_data_double;
    rank_corr_flag = false;
    tmp_dir.clear();
    version.clear();
@@ -339,11 +341,11 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    // Conf: block_size
    block_size = conf.lookup_int(conf_key_block_size);
 
+   // Reset invalid block_sizes to bad data so that they
    if(block_size <= 0.0) {
-      mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-           << "The \"" << conf_key_block_size << "\" parameter ("
-           << block_size << ") must be greater than 0.\n\n";
-      exit(1);
+      block_size = bad_data_int;
+      mlog << Debug(3) << "Automatically setting the \""
+           << conf_key_block_size << "\" parameter to the size of the grid.\n";
    }
 
    // Conf: vld_thresh
@@ -413,6 +415,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    } // end if continuous
 
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&conf);
+
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);
 
@@ -423,6 +428,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    n_boot_rep    = boot_info.n_rep;
    boot_rng      = boot_info.rng;
    boot_seed     = boot_info.seed;
+
+   // Conf: hss_ec_value
+   hss_ec_value = conf.lookup_double(conf_key_hss_ec_value);
 
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);

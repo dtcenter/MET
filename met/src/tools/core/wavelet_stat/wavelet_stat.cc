@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -35,7 +35,8 @@
 //   010    02/25/15  Halley Gotway   Add automated regridding.
 //   011    05/15/17  Prestopnik P.   Add shape to regrid options.
 //   012    04/08/19  Halley Gotway   Add percentile thresholds.
-//   012    04/01/19  Fillmore       Add FCST and OBS units.
+//   013    04/01/19  Fillmore        Add FCST and OBS units.
+//   014    07/09/21  Linden          MET #1746 Skip thresholding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,8 +114,8 @@ static double mean_array(double *, int);
 
 static void plot_ps_raw(const DataPlane &, const DataPlane &,
                         const DataPlane &, const DataPlane &, int);
-static void plot_ps_wvlt(const double *, int, int, int, ISCInfo &,
-                         int, int);
+static void plot_ps_wvlt(const double *, const double, int, int, int,
+                         ISCInfo &, int, int);
 static double compute_percentage(double, double);
 
 static void set_plot_dims(int, int);
@@ -419,7 +420,7 @@ void process_scores() {
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
       for(j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n_elements()];
+         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
       }
 
       // Process percentile thresholds
@@ -443,7 +444,7 @@ void process_scores() {
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            for(k=0; k<conf_info.fcat_ta[i].n_elements(); k++) {
+            for(k=0; k<conf_info.fcat_ta[i].n(); k++) {
 
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -467,7 +468,7 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.fcat_ta[i].n_elements(); j++) {
+         for(j=0; j<conf_info.fcat_ta[i].n(); j++) {
 
             // Set the forecast and observation thresholds
             shc.set_fcst_thresh(conf_info.fcat_ta[i][j]);
@@ -933,15 +934,16 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    double *f_dwt = (double *) 0, *o_dwt = (double *) 0; // Discrete wavelet transformations
    double *f_scl = (double *) 0, *o_scl = (double *) 0; // Binary field decomposed by scale
    double *diff = (double *) 0;                         // Difference field
-   double mse, fen, oen;
+   double mse, fen, oen, mad;
    int n, ns, n_isc;
    int bnd, row, col;
    int i, j, k;
    ConcatString fcst_thresh_str, obs_thresh_str;
+   bool apply_fcst_thresh, apply_obs_thresh;
 
    // Check the NumArray lengths
-   n = f_na.n_elements();
-   if(n != o_na.n_elements()) {
+   n = f_na.n();
+   if(n != o_na.n()) {
       mlog << Error << "\ndo_intensity_scale() -> "
            << "the forecast and observation arrays must have equal "
            << "length.\n\n";
@@ -962,7 +964,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.fcat_ta[i_vx].n_elements();
+   n_isc = conf_info.fcat_ta[i_vx].n();
    for(i=0; i<n_isc; i++) {
       isc_info[i].clear();
       isc_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
@@ -991,22 +993,41 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Apply each threshold
-   for(i=0; i<conf_info.fcat_ta[i_vx].n_elements(); i++) {
+   for(i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
+
+      // Initialize to true
+      apply_fcst_thresh = apply_obs_thresh = true;
 
       fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
       obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
 
+      // If the forecast threshold is set to NA skip masking below
+      if(isc_info[i].fthresh.get_type() == thresh_na) {
+         mlog << Debug(2) << "The forecast threshold is NA, skipping applying threshold.\n";
+         apply_fcst_thresh = false;
+      }
+
+      // If the observation threshold is set to NA skip masking below
+      if(isc_info[i].othresh.get_type() == thresh_na) {
+         mlog << Debug(2) << "The observation threshold is NA, skipping applying threshold.\n";
+         apply_obs_thresh = false;
+      }
+            
       mlog << Debug(2) << "Computing Intensity-Scale decomposition for "
            << conf_info.fcst_info[i_vx]->magic_str() << " "
            << fcst_thresh_str << " versus "
            << conf_info.obs_info[i_vx]->magic_str() << " "
            << obs_thresh_str << ".\n";
 
-      // Apply the threshold to each point to create 0/1 mask fields
-      for(j=0; j<n; j++) {
-         f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
-         o_dat[j] = isc_info[i].othresh.check(o_na[j]);
+      // Apply the threshold, if specified
+      for(j=0, mad=bad_data_double; j<n; j++) {
+         f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
+         o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
          diff[j]  = f_dat[j] - o_dat[j];
+
+         // Find the maximum absolute difference
+         if(is_bad_data(mad))         mad = fabs(diff[j]);
+         else if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
       } // end for j
 
       // Compute the contingency table for the binary fields
@@ -1023,15 +1044,15 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
-      if ( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
+      if(conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
          write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_vx, i_tile, -1,
                       isc_info[i].fthresh,
                       isc_info[i].othresh);
       }
 
       // Write the thresholded binary difference field to PostScript
-      if ( ! (conf_info.nc_info.all_false()) ) {
-         plot_ps_wvlt(diff, n, i_vx, i_tile, isc_info[i], -1, ns);
+      if(!conf_info.nc_info.all_false()) {
+         plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], -1, ns);
       }
 
       // Initialize the discrete wavelet transforms
@@ -1102,7 +1123,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          isc_info[i].compute_isc(j);
 
          // Write the decomposed fields for this scale to NetCDF
-         if ( ! (conf_info.nc_info.all_false()) ) {
+         if(!conf_info.nc_info.all_false()) {
             write_nc_wav(conf_info.nc_info,
                          f_scl, o_scl, n, i_vx, i_tile, j,
                          isc_info[i].fthresh,
@@ -1114,7 +1135,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
          // Write the decomposed difference field for this scale to PostScript
          if(conf_info.ps_plot_flag) {
-            plot_ps_wvlt(diff, n, i_vx, i_tile, isc_info[i], j, ns);
+            plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], j, ns);
          }
 
       } // end for j
@@ -2265,7 +2286,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
+void plot_ps_wvlt(const double *diff, double mad,
+                  int n, int i_vx, int i_tile,
                   ISCInfo &isc_info,
                   int i_scale, int n_scale) {
    ConcatString label;
@@ -2287,12 +2309,6 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    }
 
    //
-   // The min and max plotting values should default to [-1.0, 1.0]
-   // for the decomposed wavelet difference fields.
-   //
-   wvlt_ct.rescale(-1.0, 1.0, bad_data_double);
-
-   //
    // If the wvlt_plot_min or wvlt_plot_max value is set in the
    // config file, rescale the colortable to the requested range.
    //
@@ -2301,6 +2317,15 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
       wvlt_ct.rescale(conf_info.wvlt_pi.plot_min,
                       conf_info.wvlt_pi.plot_max,
                       bad_data_double);
+   }
+   //
+   // Otherwise, rescale the colortable to [-d, d] where d is the maximum
+   // absolute difference and at least 1.0. If thresholds have been applied,
+   // the plotting range should be [-1.0, 1.0].
+   //
+   else {
+      double max_plot_val = max(1.0, mad);
+      wvlt_ct.rescale(-1.0*max_plot_val, max_plot_val, bad_data_double);
    }
 
    //
@@ -2331,10 +2356,10 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    v_tab -= 1.0*plot_text_sep;
    ps_out->write_centered_text(1, 1, h_tab_cen, v_tab, 0.5, 0.5, label.c_str());
    if(i_scale == -1)
-      label.format("Tile %i, Binary, Difference (F-0)",
+      label.format("Tile %i, Binary, Difference (F-O)",
               i_tile+1);
    else
-      label.format("Tile %i, Scale %i, Difference (F-0)",
+      label.format("Tile %i, Scale %i, Difference (F-O)",
               i_tile+1, i_scale+1);
 
    v_tab -= 2.0*plot_text_sep;

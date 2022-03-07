@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@
 //                    percentile thresholds.
 //   012    04/25/21  Halley Gotway  Replace pickle files for temporary
 //                    ascii.
+//   013    07/16/21  Halley Gotway  MET #1788 Add CBS Index.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +74,6 @@ static int using_python = false;
 
 #ifdef WITH_PYTHON
 
-// static ConcatString user_script_path = "/d3/personal/randy/github/develop/stat_analysis_test/test.py";
 static ConcatString user_script_path;
 static StringArray  user_script_args;
 
@@ -184,40 +184,52 @@ int main(int argc, char * argv []) {
       //
       // Process the STAT files found in the search directories.
       //
-
 #ifdef WITH_PYTHON
       if ( using_python )  {
-
          process_python(default_job);
-
       } else {
 #endif
          process_search_dirs();
-
 #ifdef WITH_PYTHON
       }
 #endif
 
       //
-      // If a config file was specified, process the jobs.
+      // If a job was specified on the command line, run it.
       //
-      if(config_file.length() > 0) {
-
+      if(default_job.job_type != no_stat_job_type) {
+         process_job(command_line_job_options.c_str(), 1);
+      }
+      //
+      // Or process config file jobs.
+      //
+      else if(config_file.length() > 0) {
          jobs_sa = conf.lookup_string_array(conf_key_jobs);
+
+         //
+         // At least one job in the config file.
+         //
+         if(jobs_sa.n() == 0) {
+            mlog << Error << "\nmain() -> "
+                 << "no jobs defined in \"" << config_file << "\"!\n\n";
+            throw(1);
+         }
 
          for(i=0; i<jobs_sa.n_elements(); i++) {
             process_job(jobs_sa[i].c_str(), i+1);
          }
       }
       //
-      // Otherwise, process the job specified on the command line.
+      // At least one job must be defined.
       //
       else {
-         process_job(command_line_job_options.c_str(), 1);
+         mlog << Error << "\nmain() -> "
+              << "at least one job must be specified on the command line "
+              << "with \"-job\" or in a configuration file with \"-config\"!\n\n";
+         throw(1);
       }
-
    }
-   catch(int j) { // Catch an error
+   catch(int j) { // Catch errors
 
       mlog << Error << "\nmain() -> "
            << "encountered an error value of " << j
@@ -433,8 +445,6 @@ void set_out_file(const char *path) {
 
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
-   MetConfig go_conf;
-   STATAnalysisJob go_job;
 
    //
    // Initialize
@@ -456,39 +466,44 @@ void process_search_dirs() {
    }
 
    //
-   // Apply the GO Index filtering criteria for a command line job.
+   // Apply the GO Index or CBS Index filtering criteria.
    //
-   if(default_job.job_type == stat_job_go_index) {
+   if(default_job.job_type == stat_job_go_index ||
+      default_job.job_type == stat_job_cbs_index) {
 
-      mlog << Debug(1) << "GO Index Config File: "
-           << replace_path(go_index_config_file) << "\n";
+      MetConfig ss_index_conf;
+      STATAnalysisJob ss_index_job;
 
-      //
-      // Read config file constants followed by the config file which
-      // defines the GO Index.
-      //
-      go_conf.read(replace_path(config_const_filename).c_str());
-      go_conf.read(replace_path(go_index_config_file).c_str());
+      ConcatString config_file =
+         (default_job.job_type == stat_job_go_index ?
+          replace_path(go_index_config_file) :
+          replace_path(cbs_index_config_file));
 
-      //
-      // Parse the contents of the GO Index config file into the
-      // search job.
-      //
-      set_job_from_config(go_conf, go_job);
+      mlog << Debug(1) << "Skill Score Index Config File: "
+           << config_file << "\n";
 
       //
-      // Amend the default job with GO Index filtering criteria.
+      // Read the config files for the constants and the skill score index.
       //
-      default_job.parse_job_command(go_job.get_jobstring().c_str());
+      ss_index_conf.read(replace_path(config_const_filename).c_str());
+      ss_index_conf.read(config_file.c_str());
 
-   } // end if go_index
+      //
+      // Parse the Skill Score Index config file into the search job.
+      //
+      ss_index_job.set_job_type(default_job.job_type);
+      set_job_from_config(ss_index_conf, ss_index_job);
+
+      //
+      // Amend the default job with Skill Score Index filtering criteria.
+      //
+      default_job.parse_job_command(ss_index_job.get_jobstring().c_str());
+   }
 
    //
    // Open up the temp file for storing the intermediate STAT line data
    //
-
    open_temps();
-
 
    //
    // Go through each input file
@@ -633,9 +648,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 void process_job(const char * jobstring, int n_job) {
-   STATAnalysisJob job, go_job;
+   STATAnalysisJob job;
    ConcatString full_jobstring;
-   MetConfig go_conf;
 
    mlog << Debug(4) << "process_job(jobstring): "
         << jobstring << "\n";
@@ -659,45 +673,47 @@ void process_job(const char * jobstring, int n_job) {
    }
 
    //
-   // Special processing for the GO Index job.
+   // Special processing for the GO Index and CBS Index jobs.
    //
-   if(job.job_type == stat_job_go_index) {
+   if(job.job_type == stat_job_go_index ||
+      job.job_type == stat_job_cbs_index) {
 
-      mlog << Debug(1) << "GO Index Config File: "
-           << replace_path(go_index_config_file) << "\n";
+      MetConfig ss_index_conf;
+      STATAnalysisJob ss_index_job;
 
-      //
-      // Read config file constants followed by the config file which
-      // defines the GO Index.
-      //
-      go_conf.read(replace_path(config_const_filename).c_str());
-      go_conf.read(replace_path(go_index_config_file).c_str());
-
-      //
-      // Parse the contents of the GO Index config file into the
-      // search job.
-      //
-      set_job_from_config(go_conf, go_job);
+      ConcatString config_file =
+         (job.job_type == stat_job_go_index ?
+          replace_path(go_index_config_file) :
+          replace_path(cbs_index_config_file));
 
       //
-      // Amend the current job with GO Index filtering criteria
+      // Read the config files for the constants and the skill score index.
+      //
+      ss_index_conf.read(replace_path(config_const_filename).c_str());
+      ss_index_conf.read(config_file.c_str());
+
+      //
+      // Parse the Skill Score Index config file into the search job.
+      //
+      ss_index_job.set_job_type(job.job_type);
+      set_job_from_config(ss_index_conf, ss_index_job);
+
+      //
+      // Amend the current job with Skill Score Index filtering criteria.
       //
       mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with GO Index configuration file: "
-           << replace_path(go_index_config_file) << "\n";
-      job.parse_job_command(go_job.get_jobstring().c_str());
-
-   } // end if go_index
-
-   //
-   // Amend the current job using any command line options
-   //
-   if(jobstring != command_line_job_options) {
-      mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with command line options: \""
-           << command_line_job_options << "\"\n";
-      job.parse_job_command(command_line_job_options.c_str());
+           << "\nAmending Job " << n_job << " with Skill Score Index configuration file: "
+           << config_file << "\n";
+      job.parse_job_command(ss_index_job.get_jobstring().c_str());
    }
+
+   //
+   // Override with any command line options
+   //
+   mlog << Debug(4)
+        << "\nAmending Job " << n_job << " with command line options: \""
+        << command_line_job_options << "\"\n";
+   job.parse_job_command(command_line_job_options.c_str());
 
    //
    // Get the full jobstring

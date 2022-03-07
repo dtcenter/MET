@@ -38,6 +38,7 @@ tc_pairs_LDADD = -lvx_stat_out \
 	-lvx_gsl_prob \
 	-lvx_pb_util \
 	-lvx_cal \
+	-lvx_nav \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

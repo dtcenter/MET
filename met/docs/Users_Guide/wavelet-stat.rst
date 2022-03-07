@@ -1,12 +1,13 @@
 .. _wavelet-stat:
 
+*****************
 Wavelet-Stat Tool
-=================
+*****************
 
 .. _WS_Introduction:
 
 Introduction
-____________
+============
 
 The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This section describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by :ref:`Casati et al. (2004) <Casati-2004>`.
 
@@ -21,18 +22,18 @@ The spatial scale components are obtained usually by applying a single band spat
 The Intensity-Scale technique evaluates the forecast skill as a function of the intensity values and of the spatial scale of the error. The scale components are obtained by applying a two dimensional Haar wavelet filter. Note that wavelets, because of their locality, are suitable for representing discontinuous fields characterized by few sparse non-zero features, such as precipitation. Moreover, the technique is based on a categorical approach, which is a robust and resistant approach, suitable for non-normally distributed variables, such as precipitation. The intensity-scale technique was specifically designed to cope with the difficult characteristics of precipitation fields, and for the verification of spatial precipitation forecasts. However, the intensity-scale technique can also be applied to verify other variables, such as cloud fraction. 
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 The method
-~~~~~~~~~~
+----------
 
 :ref:`Casati et al. (2004) <Casati-2004>` applied the Intensity-Scale verification to preprocessed and re-calibrated (unbiased) data. The preprocessing was aimed to mainly normalize the data, and defined categorical thresholds so that each categorical bin had a similar sample size. The recalibration was performed to eliminate the forecast bias. Preprocessing and recalibration are not strictly necessary for the application of the Intensity-Scale technique. The MET Intensity-Scale Tool does not perform either, and applies the Intensity-Scale approach to biased forecasts, for categorical thresholds defined by the user.
 
 The Intensity Scale approach can be summarized in the following 5 steps:
 
-1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. :numref:`wavelet-stat_NIMROD_3h_fcst` illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold :numref:`contingency_table_counts`.
+1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. This can also be done with no thresholds indicated at all and in that case the grid-point values are not transformed to binary fields and instead the raw data is used as is for statistics. :numref:`wavelet-stat_NIMROD_3h_fcst` illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold :numref:`contingency_table_counts`.
 
-2. The binary forecast and observation fields obtained from the thresholding are then decomposed into the sum of components on different scales, by using a 2D Haar wavelet filter (:numref:`wavelet-stat_NIMROD_diff`). Note that the scale components are fields, and their sum adds up to the original binary field. For a forecast defined over square domain of **2ⁿ x 2ⁿ** grid-points, the scale components are **n+1: n** mother wavelet components + the largest father wavelet (or scale-function) component. The **n** mother wavelet components have resolution equal to **1, 2, 4, ...** :math:`\mathbf{2^{n-1}}`  grid-points. The largest father wavelet component is a constant field over the **2ⁿ x 2ⁿ** grid-point domain with value equal to the field mean.
+2. The binary forecast and observation fields obtained from the thresholding are then decomposed into the sum of components on different scales, by using a 2D Haar wavelet filter (:numref:`wavelet-stat_NIMROD_diff`). Note that the scale components are fields, and their sum adds up to the original binary field. For a forecast defined over square domain of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points, the scale components are **n+1: n** mother wavelet components + the largest father wavelet (or scale-function) component. The **n** mother wavelet components have resolution equal to **1, 2, 4, ...** :math:`\mathbf{2^{n-1}}`  grid-points. The largest father wavelet component is a constant field over the :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-point domain with value equal to the field mean.
 
 **Note** that the wavelet transform is a linear operator: this implies that the difference of the spatial scale components of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_diff`) are equal to the spatial scale components of the difference of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`), and these scale components also add up to the original binary field difference (:numref:`wavelet-stat_NIMROD_3h_fcst`). The intensity-scale technique considers thus the spatial scale of the error. For the case illustrated (:numref:`wavelet-stat_NIMROD_3h_fcst` and :numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`) note the large error associated at the scale of 160 km, due the storm, 160km displaced almost its entire length.
 
@@ -59,14 +60,14 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     -  
     - Total
   * -  
-    - o = 1 (e.g., “Yes”)
-    - o = 0 (e.g., “No”)
+    - o = 1 (e.g., "Yes")
+    - o = 0 (e.g., "No")
     -  
-  * - f = 1 (e.g., “Yes”)
+  * - f = 1 (e.g., "Yes")
     - Hits **= a**
     - False Alarms **= b**
     - **a+b**
-  * - f = 0 (e.g., “No”)
+  * - f = 0 (e.g., "No")
     - Misses **= c**
     - Correct rejections **= d**
     - **c+d**
@@ -126,30 +127,30 @@ Note that the energy squared of the observation binary field is identical to the
 
 
 The spatial domain constraints
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
-The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of **2ⁿ x 2ⁿ** grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions **2ⁿ x 2ⁿ** over the input domain in the following ways:
+The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} over the input domain in the following ways:
 
-1. User-Defined Tiling: The user may define one or more tiles of size **2ⁿ x 2ⁿ** over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
+1. User-Defined Tiling: The user may define one or more tiles of size :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
 
-2. Automated Tiling: This tiling method is essentially the same as the user-defined tiling method listed above except that the tool automatically selects the location and size of the tile(s) to be applied. It figures out the maximum tile of dimension **2ⁿ x 2ⁿ** that fits within the domain and places the tile at the center of the domain. For domains that are very elongated in one direction, it defines as many of these tiles as possible that fit within the domain.
+2. Automated Tiling: This tiling method is essentially the same as the user-defined tiling method listed above except that the tool automatically selects the location and size of the tile(s) to be applied. It figures out the maximum tile of dimension :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} that fits within the domain and places the tile at the center of the domain. For domains that are very elongated in one direction, it defines as many of these tiles as possible that fit within the domain.
 
-3. Padding: If the domain size is only slightly smaller than **2ⁿ x 2ⁿ**, for certain variables (e.g. precipitation), it is advisable to expand the domain out to **2ⁿ x 2ⁿ** grid-points by adding extra rows and/or columns of fill data. For precipitation variables, a fill value of zero is used. For continuous variables, such as temperature, the fill value is defined as the mean of the valid data in the rest of the field. A drawback to the padding method is the introduction of artificial data into the original field. Padding should only be used when a very small number of rows and/or columns need to be added.
+3. Padding: If the domain size is only slightly smaller than :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n}, for certain variables (e.g. precipitation), it is advisable to expand the domain out to :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points by adding extra rows and/or columns of fill data. For precipitation variables, a fill value of zero is used. For continuous variables, such as temperature, the fill value is defined as the mean of the valid data in the rest of the field. A drawback to the padding method is the introduction of artificial data into the original field. Padding should only be used when a very small number of rows and/or columns need to be added.
 
 Aggregation of statistics on multiple cases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
-The Stat-Analysis tool aggregates the intensity scale technique results. Since the results are scale-dependent, it is sensible to aggregate results from multiple model runs (e.g. daily runs for a season) on the same spatial domain, so that the scale components for each singular case will be the same number, and the domain, if not a square domain of **2ⁿ x 2ⁿ** grid-points, will be treated in the same fashion. Similarly, the intensity thresholds for each run should all be the same. 
+The Stat-Analysis tool aggregates the intensity scale technique results. Since the results are scale-dependent, it is sensible to aggregate results from multiple model runs (e.g. daily runs for a season) on the same spatial domain, so that the scale components for each singular case will be the same number, and the domain, if not a square domain of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points, will be treated in the same fashion. Similarly, the intensity thresholds for each run should all be the same. 
 
 The MSE and forecast and observation squared energy for each scale and thresholds are aggregated simply with a weighted average, where weights are proportional to the number of grid-points used in each single run to evaluate the statistics. If the same domain is always used (and it should) the weights result all the same, and the weighted averaging is a simple mean. For each threshold, the aggregated Br is equal to the aggregated squared energy of the binary observation field, and the aggregated FBI is obtained as the ratio of the aggregated squared energies of the forecast and observation binary fields. From aggregated Br and FBI, the MSErandom for the aggregated runs can be evaluated using the same formula as for the single run. Finally, the Intensity-Scale Skill Score is evaluated by using the aggregated statistics within the same formula used for the single case.
 
 Practical information
-_____________________
+=====================
 
 The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
 
 wavelet_stat usage
-~~~~~~~~~~~~~~~~~~
+------------------
 
 The usage statement for the Wavelet-Stat tool is shown below:
 
@@ -182,9 +183,9 @@ Optional arguments for wavelet_stat
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-6. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the wavelet_stat calling sequence is listed below:
 
@@ -200,7 +201,7 @@ In the example, the Wavelet-Stat tool will verify the model data in the **sample
 .. _wavelet_stat-configuration-file:
 
 wavelet_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
@@ -217,7 +218,7 @@ _______________________
   mask_missing_flag = NONE;
   met_data_dir      = "MET_BASE";
   ps_plot_flag      = TRUE;
-  fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable”;
+  fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable";
                         plot_min = 0.0; plot_max = 0.0; }
   obs_raw_plot      = { ... }
   wvlt_plot         = { ... }
@@ -230,6 +231,23 @@ _______________________
 
 .. code-block:: none
 
+  // Empty list of thresholds
+  cat_thresh = [];
+
+  // Or explicitly set the NA threshold type
+  cat_thresh = [>0.0, >=5.0, NA];
+
+   
+The **cat_thresh** option defines an array of thresholds for each field defined in the fcst and obs dictionaries. The number of forecast and observation categorical thresholds must match. If set to an empty list, the thresholds will not be applied (no binary masking) and all the raw grid-point values will be used for downstream statistics.
+
+If the array of thresholds is an empty list, the application will set the threshold to NA internally and skip applying the thresholds. If the threshold is set to NA explicitly in the list, the application will also skip applying the threshold.
+
+Since the application has the ability to loop through multiple thresholds (for multiple fields), a user can include NA in the list of thresholds to produce statistics for the raw data values for the given field.
+		
+_______________________
+
+.. code-block:: none
+		
   grid_decomp_flag = AUTO;
   
   tile = {
@@ -243,7 +261,7 @@ The **grid_decomp_flag** variable specifies how tiling should be performed:
 
 • **TILE** indicates that the user-defined tiles should be applied.
 
-• **PAD** indicated that the data should be padded out to the nearest dimension of **2ⁿ x 2ⁿ**
+• **PAD** indicated that the data should be padded out to the nearest dimension of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n}
 
 The **width** and **location** variables allow users to manually define the tiles of dimension they would like to apply. The x_ll and y_ll variables specify the location of one or more lower-left tile grid (x, y) points.
 
@@ -294,7 +312,7 @@ The nc_pairs_flag is described in :numref:`grid_stat-configuration-file`
 .. _wavelet_stat-output:
 
 wavelet_stat output
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and PostScript formats. The ASCII output duplicates the STAT output but has the data organized by line type. While the Wavelet-Stat tool currently only outputs one STAT line type, additional line types may be added in future releases. The output files are written to the default output directory or the directory specified by the -outdir command line option. 
 
@@ -306,7 +324,7 @@ The output ASCII files are named similarly:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indicate that this is an intensity-scale line type.
 
-The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in :numref:`point_stat-output` for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
+The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in :numref:`point_stat-output` for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have names for the header columns. The isc file contains names for all columns. The format of the ISC line type is explained in the following table.
 
 .. _table_WS_header_info_ws_outputs:
 
@@ -460,11 +478,11 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
   * - NetCDF Dimension
     - Description
   * - x
-    - Dimension of the tile which equals **2ⁿ**
+    - Dimension of the tile which equals :math:`\mathbf{2^n}`
   * - y
-    - Dimension of the tile which equals **2ⁿ**
+    - Dimension of the tile which equals :math:`\mathbf{2^n}`
   * - scale
-    - Dimension for the number of scales. This is set to **n+2**, where **2ⁿ** is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
+    - Dimension for the number of scales. This is set to **n+2**, where :math:`\mathbf{2^n}` is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
   * - tile
     - Dimension for the number of tiles used
 
@@ -482,19 +500,19 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
     - Description
   * - FCST_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the forecast field specified by “FIELD_LEVEL”
+    - Raw values for the forecast field specified by "FIELD_LEVEL"
   * - OBS_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the observation field specified by “FIELD_LEVEL”
+    - Raw values for the observation field specified by "FIELD_LEVEL"
   * - DIFF_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the difference field (**f-o**) specified by “FIELD_LEVEL”
+    - Raw values for the difference field (**f-o**) specified by "FIELD_LEVEL"
   * - FCST_FIELD_LEVEL_THRESH
     - tile, scale, x, y
-    - Wavelet scale-decomposition of the forecast field specified by “FIELD_LEVEL_THRESH”
+    - Wavelet scale-decomposition of the forecast field specified by "FIELD_LEVEL_THRESH"
   * - OBS_FIELD_LEVEL_THRESH
     - tile, scale, x, y
-    - Wavelet scale-decomposition of the observation field specified by “FIELD_LEVEL_THRESH”
+    - Wavelet scale-decomposition of the observation field specified by "FIELD_LEVEL_THRESH"
 
 Lastly, the **Wavelet-Stat** tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 

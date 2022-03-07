@@ -19,6 +19,7 @@
 tablefilesdir = $(pkgdatadir)/table_files
 
 tablefiles_DATA = \
+	met_header_columns_V10.1.txt \
 	met_header_columns_V10.0.txt \
 	met_header_columns_V9.1.txt \
 	met_header_columns_V9.0.txt \
@@ -86,9 +87,9 @@ tablefiles_DATA = \
 	grib1_ncep_141_7.txt \
 	grib1_ncep_2_7.txt \
 	grib1_lidar2nc.txt \
-	grib2_af_gpp.txt \
 	grib2_all.txt \
 	grib2_bom.txt \
+	grib2_gpp_af.txt \
 	grib2_mrms.txt \
 	grib2_ndfd.txt
 

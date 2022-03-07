@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -32,7 +32,7 @@ using namespace std;
 #include "scope.h"
 
 #include "vx_log.h"
-#include "vx_cal.h"
+#include "enum_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ int main(int argc, char * argv[])
 
 generation_gmt = time(0);
 
-int j = strlen(argv[0]) - 1;
+int j = m_strlen(argv[0]) - 1;
 
 while ( (j >= 0) && (argv[0][j] != '/') )  --j;
 
@@ -395,7 +395,7 @@ void yyerror(const char * s)
 
 int c;
 
-c = (int) (column - strlen(yytext));
+c = (int) (column - m_strlen(yytext));
 
 cout << "\n\n  " << program_name << " -> "
      << "syntax error in file \"" << header_filename << "\" at line " << LineNumber 

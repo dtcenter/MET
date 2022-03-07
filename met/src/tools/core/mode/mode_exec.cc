@@ -1,7 +1,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1752,7 +1752,7 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
    if ( ! text )  t = "XXX";
    else           t = text;
 
-   const int N = strlen(t);
+   const int N = m_strlen(t);
 
 
    dim = add_dim(f, dim_name, N);

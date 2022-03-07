@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -212,12 +212,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
    }
    int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
-   Grib1TableEntry  tab;
-
-   // if not specified, fill others with default values
-   if(field_ptv       == bad_data_int) field_ptv       = default_grib1_ptv;
-   if(field_center    == bad_data_int) field_center    = default_grib1_center;
-   if(field_subcenter == bad_data_int) field_subcenter = default_grib1_subcenter;
+   Grib1TableEntry tab;
 
    //  if the name is specified, use it
    if( !field_name.empty() ){
@@ -229,9 +224,13 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
          if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
             mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
-                 << "unrecognized GRIB1 field abbreviation '"
-                 << field_name << "' for table version " << field_ptv
-                 << "\n\n";
+                 << "unrecognized GRIB1 field abbreviation '" << field_name
+                 << "' for table version (" << field_ptv
+                 << "), center (" << field_center
+                 << "), and subcenter (" << field_subcenter
+                 << ") or default table version (" << default_grib1_ptv
+                 << "), center (" << default_grib1_center
+                 << "), and subcenter (" << default_grib1_subcenter << ").\n\n";
             exit(1);
          }
       }

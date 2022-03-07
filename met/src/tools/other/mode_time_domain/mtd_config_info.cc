@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -697,13 +697,13 @@ table.set_entry(row, c++, (string)met_version);
 
    //  model
 
-s = check_hdr_str(model);
+s = check_hdr_str(conf_key_model, model);
 
 table.set_entry(row, c++, s.text());
 
    //  description
 
-s = check_hdr_str(desc);
+s = check_hdr_str(conf_key_desc, desc);
 
 table.set_entry(row, c++, s.text());
 
@@ -765,37 +765,37 @@ table.set_entry(row, c++, s.text());
 
    //  fcst var
 
-s = check_hdr_str(fcst_info->name_attr());
+s = check_hdr_str(conf_key_fcst_var, fcst_info->name_attr());
 
 table.set_entry(row, c++, s.text());
 
    //  fcst units
 
-s = check_hdr_str(fcst_info->units_attr(), true);
+s = check_hdr_str(conf_key_fcst_units, fcst_info->units_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  fcst level
 
-s = check_hdr_str(fcst_info->level_attr(), true);
+s = check_hdr_str(conf_key_fcst_lev, fcst_info->level_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  obs var
 
-s = check_hdr_str(obs_info->name_attr());
+s = check_hdr_str(conf_key_obs_var, obs_info->name_attr());
 
 table.set_entry(row, c++, s.text());
 
    //  obs units
 
-s = check_hdr_str(obs_info->units_attr(), true);
+s = check_hdr_str(conf_key_obs_units, obs_info->units_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  obs level
 
-s = check_hdr_str(obs_info->level_attr(), true);
+s = check_hdr_str(conf_key_obs_lev, obs_info->level_attr(), true);
 
 table.set_entry(row, c++, s.text());
 

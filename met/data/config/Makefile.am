@@ -23,6 +23,7 @@ config_DATA = \
 	ConfigMapData \
 	Ascii2NcConfig_default \
 	EnsembleStatConfig_default \
+	GenEnsProdConfig_default \
 	GridStatConfig_default \
 	GridDiagConfig_default \
 	IODA2NCConfig_default \
@@ -36,6 +37,7 @@ config_DATA = \
 	SeriesAnalysisConfig_default \
 	STATAnalysisConfig_default \
 	STATAnalysisConfig_GO_Index \
+	STATAnalysisConfig_CBS_Index \
 	TCPairsConfig_default \
 	TCRMWConfig_default \
 	RMWAnalysisConfig_default \

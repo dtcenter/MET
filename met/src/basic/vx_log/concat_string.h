@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,10 +71,6 @@ class ConcatString {
 
       void assign(const ConcatString &);
 
-      void extend(int);
-
-      int AllocInc;
-
       int Precision;
 
       char FloatFormat[16];
@@ -101,8 +97,6 @@ class ConcatString {
          //
          //  set stuff
          //
-
-      void set_alloc_inc(int);
 
       void set_precision(int);
 
@@ -206,8 +200,6 @@ inline int          ConcatString::length()       const { return ( (int) (s->leng
 inline int          ConcatString::precision()    const { return ( Precision ); }
 
 inline const char * ConcatString::float_format() const { return ( FloatFormat ); }
-
-inline int          ConcatString::alloc_inc()    const { return ( AllocInc ); }
 
 inline bool         ConcatString::empty()        const { return ( s ?  s->empty() : true ); }
 inline bool         ConcatString::nonempty()     const { return ( s ? !s->empty() : false ); }

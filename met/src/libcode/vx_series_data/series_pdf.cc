@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,7 +22,7 @@
 
 void init_pdf(
     int n,
-    vector<int>& pdf) {
+    vector<long long>& pdf) {
 
     for(int k = 0; k < n; k++) {
         pdf.push_back(0);
@@ -35,7 +35,7 @@ void init_pdf(
     double min,
     double max,
     double delta,
-    vector<int>& pdf) {
+    vector<long long>& pdf) {
 
     int n = (max - min) / delta;
     for(int k = 0; k < n; k++) {
@@ -48,7 +48,7 @@ void init_pdf(
 void init_joint_pdf(
     int n_A,
     int n_B,
-    vector<int>& pdf) {
+    vector<long long>& pdf) {
 
     for(int k = 0; k < n_A * n_B; k++) {
         pdf.push_back(0);
@@ -60,7 +60,7 @@ void init_joint_pdf(
 void update_pdf(
     double min,
     double delta,
-    vector<int>& pdf,
+    vector<long long>& pdf,
     const DataPlane& dp,
     const MaskPlane& mp) {
 
@@ -86,7 +86,7 @@ void update_joint_pdf(
     double min_B,
     double delta_A,
     double delta_B,
-    vector<int>& pdf,
+    vector<long long>& pdf,
     const DataPlane& dp_A,
     const DataPlane& dp_B,
     const MaskPlane& mp) {
@@ -115,7 +115,7 @@ void update_joint_pdf(
 void print_pdf(
     double min,
     double delta,
-    const vector<int>& pdf) {
+    const vector<long long>& pdf) {
 
     for(int k = 0; k < pdf.size(); k++) {
         double bin_min = min + k * delta;
@@ -132,7 +132,7 @@ void write_nc_pdf(
     const VarInfo& info,
     double min,
     double delta,
-    const vector<int>& pdf) {
+    const vector<long long>& pdf) {
 
     vector<double> bin_min;
     vector<double> bin_max;

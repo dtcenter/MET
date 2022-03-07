@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -42,7 +42,8 @@ enum InterpMthd {
    InterpMthd_Lower_Left,
    InterpMthd_Gaussian,
    InterpMthd_MaxGauss,
-   InterpMthd_Geog_Match
+   InterpMthd_Geog_Match,
+   InterpMthd_HiRA
 };
 
 //
@@ -69,6 +70,7 @@ static const char interpmthd_lower_left_str[]  = "LOWER_LEFT";
 static const char interpmthd_gaussian_str[]    = "GAUSSIAN";
 static const char interpmthd_maxgauss_str[]    = "MAXGAUSS";
 static const char interpmthd_geog_match_str[]  = "GEOG_MATCH";
+static const char interpmthd_hira_str[]        = "HIRA";
 
 ///////////////////////////////////////////////////////////////////////////////
 

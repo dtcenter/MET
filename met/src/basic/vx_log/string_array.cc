@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -131,11 +131,9 @@ void StringArray::init_from_scratch()
 {
 
 IgnoreCase = 0;
+MaxLength = 0;
 
 clear();
-
-
-
 
 return;
 
@@ -301,6 +299,22 @@ void StringArray::add_css(const std::string text)
   }
 
   return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::set(const std::string text)
+
+{
+
+s.clear();
+
+s.push_back(text);
+
+return;
 
 }
 

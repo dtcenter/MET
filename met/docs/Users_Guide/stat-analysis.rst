@@ -1,30 +1,31 @@
 .. _stat-analysis:
 
+******************
 Stat-Analysis Tool
-==================
+******************
 
 Introduction
-____________
+============
 
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this section.
 
-MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the “-lookin python ...” option. An example of running Stat-Analysis with Python embedding is shown in :numref:`stat_analysis-usage`.
+MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding is shown in :numref:`stat_analysis-usage`.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
-The Stat-Analysis tool can perform a variety of analyses, and each type of analysis is called a “job”. The job types include the ability to (i) aggregate results over a user-specified time; (ii) stratify statistics based on time of day, model initialization time, lead-time, model run identifier, output filename, or wavelet decomposition scale; and (iii) compute specific verification indices such as the GO Index [1]_
+The Stat-Analysis tool can perform a variety of analyses, and each type of analysis is called a "job". The job types include the ability to (i) aggregate results over a user-specified time; (ii) stratify statistics based on time of day, model initialization time, lead-time, model run identifier, output filename, or wavelet decomposition scale; and (iii) compute specific verification indices such as the GO Index [1]_
 and wind direction statistics. Future functionality may include information about time-trends and/or calculations based on climatology (e.g., anomaly correlation). This section summarizes the capabilities of the supported Stat-Analysis jobs.
 
 Filter STAT lines
-~~~~~~~~~~~~~~~~~
+-----------------
 
-The Stat-Analysis “filter” job simply filters out specific STAT lines based on user-specified search criteria. All of the STAT lines that are retained from one or many files are written to a single output file. The output file for filtered STAT lines must be specified using the **-dump_row** job command option.
+The Stat-Analysis "filter" job simply filters out specific STAT lines based on user-specified search criteria. All of the STAT lines that are retained from one or many files are written to a single output file. The output file for filtered STAT lines must be specified using the **-dump_row** job command option.
 
 Summary statistics for columns
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
-The Stat-Analysis “summary” job produces summary information for columns of data. After the user specifies the column(s) of interest and any other relevant search criteria, summary information is produced from values in those column(s) of data. The summary statistics produced are: mean, standard deviation, minimum, maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile range, the range, and both weighted and unweighted means using the logic prescribed by the World Meteorological Organization (WMO).
+The Stat-Analysis "summary" job produces summary information for columns of data. After the user specifies the column(s) of interest and any other relevant search criteria, summary information is produced from values in those column(s) of data. The summary statistics produced are: mean, standard deviation, minimum, maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile range, the range, and both weighted and unweighted means using the logic prescribed by the World Meteorological Organization (WMO).
 
 Confidence intervals are computed for the mean and standard deviation of the column of data. For the mean, the confidence interval is computed two ways - based on an assumption of normality and also using the bootstrap method. For the standard deviation, the confidence interval is computed using the bootstrap method. In this application of the bootstrap method, the values in the column of data being summarized are resampled, and for each replicated sample, the mean and standard deviation are computed.
 
@@ -37,25 +38,64 @@ The **-derive** job command option can be used to perform the derivation of stat
 .. _StA_Aggregated-values-from:
 
 Aggregated values from multiple STAT lines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
-The Stat-Analysis “aggregate” job aggregates values from multiple STAT lines of the same type. The user may specify the specific line type of interest and any other relevant search criteria. The Stat-Analysis tool then creates sums of each of the values in all lines matching the search criteria. The aggregated data are output as the same line type as the user specified. The STAT line types which may be aggregated in this way are the contingency table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and other (ISC, ECNT, RPS, RHIST, PHIST, RELP, NBRCNT, SSVAR, and GRAD) line types.
+The Stat-Analysis "aggregate" job aggregates values from multiple STAT lines of the same type. The user may specify the specific line type of interest and any other relevant search criteria. The Stat-Analysis tool then creates sums of each of the values in all lines matching the search criteria. The aggregated data are output as the same line type as the user specified. The STAT line types which may be aggregated in this way are the contingency table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and other (ISC, ECNT, RPS, RHIST, PHIST, RELP, NBRCNT, SSVAR, and GRAD) line types.
 
 Aggregate STAT lines and produce aggregated statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------
 
-The Stat-Analysis “aggregate-stat” job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each “aggregate-stat” job, as long as each output is derivable from the input.
+The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
 
-When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the “-out_thresh” (or “-out_fcst_thresh” and  “-out_obs_thresh” options) are required to compute contingnecy table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
+When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the "-out_thresh" (or "-out_fcst_thresh" and  "-out_obs_thresh" options) are required to compute contingnecy table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
 
 When aggregating the matched pair line type (MPR) and computing an output contingency table statistics (CTS) or continuous statistics (CNT) line type, the bootstrapping method can be applied to compute confidence intervals. The bootstrapping method is applied here in the same way that it is applied in the statistics tools. For a set of n matched forecast-observation pairs, the matched pairs are resampled with replacement many times. For each replicated sample, the corresponding statistics are computed. The confidence intervals are derived from the statistics computed for each replicated sample.
 
 .. _StA_Skill-Score-Index:
 
-Skill Score Index, including GO Index
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Skill Score Index
+-----------------
 
-The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. The GO Index is a special case of the Skill Score index for which a specific configuration file is provided. The GO index is a weighted average of the RMSE values for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in :numref:`compute_GO_Index` and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index. For a general skill score index, the user can specify the weights and variables to use in the calculations in a Stat-Analysis configuration file and run the ss_index job type.
+The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill score indices by weighting scores for meteorological fields at different levels and lead times. Pre-defined configuration files are provided for the GO Index and CBS Index which are special cases of the highly configurable skill score index job.
+
+In general, a skill score index is computed over several terms and the number and definition of those terms is configurable. It is computed by aggregating the output from earlier runs of the Point-Stat and/or Grid-Stat tools over one or more cases. When configuring a skill score index job, the following requirements apply:
+
+1. Exactly two models names must be chosen. The first is interpreted as the forecast model and the second is the reference model, against which the performance of the forecast should be measured. Specify this with the "model" configuration file entry or using the "-model" job command option.
+
+2. The forecast variable name, level, lead time, line type, column, and weight options must be specified. If the value remains constant for all the terms, set it to an array of length one. If the value changes for at least one term, specify an array entry for each term. Specify these with the "fcst_var", "fcst_lev", "lead_time", "line_type", "column", and "weight" configuration file entries, respectively, or use the corresponding job command options.
+
+3. While these line types are required, additional options may be provided for each term, including the observation type ("obtype"), verification region ("vx_mask"), and interpolation method ("interp_mthd"). Specify each as single value or provide a value for each term.
+
+4. Only the SL1L2 and CTC input line types are supported, and the input Point-Stat and/or Grid-Stat output must contain these line types.
+
+5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
+
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+
+For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
+
+.. math:: ss = 1.0 - \frac{s_{fcst}^2}{s_{ref}^2}
+
+Where :math:`s_{fcst}` and :math:`s_{ref}` are the aggregated forecast and reference statistics, respectively. Next, a weighted average is computed from the skill scores for each term:
+
+ .. math:: ss_{avg} = \frac{1}{n} \sum_{i=1}^{n} w_i * ss_i
+
+Where, :math:`w_i` and :math:`ss_i` are the weight and skill score for each term and :math:`n` is the number of terms. Finally, the skill score index is computed as:
+
+.. math:: index = \sqrt{\frac{1.0}{1.0-ss_{avg}}}
+
+A value greater than 1.0 indicates that the forecast model outperforms the reference, while a value less than 1.0 indicates that the reference outperforms the forecast.
+
+The default skill score index name (SS_INDEX) can be overridden using the "ss_index_name" option in the configuration file. The pre-defined configuration files for the GO Index and CBS Index use "GO_INDEX" and "CBS_INDEX", respectively.
+
+When running a skill score index job using the "-out_stat" job command option, a .stat output file is written containing the skill score index (SSIDX) output line type. If the "-by" job command option is specified, the skill score index will be computed separately for each unique combination of values found in the column(s) specified. For example, "-by FCST_INIT_BEG,VX_MASK" runs the job separately for each combination of model initialization time and verification region found in the input. Note that increasing the Stat-Analysis verbosity level (-v 3) on the command line prints detailed information about each skill score index term.
+
+.. _StA_Go-Index:
+
+GO Index
+--------
+
+The "go_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The GO Index is a weighted average of 48 skill scores of RMSE statistics for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are listed in :numref:`compute_GO_Index` and are defined by the default "STATAnalysisConfig_GO_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_GO_Index` to compute values for the GO Index.
 
 .. _compute_GO_Index:
 
@@ -148,15 +188,59 @@ The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill sco
     - 4
     - 2
 
-Ramp Events
-~~~~~~~~~~~
+.. _StA_CBS-Index:
 
-The Stat-Analysis “ramp” job identifies ramp events (large increases or decreases in values over a time window) in both the forecast and observation data. It categorizes these events as hits, misses, false alarms, or correct negatives by applying a configurable matching time window and computes the corresponding categorical statistics.
+CBS Index
+---------
+
+The "cbs_index" job is a special case of the "ss_index" job, described in :numref:`StA_Skill-Score-Index`. The CBS Index is a weighted average of 40 skill scores of RMSE statistics for mean sea level pressure, height, and wind speed at multiple levels computed over the northern hemisphere, southern hemisphere and the tropics. The variables, levels, lead times, and regions included in the index are listed in :numref:`compute_CBS_Index` and are defined by the default "STATAnalysisConfig_CBS_Index" configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables for each level, lead time, and masking region must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :numref:`compute_CBS_Index` to compute values for the CBS Index.
+
+.. _compute_CBS_Index:
+
+.. list-table:: Variables, levels, and weights used to compute the CBS Index for 24, 48, 72, 96 and 120 hour lead times.
+  :widths: auto
+  :header-rows: 2
+
+  * - Variable
+    - Level
+    - Weights by Region
+    -
+    -
+  * -
+    -
+    - North Hem
+    - Tropics
+    - South Hem
+  * - Pressure
+    - Mean sea level
+    - 6.4
+    - x
+    - 3.2
+  * - Height
+    - 500 hPa
+    - 2.4
+    - x
+    - 1.2
+  * - Wind speed
+    - 250 hPa
+    - 2.4
+    - 1.2
+    - 1.2
+  * -
+    - 850 hPa
+    - x
+    - 2.0
+    - x
+
+Ramp Events
+-----------
+
+The Stat-Analysis "ramp" job identifies ramp events (large increases or decreases in values over a time window) in both the forecast and observation data. It categorizes these events as hits, misses, false alarms, or correct negatives by applying a configurable matching time window and computes the corresponding categorical statistics.
 
 Wind Direction Statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
-The Stat-Analysis “aggregate_stat” job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold. 
+The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold.
 
 The first step in verifying wind direction is running the Grid-Stat and/or Point-Stat tools to verify each forecast of interest and generate the VL1L2 or MPR line(s). When running these tools, please note:
 
@@ -175,14 +259,14 @@ Once the appropriate lines have been generated for each verification time of int
 2. For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into a single line of partial sums where the weight for each line is determined by the number of points it represents. From this aggregated line, the mean forecast wind direction, observation wind direction, and the associated error are computed and written out.
 
 Practical information
-_____________________
+=====================
 
 The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
 
 .. _stat_analysis-usage:
 
 stat_analysis usage
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The usage statement for the Stat-Analysis tool is shown below:
 
@@ -203,7 +287,7 @@ In the usage statement for the Stat-Analysis tool, some additional terminology i
 Required arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in “.stat”) or any explicit file name with any suffix (such as “_ctc.txt”) to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If “-lookin python” is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass matched pair (MPR) lines as input to Stat-Analysis.
+1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in ".stat") or any explicit file name with any suffix (such as "_ctc.txt") to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If "-lookin python" is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass matched pair (MPR) lines as input to Stat-Analysis.
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** is described in :numref:`stat_analysis-configuration-file`
 
@@ -248,7 +332,7 @@ In this example, rather than passing the MPR output lines from Point-Stat direct
 .. _stat_analysis-configuration-file:
 
 stat_analysis configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
 
@@ -268,6 +352,7 @@ ________________________
 
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                    rng = "mt19937"; seed = ""; }
+  hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   version        = "VN.N";
@@ -431,7 +516,16 @@ ___________________
   column = [];
   weight = [];
 
-The column and weight fields are used to define a skill score index. The computation of a single value will be computed from each column and weight value specified. The GO Index is a specific example of a skill score index. 
+The column and weight entries are used to define a skill score index. They can either be set to a constant value of length one or specify a separate value for each term of the index.
+
+___________________
+
+.. code-block:: none
+
+  ss_index_name       = "SS_INDEX";
+  ss_index_vld_thresh = 1.0;
+
+The ss_index_name and ss_index_vld_thresh options are used to define a skill score index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration. The ss_index_vld_thresh entry is a number between 0.0 and 1.0 that defines the required ratio of valid terms. If the ratio of valid skill score index terms to the total is less than than this number, no output is written for that case. The default value of 1.0 indicates that all terms are required.
 
 ___________________
 
@@ -475,7 +569,10 @@ All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_a
     - Calculates a user-defined Skill Score index as described in section :numref:`StA_Skill-Score-Index`.
     - \-model forecast :raw-html:`<br />`  \-model reference
   * - go_index
-    - Calculates the GO Index as described in section :numref:`StA_Skill-Score-Index`.
+    - Calculates the GO Index as described in section :numref:`StA_GO-Index`.
+    - \-model forecast :raw-html:`<br />`   \-model reference
+  * - cbs_index
+    - Calculates the CBS Index as described in section :numref:`StA_CBS-Index`.
     - \-model forecast :raw-html:`<br />`   \-model reference
   * - ramp
     - Defines a ramp event on a time-series of forecast and observed values. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
@@ -552,9 +649,9 @@ This option specifies the desired output line type(s) for the **aggregate_stat**
 
 The Stat-Analysis tool writes its output to either the log file or the file specified using the **-out** command line option. However the **aggregate** and **aggregate_stat** jobs create STAT output lines and the standard output written lacks the full set of STAT header columns. The **-out_stat** job command option may be used for these jobs to specify the name of an output file to which full STAT output lines should be written. When the **-out_stat** job command option is used for **aggregate** and **aggregate_stat** jobs the output is sent to the **-out_stat** file instead of the log or **-out** file.
 
-Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as “mask1”, “mask2”, and “mask3”. The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: “mask1,mask2,mask3”. Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as “-set_hdr VX_MASK all_three_masks”.
+Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as "mask1", "mask2", and "mask3". The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: "mask1,mask2,mask3". Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as "-set_hdr VX_MASK all_three_masks".
 
-When using the “-out_stat” option to create a .stat output file and stratifying results using one or more “-by” job command options, those columns may be referenced in the “-set_hdr” option. When using multiple “-by” options, use “CASE” to reference the full case information string:
+When using the "-out_stat" option to create a .stat output file and stratifying results using one or more "-by" job command options, those columns may be referenced in the "-set_hdr" option. When using multiple "-by" options, use "CASE" to reference the full case information string:
 
 .. code-block:: none
 		
@@ -569,7 +666,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :numref:`config_options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 .. code-block:: none
 
@@ -596,7 +693,7 @@ These job command options are analogous to the options listed above but apply wh
 When processing input ORANK lines and writing output RHIST or PHIST lines, this option defines the output histogram bin width to be used.
 
 stat-analysis tool output
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The output generated by the Stat-Analysis tool contains statistics produced by the analysis. It also records information about the analysis job that produced the output for each line. Generally, the output is printed to the screen. However, it can be redirected to an output file using the "**-out**" option. The format of output from each STAT job command is described below.
 
@@ -655,7 +752,6 @@ This job produces summary statistics for the column name and line type specified
   * - 22
     - WMO Weighted Mean value
 
-
 Job: aggregate
 ^^^^^^^^^^^^^^
 
@@ -693,15 +789,73 @@ This job is similar to the "**aggregate**" job listed above, however the format 
   * - MPR
     - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
     
-**Job: ss_index**
+Job: ss_index, go_index, cbs_index
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The output from this job consists of three lines, the first two of which contain "**JOB_LIST**" and "**COL_NAME**", as described above. The third line contains "**SS_INDEX**" followed by a colon and then the value computed for the user-defined Skill Score Index. 
+While the inputs for the "ss_index", "go_index", and "cbs_index" jobs may vary, the output is the same. By default, the job output is written to the screen or to a "-out" file, if specified. If the "-out_stat" job command option is specified, a STAT output file is written containing the skill score index (SSIDX) output line type.
 
-**Job: go_index**
+The SSIDX line type consists of the common STAT header columns described in :numref:`table_PS_header_info_point-stat_out` followed by the columns described below. In general, when multiple input header strings are encountered, the output is reported as a comma-separated list of the unique values. The "-set_hdr" job command option can be used to override any of the output header strings (e.g. "-set_hdr VX_MASK MANY" sets the output VX_MASK column to "MANY"). Special logic applied to some of the STAT header columns are also described below.
 
-The output from this job consists of three lines, the first two of which contain "**JOB_LIST**" and"**COL_NAME**", as described above. The third line contains "**GO_INDEX**" followed by a colon and then the value computed for the GO Index. 
+..  _table_SA_format_info_SSIDX:
 
-**Job: ramp**
+.. list-table:: Format information for the SSIDX (Skill Score Index) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SSIDX OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SSIDX Column Name
+    - Description
+  * - 4
+    - FCST_LEAD
+    - Maximum input forecast lead time
+  * - 5
+    - FCST_VALID_BEG
+    - Minimum input forecast valid start time
+  * - 6
+    - FCST_VALID_END
+    - Maximum input forecast valid end time
+  * - 7
+    - OBS_LEAD
+    - Maximum input observation lead time
+  * - 8
+    - OBS_VALID_BEG
+    - Minimum input observation valid start time
+  * - 9
+    - OBS_VALID_END
+    - Maximum input observation valid end time
+  * - 10
+    - FCST_VAR
+    - Skill score index name from the "ss_index_name" option
+  * - 11
+    - OBS_VAR
+    - Skill score index name from the "ss_index_name" option
+  * - 24
+    - SSIDX
+    - Skill score index line type
+  * - 25
+    - FCST_MODEL
+    - Forecast model name
+  * - 26
+    - REF_MODEL
+    - Reference model name
+  * - 27
+    - N_INIT
+    - Number of unique input model initialization times
+  * - 28
+    - N_TERM
+    - Number of skill score index terms
+  * - 29
+    - N_VLD
+    - Number of terms for which a valid skill score was computed
+  * - 30
+    - SS_INDEX
+    - Skill score index value
+
+Job: ramp
+^^^^^^^^^
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 

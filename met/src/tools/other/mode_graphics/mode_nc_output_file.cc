@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -725,7 +725,6 @@ for (x=0; x<Nx; ++x)  {
          default:
             mlog << Error << "\n\n  ModeNcOutputFile::select_obj() const -> bad field\n\n";
             exit ( 1 );
-            break;
 
       }   //  switch
 

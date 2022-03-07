@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -64,7 +64,7 @@ static const char * cts_columns [] = {
 };
 
 static const char * mctc_columns [] = {
-   "TOTAL",       "N_CAT"
+   "TOTAL",       "N_CAT",       "Fi_Oj",       "EC_VALUE"
 };
 
 static const char * mcts_columns [] = {
@@ -72,7 +72,8 @@ static const char * mcts_columns [] = {
    "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
    "HK",          "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "GER",         "GER_BCL",     "GER_BCU"
+   "GER",         "GER_BCL",     "GER_BCU",
+   "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
 static const char * cnt_columns [] = {
@@ -102,7 +103,8 @@ static const char * cnt_columns [] = {
    "MSESS",            "MSESS_BCL",            "MSESS_BCU",
    "RMSFA",            "RMSFA_BCL",            "RMSFA_BCU",
    "RMSOA",            "RMSOA_BCL",            "RMSOA_BCU",
-   "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU"
+   "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
+   "SI",               "SI_BCL",               "SI_BCL" 
 };
 
 static const char * sl1l2_columns [] = {
@@ -245,7 +247,8 @@ static const char * dmap_columns [] = {
    "FBIAS",       "BADDELEY",    "HAUSDORFF",
    "MED_FO",      "MED_OF",      "MED_MIN",     "MED_MAX",     "MED_MEAN",
    "FOM_FO",      "FOM_OF",      "FOM_MIN",     "FOM_MAX",     "FOM_MEAN",
-   "ZHU_FO",      "ZHU_OF",      "ZHU_MIN",     "ZHU_MAX",     "ZHU_MEAN"
+   "ZHU_FO",      "ZHU_OF",      "ZHU_MIN",     "ZHU_MAX",     "ZHU_MEAN",
+   "G",           "GBETA",       "BETA_VALUE"
 };
 
 static const char * isc_columns [] = {
@@ -306,17 +309,23 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
+static const char * relp_columns [] = {
+   "TOTAL",       "N_ENS",       "RELP_"
+};
+
+static const char * ssidx_columns [] = {
+   "FCST_MODEL",  "REF_MODEL",   "N_INIT",
+   "N_TERM",      "N_VLD",       "SS_INDEX"
+};
+
 static const char * genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
+   "PROB_LEAD",   "PROB_VAL",
    "AGEN_INIT",   "AGEN_FHR",
    "AGEN_LAT",    "AGEN_LON",    "AGEN_DLAND",
    "BGEN_LAT",    "BGEN_LON",    "BGEN_DLAND",
    "GEN_DIST",    "GEN_TDIFF",   "INIT_TDIFF",
    "DEV_CAT",     "OPS_CAT"
-};
-
-static const char * relp_columns [] = {
-   "TOTAL",       "N_ENS",       "RELP_"
 };
 
 static const char * job_summary_columns [] = {
@@ -327,14 +336,6 @@ static const char * job_summary_columns [] = {
    "P10",         "P25",         "P50",          "P75",         "P90",
    "MAX",         "IQR",         "RANGE",
    "WMO_TYPE",    "WMO_MEAN",    "WMO_WEIGHTED_MEAN"
-};
-
-static const char * job_go_columns [] = {
-   "GO_INDEX"
-};
-
-static const char * job_ss_columns [] = {
-   "SS_INDEX"
 };
 
 static const char * job_wdir_columns [] = {
@@ -396,8 +397,6 @@ static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_colu
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
 static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
-static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
-static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
@@ -411,15 +410,17 @@ static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_co
 static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
 
+static const int n_ssidx_columns        = sizeof(ssidx_columns)/sizeof(*ssidx_columns);
+
 static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
-inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); }
-inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
-inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
+inline int get_n_mctc_columns  (int n) { return(3  + n*n);             } // n = N_CAT
+inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
+inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); } // n = N_THRESH
+inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); } // n = N_THRESH
+inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
 inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
 inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS

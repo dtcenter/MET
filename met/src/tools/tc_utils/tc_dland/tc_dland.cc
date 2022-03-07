@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -290,7 +290,7 @@ void process_distances() {
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
    if(!put_nc_data_with_dims(&dland_var, &dland[0], grid.ny(), grid.nx())) {
-      if(dland) { delete dland; dland = (float *) 0; }
+      if(dland) { delete [] dland; dland = (float *) 0; }
       mlog << Error << "\nprocess_distances() -> "
            << "error with dland_var->put\n\n";
       exit(1);

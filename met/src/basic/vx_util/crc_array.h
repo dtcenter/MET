@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -130,6 +130,7 @@ class CRC_Array {
       void add(const CRC_Array <T> &);
       void add_css_sec(const char *);
 
+      void set(const T & val);
       void set(int ix, const T & val);
 
       void sort_increasing();
@@ -396,6 +397,24 @@ return;
 
 template <typename T>
 
+void CRC_Array<T>::set(const T & elem)
+
+{
+
+clear();
+
+add(elem);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
 void CRC_Array<T>::set(int ix, const T & elem)
 
 {
@@ -410,6 +429,7 @@ void CRC_Array<T>::set(int ix, const T & elem)
       exit ( 1 );
 
    }
+
    e[ix] = elem;
 }
 

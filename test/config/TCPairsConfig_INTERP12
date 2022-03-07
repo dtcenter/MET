@@ -50,10 +50,17 @@ init_inc = [];
 init_exc = [];
 
 //
-// Valid model time window
+// Valid model time windows to include or exclude
 //
 valid_beg = "";
 valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Valid times for which output should be written
+//
+write_valid = [];
 
 //
 // Model initialization hours
@@ -137,4 +144,4 @@ basin_map = [
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V10.0.0";
+version = "V10.1.0";

@@ -1,6 +1,7 @@
 ascii2nc
 ensemble_stat
 gen_vx_mask
+gen_ens_prod
 grib2
 grid_stat
 gis_utils

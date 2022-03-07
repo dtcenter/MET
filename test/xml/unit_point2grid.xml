@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_ascii2nc.xml unit_pb2nc.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -109,12 +111,12 @@
     <param> \
       &DATA_DIR_OBS;/point_obs/prepbufr.gdas.2017060300.nc \
       G212 \
-      &OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_big_input.nc \
       -field 'name="TMP"; level="Z2";' \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/pb2nc_TMP_big_input.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_big_input.nc</grid_nc>
     </output>
   </test>
 

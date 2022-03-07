@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -523,6 +523,26 @@ int PointStatConfInfo::get_max_n_eclv_points() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int PointStatConfInfo::get_max_n_hira_ens() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatConfInfo::get_max_n_hira_prob() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool PointStatConfInfo::get_vflag() const {
    int i;
    bool vflag = false;
@@ -621,6 +641,7 @@ void PointStatVxOpt::clear() {
    interp_info.clear();
    hira_info.clear();
 
+   hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
    msg_typ.clear();
@@ -650,8 +671,8 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
    //    eclv_points, cdf_info, ci_alpha
-   //    boot_info, hira_info, rank_corr_flag,
-   //    output_flag
+   //    boot_info, hira_info, hss_ec_value,
+   //    rank_corr_flag, output_flag
    //
 
    if(!(beg_ds         == v.beg_ds        ) ||
@@ -868,6 +889,9 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: hira
    hira_info = parse_conf_hira(&odict);
 
+   // Conf: hss_ec_value
+   hss_ec_value = odict.lookup_double(conf_key_hss_ec_value);
+
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
@@ -891,10 +915,13 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: sid_exc
    vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
-
-   // Conf: obs_qty
-   vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
-
+   
+   // Conf: obs_qty_inc
+   vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty_inc(&odict));
+   
+   // Conf: obs_qty_exc
+   vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
+   
    return;
 }
 
@@ -945,7 +972,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
    // Store the climo CDF info
-   vx_pd.set_climo_cdf_info(cdf_info);
+   vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;
@@ -1024,6 +1051,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    for(i=0; i<n_interp; i++) {
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
+      vx_pd.set_interp_thresh(interp_info.vld_thresh);
    }
 
    // After sizing VxPairDataPoint, add settings for each array element
@@ -1161,8 +1189,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          n = (!prob_flag ? 0 : n_pd * get_n_oprob_thresh() * n_bin);
 
          // Number of HiRA PCT, PJC, or PRC lines =
-         //    Message Types * Masks * Interpolations * Thresholds *
-         //    HiRA widths
+         //    Message Types * Masks * HiRA widths * Thresholds
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
                   hira_info.width.n());
@@ -1178,8 +1205,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_oprob_thresh() * get_n_ci_alpha() * n_bin);
 
          // Number of HiRA PSTD lines =
-         //    Message Types * Masks * Interpolations * Thresholds *
-         //    HiRA widths * Alphas
+         //    Message Types * Masks * HiRA widths * Thresholds *
+         //    Alphas
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd *
                   get_n_cat_thresh() * hira_info.width.n() *
@@ -1191,10 +1218,24 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_ecnt):
       case(i_rps):
          // Number of HiRA ECNT and RPS lines =
-         //    Message Types * Masks * Interpolations * HiRA widths *
+         //    Message Types * Masks * HiRA widths *
          //    Alphas
          if(hira_info.flag) {
             n = n_pd * hira_info.width.n() * get_n_ci_alpha();
+         }
+         else {
+            n = 0;
+         }
+
+         break;
+
+      case(i_orank):
+         // Number of HiRA ORANK lines possible =
+         //    Number of pairs * Categorical Thresholds *
+         //    HiRA widths
+         if(hira_info.flag) {
+            n = vx_pd.get_n_pair() * get_n_cat_thresh() *
+                hira_info.width.n();
          }
          else {
             n = 0;
@@ -1237,7 +1278,6 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
-         break;
    }
 
    return(n);
@@ -1276,6 +1316,19 @@ int PointStatVxOpt::get_n_fprob_thresh() const {
 int PointStatVxOpt::get_n_oprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
           0 : ocat_ta.n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_hira_ens() const {
+   int n = (hira_info.flag ? hira_info.width.max() : 0);
+   return(n*n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_hira_prob() const {
+   return(hira_info.flag ? hira_info.cov_ta.n() : 0);
 }
 
 ////////////////////////////////////////////////////////////////////////

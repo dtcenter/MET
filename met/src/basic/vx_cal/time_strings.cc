@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -532,7 +532,7 @@ if ( !text ) {
    exit ( 1 );
 
 }
-else if ( strlen(text) == 0 ) {
+else if ( m_strlen(text) == 0 ) {
 
    mlog << Error << "\ntimestring_to_unix(const char *) -> "
         << "empty time string!\n\n";
@@ -707,7 +707,7 @@ if ( !text ) {
    exit ( 1 );
 
 }
-else if ( strlen(text) == 0 ) {
+else if ( m_strlen(text) == 0 ) {
 
    mlog << Error << "\ntimestring_to_sec(const char *) -> "
         << "empty time string!\n\n";

@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,20 +157,18 @@ for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
 for (j=0; j<ny_half; ++j)  {
 
-   k = j + ny_half;
+   i = j + ny_half;
 
-   k = Ny - 1 - k;
+   k = Ny - 1 - i;
 
    L.lether_root_weight(k, r, w);
    // L.d_and_r_root_weight(k, r, w);
 
    latitude = asind(r);
 
-   i = j + ny_half;
-
    Latitudes[i] = latitude;
 
-   Latitudes[Ny - 1 - i] = -latitude;
+   Latitudes[k] = -latitude;
 
 }
 
@@ -372,19 +370,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString GaussianGrid::serialize() const
+ConcatString GaussianGrid::serialize(const char *sep) const
 
 {
     
 ConcatString a;
 char junk[256];
 
-a << "Projection: Gaussian";
+a << "Projection: Gaussian" << sep;
 
 snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny;
 
    //
    //  done
@@ -433,7 +431,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool GaussianGrid::is_global() const
+bool GaussianGrid::wrap_lon() const
 
 {
 

@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -140,6 +142,19 @@
     </output>
   </test>
 
+  <test name="pcp_combine_sub_GRIB1_run2">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F030.grib 30 \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib 24 \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="pcp_combine_sub_GRIB2">
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
@@ -172,10 +187,10 @@
       -subtract \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_06:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
-      &OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc
+      &OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12_00_00_PLEV_APCP06.nc
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12_00_00_PLEV_APCP06.nc</grid_nc>
     </output>
   </test>
 

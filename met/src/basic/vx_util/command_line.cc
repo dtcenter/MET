@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -776,7 +776,7 @@ for (j=0; j<N; ++j)  {
          //
 
       if ( (args[j].compare(verbosity_option) == 0) ||
-           (args[j].compare(log_option)       == 0) )  continue;      
+           (args[j].compare(log_option)       == 0) )  continue;
 
       option_index = options.lookup(args[j]);
 
@@ -795,8 +795,6 @@ for (j=0; j<N; ++j)  {
          exit ( 1 );
 
       }
-
-      return ( j );
 
    }
 

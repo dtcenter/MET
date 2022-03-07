@@ -51,6 +51,7 @@ wind_logic          = UNION;
 eclv_points         = 0.05;
 nc_pairs_var_name   = "";
 nc_pairs_var_suffix = "";
+hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
 
 tmp_field = [ { name = "TMP"; level = [ "P500" ]; } ];
@@ -169,6 +170,7 @@ distance_map = {
    baddeley_max_dist = NA;
    fom_alpha         = 0.1;
    zhu_weight        = 0.5;
+   beta_value(n)     = n * n / 2.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +224,6 @@ nc_pairs_flag = {
 grid_weight_flag = ${GRID_WEIGHT};
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V10.0.0";
+version          = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

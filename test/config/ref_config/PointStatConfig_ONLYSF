@@ -84,7 +84,7 @@ fcst = {
 
       {
         name       = "PRMSL";
-        level      = [ "Z0" ];
+        level      = [ "L0" ];
         cat_thresh = [ >0.0 ];
       }
    ];
@@ -192,6 +192,6 @@ duplicate_flag = NONE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${MODEL}_F${FCST_TIME}_ONLYSF";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

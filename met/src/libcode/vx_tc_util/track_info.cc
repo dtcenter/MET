@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -606,11 +606,12 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 
 bool TrackInfo::is_interp() const {
    const char *s = Technique.c_str();
-
-   s += (strlen(Technique.c_str()) - 1);
+   int offset = (m_strlen(Technique.c_str()) - 1);
 
    // Return true if the last character of the model name is 'I'
-   return(*s == 'I');
+   if (offset < 0) return false;
+   else return(s[offset] == 'I');
+
 }
 
 ////////////////////////////////////////////////////////////////////////

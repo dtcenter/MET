@@ -1,14 +1,10 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,6 +73,8 @@ lat_ll = lon_ll = 0.0;
 
 delta_lat = delta_lon = 0.0;
 
+wrapLon = false;
+
 memset(&Data, 0, sizeof(Data));
 
 return;
@@ -120,7 +118,29 @@ Name = data.name;
 
 Data = data;
 
+   //
+   //  wrap longitudes when:
+   //    - all 360 degrees are included
+   //    - 360 is divisible by delta_lon
+   //
 
+bool   lon_rng_flag = fabs((Nx + 1)*delta_lon) >= 360.0;
+double lon_div      = 360.0 / delta_lon;
+bool   lon_div_flag = is_eq(lon_div, floor(lon_div));
+
+wrapLon = (lon_rng_flag && lon_div_flag);
+
+   //
+   //  inform users about unexpected delta longitudes
+   //
+
+if ( lon_rng_flag && !lon_div_flag )  {
+
+   mlog << Debug(4) << "Cannot wrap longitudes since 360 is not "
+        << "evenly divisible by delta_lon = "
+        << delta_lon << ".\n";
+
+}
 
 return;
 
@@ -133,6 +153,7 @@ return;
 void LatLonGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const
 
 {
+
 double n;
 
 y = (lat - lat_ll)/delta_lat;
@@ -249,6 +270,8 @@ out << prefix << "lon_ll       = " << lon_ll << "\n";
 out << prefix << "delta_lat_ll = " << delta_lat << "\n";
 out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
+out << prefix << "wrapLon      = " << bool_to_string(wrapLon) << "\n";
+
    //
    //  done
    //
@@ -263,7 +286,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString LatLonGrid::serialize() const
+ConcatString LatLonGrid::serialize(const char *sep) const
 
 {
 
@@ -271,16 +294,18 @@ ConcatString a;
 char junk[256];
 
 
-a << "Projection: Lat/Lon";
+a << "Projection: Lat/Lon" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), " lat_ll: %.3f", lat_ll);   a << junk;
-snprintf(junk, sizeof(junk), " lon_ll: %.3f", lon_ll);   a << junk;
+snprintf(junk, sizeof(junk), "lat_ll: %.3f", lat_ll);   a << junk << sep;
+snprintf(junk, sizeof(junk), "lon_ll: %.3f", lon_ll);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " delta_lat: %.3f", delta_lat);   a << junk;
-snprintf(junk, sizeof(junk), " delta_lon: %.3f", delta_lon);   a << junk;
+snprintf(junk, sizeof(junk), "delta_lat: %.3f", delta_lat);   a << junk << sep;
+snprintf(junk, sizeof(junk), "delta_lon: %.3f", delta_lon);   a << junk << sep;
+
+snprintf(junk, sizeof(junk), "wrapLon: %s", bool_to_string(wrapLon));   a << junk;
 
    //
    //  done
@@ -328,33 +353,13 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LatLonGrid::is_global() const
-
-{
-
-const double lon_range = fabs((Nx + 1)*delta_lon);
-const double lat_range = fabs((Ny + 1)*delta_lat);
-
-const bool full_range_lat = (lat_range >= 180.0);
-const bool full_range_lon = (lon_range >= 360.0);
-
-const bool answer = full_range_lat && full_range_lon;
-
-return ( answer );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LatLonGrid::shift_right(int N)
 
 {
 
 if ( N == 0 )  return;
 
-if ( ! is_global() ) {
+if ( ! wrapLon ) {
 
    mlog << Error
         << "\n\n  LatLonGrid::shift_right(int) -> "
@@ -450,5 +455,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

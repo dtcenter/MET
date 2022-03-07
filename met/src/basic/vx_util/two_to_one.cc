@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -643,7 +643,6 @@ switch ( k )  {
       mlog << Error << "\nget_two_to_one() -> "
            << "bad input values\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -696,7 +695,6 @@ switch ( k )  {
       mlog << Error << "\nget_one_to_two() -> "
            << "bad input values\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

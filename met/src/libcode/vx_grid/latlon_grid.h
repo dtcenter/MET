@@ -1,14 +1,10 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,6 +42,8 @@ class LatLonGrid : public GridRep {
       int Nx;
       int Ny;
 
+      bool wrapLon;
+
       ConcatString Name;
 
       LatLonData Data;
@@ -73,13 +71,13 @@ class LatLonGrid : public GridRep {
 
       void dump(ostream &, int = 0) const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 
-      bool is_global() const;
+      bool wrap_lon() const;
 
       void shift_right(int);
 
@@ -91,7 +89,8 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
+inline double LatLonGrid::scale_km() const { return ( -1.0 );    }
+inline bool   LatLonGrid::wrap_lon() const { return ( wrapLon ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -101,6 +100,3 @@ inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

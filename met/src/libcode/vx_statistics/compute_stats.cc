@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -120,6 +120,14 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    // Compute root mean squared error
    cnt_info.rmse.v = sqrt(cnt_info.mse.v);
 
+   // Compute Scatter Index (SI)
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
+      cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
+   }
+   else {
+      cnt_info.si.v = bad_data_double;
+   }
+   
    // Compute normal confidence intervals
    cnt_info.compute_ci();
 
@@ -342,6 +350,17 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    cnt_info.rmse.v = sqrt(err_sq_bar);
 
+   //
+   // Compute Scatter Index (SI)
+   //
+   if(!is_eq(cnt_info.obar.v, 0.0)) {
+      cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
+   }
+   else {
+      cnt_info.si.v = bad_data_double;
+   }
+
+   
    //
    // Only compute the Kendall Tau and Spearman's Rank corrleation
    // coefficients if the rank_flag is set.
@@ -743,7 +762,7 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cdf_info,
+      else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
                                                   pd.cmn_na, pd.csd_na,
                                                   pct_info.othresh);
    }
@@ -1196,6 +1215,9 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmse.v);
    cnt_mean.rmse.v = na.mean();
 
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].si.v);
+   cnt_mean.si.v = na.mean();
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e10.v);
    cnt_mean.e10.v = na.mean();
 
@@ -1227,7 +1249,7 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_pct_mean(const PCTInfo *cnt_info, int n,
-                      PCTInfo &pct_mean) {
+                      PCTInfo &pct_mean, bool sum_total) {
    int i;
    NumArray na;
 
@@ -1245,9 +1267,10 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
    pct_mean.allocate_n_alpha(1);
    pct_mean.alpha[0] = bad_data_double;
 
-   // Compute the sum of the totals
+   // Compute the sum or mean of the totals
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].total);
-   pct_mean.total = na.sum();
+   if(sum_total) pct_mean.total = na.sum();
+   else          pct_mean.total = na.mean();
 
    // Compute means of statistics
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -643,7 +643,6 @@ double AeronetHandler::extract_height(string hdr_field) {
   string height_str = "";
 
   if (string::npos == hdr_field.find("Empty")) {
-    size_t offset;
     int token_count = 0;
     bool with_unit = false;
     string tmp_height;
@@ -652,7 +651,7 @@ double AeronetHandler::extract_height(string hdr_field) {
     hdr_names.parse_delim(hdr_field.c_str(), "_");
     // AOD_1640nm-Total,AOD_1640nm-AOD,AOD_1640nm-Rayleigh,AOD_1640nm-O3,
     //   AOD_1640nm-NO2,AOD_1640nm-CO2,AOD_1640nm-CH4,AOD_1640nm-WaterVapor
-    if (0 == (offset = hdr_field.find(AOD_NAME))) {
+    if (0 == hdr_field.find(AOD_NAME)) {
       with_unit = true;
       tmp_height = hdr_names[hdr_names.n_elements()-1];
       hdr_names.clear();
@@ -660,27 +659,27 @@ double AeronetHandler::extract_height(string hdr_field) {
       height_str = hdr_names[0];
     }
     // Exact_Wavelengths_for_Input_AOD(um)
-    else if (0 == (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME))) {
+    else if (0 == hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME)) {
       StringArray tmp_hdr_names;
       tmp_hdr_names.parse_delim(WAVELENGTHS_INPUT_AOD_NAME.c_str(), "_");
       token_count = tmp_hdr_names.n_elements();
     }
     // 870nm_Input_AOD
-    else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
+    else if (string::npos != hdr_field.find(INPUT_AOD_NAME)) {
       with_unit = true;
       height_str = hdr_names[0];
     }
     // Exact_Wavelengths_of_AOD(um)_865nm
     // Exact_Wavelengths_of_PW(um)_935nm
-    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))
-        || string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME)) ) {
+    else if (string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME)
+        || string::npos != hdr_field.find(WAVELENGTHS_PW_NAME) ) {
       with_unit = true;
       StringArray tmp_hdr_names;
       tmp_hdr_names.parse_delim(WAVELENGTHS_AOD_NAME.c_str(), "_");
       token_count = tmp_hdr_names.n_elements();
     }
     // Exact_Wavelengths_of_INPUT_AOD(um)
-    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME)) ) {
+    else if (string::npos != hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME) ) {
       StringArray tmp_hdr_names;
       tmp_hdr_names.parse_delim(WAVELENGTHS_INPUT_AOD_NAME.c_str(), "_");
       token_count = tmp_hdr_names.n_elements();
@@ -720,29 +719,28 @@ int AeronetHandler::get_header_count_v3(StringArray hdr_tokens) {
 string AeronetHandler::make_var_name_from_header(string hdr_field) {
   string var_name = hdr_field;
   if (format_version == 3) {
-    int offset;
     bool found = true;
     StringArray hdr_names;
     // AOD_1640nm-Total,AOD_1640nm-AOD,AOD_1640nm-Rayleigh,AOD_1640nm-O3,
     //   AOD_1640nm-NO2,AOD_1640nm-CO2,AOD_1640nm-CH4,AOD_1640nm-WaterVapor
-    if (0 == (offset = hdr_field.find(AOD_NAME))) {
+    if (0 == hdr_field.find(AOD_NAME)) {
       hdr_names.parse_delim(hdr_field.c_str(), "_");
       var_name = hdr_names[0];
     }
     // Exact_Wavelengths_for_Input_AOD(um)
-    else if (0 == (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME))) {
+    else if (0 == hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME)) {
       var_name = WAVELENGTHS_INPUT_AOD_NAME;
     }
     // const string Input_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
-    else if ((int) string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
+    else if ((int) string::npos != hdr_field.find(INPUT_AOD_NAME)) {
       var_name = INPUT_AOD_NAME;
     }
     // Exact_Wavelengths_of_AOD(um)_865nm
-    else if ((int) string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))) {
+    else if ((int) string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME)) {
       var_name = WAVELENGTHS_AOD_NAME;
     }
     // Exact_Wavelengths_of_PW(um)_935nm
-    else if ((int) string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME))) {
+    else if ((int) string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) {
       var_name = WAVELENGTHS_PW_NAME;
     }
     else if ((hdr_field == OPTICAL_AIR_MASS_NAME)) {

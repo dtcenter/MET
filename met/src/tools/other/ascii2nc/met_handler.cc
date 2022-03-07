@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -153,7 +153,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
     // Save the observation info
 
     int grib_code = atoi(data_line[6]);
-    for (unsigned int i=0; i<strlen(data_line[6]); i++) {
+    for (unsigned int i=0; i<m_strlen(data_line[6]); i++) {
       if( !isdigit(data_line[6][i]) )  {
         int var_index;
         use_var_id = true;

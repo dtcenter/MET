@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -85,8 +85,7 @@
 //                    output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   036    02/14/17  Win            MET-621 enhancement support- additional
-//                    nc_pairs_flag 'apply_mask'
+//   036    02/14/17  Win            MET #621 Add nc_pairs_flag.apply_mask
 //   037    05/15/17  Prestopnik P   Add shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    08/18/17  Halley Gotway  Add fourier decomposition.
@@ -108,6 +107,8 @@
 //                    nc_pairs_var_str to nc_pairs_var_suffix.
 //   051    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
 //                    filtering options.
+//   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
+//   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -125,6 +126,8 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "handle_openmp.h"
 
 #include "grid_stat.h"
 
@@ -183,6 +186,9 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
@@ -757,7 +763,7 @@ void process_scores() {
 
          // Create grid template to find the number of points
          GridTemplateFactory gtf;
-         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j]);
+         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
 
          shc.set_interp_mthd(interp_mthd, interp->shape);
          int interp_pnts = gt->size();
@@ -768,8 +774,8 @@ void process_scores() {
          if(interp->field == FieldType_Fcst ||
             interp->field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, interp->vld_thresh,
-                         interp->gaussian);
+                         interp->width[j], interp->shape, grid.wrap_lon(),
+                         interp->vld_thresh, interp->gaussian);
          }
          // Do not smooth the forecast field
          else {
@@ -780,8 +786,8 @@ void process_scores() {
          if(interp->field == FieldType_Obs ||
             interp->field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, interp->vld_thresh,
-                         interp->gaussian);
+                         interp->width[j], interp->shape, grid.wrap_lon(),
+                         interp->vld_thresh, interp->gaussian);
          }
          // Do not smooth the observation field
          else {
@@ -929,12 +935,13 @@ void process_scores() {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
-            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
                (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -969,8 +976,8 @@ void process_scores() {
                if(interp->field == FieldType_Fcst ||
                   interp->field == FieldType_Both) {
                   smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
-                               interp->width[j], interp->shape, interp->vld_thresh,
-                               interp->gaussian);
+                               interp->width[j], interp->shape, grid.wrap_lon(),
+                               interp->vld_thresh, interp->gaussian);
                }
                // Do not smooth the forecast field
                else {
@@ -983,8 +990,8 @@ void process_scores() {
                   interp->field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
-                               interp->shape, interp->vld_thresh,
-                               interp->gaussian);
+                               interp->shape,  grid.wrap_lon(),
+                               interp->vld_thresh, interp->gaussian);
                }
                // Do not smooth the observation field
                else {
@@ -1005,7 +1012,6 @@ void process_scores() {
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
@@ -1015,18 +1021,15 @@ void process_scores() {
                   // Write out VAL1L2
                   if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
                      vl1l2_info[m].vacount > 0) {
-
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
 
-
                   // Write out VCNT
                   if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vcnt_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vcnt],
                         stat_at, i_stat_row,
@@ -1209,6 +1212,13 @@ void process_scores() {
             DataPlane fcst_dp_dmap, obs_dp_dmap;
             pd.extend(grid.nx()*grid.ny());
 
+            // Mask out missing data between the fields for a fair comparison
+            DataPlane fcst_dp_mm = fcst_dp;
+            DataPlane obs_dp_mm  = obs_dp;
+            mask_bad_data(fcst_dp_mm, obs_dp_mm);
+            mask_bad_data(obs_dp_mm, fcst_dp_mm);
+            int n_good_data = obs_dp_mm.n_good_data();
+
             // Loop over the categorical thresholds
             for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
@@ -1232,7 +1242,7 @@ void process_scores() {
 
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
-                                     &fcst_dp, &obs_dp,
+                                     &fcst_dp_mm, &obs_dp_mm,
                                      &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
@@ -1248,7 +1258,7 @@ void process_scores() {
                      fcst_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
 
-                     fcst_dp_thresh = fcst_dp;
+                     fcst_dp_thresh = fcst_dp_mm;
                      fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
                      fcst_dp_dmap = distance_map(fcst_dp_thresh);
 
@@ -1267,7 +1277,7 @@ void process_scores() {
                      obs_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
 
-                     obs_dp_thresh = obs_dp;
+                     obs_dp_thresh = obs_dp_mm;
                      obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
                      obs_dp_dmap = distance_map(obs_dp_thresh);
 
@@ -1297,7 +1307,9 @@ void process_scores() {
                         conf_info.vx_opt[i].baddeley_p,
                         conf_info.vx_opt[i].baddeley_max_dist,
                         conf_info.vx_opt[i].fom_alpha,
-                        conf_info.vx_opt[i].zhu_weight);
+                        conf_info.vx_opt[i].zhu_weight,
+                        conf_info.vx_opt[i].beta_value_fx((double) n_good_data),
+                        n_good_data);
 
                   // Compute DMAP statistics
                   dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
@@ -1382,7 +1394,9 @@ void process_scores() {
                         // Compute fractional coverage
                         fractional_coverage(fcst_dp, fcst_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
+                                            grid.wrap_lon(),
                                             conf_info.vx_opt[i].fcat_ta[k],
+                                            &cmn_dp, &csd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field
@@ -1420,7 +1434,9 @@ void process_scores() {
                         // Compute fractional coverage
                         fractional_coverage(obs_dp, obs_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
+                                            grid.wrap_lon(),
                                             conf_info.vx_opt[i].ocat_ta[k],
+                                            &cmn_dp, &csd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field
@@ -1663,12 +1679,13 @@ void process_scores() {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
-            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
                (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1740,7 +1757,6 @@ void process_scores() {
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
-
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
@@ -1750,12 +1766,21 @@ void process_scores() {
                   // Write out VAL1L2
                   if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
                      vl1l2_info[m].vacount > 0) {
-
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
+
+                  // Write out VCNT
+                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
+                     vl1l2_info[m].vcount > 0) {
+                     write_vcnt_row(shc, vl1l2_info[m],
+                        conf_info.vx_opt[i].output_flag[i_vcnt],
+                        stat_at, i_stat_row,
+                        txt_at[i_vcnt], i_txt_row[i_vcnt]);
+                  }
+
                } // end for m
 
                // Reset the forecast variable name
@@ -1822,7 +1847,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    pd.erase();
 
    // Store the climo CDF info
-   pd.set_climo_cdf_info(vx_opt.cdf_info);
+   pd.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
    
    // Apply the mask the data fields or fill with default values
    apply_mask(*fcst_ptr, mask_mp, pd.f_na);
@@ -1896,6 +1921,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
    mcts_info.cts.set_size(conf_info.vx_opt[i_vx].fcat_ta.n() + 1);
+   mcts_info.cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
    mcts_info.set_fthresh(conf_info.vx_opt[i_vx].fcat_ta);
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
@@ -2132,7 +2158,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    int i;
 
    // Check that the number of pairs are the same
-   if(pd_u_ptr->n_obs != pd_u_ptr->n_obs) {
+   if(pd_u_ptr->n_obs != pd_v_ptr->n_obs) {
       mlog << Error << "\ndo_vl1l2() -> "
            << "unequal number of UGRD and VGRD pairs ("
            << pd_u_ptr->n_obs << " != " << pd_v_ptr->n_obs

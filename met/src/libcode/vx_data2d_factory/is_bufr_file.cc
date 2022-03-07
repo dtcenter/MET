@@ -1,7 +1,5 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -34,7 +32,7 @@ using namespace std;
 
 static const char bufr_magic [] = "BUFR";
 
-static const int bufr_magic_len = strlen(bufr_magic);
+static const int bufr_magic_len = m_strlen(bufr_magic);
 
 static const int buf_size = 8;
 

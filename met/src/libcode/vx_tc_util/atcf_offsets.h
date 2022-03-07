@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -100,10 +100,10 @@ static const int GenMax700VortOffset     = 30;
 //
 
 static const int ProbOffset            = 8;  // probability of event (0-100)
-static const int ProbItemOffset        = 9;  // intensity change for event
+static const int ProbItemOffset        = 9;  // RI: intensity change, GN: time window
 
 //
-// Offsets specific to ATCF RIRW line type
+// Offsets specific to ATCF EDECK RI line type
 //
 
 static const int ProbRIRWValueOffset     = 10; // final intensity
@@ -112,12 +112,23 @@ static const int ProbRIRWBegOffset       = 12; // RIRW start time
 static const int ProbRIRWEndOffset       = 13; // RIRW stop time
 
 //
+// Offsets specific to ATCF EDECK GN line type
+//
+
+static const int ProbGenInitialsOffset   = 10; // forecaster initials
+static const int ProbGenOrDisOffset      = 11; // genesis or dissipation:
+                                               //   invest, genFcst, genesis,
+                                               //   disFcst, dissipate
+static const int ProbGenTimeOffset       = 12; // forecast genesis time
+
+//
 // Minimum number of required elements
 //
 
 static const int MinATCFTrackElements    = 8;
 static const int MinATCFGenTrackElements = 9;
 static const int MinATCFProbRIRWElements = 14;
+static const int MinATCFProbGNElements   = 13;
 
 ////////////////////////////////////////////////////////////////////////
 

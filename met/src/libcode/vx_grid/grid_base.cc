@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -900,13 +900,13 @@ return ( rep->name() );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Grid::serialize() const
+ConcatString Grid::serialize(const char *sep) const
 
 {
 
 ConcatString s;
 
-if ( rep )  s = rep->serialize();
+if ( rep )  s = rep->serialize(sep);
 
 return ( s );
 
@@ -957,19 +957,19 @@ return ( rep->rot_grid_to_earth(x, y) );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Grid::is_global() const
+bool Grid::wrap_lon() const
 
 {
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::is_global() const -> empty grid!\n\n";
+   mlog << Error << "\nGrid::wrap_lon() const -> empty grid!\n\n";
 
    exit ( 1 );
 
 }
 
-return ( rep->is_global() );
+return ( rep->wrap_lon() );
 
 }
 

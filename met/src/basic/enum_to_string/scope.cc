@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,8 @@ using namespace std;
 #include <cmath>
 
 #include "scope.h"
+#include "str_wrappers.h"
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,7 +131,7 @@ return;
 void ScopeStackElement::set_name(const char * text)
 
 {
-
+const char *method_name = "void ScopeStackElement::set_name(const char *) -> ";
 if ( Name )  { delete [] Name;  Name = (const char *) 0; }
 
 if ( !text )  return;
@@ -137,19 +139,19 @@ if ( !text )  return;
 int k;
 char * c = (char *) 0;
 
-k = strlen(text);
+k = m_strlen(text);
 
 c = new char [1 + k];
 
 if ( !c )  {
 
-   cerr << "\n\n  void ScopeStackElement::set_name(const char *) -> memory allocation error\n\n";
+   cerr << "\n\n  " << method_name << "memory allocation error\n\n";
 
    exit ( 1 );
 
 }
 
-strncpy(c, text, k);
+m_strncpy(c, text, k, method_name);
 
 c[k] = (char) 0;   //  just to make sure
 

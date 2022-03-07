@@ -43,6 +43,8 @@ eclv_points = 0.05;
 fcst = {
    sid_inc = [];
    sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
 
    field = [
       { name = "TMP";  level = "Z2"; message_type = "ADPSFC"; }
@@ -133,6 +135,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = NONE;
    mpr    = STAT;
@@ -144,6 +147,6 @@ duplicate_flag = NONE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

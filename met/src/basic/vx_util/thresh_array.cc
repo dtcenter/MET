@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -256,24 +256,34 @@ void ThreshArray::add_css(const char *text) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ThreshArray::set(const SingleThresh &st) {
+
+   clear();
+
+   add(st);
+
+   return;
+}
+////////////////////////////////////////////////////////////////////////
+
 void ThreshArray::parse_thresh_str(const char *thresh_str) {
-   char *line = (char *) 0;
    char *c    = (char *) 0;
    char *lp   = (char *) 0;
    const char delim [] = " ";
-   const int n = strlen(thresh_str);
+   const char *method_name = "ThreshArray::parse_thresh_str()";
 
-   line = new char [n + 1];
-   memset(line, 0, n + 1);
-   strcpy(line, thresh_str);
+   char *line = m_strcpy2(thresh_str, method_name);
+   if (line) {
 
-   lp = line;
+      lp = line;
+      
+      while((c = strtok(lp, delim)) != NULL ) {
+      
+         add(c);
+      
+         lp = (char *) 0;
+      }
 
-   while((c = strtok(lp, delim)) != NULL ) {
-
-      add(c);
-
-      lp = (char *) 0;
    }
 
    if(line) { delete [] line; line = (char *) 0; }
@@ -552,7 +562,7 @@ ThreshArray string_to_prob_thresh(const char *s) {
       // Determine input precision
       ConcatString cs;
       const char *ptr = strchr(s, '.');
-      int prec = ( ptr ? strlen(++ptr) : 0 );
+      int prec = ( ptr ? m_strlen(++ptr) : 0 );
       cs.set_precision(prec);
 
       // Construct list of probability thresholds using the input precision
@@ -754,6 +764,27 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
    }
    else {
       ta_out = ta;
+   }
+
+   return(ta_out);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ThreshArray derive_cdp_thresh(const ThreshArray &ta) {
+   SingleThresh st;
+   ThreshArray ta_out;
+
+   for(int i=0; i<ta.n(); i++) {
+
+      // Skip 0.0 and 1.0
+      if(is_eq(ta[i].get_value(), 0.0) ||
+         is_eq(ta[i].get_value(), 1.0)) continue;
+
+      // Add CDP thresholds
+      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
+
+      ta_out.add(st);
    }
 
    return(ta_out);

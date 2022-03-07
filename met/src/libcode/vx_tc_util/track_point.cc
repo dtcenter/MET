@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -270,7 +270,6 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
             << "unexpected quadrant type encountered \""
             << quadranttype_to_string(ref_quad) << "\".\n\n";
        exit(1);
-       break;
    }
 
    return;

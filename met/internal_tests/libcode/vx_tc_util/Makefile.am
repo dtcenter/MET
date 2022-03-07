@@ -43,6 +43,7 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_nav \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -75,6 +76,7 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_nav \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

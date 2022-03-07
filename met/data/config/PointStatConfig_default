@@ -46,6 +46,7 @@ cnt_logic      = UNION;
 wind_thresh    = [ NA ];
 wind_logic     = UNION;
 eclv_points    = 0.05;
+hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 
 //
@@ -96,7 +97,8 @@ obs = fcst;
 message_type   = [ "ADPUPA" ];
 sid_inc        = [];
 sid_exc        = [];
-obs_quality    = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
@@ -147,6 +149,7 @@ climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,6 +282,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE; // Only for HiRA.
+   orank  = NONE; // Only for HiRA.
    rps    = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
@@ -288,6 +292,6 @@ output_flag = {
 
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

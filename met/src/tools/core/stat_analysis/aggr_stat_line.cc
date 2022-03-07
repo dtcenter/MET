@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -466,7 +466,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
-   if(interp_pnts.n() > 1) {
+   if(interp_pnts.n() == 0 || interp_pnts.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
            << interp_pnts.n()
@@ -502,7 +502,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // ALPHA
    css = write_css(alpha);
-   if(alpha.n() > 1) {
+   if(alpha.n() == 0 || alpha.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
            << alpha.n()
@@ -765,6 +765,9 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                aggr.wgt[req_stat[i]] = empty_na;
             }
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -952,6 +955,9 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.cts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1136,6 +1142,9 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.mcts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1313,6 +1322,9 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.pct_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1538,12 +1550,14 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.nbrcnt_info = cur_nbrcnt;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
          //
          else {
-
             m[key].sl1l2_info  += cur_sl1l2;
             m[key].vl1l2_info  += cur_vl1l2;
             m[key].nbrcnt_info += cur_nbrcnt;
@@ -1693,6 +1707,9 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.grad_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -1801,6 +1818,9 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.vl1l2_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
@@ -1926,6 +1946,9 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Otherwise, add data to existing map entry
@@ -2181,9 +2204,6 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
 
-            bool center = false;
-            aggr.pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
-
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
             aggr.pd.cmn_na.clear();
@@ -2203,7 +2223,17 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
 
+            bool center = false;
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+
             m[key] = aggr;
+
+            // Set the pointer after storing in the map
+            m[key].pd.set_climo_cdf_info_ptr(&m[key].cdf_info);
+
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment sums in the existing map entry
@@ -2304,6 +2334,9 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
             aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2549,6 +2582,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
             aggr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2684,6 +2720,9 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.rps_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -2773,6 +2812,9 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.clear();
             for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -2861,6 +2903,9 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.phist_na = cur.phist_na;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -2948,6 +2993,9 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.relp_na = cur.relp_na;
             aggr.hdr.clear();
             m[key] = aggr;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
          //
          // Increment counts in the existing map entry
@@ -3039,9 +3087,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
+
             aggr.clear();
-            bool center = false;
-            aggr.ens_pd.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
@@ -3050,7 +3098,18 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
+
+            bool center = false;
+            aggr.cdf_info.set_cdf_ta(nint(1.0/job.out_bin_size), center);
+
             m[key] = aggr;
+
+            // Set the pointer after storing in the map
+            m[key].ens_pd.set_climo_cdf_info_ptr(&m[key].cdf_info);
+
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -3093,7 +3152,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.v_na.add(n_valid);
 
          // Derive ensemble from climo mean and standard deviation
-         derive_climo_vals(m[key].ens_pd.cdf_info,
+         derive_climo_vals(&m[key].cdf_info,
                            cur.climo_mean, cur.climo_stdev, climo_vals);
 
          // Store empirical CRPS stats
@@ -3278,6 +3337,9 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
             cur.fcst_var = line.fcst_var();
             cur.obs_var  = line.obs_var();
             m[key] = cur;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
          }
 
          //
@@ -3335,6 +3397,198 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
          // Keep track of the unique header column entries
          //
          m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
+                   map<ConcatString, AggrSSIndexInfo> &m,
+                   int &n_in, int &n_out) {
+   STATLine line;
+   AggrSSIndexInfo cur;
+   ConcatString key;
+   int i, n_term;
+
+   //
+   // Store the index name and valid data threshold
+   //
+   cur.job_info.ss_index_name       = job.ss_index_name;
+   cur.job_info.ss_index_vld_thresh = job.ss_index_vld_thresh;
+
+   //
+   // Check that the -model option has been supplied exactly 2 times.
+   // The first is the forecast model and the second is the reference.
+   //
+   if(job.model.n() != 2) {
+      mlog << Error << "\naggr_ss_index() -> "
+           << "this job may only be called when the \"-model\" option "
+           << "has been used exactly twice to specify the forecast "
+           << "model followed by the reference model.\n\n";
+      throw(1);
+   }
+   else {
+      cur.job_info.fcst_model = job.model[0];
+      cur.job_info.ref_model  = job.model[1];
+   }
+
+   mlog << Debug(3)
+        << "Computing " << cur.job_info.ss_index_name << " for forecast model ("
+        << cur.job_info.fcst_model << ") versus reference model ("
+        << cur.job_info.ref_model  << ").\n";
+
+   //
+   // Compute the number of terms as the maximum array length
+   //
+   n_term = max(     0, job.fcst_var.n());
+   n_term = max(n_term, job.fcst_lev.n());
+   n_term = max(n_term, job.fcst_lead.n());
+   n_term = max(n_term, job.line_type.n());
+   n_term = max(n_term, job.column.n());
+   n_term = max(n_term, job.weight.n());
+
+   //
+   // Must be at least one term
+   //
+   if(n_term < 1) {
+      mlog << Error << "\naggr_ss_var() -> "
+           << "you must define the skill score index to be computed "
+           << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
+           << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
+      throw(1);
+   }
+
+   //
+   // Sanity check the array lengths
+   //
+   if((job.fcst_lev.n()  != n_term && job.fcst_lev.n()  != 1) ||
+      (job.fcst_lead.n() != n_term && job.fcst_lead.n() != 1) ||
+      (job.line_type.n() != n_term && job.line_type.n() != 1) ||
+      (job.column.n()    != n_term && job.column.n()    != 1) ||
+      (job.weight.n()    != n_term && job.weight.n()    != 1)) {
+      mlog << Error << "\naggr_ss_var() -> "
+           << "each skill score index parameter must have the same length ("
+           << n_term << ") or have length 1!\n"
+           << "Check the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
+           << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
+      throw(1);
+   }
+
+   //
+   // Create a job for each term
+   //
+   for(i=0; i<n_term; i++) {
+
+      //
+      // Create a STATAnalysisJob for each term
+      //
+      STATAnalysisJob fcst_term;
+      STATAnalysisJob ref_term;
+
+      //
+      // Initialize to the full Skill Score Index job
+      // and set the type to aggregation
+      //
+      fcst_term = job;
+      fcst_term.set_job_type(stat_job_aggr);
+
+      //
+      // line_type
+      //
+      if(job.line_type.n() == n_term) {
+         fcst_term.line_type.set(job.line_type[i]);
+
+         STATLineType lt = string_to_statlinetype(job.line_type[i].c_str());
+         if(lt != stat_sl1l2 && lt != stat_ctc) {
+            mlog << Error << "\naggr_ss_index() -> "
+                 << "a skill score index can only be computed using "
+                 << "statistics derived from SL1L2 or CTC line types."
+                 << "\n\n";
+            throw(1);
+         }
+      }
+
+      //
+      // Set filtering options
+      //
+      fcst_term.model.set(cur.job_info.fcst_model);
+      if(job.fcst_lead.n()      == n_term) fcst_term.fcst_lead.set(job.fcst_lead[i]);
+      if(job.obs_lead.n()       == n_term) fcst_term.obs_lead.set(job.obs_lead[i]);
+      if(job.fcst_init_hour.n() == n_term) fcst_term.fcst_init_hour.set(job.fcst_init_hour[i]);
+      if(job.obs_init_hour.n()  == n_term) fcst_term.obs_init_hour.set(job.obs_init_hour[i]);
+      if(job.fcst_var.n()       == n_term) fcst_term.fcst_var.set(job.fcst_var[i]);
+      if(job.obs_var.n()        == n_term) fcst_term.obs_var.set(job.obs_var[i]);
+      if(job.fcst_lev.n()       == n_term) fcst_term.fcst_lev.set(job.fcst_lev[i]);
+      if(job.obs_lev.n()        == n_term) fcst_term.obs_lev.set(job.obs_lev[i]);
+      if(job.obtype.n()         == n_term) fcst_term.obtype.set(job.obtype[i]);
+      if(job.vx_mask.n()        == n_term) fcst_term.vx_mask.set(job.vx_mask[i]);
+      if(job.interp_mthd.n()    == n_term) fcst_term.interp_mthd.set(job.interp_mthd[i]);
+      if(job.interp_pnts.n()    == n_term) fcst_term.interp_pnts.set(job.interp_pnts[i]);
+      if(job.fcst_thresh.n()    == n_term) fcst_term.fcst_thresh.set(job.fcst_thresh[i]);
+      if(job.obs_thresh.n()     == n_term) fcst_term.obs_thresh.set(job.obs_thresh[i]);
+      if(job.line_type.n()      == n_term) fcst_term.line_type.set(job.line_type[i]);
+      if(job.column.n()         == n_term) fcst_term.column.set(job.column[i]);
+      if(job.weight.n()         == n_term) fcst_term.weight.set(job.weight[i]);
+
+      //
+      // Set the reference model job identical to the forecast model
+      // job but with a different model name.
+      //
+      ref_term = fcst_term;
+      ref_term.model.set(cur.job_info.ref_model);
+
+      //
+      // Store the forecast and reference jobs for this term
+      //
+      cur.job_info.add_term(fcst_term, ref_term);
+
+   } // end for i
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(cur.job_info.is_keeper(line)) {
+
+         //
+         // Build the map key for the current line
+         //
+         key = job.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            m[key] = cur;
+            mlog << Debug(3) << "[Case " << m.size()
+                 << "] Added new case for key \""
+                 << key << "\".\n";
+         }
+
+         //
+         // Add the current line to the map entry
+         //
+         m[key].job_info.add(line);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         //
+         // Write line to dump file
+         //
+         job.dump_stat_line(line);
 
          n_out++;
       }
@@ -3425,6 +3679,7 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    mcts_info.clear();
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.cts.set_ec_value(job.hss_ec_value);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
 
@@ -3447,6 +3702,7 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    mcts_info.clear();
    mcts_info.cts.set_size(job.out_fcst_thresh.n() + 1);
+   mcts_info.cts.set_ec_value(job.hss_ec_value);
    mcts_info.set_fthresh(job.out_fcst_thresh);
    mcts_info.set_othresh(job.out_obs_thresh);
 

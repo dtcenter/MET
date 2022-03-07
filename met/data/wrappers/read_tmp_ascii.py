@@ -16,7 +16,7 @@ Version  Date
 
 __author__ = 'David Fillmore'
 __version__ = '1.0.0'
-__email__ = 'met_help@ucar.edu'
+
 
 import argparse
 

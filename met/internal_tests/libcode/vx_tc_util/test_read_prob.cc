@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
    while(f >> p_line) {
 
       // Add the current line to the array of probs
-      probs.add(p_line);
+      probs.add(p_line, bad_data_double, false);
 
       // Increment the line count
       count++;

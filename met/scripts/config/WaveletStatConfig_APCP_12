@@ -50,7 +50,7 @@ fcst = {
       {
         name       = "APCP";
         level      = [ "A12" ];
-        cat_thresh = [ >0.0, >=5.0 ];
+        cat_thresh = [ >0.0, >=5.0, NA ];
       }
    ];
 }
@@ -59,7 +59,7 @@ obs = {
       {
         name       = "APCP_12";
         level      = [ "(*,*)" ];
-        cat_thresh = [ >0.0, >=5.0 ];
+        cat_thresh = [ >0.0, >=5.0, NA ];
       }
    ];
 }
@@ -137,13 +137,13 @@ obs_raw_plot = {
 
 wvlt_plot = {
    color_table = "MET_BASE/colortables/NCL_colortables/BlWhRe.ctable";
-   plot_min = -1.0;
-   plot_max =  1.0;
+   plot_min = 0.0;
+   plot_max = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix = "";
-version = "V10.0.0";
+version = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

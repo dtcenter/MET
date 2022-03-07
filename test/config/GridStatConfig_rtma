@@ -52,6 +52,7 @@ wind_logic          = UNION;
 eclv_points         = 0.05;
 nc_pairs_var_name   = "";
 nc_pairs_var_suffix = "";
+hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
 
 //
@@ -110,7 +111,7 @@ interp = {
    type = [
       { method = NEAREST; width  = 1; },
       { method = UW_MEAN; width  = 3; },
-      { method = MIN;     width  = 1; },
+      { method = MIN;     width  = 3; },
       { method = MAX;     width  = 3; }
    ];
 }
@@ -159,6 +160,7 @@ distance_map = {
    baddeley_max_dist = NA;
    fom_alpha         = 0.1;
    zhu_weight        = 0.5;
+   beta_value(n)     = n * n / 2.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +214,6 @@ nc_pairs_flag = {
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V10.0.0";
+version          = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

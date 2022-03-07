@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11-17-08  Halley Gotway
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -84,8 +85,8 @@ extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, dou
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
                                 double cmn, double csd, const MaskPlane *mp = 0);
-extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y, const MaskPlane *mp = 0);
-extern double   interp_xy      (const DataPlane &, int x, int y, const MaskPlane *mp = 0);
+extern double   interp_bilin   (const DataPlane &, bool wrap_lon, double obs_x, double obs_y, const MaskPlane *mp = 0);
+extern double   interp_xy      (const DataPlane &, bool wrap_lon, int x, int y, const MaskPlane *mp = 0);
 
 extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t, const MaskPlane *mp = 0);
 
@@ -102,8 +103,8 @@ extern double compute_sfc_interp(const DataPlane &dp,
                                  double obs_elv, double obs_v,
                                  const InterpMthd mthd, const int width,
                                  const GridTemplateFactory::GridTemplates shape,
-                                 double interp_thresh, const SurfaceInfo &sfc_info,
-                                 bool is_land_obs);
+                                 bool wrap_lon, double interp_thresh,
+                                 const SurfaceInfo &sfc_info, bool is_land_obs);
 
 extern MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
                                   const SurfaceInfo &sfc_info,
@@ -113,14 +114,16 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
-                                  double interp_thresh, const SingleThresh *cat_thresh = 0);
+                                  bool wrap_lon, double interp_thresh,
+                                  const SingleThresh *cat_thresh = 0);
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y,
                                   double obs_v, double cmn, double csd,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
-                                  double interp_thresh, const SingleThresh *cat_thresh = 0);
+                                  bool wrap_lon, double interp_thresh,
+                                  const SingleThresh *cat_thresh = 0);
 
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);

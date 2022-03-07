@@ -73,9 +73,7 @@ weight = [];
 //
 // Array of STAT-Analysis jobs to be performed on the filtered data
 //
-jobs = [
-   "-job filter -dump_row ./filter_job.stat"
-];
+jobs = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -108,9 +106,18 @@ wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Skill score index options
+//
+ss_index_name       = "SS_INDEX";
+ss_index_vld_thresh = 1.0;
+
+////////////////////////////////////////////////////////////////////////////////
+
+hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

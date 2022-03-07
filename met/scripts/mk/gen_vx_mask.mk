@@ -23,7 +23,7 @@ gen_vx_mask: ${GEN_VX_MASK_EXEC}
 	${GEN_VX_MASK_EXEC} \
    	../data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
 	../data/poly/CONUS.poly \
-   	${TEST_OUT_DIR}/gen_vx_mask/CONUS_poly.nc -v 2
+   	${TEST_OUT_DIR}/gen_vx_mask/CONUS_poly.nc -type poly -v 2
 	@ 
 	echo
 	echo "*** Running Gen-Vx-Mask to generate a circle mask file ***"

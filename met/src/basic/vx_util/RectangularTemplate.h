@@ -1,57 +1,30 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1990 - 2021
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
-// ** Boulder, Colorado, USA
-// ** BSD licence applies - redistribution and use in source and binary
-// ** forms, with or without modification, are permitted provided that
-// ** the following conditions are met:
-// ** 1) If the software is modified to produce derivative works,
-// ** such modified software should be clearly marked, so as not
-// ** to confuse it with the version available from UCAR.
-// ** 2) Redistributions of source code must retain the above copyright
-// ** notice, this list of conditions and the following disclaimer.
-// ** 3) Redistributions in binary form must reproduce the above copyright
-// ** notice, this list of conditions and the following disclaimer in the
-// ** documentation and/or other materials provided with the distribution.
-// ** 4) Neither the name of UCAR nor the names of its contributors,
-// ** if any, may be used to endorse or promote products derived from
-// ** this software without specific prior written permission.
-// ** DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
-// ** OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-// ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-/* RCS info
- *   $Author: dixon $
- *   $Locker:  $
- *   $Date: 2016/03/03 19:21:31 $
- *   $Id: RectangularTemplate.hh,v 1.3 2016/03/03 19:21:31 dixon Exp $
- *   $Revision: 1.3 $
- *   $State: Exp $
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   RectangularTemplate.h
+//
+//   Description:
+//      Class implementing a Rectangular template to be
+//      applied on gridded data.
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//   000    01-01-07  Megenhardt      Initial version.
+//   001    09-07-21  Halley Gotway   Add wrap_lon.
+//
+///////////////////////////////////////////////////////////////////////////////
 
-/**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**/
+#ifndef __RECTANGULAR_TEMPLATE_H__
+#define __RECTANGULAR_TEMPLATE_H__
 
-/************************************************************************
- * RectangularTemplate.hh: class implementing a Rectangular template to be
- *                      applied on gridded data.
- *
- * RAP, NCAR, Boulder CO
- *
- * January 2007
- *
- * Dan Megenhardt
- *
- ************************************************************************/
-
-#ifndef RectangularTemplate_HH
-#define RectangularTemplate_HH
-
-/*
- **************************** includes **********************************
- */
+///////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 
@@ -61,71 +34,44 @@
 #include <GridPoint.h>
 #include <GridTemplate.h>
 
-/*
- ******************************* defines ********************************
- */
+///////////////////////////////////////////////////////////////////////////////
 
-/*
- ******************************* structures *****************************
- */
+class RectangularTemplate : public GridTemplate {
 
-/*
- ************************* global variables *****************************
- */
+   public:
 
-/*
- ***************************** function prototypes **********************
- */
+      RectangularTemplate(int height, int width, bool wrap_lon);
+      virtual ~RectangularTemplate(void);
 
-/*
- ************************* class definitions ****************************
- */
+      void printOffsetList(FILE *stream);
 
-class RectangularTemplate : public GridTemplate
-{
- public:
+      // Access methods
 
-  // Constructor
-  RectangularTemplate(int height, int width);
+      int getHeight(void) const {
+         return _height;
+      }
 
-  // Destructor
+      int getWidth(void) const {
+         return _width;
+      }
 
-  virtual ~RectangularTemplate(void);
+      const char* getClassName(void) const {
+         return RectangularTemplate::_className();
+      }
 
-  // Print the offset list to the given stream.  This is used for debugging.
+   private:
 
-  void printOffsetList(FILE *stream);
+      int _height;
+      int _width;
 
-  // Access methods
-
-  int getHeight(void) const
-  {
-    return _height;
-  }
-
-  int getWidth(void) const
-  {
-    return _width;
-  }
-
-  const char* getClassName(void) const{
-    return RectangularTemplate::_className();
-  }
-
- private:
-
-  // The box dimensions
-
-  int _height;
-  int _width;
-
-  // Return the class name for error messages.
-  static const char* _className(void)
-  {
-    return("RectangularTemplate");
-  }
-
+      // Return the class name for error messages.
+      static const char* _className(void) {
+         return("RectangularTemplate");
+      }
 };
 
+///////////////////////////////////////////////////////////////////////////////
 
-#endif
+#endif   //  __RECTANGULAR_TEMPLATE_H__
+
+///////////////////////////////////////////////////////////////////////////////

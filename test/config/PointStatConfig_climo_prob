@@ -65,9 +65,11 @@ fcst = {
 }
 
 obs = {
-   sid_inc      = [];
-   sid_exc      = [];
-   message_type = [ "ADPSFC" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+   message_type    = [ "ADPSFC" ];
 
    field = [
       {
@@ -121,6 +123,7 @@ climo_cdf = {
    cdf_bins    = 11;
    center_bins = TRUE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +215,7 @@ output_flag = {
    pjc    = BOTH;
    prc    = BOTH;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = BOTH;
    mpr    = BOTH;
@@ -219,11 +223,10 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

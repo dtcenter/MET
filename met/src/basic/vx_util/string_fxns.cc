@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -112,21 +112,20 @@ const char * get_short_name(const char * path)
 
 {
 
-if ( !path )  return ( (const char *) 0 );
+const char * short_name = (const char *) NULL;
 
-int j;
-const char * short_name = (const char *) 0;
+if ( path ) {
+   int j;
 
+   j = m_strlen(path) - 1;
 
-j = strlen(path) - 1;
+   while ( (j >= 0) && (path[j] != '/') )  --j;
 
-while ( (j >= 0) && (path[j] != '/') )  --j;
+   ++j;
 
-++j;
+   short_name = path + j;
 
-short_name = path + j;
-
-
+}
 
 return ( short_name );
 
@@ -139,13 +138,13 @@ return ( short_name );
 void append_char(char *str, const char c)
 
 {
-   char *ptr = (char *) 0;
+   char *ptr = (char *) NULL;
 
    //
    // If the specified characater does not already exist at the
    // end of the string, add one.
    //
-   ptr = str + strlen(str) - 1;
+   ptr = str + m_strlen(str) - 1;
 
    if(*ptr != c) {
       *(++ptr) = c;
@@ -165,13 +164,13 @@ void append_char(char *str, const char c)
 void strip_char(char *str, const char c)
 
 {
-   char *ptr = (char *) 0;
+   char *ptr = (char *) NULL;
 
    //
    // If the specified character exists at the end of the string,
    // remove it.
    //
-   ptr = str + strlen(str) - 1;
+   ptr = str + m_strlen(str) - 1;
 
    if(*ptr == c) {
       *(ptr) = 0;
@@ -187,44 +186,47 @@ void strip_char(char *str, const char c)
 int num_tokens(const char *test_str, const char *separator)
 
 {
-   int n;
-   char *temp_str = (char *) 0;
-   char *c = (char *) 0;
+   int n = 0;
+   char *temp_str = (char *) NULL;
+   char *c = (char *) NULL;
+   const char *method_name = "num_tokens() -> ";
 
    //
    // Check for an empty string
    //
-   if(strlen(test_str) <= 0) return(0);
+   if(!test_str) return(0);
+   
+   int buf_len = m_strlen(test_str);
+   if(buf_len <= 0) return(0);
 
    //
    // Initialize the temp string for use in tokenizing
    //
-   temp_str = new char[strlen(test_str) + 1];
+   temp_str = m_strcpy2(test_str, method_name);
+   if (temp_str) {
 
-   if(!temp_str) {
-      mlog << Error << "\nnum_tokens() -> "
-           << "memory allocation error\n\n";
-      exit(1);
+      //
+      // Compute the number of tokens in the string
+      //
+      //c = strtok(temp_str1.c_str(), separator);
+      c = strtok(temp_str, separator);
+
+      //
+      // Check for an empty string
+      //
+      if(c) {
+         n = 1;
+
+         //
+         // Parse remaining tokens
+         //
+         //
+         while((c = strtok(0, separator)) != NULL) n++;
+      }
+
    }
-   strcpy(temp_str, test_str);
 
-   //
-   // Compute the number of tokens in the string
-   //
-   c = strtok(temp_str, separator);
-
-   //
-   // Check for an empty string
-   //
-   if(!c) { delete [] temp_str;  temp_str = 0;  return(0); }
-   else   n = 1;
-
-   //
-   // Parse remaining tokens
-   //
-   while((c = strtok(0, separator)) != NULL) n++;
-
-   if(temp_str) { delete [] temp_str; temp_str = (char *) 0; }
+   if(temp_str) { delete [] temp_str; temp_str = (char *) NULL; }
 
    return(n);
 }
@@ -247,7 +249,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
    // case-insensitive matching.
    //
    for(i=0; i<n_prefix; i++) {
-      if(strncasecmp(str, prefix_list[i], strlen(prefix_list[i])) == 0) {
+      if(strncasecmp(str, prefix_list[i], m_strlen(prefix_list[i])) == 0) {
          status = true;
          break;
       }
@@ -260,6 +262,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 
 int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 {
+   const char *method_name = "regex_apply() ";
    //  compile the regex pattern
    int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
    regex_t *re = new regex_t;
@@ -267,7 +270,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    if(0 != (rc = regcomp(re, pat, REG_EXTENDED))){
       regfree(re);
       if( re ) { delete re; re = 0; }
-      mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
+      mlog << Error << "\n" << method_name << "- regcomp() error: " << rc << "\n\n";
       exit(1);
    }
 
@@ -294,7 +297,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
          for(int i=0; i < num_act; i++){
             int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
             mat[i] = new char[mat_len + 1];
-            strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data());
+            m_strncpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
+                      mat_len, method_name, "mat[i]");
          }
          mat[num_act] = NULL;
 
@@ -304,7 +308,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    }
 
    regfree(re);
-   if( re ) { delete re; re = 0; }
+   if( re ) { delete re; re = NULL; }
    return num_act;
 }
 
@@ -327,7 +331,7 @@ ConcatString str_replace(const char* data, const char* old, const char* repl){
    string str = data;
    size_t pos = str.find( old );
    if( string::npos == pos ) return ret;
-   str.replace(pos, strlen(old), repl);
+   str.replace(pos, m_strlen(old), repl);
 
    ret = str;
    return ret;
@@ -379,7 +383,7 @@ ConcatString str_trim(const ConcatString str){
 
 int parse_thresh_index(const char *col_name) {
    int i = 0;
-   const char *ptr = (const char *) 0;
+   const char *ptr = (const char *) NULL;
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
    else {

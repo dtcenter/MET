@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1319,6 +1319,12 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    ConcatString var_str, cs;
    StringArray sa;
    NcVar nc_var;
+
+   if (!var_info) {
+      mlog << Error << "\nwrite_nc_data() -> "
+           << "var_info is null.\n\n";
+      exit(1);
+   }
 
    //
    // Write to the -name command line argument, if specified.

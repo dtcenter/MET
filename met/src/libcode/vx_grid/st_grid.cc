@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -96,7 +96,6 @@ switch ( data.hemisphere )  {
       mlog << Error << "\nStereographicGrid::StereographicGrid(const StereographicData &) -> "
            << "bad hemisphere ...\"" << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -484,26 +483,26 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString StereographicGrid::serialize() const
+ConcatString StereographicGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: Stereographic";
+a << "Projection: Stereographic" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny << sep;
 
-a << " IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false");
+a << "IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false") << sep;
 
-snprintf(junk, sizeof(junk), " Lon_orient: %.3f", Lon_orient);   a << junk;
+snprintf(junk, sizeof(junk), "Lon_orient: %.3f", Lon_orient);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Bx: %.3f", Bx);   a << junk;
-snprintf(junk, sizeof(junk), " By: %.3f", By);   a << junk;
+snprintf(junk, sizeof(junk), "Bx: %.3f", Bx);   a << junk << sep;
+snprintf(junk, sizeof(junk), "By: %.3f", By);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " Alpha: %.4f", Alpha);   a << junk;
+snprintf(junk, sizeof(junk), "Alpha: %.4f", Alpha);   a << junk;
 
    //
    //  done
@@ -554,7 +553,7 @@ return ( angle );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StereographicGrid::is_global() const
+bool StereographicGrid::wrap_lon() const
 
 {
 

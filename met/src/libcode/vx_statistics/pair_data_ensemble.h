@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,6 +90,7 @@ class PairDataEnsemble : public PairBase {
 
       int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
+      int        ctrl_index;      // Index of the control member
       bool       skip_const;      // Skip cases where the observation and
                                   // all ensemble members are constant
       BoolArray  skip_ba;         // Flag for each observation [n_obs]
@@ -106,6 +107,7 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
       NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
+      NumArray   esumn_na;        // Count of ensemble values [n_obs]
 
       NumArray   mn_na;           // Ensemble mean value [n_obs]
       NumArray   mn_oerr_na;      // Mean of perturbed members [n_obs]
@@ -125,7 +127,7 @@ class PairDataEnsemble : public PairBase {
 
       void clear();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       bool has_obs_error() const;
 
@@ -172,7 +174,7 @@ class VxPairDataEnsemble {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
+      EnsVarInfo *fcst_info;     // Forecast field, allocated by EnsVarInfo
       VarInfo *climo_info;       // Climatology field, allocated by VarInfoFactory
       VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
 
@@ -205,8 +207,9 @@ class VxPairDataEnsemble {
 
       StringArray sid_inc_filt;  // Station ID inclusion list
       StringArray sid_exc_filt;  // Station ID exclusion list
-      StringArray obs_qty_filt;  // Observation quality markers
-
+      StringArray obs_qty_inc_filt;  // Observation quality include markers
+      StringArray obs_qty_exc_filt;  // Observation quality exclude markers
+      
       //////////////////////////////////////////////////////////////////
 
       ObsErrorInfo *obs_error_info; // Pointer for observation error
@@ -230,7 +233,7 @@ class VxPairDataEnsemble {
 
       void clear();
 
-      void set_fcst_info(VarInfo *);
+      void set_fcst_info(EnsVarInfo *);
       void set_climo_info(VarInfo *);
       void set_obs_info(VarInfo *);
 
@@ -249,8 +252,9 @@ class VxPairDataEnsemble {
 
       void set_sid_inc_filt(const StringArray);
       void set_sid_exc_filt(const StringArray);
-      void set_obs_qty_filt(const StringArray);
-
+      void set_obs_qty_inc_filt(const StringArray);
+      void set_obs_qty_exc_filt(const StringArray);
+      
       // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
 
@@ -268,7 +272,7 @@ class VxPairDataEnsemble {
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
 
-      void set_climo_cdf_info(const ClimoCDFInfo &);
+      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
@@ -277,7 +281,7 @@ class VxPairDataEnsemble {
                          unixtime, const char *, float *, Grid &,
                          const char * = 0, const DataPlane * = 0);
 
-      void add_ens(int, bool mn);
+      void add_ens(int, bool mn, Grid &);
 
       int  get_n_pair() const;
 
@@ -290,6 +294,8 @@ class VxPairDataEnsemble {
       void print_obs_summary();
 
       void calc_obs_summary();
+
+      void set_ctrl_index(int);
 
       void set_skip_const(bool);
 };

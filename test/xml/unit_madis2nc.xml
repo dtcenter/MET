@@ -11,6 +11,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <!-- MADIS data can be retrieved from the NOAA JET machine here:
@@ -127,6 +129,18 @@
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_MESONET_optional_vars">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/mesonet/mesonet_20170101_0000.nc \
+      &OUTPUT_DIR;/madis2nc/mesonet_20170101_0000_F000.nc \
+      -type mesonet -mask_grid G207 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_20170101_0000_F000.nc</point_nc>
     </output>
   </test>
 

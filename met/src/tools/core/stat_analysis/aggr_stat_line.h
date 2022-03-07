@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -53,6 +53,7 @@ using namespace std;
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
 #include "ens_stats.h"
+#include "skill_score_index_job.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -140,6 +141,7 @@ struct AggrMPRInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
    PairDataPoint pd;
+   ClimoCDFInfo cdf_info;
 };
 
 struct AggrISCInfo {
@@ -151,6 +153,7 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
+   ClimoCDFInfo cdf_info;
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
    void clear();
 };
@@ -158,6 +161,11 @@ struct AggrENSInfo {
 struct AggrRPSInfo {
    StatHdrInfo hdr;
    RPSInfo rps_info;
+};
+
+struct AggrSSIndexInfo {
+   StatHdrInfo hdr;
+   SSIndexJobInfo job_info;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -285,6 +293,11 @@ extern void aggr_ssvar_lines(
 extern void aggr_time_series_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrTimeSeriesInfo> &,
+               int &, int &);
+
+extern void aggr_ss_index(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrSSIndexInfo> &,
                int &, int &);
 
 ////////////////////////////////////////////////////////////////////////

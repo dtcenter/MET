@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -121,10 +121,7 @@ void MetNcMetDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
-
-{
-
+bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
@@ -221,14 +218,18 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetNcMetDataFile::index(VarInfo &vinfo){
+int MetNcMetDataFile::index(VarInfo &vinfo) {
 
-   if( NULL == MetNc->find_var_name( vinfo.name().c_str() ) ) return -1;
+   NcVarInfo *ncinfo = MetNc->find_var_name( vinfo.name().c_str() );
 
-   if( ( vinfo.valid()              && MetNc->ValidTime   != vinfo.valid() ) ||
-       ( vinfo.init()               && MetNc->InitTime    != vinfo.init()  ) ||
-       ( !is_bad_data(vinfo.lead()) && MetNc->lead_time() != vinfo.lead()  ) )
-      return -1;
+   if( !ncinfo ) return(-1);
 
-   return 0;
+   if( ( vinfo.valid() != 0         && ncinfo->ValidTime   != vinfo.valid() ) ||
+       ( vinfo.init() != 0          && ncinfo->InitTime    != vinfo.init()  ) ||
+       ( !is_bad_data(vinfo.lead()) && ncinfo->lead_time() != vinfo.lead()  ) )
+      return(-1);
+
+   return(0);
 }
+
+////////////////////////////////////////////////////////////////////////

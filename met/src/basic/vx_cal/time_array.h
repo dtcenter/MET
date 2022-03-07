@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -91,6 +91,12 @@ class TimeArray {
 
 inline int TimeArray::n_elements() const { return ( Nelements ); }
 inline int TimeArray::n()          const { return ( Nelements ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern ConcatString write_css                (const TimeArray &);
 
 
 ////////////////////////////////////////////////////////////////////////

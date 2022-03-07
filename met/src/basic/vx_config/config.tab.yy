@@ -1661,7 +1661,7 @@ if ( s->PT < 0 || s->PT > 100 )  {
 
 }
 
-if ( s->Ptype == perc_thresh_freq_bias && !is_eq(s->PT, 1.0) )  {
+if ( s->Ptype == perc_thresh_freq_bias && s->PT <= 0 )  {
 
    mlog << Error << "\ndo_simple_perc_thresh() -> "
         << "unsupported frequency bias percentile threshold!\n\n";

@@ -1,21 +1,17 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __VX_SHAPEFILES_DBF_FILE_H__
 #define  __VX_SHAPEFILES_DBF_FILE_H__
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
    //
    //  Got info on the dbf file format at
@@ -27,15 +23,11 @@
    //        http://web.archive.org/web/20150323061445/http://ulisse.elettra.trieste.it/services/doc/dbase/DBFstruct.htm
    //
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 struct DbfSubRecord;   //  forward reference
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 class DbfHeader {
 
@@ -85,9 +77,7 @@ class DbfHeader {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 class DbfSubRecord {
 
@@ -133,19 +123,83 @@ class DbfSubRecord {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void dump_record(ostream &, const int depth, const unsigned char * buf, const DbfHeader &);
 
+////////////////////////////////////////////////////////////////////////
+
+class DbfFile {
+
+   private:
+
+      DbfFile(const DbfFile &);
+      DbfFile & operator=(const DbfFile &);
+
+   protected:
+
+      void init_from_scratch();
+
+      int fd;
+
+      bool At_Eof;
+
+      DbfHeader Header;
+
+      ConcatString Filename;
+
+   public:
+
+      DbfFile();
+     ~DbfFile();
+
+      bool open(const char * path);
+
+      void close();
+
+         //
+         //  set stuff
+         //
+
+         //
+         //  get stuff
+         //
+
+      const DbfHeader * header() const;
+
+      const char * filename() const;
+
+      bool at_eof() const;
+
+      int position() const;   //  offset in bytes from beginning of file
+
+      bool is_open() const;
+
+         //
+         //  do stuff
+         //
+
+      void lseek(int offset, int whence = SEEK_SET);   //  just like lseek(2)
+
+      bool read(unsigned char * buf, int nbytes);
+
+      StringArray subrecord_names();
+
+      StringArray subrecord_values(int i_rec);
+
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 
+inline const DbfHeader * DbfFile::header() const { return ( &Header ); }
+
+inline bool  DbfFile::at_eof() const { return ( At_Eof ); }
+
+inline bool  DbfFile::is_open() const { return ( fd >= 0 ); }
+
+////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __VX_SHAPEFILES_DBF_FILE_H__  */
 
-
 ////////////////////////////////////////////////////////////////////////
-
-

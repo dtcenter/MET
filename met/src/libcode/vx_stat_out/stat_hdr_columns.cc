@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -99,14 +99,14 @@ void StatHdrColumns::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_model(const char *s) {
-   model = check_hdr_str((string)s);
+   model = check_hdr_str(conf_key_model, (string) s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_desc(const char *s) {
-   desc = check_hdr_str((string)s);
+   desc = check_hdr_str(conf_key_desc, (string) s);
    return;
 }
 
@@ -161,56 +161,56 @@ void StatHdrColumns::set_obs_valid_end(const unixtime ut) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_var(const ConcatString s) {
-   fcst_var = check_hdr_str(s);
+   fcst_var = check_hdr_str(conf_key_fcst_var, s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_units(const ConcatString s) {
-   fcst_units = check_hdr_str(s, true);
+   fcst_units = check_hdr_str(conf_key_fcst_units, s, true);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_lev(const char *s) {
-   fcst_lev = check_hdr_str((string)s, true);
+   fcst_lev = check_hdr_str(conf_key_fcst_lev, (string) s, true);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_var(const ConcatString s) {
-   obs_var = check_hdr_str(s);
+   obs_var = check_hdr_str(conf_key_obs_var, s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_units(const ConcatString s) {
-   obs_units = check_hdr_str(s, true);
+   obs_units = check_hdr_str(conf_key_obs_units, s, true);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_lev(const char *s) {
-   obs_lev = check_hdr_str((string)s, true);
+   obs_lev = check_hdr_str(conf_key_obs_lev, (string) s, true);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obtype(const char *s) {
-   obtype = check_hdr_str((string)s);
+   obtype = check_hdr_str(conf_key_obtype, (string) s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_mask(const char *s) {
-   mask = check_hdr_str((string)s);
+   mask = check_hdr_str(conf_key_vx_mask, (string) s);
    return;
 }
 
@@ -234,7 +234,7 @@ void StatHdrColumns::set_interp_mthd(ConcatString s,
       GridTemplateFactory gtf;
       mthd << '_' << gtf.enum2String(shape).c_str();
    }
-   interp_mthd = check_hdr_str(mthd);
+   interp_mthd = check_hdr_str(conf_key_interp_mthd, mthd);
    return;
 }
 
@@ -269,7 +269,7 @@ void StatHdrColumns::set_interp_pnts(const int n) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_line_type(const char *s) {
-   line_type = check_hdr_str((string)s);
+   line_type = check_hdr_str(conf_key_line_type, (string) s);
    return;
 }
 

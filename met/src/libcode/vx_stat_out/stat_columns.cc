@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -141,6 +141,9 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
          col++;
       }
    }
+
+   at.set_entry(r, col, (string)mctc_columns[3]);
+   col++;
 
    return;
 }
@@ -2338,7 +2341,8 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    MSESS,            MSESS_BCL,            MSESS_BCU,
    //    RMSFA,            RMSFA_BCL,            RMSFA_BCU,
    //    RMSOA,            RMSOA_BCL,            RMSOA_BCU,
-   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
+   //    SI,               SI_BCL,               SI_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2632,6 +2636,15 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+96, // Anomaly Correlation Uncentered BCU
       cnt_info.anom_corr_uncntr.v_bcu[i]);
 
+   at.set_entry(r, c+97, // Scatter Index
+      cnt_info.si.v);
+
+   at.set_entry(r, c+98, // Scatter Index BCL
+      cnt_info.si.v_bcl[i]);
+
+   at.set_entry(r, c+99, // Scatter Index BCU
+      cnt_info.si.v_bcu[i]);
+
    return;
 }
 
@@ -2644,12 +2657,12 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    //
    // Multi-Category Contingency Table Counts
    // Dump out the MCTC line:
-   //    TOTAL,       N_CAT,     Fi_Oj
+   //    TOTAL,       N_CAT,     Fi_Oj,     EC_VALUE
    //
    at.set_entry(r, c+0,  // Total Count
       mcts_info.cts.total());
 
-   at.set_entry(r, c+1,  // N_CAT
+   at.set_entry(r, c+1,  // Number of categories 
       mcts_info.cts.nrows());
 
    //
@@ -2658,11 +2671,15 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    for(i=0, col=c+2; i<mcts_info.cts.nrows(); i++) {
       for(j=0; j<mcts_info.cts.ncols(); j++) {
 
-         at.set_entry(r, col,      // Fi_Oj
+         at.set_entry(r, col,      // Fi_Oj table counts
             mcts_info.cts.entry(i, j));
          col++;
       }
    }
+
+   at.set_entry(r, col,  // Expected Correct value 
+      mcts_info.cts.ec_value());
+   col++;
 
    return;
 }
@@ -2679,7 +2696,9 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
    //    HK,          HK_BCL,      HK_BCU,
    //    HSS,         HSS_BCL,     HSS_BCU,
-   //    GER,         GER_BCL,     GER_BCU
+   //    GER,         GER_BCL,     GER_BCU,
+   //    HSS_EC,      HSS_EC_BCL,  HSS_EC_BCU,
+   //    EC_VALUE
    //
    at.set_entry(r, c+0,  // Total count
       mcts_info.cts.total());
@@ -2728,6 +2747,18 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
 
    at.set_entry(r, c+15, // Gerrity Score BCU
       mcts_info.ger.v_bcu[i]);
+
+   at.set_entry(r, c+16, // Heidke Skill Score with Expected Correct
+      mcts_info.hss_ec.v);
+
+   at.set_entry(r, c+17, // Heidke Skill Score EC BCL
+      mcts_info.hss_ec.v_bcl[i]);
+
+   at.set_entry(r, c+18, // Heidke Skill Score EC BCU
+      mcts_info.hss_ec.v_bcu[i]);
+
+   at.set_entry(r, c+19, // Expected Correct value
+      mcts_info.cts.ec_value());
 
    return;
 }
@@ -3450,7 +3481,8 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
    //    FBIAS,       BADDELEY,    HAUSDORFF,
    //    MED_FO,      MED_OF,      MED_MIN,      MED_MAX,      MED_MEAN,
    //    FOM_FO,      FOM_OF,      FOM_MIN,      FOM_MAX,      FOM_MEAN,
-   //    ZHU_FO,      ZHU_OF,      ZHU_MIN,      ZHU_MAX,      ZHU_MEAN
+   //    ZHU_FO,      ZHU_OF,      ZHU_MIN,      ZHU_MAX,      ZHU_MEAN,
+   //    G,           GBETA,       BETA_VALUE
    //
    at.set_entry(r, c+0,  // TOTAL
       dmap_info.total);
@@ -3514,6 +3546,15 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
 
    at.set_entry(r, c+20, // ZHU_MEAN
       dmap_info.zhu_mean);
+
+   at.set_entry(r, c+21, // G
+      dmap_info.g);
+
+   at.set_entry(r, c+22, // GBETA
+      dmap_info.gbeta);
+
+   at.set_entry(r, c+23, // BETA_VALUE 
+      dmap_info.get_beta_value());
 
    return;
 }
@@ -4079,6 +4120,38 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
          pd_ptr->relp_na[i]);
       col++;
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_ssidx_cols(const SSIDXData &ssidx_data,
+                      AsciiTable &at, int r, int c) {
+
+   //
+   // Skill Score Index
+   // Dump out the SSIDX line:
+   //    FCST_MODEL,  REF_MODEL,   N_INIT,
+   //    N_TERM,      N_VLD,       SS_INDEX
+   //
+   at.set_entry(r, c+0,  // Forecast model name
+      ssidx_data.fcst_model);
+
+   at.set_entry(r, c+1,  // Reference model name
+      ssidx_data.ref_model);
+
+   at.set_entry(r, c+2,  // Number of initializations
+      ssidx_data.init_time.n());
+
+   at.set_entry(r, c+3,  // Number of terms
+      ssidx_data.n_term);
+
+   at.set_entry(r, c+4,  // Number of valid terms
+      ssidx_data.n_vld);
+
+   at.set_entry(r, c+5,  // Skill score index value
+      ssidx_data.ss_index);
 
    return;
 }

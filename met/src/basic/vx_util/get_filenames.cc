@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,7 +29,6 @@ using namespace std;
 #include "vx_log.h"
 
 #include "get_filenames.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,10 +112,13 @@ struct stat sbuf;
 if ( S_ISDIR(sbuf.st_mode) )  {
 
    //
-   //  process directory
+   //  get filenames from the directory and sort them
+   //  to make the order consistent across platforms
    //
 
    b = get_filenames_from_dir(search_dir.c_str(), prefix, suffix);
+
+   b.sort();
 
    a.add(b);
 
@@ -199,9 +201,16 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    }
 
+   //
+   //  get filenames from the directory and sort them
+   //  to make the order consistent across platforms
+   //
+
    if ( S_ISDIR(sbuf.st_mode) )  {
 
       b = get_filenames_from_dir(entry_path, prefix, suffix);
+
+      b.sort();
 
       a.add(b);
 

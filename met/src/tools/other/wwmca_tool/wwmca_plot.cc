@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -263,7 +263,7 @@ short_name = get_short_name(filename);
 
 // allocate space for the pixel time filename (make it slightly
 // larger than the input filename to ensure that it is large enough)
-pt_filename = new char [strlen(filename) + 10];
+pt_filename = new char [m_strlen(filename) + 10];
 
 // create pixel time filename and read it in
 set_pixel_time_filename(filename, pt_filename);
@@ -385,12 +385,13 @@ void set_pixel_time_filename(const char * cp_name, char * pt_name)
    static const char * pt_name_start = "WWMCA_PIXL_TIME_MEANS";
    int cp_length, short_cp_length;
    int i, j;
+   const char *method_name = "set_pixel_time_filename() -> ";
 
    // get the short name of the cloud percent file
    short_cp_name = get_short_name(cp_name);
 
    // get the lengths of the cloud percent filename including path and without path
-   cp_length = strlen(cp_name);
+   cp_length = m_strlen(cp_name);
    short_cp_length = short_cp_name.length();
 
    // copy the path to the files
@@ -399,9 +400,9 @@ void set_pixel_time_filename(const char * cp_name, char * pt_name)
 
    // now create the new pixel time filename which consists of the pt_name_start and the
    // rest of the cp_name after removing its start (WWMCA_TOTAL_CLOUD_PCT)
-   strcpy(pt_name + i, pt_name_start);
+   m_strncpy((char *)(pt_name + i), pt_name_start, m_strlen(pt_name_start), method_name);
 
-   for (j = i + strlen(pt_name_start); j < cp_length; j++)
+   for (j = i + m_strlen(pt_name_start); j < cp_length; j++)
       pt_name[j] = cp_name[j];
 
    pt_name[j] = '\0';  // null terminate the string

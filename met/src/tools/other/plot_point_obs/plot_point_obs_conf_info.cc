@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -390,7 +390,7 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
    conf.read(replace_path(default_config_filename).c_str());
 
    // Read the user file name, if provided
-   if(strlen(user_file_name) > 0) {
+   if(m_strlen(user_file_name) > 0) {
       mlog << Debug(1) << "User Config File: "
            << user_file_name << "\n";
       conf.read(user_file_name);
@@ -436,7 +436,7 @@ void PlotPointObsConfInfo::process_config(
    }
 
    // Parse plot_grid_string, if set
-   if(strlen(plot_grid_string) > 0) {
+   if(m_strlen(plot_grid_string) > 0) {
 
       // Parse as a white-space separated string
       sa.parse_wsss(plot_grid_string);

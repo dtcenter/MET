@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -79,6 +79,7 @@ void ProbInfoBase::clear() {
    ValidTime = (unixtime) 0;
    Lat = bad_data_double;
    Lon = bad_data_double;
+   DLand = bad_data_double;
    NProb = 0;
    Prob.clear();
    ProbItem.clear();
@@ -101,6 +102,7 @@ void ProbInfoBase::dump(ostream &out, int indent_depth) const {
    out << prefix << "ValidTime       = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\"\n";
    out << prefix << "Lat             = "   << Lat << "\n";
    out << prefix << "Lon             = "   << Lon << "\n";
+   out << prefix << "DLand           = "   << DLand << "\n";
    out << prefix << "NProb           = "   << NProb << "\n";
    out << prefix << "Prob:"                << "\n";
    Prob.dump(out, indent_depth+1);
@@ -130,6 +132,7 @@ ConcatString ProbInfoBase::serialize() const {
      << ", ValidTime = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\""
      << ", Lat = " << Lat
      << ", Lon = " << Lon
+     << ", DLand = " << DLand
      << ", NProb = " << NProb;
 
    return(s);
@@ -155,6 +158,14 @@ ConcatString ProbInfoBase::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ProbInfoBase::set_dland(double d) {
+   DLand = d;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ProbInfoBase::assign(const ProbInfoBase &t) {
 
    clear();
@@ -168,6 +179,7 @@ void ProbInfoBase::assign(const ProbInfoBase &t) {
    ValidTime  = t.ValidTime;
    Lat        = t.Lat;
    Lon        = t.Lon;
+   DLand      = t.DLand;
    NProb      = t.NProb;
    Prob       = t.Prob;
    ProbItem   = t.ProbItem;
@@ -178,7 +190,7 @@ void ProbInfoBase::assign(const ProbInfoBase &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbInfoBase::initialize(const ATCFProbLine &l) {
+void ProbInfoBase::initialize(const ATCFProbLine &l, double dland) {
 
    clear();
 
@@ -192,6 +204,7 @@ void ProbInfoBase::initialize(const ATCFProbLine &l) {
    ValidTime = l.valid();
    Lat       = l.lat();
    Lon       = l.lon();
+   DLand     = dland;
 
    return;
 }
@@ -206,7 +219,6 @@ bool ProbInfoBase::is_match(const ATCFProbLine &l) const {
           Cyclone   == l.cyclone_number() &&
           Technique == l.technique() &&
           InitTime  == l.warning_time() &&
-          ValidTime == l.valid() &&
           Lat       == l.lat() &&
           Lon       == l.lon());
 }
@@ -239,7 +251,7 @@ bool ProbInfoBase::is_match(const TrackInfo &t) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbInfoBase::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbInfoBase::add(const ATCFProbLine &l, double dland, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
@@ -253,7 +265,7 @@ bool ProbInfoBase::add(const ATCFProbLine &l, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l);
+   if(Type == NoATCFLineType) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return(false);
@@ -297,6 +309,7 @@ void ProbInfoBase::set(const TCStatLine &l) {
    ValidTime = l.valid();
    Lat = atof(l.get_item("ALAT"));
    Lon = atof(l.get_item("ALON"));
+   DLand = atof(l.get_item("ADLAND"));
    NProb = atoi(l.get_item("N_THRESH"));
    for(int i=1; i<=NProb; i++) {
       cs << cs_erase << "PROB_" << i;

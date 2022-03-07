@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -84,7 +84,6 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
          mlog << Error << "\nTCStatJobFactory::new_tc_stat_job_type() -> "
               << "unsupported job type \"" << type_str << "\"\n\n";
          exit(1);
-         break;
    } // end switch
 
    return(job);
@@ -1341,6 +1340,9 @@ void TCStatJob::event_equalize_tracks() {
    mlog << Debug(3)
         << "Applying track-based event equalization logic.\n";
 
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
+
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
 
@@ -1425,6 +1427,9 @@ void TCStatJob::event_equalize_lines() {
 
    mlog << Debug(3)
         << "Applying line-based event equalization logic.\n";
+
+   // Add case map entry for any -amodel job command options
+   for(i=0; i<AModel.n(); i++) case_map[AModel[i]] = case_list;
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
@@ -3614,6 +3619,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::close_dump_file() {
+   const char *method_name = "TCStatJobProbRIRW::do_job() -> ";
 
    // Close the current output dump file stream
    if(DumpOut) {
@@ -3644,7 +3650,7 @@ void TCStatJobProbRIRW::close_dump_file() {
 
    // Open the dump file back up for reading
    if(!f.open(DumpFile.c_str())) {
-      mlog << Error << "\nTCStatJobProbRIRW::close_dump_file() -> "
+      mlog << Error << "\n" << method_name
            << "can't open the dump file \"" << DumpFile
            << "\" for reading!\n\n";
       exit(1);
@@ -3666,7 +3672,10 @@ void TCStatJobProbRIRW::close_dump_file() {
    TCStatJob::open_dump_file();
 
    // Write the reformatted AsciiTable
-   *DumpOut << out_at;
+
+   if(DumpOut) *DumpOut << out_at;
+   else mlog << Warning << "\n" << method_name
+             << "can't write the reformatted AsciiTable because DumpOut is null\n\n";
 
    // Call parent to close the dump file
    TCStatJob::close_dump_file();
@@ -3958,6 +3967,48 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
+TCLineCounts::TCLineCounts() {
+   // Read and keep counts
+   NRead = 0;
+   NKeep = 0;
+
+   // Checking entire track
+   RejTrackWatchWarn = 0;
+   RejInitThresh = 0;
+   RejInitStr = 0;
+
+   // Filtering on track attributes
+   RejRIRW = 0;
+   RejLandfall = 0;
+
+   // Checking track point attributes
+   RejAModel = 0;
+   RejBModel = 0;
+   RejDesc = 0;
+   RejStormId = 0;
+   RejBasin = 0;
+   RejCyclone = 0;
+   RejStormName = 0;
+   RejInit = 0;
+   RejInitHour = 0;
+   RejLead = 0;
+   RejValid = 0;
+   RejValidHour = 0;
+   RejInitMask = 0;
+   RejValidMask = 0;
+   RejLineType = 0;
+   RejWaterOnly = 0;
+   RejColumnThresh = 0;
+   RejColumnStr = 0;
+   RejMatchPoints = 0;
+   RejEventEqual = 0;
+   RejOutInitMask = 0;
+   RejOutValidMask = 0;
+   RejLeadReq = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    int i;
 
@@ -3997,26 +4048,28 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    // Build case information for the map key
    for(i=0; i<case_cols.n(); i++) {
 
-     cur = l.get(case_cols[i].c_str());
+      cur = l.get(case_cols[i].c_str());
 
       // For bad data, use the NA string
       if(is_bad_data(atoi(cur.c_str()))) cur = na_string;
 
-      // Special handling for lead time:
+      // Special handling for lead times < 100 hours:
       // Switch 2-digit hours to 3-digit hours so that the
       // summary job output is sorted nicely.
-      if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 &&
-         cur != na_str &&
-         abs(lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
+      bool need_cur = true;
+      if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 && cur != na_str) {
+         if(abs(lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
 
-         // Handle positive and negative lead times
-         key << (lead < 0 ? ":-0" : ":0")
-             << sec_to_hhmmss(abs(lead));
+            // Handle positive and negative lead times
+            key << (lead < 0 ? ":-0" : ":0")
+                << sec_to_hhmmss(abs(lead));
+            need_cur = false;
+         }
       }
-      // Otherwise, just append the current case info
-      else {
-         key << ":" << cur;
-      }
+
+      // Append the current case info if needed
+      if(need_cur) key << ":" << cur;
+
    } // end for i
 
    return(key);

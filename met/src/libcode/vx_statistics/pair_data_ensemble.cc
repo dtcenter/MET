@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -108,6 +108,7 @@ void PairDataEnsemble::clear() {
 
    n_ens = 0;
    n_pair = 0;
+   ctrl_index = bad_data_int;
    skip_const = false;
    skip_ba.clear();
 
@@ -121,6 +122,7 @@ void PairDataEnsemble::clear() {
 
    esum_na.clear();
    esumsq_na.clear();
+   esumn_na.clear();
 
    mn_na.clear();
    mn_oerr_na.clear();
@@ -143,35 +145,36 @@ void PairDataEnsemble::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::extend(int n, bool exact) {
+void PairDataEnsemble::extend(int n) {
    int i;
 
    // Allocate memory for the number of observations.
    // Only applies to arrays sized by n_obs which does not include:
    //   rhist_na, relp_na, phist_na
 
-   PairBase::extend(n, exact);
+   PairBase::extend(n);
 
-   obs_error_entry.extend(n, exact);
+   obs_error_entry.extend(n);
 
-   for(i=0; i<n_ens; i++) e_na[i].extend(n, exact);
+   for(i=0; i<n_ens; i++) e_na[i].extend(n);
 
-   v_na.extend               (n, exact);
-   r_na.extend               (n, exact);
-   crps_emp_na.extend        (n, exact);
-   crpscl_emp_na.extend      (n, exact);
-   crps_gaus_na.extend       (n, exact);
-   crpscl_gaus_na.extend     (n, exact);
-   ign_na.extend             (n, exact);
-   pit_na.extend             (n, exact);
-   skip_ba.extend            (n, exact);
-   var_na.extend             (n, exact);
-   var_oerr_na.extend        (n, exact);
-   var_plus_oerr_na.extend   (n, exact);
-   esum_na.extend            (n, exact);
-   esumsq_na.extend          (n, exact);
-   mn_na.extend              (n, exact);
-   mn_oerr_na.extend         (n, exact);
+   v_na.extend               (n);
+   r_na.extend               (n);
+   crps_emp_na.extend        (n);
+   crpscl_emp_na.extend      (n);
+   crps_gaus_na.extend       (n);
+   crpscl_gaus_na.extend     (n);
+   ign_na.extend             (n);
+   pit_na.extend             (n);
+   skip_ba.extend            (n);
+   var_na.extend             (n);
+   var_oerr_na.extend        (n);
+   var_plus_oerr_na.extend   (n);
+   esum_na.extend            (n);
+   esumsq_na.extend          (n);
+   esumn_na.extend           (n);
+   mn_na.extend              (n);
+   mn_oerr_na.extend         (n);
 
    return;
 }
@@ -206,7 +209,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
-   cdf_info       = pd.cdf_info;
+   cdf_info_ptr   = pd.cdf_info_ptr;
 
    cmn_na         = pd.cmn_na;
    csd_na         = pd.csd_na;
@@ -222,6 +225,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
    n_pair         = pd.n_pair;
+   ctrl_index     = pd.ctrl_index;
    skip_const     = pd.skip_const;
    skip_ba        = pd.skip_ba;
 
@@ -231,6 +235,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    esum_na        = pd.esum_na;
    esumsq_na      = pd.esumsq_na;
+   esumn_na       = pd.esumn_na;
 
    mn_na          = pd.mn_na;
    mn_oerr_na     = pd.mn_oerr_na;
@@ -290,12 +295,14 @@ void PairDataEnsemble::add_ens_var_sums(int i_obs, double v) {
    if(i_obs >= esum_na.n()) {
       esum_na.add(0.0);
       esumsq_na.add(0.0);
+      esumn_na.add(0.0);
    }
 
    // Track sums of the raw ensemble member values
    if(!is_bad_data(v)) {
       esum_na.inc(i_obs, v);
       esumsq_na.inc(i_obs, v*v);
+      esumn_na.inc(i_obs, 1);
    }
 
    return;
@@ -338,15 +345,15 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
 
-   if(cmn_flag && cdf_info.cdf_ta.n() == 2) {
+   if(cmn_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() == 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to the "
            << "climatological mean.\n";
    }
-   else if(cmn_flag && csd_flag && cdf_info.cdf_ta.n() > 2) {
+   else if(cmn_flag && csd_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() > 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to a "
-           << cdf_info.cdf_ta.n() - 2
+           << cdf_info_ptr->cdf_ta.n() - 2
            << "-member climatological ensemble.\n";
    }
    else {
@@ -416,17 +423,17 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       else {
 
          // Compute the variance of the unperturbed ensemble members
-         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], v_na[i]);
+         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
          // Process the observation error information.
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
-            // Compute perturbed ensemble mean and variance 
-            cur_ens.compute_mean_variance(mean, var_perturbed);
-            mn_oerr_na.add(mean);
-            var_oerr_na.add(var_perturbed);
+            // Compute perturbed ensemble mean and variance
+            // Exclude the control member from the variance
+            mn_oerr_na.add(cur_ens.mean());
+            var_oerr_na.add(cur_ens.variance(ctrl_index));
 
             // Compute the variance plus observation error variance.
             var_plus_oerr_na.add(var_unperturbed +
@@ -461,14 +468,18 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
 
          // Derive ensemble from climo mean and standard deviation
-         derive_climo_vals(cdf_info, cmn_na[i], csd_na[i], cur_clm);
+         derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
          crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
          crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
 
+         // Ensemble mean and standard deviation
+         // Exclude the control member from the standard deviation
+         mean  = cur_ens.mean();
+         stdev = cur_ens.stdev(ctrl_index);
+
          // Store Gaussian CRPS stats
-         cur_ens.compute_mean_stdev(mean, stdev);
          crps_gaus_na.add(compute_crps_gaus(o_na[i], mean, stdev));
          crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
@@ -613,9 +624,13 @@ struct ssvar_bin_comp {
 
 void PairDataEnsemble::compute_ssvar() {
    int i, j;
-   double mn, var;
+   double var;
    ssvar_bin_map bins;
    NumArray cur;
+
+   // HiRA stores the ensemble mean as bad data
+   // Do not compute SSVAR when bad data is present
+   if(mn_na.has(bad_data_double)) return;
 
    // Check number of points
    if(o_na.n() != mn_na.n()) {
@@ -644,21 +659,22 @@ void PairDataEnsemble::compute_ssvar() {
       if(skip_ba[i]) continue;
 
       // Store ensemble values for the current observation
-      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
-
-      // Compute standard deviation
-      cur.compute_mean_variance(mn, var);
+      // Exclude the control member from the variance
+      for(j=0, cur.erase(); j<n_ens; j++) {
+         if(j == ctrl_index) continue;
+         cur.add(e_na[j][i]);
+      }
 
       // Build a variance point
       ens_ssvar_pt pt;
-      pt.var = var;
+      pt.var = cur.variance();
       pt.f   = mn_na[i];
       pt.o   = o_na[i];
       pt.w   = wgt_na[i];
 
       // Determine the bin for the current point and add it to the list
       // Bins are defined starting at 0 and are left-closed, right-open
-      j = floor(var/ssvar_bin_size);
+      j = floor(pt.var/ssvar_bin_size);
       string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
@@ -773,7 +789,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    pd.ssvar_bin_size  = ssvar_bin_size;
    pd.obs_error_entry = obs_error_entry;
    pd.obs_error_flag  = obs_error_flag;
-   pd.cdf_info        = cdf_info;
+   pd.cdf_info_ptr    = cdf_info_ptr;
 
    bool cmn_flag = set_climo_flag(o_na, cmn_na);
    bool csd_flag = set_climo_flag(o_na, csd_na);
@@ -801,7 +817,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
-      //   o_qc_sa, esum_na, esumsq_na
+      //   o_qc_sa, esum_na, esumsq_na, esumn_na
 
       pd.wgt_na.add(wgt_na[i]);
       pd.o_na.add(o_na[i]);
@@ -879,7 +895,7 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   fcst_info    = (VarInfo *) 0;
+   fcst_info    = (EnsVarInfo *) 0;
    climo_info   = (VarInfo *) 0;
    obs_info     = (VarInfo *) 0;
    pd           = (PairDataEnsemble ***) 0;
@@ -898,7 +914,7 @@ void VxPairDataEnsemble::init_from_scratch() {
 void VxPairDataEnsemble::clear() {
    int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *) 0; }
+   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) 0; }
    if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
    if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) 0; }
 
@@ -913,8 +929,9 @@ void VxPairDataEnsemble::clear() {
 
    sid_inc_filt.clear();
    sid_exc_filt.clear();
-   obs_qty_filt.clear();
-
+   obs_qty_inc_filt.clear();
+   obs_qty_exc_filt.clear();
+   
    obs_error_info = (ObsErrorInfo *) 0;
 
    fcst_ut = (unixtime) 0;
@@ -954,7 +971,8 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    end_ut         = vx_pd.end_ut;
    sid_inc_filt   = vx_pd.sid_inc_filt;
    sid_exc_filt   = vx_pd.sid_exc_filt;
-   obs_qty_filt   = vx_pd.obs_qty_filt;
+   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
+   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
    obs_error_info = vx_pd.obs_error_info;
 
    interp_thresh  = vx_pd.interp_thresh;
@@ -979,15 +997,14 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_fcst_info(VarInfo *info) {
+void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) 0; }
 
    // Perform a deep copy
-   fcst_info = f.new_var_info(info->file_type());
-   *fcst_info = *info;
+   fcst_info = new EnsVarInfo(*info);
 
    return;
 }
@@ -1132,9 +1149,18 @@ void VxPairDataEnsemble::set_sid_exc_filt(const StringArray sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_obs_qty_filt(const StringArray q) {
+void VxPairDataEnsemble::set_obs_qty_inc_filt(const StringArray q) {
 
-   obs_qty_filt = q;
+   obs_qty_inc_filt = q;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_obs_qty_exc_filt(const StringArray q) {
+
+   obs_qty_exc_filt = q;
 
    return;
 }
@@ -1254,7 +1280,7 @@ void VxPairDataEnsemble::set_interp(int i_interp,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
-                                     int width, GridTemplateFactory::GridTemplates shape) {
+                                    int width, GridTemplateFactory::GridTemplates shape) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
@@ -1274,7 +1300,18 @@ void VxPairDataEnsemble::set_ens_size(int n) {
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_ens_size(n);
+
+            // Handle HiRA neighborhoods
+            if(pd[i][j][k].interp_mthd == InterpMthd_HiRA) {
+               GridTemplateFactory gtf;
+               GridTemplate* gt = gtf.buildGT(pd[i][j][k].interp_shape,
+                                              pd[i][j][k].interp_wdth,
+                                              false);
+               pd[i][j][k].set_ens_size(n*gt->size());
+            }
+            else {
+               pd[i][j][k].set_ens_size(n);
+            }
          }
       }
    }
@@ -1284,12 +1321,12 @@ void VxPairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_climo_cdf_info(const ClimoCDFInfo &info) {
+void VxPairDataEnsemble::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
    for(int i=0; i<n_msg_typ; i++) {
       for(int j=0; j<n_mask; j++) {
          for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info(info);
+            pd[i][j][k].set_climo_cdf_info_ptr(info);
          }
       }
    }
@@ -1360,7 +1397,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) return;
 
    // Check whether the observation variable name matches (rej_var)
-   if ((var_name != 0) && (0 < strlen(var_name))) {
+   if ((var_name != 0) && (0 < m_strlen(var_name))) {
       if ( var_name != obs_info->name() ) {
          return;
       }
@@ -1368,16 +1405,13 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    else if(obs_info_grib->code() != nint(obs_arr[1])) {
       return;
    }
-
-   // Check if the observation quality flag is included in the list
-   if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
-      bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n() && !qty_match; i++)
-         if( obs_qty == obs_qty_filt[i]) qty_match = true;
-
-      if(!qty_match) return;
+   
+   // Check the observation quality include and exclude options
+   if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
+      (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
+      return;
    }
-
+   
    // Check whether the observation time falls within the valid time
    // window
    if(hdr_ut < beg_ut || hdr_ut > end_ut) return;
@@ -1400,8 +1434,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    y = nint(obs_y);
 
    // Check if the observation's lat/lon is on the grid
-   if(x < 0 || x >= gr.nx() ||
-      y < 0 || y >= gr.ny()) return;
+   if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
+        y < 0 || y >= gr.ny()) return;
 
    // For pressure levels, check if the observation pressure level
    // falls in the requsted range.
@@ -1422,7 +1456,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // falls within the requested range.
    else {
 
-      if(!msg_typ_sfc.has(hdr_typ_str) &&
+      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info_grib->level().lower() ||
           obs_hgt > obs_info_grib->level().upper())) {
          return;
@@ -1438,7 +1472,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // below the observation point.
    else {
       // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
       find_vert_lvl(climo_mn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
    }
@@ -1452,7 +1486,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // levels above and below the observation point.
    else {
       // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
       find_vert_lvl(climo_sd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
    }
@@ -1461,12 +1495,12 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      msg_typ_sfc.has(hdr_typ_str)) {
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 
    // Set flag for specific humidity
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
+   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Store pointer to ObsErrorEntry
@@ -1541,16 +1575,16 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Compute the interpolated climatology values using the
             // observation pressure level or height
-            to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+            to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
 
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
                        bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape,
+                       pd[0][0][k].interp_shape, gr.wrap_lon(),
                        interp_thresh, spfh_flag,
-                       fcst_info->level().type(),
+                       fcst_info->get_var_info()->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
             // Check for bad data
@@ -1575,9 +1609,9 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
                         bad_data_double, bad_data_double,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape,
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
                         interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
+                        fcst_info->get_var_info()->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Check for bad data
@@ -1604,13 +1638,14 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_ens(int member, bool mn) {
-   int i, j, k, l;
-   int f_lvl_blw, f_lvl_abv;
+void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
+   int i, j, k, l, m;
+   int f_lvl_blw, f_lvl_abv, i_mem;
    double to_lvl, fcst_v;
+   NumArray fcst_na;
 
    // Set flag for specific humidity
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
+   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Loop through all the PairDataEnsemble objects and interpolate
@@ -1618,11 +1653,26 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
 
+            // Only apply HiRA to single levels
+            if(pd[0][0][k].interp_mthd == InterpMthd_HiRA &&
+               fcst_dpa.n_planes() != 1 ) {
+
+               mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
+                    << "the \"" << interpmthd_to_string(pd[0][0][k].interp_mthd)
+                    << "\" interpolation method only applies when verifying a "
+                    << "single level, not " << fcst_dpa.n_planes()
+                    << " levels.\n\n";
+               continue;
+            }
+
             // Process each of the observations
             for(l=0; l<pd[i][j][k].n_obs; l++) {
 
+               // Initialize
+               fcst_na.erase();
+
                // Interpolate using the observation pressure level or height
-               to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+               to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
                          pd[i][j][k].lvl_na[l] : pd[i][j][k].elv_na[l]);
 
                // For a single forecast field
@@ -1636,42 +1686,83 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                   find_vert_lvl(fcst_dpa, to_lvl, f_lvl_blw, f_lvl_abv);
                }
 
-               // Compute the interpolated ensemble value
-               fcst_v = compute_interp(fcst_dpa,
-                           pd[i][j][k].x_na[l],
-                           pd[i][j][k].y_na[l],
-                           pd[i][j][k].o_na[l],
-                           pd[i][j][k].cmn_na[l],
-                           pd[i][j][k].csd_na[l],
-                           pd[0][0][k].interp_mthd,
-                           pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape,
-                           interp_thresh, spfh_flag,
-                           fcst_info->level().type(),
-                           to_lvl, f_lvl_blw, f_lvl_abv);
+               // Extract the HiRA neighborhood of values
+               if(pd[0][0][k].interp_mthd == InterpMthd_HiRA) {
 
-               // Store the ensemble mean
-               if(mn) {
-                  pd[i][j][k].mn_na.add(fcst_v);
+                  // For HiRA, set the ensemble mean to bad data
+                  if(mn) {
+                     fcst_na.erase();
+                     fcst_na.add(bad_data_double);
+                  }
+                  // Otherwise, retrieve all the neighborhood values
+                  // using a valid threshold of 0
+                  else {
+                     get_interp_points(fcst_dpa,
+                        pd[i][j][k].x_na[l],
+                        pd[i][j][k].y_na[l],
+                        pd[0][0][k].interp_mthd,
+                        pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape,
+                        gr.wrap_lon(),
+                        0, spfh_flag,
+                        fcst_info->get_var_info()->level().type(),
+                        to_lvl, f_lvl_blw, f_lvl_abv,
+                        fcst_na);
+                  }
                }
-               // Store the ensemble member values
+               // Otherwise, get a single interpolated ensemble value
                else {
+                  fcst_na.add(compute_interp(fcst_dpa,
+                     pd[i][j][k].x_na[l],
+                     pd[i][j][k].y_na[l],
+                     pd[i][j][k].o_na[l],
+                     pd[i][j][k].cmn_na[l],
+                     pd[i][j][k].csd_na[l],
+                     pd[0][0][k].interp_mthd,
+                     pd[0][0][k].interp_wdth,
+                     pd[0][0][k].interp_shape,
+                     gr.wrap_lon(),
+                     interp_thresh, spfh_flag,
+                     fcst_info->get_var_info()->level().type(),
+                     to_lvl, f_lvl_blw, f_lvl_abv));
+               }
 
-                  // Track unperturbed ensemble variance sums
-                  pd[i][j][k].add_ens_var_sums(l, fcst_v);
+               // Store the single ensemble value or HiRA neighborhood
+               for(m=0; m<fcst_na.n(); m++) {
 
-                  // Apply observation error perturbation, if requested
-                  if(obs_error_info->flag) {
-                     fcst_v = add_obs_error_inc(
-                                 obs_error_info->rng_ptr, FieldType_Fcst,
-                                 pd[i][j][k].obs_error_entry[l],
-                                 pd[i][j][k].o_na[l], fcst_v);
+                  // Store the ensemble mean
+                  if(mn) {
+                     pd[i][j][k].mn_na.add(fcst_na[m]);
+                  }
+                  // Store the ensemble member values
+                  else {
+
+                     // Track unperturbed ensemble variance sums
+                     // Exclude the control member from the variance
+                     if(member != pd[i][j][k].ctrl_index) {
+                        pd[i][j][k].add_ens_var_sums(l, fcst_na[m]);
+                     }
+
+                     // Apply observation error perturbation, if requested
+                     if(obs_error_info->flag) {
+                        fcst_v = add_obs_error_inc(
+                                    obs_error_info->rng_ptr, FieldType_Fcst,
+                                    pd[i][j][k].obs_error_entry[l],
+                                    pd[i][j][k].o_na[l], fcst_na[m]);
+                     }
+                     else {
+                        fcst_v = fcst_na[m];
+                     }
+
+                     // Determine index of ensemble member
+                     i_mem = member * fcst_na.n() + m;
+
+                     // Store perturbed ensemble member value
+                     pd[i][j][k].add_ens(i_mem, fcst_v);
                   }
 
-                  // Store perturbed ensemble member value
-                  pd[i][j][k].add_ens(member, fcst_v);
-               }
-            }
+               } // end for m - fcst_na
+            } // end for l - n_obs
          } // end for k - n_interp
       } // end for j - n_mask
    } // end for i - n_msg_typ
@@ -1772,6 +1863,21 @@ void VxPairDataEnsemble::calc_obs_summary() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataEnsemble::set_ctrl_index(int index) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].ctrl_index = index;
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataEnsemble::set_skip_const(bool tf) {
 
    for(int i=0; i < n_msg_typ; i++){
@@ -1793,7 +1899,7 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
 
 double compute_crps_emp(double obs, const NumArray &ens_na) {
    int i;
-   double fcst;
+   double fcst = 0.0;
    NumArray evals;
 
    // Store valid ensemble member values

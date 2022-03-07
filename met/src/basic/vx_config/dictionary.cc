@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -219,7 +219,6 @@ switch ( entry.Type )  {
            << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(entry.Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -300,7 +299,6 @@ switch ( Type )  {
            << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -377,7 +375,6 @@ switch ( Type )  {
          mlog << Error
               << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->get_type() << "\n";
          exit ( 1 );
-         break;
 
       }  //  switch
       if ( Thresh->get_type() != thresh_na )  out << Thresh->get_value();
@@ -402,7 +399,6 @@ switch ( Type )  {
            << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
@@ -766,21 +762,30 @@ return ( Bval );
 ////////////////////////////////////////////////////////////////////////
 
 
-const ConcatString * DictionaryEntry::string_value() const
+const ConcatString DictionaryEntry::string_value() const
 
 {
 
-if ( Type != StringType )  {
+   if ( Type != StringType )  {
 
-   mlog << Error
-        << "\nDictionaryEntry::string_value() -> bad type\n\n";
+      mlog << Error
+           << "\nDictionaryEntry::string_value() -> bad type\n\n";
 
-   exit ( 1 );
+      exit ( 1 );
 
-}
+   }
 
+   ConcatString sub_text = ConcatString(*Text);
+   ConcatString cur_env_val;
+   if ( get_env(met_ens_member_id, cur_env_val) )  {
 
-return ( Text );
+      if(!cur_env_val.empty()) {
+         sub_text.replace(met_ens_member_id, cur_env_val.c_str(), false);
+      }
+
+   }
+
+   return ( sub_text );
 
 }
 
@@ -1313,7 +1318,7 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
    //  try current dictionary
    //
 
- const char * stub = scope[scope.n_elements() - 1].c_str();
+const string stub = scope[scope.n_elements() - 1].c_str();
 
 E = D->lookup_simple(stub);
 
@@ -1820,7 +1825,7 @@ if ( !Entry || !is_correct_type )  {
 
 }
 
-return ( *(Entry->string_value()) );
+return ( Entry->string_value() );
 
 }
 
@@ -1878,7 +1883,7 @@ if ( !Entry || !is_correct_type )  {
 
 if ( Entry->type() == StringType )  {
 
-   array.add( *(Entry->string_value()) );
+   array.add( Entry->string_value() );
 
    return ( array );
 
@@ -1915,7 +1920,7 @@ if ( Dict->n_entries() > 0 )  {
 
 for (int i=0; i<Dict->n_entries(); i++)  {
 
-   array.add(*(*Dict)[i]->string_value());
+   array.add((*Dict)[i]->string_value());
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -252,7 +252,7 @@ ConcatString MetConfig::get_tmp_dir()
    // Use the MET_TMP_DIR environment variable, if set.
    if(!get_env("MET_TMP_DIR", tmp_dir)) {
       const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
-      if ( LastLookupStatus ) tmp_dir = *(_e->string_value());
+      if ( LastLookupStatus ) tmp_dir = _e->string_value();
       else                    tmp_dir = default_tmp_dir;
    }
 
@@ -312,9 +312,10 @@ if ( empty(name) )  {
 
 DictionaryStack DS(*this);
 ConcatString temp_filename = get_tmp_dir();
-
-temp_filename << "/" << make_temp_file_name("met_config", 0);
-
+ 
+temp_filename << "/" << "met_config";
+temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+ 
 recursive_envs(name, temp_filename.c_str());
 
 bison_input_filename = (const char *) temp_filename.c_str();
@@ -422,9 +423,10 @@ if ( empty(s) )  {
 ofstream out;
 ConcatString temp_filename = get_tmp_dir();
 
-temp_filename << "/" << make_temp_file_name("config", ".temp");
-
- out.open(temp_filename.c_str());
+temp_filename << "/" << "met_config";
+temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+ 
+out.open(temp_filename.c_str());
 
 if ( ! out )  {
 

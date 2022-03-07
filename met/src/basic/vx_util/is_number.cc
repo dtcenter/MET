@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "is_number.h"
+#include "str_wrappers.h"
 #include "substring.h"
 
 
@@ -46,7 +47,7 @@ static int is_allowed_float_char(const char c);
 
 static const char allowed_float_chars [] = "+-Ee.0123456789";
 
-static const int n_allowed_float_chars = strlen(allowed_float_chars);
+static const int n_allowed_float_chars = m_strlen(allowed_float_chars);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ int is_float(const char * text)
 
 if ( !text )  return ( 0 );
 
-const int n = strlen(text);
+const int n = m_strlen(text);
 
 if ( n == 0 )  return ( 0 );
 
@@ -184,7 +185,7 @@ if ( is_sign_char(t[0]) )  ++t;
    //  at most one decimal point
    //
 
-n = strlen(t);
+n = m_strlen(t);
 
 digit_count = dp_count = 0;
 
@@ -226,7 +227,7 @@ char junk[128];
    //  if the "e" is the first or last character, return "no"
    //
 
-n = strlen(text);
+n = m_strlen(text);
 
 if ( (exp_pos == 0) || (exp_pos == (n - 1)) )  return ( 0 );
 

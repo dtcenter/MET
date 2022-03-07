@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -45,26 +45,12 @@ using namespace std;
 
 #include "plot_point_obs.h"
 
-#include "nc_utils.h"
-#include "vx_log.h"
-#include "data_plane.h"
 #include "data_plane_plot.h"
-#include "write_netcdf.h"
-#include "vx_data2d.h"
-#include "vx_data2d_factory.h"
-#include "vx_data2d_grib.h"
-#include "vx_data2d_nc_met.h"
-#include "vx_data2d_nc_pinterp.h"
-#include "vx_util.h"
-#include "vx_cal.h"
-#include "vx_grid.h"
-#include "vx_math.h"
-#include "vx_color.h"
 #include "vx_ps.h"
 #include "vx_pxm.h"
 #include "vx_render.h"
 #include "vx_plot_util.h"
-#include "nc_obs_util.h"
+#include "nc_point_obs_in.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -147,272 +133,159 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_obs(const char *point_obs_filename) {
-   int h, v;
-   int   obs_hid_block[DEF_NC_BUFFER_SIZE];
-   int   obs_vid_block[DEF_NC_BUFFER_SIZE];
-   int   obs_qty_block[DEF_NC_BUFFER_SIZE];
-   float obs_lvl_block[DEF_NC_BUFFER_SIZE];
-   float obs_hgt_block[DEF_NC_BUFFER_SIZE];
-   float obs_val_block[DEF_NC_BUFFER_SIZE];
-   float obs_arr_block[DEF_NC_BUFFER_SIZE][OBS_ARRAY_LEN];
+   int h, v, i_obs;
+   const char *method_name = "process_point_obs() -> ";
+   const char *method_name_s = "process_point_obs() ";
 
    // Open the netCDF point observation file
    mlog << Debug(1) << "Reading point observation file: "
         << point_obs_filename << "\n";
 
-   NcFile * f_in = open_ncfile(point_obs_filename);
+   bool status;
+   bool use_var_id = true;
+   bool use_obs_arr = false;
 
-   if(!f_in || IS_INVALID_NC_P(f_in)) {
-      mlog << Error << "\nprocess_point_obs() -> "
-           << "trouble opening point observation file "
-           << point_obs_filename << ".\n\n";
-      delete f_in;
-      f_in = (NcFile *) 0;
-
-      exit(1);
-   }
-
-   // Read the dimensions and variables
-   NetcdfObsVars obsVars;
-   read_nc_dims_vars(obsVars, f_in);
-   bool use_var_id = obsVars.use_var_id;
-   bool use_qty_idx = IS_VALID_NC(obsVars.obs_qty_tbl_var);
-
-   // Print warning about ineffective command line arguments
-   if(use_var_id && ivar.n() != 0) {
-      mlog << Warning << "\n-gc option is ignored!\n\n";
-   }
-   if(!use_var_id && svar.n() != 0) {
-      mlog << Warning << "\n-obs_var option is ignored!\n\n";
-   }
-
-   if(IS_INVALID_NC(obsVars.hdr_dim)     ||
-      IS_INVALID_NC(obsVars.obs_dim)     ||
-      IS_INVALID_NC(obsVars.strl_dim)    ||
-      IS_INVALID_NC(obsVars.hdr_typ_var) ||
-      IS_INVALID_NC(obsVars.hdr_sid_var) ||
-      IS_INVALID_NC(obsVars.hdr_vld_var)) {
-      mlog << Error << "\nprocess_point_obs() -> "
-           << "trouble reading point observation file "
-           << point_obs_filename << ".\n\n";
-      exit(1);
-   }
-
-   if(is_version_less_than_1_02(f_in)) {
-      if(IS_INVALID_NC(obsVars.hdr_arr_dim) ||
-         IS_INVALID_NC(obsVars.obs_arr_dim) ||
-         IS_INVALID_NC(obsVars.hdr_arr_var) ||
-         IS_INVALID_NC(obsVars.obs_arr_var)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "trouble reading point observation file "
-              << point_obs_filename << "(2D variables).\n\n";
+   bool use_python = false;
+   MetNcPointObsIn nc_point_obs;
+   MetPointData *met_point_obs = 0;
+#ifdef WITH_PYTHON
+   MetPythonPointDataFile met_point_file;
+   string python_command = point_obs_filename;
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
          exit(1);
       }
-   }
-   else {
-      if(IS_INVALID_NC(obsVars.hdr_lat_var) ||
-         IS_INVALID_NC(obsVars.hdr_typ_tbl_var) ||
-         IS_INVALID_NC(obsVars.obs_qty_tbl_var) ||
-         IS_INVALID_NC(obsVars.obs_val_var)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "trouble reading point observation file "
-              << point_obs_filename << "(header or obs).\n\n";
+
+      if(!met_point_file.open(python_command.substr(offset+1).c_str(), use_xarray)) {
+         met_point_file.close();
+         mlog << Error << "\n" << method_name
+              << "trouble getting point observation file from python command "
+              << python_command << ".\n\n";
          exit(1);
       }
+
+      met_point_obs = met_point_file.get_met_point_data();
+   }
+   else
+#endif
+   {
+      if(!nc_point_obs.open(point_obs_filename)) {
+         nc_point_obs.close();
+
+         mlog << Error << "\n" << method_name
+              << "trouble opening point observation file "
+              << point_obs_filename << ".\n\n";
+
+         exit(1);
+      }
+
+      // Read the dimensions and variables
+      nc_point_obs.read_dim_headers();
+      nc_point_obs.check_nc(point_obs_filename, method_name_s);   // exit if missing dims/vars
+      nc_point_obs.read_obs_data();
+
+      use_obs_arr = nc_point_obs.is_using_obs_arr();
+
+      // Print warning about ineffective command line arguments
+      if(use_var_id && ivar.n() != 0) {
+         mlog << Warning << "\n" << method_name << "-gc option is ignored!\n\n";
+      }
+      if(!use_var_id && svar.n() != 0) {
+         mlog << Warning << "\n" << method_name << "-obs_var option is ignored!\n\n";
+      }
+      met_point_obs = (MetPointData *)&nc_point_obs;
    }
 
-   long nhdr_count = get_dim_size(&obsVars.hdr_dim);
-   long nobs_count = get_dim_size(&obsVars.obs_dim);
+   long nhdr_count = met_point_obs->get_hdr_cnt();
+   long nobs_count = met_point_obs->get_obs_cnt();
 
    mlog << Debug(2) << "Processing " << nobs_count
         << " observations at " << nhdr_count << " locations.\n";
 
    // Get the corresponding header:
    //   message type, staton_id, valid_time, and lat/lon/elv
-   NcHeaderData header_data = get_nc_hdr_data(obsVars);
 
-   bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
-   bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);
-
-   int hdr_arr_len  = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) :
-                                    HDR_ARRAY_LEN;
-   int obs_arr_len  = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) :
-                                    OBS_ARRAY_LEN;
-   int buf_size;
+   int buf_size = (nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : nobs_count;
 
    // Allocate space to store the data
-   float hdr_arr[hdr_arr_len];
-   float obs_arr[obs_arr_len];
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
+   int obs_qty_block[buf_size];
+   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-   long offsets_1D[1] = { 0 };
-   long lengths_1D[1] = { 1 };
+   use_var_id = met_point_obs->is_using_var_id();
+   if(use_var_id) var_list = met_point_obs->get_var_names();
+   qty_list = met_point_obs->get_qty_data();
 
-   if(use_var_id) {
-      NcVar obs_var_var = get_nc_var(f_in, nc_var_obs_var);
-      long var_count = get_dim_size(&obs_var_var, 0);
-      long var_len = get_dim_size(&obs_var_var, 1);
-      char obs_var_str[var_count][var_len];
-
-      lengths[0] = var_count;
-      lengths[1] = var_len;
-      if(!get_nc_data(&obs_var_var,
-                      (char *) &obs_var_str[0],
-                      lengths, offsets)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "trouble getting " << nc_var_obs_var << "\n\n";
-         exit(1);
-      }
-      for(int index=0; index<var_count; index++) {
-         var_list.add(obs_var_str[index]);
-      }
+   if (0 == qty_list.n()) {
+      mlog << Error << "\n" << method_name << "Missing quality marks\n\n";
+      exit (1);
+   }
+   if (use_var_id && (0 == var_list.n())) {
+      mlog << Debug(1) << method_name << "Missing variable names\ns\n";
+      exit (1);
    }
 
-   long qty_len;
-   if(use_qty_idx) {
-      qty_len = get_dim_size(&obsVars.obs_qty_tbl_var, 1);
-      long qty_count = get_dim_size(&obsVars.obs_qty_tbl_var, 0);
-      char obs_var_str[qty_count][qty_len];
+   ConcatString hdr_typ_str;
+   ConcatString hdr_sid_str;
+   ConcatString hdr_vld_str;
+   ConcatString obs_qty_str;
 
-      lengths[0] = qty_count;
-      lengths[1] = qty_len;
-      if(!get_nc_data(&obsVars.obs_qty_tbl_var,
-                      (char *) obs_var_str,
-                      lengths, offsets)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "trouble getting " << nc_var_obs_qty_tbl << "\n\n";
-         exit(1);
-      }
-      for(int index=0; index<qty_count; index++) {
-         qty_list.add(obs_var_str[index]);
-      }
-   }
-   else {
-      qty_len = get_dim_size(&obsVars.obs_qty_var, 1);
-   }
-
-   char qty_str_block[DEF_NC_BUFFER_SIZE][qty_len];
    for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
-      buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ?
-                  DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
+      int buf_size2 = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ?
+                        DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
 
-      offsets[0] = i_start;
-      lengths[0] = buf_size;
-      offsets_1D[0] = i_start;
-      lengths_1D[0] = buf_size;
-      if(use_obs_arr) {
-         lengths[1] = obs_arr_len;
-
-         // Read the current observation message
-         if(!get_nc_data(&obsVars.obs_arr_var,
-                         (float *) &obs_arr_block[0],
-                         lengths, offsets)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_arr\n\n";
-            exit(1);
-         }
-
-         lengths[1] = qty_len;
-         if(!get_nc_data(&obsVars.obs_qty_var,
-                         (char *) qty_str_block,
-                         lengths, offsets)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_qty\n\n";
-            exit(1);
-         }
-         qty_list.clear();
-         for(int index=0; index<buf_size; index++) {
-            qty_list.add(qty_str_block[index]);
-         }
-         lengths[1] = obs_arr_len;
-      }
-      else {
-         // Read the current observation message
-         if(!get_nc_data(&obsVars.obs_hid_var,
-                         (int *) &obs_hid_block[0],
-                         lengths_1D, offsets_1D)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_hid\n\n";
-            exit(1);
-         }
-         if(!get_nc_data((IS_INVALID_NC(obsVars.obs_vid_var) ?
-                         &obsVars.obs_gc_var : &obsVars.obs_vid_var),
-                         (int *)&obs_vid_block[0], lengths_1D, offsets)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_hid\n\n";
-            exit(1);
-         }
-         if(!get_nc_data(&obsVars.obs_lvl_var,
-                         (float *) &obs_lvl_block[0],
-                         lengths_1D, offsets_1D)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_lvl\n\n";
-            exit(1);
-         }
-         if(!get_nc_data(&obsVars.obs_hgt_var,
-                         (float *) &obs_hgt_block[0],
-                         lengths_1D, offsets_1D)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_hgt\n\n";
-            exit(1);
-         }
-         if(!get_nc_data(&obsVars.obs_val_var,
-                         (float *) &obs_val_block[0],
-                         lengths_1D, offsets_1D)) {
-            mlog << Error << "\nprocess_point_obs() -> "
-                 << "trouble getting obs_val\n\n";
-            exit(1);
-         }
-         if (use_qty_idx) {
-            if(!get_nc_data(&obsVars.obs_qty_var,
-                            (int *) obs_qty_block,
-                            lengths_1D, offsets_1D)) {
-               mlog << Error << "\nprocess_point_obs() -> "
-                    << "trouble getting obs_qty\n\n";
-               exit(1);
-            }
-         }
-      }
+#ifdef WITH_PYTHON
+      if (use_python)
+         status = met_point_obs->get_point_obs_data()->fill_obs_buf(
+                             buf_size2, i_start, (float *)obs_arr_block, obs_qty_block);
+      else
+#endif
+      status = nc_point_obs.read_obs_data(buf_size2, i_start, (float *)obs_arr_block,
+                                          obs_qty_block, (char *)0);
+      if (!status) exit(1);
 
       int typ_idx, sid_idx, vld_idx;
-      for(int i_offset=0; i_offset<buf_size; i_offset++) {
+      for(int i_offset=0; i_offset<buf_size2; i_offset++) {
 
-         if(use_obs_arr) {
-             for(int j=0; j < obs_arr_len; j++) {
-                obs_arr[j] = obs_arr_block[i_offset][j];
-             }
-         }
-         else {
-            obs_arr[0] = (float) obs_hid_block[i_offset];
-            obs_arr[1] = (float) obs_vid_block[i_offset];
-            obs_arr[2] = obs_lvl_block[i_offset];
-            obs_arr[3] = obs_hgt_block[i_offset];
-            obs_arr[4] = obs_val_block[i_offset];
+         i_obs = i_start + i_offset;
+         for (int j=0; j<OBS_ARRAY_LEN; j++) {
+            obs_arr[j] = obs_arr_block[i_offset][j];
          }
 
          if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
+
+         int qty_offset = use_obs_arr ? i_obs : obs_qty_block[i_offset];
+         obs_qty_str = qty_list[qty_offset];
 
          // Get the header index and variable type for this observation.
          h = nint(obs_arr[0]);
          v = nint(obs_arr[1]);
 
-         typ_idx = (use_obs_arr ? h : header_data.typ_idx_array[h]);
-         sid_idx = (use_obs_arr ? h : header_data.sid_idx_array[h]);
-         vld_idx = (use_obs_arr ? h : header_data.vld_idx_array[h]);
+         // Read the corresponding header array for this observation
+         // - the corresponding header type, header Station ID, and valid time
+#ifdef WITH_PYTHON
+         if (use_python)
+            met_point_obs->get_header(h, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
+         else
+#endif
+            nc_point_obs.get_header(h, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
 
          // Store data in an observation object
          Observation cur_obs(
-            header_data.typ_array[typ_idx],          // message type
-            header_data.sid_array[sid_idx],          // station id
+            hdr_typ_str,          // message type
+            hdr_sid_str,          // station id
             timestring_to_time_t(                    // valid time
-               header_data.vld_array[vld_idx].c_str()),
-            header_data.lat_array[h],                // latitude
-            header_data.lon_array[h],                // longitude
-            header_data.elv_array[h],                // elevation
-            (use_qty_idx ?                           // quality string
-               qty_list[obs_qty_block[i_offset]] :
-               qty_list[i_offset]),
+               hdr_vld_str.c_str()),
+            hdr_arr[0],                // latitude
+            hdr_arr[1],                // longitude
+            hdr_arr[2],                // elevation
+            obs_qty_str.c_str(),                     // quality string
             (use_var_id ? bad_data_int : v),         // grib code
             (double) obs_arr[2],                     // pressure
             (double) obs_arr[3],                     // height
@@ -426,11 +299,14 @@ void process_point_obs(const char *point_obs_filename) {
    } // end for i_start
 
    // Clean up
-   if(f_in) { delete f_in; f_in = (NcFile *) 0; }
+#ifdef WITH_PYTHON
+   if (use_python) met_point_file.close();
+   else
+#endif
+   nc_point_obs.close();
 
    return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -633,7 +509,7 @@ void create_plot() {
    if(use_flate) plot.end_flate();
 
    mlog << Debug(2)
-        << "Finished plotting " << plot_count << " locations.\n"
+        << "Finished plotting " << plot_count << " locations for " << ps_file << ".\n"
         << "Skipped " << skip_count << " locations off the grid.\n";
 
    plot.showpage();

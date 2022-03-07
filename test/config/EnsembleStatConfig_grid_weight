@@ -32,9 +32,18 @@ regrid = {
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "ens.field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
 
 tmp_field = [ { name = "TMP"; level = [ "Z2" ]; } ];
 
@@ -46,6 +55,13 @@ ens = {
    vld_thresh = 1.0;
    field      = tmp_field;
 }
+
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = [];
+control_id = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -77,13 +93,30 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+eclv_points = 0.05;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type = [ "APDSFC" ];
-   sid_inc      = [];
-   sid_exc      = [];
-   field        = tmp_field;
+   message_type    = [ "APDSFC" ];
+   sid_inc         = [];
+   sid_exc         = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+   field           = tmp_field;
 }
 obs = fcst;
 
@@ -93,12 +126,16 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-obs_thresh     = [ NA ];
-obs_quality    = [];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
-skip_const     = FALSE;
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
 
 //
 // Observation error options
@@ -122,16 +159,10 @@ obs_error = {
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
-//
-// Categorical thresholds to define ensemble probabilities
-// May be set separately in each "fcst.field" entry
-//
-prob_cat_thresh = [];
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = {
 
@@ -186,6 +217,7 @@ ci_alpha  = [ 0.05 ];
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [
       {
@@ -208,6 +240,11 @@ output_flag = {
    orank = NONE;
    ssvar = STAT;
    relp  = STAT;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,6 +253,7 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
+   latlon    = TRUE;
    mean      = TRUE;
    stdev     = FALSE;
    minus     = FALSE;
@@ -245,6 +283,6 @@ rng = {
 
 grid_weight_flag = ${GRID_WEIGHT};
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V10.0.0";
+version          = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

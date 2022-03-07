@@ -13,6 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_statistics.a
 libvx_statistics_a_SOURCES = \
                apply_mask.cc apply_mask.h \
+               grid_closed_poly.cc grid_closed_poly.h \
                compute_ci.cc compute_ci.h \
                contable.cc contable.h \
                contable_stats.cc \

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,6 +16,7 @@
 #include <netcdf>
 using namespace netCDF;
 #include "nc_utils.h"
+#include "nc_obs_util.h"
 #include "vx_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,10 +34,7 @@ struct NcObsOutputData {
 
 extern string _secsToTimeString(const int secs);
 
-extern void init_netcdf_output(NcFile *, NetcdfObsVars &obs_vars,
-      NcObsOutputData &nc_out_data, string program_name);
-
-extern bool write_observations(NcFile *, NetcdfObsVars &, NcObsOutputData &nc_out_data);
+// Not moved to nc_obs_util to reduce the dependency (library)
 
 extern void write_summary_attributes(NcFile *, TimeSummaryInfo);
 

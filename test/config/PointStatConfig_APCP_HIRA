@@ -42,6 +42,8 @@ eclv_points = 0.05;
 cat_thresh   = [ >0.254, >2.540 ];
 sid_inc      = [];
 sid_exc      = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 
 fcst = {
    field = [
@@ -123,6 +125,7 @@ output_flag = {
    pjc    = STAT;
    prc    = STAT;
    ecnt   = STAT;
+   orank  = STAT;
    rps    = STAT;
    eclv   = STAT;
    mpr    = STAT;
@@ -134,6 +137,6 @@ duplicate_flag = NONE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

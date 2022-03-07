@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -64,17 +64,18 @@ void PairBase::clear() {
    IsPointVx = false;
 
    mask_name.clear();
-   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
-   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+
+   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
 
+   interp_wdth = 0;
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
-
-   cdf_info.clear();
 
    o_na.clear();
    x_na.clear();
@@ -113,17 +114,17 @@ void PairBase::erase() {
    IsPointVx = false;
 
    mask_name.erase();
-   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
-   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+
+   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
 
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
-
-   cdf_info.clear();
 
    o_na.erase();
    x_na.erase();
@@ -157,23 +158,23 @@ void PairBase::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::extend(int n, bool exact) {
+void PairBase::extend(int n) {
 
-   o_na.extend  (n, exact);
-   x_na.extend  (n, exact);
-   y_na.extend  (n, exact);
-   wgt_na.extend(n, exact);
+   o_na.extend  (n);
+   x_na.extend  (n);
+   y_na.extend  (n);
+   wgt_na.extend(n);
 
-   cmn_na.extend(n, exact);
-   csd_na.extend(n, exact);
-   cdf_na.extend(n, exact);
+   cmn_na.extend(n);
+   csd_na.extend(n);
+   cdf_na.extend(n);
 
    if(IsPointVx) {
-      lat_na.extend(n, exact);
-      lon_na.extend(n, exact);
-      vld_ta.extend(n, exact);
-      lvl_na.extend(n, exact);
-      elv_na.extend(n, exact);
+      lat_na.extend(n);
+      lon_na.extend(n);
+      vld_ta.extend(n);
+      lvl_na.extend(n);
+      elv_na.extend(n);
    }
 
    return;
@@ -211,6 +212,15 @@ void PairBase::set_mask_sid_ptr(StringArray *sid_ptr) {
 void PairBase::set_mask_llpnt_ptr(MaskLatLon *llpnt_ptr) {
 
    mask_llpnt_ptr = llpnt_ptr;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_climo_cdf_info_ptr(const ClimoCDFInfo *info_ptr) {
+
+   cdf_info_ptr = info_ptr;
 
    return;
 }
@@ -265,15 +275,6 @@ void PairBase::set_interp_wdth(int n) {
 void PairBase::set_interp_shape(GridTemplateFactory::GridTemplates shape) {
 
    interp_shape = shape;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_climo_cdf_info(const ClimoCDFInfo &info) {
-
-   cdf_info = info;
 
    return;
 }
@@ -876,6 +877,7 @@ double compute_interp(const DataPlaneArray &dpa,
                       const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
+                      const bool wrap_lon,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
@@ -886,14 +888,16 @@ double compute_interp(const DataPlaneArray &dpa,
    if(dpa.n_planes() == 0) return(bad_data_double);
 
    v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
-                               method, width, shape, thresh, cat_thresh);
+                               method, width, shape, wrap_lon,
+                               thresh, cat_thresh);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
       v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
-                                  method, width, shape, thresh, cat_thresh);
+                                  method, width, shape, wrap_lon,
+                                  thresh, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
       if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
@@ -932,6 +936,7 @@ void get_interp_points(const DataPlaneArray &dpa,
                        const double obs_x, const double obs_y,
                        const InterpMthd method, const int width,
                        const GridTemplateFactory::GridTemplates shape,
+                       const bool wrap_lon,
                        const double thresh, const bool spfh_flag,
                        const LevelType lvl_typ, const double to_lvl,
                        const int i_blw, const int i_abv,
@@ -947,7 +952,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width);
+   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Get interpolation points below the observation
    pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
@@ -1022,22 +1027,25 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void derive_climo_vals(const ClimoCDFInfo &cdf_info,
+void derive_climo_vals(const ClimoCDFInfo *cdf_info_ptr,
                        double m, double s,
                        NumArray &climo_vals) {
 
    // Initialize
    climo_vals.erase();
 
-   // cdf_info.cdf_ta starts with >=0.0 and ends with >=1.0.
+   // Check for no work to do
+   if(!cdf_info_ptr) return;
+
+   // cdf_info_ptr->cdf_ta starts with >=0.0 and ends with >=1.0.
    // The number of bins is the number of thresholds minus 1.
 
    // Check for bad mean value
-   if(is_bad_data(m) || cdf_info.cdf_ta.n() < 2) {
+   if(is_bad_data(m) || cdf_info_ptr->cdf_ta.n() < 2) {
       return;
    }
    // Single climo bin
-   else if(cdf_info.cdf_ta.n() == 2) {
+   else if(cdf_info_ptr->cdf_ta.n() == 2) {
       climo_vals.add(m);
    }
    // Check for bad standard deviation value
@@ -1048,9 +1056,9 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
    else {
 
       // Skip the first and last thresholds
-      for(int i=1; i<cdf_info.cdf_ta.n()-1; i++) {
+      for(int i=1; i<cdf_info_ptr->cdf_ta.n()-1; i++) {
          climo_vals.add(
-            normal_cdf_inv(cdf_info.cdf_ta[i].get_value(), m, s));
+            normal_cdf_inv(cdf_info_ptr->cdf_ta[i].get_value(), m, s));
       }
    }
 
@@ -1059,7 +1067,7 @@ void derive_climo_vals(const ClimoCDFInfo &cdf_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
+NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
                            const NumArray &mn_na, const NumArray &sd_na,
                            const SingleThresh &othresh) {
    int i, n_mn, n_sd;
@@ -1085,21 +1093,74 @@ NumArray derive_climo_prob(const ClimoCDFInfo &cdf_info,
    // threshold
    else if(n_mn > 0 && n_sd > 0) {
 
-      // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
-      mlog << Debug(4)
-           << "Deriving climatological probabilities for threshold "
-           << othresh.get_str() << " by sampling " << cdf_info.cdf_ta.n()-2
-           << " values from the normal climatological distribution.\n";
+      // Need cdf_info_ptr set to proceed
+      if(!cdf_info_ptr) return(climo_prob);
 
-      // Compute the probability by sampling from the climo distribution
-      // and deriving the event frequency
-      for(i=0; i<mn_na.n(); i++) {
-         derive_climo_vals(cdf_info, mn_na[i], sd_na[i], climo_vals);
-         climo_prob.add(derive_prob(climo_vals, othresh));
+      // Derive climatological probabilities directly
+      if(cdf_info_ptr->direct_prob) {
+
+         mlog << Debug(4)
+              << "Deriving climatological probabilities for threshold "
+              << othresh.get_str() << " directly from the normal "
+              << "climatological distribution.\n";
+
+         // Directly derive the climatological probability
+         for(i=0; i<mn_na.n(); i++) {
+
+            // Check for bad data
+            if(is_bad_data(mn_na[i]) || is_bad_data(sd_na[i])) {
+               prob = bad_data_double;
+            }
+            else {
+
+               // Probability is the area to the left of the threshold value
+               prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
+
+               // Adjust the probability based on the threshold type
+               switch(othresh.get_type()) {
+                  case thresh_lt:
+                  case thresh_le:
+                     break;
+                  case thresh_gt:
+                  case thresh_ge: prob = 1.0 - prob;
+                     break;
+                  case thresh_eq: prob = 0.0;
+                     break;
+                  case thresh_ne: prob = 1.0;
+                     break;
+                  default:
+                     break;
+               } // switch
+               climo_prob.add(prob);
+            }
+         }
+      }
+      // Derive climatological probabilities by sampling from the distribution
+      else {
+
+         if(cdf_info_ptr->cdf_ta.n() == 0) {
+            mlog << Error << "\nderive_climo_prob() -> "
+                 << "No climatological probability thresholds defined!\n\n";
+            exit(1);
+         }
+
+         // The first (>=0.0) and last (>=1.0) climo thresholds are omitted
+         mlog << Debug(4)
+              << "Deriving climatological probabilities for threshold "
+              << othresh.get_str() << " by sampling "
+              << cdf_info_ptr->cdf_ta.n()-2
+              << " values from the normal climatological distribution.\n";
+
+         // Compute the probability by sampling from the climo distribution
+         // and deriving the event frequency
+         for(i=0; i<mn_na.n(); i++) {
+            derive_climo_vals(cdf_info_ptr, mn_na[i], sd_na[i], climo_vals);
+            climo_prob.add(derive_prob(climo_vals, othresh));
+         }
       }
    }
    // If only climatological mean was provided, it should already
-   // contain probabilities.  Range check the data to be sure.
+   // contain probabilities. Range check the data to be sure.
    else {
 
       // Range check climatological probability mean values

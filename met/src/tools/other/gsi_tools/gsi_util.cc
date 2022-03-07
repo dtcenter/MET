@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -175,7 +175,7 @@ ConcatString get_rad_key(const RadData &d) {
 
 int key_to_integer(const char * key) {
    int int_key = 0;
-   for (unsigned int idx=0; idx<strlen(key); idx++) {
+   for (unsigned int idx=0; idx<m_strlen(key); idx++) {
       int_key += ((int)key[idx]) << (idx%3)*8;
       //int_key += (int)key[idx];
    }

@@ -88,6 +88,7 @@ AW_MEAN        = 20;
 GAUSSIAN       = 21;
 MAXGAUSS       = 22;
 GEOG_MATCH     = 23;
+HIRA           = 24;
 
 // Interpolation types
 NONE           = 1;
@@ -168,4 +169,11 @@ BETA           = 8;
 // PB2NC event stack
 TOP            = TRUE;
 BOTTOM         = FALSE;
+
+// Normalization types
+NONE           = 1;
+CLIMO_ANOM     = 2;
+CLIMO_STD_ANOM = 3;
+FCST_ANOM      = 4;
+FCST_STD_ANOM  = 5;
 

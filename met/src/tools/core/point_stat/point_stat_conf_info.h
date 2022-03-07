@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -46,12 +46,13 @@ static const int i_pjc       = 12;
 static const int i_prc       = 13;
 static const int i_ecnt      = 14;
 
-static const int i_rps       = 15;
-static const int i_eclv      = 16;
-static const int i_mpr       = 17;
-static const int i_vcnt      = 18;
+static const int i_orank     = 15;
+static const int i_rps       = 16;
+static const int i_eclv      = 17;
+static const int i_mpr       = 18;
+static const int i_vcnt      = 19;
 
-static const int n_txt       = 19;
+static const int n_txt       = 20;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -74,10 +75,11 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_prc,    //  13
    stat_ecnt,   //  14
 
-   stat_rps,    //  14
-   stat_eclv,   //  15
-   stat_mpr,    //  16
-   stat_vcnt,   //  17
+   stat_orank,  //  15
+   stat_rps,    //  16
+   stat_eclv,   //  17
+   stat_mpr,    //  18
+   stat_vcnt,   //  19
 
 };
 
@@ -141,6 +143,7 @@ class PointStatVxOpt {
       InterpInfo      interp_info;        // Interpolation information
       HiRAInfo        hira_info;          // HiRA verification logic
 
+      double          hss_ec_value;       // MCTS HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
 
       StringArray     msg_typ;            // Array of message types
@@ -177,19 +180,21 @@ class PointStatVxOpt {
       int get_n_oprob_thresh() const;
 
       int get_n_eclv_points()  const;
+      int get_n_hira_ens()     const;
+      int get_n_hira_prob()    const;
       int get_n_cdf_bin()      const;
       int get_n_ci_alpha()     const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PointStatVxOpt::get_n_msg_typ()     const { return(msg_typ.n_elements());         }
-inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());       }
-inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);         }
+inline int PointStatVxOpt::get_n_msg_typ()     const { return(msg_typ.n());          }
+inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n());        }
+inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp); }
 
-inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());     }
-inline int PointStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);               }
-inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
+inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
+inline int PointStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);       }
+inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n());         }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -265,6 +270,8 @@ class PointStatConfInfo {
       int get_max_n_fprob_thresh() const;
       int get_max_n_oprob_thresh() const;
       int get_max_n_eclv_points()  const;
+      int get_max_n_hira_ens()     const;
+      int get_max_n_hira_prob()    const;
 
       // Check for any verification of vectors
       bool get_vflag() const;

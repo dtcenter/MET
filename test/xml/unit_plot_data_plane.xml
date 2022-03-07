@@ -11,12 +11,12 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_pcp_combine.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-
-  <!-- Depends on unit_pcp_combine.xml -->
 
   <test name="plot_data_plane_GRIB1">
     <exec>&MET_BIN;/plot_data_plane</exec>
@@ -108,7 +108,7 @@
     <param> \
       &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
       &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps \
-      'name="PRMSL";level="L0";GRIB_ens="+1";' \
+      'name="PRMSL";level="L0";GRIB_ens="+1";lead_time="00";' \
       -title "GRIB1 GEFS  PRMSL ENS +1" \
       -v 1
     </param>
@@ -122,7 +122,7 @@
     <param> \
       &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
       &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps \
-      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";' \
+      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";lead_time="00";' \
       -title "GRIB1 GEFS  PRMSL ENS low_res_ctl" \
       -v 1
     </param>
@@ -135,13 +135,13 @@
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
-      &OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps \
+      &OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12_00_00_PLEV_NC_PINTERP_PRES_SFC.ps \
       'name = "PSFC"; level = "(0,*,*)";' \
       -title "NC PINTERP Pressure at the Surface" \
       -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps</ps>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12_00_00_PLEV_NC_PINTERP_PRES_SFC.ps</ps>
     </output>
   </test>
 

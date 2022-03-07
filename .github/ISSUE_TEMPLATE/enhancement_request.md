@@ -2,7 +2,7 @@
 name: Enhancement request
 about: Improve something that it's currently doing
 title: ''
-labels: 'type: enhancement'
+labels: 'alert: NEED ACCOUNT KEY, alert: NEED MORE DEFINITION, alert: NEED PROJECT ASSIGNMENT, type: enhancement'
 assignees: ''
 
 ---
@@ -38,15 +38,15 @@ Consider breaking the enhancement down into sub-issues.
 - [ ] Select **requestor(s)**
 
 ### Projects and Milestone ###
-- [ ] Review **projects** and select relevant **Repository** and **Organization** ones or add "alert:NEED PROJECT ASSIGNMENT" label
-- [ ] Select **milestone** to next major version milestone or "Future Versions"
+- [ ] Select **Repository** and/or **Organization** level **Project(s)** or add **alert: NEED PROJECT ASSIGNMENT** label
+- [ ] Select **Milestone** as the next official version or **Future Versions**
 
 ## Define Related Issue(s) ##
 Consider the impact to the other METplus components.
 - [ ] [METplus](https://github.com/dtcenter/METplus/issues/new/choose), [MET](https://github.com/dtcenter/MET/issues/new/choose), [METdatadb](https://github.com/dtcenter/METdatadb/issues/new/choose), [METviewer](https://github.com/dtcenter/METviewer/issues/new/choose), [METexpress](https://github.com/dtcenter/METexpress/issues/new/choose), [METcalcpy](https://github.com/dtcenter/METcalcpy/issues/new/choose), [METplotpy](https://github.com/dtcenter/METplotpy/issues/new/choose)
 
 ## Enhancement Checklist ##
-See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
+See the [METplus Workflow](https://metplus.readthedocs.io/en/latest/Contributors_Guide/github_workflow.html) for details.
 - [ ] Complete the issue definition above, including the **Time Estimate** and **Funding Source**.
 - [ ] Fork this repository or create a branch of **develop**.
 Branch name: `feature_<Issue Number>_<Description>`
@@ -58,7 +58,9 @@ Branch name: `feature_<Issue Number>_<Description>`
 - [ ] Submit a pull request to merge into **develop**.
 Pull request: `feature <Issue Number> <Description>`
 - [ ] Define the pull request metadata, as permissions allow.
-Select: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
+Select: **Reviewer(s)** and **Linked issues**
+Select: **Repository** level development cycle **Project** for the next official release
+Select: **Milestone** as the next official version
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
 - [ ] Close this issue.

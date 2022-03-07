@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,6 +19,7 @@ using namespace std;
 #include <ctype.h>
 #include <cmath>
 
+#include "str_wrappers.h"
 #include "string_fxns.h"
 #include "filename_suffix.h"
 #include "concat_string.h"
@@ -42,7 +43,7 @@ const char * f = get_short_name(filename);   //  to avoid things like "./foo"
    //  start at the end of the filename
    //
 
-const char * s = f + (strlen(f) - 1);
+const char * s = f + (m_strlen(f) - 1);
 
    //
    //  move left until we see a period

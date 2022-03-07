@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -309,6 +309,7 @@ int n, j;
 char c1, c2;
 char junk[max_comment_length + 10];
 ifstream in;
+const char *method_name = "Pbm::read() -> ";
 
    //
    //  clear out old image, if any
@@ -324,7 +325,7 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Warning << "\nPbm::read() -> unable to read image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n" << method_name << "unable to read image file \"" << filename << "\"\n\n";
 
    return ( 0 );
 
@@ -333,20 +334,7 @@ if ( !in )  {
    //
    //  copy filename
    //
-
-Name = new char [1 + strlen(filename)];
-
-if ( !Name )  {
-
-   mlog << Warning << "\nPbm::read() -> can't allocate memory for file name\n\n";
-
-   clear();
-
-   return ( 0 );
-
-}
-
-strcpy(Name, filename);
+Name = m_strcpy2(filename, method_name, "Name");
 
    //
    //  read magic cookie
@@ -357,7 +345,7 @@ in.get(c2);
 
 if ( !in )  {
 
-   mlog << Warning << "\nPbm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n" << method_name << "unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -367,7 +355,7 @@ if ( !in )  {
 
 if ( (c1 != 'P') || (c2 != '4') )  {
 
-   mlog << Warning << "\nPbm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n" << method_name << "bad magic number in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -408,7 +396,7 @@ n = total_data_bytes();
 
 if ( !(data = new unsigned char [n]) )  {
 
-   mlog << Warning << "\nPbm::read() -> memory allocation error\n\n";
+   mlog << Warning << "\n" << method_name << "memory allocation error\n\n";
 
    clear();
 
@@ -418,7 +406,7 @@ if ( !(data = new unsigned char [n]) )  {
 
 if ( !in.read((char *) data, n) )  {
 
-   mlog << Warning << "\nPbm::read() -> trouble reading image data\n\n";
+   mlog << Warning << "\n" << method_name << "trouble reading image data\n\n";
 
    clear();
 

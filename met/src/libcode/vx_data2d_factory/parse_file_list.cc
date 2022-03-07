@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,7 +30,6 @@ using namespace std;
 
 #include "parse_file_list.h"
 #include "data2d_factory_utils.h"
-#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -2773,10 +2773,11 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
    // Version
    at.set_entry(row, c++,
-                (string)met_version);
+                (string) met_version);
 
    // Model Name
-   s = check_hdr_str(eng.conf_info.model);
+   s = check_hdr_str(conf_key_model,
+                     eng.conf_info.model);
    at.set_entry(row, c++, s.text());
 
      //  N_valid
@@ -2787,7 +2788,7 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
 
    // Description
-   s = check_hdr_str(eng.conf_info.desc);
+   s = check_hdr_str(conf_key_desc, eng.conf_info.desc);
    at.set_entry(row, c++, s.text());
 
    // Forecast lead time
@@ -2831,31 +2832,38 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 eng.conf_info.Obs->conv_thresh.get_str());
 
    // Forecast Variable Name
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->name_attr());
+   s = check_hdr_str(conf_key_fcst_var,
+                     eng.conf_info.fcst_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->units_attr(), true);
+   s = check_hdr_str(conf_key_fcst_units,
+                     eng.conf_info.fcst_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(eng.conf_info.Fcst->var_info->level_attr(), true);
+   s = check_hdr_str(conf_key_fcst_lev,
+                     eng.conf_info.fcst_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   s = check_hdr_str(eng.conf_info.Obs->var_info->name_attr());
+   s = check_hdr_str(conf_key_obs_var,
+                     eng.conf_info.obs_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   s = check_hdr_str(eng.conf_info.Obs->var_info->units_attr(), true);
+   s = check_hdr_str(conf_key_obs_units,
+                     eng.conf_info.obs_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(eng.conf_info.Obs->var_info->level_attr(), true);
+   s = check_hdr_str(conf_key_obs_lev,
+                     eng.conf_info.obs_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation type
-   s =  check_hdr_str(eng.conf_info.obtype);
+   s = check_hdr_str(conf_key_obtype,
+                     eng.conf_info.obtype);
    at.set_entry(row, c++, s.text());
 
    return;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -40,6 +40,9 @@ class Dictionary;        //  forward reference
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char met_ens_member_id [] = "MET_ENS_MEMBER_ID";
+
+////////////////////////////////////////////////////////////////////////
 
 class DictionaryEntry {
 
@@ -122,7 +125,7 @@ class DictionaryEntry {
 
       int     n_args () const;
 
-      const ConcatString * string_value () const;
+      const ConcatString string_value () const;
 
       Dictionary * dict () const;   //  doesn't check for dict vs array
 

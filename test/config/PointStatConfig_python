@@ -72,7 +72,8 @@ obs = {
 message_type   = [ "ADPSFC" ];
 sid_inc        = [];
 sid_exc        = [];
-obs_quality    = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
@@ -111,6 +112,7 @@ climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;
    write_bins  = TRUE;
+   direct_prob = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +203,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   orank  = NONE;
    rps    = NONE;
    eclv   = NONE;
    mpr    = STAT;
@@ -211,7 +214,7 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
 

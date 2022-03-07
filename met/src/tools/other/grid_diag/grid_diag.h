@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -110,8 +110,8 @@ vector<double> var_mins;
 vector<double> var_maxs;
 
 // Variable histogram map
-map<ConcatString, vector<int> > histograms;
-map<ConcatString, vector<int> > joint_histograms;
+map<ConcatString, vector<long long> > histograms;
+map<ConcatString, vector<long long> > joint_histograms;
 map<ConcatString, vector<double> > bin_mins;
 map<ConcatString, vector<double> > bin_maxs;
 map<ConcatString, vector<double> > bin_mids;

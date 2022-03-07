@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -15,6 +15,10 @@ using namespace std;
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
 
 #include "data_plane_util.h"
 #include "interp_util.h"
@@ -95,7 +99,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const GaussianInfo &gaussian) {
+                  bool wrap_lon, double t, const GaussianInfo &gaussian) {
    double v = 0.0;
    int x, y;
 
@@ -107,10 +111,11 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    // build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);
+   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
    mlog << Debug(3)
-        << "Smoothing field using the " << interpmthd_to_string(mthd)
+        << "Smoothing " << (wrap_lon ? "global" : "non-global")
+        << " field using the " << interpmthd_to_string(mthd)
         << "(" << gt->size() << ") " << gt->getClassName()
         << " interpolation method.\n";
 
@@ -155,7 +160,6 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                     << interpmthd_to_string(mthd) << "(" << mthd
                     << ")\n\n";
                exit(1);
-               break;
          }
 
          // Store the smoothed value
@@ -186,10 +190,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double t, const GaussianInfo &gaussian) {
+                       bool wrap_lon, double t, const GaussianInfo &gaussian) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian);
+   smooth_field(dp, smooth_dp, mthd, width, shape, wrap_lon, t, gaussian);
 
    return(smooth_dp);
 }
@@ -203,248 +207,141 @@ DataPlane smooth_field(const DataPlane &dp,
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
-        SingleThresh t, double vld_t) {
+        bool wrap_lon, SingleThresh t,
+        const DataPlane *cmn, const DataPlane *csd, double vld_t) {
    GridPoint *gp = NULL;
    int x, y;
    int n_vld = 0;
    int n_thr = 0;
    double v;
+   double bad = bad_data_double;
+   bool use_climo = false;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
-           << "Grid must have at least one point in it. \n\n";
+           << "grid must have at least one point in it. \n\n";
       exit(1);
    }
 
-   // Build the grid template
-   GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);
-
-   mlog << Debug(3)
-        << "Computing fractional coverage field using the "
-        << t.get_str() << " threshold and the "
-        << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
-        << ") " << gt->getClassName() << " interpolation method.\n";
-
-   // Initialize the fractional coverage field
-   frac_dp = dp;
-   frac_dp.set_constant(bad_data_double);
-
-   // Compute the fractional coverage meeting the threshold criteria
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
-
-         // For a new column, reset the grid template and counts.
-         if(y == 0) {
-
-            // Initialize counts
-            n_vld = n_thr = 0;
-
-            // Sum all the points
-            for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
-                gp != NULL;
-                gp  = gt->getNextInGrid()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld++;
-               if(t.check(v)) n_thr++;
-            }
-         }
-         // Subtract off the bottom edge, shift up, and add the top.
-         else {
-
-            // Subtract points from the the bottom edge
-            for(gp  = gt->getFirstInBotEdge();
-                gp != NULL;
-                gp  = gt->getNextInBotEdge()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld--;
-               if(t.check(v)) n_thr--;
-            }
-
-            // Increment Y
-            gt->incBaseY(1);
-
-            // Add points from the the top edge
-            for(gp  = gt->getFirstInTopEdge();
-                gp != NULL;
-                gp  = gt->getNextInTopEdge()) {
-               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
-               n_vld++;
-               if(t.check(v)) n_thr++;
-            }
-         }
-
-         // Check for enough valid data and compute fractional coverage
-         if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
-            frac_dp.set((double) n_thr/n_vld, x, y);
-         }
-
-      } // end for y
-
-      // Increment X
-      if(x < (dp.nx() - 1)) gt->incBaseX(1);
-
-   } // end for x
-
-   delete gt;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Convert the DataPlane field to the corresponding fractional coverage
-// using the threshold critea specified.
-//
-////////////////////////////////////////////////////////////////////////
-
-void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
-        int width, SingleThresh t, double vld_t) {
-   int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
-   double v;
-   int count_vld = 0;
-   int count_thr = 0;
-   NumArray box_na;
-
-   mlog << Debug(3)
-        << "Computing fractional coverage field using the "
-        << t.get_str() << " threshold and the "
-        << interpmthd_to_string(InterpMthd_Nbrhd)
-        << "(" << width*width << ") interpolation method.\n";
-
-   // Check that width is set to 1 or greater
-   if(width < 1) {
-      mlog << Error << "\nfractional_coverage_square() -> "
-           << "width must be set to a value of 1 or greater.\n\n";
-      exit(1);
+   // Check climatology data, if needed
+   if(cmn && csd) {
+      if(!cmn->is_empty() && !csd->is_empty()) use_climo = true;
    }
 
-   // Initialize the fractional coverage field
-   frac_dp = dp;
-   frac_dp.set_constant(bad_data_double);
+   // Check climatology dimensions
+   if(use_climo) {
 
-   // Compute the box half-width
-   half_width = (width - 1)/2;
+      // Check dimensions
+      if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology mean dimension ("
+           << cmn->nx() << ", " << cmn->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+      if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "climatology standard deviation dimension ("
+           << csd->nx() << ", " << csd->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+   }
 
-   // Initialize the box
-   for(i=0; i<width*width; i++) box_na.add(bad_data_int);
+#pragma omp parallel default(none)                 \
+   shared(mlog, dp, frac_dp, width, wrap_lon, t)   \
+   shared(use_climo, cmn, csd, vld_t, bad)         \
+   private(x, y, n_vld, n_thr, gp, v)
+   {
 
-   // Compute the fractional coverage meeting the threshold criteria
-   for(x=0; x<dp.nx(); x++) {
+     // Build the grid template
+     GridTemplateFactory gtf;
+     GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
-      // Find the lower-left x-coordinate of the neighborhood
-      x_ll = x - half_width;
+#pragma omp single
+     {
+       mlog << Debug(3)
+            << "Computing fractional coverage field using the "
+            << t.get_str() << " threshold and the "
+            << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+            << ") " << gt->getClassName() << " interpolation method.\n";
 
-      for(y=0; y<dp.ny(); y++) {
+       // Initialize the fractional coverage field
+       frac_dp = dp;
+       frac_dp.set_constant(bad_data_double);
+     }
 
-         // Find the lower-left y-coordinate of the neighborhood
-         y_ll = y - half_width;
-         y_ur = y + half_width;
+     // Compute the fractional coverage meeting the threshold criteria
+#pragma omp for schedule (static)
+     for(x=0; x<dp.nx(); x++) {
+        for(y=0; y<dp.ny(); y++) {
 
-         // Initialize the box for this new column
-         if(y == 0) {
+           // For a new column, reset the grid template and counts.
+           if(y == 0) {
 
-            // Initialize counts
-            count_vld = count_thr = 0;
+              // Initialize counts
+              n_vld = n_thr = 0;
 
-            for(i=0; i<width; i++) {
+              // Sum all the points
+              for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
+                  gp != NULL;
+                  gp  = gt->getNextInGrid()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld++;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+              }
+           }
+           // Subtract off the bottom edge, shift up, and add the top.
+           else {
 
-               xx = x_ll + i;
+              // Subtract points from the the bottom edge
+              for(gp  = gt->getFirstInBotEdge();
+                  gp != NULL;
+                  gp  = gt->getNextInBotEdge()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld--;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
+              }
 
-               for(j=0; j<width; j++) {
+              // Increment Y
+              gt->incBaseY(1);
 
-                  yy = y_ll + j;
+              // Add points from the the top edge
+              for(gp  = gt->getFirstInTopEdge();
+                  gp != NULL;
+                  gp  = gt->getNextInTopEdge()) {
+                 if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+                 n_vld++;
+                 if(t.check(v,
+                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
+                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+              }
+           }
 
-                  n = DefaultTO.two_to_one(width, width, i, j);
+           // Check for enough valid data and compute fractional coverage
+           if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
+              frac_dp.set((double) n_thr/n_vld, x, y);
+           }
 
-                  // Check for being off the grid
-                  if(xx < 0 || xx >= dp.nx() ||
-                     yy < 0 || yy >= dp.ny()) {
-                     k = bad_data_int;
-                  }
-                  // Check v to see if it meets the threshold criteria
-                  else {
-                     v = dp.get(xx, yy);
-                     if(is_bad_data(v))  k = bad_data_int;
-                     else if(t.check(v)) k = 1;
-                     else                k = 0;
-                  }
-                  box_na.set(n, k);
+        } // end for y
 
-                  // Increment the counts
-                  if(!is_bad_data(k)) {
-                     count_vld += 1;
-                     count_thr += k;
-                  }
+        // Increment X
+        if(x < (dp.nx() - 1)) gt->incBaseX(1);
 
-               } // end for j
-            } // end for i
-         } // end if
+     } // end for x
 
-         // Otherwise, update one row of the box
-         else {
+     delete gt;
 
-            // Compute the row of the neighborhood box to be updated
-            j = (y - 1) % width;
-
-            for(i=0; i<width; i++) {
-
-               // Index into the box
-               n = DefaultTO.two_to_one(width, width, i, j);
-
-               // Get x and y values to be checked
-               xx = x_ll + i;
-               yy = y_ur;
-
-               // Decrement counts for data to be replaced
-               k = nint(box_na[n]);
-               if(!is_bad_data(k)) {
-                  count_vld -= 1;
-                  count_thr -= k;
-               }
-
-               // Check for being off the grid
-               if(xx < 0 || xx >= dp.nx() ||
-                  yy < 0 || yy >= dp.ny()) {
-                  k = bad_data_int;
-               }
-               // Check v to see if it meets the threshold criteria
-               else {
-                  v = dp.get(xx, yy);
-                  if(is_bad_data(v))  k = bad_data_int;
-                  else if(t.check(v)) k = 1;
-                  else                k = 0;
-               }
-               box_na.set(n, k);
-
-               // Increment the counts
-               if(!is_bad_data(k)) {
-                  count_vld += 1;
-                  count_thr += k;
-               }
-
-            } // end for i
-         } // end else
-
-         // Check whether enough valid grid points were found
-         if((double) count_vld/(width*width) < vld_t ||
-            count_vld == 0) {
-            v = bad_data_double;
-         }
-         // Compute the fractional coverage
-         else {
-            v = (double) count_thr/count_vld;
-         }
-
-         // Store the fractional coverage value
-         frac_dp.set(v, x, y);
-
-      } // end for y
-   } // end for x
+   } // End of omp parallel
 
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////

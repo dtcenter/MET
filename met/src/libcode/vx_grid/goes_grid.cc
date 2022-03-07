@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -307,17 +307,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString GoesImagerGrid::serialize() const
+ConcatString GoesImagerGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: GoesImager";
+a << "Projection: GoesImager" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny;
 
 //snprintf(junk, sizeof(junk), " Lat_LL: %.3f", Lat_LL);   a << junk;
 //snprintf(junk, sizeof(junk), " Lon_LL: %.3f", Lon_LL);   a << junk;
@@ -376,7 +376,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool GoesImagerGrid::is_global() const
+bool GoesImagerGrid::wrap_lon() const
 
 {
 
@@ -522,14 +522,14 @@ void GoesImagerData::compute_lat_lon()
             }
          }
       }
+
+      mlog << Debug(4) << method_name << " lon: " << lon_min << " to " << lon_max
+           << ", lat: " << lat_min << " to " << lat_max << " at index "
+           << idx_lon_min << " & " << idx_lon_max << ", "
+           << idx_lat_min << " & " << idx_lat_max << " from "
+           << "  x: " << x_values[0] << " to " << x_values[nx-1]
+           << "  y: " << y_values[0] << " to " << y_values[ny-1] << "\n";
    }
-   
-   mlog << Debug(4) << method_name << " lon: " << lon_min << " to " << lon_max
-        << ", lat: " << lat_min << " to " << lat_max << " at index "
-        << idx_lon_min << " & " << idx_lon_max << ", "
-        << idx_lat_min << " & " << idx_lat_max << " from "
-        << "  x: " << x_values[0] << " to " << x_values[nx-1]
-        << "  y: " << y_values[0] << " to " << y_values[ny-1] << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

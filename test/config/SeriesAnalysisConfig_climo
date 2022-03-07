@@ -82,6 +82,12 @@ climo_stdev = {
    file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   direct_prob = FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -108,10 +114,11 @@ mask = {
 }
 
 //
-// Number of grid points to be processed concurrently.  Set smaller to use
-// less memory but increase the number of passes through the data.
+// Number of grid points to be processed concurrently. Set smaller to use less
+// memory but increase the number of passes through the data. If set <= 0, all
+// grid points are processed concurrently.
 //
-block_size = 150000;
+block_size = 0;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point
@@ -140,8 +147,9 @@ output_stats = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
-version        = "V10.0.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

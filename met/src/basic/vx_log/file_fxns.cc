@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,8 +28,7 @@ using namespace std;
 
 bool is_regular_file(const char *path) {
    struct stat path_stat;
-   stat(path, &path_stat);
-   return(S_ISREG(path_stat.st_mode));
+   return(!stat(path, &path_stat) && S_ISREG(path_stat.st_mode));
 }
 
 ////////////////////////////////////////////////////////////////////////

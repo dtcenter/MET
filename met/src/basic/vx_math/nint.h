@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,8 +11,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __PS_DITHER_NINT_H__
-#define  __PS_DITHER_NINT_H__
+#ifndef  __VX_MATH_NINT_H__
+#define  __VX_MATH_NINT_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,13 @@ extern int nint(double);
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __PS_DITHER_NINT_H__
+extern int positive_modulo(int, int);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   //  __VX_MATH_NINT_H__
 
 
 ////////////////////////////////////////////////////////////////////////

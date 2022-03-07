@@ -130,8 +130,6 @@ c     print*,'itype=',itype
          CINS(I,J) = 0.0
          THESP(I,J)= 0.0
          IEQL(I,J) = LM+1
-C      print*,' DEBUG HS calcape IEQL(I,J): by LM+1: ',IEQL(I,J)
-C      print*,' DEBUG HS calcape LCL(I,J) to 0 '
          
          LCL(I,J)=0
        ENDDO
@@ -233,11 +231,8 @@ C--------------SATURATION POINT VARIABLES AT THE BOTTOM-----------------
           APESPK=(H10E5/TPSPK)**CAPA
           TTHESK=TTHBTK*EXP(ELOCP*QBTK*APESPK/TTHBTK)
 C--------------CHECK FOR MAXIMUM THETA E--------------------------------
-C      print*,' DEBUG HS calcape PTBL(IQ  ,IT  )',PTBL(IQ  ,IT  ),
 C     2 PTBL(IQ+1  ,IT  ),PTBL(IQ  ,IT+1  ),PTBL(IQ+1  ,IT+1  )
-C      print*,' DEBUG HS calcape TTHESK.GT.THESP(I,J:',TTHESK,THESP(I,J)
           IF(TTHESK.GT.THESP(I,J))    THEN
-C      print*,' DEBUG HS calcape Update PSP:',TPSPK,' LMM:',LMM
             PSP  (I,J)=TPSPK
             THESP(I,J)=TTHESK
           ENDIF
@@ -253,9 +248,7 @@ C-------(IN SOME RARE CASES FOR ITYPE=2, IT IS NOT)---------------------
          DO J=1,JM
           DO I=1,IM
             IF (L.LT.LMH(I,J)) THEN
-C      print*,' DEBUG HS calcape L.LT.LMH(I,J):',L,LMH(I,J)
              PKL = P(I,J,L)
-C      print*,' DEBUG HS calcape L,PKL.LT.PSP(I,J)',L,PKL,PSP(I,J)
              IF (PKL.LT.PSP(I,J)) THEN
               LCL(I,J)=L+1
               PLCL(I,J)=P(I,J,L+1)
@@ -276,7 +269,6 @@ C--------------SCALING PRESSURE & TT TABLE INDEX------------------------
         DO J=1,JM
          DO I=1,IM
           PKL = P(I,J,L)
-C      print*,' DEBUG HS calcape L.LE.LCL(I,J):',L,LCL(I,J)
           IF(L.LE.LCL(I,J)) THEN
             IF(PKL.LT.PLQ)THEN
               KNUML=KNUML+1
@@ -311,23 +303,19 @@ C**
         ENDIF
 
 C------------SEARCH FOR EQ LEVEL----------------------------------------
-C       print*,' DEBUG HS calcape SEARCH FOR EQ LEVEL, KNUMH:',KNUMH
        DO N=1,KNUMH
         I=IHRES(N)
         J=JHRES(N)
         IF(TPAR(I,J,L).GT.T(I,J,L)) THEN
               IEQL(I,J)=L
-C       print*,' DEBUG HS calcape 111 IEQL(I,J):',IEQL(I,J)
               PEQL(I,J)=P(I,J,L)
         ENDIF
        ENDDO
-C       print*,' DEBUG HS calcape SEARCH FOR EQ LEVEL, KNUML:',KNUML
        DO N=1,KNUML
         I=ILRES(N)
         J=JLRES(N)
         IF(TPAR(I,J,L).GT.T(I,J,L)) THEN
               IEQL(I,J)=L
-C           print*,' DEBUG HS calcape 222 IEQL(I,J):',IEQL(I,J)
               PEQL(I,J)=P(I,J,L)
         ENDIF
        ENDDO
@@ -339,7 +327,6 @@ c       print*,'Get to computing CAPE and CINS'
         DO I=1,IM
          LCLK=LCL(I,J)
          IEQK=IEQL(I,J)
-C       print*,' DEBUG HS calcape  IEQK,LCLK:',IEQK,LCLK
          DO L=IEQK,LCLK
 c          print*,'l=',l
 c          print*,'p(i,j,l)=',p(i,j,l)
@@ -369,12 +356,10 @@ c          print*,'regular thetaa=',thetaa
 C          print*,'virtual thetap=',thetap
 C          print*,'virtual thetaa=',thetaa
            endif
-C       print*,' DEBUG HS calcape before CAPE(I,J)=',CAPE(I,J)
            IF (THETAP.LT.THETAA)
      &      CINS(I,J)=CINS(I,J)+G*(ALOG(THETAP)-ALOG(THETAA))*DZKL
            IF (THETAP.GT.THETAA)
      &      CAPE(I,J)=CAPE(I,J)+G*(ALOG(THETAP)-ALOG(THETAA))*DZKL
-C           print*,' DEBUG HS calcape  after CAPE(I,J)=',CAPE(I,J)
          ENDDO
         ENDDO
        ENDDO
@@ -389,7 +374,6 @@ C
       DO I = 1,IM
          CAPE(I,J) = AMAX1(0.0,CAPE(I,J))
          CINS(I,J) = AMIN1(CINS(I,J),0.0)
-C      print*,' DEBUG HS calcape final CAPE(I,J)=',CAPE(I,J)
       ENDDO
       ENDDO
 c     if(itype.eq.2) print*,'CAPE,CINS=',CAPE,CINS
@@ -791,19 +775,7 @@ C
  600  K1=K1+1
       IF(K1.LE.NNEW) GO TO 300
 C-----------------------------------------------------------------------
-C      print*,' DEBUG HS calcape NOLD,NNEW: ',NOLD,NNEW
-CC      print*,' DEBUG HS calcape XOLD: ',XOLD
-CC      print*,' DEBUG HS calcape YOLD: ',YOLD
-C      print*,' DEBUG HS calcape XOLD(1)->: XNEW(1)',XOLD(1),XNEW(1)
-C      print*,' DEBUG HS calcape XOLD(2)->: XNEW(2)',XOLD(2),XNEW(2)
-CC      print*,' DEBUG HS calcape XNEW: ',XNEW
-CC      print*,' DEBUG HS calcape YNEW: ',YNEW
-C      print*,' DEBUG HS calcape YOLD(1)->: YNEW(1)',YOLD(1),YNEW(1)
-C      print*,' DEBUG HS calcape YOLD(2)->: YNEW(2)',YOLD(2),YNEW(2)
-C      print*,' DEBUG HS calcape YOLD(3)->: YNEW(3)',YOLD(3),YNEW(3)
-C      print*,' DEBUG HS calcape YOLD(-2)->: YNEW(-2)',
 C     2 YOLD(NOLD-1),YNEW(NNEW-1)
-C      print*,' DEBUG HS calcape YOLD(-1)->: YNEW(-1)',
 C     2 YOLD(NOLD),YNEW(NNEW)
       RETURN
       END

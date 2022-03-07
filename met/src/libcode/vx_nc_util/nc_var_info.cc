@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,7 +58,7 @@ unixtime get_att_value_unixtime(const NcAtt *att) {
 
 
    //
-   //  Code for class NcNcVarInfo
+   //  Code for class NcVarInfo
    //
 
 
@@ -151,6 +151,10 @@ level_att.clear();
 
 units_att.clear();
 
+ValidTime = (unixtime) 0;
+
+InitTime = (unixtime) 0;
+
 AccumTime = 0;
 
 Ndims = 0;
@@ -199,6 +203,12 @@ else                              out << "(nul)";
 if ( units_att.length() > 0 )     out << '\"' << units_att << '\"';
 else                              out << "(nul)";
 
+out << prefix << "ValidTime = " << unix_to_yyyymmdd_hhmmss(ValidTime)
+              << " (" << ValidTime << ")\n";
+
+out << prefix << "InitTime  = " << unix_to_yyyymmdd_hhmmss(InitTime)
+              << " (" << InitTime  << ")\n";
+
 out << prefix << "AccumTime = " << AccumTime;
 
 out << "\n";
@@ -232,6 +242,17 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+int NcVarInfo::lead_time() const
+
+{
+
+return ( (int) (ValidTime - InitTime) );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -253,6 +274,10 @@ long_name_att = i.long_name_att;
 level_att = i.level_att;
 
 units_att = i.units_att;
+
+ValidTime = i.ValidTime;
+
+InitTime = i.InitTime;
 
 AccumTime = i.AccumTime;
 

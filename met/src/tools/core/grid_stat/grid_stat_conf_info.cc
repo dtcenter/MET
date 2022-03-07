@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -529,6 +529,13 @@ void GridStatVxOpt::clear() {
    grad_dx.clear();
    grad_dy.clear();
 
+   baddeley_p = bad_data_int;
+   baddeley_max_dist = bad_data_double;
+   fom_alpha = bad_data_double;
+   zhu_weight = bad_data_double;
+   beta_value_fx.clear();
+
+   hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
@@ -810,6 +817,17 @@ void GridStatVxOpt::process_config(
       exit(1);
    }
 
+   beta_value_fx.set(d->lookup(conf_key_beta_value));
+   if(!beta_value_fx.is_set()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_beta_value
+           << "\" function is not set!\n\n";
+      exit(1);
+   }
+
+   // Conf: hss_ec_value
+   hss_ec_value = odict.lookup_double(conf_key_hss_ec_value);
+
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
@@ -891,7 +909,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,
-   //    rank_corr_flag, output_flag, nc_info
+   //    hss_ec_value, rank_corr_flag, output_flag, nc_info
    //
 
    if(!(mask_grid   == v.mask_grid  ) ||
@@ -1104,7 +1122,6 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
-         break;
    }
 
    return(n);

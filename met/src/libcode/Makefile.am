@@ -27,6 +27,7 @@ SUBDIRS	= vx_grid \
 if ENABLE_PYTHON
   SUBDIRS += vx_python3_utils
   SUBDIRS += vx_data2d_python
+  SUBDIRS += vx_pointdata_python
 endif
 
 

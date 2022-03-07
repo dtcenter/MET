@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -289,7 +289,7 @@ void usage() {
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"input_filename\" is the name of a "
-        << " gridded data file to be plotted (required).\n"
+        << "gridded data file to be plotted (required).\n"
 
         << "\t\t\"output_filename\" is the name of the output "
         << "PostScript file to be written (required).\n"

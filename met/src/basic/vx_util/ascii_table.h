@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -366,7 +366,7 @@ extern void copy_ascii_table_row(const AsciiTable &at_from, const int r_from, As
 
 extern void justify_met_at(AsciiTable &at, const int n_hdr_cols);
 
-extern ConcatString check_hdr_str(const ConcatString,
+extern ConcatString check_hdr_str(const ConcatString &, const ConcatString &,
                                   bool space_to_underscore = false);
 
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,13 +71,13 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
       case FileType_Gb2:
 #ifdef WITH_GRIB2
          vi = new VarInfoGrib2;
+         break;
 #else
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for GRIB2 has not been compiled!\n"
               << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
 #endif
-         break;
 
       case FileType_NcMet:
          vi = new VarInfoNcMet;
@@ -94,31 +94,29 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p->set_file_type(type);
          vi = p;
          p = 0;
+         break;
 #else
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for Python has not been compiled!\n"
               << "To run Python scripts, recompile with the --enable-python option.\n\n";
          exit(1);
 #endif
-      break;
 
       case FileType_NcCF:
-      vi = new VarInfoNcCF;
-      break;
+         vi = new VarInfoNcCF;
+         break;
 
       case FileType_HdfEos:
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
-         break;
 
       default:
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
-         break;
    } // end switch
 
    mlog << Debug(4)

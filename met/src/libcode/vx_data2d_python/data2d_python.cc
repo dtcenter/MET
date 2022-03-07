@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,7 +157,7 @@ ConcatString full_path, file_name;
 int i, file_argc;
 char **file_argv = (char **) 0; // allocated
 StringArray sa;
-
+const char *method_name = "MetPythonDataFile::open() ";
 
    //
    //  Store the PythonCommand that is being run
@@ -175,9 +175,12 @@ file_argc = sa.n_elements();
 
 if ( file_argc > 0 )  {
    file_argv = new char * [ file_argc ];
+   char a_var_name[512+1];
+
    for ( i=0; i<sa.n_elements(); i++ )  {
-     file_argv[i] = new char [ sa[i].length() + 1 ];
-      strcpy(file_argv[i], sa[i].c_str());
+      int buf_len = sa[i].length();
+      snprintf(a_var_name, 512, "file_argv[%d]", i);
+      file_argv[i] = m_strcpy2(sa[i].c_str(), method_name, a_var_name);
    }
 }
 
@@ -208,7 +211,6 @@ switch ( Type )  {   //  assumes Type is already set
            << "MetPythonDataFile::open(const char * script_filename) -> bad file type: "
            << grdfiletype_to_string(Type) << "\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

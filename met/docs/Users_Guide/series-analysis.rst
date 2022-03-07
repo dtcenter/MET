@@ -1,15 +1,16 @@
 .. _series-analysis:
 
+********************
 Series-Analysis Tool
-====================
+********************
 
 Introduction
-____________
+============
 
 The Series-Analysis Tool accumulates statistics separately for each horizontal grid location over a series. Often, this series is over time or height, though any type of series is possible. This differs from the Grid-Stat tool in that Grid-Stat verifies all grid locations together as a group. Thus, the Series-Analysis Tool can be used to find verification information specific to certain locations or see how model performance varies over the domain. 
 
 Practical Information
-_____________________
+=====================
 
 This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
 
@@ -22,7 +23,7 @@ To define a time series of forecasts that all have the same valid time, set the 
 To define a series of vertical levels all contained in a single input file, set the forecast and observation fields to a list of the vertical levels to be used. Pass the tool single forecast and observation files containing the vertical level data. The tool will loop over the forecast field entries, extract that field from the input forecast file, and then search the observation file for a matching record.
 
 series_analysis usage
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The usage statement for the Series-Analysis tool is shown below:
 
@@ -63,7 +64,7 @@ Optional arguments for series_analysis
 
 8. The -v level overrides the default level of logging (2).
 
-9. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+9. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the series_analysis calling sequence is shown below:
 
@@ -78,7 +79,7 @@ An example of the series_analysis calling sequence is shown below:
 In this example, the Series-Analysis tool will process the list of forecast and observation files specified in the text file lists into statistics for each grid location using settings specified in the configuration file. Series-Analysis will create an output NetCDF file containing requested statistics. 
 
 series_analysis output
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the Plot-Data-Plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
 
@@ -89,7 +90,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
    An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
 
 series_analysis configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 The default configuration file for the Series-Analysis tool named **SeriesAnalysisConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
@@ -110,6 +111,7 @@ ____________________
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                      rng = "mt19937"; seed = ""; }
   mask           = { grid = [ "FULL" ]; poly = []; }
+  hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   version        = "VN.N";
@@ -122,8 +124,7 @@ ____________________
 
   block_size = 1024;
 
-Number of grid points to be processed concurrently. Set smaller to use less memory but increase the number of passes through the data. The amount of memory the Series-Analysis tool consumes is determined by the size of the grid, the length of the series, and the block_size entry defined above. The larger this entry is set the faster the tool will run, subject to the amount of memory available on the machine.
-
+Number of grid points to be processed concurrently. Set smaller to use less memory but increase the number of passes through the data. The amount of memory the Series-Analysis tool consumes is determined by the size of the grid, the length of the series, and the block_size entry defined above. The larger this entry is set the faster the tool will run, subject to the amount of memory available on the machine. If set less than or equal to 0, it is automatically reset to the number of grid points, and they are all processed concurrently.
 
 ____________________
 

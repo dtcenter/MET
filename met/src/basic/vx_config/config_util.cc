@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,6 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
+static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -140,9 +141,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -766,11 +768,36 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_obs_qty(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_qty() -> ";
+StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
+   StringArray sa;
+   const char *method_name = "parse_conf_obs_qty_inc() -> ";
 
-   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty, method_name);
+   // Check for old "obs_quality" entry
+   sa = dict->lookup_string_array(conf_key_obs_qty, false);
 
+   // Print a warning if the deprecated option was used
+   if(dict->last_lookup_status()) {
+      mlog << Warning << "\nparse_conf_obs_qty_inc() -> "
+           << "Set the \"" << conf_key_obs_qty_inc << "\" value ("
+           << write_css(sa) << ") from the deprecated \""
+           << conf_key_obs_qty << "\" configuration entry.\n"
+           << "Replace \"" << conf_key_obs_qty << "\" with \""
+           << conf_key_obs_qty_inc << "\"!\n\n";
+   }
+   else {
+      sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
+   }
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_obs_qty_exc(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_qty_exc() -> ";
+   
+   StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
+   
    return(sa);
 }
 
@@ -1059,14 +1086,6 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
 map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
-   parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
-   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1473,6 +1492,7 @@ void ClimoCDFInfo::clear() {
    n_bin = 0;
    cdf_ta.clear();
    write_bins = false;
+   direct_prob = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1492,6 +1512,9 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
            << ") must be greater than zero.\n\n";
       exit(1);
    }
+
+   // Initialize
+   cdf_ta.clear();
 
    // Even number of bins cannot be centered
    if(n_bin%2 == 0 && center) {
@@ -1561,8 +1584,12 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    center = cdf_dict->lookup_bool(conf_key_center_bins);
 
    // Conf: write_bins
-   // Used by Grid-Stat and Point-Stat but not by Ensemble-Stat
+   // Used by Grid-Stat and Point-Stat
+   // Not used by Ensemble-Stat or Series-Analysis
    info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins, false, false);
+
+   // Conf: direct_prob
+   info.direct_prob = cdf_dict->lookup_bool(conf_key_direct_prob, false, false);
 
    // Check that at least one value is provided
    if(bins.n() == 0) {
@@ -2246,6 +2273,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -2327,10 +2355,11 @@ const char * statlinetype_to_string(const STATLineType t) {
 
       case(stat_relp):         s = stat_relp_str;    break;
       case(stat_genmpr):       s = stat_genmpr_str;  break;
+      case(stat_ssidx):        s = stat_ssidx_str;   break;
       case(stat_header):       s = stat_header_str;  break;
-      case(no_stat_line_type): s = stat_na_str;      break;
 
-      default:                 s = (const char *) 0; break;
+      case(no_stat_line_type):
+      default:                 s = stat_na_str;      break;
    }
 
    return(s);
@@ -2339,8 +2368,9 @@ const char * statlinetype_to_string(const STATLineType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void statlinetype_to_string(const STATLineType t, char *out) {
+   const char *method_name = "statlinetype_to_string() -> ";
 
-   strcpy(out, statlinetype_to_string(t));
+   m_strcpy(out, statlinetype_to_string(t), method_name);
 
    return;
 }
@@ -2388,6 +2418,7 @@ STATLineType string_to_statlinetype(const char *s) {
 
    else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
    else if(strcasecmp(s, stat_genmpr_str) == 0) t = stat_genmpr;
+   else if(strcasecmp(s, stat_ssidx_str)  == 0) t = stat_ssidx;
    else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
 
    else                                         t = no_stat_line_type;
@@ -2450,7 +2481,6 @@ ConcatString fieldtype_to_string(FieldType type) {
          mlog << Error << "\nfieldtype_to_string() -> "
               << "Unexpected FieldType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2520,7 +2550,6 @@ ConcatString setlogic_to_string(SetLogic type) {
          mlog << Error << "\nsetlogic_to_string() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2541,7 +2570,6 @@ ConcatString setlogic_to_abbr(SetLogic type) {
          mlog << Error << "\nsetlogic_to_abbr() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2562,7 +2590,6 @@ ConcatString setlogic_to_symbol(SetLogic type) {
          mlog << Error << "\nsetlogic_to_symbol() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2642,7 +2669,6 @@ ConcatString tracktype_to_string(TrackType type) {
          mlog << Error << "\ntracktype_to_string() -> "
               << "Unexpected TrackType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2698,7 +2724,6 @@ ConcatString interp12type_to_string(Interp12Type type) {
          mlog << Error << "\ninterp12type_to_string() -> "
               << "Unexpected Interp12Type value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2738,7 +2763,6 @@ ConcatString mergetype_to_string(MergeType type) {
          mlog << Error << "\nmergetype_to_string() -> "
               << "Unexpected MergeType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2765,7 +2789,6 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
          mlog << Error << "\nobssummary_to_string() -> "
               << "Unexpected ObsSummary value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2805,7 +2828,6 @@ ConcatString matchtype_to_string(MatchType type) {
          mlog << Error << "\nmatchtype_to_string() -> "
               << "Unexpected MatchType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2873,7 +2895,6 @@ ConcatString disttype_to_string(DistType type) {
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2915,7 +2936,6 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
          mlog << Error << "\ngriddecomptype_to_string() -> "
               << "Unexpected GridDecompType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
@@ -2939,10 +2959,55 @@ ConcatString wavelettype_to_string(WaveletType type) {
          mlog << Error << "\nwavlettype_to_string() -> "
               << "Unexpected WaveletType value of " << type << ".\n\n";
          exit(1);
-         break;
    }
 
    return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_conf_ens_member_ids(Dictionary *dict) {
+   const char *method_name = "parse_conf_ens_member_ids() -> ";
+
+   StringArray sa = parse_conf_string_array(dict, conf_key_ens_member_ids, method_name);
+
+   if(sa.n() > 0) {
+      mlog << Debug(4) << method_name
+           << "Ensemble Member IDs \"" << conf_key_ens_member_ids << "\" list contains "
+           << sa.n() << " entries.\n";
+   }
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NormalizeType parse_conf_normalize(Dictionary *dict) {
+   NormalizeType t = NormalizeType_None;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_normalize);
+
+   // Convert integer to enumerated NormalizeType
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
+   else {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

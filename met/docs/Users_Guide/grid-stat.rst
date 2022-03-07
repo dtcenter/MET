@@ -1,21 +1,22 @@
 .. _grid-stat:
 
+**************
 Grid-Stat Tool
-==============
+**************
 
 Introduction
-____________
+============
 
 The Grid-Stat tool provides verification statistics for a matched forecast and observation grid. All of the forecast grid points in the region of interest are matched to observation grid points on the same grid. All the matched grid points are used to compute the verification statistics. The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that no interpolation is required because the forecasts and observations are on the same grid. However, the interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 
 Statistical measures
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and on the Collaboration for Australian Weather and Climate Research Forecast Verification - `Issues, Methods and FAQ web page <http://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_.
 
@@ -31,7 +32,7 @@ Measures for continuous variables
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
-A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
+A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as "conditional verification". For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -53,26 +54,26 @@ Use of analysis fields for verification
 The Grid-Stat tool allows evaluation of model forecasts using model analysis fields. However, users are cautioned that an analysis field is not independent of its parent model; for this reason verification of model output using an analysis field from the same model is generally not recommended and is not likely to yield meaningful information about model performance.
 
 Statistical confidence intervals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron, 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
 
 Grid weighting
-~~~~~~~~~~~~~~
+--------------
 
 When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`config_options` for more information.
 
 Neighborhood methods
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
-MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as “fuzzy” verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
+MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as "fuzzy" verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
 
 There are several ways to present the results of the neighborhood approaches, such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS). These scores are presented in :numref:`Appendix C, Section %s <appendixC>`. One can also simply up-scale the information on the forecast verification grid by smoothing or resampling within a specified neighborhood around each grid point and recalculate the traditional verification metrics on the coarser grid. The MET output includes traditional contingency table statistics for each threshold and neighborhood window size.
 
 The user must specify several parameters in the grid_stat configuration file to utilize the neighborhood approach, such as the interpolation method, size of the smoothing window, and required fraction of valid data points within the smoothing window. For FSS-specific results, the user must specify the size of the neighborhood window, the required fraction of valid data points within the window, and the fractional coverage threshold from which the contingency tables are defined. These parameters are described further in the practical information section below.
 
 Fourier Decomposition
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The MET software will compute the full one-dimensional Fourier transform, then do a partial inverse transform based on the two user-defined wave numbers. These two wave numbers define a band pass filter in the Fourier domain. This process is conceptually similar to the operation of projecting onto subspace in linear algebra. If one were to sum up all possible wave numbers the result would be to simply reproduce the raw data.
 
@@ -81,16 +82,16 @@ Decomposition via Fourier transform allows the user to evaluate the model separa
 Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al., 2004 <Casati-2004>`; :ref:`Weniger et al., 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
 Gradient Statistics
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The S1 score has been in historical use for verification of forecasts, particularly for variables such as pressure and geopotential height. This score compares differences between adjacent grid points in the forecast and observed fields. When the adjacent points in both forecast and observed fields exhibit the same differences, the S1 score will be the perfect value of 0. Larger differences will result in a larger score.
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
 Distance Maps
-~~~~~~~~~~~~~
+-------------
 
-The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, :math:`s=(x,y)`, in the domain, :math:`D`, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas :math:`A`, from one field and observation event areas :math:`B` from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
+The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, **s=(x,y)**, in the domain, **D**, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas **A**, from one field and observation event areas **B** from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
 
 Because these methods rely on the distance map, it is helpful to understand precisely what such maps do. :numref:`grid-stat_fig1` demonstrates the path of the shortest distance to the nearest event point in the event area A marked by the gray rectangle in the diagram. Note that the arrows all point to a grid point on the boundary of the event area A as it would be a longer distance to any point in its interior. :numref:`grid-stat_fig2` demonstrates the shortest distances from every grid point inside a second event area marked by the gray circle labeled B to the same event area A as in :numref:`grid-stat_fig1`. Note that all of the distances are to points on a small subsection (indicated by the yellow stretch) of the subset A.
 
@@ -120,17 +121,40 @@ While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illus
 
    The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
-The statistics derived from these distance maps are described in :numref:`Appendix C, Section %s <App_C-distance_maps>`. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+The statistics derived from these distance maps are described in :numref:`Appendix C, Section %s <App_C-distance_maps>`. To make fair comparisons, any grid point containing bad data in either the forecast or observation field is set to bad data in both fields. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+
+.. _grid-stat_gbeta:
+
+:math:`\beta` and :math:`G_\beta`
+---------------------------------
+
+See :numref:`App_C-gbeta` for the :math:`G` and :math:`G_\beta` equations.
+
+:math:`G_\beta` provides a summary measure of forecast quality for each user-defined threshold chosen. It falls into a range from zero to one where one is a perfect forecast and zero is considered to be a very poor forecast as determined by the user through the value of :math:`\beta`. Values of :math:`G_\beta` closer to one represent better forecasts and worse forecasts as it decreases toward zero. Although a particular value cannot be universally compared against any forecast, when applied with the same choice of :math:`\beta` for the same variable and on the same domain, it is highly effective at ranking such forecasts.
+
+:math:`G_\beta` is sensitive to the choice of :math:`\beta`, which depends on the (i) specific domain, (ii) variable, and (iii) user’s needs. Smaller values make :math:`G_\beta` more stringent and larger values make it more lenient. :numref:`grid-stat_fig6` shows an example of applying :math:`G_\beta` over a range of :math:`\beta` values to a precipitation verification set where the binary fields are created by applying a threshold of :math:`2.1 mmh^{-1}`. Color choice and human bias can make it difficult to determine the quality of the forecast for a human observer looking at the raw images in the top row of the figure (:ref:`Ahijevych et al., 2009 <Ahijevych-2009>`). The bottom left panel of the figure displays the differences in their binary fields, which highlights that the forecast captured the overall shapes of the observed rain areas but suffers from a spatial displacement error (perhaps really a timing error).
+
+Whether or not the forecast from :numref:`grid-stat_fig6` is “good” or not depends on the specific user. Is it sufficient that the forecast came as close as it did to the observation field? If the answer is yes for the user, then a higher choice of :math:`\beta`, such as :math:`N/2`, with :math:`N` equal to the number of points in the domain, will correctly inform this user that it is a “good” forecast as it will lead to a :math:`G_\beta` value near one. If the user requires the forecast to be much better aligned spatially with the observation field, then a lower choice, perhaps :math:`\beta = N`, will correctly inform that the forecast suffers from spatial displacement errors that are too large for this user to be pleased. If the goal is to rank a series of ensemble forecasts, for example, then a choice of :math:`\beta` that falls in the steep part of the curve shown in the lower right panel of the figure should be preferred, say somewhere between :math:`\beta = N` and :math:`\beta = N^2/2`. Such a choice will ensure that each member is differentiated by the measure.
+
+.. _grid-stat_fig6:
+
+.. figure:: figure/grid-stat_fig6.png
+
+   Top left is an example of an  accumulated precipitation (mm/h)  forecast with the corresponding observed field on the top right. Bottom left shows the difference in binary fields, where the binary fields are created by setting all values in the original fields that fall above :math:`2.1 mmh^{-1}` to one and the rest to zero. Bottom right shows the results for :math:`G_\beta` calculated on the binary fields using the threshold of :math:`2.1 mmh^{-1}` over a range of choices for :math:`\beta`.
+
+In some cases, a user may be interested in a much higher threshold than :math:`2.1 mmh^{-1}` of the above example. :ref:`Gilleland, 2021 (Fig. 4) <Gilleland-2021>`, for example, shows this same forecast using a threshold of :math:`40 mmh^{-1}`. Only a small area in Mississippi has such extreme rain predicted at this valid time; yet none was observed. Small spatial areas of extreme rain in the observed field, however, did occur in a location far away from Mississippi that was not predicted. Generally, for this type of verification, the Hausdorff metric is a good choice of measure. However, a small choice of :math:`\beta` will provide similar results as the Hausdorff distance (:ref:`Gilleland, 2021 <Gilleland-2021>`). The user should think about the average size of storm areas and multiply this value by the displacement distance  they are comfortable with in order to get a good initial choice for :math:`\beta`, and may have to increase or decrease its value by trial-and-error using one or two example cases from their verification set.
+
+Since :math:`G_\beta` is so sensitive to the choice of :math:`\beta`, which is defined relative to the number of points in the verification domain, :math:`G_\beta` is only computed for the full verification domain. :math:`G_\beta` is reported as a bad data value for any masking region subsets of the full verification domain.
 
 Practical information
-_____________________
+=====================
 
 This section contains information about configuring and running the Grid-Stat tool. The Grid-Stat tool verifies gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported file formats. The requirement of having all gridded fields using the same grid specification was removed in METv5.1. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded observation data may be a gridded analysis based on observations such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used.
 
 The Grid-Stat tool provides the capability of verifying one or more model variables/levels using multiple thresholds for each model variable/level. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. The interpolation parameters may be used to perform a smoothing operation on the forecast field prior to verifying it to investigate how the scale of the forecast affects the verification statistics. The Grid-Stat tool computes a number of continuous statistics for the forecast minus observation differences, discrete statistics once the data have been thresholded, or statistics for probabilistic forecasts. All types of statistics can incorporate a climatological reference.
 
 grid_stat usage
-~~~~~~~~~~~~~~~
+---------------
 
 The usage statement for the Grid-Stat tool is listed below:
 
@@ -163,9 +187,9 @@ Optional arguments for grid_stat
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-6. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the grid_stat calling sequence is listed below:
 
@@ -194,7 +218,7 @@ In the second example, the Grid-Stat tool will verify the model data in the samp
 .. _grid_stat-configuration-file:
 
 grid_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
@@ -224,6 +248,7 @@ __________________________
   mpr_column     = [];
   mpr_thresh     = [];
   eclv_points    = 0.05;
+  hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
@@ -232,6 +257,10 @@ __________________________
 The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
 ___________________________
+
+.. _nbrhd:
+
+:ref:`nbrhd <nbrhd>`
 
 .. code-block:: none
 
@@ -243,16 +272,20 @@ ___________________________
      cov_thresh = [ >=0.5 ];
    }
 
-	 
+
 The **nbrhd** dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** value specifies the width of the square or diameter of the circle as an odd integer.
 
 The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
 
 The **vld_thresh** entry contains a number between 0 and 1. When performing neighborhood verification over some neighborhood of points the ratio of the number of valid data points to the total number of points in the neighborhood is computed. If that ratio is greater than this threshold, that value is included in the neighborhood verification. Setting this threshold to 1, which is the default, requires that the entire neighborhood must contain valid data. This variable will typically come into play only along the boundaries of the verification region chosen.
 
-The **cov_thresh** entry contains a comma separated list of thresholds to be applied to the neighborhood coverage field. The coverage is the proportion of forecast points in the neighborhood that exceed the forecast threshold. For example, if 10 of the 25 forecast grid points contain values larger than a threshold of 2, then the coverage is 10/25 = 0.4. If the coverage threshold is set to 0.5, then this neighborhood is considered to be a “No” forecast.
+The **cov_thresh** entry contains a comma separated list of thresholds to be applied to the neighborhood coverage field. The coverage is the proportion of forecast points in the neighborhood that exceed the forecast threshold. For example, if 10 of the 25 forecast grid points contain values larger than a threshold of 2, then the coverage is 10/25 = 0.4. If the coverage threshold is set to 0.5, then this neighborhood is considered to be a "No" forecast.
 
 ___________________
+
+.. _fourier:
+
+:ref:`fourier <fourier>`
 
 .. code-block:: none
 
@@ -262,24 +295,35 @@ ___________________
   }
 
 
-The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
+The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed.
 
-The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included. The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
+The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid:
+
+* The **wave_1d_beg** entry is an array of integers specifying the first wave number to be included.
+
+* The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
 
+.. _gradient:
+
+:ref:`gradient <gradient>`
+
 .. code-block:: none
 
-  grad = {
+  gradient = {
      dx = [ 1 ];
      dy = [ 1 ];
    }
 
 
-
 The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
 
 ____________________
+
+.. _distance_map:
+
+:ref:`distance_map <distance_map>`
 
 .. code-block:: none
 
@@ -288,9 +332,10 @@ ____________________
      baddeley_max_dist = NA;
      fom_alpha         = 0.1;
      zhu_weight        = 0.5;
+     beta_value(n)     = n * n / 2.0;
   }
 
-The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry.
+The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is defined as a function of n, where n is the total number of grid points in the full verification domain containing valid data in both the forecast and observation fields. The resulting beta_value is used to compute the :math:`G_\beta` statistic. The default function, :math:`N^2 / 2`, is recommended in :ref:`Gilleland, 2021 <Gilleland-2021>` but can be modified as needed.
 
 _____________________
 
@@ -344,7 +389,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 10. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-11. **VCNT** for Vector Contingency Table Statistics
+11. **VCNT** for Vector Continuous Statistics
 
 12. **PCT** for Contingency Table Counts for Probabilistic forecasts
 
@@ -387,7 +432,7 @@ _____________________
   }
 
 
-The **nc_pairs_flag** entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if **output_flag** dictionary indicates any statistics should be computed. The **latlon, raw**, and **diff** entries control the creation of output variables for the latitude and longitude, the raw forecast and observed fields, and the forecast minus observation difference fields. The **climo, weight**, and **nbrhd** entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
+The **nc_pairs_flag** entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if **output_flag** dictionary indicates any statistics should be computed. The **latlon, raw**, and **diff** entries control the creation of output variables for the latitude and longitude, the forecast and observed fields after they have been modified by any user-defined regridding, censoring, and conversion, and the forecast minus observation difference fields, respectively. The **climo, weight**, and **nbrhd** entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
 
 Setting the **climo_cdp** entry to TRUE enables the creation of an output variable for each climatological distribution percentile (CDP) threshold requested in the configuration file. Note that enabling **nbrhd** output may lead to very large output files. The **gradient** entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The **distance_map** entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The **apply_mask** entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
 
@@ -413,7 +458,7 @@ The **nc_pairs_var_suffix** entry is similar to the **nc_pairs_var_name** entry.
 .. _grid_stat-output:
 
 grid_stat output
-~~~~~~~~~~~~~~~~
+----------------
 
 grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 
@@ -803,6 +848,15 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 45
     - ZHU_MEAN
     - Mean of ZHU_FO and ZHU_OF
+  * - 46
+    - G
+    - :math:`G` distance measure
+  * - 47
+    - GBETA
+    - :math:`G_\beta` distance measure
+  * - 48
+    - BETA_VALUE
+    - Beta value used to compute :math:`G_\beta`
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 

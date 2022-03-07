@@ -11,6 +11,8 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
+<!-- Requires: unit_pcp_combine.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -72,6 +74,32 @@
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V_nbrcts.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V_nbrcnt.txt</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_GRIB2_NAM_RTMA_NP2">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OMP_NUM_THREADS</name>  <value>2</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_NAM_RTMA_NP2</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012_gRtma.grib2 \
+      &DATA_DIR_OBS;/rtma/rtma_2012051712_F000.grib2 \
+      &CONFIG_DIR;/GridStatConfig_rtma \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_nbrctc.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_nbrcts.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_nbrcnt.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_NP2_120000L_20120409_120000V_pairs.nc</grid_nc>
     </output>
   </test>
 
