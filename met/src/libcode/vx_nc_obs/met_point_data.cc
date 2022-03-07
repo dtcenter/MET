@@ -38,6 +38,7 @@ using namespace std;
 
 MetPointData::MetPointData() {
    // Derived class should set obs_data
+   obs_data = (MetPointObsData *0;
    init_from_scratch();
 }
 
