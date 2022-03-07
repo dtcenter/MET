@@ -19,9 +19,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static constexpr const char * const union_char          = "||";
-static constexpr const char * const intersection_char   = "&&";
-static const char negation_char           = '!';
+static const char union_char[]          = "||";
+static const char intersection_char[]   = "&&";
+static const char negation_char         = '!';
 
 static const char   mark_char           = '(';
 static const char unmark_char           = ')';

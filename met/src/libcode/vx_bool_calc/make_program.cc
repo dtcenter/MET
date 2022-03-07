@@ -18,6 +18,8 @@ using namespace std;
 #include "token_stack.h"
 #include "make_program.h"
 
+#include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +43,8 @@ TokenStack op;   //  operator
 
 if ( ! balanced(input) )  {
 
-   cerr << "\n\n  make_program() -> unbalanced parentheses!\n\n";
+   mlog << Error << "\nmake_program() -> "
+        << "unbalanced parentheses!\n\n";
 
    exit ( 1 );
 
@@ -78,7 +81,8 @@ while ( op.nonempty() )  {
 
    if ( tok.is_mark() )  {
 
-      cerr << "\n\n  bad expression ... extra paranthesis?\n\n";
+      mlog << Error << "\nmake_program() -> "
+           << "extra paranthesis?\n\n";
 
       exit ( 1 );
 

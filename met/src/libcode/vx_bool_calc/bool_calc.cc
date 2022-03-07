@@ -13,6 +13,8 @@ using namespace std;
 #include "bool_calc.h"
 #include "make_program.h"
 
+#include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -180,7 +182,8 @@ for (j=0; j<((int) P.size()); ++j)  {
 
 
       default:
-         cerr << "\n\n  BoolCalc::run(const vector<bool>) -> bad token in program ... \n\n";
+         mlog << Error << "\nBoolCalc::run(const vector<bool>) -> "
+              << "bad token in program ... \n\n";
          tok.dump(cerr, 1);
          exit ( 1 );
          break;
@@ -192,7 +195,7 @@ for (j=0; j<((int) P.size()); ++j)  {
 
 if ( s->size() != 1 )  {
 
-   cerr << "\n\n  BoolCalc::run(const vector<bool>) -> "
+   mlog << Error << "\nBoolCalc::run(const vector<bool>) -> "
         << "too many elements left on stack! ("
         << (s->size()) << ")\n\n";
 

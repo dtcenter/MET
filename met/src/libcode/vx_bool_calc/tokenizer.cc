@@ -13,8 +13,9 @@ using namespace std;
 #include <cmath>
 
 #include "empty_string.h"
-
 #include "tokenizer.h"
+
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,8 @@ void Tokenizer::set(const char * input)
 
 if ( empty(input) )  {
 
-   cout << "\n\n  Tokenizer::set() -> empty input string!\n\n";
+   mlog << Error << "\nTokenizer::set() -> "
+        << "empty input string!\n\n";
 
    exit ( 1 );
 
@@ -181,63 +183,58 @@ old_pos = pos;
 
 c = source[pos++];
 
-// if ( verbose )  cout << "tokenizer: c = " << c << "\n";
+if ( c == mark_char )  {
 
-switch ( c )  {
+   tok.set_mark(old_pos);
 
-   case mark_char:
-      tok.set_mark(old_pos);
-      break;
+}
+else if ( c == unmark_char )  {
 
+   tok.set_unmark(old_pos);
 
-   case unmark_char:
-      tok.set_unmark(old_pos);
-      break;
+}
+else if ( c == union_char[0] )  {
 
-
-   case union_char[0]:
-      c2 = source[pos++];
-      if ( c2 == union_char[1])  tok.set_union(old_pos);
-      else {
-         cerr << "\n\n  Tokenizer::next_token() -> unrecognized token: " << c << c2 << "\n\n";
-         exit ( 1 );
-      }
-      break;
-
-
-   case intersection_char[0]:
-      tok.set_intersection(old_pos);
-      c2 = source[pos++];
-      if ( c2 == intersection_char[1])  tok.set_intersection(old_pos);
-      else {
-         cerr << "\n\n  Tokenizer::next_token() -> unrecognized token: " << c << c2 << "\n\n";
-         exit ( 1 );
-      }
-      break;
-
-
-   case negation_char:
-      tok.set_negation(old_pos);
-      break;
-
-
-   case local_var_char:
-      k = get_number();
-      tok.set_local_var(k, old_pos);
-      break;
-
-
-
-   default:
-      cerr << "\n\n  Tokenizer::next_token() -> unrecognized character: " << c << "\n\n";
+   c2 = source[pos++];
+   if ( c2 == union_char[1])  tok.set_union(old_pos);
+   else {
+      mlog << Error << "\nTokenizer::next_token() -> "
+           << "unrecognized token: " << c << c2 << "\n\n";
       exit ( 1 );
-      break;
+   }
 
-}   //  switch
+}
+else if ( c == intersection_char[0] )  {
 
+   tok.set_intersection(old_pos);
+   c2 = source[pos++];
+   if ( c2 == intersection_char[1])  tok.set_intersection(old_pos);
+   else {
+      mlog << Error << "\nTokenizer::next_token() -> "
+           << "unrecognized token: " << c << c2 << "\n\n";
+      exit ( 1 );
+   }
 
+}
+else if ( c == negation_char )  {
 
-// if ( verbose )  { cout << "tokenizer final: ";  tok.dump(cout); }
+   tok.set_negation(old_pos);
+
+}
+else if ( c = local_var_char )  {
+
+   k = get_number();
+   tok.set_local_var(k, old_pos);
+
+}
+else {
+
+   mlog << Error << "\nTokenizer::next_token() -> "
+        << "unrecognized character: " << c << "\n\n";
+   exit ( 1 );
+
+}
+
 
 return ( tok );
 
@@ -245,7 +242,3 @@ return ( tok );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
