@@ -299,7 +299,6 @@ rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
-gi  = (const GoesImagerData *)    0;
 tc  = (const TcrmwData *)         0;
 
 clear();
