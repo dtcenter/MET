@@ -299,6 +299,8 @@ rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
+gi  = (const GoesImagerData *)    0;
+tc  = (const TcrmwData *)         0;
 
 clear();
 
@@ -321,6 +323,7 @@ if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
 if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
+if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 
 return;
 
@@ -341,6 +344,7 @@ if ( info.rll )  set( *(info.rll) );
 if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
 if ( info.gi  )  set( *(info.gi ) );
+if ( info.tc  )  set( *(info.tc ) );
 
 return;
 
@@ -363,6 +367,7 @@ if ( rll ) ++count;
 if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
+if ( tc  ) ++count;
 
 return ( count == 1 );
 
@@ -391,6 +396,7 @@ else if ( rll )  gg.set( *rll );
 else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
+else if ( tc  )  gg.set( *tc  );
 
 return;
 
