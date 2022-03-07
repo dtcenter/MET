@@ -2833,32 +2833,32 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
    // Forecast Variable Name
    s = check_hdr_str(conf_key_fcst_var,
-                     eng.conf_info.fcst_info->name_attr());
+                     eng.conf_info.Fcst->var_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
    s = check_hdr_str(conf_key_fcst_units,
-                     eng.conf_info.fcst_info->units_attr(), true);
+                     eng.conf_info.Fcst->var_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
    s = check_hdr_str(conf_key_fcst_lev,
-                     eng.conf_info.fcst_info->level_attr(), true);
+                     eng.conf_info.Fcst->var_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
    s = check_hdr_str(conf_key_obs_var,
-                     eng.conf_info.obs_info->name_attr());
+                     eng.conf_info.Obs->var_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
    s = check_hdr_str(conf_key_obs_units,
-                     eng.conf_info.obs_info->units_attr(), true);
+                     eng.conf_info.Obs->var_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
    s = check_hdr_str(conf_key_obs_lev,
-                     eng.conf_info.obs_info->level_attr(), true);
+                     eng.conf_info.Obs->var_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation type
