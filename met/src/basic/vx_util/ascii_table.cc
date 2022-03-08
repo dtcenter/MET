@@ -1328,8 +1328,11 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
 
 if ( Nrows <= 2 )  return;
 
-int left[Nrows];
-int right[Nrows];
+// int left[Nrows];
+// int right[Nrows];
+
+int * left  = new int [Nrows];
+int * right = new int [Nrows];
 
 int r, c, n, k;
 int max_left, max_right;
@@ -1377,6 +1380,9 @@ for (c=0; c<Ncols; ++c)  {
    //
    //  done
    //
+
+if ( left  )  { delete [] left;   left  = 0; }
+if ( right )  { delete [] right;  right = 0; }
 
 
 DecimalPointsAligned = true;
