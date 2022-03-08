@@ -269,6 +269,27 @@ int NumArray::has(double d, bool forward) const
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NumArray::is_const(double d) const
+
+{
+
+   bool status = true;
+
+   for (int j=0; j<n_elements(); ++j)  {
+      if ( !is_eq(e[j], d) )  {
+         status = false;
+         break;
+      }
+   }
+
+   return ( status && n_elements() > 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::add(int k)
 
 {
