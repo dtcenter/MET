@@ -14,7 +14,7 @@ bin_PROGRAMS    = mode
 mode_SOURCES = mode_usage.cc \
 	mode_frontend.cc \
 	multivar_frontend.cc \
-     mode.cc \
+	mode.cc \
 	combine_boolplanes.cc \
 	objects_from_netcdf.cc \
 	mode_ps_file.cc \

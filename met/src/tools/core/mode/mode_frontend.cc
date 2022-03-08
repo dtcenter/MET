@@ -99,13 +99,9 @@ extern const char * const program_name;
 static ModeExecutive * mode_exec = 0;
 
 
-void singlevar_usage();   //  this needs external linkage
-
-
 ///////////////////////////////////////////////////////////////////////
 
 
-// static const char * default_out_dir = "MET_BASE/out/mode";
 static const char * default_out_dir = ".";
 
 static int compress_level = -1;
@@ -383,60 +379,6 @@ if ( field_index < 0 )  {
    exit ( 1 );
 
 }
-
-return;
-
-}
-
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void singlevar_usage()
-
-{
-
-cout << "\n\n"
-     << "Usage: " << program_name << "\n"
-     << "\tfcst_file\n"
-     << "\tobs_file\n"
-     << "\tconfig_file\n"
-     << "\t[-config_merge merge_config_file]\n"
-     << "\t[-outdir path]\n"
-     << "\t[-log file]\n"
-     << "\t[-v level]\n"
-     << "\t[-compress level]\n\n"
-
-     << "\twhere\n"
-
-     << "\t\t\"fcst_file\" is a gridded forecast file "
-     << "containing the field to be verified (required).\n"
-
-     << "\t\t\"obs_file\" is a gridded observation file "
-     << "containing the verifying field (required).\n"
-
-     << "\t\t\"config_file\" is a MODEConfig file "
-     << "containing the desired configuration settings (required).\n"
-
-     << "\t\t\"-config_merge merge_config_file\" overrides the default "
-     << "fuzzy engine settings for merging within the fcst/obs fields "
-     << "(optional).\n"
-
-     << "\t\t\"-outdir path\" overrides the default output directory ("
-     << mode_exec->out_dir << ") (optional).\n"
-
-     << "\t\t\"-log file\" outputs log messages to the specified "
-     << "file (optional).\n"
-
-     << "\t\t\"-v level\" overrides the default level of logging ("
-     << mlog.verbosity_level() << ") (optional).\n"
-
-     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-     << mode_exec->engine.conf_info.get_compression_level() << ") (optional).\n\n"
-
-     << flush;
-
 
 return;
 
