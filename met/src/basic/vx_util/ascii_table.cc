@@ -1328,9 +1328,6 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
 
 if ( Nrows <= 2 )  return;
 
-// int left[Nrows];
-// int right[Nrows];
-
 int * left  = new int [Nrows];
 int * right = new int [Nrows];
 
