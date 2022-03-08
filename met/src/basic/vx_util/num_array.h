@@ -62,6 +62,8 @@ class NumArray {
       int has(int, bool forward=true)    const;
       int has(double, bool forward=true) const;
 
+      bool is_const(double) const;
+
       void add(int);
       void add(double);
       void add(const NumArray &);

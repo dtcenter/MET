@@ -228,9 +228,6 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Store the number of ensemble members
    n_ens = pd.n_ens;
 
-   // HiRA data has no ensemble mean
-   bool skip_mean = pd.mn_na.has(bad_data_double);
-
    // Compute empirical CRPS scores
    crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
@@ -260,8 +257,9 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       }
    }
 
-   // Compute ensemble mean based statistics
-   if(!skip_mean) {
+   // Compute ensemble mean based statistics, if possible
+   // HiRA stores the ensemble mean as bad data
+   if(!pd.mn_na.is_const(bad_data_double)) {
 
       // Compute ME and RMSE values
       fbar = obar = ffbar = oobar = fobar = 0.0;
