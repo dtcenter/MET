@@ -128,8 +128,8 @@ read_config(config_file);
 
 if ( config.fcst_multivar_logic.empty() )  {
 
-   mlog << Error
-        << program_name << ": fcst multivar logic not specified!\n\n";
+   mlog << Error << "\n" << program_name
+        << ": fcst multivar logic not specified!\n\n";
 
    exit ( 1 );
 
@@ -138,8 +138,8 @@ if ( config.fcst_multivar_logic.empty() )  {
 
 if ( config.obs_multivar_logic.empty() )  {
 
-   mlog << Error
-        << program_name << ": obs multivar logic not specified!\n\n";
+   mlog << Error << "\n" << program_name
+        << ": obs multivar logic not specified!\n\n";
 
    exit ( 1 );
 
@@ -154,8 +154,7 @@ fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
 
 if ( fcst_filenames.n() != obs_filenames.n() )  {
 
-   mlog << Error
-        << "\n\n  " << program_name 
+   mlog << Error << "\n" << program_name
         << ": number of fcst and obs files should be the same!\n\n";
 
    exit ( 1 );
@@ -170,6 +169,19 @@ int status;
 char junk [256];
 
 mlog << Debug(2) << "\n" << sep << "\n";
+
+   //
+   //  check for no inputs
+   //
+
+if ( n_files == 0 )  {
+
+   mlog << Error << "\n" << program_name
+        << ": no input forecast files to process!\n\n";
+
+   exit ( 1 );
+
+}
 
    //
    //  do the individual mode runs
@@ -204,8 +216,9 @@ for (j=0; j<n_files; ++j)  {
 
       if ( status < 0 )  {
 
-         mlog << Error
-              << program_name << ": unable to create output directory \"" << dir << "\"\n\n";
+         mlog << Error << "\n" << program_name
+              << ": unable to create output directory \""
+              << dir << "\"\n\n";
 
          exit ( 1 );
 
@@ -321,8 +334,8 @@ path = nc_files[0];
 
 if ( ! met.open(path.text()) )  {
 
-   mlog << Error
-        << "\n\n  " << program_name << ": unable to open mode output file \""
+   mlog << Error << "\n" << program_nam
+        << ": unable to open mode output file \""
         << path << "\"\n\n";
 
    exit ( 1 );
@@ -409,8 +422,7 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error
-        << "\n\n  " << program_name << ": "
+   mlog << Error << "\n" << program_name << ": "
         << "command \"" << command << "\" failed!\n\n";
 
    exit ( 1 );
