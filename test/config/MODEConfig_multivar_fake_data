@@ -27,9 +27,11 @@ obtype = "PRECIP";
 // Verification grid
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +47,11 @@ grid_res = 20;
 // Run all permutations of radius and threshold
 //
 quilt = FALSE;
+
+//
+// MODE Multivar boolean combination logic
+//
+multivar_field_logic = "#1 && #2 && #3";
 
 //
 // Forecast and observation fields to be verified
@@ -77,9 +84,6 @@ fcst = {
    filter_attr_thresh = [];
    merge_thresh       = >=3.5;
    merge_flag         = NONE;
-
-   multivar_logic     = "#1 && #2 && #3";
-
 }
 obs = fcst;
 
@@ -209,21 +213,19 @@ print_interest_thresh = 0.0;
 met_data_dir = "MET_BASE";
 
 fcst_raw_plot = {
-   color_table      = "MET_BASE/colortables/met_default.ctable";
-   plot_min         = 0.0;
-   plot_max         = 25.4;
-   colorbar_spacing = 1;
+   color_table = "MET_BASE/colortables/met_default.ctable";
+   plot_min    = 0.0;
+   plot_max    = 25.4;
 }
 
 obs_raw_plot = {
-   color_table      = "MET_BASE/colortables/met_default.ctable";
-   plot_min         = 0.0;
-   plot_max         = 25.4;
-   colorbar_spacing = 1;
+   color_table = "MET_BASE/colortables/met_default.ctable";
+   plot_min    = 0.0;
+   plot_max    = 25.4;
 }
 
 object_plot = {
-   color_table      = "MET_BASE/colortables/mode_obj.ctable";
+   color_table = "MET_BASE/colortables/mode_obj.ctable";
 }
 
 //
@@ -247,7 +249,11 @@ ct_stats_flag   = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+shift_right = 0;   //  grid squares
+
+////////////////////////////////////////////////////////////////////////////////
+
 output_prefix  = "";
-version        = "V10.0";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

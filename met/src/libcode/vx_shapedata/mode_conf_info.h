@@ -191,7 +191,7 @@ class ModeConfInfo {
       ConcatString     desc;                   // Description
       ConcatString     obtype;                 // Observation type
 
-      ConcatString     multivar_field_logic;   // Mulvi-variate booleanlogic
+      ConcatString     multivar_field_logic;   // Multvi-variate booleanlogic
 
       ConcatString     mask_grid_name;         // Path for masking grid area
       ConcatString     mask_poly_name;         // Path for masking poly area

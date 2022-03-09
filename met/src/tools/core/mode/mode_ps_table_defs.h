@@ -1,8 +1,4 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -49,5 +45,3 @@ static Color dark_gray   = blend_colors(white, black, 0.50);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

@@ -17,14 +17,9 @@ model = "WRF";
 desc = "NA";
 
 //
-// MODE Multivar boolean combination logic
-//
-multivar_field_logic = "#1 && #2 && #3";
-
-//
 // Output observation type to be written
 //
-obtype = "PRECIP";
+obtype = "ANALYS";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -32,9 +27,11 @@ obtype = "PRECIP";
 // Verification grid
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,14 +49,14 @@ grid_res = 20;
 quilt = FALSE;
 
 //
+// MODE Multivar boolean combination logic
+//
+multivar_field_logic = "#1 && #2 && #3";
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
-
-   // field = {
-   //    name  = "GAMMA";
-   //    level = "(*,*)";
-   // }
 
    field = [
 
@@ -89,12 +86,6 @@ fcst = {
    merge_flag         = NONE;
 }
 obs = fcst;
-// obs = {
-//    field = {
-//       name  = "APCP_";
-//       level = "A06";
-//    }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -222,21 +213,19 @@ print_interest_thresh = 0.0;
 met_data_dir = "MET_BASE";
 
 fcst_raw_plot = {
-   color_table      = "MET_BASE/colortables/met_default.ctable";
-   plot_min         = 0.0;
-   plot_max         = 25.4;
-   colorbar_spacing = 1;
+   color_table = "MET_BASE/colortables/met_default.ctable";
+   plot_min    = 0.0;
+   plot_max    = 0.0;
 }
 
 obs_raw_plot = {
-   color_table      = "MET_BASE/colortables/met_default.ctable";
-   plot_min         = 0.0;
-   plot_max         = 25.4;
-   colorbar_spacing = 1;
+   color_table = "MET_BASE/colortables/met_default.ctable";
+   plot_min    = 0.0;
+   plot_max    = 0.0;
 }
 
 object_plot = {
-   color_table      = "MET_BASE/colortables/mode_obj.ctable";
+   color_table = "MET_BASE/colortables/mode_obj.ctable";
 }
 
 //
@@ -260,7 +249,11 @@ ct_stats_flag   = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-output_prefix  = "r_";
-version        = "V9.0";
+shift_right = 0;   //  grid squares
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_prefix  = "";
+version        = "V10.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

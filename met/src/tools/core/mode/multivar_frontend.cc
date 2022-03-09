@@ -6,6 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -254,12 +255,6 @@ for (j=0; j<n_files; ++j)  {
 
    command << " -outdir " << dir;
 
-   // for (k=4; k<Argc; ++k)  {
-   // 
-   //    command << ' ' << Argv[k];
-   // 
-   // }
-
    mode_argv.add("-field_index");
    snprintf(junk, sizeof(junk), "%d", j);
    mode_argv.add(junk);
@@ -334,7 +329,7 @@ path = nc_files[0];
 
 if ( ! met.open(path.text()) )  {
 
-   mlog << Error << "\n" << program_nam
+   mlog << Error << "\n" << program_name
         << ": unable to open mode output file \""
         << path << "\"\n\n";
 
@@ -557,15 +552,6 @@ nc.putAtt(string("MET_version"), string(met_version));
 
 grid_output(grid.info(), &nc);
 
-
-
-
-
-
-
-
-
-
    //
    //  done
    //
@@ -580,5 +566,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

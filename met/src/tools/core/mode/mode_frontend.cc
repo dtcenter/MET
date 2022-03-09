@@ -6,55 +6,9 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-////////////////////////////////////////////////////////////////////////
-//
-//   Filename:   mode.cc
-//
-//   Description:
-//      Based on user specified parameters, this tool derives objects
-//      within two gridded datasets using a convolution-thresholding
-//      approach.  It then compares objects within the same field and
-//      across fields, and calculates a total interest value for each
-//      pair of objects using a fuzzy logic approach.  The interest
-//      values are thresholded, and object pairs with a high enough
-//      interest value are associated with one another.
-//
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//   000    10-11-06  Halley Gotway  New
-//   001    12-20-06  Halley Gotway  Write check_xy_ll to reduce
-//                                   duplicated code.
-//   002    01/11/08  Halley Gotway  Modify sprintf statements which
-//                                   use the GRIB code abbreviation string
-//   003    02/06/08  Halley Gotway  Modify to read the updated NetCDF
-//                                   output of PCP-Combine
-//   004    09/23/08  Halley Gotway  Add two output fields to the
-//                                   NetCDF object file for the raw fcst/obs values.
-//   005    09/23/08  Halley Gotway  Change argument sequence for the
-//                                   get_grib_record routine.
-//   006    05/03/10  Halley Gotway  Remove the variable/level info
-//                                   from the output file naming convention.
-//   007    05/11/10  Halley Gotway  Plot polyline lines thicker.
-//   008    06/30/10  Halley Gotway  Enhance grid equality checks.
-//   009    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
-//   010    08/09/10  Halley Gotway  Add valid time variable attributes
-//                                   to NetCDF output.
-//   011    10/28/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
-//   012    11/15/11  Holmes         Added code to enable reading of
-//                                   multiple config files.
-//
-//   013    01/11/11  Bullock        Ported to new repository
-//   014    05/10/12  Halley Gotway  Switch to using vx_config library.
-//   015    05/10/12  Halley Gotway  Move -fcst_valid, -fcst_lead,
-//                                   -obs_valid, and -obs_lead command line options
-//                                   to config file.
-//   016    02/25/15  Halley Gotway  Add automated regridding.
-//   017    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   018    04/08/19  Halley Gotway  Add percentile thresholds.
-//   019    04/01/19  Fillmore       Add FCST and OBS units.
-//
-////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+
 
 using namespace std;
 
