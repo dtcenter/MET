@@ -51,7 +51,7 @@ quilt = FALSE;
 //
 // MODE Multivar boolean combination logic
 //
-multivar_field_logic = "#1 && #2 && #3";
+multivar_logic = "#1 && #2 && #3";
 
 //
 // Forecast and observation fields to be verified
