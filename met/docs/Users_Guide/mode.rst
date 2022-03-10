@@ -103,10 +103,17 @@ Summary statistics
 
 Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to :numref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
+.. _MODE-multivar:
+
+Multi-Variate MODE
+------------------
+
+Traditionally, MODE defines objects by smoothing and thresholding data from a single input field. MET version 10.1.0 extends MODE by adding the option to define objects using multiple input fields. As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the tradition method for running MODE is invokes, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked. The object definition criteria can be specified separately within in field array entry to define objects for that field. The **multivar_logic** string defines the boolean logic for combining objects together from each of the inputs. The boolean logic uses integers from 1 to N, the number of input fields, to refer to the N-th field. Note that the multi-variate MODE forecast and observation object definition logic does not need to match. The result of the boolean logic is the creation of forecast and observation *super* objects, which are written to NetCDF output files. Users can then configure and run traditional MODE to compare the forecast super object to the observed super object.
+
 Practical information
 =====================
 
-This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. The requirement of having all gridded fields using the same grid specification has been removed with METv5.1. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
+This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. If the input datasets are not already on a common grid, MODE can interpolate them to a common grid. The regrid option in the configuration file enables the user to specify the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
 
 MODE provides the capability to select a single model variable/level from which to derive objects to be analyzed. MODE was developed and tested using accumulated precipitation. However, the code has been generalized to allow the use of any gridded model and observation field. Based on the options specified in the configuration file, MODE will define a set of simple objects in the model and observation fields. It will then compute an interest value for each pair of objects across the fields using a fuzzy engine approach. Those interest values are thresholded, and any pairs of objects above the threshold will be matched/merged. Through the configuration file, MODE offers a wide range of flexibility in how the objects are defined, processed, matched, and merged.
 
@@ -198,7 +205,6 @@ _____________________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-
 _____________________
 
 .. code-block:: none
@@ -223,6 +229,16 @@ _____________________
 
 .. code-block:: none
 
+   multivar_logic = "#1 && #2 && #3";
+
+The **multivar_logic** entry appears only in the **MODEMultivarConfig_default** file. This option applies only running Multi-Variate MODE by setting **field** to an array of dictionaries to define multiple input fields. Objects are defined separately for each input field based on the configuration settings specified for each field array entry. The **multivar_logic** entry is a string which defines how objects for each field are combined into a final *super* object. The objects for each field are referred to as '#N' where N is the N-th field array entry. The '&&' and '||' strings define intersection and union logic, respectively. For example, "#1 && #2" is the intersection of the objects from the first and second fields. "(#1 && #2) || #3" is the union of that intersection with the objects from the third field.
+
+The **multivar_logic** entry is parsed separately from the **fcst** and **obs** dictionaries and can be defined differently in each.
+
+_____________________
+
+.. code-block:: none
+
   fcst = {
      field = {
         name = "APCP";
@@ -241,6 +257,8 @@ _____________________
   obs = fcst; 
 
 The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
+
+When **field** is set to an array of dictionaries rather than a single one, the multi-variate MODE logic is invoked. Please see :numref:`MODE-multivar` for a description of that logic.
 
 The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`config_options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
