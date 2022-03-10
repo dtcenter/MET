@@ -8,6 +8,44 @@ Important issues are listed **in bold** for emphasis.
 MET Version 10.1.0 release notes (20220314)
 -------------------------------------------
 
+* Repository and build:
+
+   * Installation:
+
+      * **Enhance the MET compilation script and its documentation** (`#1395 <https://github.com/dtcenter/MET/issues/1395>`_).
+
+   * Static Code Analysis:
+
+      * **Automate calls to the SonarQube static code analysis tool in the nightly build** (`#2020 <https://github.com/dtcenter/MET/issues/2020>`_).
+      * Fix Fortify High finding for src/libcode/vx_data2d_nccf/nccf_file.cc (`#1795 <http://github.com/dtcenter/MET/issues/1795>`_).
+      * Fix the findings from SonarQube (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
+      * Reduce the Security hotspots from SonarQube (`#1903 <https://github.com/dtcenter/MET/issues/1903>`_).
+      * Address findings from the Cppcheck code analysis tool (`#1996 <https://github.com/dtcenter/MET/issues/1996>`_).
+
+   * Testing:
+
+      * Review and revise the warning messages when running the MET unit tests (`#1921 <https://github.com/dtcenter/MET/issues/1921>`_).
+      * Investigate nightly build output wind direction differences caused by machine precision (`#2027 <https://github.com/dtcenter/MET/issues/2027>`_).
+      * Modify plot_tcmpr.R script to support plotting of extra-tropical cyclone tracks not verified against BEST tracks (`#1801 <http://github.com/dtcenter/MET/issues/1801>`_).
+      * Fix failure in plot_tcmpr.R script when a directory is passed in with -lookin (`#1872 <https://github.com/dtcenter/MET/issues/1872>`_).
+
+   * Continuous Integration:
+
+      * **Implement Continuous Integration with GitHub Actions in MET** (`#1546 <https://github.com/dtcenter/MET/issues/1546>`_).
+      * Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
+
+* Documentation:
+
+   * **Create and publish a PDF of the MET User's Guide via Read-The-Docs** (`#1453 <https://github.com/dtcenter/MET/issues/1453>`_).
+   * **Enhance the MET documentation to follow the standard for sections** (`#1998 <https://github.com/dtcenter/MET/issues/1998>`_).
+   * Add anchors to link directly to configuration items in the MET User's Guide (`#1811 <http://github.com/dtcenter/MET/issues/1811>`_).
+   * Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).
+   * Document the statistics from the RPS line type in Appendix C (`#1853 <https://github.com/dtcenter/MET/issues/1853>`_).
+   * Enhance the documentation with meta-data that is expected by MET for netCDF (`#1949 <https://github.com/dtcenter/MET/issues/1949>`_).
+   * Update documentation to reference GitHub Discussions instead of MET Help (`#1833 <https://github.com/dtcenter/MET/issues/1833>`_).
+   * Fix broken URLs in default MET config files (`#1864 <https://github.com/dtcenter/MET/issues/1864>`_).
+
+
 * Library code:
 
    * Bugfixes:
@@ -48,60 +86,6 @@ MET Version 10.1.0 release notes (20220314)
 
       * Fix ASCII2NC to check the return status when reading ASCII input files (`#1957 <https://github.com/dtcenter/MET/issues/1957>`_).
 
-   * PB2NC Tool:
-
-      * **Enhance PB2NC to derive Mixed-Layer CAPE (MLCAPE)** (`#1824 <https://github.com/dtcenter/MET/issues/1824>`_).
-      * Enhance the PBL derivation logic in PB2NC (`#1913 <https://github.com/dtcenter/MET/issues/1913>`_).
-      * Update the PB2NC configuration to correct the obs_prefbufr_map name as obs_prepbufr_map (`#2044 <https://github.com/dtcenter/MET/issues/2044>`_).
-      * Add entries to the default obs_prepbufr_map setting (`#2070 <https://github.com/dtcenter/MET/issues/2070>`_).
-      * Fix PB2NC to better inventory BUFR input data when processing all variables (`#1894 <https://github.com/dtcenter/MET/issues/1894>`_).
-      * Fix PB2NC to reduce redundant verbosity level 3 log messages (`#2015 <https://github.com/dtcenter/MET/issues/2015>`_).
-      * Resolve PB2NC string truncation warning messages (`#1909 <https://github.com/dtcenter/MET/issues/1909>`_).
-
-   * MADIS2NC Tool:
-
-      * Enhance MADIS2NC to handle the 2016 updates to its format (`#1936 <https://github.com/dtcenter/MET/issues/1936>`_).
-      * Fix MADIS2NC to correctly parse MADIS profiler quality flag values (`#2028 <https://github.com/dtcenter/MET/issues/2028>`_).
-
-   * IODA2NC Tool:
-
-      * Fix IODA2NC to handle the same input file being provided multiple times (`#1965 <https://github.com/dtcenter/MET/issues/1965>`_).
-      * Fix IODA2NC bug rejecting all input observations in unit tests (`#1922 <https://github.com/dtcenter/MET/issues/1922>`_).
-
-   * Point2Grid Tool:
-
-      * Enhance Point2Grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
-      * Fix the output of Point2Grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
-
-   * Gen-Vx-Mask Tool:
-
-      * **Refine logic to prevent rounding shapefile points to the nearest grid point** (affects GenVxMask -type shape masks) (`#1810 <https://github.com/dtcenter/MET/issues/1810>`_).
-      * Change -type for Gen-Vx-Mask from an optional argument to a required one (`#1792 <http://github.com/dtcenter/MET/issues/1792>`_).
-      * Fix Gen-Vx-Mask to handle named grids and grid specification strings for -type grid (`#1993 <https://github.com/dtcenter/MET/issues/1993>`_).
-      * Fix Gen-Vx-Mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
-
-   * (NEW) Gen-Ens-Prod Tool:
-
-      * **Create the new Gen-Ens-Prod tool for ensemble product generation** (`#1904 <https://github.com/dtcenter/MET/issues/1904>`_).
-      * **Enhance Ensemble-Stat and Gen-Ens-Prod to read all ensemble members from a single input file** (`#1695 <https://github.com/dtcenter/MET/issues/1695>`_).
-      * Enhance Gen-Ens-Prod to standardize ensemble members relative to climatology (`#1918 <https://github.com/dtcenter/MET/issues/1918>`_).
-
-   * Grid-Diag Tool:
-
-      * Fix integer overflow in Grid-Diag (`#1886 <https://github.com/dtcenter/MET/issues/1886>`_).
-
-   * Point-Stat Tool:
-
-      * Add ORANK line type to the HiRA output from Point-Stat (`#1764 <https://github.com/dtcenter/MET/issues/1764>`_).
-      * Add Point-Stat and Ensemble-Stat obs_quality_exc configuration option to specify which quality flags should be excluded (`#1858 <https://github.com/dtcenter/MET/issues/1858>`_).
-      * Fix Point-Stat and Grid-Stat to write VCNT output even if no VL1L2 or VAL1L2 output is requested (`#1991 <https://github.com/dtcenter/MET/issues/1991>`_).
-
-   * Grid-Stat Tool:
-
-      * **Enhance Grid-Stat to use OpenMP for efficient computation of neighborhood statistics by setting $OMP_NUM_THREADS** (`#1926 <https://github.com/dtcenter/MET/issues/1926>`_).
-      * **Add G and G-Beta to the DMAP line type from Grid-Stat** (`#1673 <https://github.com/dtcenter/MET/issues/1673>`_).
-      * Fix Point-Stat and Grid-Stat to write VCNT output even if no VL1L2 or VAL1L2 output is requested (`#1991 <https://github.com/dtcenter/MET/issues/1991>`_).
-
    * Ensemble-Stat Tool:
 
       * **Enhance Ensemble-Stat to compute probabilistic statistics for user-defined or climatology-based thresholds** (`#1259 <https://github.com/dtcenter/MET/issues/1259>`_).
@@ -113,17 +97,38 @@ MET Version 10.1.0 release notes (20220314)
       * Print a warning message about switching from Ensemble-Stat to Gen-Ens-Prod (`#1907 <https://github.com/dtcenter/MET/issues/1907>`_).
       * Fix failure of Ensemble-Stat when verifying against gridded ECMWF GRIB1 files (`#1879 <https://github.com/dtcenter/MET/issues/1879>`_).
 
-   * Wavelet-Stat Tool:
+   * Gen-Ens-Prod Tool (NEW):
 
-      * Make the specification of a binary threshold in Wavelet-Stat optional (`#1746 <https://github.com/dtcenter/MET/issues/1746>`_).
+      * **Create the new Gen-Ens-Prod tool for ensemble product generation** (`#1904 <https://github.com/dtcenter/MET/issues/1904>`_).
+      * **Enhance Ensemble-Stat and Gen-Ens-Prod to read all ensemble members from a single input file** (`#1695 <https://github.com/dtcenter/MET/issues/1695>`_).
+      * Enhance Gen-Ens-Prod to standardize ensemble members relative to climatology (`#1918 <https://github.com/dtcenter/MET/issues/1918>`_).
 
-   * Stat-Analysis Tool:
+   * Gen-Vx-Mask Tool:
 
-      * **Enhance Stat-Analysis to compute the CBS Index** (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
-      * **Enhance Stat-Analysis to write the GO Index and CBS Index into a new SSIDX STAT line type** (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
-      * Modify the STAT-Analysis GO Index configuration file (`#1945 <https://github.com/dtcenter/MET/issues/1945>`_).
-      * Fix Stat-Analysis skill score index job which always writes a dump row output file (`#1914 <https://github.com/dtcenter/MET/issues/1914>`_).
-      * Fix consumption of too much memory by Stat-Analysis (`#1875 <https://github.com/dtcenter/MET/issues/1875>`_).
+      * **Refine logic to prevent rounding shapefile points to the nearest grid point** (affects GenVxMask -type shape masks) (`#1810 <https://github.com/dtcenter/MET/issues/1810>`_).
+      * Change -type for Gen-Vx-Mask from an optional argument to a required one (`#1792 <http://github.com/dtcenter/MET/issues/1792>`_).
+      * Fix Gen-Vx-Mask to handle named grids and grid specification strings for -type grid (`#1993 <https://github.com/dtcenter/MET/issues/1993>`_).
+      * Fix Gen-Vx-Mask so that the -input_field and -mask_field options are processed independently (`#1891 <https://github.com/dtcenter/MET/issues/1891>`_).
+
+   * Grid-Diag Tool:
+
+      * Fix integer overflow in Grid-Diag (`#1886 <https://github.com/dtcenter/MET/issues/1886>`_).
+
+   * Grid-Stat Tool:
+
+      * **Enhance Grid-Stat to use OpenMP for efficient computation of neighborhood statistics by setting $OMP_NUM_THREADS** (`#1926 <https://github.com/dtcenter/MET/issues/1926>`_).
+      * **Add G and G-Beta to the DMAP line type from Grid-Stat** (`#1673 <https://github.com/dtcenter/MET/issues/1673>`_).
+      * Fix Point-Stat and Grid-Stat to write VCNT output even if no VL1L2 or VAL1L2 output is requested (`#1991 <https://github.com/dtcenter/MET/issues/1991>`_).
+
+   * IODA2NC Tool:
+
+      * Fix IODA2NC to handle the same input file being provided multiple times (`#1965 <https://github.com/dtcenter/MET/issues/1965>`_).
+      * Fix IODA2NC bug rejecting all input observations in unit tests (`#1922 <https://github.com/dtcenter/MET/issues/1922>`_).
+
+   * MADIS2NC Tool:
+
+      * Enhance MADIS2NC to handle the 2016 updates to its format (`#1936 <https://github.com/dtcenter/MET/issues/1936>`_).
+      * Fix MADIS2NC to correctly parse MADIS profiler quality flag values (`#2028 <https://github.com/dtcenter/MET/issues/2028>`_).
 
    * MODE Tool:
 
@@ -133,9 +138,38 @@ MET Version 10.1.0 release notes (20220314)
 
       * Fix MTD to compute the CDIST_TRAVELLED value correctly (`#1976 <https://github.com/dtcenter/MET/issues/1976>`_).
 
+   * PB2NC Tool:
+
+      * **Enhance PB2NC to derive Mixed-Layer CAPE (MLCAPE)** (`#1824 <https://github.com/dtcenter/MET/issues/1824>`_).
+      * Enhance the PBL derivation logic in PB2NC (`#1913 <https://github.com/dtcenter/MET/issues/1913>`_).
+      * Update the PB2NC configuration to correct the obs_prefbufr_map name as obs_prepbufr_map (`#2044 <https://github.com/dtcenter/MET/issues/2044>`_).
+      * Add entries to the default obs_prepbufr_map setting (`#2070 <https://github.com/dtcenter/MET/issues/2070>`_).
+      * Fix PB2NC to better inventory BUFR input data when processing all variables (`#1894 <https://github.com/dtcenter/MET/issues/1894>`_).
+      * Fix PB2NC to reduce redundant verbosity level 3 log messages (`#2015 <https://github.com/dtcenter/MET/issues/2015>`_).
+      * Resolve PB2NC string truncation warning messages (`#1909 <https://github.com/dtcenter/MET/issues/1909>`_).
+
+   * Point2Grid Tool:
+
+      * Enhance Point2Grid to support double type latitude/longitude variables (`#1838 <https://github.com/dtcenter/MET/issues/1838>`_).
+      * Fix the output of Point2Grid which is flipped and rotated with lat/lon to lat/lon conversion (`#1817 <https://github.com/dtcenter/MET/issues/1817>`_).
+
+   * Point-Stat Tool:
+
+      * Add ORANK line type to the HiRA output from Point-Stat (`#1764 <https://github.com/dtcenter/MET/issues/1764>`_).
+      * Add Point-Stat and Ensemble-Stat obs_quality_exc configuration option to specify which quality flags should be excluded (`#1858 <https://github.com/dtcenter/MET/issues/1858>`_).
+      * Fix Point-Stat and Grid-Stat to write VCNT output even if no VL1L2 or VAL1L2 output is requested (`#1991 <https://github.com/dtcenter/MET/issues/1991>`_).
+
    * Series-Analysis Tool:
 
       * Enhance Series-Analysis to compute the BRIERCL statistic from the PSTD line type (`#2003 <https://github.com/dtcenter/MET/issues/2003>`_).
+
+   * Stat-Analysis Tool:
+
+      * **Enhance Stat-Analysis to compute the CBS Index** (`#1031 <https://github.com/dtcenter/MET/issues/1031>`_).
+      * **Enhance Stat-Analysis to write the GO Index and CBS Index into a new SSIDX STAT line type** (`#1788 <https://github.com/dtcenter/MET/issues/1788>`_).
+      * Modify the STAT-Analysis GO Index configuration file (`#1945 <https://github.com/dtcenter/MET/issues/1945>`_).
+      * Fix Stat-Analysis skill score index job which always writes a dump row output file (`#1914 <https://github.com/dtcenter/MET/issues/1914>`_).
+      * Fix consumption of too much memory by Stat-Analysis (`#1875 <https://github.com/dtcenter/MET/issues/1875>`_).
 
    * TC-Gen Tool:
 
@@ -150,42 +184,9 @@ MET Version 10.1.0 release notes (20220314)
 
       * Fix TC-Stat event equalization logic to include any model name requested using -amodel (`#1932 <https://github.com/dtcenter/MET/issues/1932>`_).
 
-* Repository:
+   * Wavelet-Stat Tool:
 
-   * Installation:
-
-      * **Enhance the MET compilation script and its documentation** (`#1395 <https://github.com/dtcenter/MET/issues/1395>`_).
-
-   * Static Code Analysis:
-
-      * **Automate calls to the SonarQube static code analysis tool in the nightly build** (`#2020 <https://github.com/dtcenter/MET/issues/2020>`_).
-      * Fix Fortify High finding for src/libcode/vx_data2d_nccf/nccf_file.cc (`#1795 <http://github.com/dtcenter/MET/issues/1795>`_).
-      * Fix the findings from SonarQube (`#1855 <https://github.com/dtcenter/MET/issues/1855>`_).
-      * Reduce the Security hotspots from SonarQube (`#1903 <https://github.com/dtcenter/MET/issues/1903>`_).
-      * Address findings from the Cppcheck code analysis tool (`#1996 <https://github.com/dtcenter/MET/issues/1996>`_).
-
-   * Testing:
-
-      * Review and revise the warning messages when running the MET unit tests (`#1921 <https://github.com/dtcenter/MET/issues/1921>`_).
-      * Investigate nightly build output wind direction differences caused by machine precision (`#2027 <https://github.com/dtcenter/MET/issues/2027>`_).
-      * Modify plot_tcmpr.R script to support plotting of extra-tropical cyclone tracks not verified against BEST tracks (`#1801 <http://github.com/dtcenter/MET/issues/1801>`_).
-      * Fix failure in plot_tcmpr.R script when a directory is passed in with -lookin (`#1872 <https://github.com/dtcenter/MET/issues/1872>`_).
-
-   * Continuous Integration:
-
-      * **Implement Continuous Integration with GitHub Actions in MET** (`#1546 <https://github.com/dtcenter/MET/issues/1546>`_).
-      * Treat warnings from the documentation as errors to facilitate continuous integration with GHA (`#1819 <https://github.com/dtcenter/MET/issues/1819>`_).
-
-   * Documentation:
-
-      * **Create and publish a PDF of the MET User's Guide via Read-The-Docs** (`#1453 <https://github.com/dtcenter/MET/issues/1453>`_).
-      * **Enhance the MET documentation to follow the standard for sections** (`#1998 <https://github.com/dtcenter/MET/issues/1998>`_).
-      * Add anchors to link directly to configuration items in the MET User's Guide (`#1811 <http://github.com/dtcenter/MET/issues/1811>`_).
-      * Update FAQ in User's Guide with info from webpage FAQ (`#1834 <https://github.com/dtcenter/MET/issues/1834>`_).
-      * Document the statistics from the RPS line type in Appendix C (`#1853 <https://github.com/dtcenter/MET/issues/1853>`_).
-      * Enhance the documentation with meta-data that is expected by MET for netCDF (`#1949 <https://github.com/dtcenter/MET/issues/1949>`_).
-      * Update documentation to reference GitHub Discussions instead of MET Help (`#1833 <https://github.com/dtcenter/MET/issues/1833>`_).
-      * Fix broken URLs in default MET config files (`#1864 <https://github.com/dtcenter/MET/issues/1864>`_).
+      * Make the specification of a binary threshold in Wavelet-Stat optional (`#1746 <https://github.com/dtcenter/MET/issues/1746>`_).
 
 MET Version 10.0.0 release notes (20210510)
 -------------------------------------------
@@ -280,13 +281,40 @@ MET Version 10.0.0 release notes (20210510)
       * Fix to handle bad records in little_r format (`#1737 <http://github.com/dtcenter/MET/issues/1737>`_).
       * Create empty output files for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
 
+   * GIS Tools:
+
+      * Fix memory corruption bug in the gis_dump_dbf utility which causes it to abort at runtime (`#1777 <http://github.com/dtcenter/MET/issues/1777>`_).
+
+   * Grid-Diag Tool:
+
+      * Fix bug when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
+
+   * Grid-Stat Tool:
+
+      * **Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences** (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
+      * Correct the climatological CDF values in the NetCDF matched pairs output files and correct the climatological probability values for climatgological distribution percentile (CDP) threshold types (`#1638 <http://github.com/dtcenter/MET/issues/1638>`_).
+
+   * IODA2NC Tool (NEW):
+
+      * **Add the new ioda2nc tool** (`#1355 <http://github.com/dtcenter/MET/issues/1355>`_).
+
    * MADIS2NC Tool:
 
       * Clarify various error messages (`#1409 <http://github.com/dtcenter/MET/issues/1409>`_).
 
+   * MODE Tool:
+
+      * **Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area** (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).
+      * **Incremental development toward the Multivariate MODE tool** (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
+
    * PB2NC Tool:
 
       * Fix intermittent segfault when deriving PBL (`#1715 <http://github.com/dtcenter/MET/issues/1715>`_).
+
+   * Plot-Point-Obs Tool:
+
+      * **Overhaul Plot-Point-Obs to make it highly configurable** (`#213 <http://github.com/dtcenter/MET/issues/213>`_, `#1528 <http://github.com/dtcenter/MET/issues/1528>`_, and `#1052 <http://github.com/dtcenter/MET/issues/1052>`_).
+      * Support regridding option in the config file (`#1627 <http://github.com/dtcenter/MET/issues/1627>`_).
 
    * Point2Grid Tool:
 
@@ -295,15 +323,6 @@ MET Version 10.0.0 release notes (20210510)
       * Create empty output files for zero input observations instead of erroring out (`#1630 <http://github.com/dtcenter/MET/issues/1630>`_).
       * Improve the Point2Grid runtime performance (`#1421 <http://github.com/dtcenter/MET/issues/1421>`_).
       * Process point observations by variable name instead of GRIB code (`#1408 <http://github.com/dtcenter/MET/issues/1408>`_).
-
-   * GIS Tools:
-
-      * Fix memory corruption bug in the gis_dump_dbf utility which causes it to abort at runtime (`#1777 <http://github.com/dtcenter/MET/issues/1777>`_).
-
-   * Plot-Point-Obs Tool:
-
-      * **Overhaul Plot-Point-Obs to make it highly configurable** (`#213 <http://github.com/dtcenter/MET/issues/213>`_, `#1528 <http://github.com/dtcenter/MET/issues/1528>`_, and `#1052 <http://github.com/dtcenter/MET/issues/1052>`_).
-      * Support regridding option in the config file (`#1627 <http://github.com/dtcenter/MET/issues/1627>`_).
 
    * Point-Stat Tool:
 
@@ -314,11 +333,6 @@ MET Version 10.0.0 release notes (20210510)
       * Enhance the validation of masking regions to check for non-unique masking region names (`#1439 <http://github.com/dtcenter/MET/issues/1439>`_).
       * Fix Point-Stat runtime error for some CF-complaint NetCDF files (`#1782 <http://github.com/dtcenter/MET/issues/1782>`_).
 
-   * Grid-Stat Tool:
-
-      * **Add mpr_column and mpr_thresh configuration options to filter out matched pairs based on large fcst, obs, and climo differences** (`#1575 <http://github.com/dtcenter/MET/issues/1575>`_).
-      * Correct the climatological CDF values in the NetCDF matched pairs output files and correct the climatological probability values for climatgological distribution percentile (CDP) threshold types (`#1638 <http://github.com/dtcenter/MET/issues/1638>`_).
-
    * Stat-Analysis Tool:
 
       * **Process multiple output thresholds and write multiple output line types in a single aggregate_stat job** (`#1735 <http://github.com/dtcenter/MET/issues/1735>`_).
@@ -326,24 +340,6 @@ MET Version 10.0.0 release notes (20210510)
       * Add -fcst_init_inc/_exc and -fcst_valid_inc/_exc job command filtering options to Stat-Analysis (`#1135 <http://github.com/dtcenter/MET/issues/1135>`_).
       * Add -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
       * Fix Stat-Analysis failure when aggregating ECNT lines (`#1706 <http://github.com/dtcenter/MET/issues/1706>`_).
-
-   * Grid-Diag Tool:
-
-      * Fix bug when reading the same variable name from multiple data sources (`#1694 <http://github.com/dtcenter/MET/issues/1694>`_).
-
-   * MODE Tool:
-
-      * **Update the MODE AREA_RATIO output column to list the forecast area divided by the observation area** (`#1643 <http://github.com/dtcenter/MET/issues/1643>`_).
-      * **Incremental development toward the Multivariate MODE tool** (`#1282 <http://github.com/dtcenter/MET/issues/1282>`_, `#1284 <http://github.com/dtcenter/MET/issues/1284>`_, and `#1290 <http://github.com/dtcenter/MET/issues/1290>`_).
-
-   * TC-Pairs Tool:
-
-      * Fix to report the correct number of lines read from input track data files (`#1725 <http://github.com/dtcenter/MET/issues/1725>`_).
-      * Fix to read supported RI edeck input lines and ignore unsupported edeck probability line types (`#1768 <http://github.com/dtcenter/MET/issues/1768>`_).
-
-   * TC-Stat Tool:
-
-      * Add -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
 
    * TC-Gen Tool:
 
@@ -354,6 +350,11 @@ MET Version 10.0.0 release notes (20210510)
       * Enhance the matching logic and update several config options to support its S2S application (`#1714 <http://github.com/dtcenter/MET/issues/1714>`_).
       * Fix lead window filtering option (`#1465 <http://github.com/dtcenter/MET/issues/1465>`_).
 
-   * IODA2NC Tool:
+   * TC-Pairs Tool:
 
-      * **Add the new ioda2nc tool** (`#1355 <http://github.com/dtcenter/MET/issues/1355>`_).
+      * Fix to report the correct number of lines read from input track data files (`#1725 <http://github.com/dtcenter/MET/issues/1725>`_).
+      * Fix to read supported RI edeck input lines and ignore unsupported edeck probability line types (`#1768 <http://github.com/dtcenter/MET/issues/1768>`_).
+
+   * TC-Stat Tool:
+
+      * Add -column_exc job command option to exclude lines based on string values (`#1733 <http://github.com/dtcenter/MET/issues/1733>`_).
