@@ -10,38 +10,40 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MODE_PS_TABLE_DEFS__
-#define  __MODE_PS_TABLE_DEFS__
+#ifndef  __MODE_OBJECTS_FROM_NETCDF_H__
+#define  __MODE_OBJECTS_FROM_NETCDF_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_color.h"
+#include "two_d_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const Color black (  0,   0,   0);
-static const Color white (255, 255, 255);
-static const Color green (  0, 255,   0);
-static const Color blue  (  0,   0, 255);
-
-
-static Color light_green = blend_colors(green, white, 0.95);
-
-static Color blue1       = blend_colors(blue,  white, 0.95);
-static Color blue2       = blend_colors(blue,  white, 0.85);
-
-static Color light_gray  = blend_colors(white, black, 0.10);
-static Color dark_gray   = blend_colors(white, black, 0.50);
+   //
+   //  grabs the objects from a MODE output netcdf file
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MODE_PS_TABLE_DEFS__  */
+extern void objects_from_netcdf(const char * netcdf_filename, 
+                                bool do_clusters,     //  do we look at cluster objects or simple objects?
+                                BoolPlane & fcst_out, 
+                                BoolPlane & obs_out);
+                                
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __MODE_OBJECTS_FROM_NETCDF_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+

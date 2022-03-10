@@ -1240,6 +1240,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_summary/Makefile
                  src/libcode/vx_python3_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
+                 src/libcode/vx_bool_calc/Makefile
                  src/libcode/vx_pointdata_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile

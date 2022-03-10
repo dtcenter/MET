@@ -11,7 +11,12 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS    = mode
-mode_SOURCES = mode.cc \
+mode_SOURCES = mode_usage.cc \
+	mode_frontend.cc \
+	multivar_frontend.cc \
+	mode.cc \
+	combine_boolplanes.cc \
+	objects_from_netcdf.cc \
 	mode_ps_file.cc \
 	plot_engine.cc \
 	page_1.cc \
@@ -45,6 +50,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_bool_calc \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \

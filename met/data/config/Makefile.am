@@ -30,6 +30,7 @@ config_DATA = \
 	Madis2NcConfig_default \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \
+	MODEMultivarConfig_default \
 	MTDConfig_default \
 	PB2NCConfig_default \
 	PointStatConfig_default \

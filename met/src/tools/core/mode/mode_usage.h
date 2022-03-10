@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -9,29 +7,27 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+#ifndef  __MODE_USAGE_H__
+#define  __MODE_USAGE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __FILE_EXISTS_H__
-#define  __FILE_EXISTS_H__
+extern void both_usage();
+
+extern void singlevar_usage();
+
+extern void multivar_usage();
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool file_exists(const char * path);
-
-extern bool directory_exists(const char * path);
+#endif   /*  __MODE_USAGE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-#endif   /*  __FILE_EXISTS_H__  */
-
-
-////////////////////////////////////////////////////////////////////////
-
-
