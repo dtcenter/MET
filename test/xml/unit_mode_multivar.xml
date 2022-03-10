@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/model_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="mode_multivar_FAKE_DATA">
+    <exec>echo "&DATA_DIR_MODEL;/mode_multivar/alpha_fcst.nc \
+                &DATA_DIR_MODEL;/mode_multivar/beta_fcst.nc \
+                &DATA_DIR_MODEL;/mode_multivar/gamma_fcst.nc" \
+                > &OUTPUT_DIR;/mode_multivar/input_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/mode_multivar/alpha_obs.nc \
+                &DATA_DIR_MODEL;/mode_multivar/beta_obs.nc \
+                &DATA_DIR_MODEL;/mode_multivar/gamma_obs.nc" \
+                > &OUTPUT_DIR;/mode_multivar/input_obs_file_list; \
+          &MET_BIN;/mode</exec>
+    <param> \
+      &OUTPUT_DIR;/mode_multivar/input_fcst_file_list \
+      &OUTPUT_DIR;/mode_multivar/input_obs_file_list \
+      &CONFIG_DIR;/MODEConfig_multivar_fake_data \
+      -outdir &OUTPUT_DIR;/mode_multivar \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/f_super.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/o_super.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

@@ -1997,13 +1997,22 @@ void process_pbfile(int i_pb) {
         << "Total observations retained or derived\t= "
         << (n_file_obs + n_derived_obs) << "\n";
 
-   if (cal_cape || cal_mlcape) {
-      mlog << Debug(3) << "\nDerived CAPE = " << (cape_count + mlcape_count)
-           << "\tZero = " << (cape_cnt_zero_values + mlcape_cnt_zero_values)
+   if (cal_cape) {
+      mlog << Debug(3) << "\nDerived CAPE = " << cape_count
+           << "\tZero = " << cape_cnt_zero_values
            << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
-           << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
-           << "\n\tfiltered: " << (cape_cnt_missing_values + mlcape_cnt_missing_values) << ", "
-           << (cape_cnt_too_big + mlcape_cnt_too_big)
+           << "\tNo vertical levels = " << cape_cnt_surface_msgs
+           << "\n\tfiltered: " << cape_cnt_missing_values << ", "
+           << cape_cnt_too_big
+           << "\n";
+   }
+   if (cal_mlcape) {
+      mlog << Debug(3) << "\nDerived MLCAPE = " << mlcape_count
+           << "\tZero = " << mlcape_cnt_zero_values
+           << "\n\tnot derived: No cape inputs = " << cape_cnt_no_levels
+           << "\tNo vertical levels = " << cape_cnt_surface_msgs
+           << "\n\tfiltered: " << mlcape_cnt_missing_values << ", "
+           << mlcape_cnt_too_big
            << "\n";
    }
 

@@ -23,6 +23,8 @@
 
 extern bool file_exists(const char * path);
 
+extern bool directory_exists(const char * path);
+
 
 ////////////////////////////////////////////////////////////////////////
 

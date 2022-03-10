@@ -55,6 +55,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_ensemble_stat.xml \
           unit_stat_analysis_es.xml \
           unit_mode.xml \
+          unit_mode_multivar.xml \
           unit_mode_analysis.xml \
           unit_plot_point_obs.xml \
           unit_plot_data_plane.xml \

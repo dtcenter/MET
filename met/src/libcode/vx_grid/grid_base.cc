@@ -299,6 +299,7 @@ rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
+tc  = (const TcrmwData *)         0;
 
 clear();
 
@@ -321,6 +322,7 @@ if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
 if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
+if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 
 return;
 

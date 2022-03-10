@@ -93,7 +93,7 @@ class MetPointData {
       bool use_arr_vars;
 
       MetPointHeader header_data;
-      MetPointObsData *obs_data = 0;
+      MetPointObsData *obs_data;
 
       void init_from_scratch();
 

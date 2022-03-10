@@ -53,9 +53,15 @@ void ModeConfInfo::init_from_scratch()
 
 {
 
-   // Initialize pointers
-   fcst_info = (VarInfo *) 0;
-   obs_info  = (VarInfo *) 0;
+   N_fields = 0;
+
+   Field_Index = 0;
+
+   fcst_array = 0;
+    obs_array = 0;
+
+   fcst_array = 0;
+    obs_array = 0;
 
    clear();
 
@@ -80,29 +86,10 @@ void ModeConfInfo::clear()
 
    grid_res = bad_data_double;
 
-   fcst_conv_radius_array.clear();
-    obs_conv_radius_array.clear();
+   Field_Index = 0;
 
-   fcst_conv_radius = bad_data_int;
-   obs_conv_radius  = bad_data_int;
-
-   fcst_conv_thresh_array.clear();
-   obs_conv_thresh_array.clear();
-
-   fcst_merge_thresh_array.clear();
-   obs_merge_thresh_array.clear();
-
-   fcst_conv_thresh.clear();
-   obs_conv_thresh.clear();
-
-   fcst_vld_thresh = bad_data_double;
-   obs_vld_thresh = bad_data_double;
-
-   fcst_filter_attr_map.clear();
-   obs_filter_attr_map.clear();
-
-   fcst_merge_flag = MergeType_None;
-   obs_merge_flag = MergeType_None;
+   fcst_multivar_logic.clear();
+    obs_multivar_logic.clear();
 
    match_flag = MatchType_None;
 
@@ -162,8 +149,13 @@ void ModeConfInfo::clear()
    quilt = false;
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
+   if ( fcst_array )  { delete [] fcst_array;  fcst_array = 0; }
+   if (  obs_array )  { delete []  obs_array;   obs_array = 0; }
+
+   Fcst = 0;
+    Obs = 0;
+
+   N_fields = 0;
 
    return;
 
@@ -171,7 +163,7 @@ void ModeConfInfo::clear()
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::read_config(const char *default_file_name, const char *user_file_name)
+void ModeConfInfo::read_config(const char * default_file_name, const char * user_file_name)
 
 {
 
@@ -184,6 +176,8 @@ void ModeConfInfo::read_config(const char *default_file_name, const char *user_f
 
    // Read the user-specified config file
    conf.read(user_file_name);
+
+   get_multivar_programs();
 
    nc_info.set_compress_level(conf.nc_compression());
 
@@ -198,11 +192,11 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
 {
 
-int j, n;
-VarInfoFactory info_factory;
-Dictionary *fcst_dict = (Dictionary *) 0;
-Dictionary *obs_dict  = (Dictionary *) 0;
-Dictionary *dict      = (Dictionary *) 0;
+int j, k, n;
+// VarInfoFactory info_factory;
+Dictionary * fcst_dict = (Dictionary *) 0;
+Dictionary * obs_dict  = (Dictionary *) 0;
+Dictionary * dict      = (Dictionary *) 0;
 PlotInfo plot_info;
 
       // Dump the contents of the config file
@@ -242,142 +236,129 @@ PlotInfo plot_info;
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
 
-      // Allocate new VarInfo objects
+   read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
+   read_fields ( obs_array,  obs_dict, otype, 'O');   //  the order is important here
 
-   fcst_info = info_factory.new_var_info(ftype);
-   obs_info  = info_factory.new_var_info(otype);
-
-      // Set the dictionaries
-
-   fcst_info->set_dict(*(fcst_dict->lookup_dictionary(conf_key_field)));
-   obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
+   Fcst = fcst_array;    //  + 0
+    Obs =  obs_array;    //  + 0
 
       // Dump the contents of the VarInfo objects
 
    if(mlog.verbosity_level() >= 5)  {
-      mlog << Debug(5)
-           << "Parsed forecast field:\n";
-      fcst_info->dump(cout);
-      mlog << Debug(5)
-           << "Parsed observation field:\n";
-      obs_info->dump(cout);
+      for (j=0; j<N_fields; ++j)  {
+         mlog << Debug(5)
+              << "Parsed forecast field:\n";
+         fcst_array[j].var_info->dump(cout);
+         mlog << Debug(5)
+              << "Parsed observation field:\n";
+         obs_array[j].var_info->dump(cout);
+      }   //  for j
    }
 
       // No support for wind direction
 
-   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction())  {
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "the wind direction field may not be verified "
-           << "using MODE.\n\n";
-      exit(1);
+   for (j=0; j<N_fields; ++j)  {
+      if(fcst_array[j].var_info->is_wind_direction() || obs_array[j].var_info->is_wind_direction())  {
+         mlog << Error << "\nModeConfInfo::process_config() -> "
+              << "the wind direction field may not be verified "
+              << "using MODE.\n\n";
+         exit(1);
+      }
    }
 
-      // Conf: fcst.raw_thresh and obs.raw_thresh are deprecated
+   for (j=0; j<N_fields; ++j)  {
 
-   if ( fcst_dict->lookup(conf_key_raw_thresh) ||
-         obs_dict->lookup(conf_key_raw_thresh) )  {
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
-           << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
-           << conf_key_censor_val << "\" instead.\n\n";
-      exit(1);
-   }
-
-      // Conf: fcst.conv_radius and obs.conv_radius
-
-   fcst_conv_radius_array = fcst_dict->lookup_int_array(conf_key_conv_radius);
-    obs_conv_radius_array =  obs_dict->lookup_int_array(conf_key_conv_radius);
-
-   if ( fcst_conv_radius_array.n_elements() != obs_conv_radius_array.n_elements() )  {
-
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "fcst and obs convolution radius arrays need to be the same size\n\n";
-
-      exit ( 1 );
-
-   }
-
-      // Check that fcst_conv_radius and obs_conv_radius are non-negative
-
-   n = fcst_conv_radius_array.n_elements();   //  same as obs_conv_radius_array.n_elements()
-
-   for (j=0; j<n; ++j)  {
-
-      if(fcst_conv_radius_array[j] < 0 || obs_conv_radius_array[j] < 0) {
+      if ( fcst_array[j].conv_radius_array.n_elements() != obs_array[j].conv_radius_array.n_elements() )  {
 
          mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "fcst_conv_radius (" << fcst_conv_radius_array[j]
-              << ") and obs_conv_radius (" << obs_conv_radius_array[j]
-              << ") must be non-negative\n\n";
+              << "fcst and obs convolution radius arrays need to be the same size\n\n";
 
-         exit(1);
+         exit ( 1 );
 
       }
 
    }
 
-   if ( fcst_conv_radius_array.n_elements() == 1 )  fcst_conv_radius = fcst_conv_radius_array[0];
-   if (  obs_conv_radius_array.n_elements() == 1 )   obs_conv_radius =  obs_conv_radius_array[0];
+      // Check that fcst_conv_radius and obs_conv_radius are non-negative
 
-      // Conf: fcst.conv_thresh and obs.conv_thresh
+   for (j=0; j<N_fields; ++j)  {
 
-   fcst_conv_thresh_array = fcst_dict->lookup_thresh_array(conf_key_conv_thresh);
-    obs_conv_thresh_array =  obs_dict->lookup_thresh_array(conf_key_conv_thresh);
+      n = fcst_array[j].conv_radius_array.n_elements();   //  same as obs_conv_radius_array.n_elements()
 
-   if ( fcst_conv_thresh_array.n_elements() != obs_conv_thresh_array.n_elements() )  {
+      for (k=0; k<n; ++k)  {
 
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "fcst and obs convolution threshold arrays need to be the same size\n\n";
+         if(fcst_array[j].conv_radius_array[k] < 0 || obs_array[j].conv_radius_array[k] < 0) {
 
-      exit ( 1 );
+            mlog << Error << "\nModeConfInfo::process_config() -> "
+                 << "fcst_conv_radius (" << fcst_array[j].conv_radius_array[k]
+                 << ") and obs_conv_radius (" << obs_array[j].conv_radius_array[k]
+                 << ") must be non-negative\n\n";
 
-   }
+            exit(1);
 
-   if ( fcst_conv_thresh_array.n_elements() == 1 )  fcst_conv_thresh = fcst_conv_thresh_array[0];
-   if (  obs_conv_thresh_array.n_elements() == 1 )   obs_conv_thresh =  obs_conv_thresh_array[0];
+         }
 
-      // Conf: fcst.vld_thresh and obs.vld_thresh
+      }   //  for k
 
-   fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
-   obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
+   }   //  for j
 
-      // Conf: fcst.filter_attr_name and fcst.filter_attr_thresh
-      //        obs.filter_attr_name and  obs.filter_attr_thresh
 
-   fcst_filter_attr_map = parse_conf_filter_attr_map(fcst_dict);
-    obs_filter_attr_map = parse_conf_filter_attr_map(obs_dict);
+   for (j=0; j<N_fields; ++j)  {
 
-      // Conf: fcst.merge_flag and obs.merge_flag
-
-   fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
-   obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
-
-      // Conf: fcst.merge_thresh and obs.merge_thresh
-
-   fcst_merge_thresh_array = fcst_dict->lookup_thresh_array(conf_key_merge_thresh);
-    obs_merge_thresh_array =  obs_dict->lookup_thresh_array(conf_key_merge_thresh);
-
-   if ( need_fcst_merge_thresh() && (fcst_merge_thresh_array.n_elements() != fcst_conv_thresh_array.n_elements()) )  {
-
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "fcst conv thresh and fcst merge thresh arrays need to be the same size\n\n";
-
-      exit ( 1 );
+      if ( fcst_array[j].conv_radius_array.n_elements() == 1 )  fcst_array[j].conv_radius = fcst_array[j].conv_radius_array[0];
+      if (  obs_array[j].conv_radius_array.n_elements() == 1 )   obs_array[j].conv_radius =  obs_array[j].conv_radius_array[0];
 
    }
 
+   for (j=0; j<N_fields; ++j)  {
 
-   if ( need_obs_merge_thresh() && (obs_merge_thresh_array.n_elements() != obs_conv_thresh_array.n_elements()) )  {
+      if ( fcst_array[j].conv_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements() )  {
 
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "obs conv thresh and obs merge thresh arrays need to be the same size\n\n";
+         mlog << Error << "\nModeConfInfo::process_config() -> "
+              << "fcst and obs convolution threshold arrays need to be the same size\n\n";
 
-      exit ( 1 );
+         exit ( 1 );
+
+      }
 
    }
 
-   if ( fcst_merge_thresh_array.n_elements() == 1 )  fcst_merge_thresh = fcst_merge_thresh_array[0];
-   if (  obs_merge_thresh_array.n_elements() == 1 )   obs_merge_thresh =  obs_merge_thresh_array[0];
+   for (j=0; j<N_fields; ++j)  {
+
+      if ( fcst_array[j].conv_thresh_array.n_elements() == 1 )  fcst_array[j].conv_thresh = fcst_array[j].conv_thresh_array[0];
+      if (  obs_array[j].conv_thresh_array.n_elements() == 1 )   obs_array[j].conv_thresh =  obs_array[j].conv_thresh_array[0];
+
+   }
+
+   for (j=0; j<N_fields; ++j)  {
+
+      if ( fcst_array[j].need_merge_thresh() && (fcst_array[j].merge_thresh_array.n_elements() != fcst_array[j].conv_thresh_array.n_elements()) )  {
+
+         mlog << Error << "\nModeConfInfo::process_config() -> "
+              << "fcst conv thresh and fcst merge thresh arrays need to be the same size\n\n";
+
+         exit ( 1 );
+
+      }
+
+
+      if ( obs_array[j].need_merge_thresh() && (obs_array[j].merge_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements()) )  {
+
+         mlog << Error << "\nModeConfInfo::process_config() -> "
+              << "obs conv thresh and obs merge thresh arrays need to be the same size\n\n";
+
+         exit ( 1 );
+
+      }
+
+   }   //  for j
+
+   for (j=0; j<N_fields; ++j)  {
+
+      if ( fcst_array[j].merge_thresh_array.n_elements() == 1 )  fcst_array[j].merge_thresh = fcst_array[j].merge_thresh_array[0];
+      if (  obs_array[j].merge_thresh_array.n_elements() == 1 )   obs_array[j].merge_thresh =  obs_array[j].merge_thresh_array[0];
+
+   }
 
       // Conf: mask_missing_flag
 
@@ -389,16 +370,21 @@ PlotInfo plot_info;
 
       // Check that match_flag is set between 0 and 3
 
-   if(match_flag == MatchType_None &&
-      (fcst_merge_flag != MergeType_None || obs_merge_flag  != MergeType_None) ) {
-      mlog << Warning << "\nModeConfInfo::process_config() -> "
-           << "When matching is disabled (match_flag = "
-           << matchtype_to_string(match_flag)
-           << ") but merging is requested (fcst_merge_flag = "
-           << mergetype_to_string(fcst_merge_flag)
-           << ", obs_merge_flag = "
-           << mergetype_to_string(obs_merge_flag)
-           << ") any merging information will be discarded.\n\n";
+   for (j=0; j<N_fields; ++j)  {
+
+      if(match_flag == MatchType_None &&
+         (fcst_array[j].merge_flag != MergeType_None || obs_array[j].merge_flag  != MergeType_None) ) {
+         mlog << Warning 
+              << "\nModeConfInfo::process_config() -> "
+              << "When matching is disabled (match_flag = "
+              << matchtype_to_string(match_flag)
+              << ") but merging is requested (fcst_merge_flag = "
+              << mergetype_to_string(fcst_array[j].merge_flag)
+              << ", obs_merge_flag = "
+              << mergetype_to_string(obs_array[j].merge_flag)
+              << ") any merging information will be discarded.\n\n";
+      }
+
    }
 
       // Conf: max_centroid_dist
@@ -525,11 +511,11 @@ PlotInfo plot_info;
 
       // Conf: fcst_raw_plot
 
-   fcst_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
+   fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
 
       // Conf: obs_raw_plot
 
-   obs_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
+    obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
 
       // Conf: object_plot
 
@@ -561,9 +547,122 @@ PlotInfo plot_info;
 
       // Conf: shift_right
 
-   shift_right = fcst_dict->lookup_int(conf_key_shift_right);
+    shift_right = fcst_dict->lookup_int(conf_key_shift_right);
 
    return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::read_fields (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType type, char _fo)
+
+{
+
+const DictionaryEntry * ee = dict->lookup(conf_key_field);
+
+if ( !ee )  {
+
+   mlog << "\n\n ModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+
+   exit ( 1 );
+
+}
+
+const Dictionary * field = ee->dict();
+
+const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
+
+info_array = new Mode_Field_Info [N];
+
+N_fields = N;
+
+
+if ( field->is_array() ) {
+
+   int j, k;
+   const DictionaryEntry * e = 0;
+   const Dictionary & D = *field;
+
+   if ( (N_fields > 0) && (N != N_fields) )  {
+
+      mlog << Error
+           << "\n\n  ModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
+
+      exit ( 1 );
+
+   }
+
+   for (j=0; j<N; ++j)  {
+
+      e = D[j];
+
+      if ( (e->type() != DictionaryType) && (e->type() != ArrayType) )  {
+
+         mlog << Error
+              << "\n\n  ModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
+
+         exit ( 1 );
+
+      }
+
+      info_array[j].set(true, j, e->dict_value(), &conf, type, _fo, false);
+
+      if ( j == 0 )  {
+
+         for (k=1; k<N; ++k)  {   //  k starts at one, here
+
+            info_array[k] = info_array[0];
+
+         }   //  for k
+
+      }
+
+   }   //  for j
+
+   return;
+
+}   //  if is array
+
+   //
+   //  nope, traditional mode
+   //
+
+info_array[0].set(false, 0, dict, &conf, type, _fo);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_field_index(int k)
+
+{
+
+if ( (k < 0) || (k >= N_fields) )  {
+
+   mlog << Error
+        << "\n\n  ModeConfInfo::set_field_index(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+Field_Index = k;
+
+Fcst = fcst_array + k;
+ Obs =  obs_array + k;
+
+return;
 
 }
 
@@ -574,15 +673,16 @@ PlotInfo plot_info;
 void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
                                    const DataPlane &o_dp)
 
+
 {
 
    //
    // Compute percentiles for forecast and observation thresholds.
    //
-   if( !fcst_conv_thresh_array.need_perc()  &&
-       !obs_conv_thresh_array.need_perc()   &&
-       !fcst_merge_thresh_array.need_perc() &&
-       !obs_merge_thresh_array.need_perc() )  return;
+   if( !(Fcst->conv_thresh_array.need_perc()  ) &&
+       !(Obs->conv_thresh_array.need_perc()   ) &&
+       !(Fcst->merge_thresh_array.need_perc() ) &&
+       !(Obs->merge_thresh_array.need_perc()  ) )  return;
 
    //
    // Sort the input arrays
@@ -604,18 +704,21 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
    //
    // Compute percentiles
    //
-    fcst_conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-                                    &fcst_conv_thresh_array,
-                                     &obs_conv_thresh_array);
-     obs_conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-                                    &fcst_conv_thresh_array,
-                                     &obs_conv_thresh_array);
-   fcst_merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-                                    &fcst_merge_thresh_array,
-                                     &obs_merge_thresh_array);
-    obs_merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-                                    &fcst_merge_thresh_array,
-                                     &obs_merge_thresh_array);
+    Fcst->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                     &(Fcst->conv_thresh_array),
+                                      &(Obs->conv_thresh_array));
+
+     Obs->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                     &(Fcst->conv_thresh_array),
+                                      &(Obs->conv_thresh_array));
+
+   Fcst->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                     &(Fcst->merge_thresh_array),
+                                      &(Obs->merge_thresh_array));
+
+    Obs->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                     &(Fcst->merge_thresh_array),
+                                      &(Obs->merge_thresh_array));
 
    return;
 
@@ -703,17 +806,18 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
    //    the same number of elements
    //
 
-if ( (k < 0) || (k >= fcst_conv_radius_array.n_elements()) )  {
+if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
 
-   mlog << Error << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+   mlog << Error 
+        << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
         << "range check error\n\n";
 
    exit ( 1 );
 
 }
 
-fcst_conv_radius = fcst_conv_radius_array[k];
- obs_conv_radius =  obs_conv_radius_array[k];
+Fcst->conv_radius = Fcst->conv_radius_array[k];
+ Obs->conv_radius =  Obs->conv_radius_array[k];
 
 return;
 
@@ -732,17 +836,18 @@ void ModeConfInfo::set_conv_thresh_by_index(int k)
    //    the same number of elements
    //
 
-if ( (k < 0) || (k >= fcst_conv_thresh_array.n_elements()) )  {
+if ( (k < 0) || (k >= Fcst->conv_thresh_array.n_elements()) )  {
 
-   mlog << Error << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+   mlog << Error 
+        << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
         << "range check error\n\n";
 
    exit ( 1 );
 
 }
 
-fcst_conv_thresh = fcst_conv_thresh_array[k];
- obs_conv_thresh =  obs_conv_thresh_array[k];
+Fcst->conv_thresh = Fcst->conv_thresh_array[k];
+ Obs->conv_thresh =  Obs->conv_thresh_array[k];
 
 return;
 
@@ -756,16 +861,7 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
 {
 
-if ( (k < 0) || (k >= fcst_merge_thresh_array.n_elements()) )  {
-
-   mlog << Error << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
-        << "range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-fcst_merge_thresh = fcst_merge_thresh_array[k];
+Fcst->set_merge_thresh_by_index(k);
 
 return;
 
@@ -779,16 +875,7 @@ void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
 {
 
-if ( (k < 0) || (k >= obs_merge_thresh_array.n_elements()) )  {
-
-   mlog << Error << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
-        << "range check error\n\n";
-
-   exit ( 1 );
-
-}
-
- obs_merge_thresh =  obs_merge_thresh_array[k];
+Obs->set_merge_thresh_by_index(k);
 
 return;
 
@@ -806,6 +893,75 @@ const int nr = n_conv_radii();
 const int nt = n_conv_threshs();
 
 return ( nr*nt );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool ModeConfInfo::is_multivar()
+
+{
+
+const DictionaryEntry * e = conf.lookup("fcst");
+
+if ( e->type() != DictionaryType )  {
+
+   mlog << Error
+        << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
+
+   exit ( 1 );
+
+}
+
+
+const DictionaryEntry * e2 = e->dict()->lookup("field");
+bool status = false;
+
+switch ( e2->type() )  {
+
+   case ArrayType:        status = true;   break;
+   case DictionaryType:   status = false;  break;
+
+   default:
+      mlog << Error
+           << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
+      exit ( 1 );
+      break;
+
+}
+
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::get_multivar_programs()
+
+{
+
+Dictionary * dict = (Dictionary *) 0;
+
+fcst_multivar_logic.clear();
+ obs_multivar_logic.clear();
+
+
+dict = conf.lookup_dictionary(conf_key_fcst);
+
+if ( dict->lookup(conf_key_multivar_logic) )  fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+
+dict = conf.lookup_dictionary(conf_key_obs);
+
+if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+
+
+
+return;
 
 }
 

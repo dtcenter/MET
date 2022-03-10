@@ -658,6 +658,12 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
+//  for use with mode multivar
+//
+
+static const char conf_key_multivar_logic   [] = "multivar_logic";
+
+//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
