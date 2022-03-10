@@ -104,7 +104,7 @@ MET Version 10.1.0 release notes (20220314)
 
    * Ensemble-Stat Tool:
 
-      * **Enhance Ensemble-Stat to compute probabilistic statistics for user-defined or climatology-based thresholds**(`#1259 <https://github.com/dtcenter/MET/issues/1259>`_).
+      * **Enhance Ensemble-Stat to compute probabilistic statistics for user-defined or climatology-based thresholds** (`#1259 <https://github.com/dtcenter/MET/issues/1259>`_).
       * **Enhance Ensemble-Stat to apply the HiRA method to ensembles** (`#1583 <https://github.com/dtcenter/MET/issues/1583>`_ and `#2045 <https://github.com/dtcenter/MET/issues/2045>`_).
       * **Enhance Ensemble-Stat and Gen-Ens-Prod to read all ensemble members from a single input file** (`#1695 <https://github.com/dtcenter/MET/issues/1695>`_).
       * **Add logic to Ensemble-Stat to handle an ensemble control member** (`#1905 <https://github.com/dtcenter/MET/issues/1905>`_).
