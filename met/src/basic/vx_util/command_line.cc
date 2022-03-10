@@ -652,6 +652,52 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void CommandLine::set(const StringArray & a)
+
+{
+
+clear();
+
+int j;
+ConcatString s;
+
+
+ProgramName = get_short_name(a[0].c_str());
+
+for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
+
+   s = a[j];
+
+   args.add(s);
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::set(const StringArray & a, UsageFunction uf)
+
+{
+
+set(a);
+
+set_usage(uf);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void CommandLine::shift_down(int pos, int k)
 
 {

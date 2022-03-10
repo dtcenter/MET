@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,38 +10,55 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MODE_PS_TABLE_DEFS__
-#define  __MODE_PS_TABLE_DEFS__
+#ifndef  __MODE_DATA_FIELD_H__
+#define  __MODE_DATA_FIELD_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_color.h"
+#include <iostream>
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const Color black (  0,   0,   0);
-static const Color white (255, 255, 255);
-static const Color green (  0, 255,   0);
-static const Color blue  (  0,   0, 255);
+class ModeDataField {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const ModeDataField &);
+
+   public:
+
+      ModeDataField();
+     ~ModeDataField();
+      ModeDataField(const ModeDataField &);
+      ModeDataField & operator=(const ModeDataField &);
+
+      void clear();
+
+      void dump(ostream &, int depth = 0) const;
 
 
-static Color light_green = blend_colors(green, white, 0.95);
 
-static Color blue1       = blend_colors(blue,  white, 0.95);
-static Color blue2       = blend_colors(blue,  white, 0.85);
+      
 
-static Color light_gray  = blend_colors(white, black, 0.10);
-static Color dark_gray   = blend_colors(white, black, 0.50);
+
+
+
+
+};
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MODE_PS_TABLE_DEFS__  */
+#endif   /*  __MODE_DATA_FIELD_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
