@@ -1,9 +1,8 @@
 MET Release Notes
 =================
 
-When applicable, release notes are followed by the GitHub issue number which
-describes the bugfix, enhancement, or new feature (
-`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
+When applicable, release notes are followed by the GitHub issue number which describes the bugfix,
+enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
 MET Version 10.1.0 release notes (20220314)
