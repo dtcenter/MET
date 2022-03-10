@@ -53,10 +53,6 @@ void ModeConfInfo::init_from_scratch()
 
 {
 
-   // Initialize pointers
-   // fcst_info = (VarInfo *) 0;
-   // obs_info  = (VarInfo *) 0;
-
    N_fields = 0;
 
    Field_Index = 0;
@@ -94,30 +90,6 @@ void ModeConfInfo::clear()
 
    fcst_multivar_logic.clear();
     obs_multivar_logic.clear();
-
-   // fcst_conv_radius_array.clear();
-   //  obs_conv_radius_array.clear();
-
-   // fcst_conv_radius = bad_data_int;
-   // obs_conv_radius  = bad_data_int;
-
-   // fcst_conv_thresh_array.clear();
-   // obs_conv_thresh_array.clear();
-
-   // fcst_merge_thresh_array.clear();
-   // obs_merge_thresh_array.clear();
-
-   // fcst_conv_thresh.clear();
-   // obs_conv_thresh.clear();
-
-   // fcst_vld_thresh = bad_data_double;
-   // obs_vld_thresh = bad_data_double;
-
-   // fcst_filter_attr_map.clear();
-   // obs_filter_attr_map.clear();
-
-   // fcst_merge_flag = MergeType_None;
-   // obs_merge_flag = MergeType_None;
 
    match_flag = MatchType_None;
 
@@ -176,11 +148,7 @@ void ModeConfInfo::clear()
 
    quilt = false;
 
-
    // Deallocate memory
-   // if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
-   // if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
-
    if ( fcst_array )  { delete [] fcst_array;  fcst_array = 0; }
    if (  obs_array )  { delete []  obs_array;   obs_array = 0; }
 
@@ -268,23 +236,11 @@ PlotInfo plot_info;
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
 
-
-//  X
    read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
    read_fields ( obs_array,  obs_dict, otype, 'O');   //  the order is important here
 
    Fcst = fcst_array;    //  + 0
     Obs =  obs_array;    //  + 0
-
-      // Allocate new VarInfo objects
-
-// *X  fcst_info = info_factory.new_var_info(ftype);
-// *X  obs_info  = info_factory.new_var_info(otype);
-
-      // Set the dictionaries
-
-// *X  fcst_info->set_dict(*(fcst_dict->lookup_dictionary(conf_key_field)));
-// *X  obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
 
       // Dump the contents of the VarInfo objects
 
@@ -309,22 +265,6 @@ PlotInfo plot_info;
          exit(1);
       }
    }
-
-      // Conf: fcst.raw_thresh and obs.raw_thresh are deprecated
-
-// *X  if ( fcst_dict->lookup(conf_key_raw_thresh) ||
-// *X        obs_dict->lookup(conf_key_raw_thresh) )  {
-// *X     mlog << Error << "\nModeConfInfo::process_config() -> "
-// *X          << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
-// *X          << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
-// *X          << conf_key_censor_val << "\" instead.\n\n";
-// *X     exit(1);
-// *X  }
-
-      // Conf: fcst.conv_radius and obs.conv_radius
-
-// *X  fcst_conv_radius_array = fcst_dict->lookup_int_array(conf_key_conv_radius);
-// *X   obs_conv_radius_array =  obs_dict->lookup_int_array(conf_key_conv_radius);
 
    for (j=0; j<N_fields; ++j)  {
 
@@ -370,11 +310,6 @@ PlotInfo plot_info;
 
    }
 
-      // Conf: fcst.conv_thresh and obs.conv_thresh
-
-// *X  fcst_conv_thresh_array = fcst_dict->lookup_thresh_array(conf_key_conv_thresh);
-// *X   obs_conv_thresh_array =  obs_dict->lookup_thresh_array(conf_key_conv_thresh);
-
    for (j=0; j<N_fields; ++j)  {
 
       if ( fcst_array[j].conv_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements() )  {
@@ -388,34 +323,12 @@ PlotInfo plot_info;
 
    }
 
-
    for (j=0; j<N_fields; ++j)  {
 
       if ( fcst_array[j].conv_thresh_array.n_elements() == 1 )  fcst_array[j].conv_thresh = fcst_array[j].conv_thresh_array[0];
       if (  obs_array[j].conv_thresh_array.n_elements() == 1 )   obs_array[j].conv_thresh =  obs_array[j].conv_thresh_array[0];
 
    }
-
-      // Conf: fcst.vld_thresh and obs.vld_thresh
-
-// *X  fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
-// *X  obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
-
-      // Conf: fcst.filter_attr_name and fcst.filter_attr_thresh
-      //        obs.filter_attr_name and  obs.filter_attr_thresh
-
-// *X  fcst_filter_attr_map = parse_conf_filter_attr_map(fcst_dict);
-// *X   obs_filter_attr_map = parse_conf_filter_attr_map(obs_dict);
-
-      // Conf: fcst.merge_flag and obs.merge_flag
-
-// *X  fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
-// *X  obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
-
-      // Conf: fcst.merge_thresh and obs.merge_thresh
-
-// *X  fcst_merge_thresh_array = fcst_dict->lookup_thresh_array(conf_key_merge_thresh);
-// *X   obs_merge_thresh_array =  obs_dict->lookup_thresh_array(conf_key_merge_thresh);
 
    for (j=0; j<N_fields; ++j)  {
 
@@ -598,12 +511,9 @@ PlotInfo plot_info;
 
       // Conf: fcst_raw_plot
 
-// *X  
    fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
 
       // Conf: obs_raw_plot
-
-// *X  
 
     obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
 
@@ -637,7 +547,6 @@ PlotInfo plot_info;
 
       // Conf: shift_right
 
-// *X  
     shift_right = fcst_dict->lookup_int(conf_key_shift_right);
 
    return;
