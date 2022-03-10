@@ -170,7 +170,6 @@ class ModeConfInfo {
       bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
       bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
       bool             ps_plot_flag;           // Flag for the output PostScript image file
-      // bool             nc_pairs_flag;          // output NetCDF file
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
       FieldType        mask_missing_flag;      // Mask missing data between fcst and obs
@@ -234,17 +233,8 @@ class ModeConfInfo {
 inline int ModeConfInfo::n_conv_radii() const { return ( Fcst->conv_radius_array.n_elements() ); }   //  should be the same as
                                                                                                      //  obs_conv_radius_array.n_elements()
 
-
 inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_array.n_elements() ); }   //  should be the same as
                                                                                                        //  obs_conv_thresh_array.n_elements()
-
-
-// inline int ModeConfInfo::n_fcst_merge_threshs () const { return ( fcst->merge_thresh_array.n_elements() ); }
-// inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs->merge_thresh_array.n_elements() ); }
-
-
-// inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst->merge_flag == MergeType_Both) || (fcst->merge_flag == MergeType_Thresh) ); }
-// inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs->merge_flag == MergeType_Both) || ( obs->merge_flag == MergeType_Thresh) ); }
 
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
 

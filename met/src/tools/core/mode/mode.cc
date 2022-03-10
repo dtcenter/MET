@@ -123,16 +123,41 @@ int main(int argc, char * argv [])
 
 {
 
-if ( argc == 1 )  both_usage();
-
-int j;
+int j, n;
 int status;
 ModeConfInfo config;
 StringArray Argv;
 string s;
 bool has_field_index = false;
-const char * const user_config_filename = argv[3];
+const char * user_config_filename = 0;
 
+for (j=0,n=0; j<argc; ++j)  {
+
+   //
+   //  all options take exactly one argument
+   //
+
+   if ( argv[j][0] == '-' )  j++;
+   else                      n++;
+
+   //
+   //  the config file is the 4th required argv item
+   //
+
+   if ( n == 4 )  {
+
+      user_config_filename = argv[j];
+      break;
+
+   }
+
+}
+
+   //
+   //  check for enough required arguments
+   //
+
+if ( !user_config_filename )  both_usage();
 
 for (j=0; j<argc; ++j)  {
 
