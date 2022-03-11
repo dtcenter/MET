@@ -64,4 +64,5 @@ EXTRA_DIST = mode_exec.h \
 	mode_ps_file.h \
 	mode_ps_table_defs.h \
 	mode_usage.h \
+	combine_boolplanes.h \
 	objects_from_netcdf.h
