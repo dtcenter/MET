@@ -280,14 +280,14 @@ Required arguments for point_stat
 
 1. The **fcst_file** argument names the gridded file in either GRIB or NetCDF containing the model data to be verified.
 
-2. The **obs_file** argument indicates the NetCDF file (output of PB2NC or ASCII2NC) containing the point observations to be used for verifying the model.
+2. The **obs_file** argument indicates the MET NetCDF point observation file to be used for verifying the model. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
 3. The **config_file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. The python embedding will be activated if the **file** begines with 'PYTHON_NUMPY=" and followed by a python script name.
+4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
 5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
