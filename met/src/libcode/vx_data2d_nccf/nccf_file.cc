@@ -2780,7 +2780,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   // Get the dimensions from the coordinate variables.
 
   mlog << Debug(6) << "\n" << method_name << " -> "
-       << "collect GRID infor from \"" << GET_NC_NAME_P(data_var) << "\".\n\n";
+       << "collect GRID info from \"" << GET_NC_NAME_P(data_var) << "\".\n\n";
        
   NcVarAtt *coordinates_att = get_nc_att(data_var, (string)"coordinates");
 
