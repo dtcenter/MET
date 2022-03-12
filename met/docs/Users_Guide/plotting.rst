@@ -9,9 +9,6 @@ Plotting Utilities
 
 This section describes how to check your data files using plotting utilities. Point observations can be plotted using the Plot-Point-Obs utility. A single model level can be plotted using the plot_data_plane utility. For object based evaluations, the MODE objects can be plotted using plot_mode_field. Occasionally, a post-processing or timing error can lead to errors in MET. These tools can assist the user by showing the data to be verified to ensure that times and locations match up as expected. 
 
-An example of running plot_point_obs with Python embedding is included below.
-
-
 plot_point_obs usage
 --------------------
 
