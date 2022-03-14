@@ -7,9 +7,9 @@ Gen-Ens-Prod Tool
 Introduction
 ============
 
-The Gen-Ens-Prod tool generates simple ensemble products (mean, spread, probability, etc) from gridded ensemble member input files. While it processes model inputs, but it does not compare them to observations or compute statistics. However, the output products can be passed as input to the MET statistics tools for comparison against observations. Climatological mean and standard deviation data may also be provided to define thresholds based on the climatological distribution at each grid point.
+The Gen-Ens-Prod tool generates simple ensemble products (mean, spread, probability, etc) from gridded ensemble member input files. While it processes model inputs, it does not compare them to observations or compute statistics. However, the output products can be passed as input to the MET statistics tools for comparison against observations. Climatological mean and standard deviation data may also be provided to define thresholds based on the climatological distribution at each grid point.
 
-Note that this ensemble product generation step was provided by the Ensemble-Stat tool in earlier versions of MET. The Gen-Ens-Prod tool replaces and extends that functionality. Users are strongly encouraged to migrate ensemble product generation from Ensemble-Stat to Gen-Ens-Prod, as new features will only be added to Gen-Ens-Prod and the existing Ensemble-Stat functionality will be deprecated in a future version.
+.. note:: This ensemble product generation step was provided by the Ensemble-Stat tool in earlier versions of MET. The Gen-Ens-Prod tool replaces and extends that functionality. Users are strongly encouraged to migrate ensemble product generation from Ensemble-Stat to Gen-Ens-Prod, as new features will only be added to Gen-Ens-Prod and the existing Ensemble-Stat functionality will be deprecated in a future version.
 
 Scientific and statistical aspects
 ==================================
