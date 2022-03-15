@@ -29,7 +29,7 @@
 class StringArray {
 
    public:
-
+   
 
       void init_from_scratch();
 
@@ -40,7 +40,8 @@ class StringArray {
       int  MaxLength;
 
       bool IgnoreCase;
-
+   
+      bool Sorted;
 
    public:
 

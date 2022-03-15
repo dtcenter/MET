@@ -65,6 +65,7 @@ StringArray::~StringArray()
 
 {
 
+Sorted = false;   
 clear();
 
 }
@@ -135,6 +136,8 @@ MaxLength = 0;
 
 clear();
 
+Sorted = false;
+
 return;
 
 }
@@ -148,6 +151,8 @@ void StringArray::clear()
 {
 
 s.clear();
+
+Sorted = false;
 
 return;
 
@@ -166,6 +171,7 @@ clear();
 s = a.s;
 
 IgnoreCase = a.IgnoreCase;
+Sorted = a.Sorted;
 
 return;
 
@@ -250,6 +256,8 @@ void StringArray::add(const std::string text)
 
 s.push_back(text);
 
+Sorted = false;
+
 return;
 
 }
@@ -265,7 +273,9 @@ void StringArray::add(const StringArray & a)
 if ( a.n() == 0 )  return;
 
 s.insert(s.end(), a.s.begin(), a.s.end());
- 
+
+Sorted = false;
+
 return;
 
 }
@@ -298,6 +308,8 @@ void StringArray::add_css(const std::string text)
 
   }
 
+  Sorted = false;
+  
   return;
 
 }
@@ -313,6 +325,8 @@ void StringArray::set(const std::string text)
 s.clear();
 
 s.push_back(text);
+
+Sorted = true;
 
 return;
 
@@ -336,6 +350,8 @@ void StringArray::set(int i, const std::string text)
 
 s[i] = text;
 
+Sorted = false;
+
 return;
 
 }
@@ -358,6 +374,8 @@ void StringArray::insert(int i, const char * text)
 
   s.insert(s.begin()+i, text);
 
+  Sorted = false;
+  
   return;
 
 }
@@ -616,13 +634,19 @@ return ( s[k].length() );
 void StringArray::sort()
 
 {
-
-if ( n() <= 1 )  return;
-
- std::sort(s.begin(), s.end());
- 
-return;
-
+   if ( n() <= 1 ) {
+      Sorted = true;
+      return;
+   }
+   
+   if ( !Sorted ) {
+      std::sort(s.begin(), s.end());
+   }
+   
+   Sorted = true;
+   
+   return;
+   
 }
 
 
