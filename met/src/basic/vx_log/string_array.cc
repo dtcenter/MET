@@ -390,6 +390,8 @@ bool StringArray::has(const std::string text, bool forward) const
 
   int index;
 
+  cout << "  From StringArray::has(), text = " << text << " forward = " << forward << endl;
+  
   return ( has(text, index, forward) );
 
 }
@@ -404,9 +406,14 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
   bool found = false;
   index = -1;
 
+  if(Sorted) {
+     cout << "From StringArray::has(), the vector of strings is Sorted (true)" << endl;
+  }
+  
   if (!s.empty()) {
     int count;
     std::string lower_text = text;
+    cout << " lower_text = " << lower_text << endl;
     std::vector<std::string>::const_iterator it;
     if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
     
@@ -423,6 +430,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
           }
         }
         else {
+          cout << "(*it).c_str() = " << (*it).c_str() << endl; 
           if ( *it == text ) {
             found = true;
             break;
