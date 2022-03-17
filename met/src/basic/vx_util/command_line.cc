@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -642,6 +642,52 @@ for (j=1; j<argc; ++j)  {   //  j starts at one here, not zero
    args.add(argv[j]);
 
 }
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::set(const StringArray & a)
+
+{
+
+clear();
+
+int j;
+ConcatString s;
+
+
+ProgramName = get_short_name(a[0].c_str());
+
+for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
+
+   s = a[j];
+
+   args.add(s);
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::set(const StringArray & a, UsageFunction uf)
+
+{
+
+set(a);
+
+set_usage(uf);
 
 
 return;

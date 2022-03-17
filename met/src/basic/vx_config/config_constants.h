@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -300,10 +300,11 @@ struct RegridInfo {
 //
 
 struct ClimoCDFInfo {
-   bool        flag;       // Flag to turn on/off climo CDF logic
-   int         n_bin;      // Number of climo CDF cdf bins
-   ThreshArray cdf_ta;     // Array of CDF thresholds
-   bool        write_bins; // Flag for writing the individual bins
+   bool        flag;        // Flag to turn on/off climo CDF logic
+   int         n_bin;       // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;      // Array of CDF thresholds
+   bool        write_bins;  // Flag for writing the individual bins
+   bool        direct_prob; // Flag for the direct computation of probs
 
    ClimoCDFInfo();
    void clear();
@@ -570,7 +571,7 @@ static const char conf_key_message_type_group_map[] = "message_type_group_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
 static const char conf_key_obs_name_map[]      = "obs_name_map";
-static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
+static const char conf_key_obs_prepbufr_map[]  = "obs_prepbufr_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
 static const char conf_key_boot_interval[]     = "boot.interval";
@@ -657,6 +658,12 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
+//  for use with mode multivar
+//
+
+static const char conf_key_multivar_logic   [] = "multivar_logic";
+
+//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
@@ -665,6 +672,7 @@ static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
 static const char conf_key_write_bins[]         = "write_bins";
+static const char conf_key_direct_prob[]        = "direct_prob";
 static const char conf_key_time_interp_method[] = "time_interp_method";
 static const char conf_key_day_interval[]       = "day_interval";
 static const char conf_key_hour_interval[]      = "hour_interval";
@@ -744,11 +752,18 @@ static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
 static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
+static const char conf_key_prob_pct_thresh[]  = "prob_pct_thresh";
 static const char conf_key_obs_error[]        = "obs_error";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";
 static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";
 static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
+
+//
+// Gen-Ens-Prod specific parameter key names
+//
+
+static const char conf_key_normalize[]   = "normalize";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";

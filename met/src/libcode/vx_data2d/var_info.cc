@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -888,6 +888,12 @@ ConcatString EnsVarInfo::get_file(int index) {
 
 int EnsVarInfo::get_file_index(int index) {
    return inputs[index].file_index;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString EnsVarInfo::get_ens_member_id(int index) {
+   return inputs[index].ens_member_id;
 }
 
 ////////////////////////////////////////////////////////////////////////

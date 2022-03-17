@@ -1,10 +1,11 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -56,6 +57,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+
 using namespace std;
 
 #include <cstdio>
@@ -71,7 +73,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "mode_exec.h"
+#include "string_array.h"
+#include "mode_usage.h"
+#include "mode_conf_info.h"
 
 #ifdef WITH_PYTHON
 #include "global_python.h"
@@ -90,33 +94,26 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 
 
-static const char program_name [] = "mode";
+extern int     mode_frontend(const StringArray &);
+extern int multivar_frontend(const StringArray &);
 
-static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-// static const char * default_out_dir = "MET_BASE/out/mode";
-static const char * default_out_dir = ".";
-
-static int compress_level = -1;
+extern const char * const program_name;   
 
 
 ///////////////////////////////////////////////////////////////////////
 
 
-static void do_quilt    ();
-static void do_straight ();
+   //
+   //  these need external linkage
+   //
 
-static void process_command_line(int, char **);
+const char * const program_name = "mode";   
 
-static void usage();
 
-static void set_config_merge_file (const StringArray &);
-static void set_outdir            (const StringArray &);
-static void set_compress          (const StringArray &);
+///////////////////////////////////////////////////////////////////////
+
+
+static const char default_config_filename [] = "MET_BASE/config/MODEConfig_default";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -126,128 +123,69 @@ int main(int argc, char * argv [])
 
 {
 
-   //
-   // Set handler to be called for memory allocation error
-   //
+int j, n;
+int status;
+ModeConfInfo config;
+StringArray Argv;
+string s;
+bool has_field_index = false;
+const char * user_config_filename = 0;
 
-set_new_handler(oom);
-
-   //
-   // Process the command line arguments
-   //
-
-process_command_line(argc, argv);
+for (j=0,n=0; j<argc; ++j)  {
 
    //
-   // Process the forecast and observation files
+   //  all options take exactly one argument
    //
 
-ModeConfInfo & conf = mode_exec.engine.conf_info;
-
-mode_exec.setup_fcst_obs_data();
-
-if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-
-
-if ( conf.quilt )  {
-
-   do_quilt();
-
-} else {
-
-   do_straight();
-
-}
-
-mode_exec.clear();
+   if ( argv[j][0] == '-' )  j++;
+   else                      n++;
 
    //
-   //  done
+   //  the config file is the 4th required argv item
    //
 
-#ifdef  WITH_PYTHON
-   GP.finalize();
-#endif
+   if ( n == 4 )  {
 
-return ( 0 );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void do_straight()
-
-{
-
-const ModeConfInfo & conf = mode_exec.engine.conf_info;
-
-const int NCT = conf.n_conv_threshs();
-const int NCR = conf.n_conv_radii();
-
-if ( NCT != NCR )  {
-
-   mlog << Error
-        << "\n\n  "
-        << program_name
-        << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
-
-   exit ( 1 );
-
-}
-
-int index;
-
-for (index=0; index<NCT; ++index)  {
-
-   mode_exec.do_conv_thresh(index, index);
-
-   mode_exec.do_match_merge();
-
-   mode_exec.process_output();
-
-}
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void do_quilt()
-
-{
-
-int t_index, r_index;   //  indices into the convolution threshold and radius arrays
-
-
-for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
-
-   for (t_index=0; t_index<(mode_exec.n_conv_threshs()); ++t_index)  {
-
-      mode_exec.do_conv_thresh(r_index, t_index);
-
-      mode_exec.do_match_merge();
-
-      mode_exec.process_output();
+      user_config_filename = argv[j];
+      break;
 
    }
 
 }
 
    //
+   //  check for enough required arguments
+   //
+
+if ( !user_config_filename )  both_usage();
+
+for (j=0; j<argc; ++j)  {
+
+   if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
+
+   s = argv[j];
+
+   Argv.add(s);
+
+}
+
+config.read_config  (default_config_filename, user_config_filename);
+
+if ( config.is_multivar() && !has_field_index )  {
+
+   status = multivar_frontend(Argv);
+
+} else {
+
+   status = mode_frontend(Argv);
+
+}
+
+   //
    //  done
    //
 
-return;
+return ( status );
 
 }
 
@@ -255,112 +193,4 @@ return;
 ///////////////////////////////////////////////////////////////////////
 
 
-void process_command_line(int argc, char **argv)
 
-{
-
-   CommandLine cline;
-   ConcatString s;
-
-
-   // Set the default output directory
-   mode_exec.out_dir = replace_path(default_out_dir);
-
-   // Check for zero arguments
-   if(argc == 1) usage();
-
-   // Parse the command line into tokens
-   cline.set(argc, argv);
-
-   // Set the usage function
-   cline.set_usage(usage);
-
-   // Add the options function calls
-   cline.add(set_config_merge_file, "-config_merge", 1);
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_compress, "-compress", 1);
-
-   // Parse the command line
-   cline.parse();
-
-   // Check for error. There should be three arguments left:
-   // forecast, observation, and config filenames
-   if(cline.n() != 3) usage();
-
-   // Store the input forecast and observation file names
-   mode_exec.fcst_file         = cline[0];
-   mode_exec.obs_file          = cline[1];
-   mode_exec.match_config_file = cline[2];
-
-   mode_exec.init();
-
-   return;
-
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void usage() {
-
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
-
-        << "Usage: " << program_name << "\n"
-        << "\tfcst_file\n"
-        << "\tobs_file\n"
-        << "\tconfig_file\n"
-        << "\t[-config_merge merge_config_file]\n"
-        << "\t[-outdir path]\n"
-        << "\t[-log file]\n"
-        << "\t[-v level]\n"
-        << "\t[-compress level]\n\n"
-
-        << "\twhere\t\"fcst_file\" is a gridded forecast file "
-        << "containing the field to be verified (required).\n"
-
-        << "\t\t\"obs_file\" is a gridded observation file "
-        << "containing the verifying field (required).\n"
-
-        << "\t\t\"config_file\" is a MODEConfig file "
-        << "containing the desired configuration settings (required).\n"
-
-        << "\t\t\"-config_merge merge_config_file\" overrides the default "
-        << "fuzzy engine settings for merging within the fcst/obs fields "
-        << "(optional).\n"
-
-        << "\t\t\"-outdir path\" overrides the default output directory ("
-        << mode_exec.out_dir << ") (optional).\n"
-
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
-
-        << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n"
-
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << mode_exec.engine.conf_info.get_compression_level() << ") (optional).\n\n" << flush;
-
-   exit (1);
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void set_config_merge_file(const StringArray & a)
-{
-   mode_exec.merge_config_file = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_outdir(const StringArray & a)
-{
-   mode_exec.out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_compress(const StringArray & a) {
-  compress_level = atoi(a[0].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////

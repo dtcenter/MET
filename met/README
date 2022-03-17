@@ -2,7 +2,7 @@
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
 ================================================================================
 
-Copyright 2021, UCAR/NCAR, NOAA, and CSU/CIRA
+Copyright 2022, UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES
 Licensed under the Apache License, Version 2.0 (the "License");
    You may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -22,7 +22,7 @@ This is the main directory for the Model Evaluation Tools source code release.
 For questions, please:
 - Refer to the MET User's Guide: https://met.readthedocs.io/en/latest
 - Refer to the MET website: http://dtcenter.org/community-code/model-evaluation-tools-met
-- Send mail to met_help@ucar.edu.
+- Create a post in the METplus GitHub Discussions forum: https://github.com/dtcenter/METplus/discussions
 
 Dependencies
 ------------
@@ -188,7 +188,7 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 36 executables:
+  command line) will contain the following executables:
    - ascii2nc
    - ensemble_stat
    - gen_ens_prod
@@ -200,6 +200,7 @@ sub-directory, or the MET Online Tutorial:
    - grid_diag
    - gsid2mpr
    - gsidens2orank
+   - ioda2nc
    - lidar2nc
    - madis2nc
    - mode

@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -63,7 +63,13 @@ class NcVarInfo {
 
       ConcatString units_att;
 
+      unixtime ValidTime;
+
+      unixtime InitTime;
+
       int AccumTime; // seconds
+
+      int lead_time () const;   //  seconds
 
       int Ndims;
 

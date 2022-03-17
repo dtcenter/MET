@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -201,9 +201,6 @@ Nvars = 0;
 
 if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
 
-ValidTime = (unixtime) 0;
-InitTime  = (unixtime) 0;
-
    //
    //  done
    //
@@ -298,9 +295,8 @@ for (j=0; j<Ndims; ++j)  {
       if ( is_bad_data(ill) ) get_att_unixtime( Var[j], init_time_att_name,  ill);
       if ( is_bad_data(vll) ) get_att_unixtime( Var[j], valid_time_att_name, vll);
 
-
-      if ( !is_bad_data(ill) )   InitTime = ill;
-      if ( !is_bad_data(vll) )  ValidTime = vll;
+      if ( !is_bad_data(ill) ) Var[j].InitTime = ill;
+      if ( !is_bad_data(vll) ) Var[j].ValidTime = vll;
 
       StringArray dimNames;
       get_dim_names(&v, &dimNames);
@@ -334,8 +330,6 @@ void MetNcFile::dump(ostream & out, int depth) const
 {
 
 int j, k;
-int month, day, year, hour, minute, second;
-char junk[256];
 Indent prefix(depth);
 Indent p2(depth + 1);
 Indent p3(depth + 2);
@@ -363,16 +357,6 @@ out << prefix << "\n";
 
 out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
 out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "Init Time = ";
-
-unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
-
-snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
-
-out << junk << "\n";
 
 out << prefix << "\n";
 
@@ -414,20 +398,6 @@ for (j=0; j<Nvars; ++j)  {
 out.flush();
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int MetNcFile::lead_time() const
-
-{
-
-unixtime dt = ValidTime - InitTime;
-
-return ( (int) dt );
 
 }
 
@@ -805,9 +775,9 @@ found = data(info->var, a, plane);
    //  store the times
    //
 
-plane.set_init  ( ValidTime - lead_time() );
-plane.set_valid ( ValidTime );
-plane.set_lead  ( lead_time() );
+plane.set_init  ( info->InitTime );
+plane.set_valid ( info->ValidTime );
+plane.set_lead  ( info->lead_time() );
 plane.set_accum ( info->AccumTime );
 
    //

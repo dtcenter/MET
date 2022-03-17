@@ -1,8 +1,8 @@
 .. _config_options:
 
-
+***************************
 Configuration File Overview
-===========================
+***************************
 
 The configuration files that control many of the MET tools contain formatted
 ASCII text. This format has been updated for MET version |version| and
@@ -392,9 +392,8 @@ into any relevant scripting.
 Settings common to multiple tools
 ---------------------------------
 
-.. _exit_on_warning:
-
-:ref:`exit_on_warning <exit_on_warning>`
+exit_on_warning
+^^^^^^^^^^^^^^^
 
 The "exit_on_warning" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
@@ -404,9 +403,8 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
-.. _nc_compression:
-
-:ref:`nc_compression <nc_compression>`
+nc_compression
+^^^^^^^^^^^^^^
 
 The "nc_compression" entry in ConfigConstants defines the compression level
 for the NetCDF variables. Setting this option in the config file of one of
@@ -427,9 +425,8 @@ writing of NetCDF files within MET significantly.
 		
   nc_compression = 0;
 
-.. _output_precision:
-
-:ref:`output_precision <output_precision>`  
+output_precision
+^^^^^^^^^^^^^^^^
   
 The "output_precision" entry in ConfigConstants defines the precision
 (number of significant decimal places) to be written to the ASCII output
@@ -440,9 +437,8 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
-.. _tmp_dir_1:
-
-:ref:`tmp_dir <tmp_dir_1>`
+tmp_dir_1
+^^^^^^^^^
       
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
@@ -454,9 +450,8 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
-.. _message_type_group_map_1:
-
-:ref:`message_type_group_map <message_type_group_map_1>`
+message_type_group_map_1
+^^^^^^^^^^^^^^^^^^^^^^^^
       
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
@@ -475,9 +470,8 @@ which surface verification logic should be applied.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
-.. _message_type_map:
-
-:ref:`message_type_map <message_type_map>`
+message_type_map
+^^^^^^^^^^^^^^^^
   
 The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
@@ -500,9 +494,8 @@ types.
      { key = "FM-97 ACARS";  val = "AIRCFT"; }
   ];
 
-.. _model:
-
-:ref:`model <model>`
+model
+^^^^^
       
 The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
@@ -514,9 +507,8 @@ e.g. model = "GFS";
 		
   model = "WRF";
 
-.. _desc:
-
-:ref:`desc <desc>`
+desc
+^^^^
       
 The "desc" entry specifies a user-specified description for each verification
 task. This string is written to the DESC column of the ASCII output
@@ -531,9 +523,8 @@ e.g. desc = "QC_9";
 		
   desc = "NA";
 
-.. _obtype:  
-
-:ref:`obtype <obtype>`
+obtype
+^^^^^^
       
 The "obtype" entry specifies a name to describe the type of verifying gridded
 observation used. This name is written to the OBTYPE column in the ASCII
@@ -548,8 +539,9 @@ the configuration file obtype value is written.
   obtype = "ANALYS";
 
 .. _regrid:
-
-:ref:`regrid <regrid>`
+  
+regrid
+^^^^^^
       
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
@@ -569,7 +561,8 @@ using the following entries:
     
   * to_grid = "path"; To regrid both to a grid defined by a file.
     
-  * to_grid = "spec"; To define a grid specification string, as described in :ref:`appendixB`.
+  * to_grid = "spec"; To define a grid specification string, as
+    described in :ref:`appendixB`.
 
 * The "vld_thresh" entry specifies a proportion between 0 and 1 to define
   the required ratio of valid data points. When regridding, compute
@@ -617,7 +610,7 @@ using the following entries:
     * MAXGAUSS    to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
-    The BEST and GEOG_MATCH interpolation options are not valid for regridding.
+    The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
 
 * The "width" entry specifies a regridding width, when applicable.
   - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
@@ -656,9 +649,8 @@ using the following entries:
      censor_val      = [];
   }
 
-.. _fcst:
-
-:ref:`fcst <fcst>`
+fcst
+^^^^
   
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
@@ -1085,9 +1077,8 @@ File-format specific settings for the "field" entry:
      ];
   }
 
-.. _obs:
-
-:ref:`obs <obs>`
+obs
+^^^
 
 The "obs" entry specifies the same type of information as "fcst", but for
 the observation data. It will often be set to the same things as "fcst",
@@ -1210,9 +1201,8 @@ or
 		
   obs = fcst;
 
-.. _climo_mean:
-
-:ref:`climo_mean <climo_mean>`
+climo_mean
+^^^^^^^^^^
       
 The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
@@ -1268,9 +1258,8 @@ of several entires defining the climatology file names and fields to be used.
      hour_interval      = 6;
   }
 
-.. _climo_stdev:
-
-:ref:`climo_stdev <climo_stdev>`
+climo_stdev
+^^^^^^^^^^^
       
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
@@ -1300,15 +1289,14 @@ over the "climo_mean" setting and then updating the "file_name" entry.
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
   }
 
-.. _climo_cdf:
-
-:ref:`climo_cdf <climo_cdf>`
+climo_cdf
+^^^^^^^^^
       
 The "climo_cdf" dictionary specifies how the the climatological mean
 ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
-within the climatological distribution. This dictionary consists of 3
-entries:
+within the climatological distribution. This dictionary consists of the
+following entries:
 
 (1)
     The "cdf_bins" entry defines the climatological bins either as an integer
@@ -1319,6 +1307,8 @@ entries:
 
 (3)
     The "write_bins" entry may be set to TRUE or FALSE.
+
+(4) The "direct_prob" entry may be set to TRUE or FALSE.
 
 MET uses the climatological mean and standard deviation to construct a normal
 PDF at each observation location. The total area under the PDF is 1, and the
@@ -1348,11 +1338,11 @@ an even number of bins can only be  uncentered. For example:
   5   centered bins (cdf_bins = 5; center_bins = TRUE;) yields:
     0.0, 0.125, 0.375, 0.625, 0.875, 1.0
 
-When multiple climatological bins are used, statistics are computed
-separately for each bin, and the average of the statistics across those bins
-is written to the output. When "write_bins" is true, the statistics for each
-bin are also written to the output. The bin number is appended to the
-contents of the VX_MASK output column.
+When multiple climatological bins are used for Point-Stat and Grid-Stat,
+statistics are computed separately for each bin, and the average of the
+statistics across those bins is written to the output. When "write_bins"
+is true, the statistics for each bin are also written to the output.
+The bin number is appended to the contents of the VX_MASK output column.
 
 Setting the number of bins to 1 effectively disables this logic by grouping
 all pairs into a single climatological bin.
@@ -1363,11 +1353,11 @@ all pairs into a single climatological bin.
      cdf_bins    = 11;    or an array of floats
      center_bins = TRUE;  or FALSE
      write_bins  = FALSE; or TRUE
+     direct_prob = FALSE; or TRUE
   }
 
-.. _climato_data:
-
-:ref:`climatology data for probability forecasts <climato_data>`
+climato_data
+^^^^^^^^^^^^
       
 When specifying climatology data for probability forecasts, either supply a
 probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
@@ -1381,11 +1371,21 @@ directly to compute Brier Skill Score (BSS).
 When "climo_mean" and "climo_stdev" are both set to non-probability fields,
 the MET tools use the mean, standard deviation, and observation event
 threshold to derive a normal approximation of the climatological
-probabilities. Those derived probability values are used to compute BSS.
+probabilities.
 
-.. _mask_missing_flag:
+The "direct_prob" option controls the derivation logic. When "direct_prob" is
+true, the climatological probability is computed directly from the
+climatological distribution at each point as the area to the left of
+the event threshold value. For greater-than or greater-than-or-equal-to
+thresholds, 1.0 minus the area is used. When "direct_prob" is false, the
+"cdf_bins" values are sampled from climatological distribution. The probability
+is computed as the proportion of those samples which meet the threshold criteria.
+In this way, the number of bins impacts the resolution of the climatological
+probabilities. These derived probability values are used to compute the
+climatological Brier Score and Brier Skill Score.
 
-:ref:`mask_missing_flag <mask_missing_flag>`
+mask_missing_flag
+^^^^^^^^^^^^^^^^^
 
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
@@ -1403,9 +1403,8 @@ in the Wavelet-Stat and MODE tools:
   mask_missing_flag = BOTH;
 
 
-.. _obs_window:
-
-:ref:`obs_window <obs_window>`
+obs_window
+^^^^^^^^^^
 
 The "obs_window" entry is a dictionary specifying a beginning ("beg"
 entry) and ending ("end" entry) time offset values in seconds. It defines
@@ -1421,9 +1420,8 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
-.. _mask:
-
-:ref:`mask <mask>`
+mask
+^^^^
      
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
@@ -1533,9 +1531,8 @@ is included in the mask.
   }
 
 
-.. _ci_alpha:
-
-:ref:`ci_alpha <ci_alpha>`
+ci_alpha
+^^^^^^^^
 
 The "ci_alpha" entry is an array of floats specifying the values for alpha
 to be used when computing confidence intervals. Values of alpha must be
@@ -1547,9 +1544,8 @@ interval.
 		
   ci_alpha = [ 0.05, 0.10 ];
 
-.. _boot:
-
-:ref:`boot <boot>`
+boot
+^^^^
 
 The "boot" entry defines the parameters to be used in calculation of
 bootstrap confidence intervals. The interval variable indicates what method
@@ -1611,9 +1607,8 @@ should be used for computing bootstrap confidence intervals:
      seed     = "";
   }
 
-.. _interp:
-
-:ref:`interp <interp>`
+interp
+^^^^^^
 
 The "interp" entry is a dictionary that specifies what interpolation or
 smoothing (for the Grid-Stat tool) methods should be applied.
@@ -1694,7 +1689,10 @@ This dictionary may include the following entries:
     * MAXGAUSS    for the maximum value followed by a Gaussian smoother
     
     * GEOG_MATCH  for the nearest grid point where the land/sea mask
-      and geography criteria are satisfied.
+      and geography criteria are satisfied
+
+    * HIRA        for all neighborhood points to define a spatial
+      ensemble (only in Ensemble-Stat)
 
     The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
     interpolating to point locations. For grid-to-grid comparisons, the
@@ -1716,9 +1714,8 @@ This dictionary may include the following entries:
      ];
   }
 
-.. _land_mask:
-
-:ref:`land_mask <land_mask>`
+land_mask
+^^^^^^^^^
      
 The "land_mask" dictionary defines the land/sea mask field which is used
 when verifying at the surface. For point observations whose message type
@@ -1745,9 +1742,8 @@ land_mask.flag may be set separately in each "obs.field" entry.
      thresh    = eq1;
   }
 
-.. _topo_mask:
-
-:ref:`topo_mask <topo_mask>`
+topo_mask
+^^^^^^^^^
      
 The "topo_mask" dictionary defines the model topography field which is used
 when verifying at the surface. This logic is applied to point observations
@@ -1776,9 +1772,8 @@ topo_mask.flag may be set separately in each "obs.field" entry.
      interp_fcst_thresh = ge-50&&le50;
   }
 
-.. _hira:
-
-:ref:`hira <hira>`
+hira
+^^^^
      
 The "hira" entry is a dictionary that is very similar to the "interp" and
 "nbrhd" entries. It specifies information for applying the High Resolution
@@ -1830,9 +1825,8 @@ This dictionary may include the following entries:
      prob_cat_thresh = [];
   }
 
-.. _output_flag:
-
-:ref:`output_flag <output_flag>`
+output_flag
+^^^^^^^^^^^
      
 The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
@@ -1882,9 +1876,8 @@ output line type from the MET tools. Each line type may be set to one of:
      grad   = NONE;  Gradient statistics (S1 score)
   }
 
-.. _nc_pairs_flag:
-
-:ref:`nc_pairs_flag <nc_pairs_flag>`
+nc_pairs_flag
+^^^^^^^^^^^^^
 
 The "nc_pairs_flag" can be set either to a boolean value or a dictionary
 in either Grid-Stat, Wavelet-Stat or MODE. The dictionary (with slightly
@@ -1914,9 +1907,8 @@ netcdf output will be generated.
      apply_mask   = TRUE;
   }
 
-.. _nc_pairs_var_name:
-
-:ref:`nc_pairs_var_name <nc_pairs_var_name>`
+nc_pairs_var_name
+^^^^^^^^^^^^^^^^^
   
 The "nc_pairs_var_name" entry specifies a string for each verification task
 in Grid-Stat. This string is parsed from each "obs.field" dictionary entry
@@ -1935,9 +1927,8 @@ For example:
 		
   nc_pairs_var_name = "";
 
-.. _nc_pairs_var_suffix:
-
-:ref:`nc_pairs_var_suffix <nc_pairs_var_suffix>`
+nc_pairs_var_suffix
+^^^^^^^^^^^^^^^^^^^
      
 The "nc_pairs_var_suffix" entry is similar to the "nc_pairs_var_name" entry
 described above.  It is also parsed from each "obs.field" dictionary entry.
@@ -1959,9 +1950,8 @@ now deprecated.
 		
   nc_pairs_var_suffix = "";
 
-.. _ps_plot_flag:
-
-:ref:`ps_plot_flag <ps_plot_flag>`
+ps_plot_flag
+^^^^^^^^^^^^
      
 The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 indicating whether a PostScript plot should be generated summarizing
@@ -1971,9 +1961,8 @@ the verification.
 		
   ps_plot_flag = TRUE;
 
-.. _grid_weight_flag:
-
-:ref:`grid_weight_flag <grid_weight_flag>`
+grid_weight_flag
+^^^^^^^^^^^^^^^^
      
 The "grid_weight_flag" specifies how grid weighting should be applied
 during the computation of continuous statistics and partial sums. It is
@@ -1996,9 +1985,8 @@ by the sum of the weights for the current masking region.
 		
   grid_weight_flag = NONE;
 
-.. _hss_ec_value:
-
-ref:`hss_ec_value <hss_ec_value>`
+hss_ec_value
+^^^^^^^^^^^^
 
 The "hss_ec_value" entry is a floating point number used in the computation
 of the HSS_EC statistic in the MCTS line type. It specifies the expected
@@ -2014,9 +2002,8 @@ It set, it must greater than or equal to 0.0 and less than 1.0. A value of
 		
   hss_ec_value = NA;
 
-.. _rank_corr_flag:
-
-ref:`rank_corr_flag <rank_corr_flag>`
+rank_corr_flag
+^^^^^^^^^^^^^^
 
 The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
 and Spearman's Rank Correlation Coefficients (in the CNT line type) should
@@ -2027,9 +2014,8 @@ intensive and slows down the runtime significantly.
 		
   rank_corr_flag = FALSE;
 
-.. _duplicate_flag:
-
-:ref:`duplicate_flag <duplicate_flag>`
+duplicate_flag
+^^^^^^^^^^^^^^
 
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
@@ -2050,9 +2036,8 @@ in those cases.
 		
   duplicate_flag = NONE;
 
-.. _obs_summary:
-
-:ref:`obs_summary <obs_summary>`
+obs_summary
+^^^^^^^^^^^
 
 The "obs_summary" entry specifies how to compute statistics on
 observations that appear at a single location (lat,lon,level,elev)
@@ -2087,9 +2072,8 @@ in those cases.
   obs_summary = NONE;
 
 
-.. _obs_perc_value:
-
-:ref:`obs_perc_value <obs_perc_value>`
+obs_perc_value
+^^^^^^^^^^^^^^
      
 Percentile value to use when obs_summary = PERC
 
@@ -2098,9 +2082,8 @@ Percentile value to use when obs_summary = PERC
   obs_perc_value = 50;
 
   
-.. _obs_quality_inc:
-
-:ref:`obs_quality_inc <obs_quality_inc>`
+obs_quality_inc
+^^^^^^^^^^^^^^^
 		
 The "obs_quality_inc" entry specifies the quality flag values that are to be
 retained and used for verification. An empty list signifies that all
@@ -2115,9 +2098,8 @@ Note "obs_quality_inc" replaces the older option "obs_quality".
   obs_quality_inc = [ "1", "2", "3", "9" ];
 
   
-.. _obs_quality_exc:
-
-:ref:`obs_quality_exc <obs_quality_exc>`
+obs_quality_exc
+^^^^^^^^^^^^^^^
 		
 The "obs_quality_exc" entry specifies the quality flag values that are to be
 ignored and not used for verification. An empty list signifies that all
@@ -2131,9 +2113,8 @@ an array of strings, even if the values themselves are numeric.
   obs_quality_exc = [ "1", "2", "3", "9" ];
 
   
-.. _met_data_dir:
-
-:ref:`met_data_dir <met_data_dir>`
+met_data_dir
+^^^^^^^^^^^^
 
 The "met_data_dir" entry specifies the location of the internal MET data
 sub-directory which contains data files used when generating plots. It
@@ -2144,9 +2125,8 @@ locate the static data files they need at run time.
 		
   met_data_dir = "MET_BASE";
 
-.. _many_plots:
-
-:ref:`fcst_raw_plot, obs_raw_plot, wvlt_plot, object_plot <many_plots>`
+many_plots
+^^^^^^^^^^
 
 The "fcst_raw_plot" entry is a dictionary used by Wavelet-Stat and MODE
 containing colortable plotting information for the plotting of the raw
@@ -2177,9 +2157,8 @@ forecast field:
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described above.
 
-.. _tmp_dir_2:
-
-:ref:`tmp_dir <tmp_dir_2>`
+tmp_dir_2
+^^^^^^^^^
 
 The "tmp_dir" entry is a string specifying the location where temporary
 files should be written.
@@ -2189,9 +2168,8 @@ files should be written.
   tmp_dir = "/tmp";
 
 
-.. _output_prefix:
-
-:ref:`output_prefix <output_prefix>`
+output_prefix
+^^^^^^^^^^^^^
 
 The "output_prefix" entry specifies a string to be included in the output
 file name. The MET statistics tools construct output file names that
@@ -2203,9 +2181,8 @@ of the same tool.
 		
   output_prefix  = "";
 
-.. _version:
-
-:ref:`version <version>`
+version
+^^^^^^^
 
 The "version" entry specifies the version number of the configuration file.
 The configuration file version number should match the version number of
@@ -2215,9 +2192,8 @@ the MET code being run. This value should generally not be modified.
 		
   version = "VN.N";
 
-.. _time_summary:
-
-:ref:`time_summary <time_summary>`
+time_summary
+^^^^^^^^^^^^
 
 This feature was implemented to allow additional processing of observations
 with high temporal resolution. The "flag" entry toggles the "time_summary"
@@ -2294,9 +2270,8 @@ Settings specific to individual tools
 EnsembleStatConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _ens:
-
-:ref:`ens <ens>`
+ens
+"""
 
 The "ens" entry is a dictionary that specifies the fields for which ensemble
 products should be generated. This is very similar to the "fcst" and "obs"
@@ -2338,9 +2313,8 @@ entries. This dictionary may include the following entries:
      ];
   }
 
-.. _nbrhd_prob:
-
-:ref:`nbrhd_prob <nbrhd_prob>`
+nbrhd_prob
+""""""""""
 
 The nbrhd_prob dictionary defines the neighborhoods used to compute NEP
 and NMEP output. The neighborhood shape is a SQUARE or CIRCLE centered on
@@ -2361,9 +2335,8 @@ specified.
      vld_thresh = 0.0;
   }
 
-.. _nmep_smooth:
-
-:ref:`nmep_smooth <nmep_smooth>`
+nmep_smooth
+"""""""""""
 
 Similar to the interp dictionary, the nmep_smooth dictionary includes a type
 array of dictionaries to define one or more methods for smoothing the NMEP
@@ -2389,9 +2362,8 @@ combination of the categorical threshold (cat_thresh), neighborhood width
      ];
   }
 
-.. _fcst, obs_1:
-
-:ref:`fcst, obs <fcst, obs_1>`
+fcst, obs_1
+"""""""""""
 
 The fcst and obs entries define the fields for which Ensemble-Stat should
 compute rank histograms, probability integral transform histograms,
@@ -2429,9 +2401,8 @@ data is provided, the climo_cdf thresholds will be used instead.
   }
 
 
-.. _nc_var_str:
-
-:ref:`nc_var_str <nc_var_str>`
+nc_var_str
+""""""""""
 
 The "nc_var_str" entry specifies a string for each ensemble field and
 verification task in Ensemble-Stat. This string is parsed from each
@@ -2447,9 +2418,8 @@ e.g. nc_var_str = "MIN";
 		
   nc_var_str = "";
 
-.. _obs_thresh:
-
-:ref:`obs_thresh <obs_thresh>`
+obs_thresh
+""""""""""
 
 The "obs_thresh" entry is an array of thresholds for filtering observation
 values prior to applying ensemble verification logic. They specify the values
@@ -2462,9 +2432,8 @@ This option may be set separately for each obs.field entry.
 		
   obs_thresh = [ NA ];
 
-.. _skip_const:
-
-:ref:`skip_const <skip_const>`
+skip_const
+""""""""""
 
 Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all
 the ensemble members and the observation have a constant value. For example,
@@ -2477,9 +2446,8 @@ random.
 		
   skip_const = FALSE;
 
-.. _obs_error:
-
-:ref:`obs_error <obs_error>`
+obs_error
+"""""""""
 
 Observation error options
 
@@ -2536,9 +2504,8 @@ levels, and range of values.
      max              = NA;
   }
 
-.. _ensemble_flag:
-
-:ref:`ensemble_flag <ensemble_flag>`
+ensemble_flag
+"""""""""""""
   
 The "ensemble_flag" entry is a dictionary of boolean value indicating
 which ensemble products should be generated:
@@ -2589,9 +2556,8 @@ which ensemble products should be generated:
      weight    = FALSE;
   }
 
-.. _rng:
-
-:ref:`rng <rng>`
+rng
+"""
 
 See: `Random Number Generator Performance <https://www.gnu.org/software/gsl/doc/html/rng.html#performance>`_
 used for random assignment of ranks when they are tied.
@@ -2944,9 +2910,8 @@ MET User's Guide for a description of these attributes.
 MODEConfig_default
 ^^^^^^^^^^^^^^^^^^
 
-.. _quilt:
-
-:ref:`quilt <quilt>`
+quilt
+"""""
 
 The "quilt" entry is a boolean to indicate whether all permutations of
 convolution radii and thresholds should be run. If set to false, the number
@@ -2961,9 +2926,8 @@ MODE will be run.
 		
   quilt = false;
 
-.. _fcst, obs_2:
-
-:ref:`fcst, obs <fcst, obs_2>`
+fcst, obs_2
+"""""""""""
 
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
@@ -3047,9 +3011,8 @@ The object definition settings for MODE are contained within the "fcst" and
      merge_flag         = THRESH;
   }
 
-.. _grid_res:
-
-:ref:`grid_res <grid_res>`
+grid_res
+""""""""
 
 The "grid_res" entry is the nominal spacing for each grid square in
 kilometers. The variable is not used directly in the code, but subsequent
@@ -3061,9 +3024,8 @@ are used for these variables.
 		
   grid_res = 4;
 
-.. _match_flag:
-
-:ref:`match_flag <match_flag>`
+match_flag
+""""""""""
 
 The "match_flag" entry specifies the matching method to be applied:
 
@@ -3081,9 +3043,8 @@ The "match_flag" entry specifies the matching method to be applied:
 		
   match_flag = MERGE_BOTH;
 
-.. _max_centroid_dist:
-
-:ref:`max_centroid_dist <max_centroid_dist>`
+max_centroid_dist
+"""""""""""""""""
 
 The "max_centroid_dist" entry specifies the maximum allowable distance in
 grid squares between the centroids of objects for them to be compared.
@@ -3094,9 +3055,8 @@ skip unreasonable object comparisons.
 		
   max_centroid_dist = 800.0/grid_res;
 
-.. _weight:
-
-:ref:`weight <weight>`
+weight
+""""""
      
 The weight variables control how much weight is assigned to each pairwise
 attribute when computing a total interest value for object pairs. The weights
@@ -3118,9 +3078,8 @@ sum of the weights listed.
      inten_perc_value = 50;
   }
 
-.. _interest_function:
-
-:ref:`interest_function <interest_function>`
+interest_function
+"""""""""""""""""
 		
 The set of interest function variables listed define which values are of
 interest for each pairwise attribute measured. The interest functions may be
@@ -3176,9 +3135,8 @@ mathematical functions.
      inten_perc_ratio = ratio_if;
   }
 
-.. _total_interest_thresh:
-
-:ref:`total_interest_thresh <total_interest_thresh>`
+total_interest_thresh
+"""""""""""""""""""""
   
 The total_interest_thresh variable should be set between 0 and 1. This
 threshold is applied to the total interest values computed for each pair of
@@ -3188,9 +3146,8 @@ objects and is used in determining matches.
 		
   total_interest_thresh = 0.7;
 
-.. _print_interest_thresh:
-
-:ref:`print_interest_thresh <print_interest_thresh>`
+print_interest_thresh
+"""""""""""""""""""""
 
 The print_interest_thresh variable determines which pairs of object
 attributes will be written to the output object attribute ASCII file. The
@@ -3204,9 +3161,8 @@ the max_centroid_dist variable.
 		
   print_interest_thresh = 0.0;
 
-.. _plot_valid_flag:
-
-:ref:`plot_valid_flag <plot_valid_flag>`
+plot_valid_flag
+"""""""""""""""
 
 When applied, the plot_valid_flag variable indicates that only the region
 containing valid data after masking is applied should be plotted. TRUE
@@ -3217,9 +3173,8 @@ region containing valid data after masking should be plotted.
 		
   plot_valid_flag = FALSE;
 
-.. _plot_gcarc_flag:
-
-:ref:`plot_gcarc_flag <plot_gcarc_flag>`
+plot_gcarc_flag
+"""""""""""""""
 
 When applied, the plot_gcarc_flag variable indicates that the edges of
 polylines should be plotted using great circle arcs as opposed to straight
@@ -3229,9 +3184,8 @@ lines in the grid.
 		
   plot_gcarc_flag = FALSE;
 
-.. _ct_stats_flag:
-
-:ref:`ct_stats_flag <ct_stats_flag>`
+ct_stats_flag
+"""""""""""""
   
 The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
 in the form of contingency table counts and statistics.
@@ -3240,9 +3194,8 @@ in the form of contingency table counts and statistics.
 		
   ct_stats_flag = TRUE;
 
-.. _shift_right:
-
-:ref:`shift_right <shift_right>`
+shift_right
+"""""""""""
 
 When MODE is run on global grids, this parameter specifies how many grid
 squares to shift the grid to the right. MODE does not currently connect
@@ -3317,9 +3270,8 @@ following criteria:
      7 - Auxiliary levels generated via interpolation from spanning levels
      (upper-air profile reports)
 
-.. _message_type:
-
-:ref:`message_type <message_type>`
+message_type
+""""""""""""
 
 In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
@@ -3340,9 +3292,8 @@ For example:
 		
   message_type = [];
 
-.. _message_type_group_map_2:
-
-:ref:`message_type_group_map <message_type_group_map_2>`
+message_type_group_map_2
+""""""""""""""""""""""""
 
 Mapping of message type group name to comma-separated list of values.
 The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
@@ -3357,9 +3308,8 @@ Derive PRMSL only for SURFACE message types.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
-.. _station_id:
-
-:ref:`station_id <station_id>`
+station_id
+""""""""""
 
 The "station_id" entry is an array of station ids to be retained or
 the filename which contains station ids. An array of station ids
@@ -3372,9 +3322,8 @@ For example:  station_id = [ "KDEN" ];
 		
   station_id = [];
 
-.. _elevation_range:
-
-:ref:`elevation_range <elevation_range>`
+elevation_range
+"""""""""""""""
 
 The "elevation_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of observing locations elevations to be
@@ -3387,9 +3336,8 @@ retained.
      end = 100000;
   }
 
-.. _pb_report_type:
-
-:ref:`pb_report_type <pb_report_type>`
+pb_report_type
+""""""""""""""
 
 The "pb_report_type" entry is an array of PREPBUFR report types to be
 retained. The numeric "pb_report_type" entry allows for further
@@ -3409,9 +3357,8 @@ For example:
 		
   pb_report_type  = [];
 
-.. _in_report_type:
-
-:ref:`in_report_type <in_report_type>`
+in_report_type
+""""""""""""""
 
 The "in_report_type" entry is an array of input report type values to be
 retained. The numeric "in_report_type" entry provides additional
@@ -3430,9 +3377,8 @@ For example:
 		
   in_report_type = [];
 
-.. _instrument_type:
-
-:ref:`instrument_type <instrument_type>`
+instrument_type
+"""""""""""""""
 
 The "instrument_type" entry is an array of instrument types to be retained.
 An empty list indicates that all should be retained.
@@ -3441,9 +3387,8 @@ An empty list indicates that all should be retained.
 		
   instrument_type = [];
 
-.. _level_range:
-
-:ref:`level_range <level_range>`
+level_range
+"""""""""""
 
 The "level_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of vertical levels (1 to 255) to be retained.
@@ -3455,9 +3400,8 @@ entries specifying the range of vertical levels (1 to 255) to be retained.
      end = 255;
   }
 
-.. _level_category:
-
-:ref:`level_category <level_category>`
+level_category
+""""""""""""""
 
 The "level_category" entry is an array of integers specifying which level
 categories should be retained:
@@ -3493,9 +3437,8 @@ See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.no
 		
   level_category = [];
 
-.. _obs_bufr_var:
-
-:ref:`obs_bufr_var <obs_bufr_var>`
+obs_bufr_var
+""""""""""""
 
 The "obs_bufr_var" entry is an array of strings containing BUFR variable
 names to be retained or derived. This replaces the "obs_grib_code" setting
@@ -3515,9 +3458,8 @@ command line option to see the list of available observation variables.
 		
   obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
-.. _obs_bufr_map:
-
-:ref:`obs_bufr_map <obs_bufr_map>`
+obs_bufr_map
+""""""""""""
 
 Mapping of input BUFR variable names to output variables names.
 The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
@@ -3528,9 +3470,8 @@ of the forecast the observation is used to verify.
 		
   obs_bufr_map = [];
 
-.. _obs_prefbufr_map:
-
-:ref:`obs_prefbufr_map <obs_prefbufr_map>`
+obs_prepbufr_map
+""""""""""""""""
 
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
 abbreviations in the output. This default map is appended to obs_bufr_map.
@@ -3540,7 +3481,7 @@ abbreviations to the output.
 
 .. code-block:: none
 		
-  obs_prefbufr_map = [
+  obs_prepbufr_map = [
      { key = "POB";     val = "PRES";  },
      { key = "QOB";     val = "SPFH";  },
      { key = "TOB";     val = "TMP";   },
@@ -3555,9 +3496,8 @@ abbreviations to the output.
      { key = "D_PRMSL"; val = "PRMSL"; }
   ];
 
-.. _quality_mark_thresh:
-
-:ref:`quality_mark_thresh <quality_mark_thresh>`
+quality_mark_thresh
+"""""""""""""""""""
      
 The "quality_mark_thresh" entry specifies the maximum quality mark value
 to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
@@ -3570,9 +3510,8 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 		
   quality_mark_thresh = 2;
 
-.. _event_stack_flag:
-
-:ref:`event_stack_flag <event_stack_flag>`
+event_stack_flag
+""""""""""""""""
 
 The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
 specify whether observations should be drawn from the top of the event
@@ -3585,22 +3524,22 @@ stack (most quality controlled) or the bottom of the event stack (most raw).
 SeriesAnalysisConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _block_size:
-
-:ref:`block_size <block_size>`
+block_size
+""""""""""
 
 Computation may be memory intensive, especially for large grids.
 The "block_size" entry sets the number of grid points to be processed
 concurrently (i.e. in one pass through a time series). Smaller values
 require less memory but increase the number of passes through the data.
+If set less than or equal to 0, it is automatically reset to the number
+of grid points, and they are all processed concurrently.
 
 .. code-block:: none
 		
   block_size = 1024;
 
-.. _vld_thresh:
-
-:ref:`vld_thresh <vld_thresh>`
+vld_thresh
+""""""""""
 
 Ratio of valid matched pairs to total length of series for a grid
 point. If valid threshold is exceeded at that grid point the statistics
@@ -3612,9 +3551,8 @@ setting requires all data in the series to be valid.
 		
   vld_thresh = 1.0;
 
-.. _output_stats:
-
-:ref:`output_stats <output_stats>`
+output_stats
+""""""""""""
 
 Statistical output types need to be specified explicitly. Refer to User's
 Guide for available output types. To keep output file size reasonable,
@@ -3640,9 +3578,8 @@ grid is large.
 STATAnalysisConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _jobs:
-
-:ref:`jobs <jobs>`
+jobs
+""""
 
 The "jobs" entry is an array of STAT-Analysis jobs to be performed.
 Each element in the array contains the specifications for a single analysis
@@ -4109,9 +4046,8 @@ confidence intervals computed for the aggregated statistics.
 WaveletStatConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _grid_decomp_flag:
-
-:ref:`grid_decomp_flag <grid_decomp_flag>`
+grid_decomp_flag
+""""""""""""""""
 
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
@@ -4126,9 +4062,8 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 		
   grid_decomp_flag = AUTO;
 
-.. _tile:
-
-:ref:`tile <tile>`
+tile
+""""
 
 The "tile" entry is a dictionary that specifies how tiles should be defined
 in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
@@ -4152,9 +4087,8 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
      ];
   }
 
-.. _wavelet:
-
-:ref:`wavelet <wavelet>`
+wavelet
+"""""""
 
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
@@ -4189,9 +4123,8 @@ wavelet decomposition should be performed:
      member = 2;
   }
 
-.. _obs_raw_wvlt_object_plots:
-
-:ref:`obs_raw_plot, wvlt_plot, object_plot <obs_raw_wvlt_object_plots>`
+obs_raw_wvlt_object_plots
+"""""""""""""""""""""""""
 
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described in the "Settings common to multiple
@@ -4200,15 +4133,13 @@ tools" section.
 WWMCARegridConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _to_grid:
-
-:ref:`to_grid <to_grid>`
+to_grid
+"""""""
 
 Please see the description of the "to_grid" entry in the "regrid" dictionary above.
 
-.. _NetCDF output information:  
-
-:ref:`NetCDF output information <NetCDF output information>`
+NetCDF output information
+"""""""""""""""""""""""""
 
 Supply the NetCDF output information.  For example:
 
@@ -4226,9 +4157,8 @@ Supply the NetCDF output information.  For example:
   long_name     = "";
   level         = "";
 
-.. _max_minutes (pixel age):
-
-:ref:`max_minutes (pixel age) <max_minutes (pixel age)>`
+max_minutes (pixel age)
+"""""""""""""""""""""""
 
 Maximum pixel age in minutes
 
@@ -4236,9 +4166,8 @@ Maximum pixel age in minutes
 
   max_minutes = 120;
 
-.. _swap_endian:
-
-:ref:`swap_endian <swap_endian>`
+swap_endian
+"""""""""""
 
 The WWMCA pixel age data is stored in binary data files in 4-byte blocks.
 The swap_endian option indicates whether the endian-ness of the data should
@@ -4248,9 +4177,8 @@ be swapped after reading.
 		
   swap_endian = TRUE;
 
-.. _write_pixel_age:
-
-:ref:`write_pixel_age <write_pixel_age>`
+write_pixel_age
+"""""""""""""""
 
 By default, wwmca_regrid writes the cloud percent data specified on the
 command line to the output file. This option writes the pixel age data,

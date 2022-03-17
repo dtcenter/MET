@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -299,6 +299,7 @@ rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
+tc  = (const TcrmwData *)         0;
 
 clear();
 
@@ -321,6 +322,7 @@ if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
 if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
+if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 
 return;
 
@@ -900,13 +902,13 @@ return ( rep->name() );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Grid::serialize() const
+ConcatString Grid::serialize(const char *sep) const
 
 {
 
 ConcatString s;
 
-if ( rep )  s = rep->serialize();
+if ( rep )  s = rep->serialize(sep);
 
 return ( s );
 

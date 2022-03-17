@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -972,7 +972,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
    // Store the climo CDF info
-   vx_pd.set_climo_cdf_info(cdf_info);
+   vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;
@@ -1189,8 +1189,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          n = (!prob_flag ? 0 : n_pd * get_n_oprob_thresh() * n_bin);
 
          // Number of HiRA PCT, PJC, or PRC lines =
-         //    Message Types * Masks * Interpolations * Thresholds *
-         //    HiRA widths
+         //    Message Types * Masks * HiRA widths * Thresholds
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
                   hira_info.width.n());
@@ -1206,8 +1205,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_oprob_thresh() * get_n_ci_alpha() * n_bin);
 
          // Number of HiRA PSTD lines =
-         //    Message Types * Masks * Interpolations * Thresholds *
-         //    HiRA widths * Alphas
+         //    Message Types * Masks * HiRA widths * Thresholds *
+         //    Alphas
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd *
                   get_n_cat_thresh() * hira_info.width.n() *
@@ -1218,8 +1217,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_ecnt):
       case(i_rps):
-         // Number of HiRA ECNT, ORANK and RPS lines =
-         //    Message Types * Masks * Interpolations * HiRA widths *
+         // Number of HiRA ECNT and RPS lines =
+         //    Message Types * Masks * HiRA widths *
          //    Alphas
          if(hira_info.flag) {
             n = n_pd * hira_info.width.n() * get_n_ci_alpha();
@@ -1231,7 +1230,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          break;
 
       case(i_orank):
-         // Number HiRA ORANK lines possible =
+         // Number of HiRA ORANK lines possible =
          //    Number of pairs * Categorical Thresholds *
          //    HiRA widths
          if(hira_info.flag) {

@@ -37,6 +37,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                thresh_array.cc thresh_array.h \
                make_path.cc make_path.h \
                memory.cc memory.h \
+               normalize.cc normalize.h \
                ordinal.cc ordinal.h \
                roman_numeral.cc roman_numeral.h \
                string_fxns.cc string_fxns.h \

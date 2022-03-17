@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -361,21 +361,25 @@ if ( vinfo->grid_attr().nxy() > 0 )  {
 }
 
    //
-   // Print a data summary
+   // Print the grid information and data summary
    //
 
 if ( mlog.verbosity_level() >= 4 ) {
+
+   mlog << Debug(4) << "\n"
+        << "Grid information:\n   "
+        << Dest_Grid->serialize("\n   ") << "\n";
 
    double min_v, max_v;
    dp.data_range(min_v, max_v);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
-        << "      plane min: " << min_v << "\n"
-        << "      plane max: " << max_v << "\n"
-        << "     valid time: " << unix_to_yyyymmdd_hhmmss(dp.valid()) << "\n"
-        << "      lead time: " << sec_to_hhmmss(dp.lead()) << "\n"
-        << "      init time: " << unix_to_yyyymmdd_hhmmss(dp.init()) << "\n"
-        << "     accum time: " << sec_to_hhmmss(dp.accum()) << "\n\n";
+        << "   plane min: " << min_v << "\n"
+        << "   plane max: " << max_v << "\n"
+        << "   valid time: " << unix_to_yyyymmdd_hhmmss(dp.valid()) << "\n"
+        << "   lead time: " << sec_to_hhmmss(dp.lead()) << "\n"
+        << "   init time: " << unix_to_yyyymmdd_hhmmss(dp.init()) << "\n"
+        << "   accum time: " << sec_to_hhmmss(dp.accum()) << "\n\n";
 
 }
 

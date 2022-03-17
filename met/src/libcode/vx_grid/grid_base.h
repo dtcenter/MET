@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -162,7 +162,7 @@ class GridRep : public GridInterface {
 
       virtual void dump(ostream &, int = 0) const = 0;
 
-      virtual ConcatString serialize() const = 0;
+      virtual ConcatString serialize(const char *sep=" ") const = 0;
 
       virtual GridInfo info() const = 0;
 
@@ -240,7 +240,7 @@ class Grid : public GridInterface {
 
       ConcatString name() const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
 

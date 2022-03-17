@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "CFSv2";
 
 //
 // Output description to be written
@@ -38,6 +38,7 @@ regrid = {
 //
 censor_thresh = [];
 censor_val    = [];
+normalize     = NONE;
 cat_thresh    = [];
 nc_var_str    = "";
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -122,7 +122,8 @@ inline int GenEnsProdConfInfo::get_compression_level() { return(conf.nc_compress
 class GenEnsProdVarInfo: public EnsVarInfo {
 
 public:
-    GenEnsProdNcOutInfo nc_info;  // Ensemble product outputs
+    NormalizeType       normalize; // Ensemble normalization logic
+    GenEnsProdNcOutInfo nc_info;   // Ensemble product outputs
 };
 
 #endif   /*  __GEN_ENS_PROD_CONF_INFO_H__  */

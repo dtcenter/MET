@@ -1,10 +1,11 @@
 .. _appendixB:
 
+************************************************
 Appendix B Map Projections, Grids, and Polylines
-================================================
+************************************************
 
 Map Projections
-_______________
+===============
 
 The following map projections are currently supported in MET:
 
@@ -23,7 +24,7 @@ The following map projections are currently supported in MET:
 * Gaussian Projection
 
 Grid Specification Strings
-__________________________
+==========================
 
 Several configuration file and command line options support the definition of grids as a grid specification string. A description of the that string for each of the supported grid types is provided below.
 
@@ -82,14 +83,14 @@ For a Gaussian grid, the syntax is
 The parameters **Nx** and **Ny** are as before, while **lon_zero** defines the first longitude.
 
 Grids
-_____
+=====
 
 The majority of NCEP's pre-defined grids that reside on one of the projections listed above are implemented in MET. The user may specify one of these NCEP grids in the configuration files as "GNNN" where NNN is the 3-digit NCEP grid number. Defining a new masking grid in MET would involve modifying the vx_data_grids library and recompiling.
 
 Please see `NCEP's website for a description and plot of these predefined grids <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
 
 Polylines for NCEP Regions
-__________________________
+==========================
 
 Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed *share/met/poly* directory. Users may also easily define their own lat/lon polyline files.
 

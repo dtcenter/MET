@@ -1,21 +1,22 @@
 .. _reformat_point:
 
+***********************************
 Re-Formatting of Point Observations
-===================================
+***********************************
 
 There are several formats of point observations that may be preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in :numref:`overview`. The software tools used to reformat point data are described in this section.
 
 .. _PB2NC tool:
 
 PB2NC tool
-__________
+==========
 
 This section describes how to configure and run the PB2NC tool. The PB2NC tool is used to stratify the contents of an input PrepBUFR point observation file and reformat it into NetCDF format for use by other MET tools. The PB2NC tool must be run on the input PrepBUFR point observation file prior to performing verification with the MET statistics tools.
 
 .. _pb2nc usage:
 
 pb2nc usage
-~~~~~~~~~~~
+-----------
 
 The usage statement for the PB2NC tool is shown below:
 
@@ -91,7 +92,7 @@ In this example, the PB2NC tool will process the input **sample_pb.blk** file ap
 .. _pb2nc configuration file:
 
 pb2nc configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`Sample test cases` is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
@@ -103,7 +104,7 @@ For example, using an environment variable to set the **message_type** (see belo
 
 \* In the configuration file: **message_type = [ ${MSG_TYP} ];**
 
- The contents of the default pb2nc configuration file are described below.
+The contents of the default pb2nc configuration file are described below.
 
 ____________________
 
@@ -124,7 +125,7 @@ _____________________
 
 Each PrepBUFR message is tagged with one of eighteen message types as listed in the :numref:`config_options` file. The **message_type** refers to the type of observation from which the observation value (or 'report') was derived. The user may specify a comma-separated list of message types to be retained. Providing an empty list indicates that all message types should be retained.
 
-___________________
+_____________________
 
 .. code-block:: none		
 
@@ -132,7 +133,7 @@ ___________________
 
 The **message_type_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of input PrepBUFR message types to output message types. This provides a method for renaming input PrepBUFR message types.
 
-______________________
+_____________________
 
 .. code-block:: none
 		
@@ -146,7 +147,7 @@ ______________________
 
 The **message_type_group_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of message type group names to a comma-separated list of values. This map is defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify this map to define sets of message types that should be processed together as a group. The **SURFACE** entry must be present to define message types for which surface verification logic should be applied.
 
-______________
+_____________________
 
 .. code-block:: none
 		
@@ -154,7 +155,7 @@ ______________
 
 Each PrepBUFR message has a station identification string associated with it. The user may specify a comma-separated list of station IDs to be retained. Providing an empty list indicates that messages from all station IDs will be retained. It can be a file name containing a list of stations.
 
-_______________
+_____________________
 
 .. code-block:: none
 		
@@ -163,7 +164,7 @@ _______________
 
 The **beg** and **end** variables are used to stratify the elevation (in meters) of the observations to be retained. The range shown above is set to -1000 to 100000 meters, which essentially retains every observation.
 
-__________________
+_____________________
 
 .. code-block:: none
 
@@ -178,7 +179,7 @@ The **pb_report_type, in_report_type**, and **instrument_type** variables are us
 
 `PrepBUFR Code table for input report types. <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
-_________________
+_____________________
 
 .. code-block:: none
 		
@@ -219,16 +220,16 @@ The **level_category** variable is used to specify a comma-separated list of Pre
    * - 7
      - Auxiliary levels generated via interpolation from spanning levels
        
-_______________
-
+_____________________
+       
 .. code-block:: none
 		
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 
 
-Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, and D_CAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, and convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
+Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, D_CAPE, and D_MLCAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, convective available potential energy, and mixed layer convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
 
-________________
+_____________________
 
 .. code-block:: none
 		
@@ -247,12 +248,13 @@ ________________
 		{ key = 'D_PRMSL';  val = 'PRMSL'; },
 		{ key = 'D_PBL';    val = 'PBL';   },
 		{ key = 'D_CAPE';   val = 'CAPE';  }
+		{ key = 'D_MLCAPE'; val = 'MLCAPE';  }
 		];
 
 
 The BUFR variable names are not shared with other forecast data. This map is used to convert the BUFR name to the common name, like GRIB2. It allows to share the configuration for forecast data with PB2NC observation data. If there is no mapping, the BUFR variable name will be saved to output NetCDF file.
 
-______________
+_____________________
 
 .. code-block:: none
 		
@@ -261,7 +263,7 @@ ______________
 
 Each observation has a quality mark value associated with it. The **quality_mark_thresh** is used to stratify out which quality marks will be retained. The value shown above indicates that only observations with quality marks less than or equal to 2 will be retained.
 
-_________________
+_____________________
 
 .. code-block:: none
 		
@@ -270,7 +272,7 @@ _________________
 
 A PrepBUFR message may contain duplicate observations with different quality mark values. The **event_stack_flag** indicates whether to use the observations at the top of the event stack (observation values have had more quality control processing applied) or the bottom of the event stack (observation values have had no quality control processing applied). The flag value of **TOP** listed above indicates the observations with the most amount of quality control processing should be used, the **BOTTOM** option uses the data closest to raw values.
 
-___________________
+_____________________
 
 .. code-block:: none
 		
@@ -311,7 +313,7 @@ The **vld_freq** and **vld_thresh** entries specify the required ratio of valid 
 .. _pb2nc output:
 
 pb2nc output
-~~~~~~~~~~~~
+------------
 
 Each NetCDF file generated by the PB2NC tool contains the dimensions and variables shown in :numref:`table_reform-point_pb2nc_output_dim` and :numref:`table_reform-point_pb2nc_output_vars`.
 
@@ -416,7 +418,7 @@ Each NetCDF file generated by the PB2NC tool contains the dimensions and variabl
 
 
 ASCII2NC tool
-_____________
+=============
 
 This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used to reformat ASCII point observations into the NetCDF format expected by the Point-Stat tool. For those users wishing to verify against point observations that are not available in PrepBUFR format, the ASCII2NC tool provides a way of incorporating those observations into MET. If the ASCII2NC tool is used to perform a reformatting step, no configuration file is needed. However, for more complex processing, such as summarizing time series observations, a configuration file may be specified. For details on the configuration file options, see :numref:`config_options` and example configuration files distributed with the MET code.
 
@@ -473,7 +475,7 @@ The default ASCII point observation format consists of one row of data per obser
     - Observation value in units consistent with the GRIB code definition.
       
 ascii2nc usage
-~~~~~~~~~~~~~~
+--------------
 
 Once the ASCII point observations have been formatted as expected, the ASCII file is ready to be processed by the ASCII2NC tool. The usage statement for ASCII2NC tool is shown below:
 
@@ -544,13 +546,13 @@ Here is an example of processing the same set of observations but using Python e
 Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 ascii2nc configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 The default configuration file for the ASCII2NC tool named **Ascii2NcConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
 
 The ASCII2NC configuration file is optional and only necessary when defining time summaries or message type mapping for little_r data. The contents of the default ASCII2NC configuration file are described below.
 
-__________________
+_____________________
 
 .. code-block:: none
 
@@ -558,7 +560,7 @@ __________________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-_________________
+_____________________
 
 .. code-block:: none
 
@@ -567,7 +569,7 @@ _________________
 
 The **time_summary** feature was implemented to allow additional processing of observations with high temporal resolution, such as SURFRAD data every 5 minutes. This option is described in :numref:`pb2nc configuration file`.
 
-_________________
+_____________________
 
 .. code-block:: none
 		
@@ -588,7 +590,7 @@ This entry is an array of dictionaries, each containing a **key** string and **v
 
 
 ascii2nc output
-~~~~~~~~~~~~~~~
+---------------
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
@@ -596,14 +598,14 @@ The NetCDF output of the ASCII2NC tool is structured in the same way as the outp
 
 
 MADIS2NC tool
-_____________
+=============
 
 
 This section describes how to run the MADIS2NC tool. The MADIS2NC tool is used to reformat `Meteorological Assimilation Data Ingest System (MADIS) <http://madis.noaa.gov>`_ point observations into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The MADIS2NC tool supports many of the MADIS data types, as listed in the usage statement below. Support for additional MADIS data types may be added in the future based on user feedback.
 
 
 madis2nc usage
-~~~~~~~~~~~~~~
+--------------
 
 The usage statement for the MADIS2NC tool is shown below:
 
@@ -686,7 +688,7 @@ In this example, the MADIS2NC tool will reformat the input sample_madis_obs.nc f
 
 
 madis2nc configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 
 The default configuration file for the MADIS2NC tool named **Madis2NcConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
@@ -694,8 +696,7 @@ The default configuration file for the MADIS2NC tool named **Madis2NcConfig_defa
 
 The MADIS2NC configuration file is optional and only necessary when defining time summaries. The contents of the default MADIS2NC configuration file are described below.
 
-_________________
-
+_____________________
 
 .. code-block:: none
 
@@ -704,8 +705,7 @@ _________________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-__________________
-
+_____________________
 
 .. code-block:: none
 
@@ -716,7 +716,7 @@ The **time_summary** dictionary is described in :numref:`pb2nc configuration fil
 
 
 madis2nc output
-~~~~~~~~~~~~~~~
+---------------
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
@@ -724,14 +724,14 @@ The NetCDF output of the MADIS2NC tool is structured in the same way as the outp
 
 
 LIDAR2NC tool
-_____________
+=============
 
 
 The LIDAR2NC tool creates a NetCDF point observation file from a CALIPSO HDF data file. Not all of the data present in the CALIPSO file is reproduced in the output, however. Instead, the output focuses mostly on information about clouds (as opposed to aerosols) as seen by the satellite along its ground track.
 
 
 lidar2nc usage
-~~~~~~~~~~~~~~
+--------------
 
 The usage statement for LIDAR2NC tool is shown below:
 
@@ -767,7 +767,7 @@ Optional arguments for lidar2nc
 5. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 lidar2nc output
-~~~~~~~~~~~~~~~
+---------------
 
 Each observation type in the lidar2nc output is assigned a GRIB code. These are outlined in :numref:`lidar2nc_grib_code_table`. GRIB codes were assigned to these fields arbitrarily, with GRIB codes in the 600s denoting individual bit fields taken from the feature classification flag field in the CALIPSO file.
 
@@ -839,14 +839,14 @@ We will not give a detailed description of each CALIPSO data product that lidar2
 
 
 IODA2NC tool
-____________
+============
 
 
 This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <http://jcsda.org>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
 
 
 ioda2nc usage
-~~~~~~~~~~~~~
+-------------
 
 The usage statement for the IODA2NC tool is shown below:
 
@@ -905,13 +905,13 @@ In this example, the IODA2NC tool will reformat the data in the input ioda.NC001
 
 
 ioda2nc configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 The default configuration file for the IODA2NC tool named **IODA2NcConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
 
 The IODA2NC configuration file is optional and only necessary when defining filtering the input observations or defining time summaries. The contents of the default IODA2NC configuration file are described below.
 
-__________________
+_____________________
 
 .. code-block:: none
 
@@ -922,8 +922,7 @@ __________________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-_________________
-
+_____________________
 
 .. code-block:: none
 
@@ -939,7 +938,7 @@ _________________
 
 The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
 
-_________________
+_____________________
 
 .. code-block:: none
 
@@ -947,7 +946,7 @@ _________________
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input IODA variable names to output variable names. The default IODA map, obs_var_map, is appended to this map.
 
-_________________
+_____________________
 
 .. code-block:: none
 		
@@ -961,7 +960,7 @@ _________________
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
 
-_________________
+_____________________
 
 .. code-block:: none
 
@@ -971,19 +970,18 @@ The **missing_thresh** option is an array of thresholds. Any data values which m
 
 
 ioda2nc output
-~~~~~~~~~~~~~~
+--------------
 
 The NetCDF output of the IODA2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
 
 Point2Grid tool
-_______________
+===============
 
-The Point2Grid tool takes point observations from a NetCDF output file from one of the four previously mentioned MET tools (ascii2nc, madis2nc, pb2nc, lidar2nc) and creates a gridded NetCDF file. The other point observations are GOES-16/17 input files in NetCDF format (especially, Aerosol Optical Depth. Future development will include support for reading input files not produced from MET tools.
-
+The Point2Grid tool reads point observations from a MET NetCDF point obseravtion file, via python embedding, or from GOES-16/17 input files in NetCDF format (especially, Aerosol Optical Depth) and creates a gridded NetCDF file. Future development may add support for additional input types.
 
 point2grid usage
-~~~~~~~~~~~~~~~~
+----------------
 
 The usage statement for the Point2Grid tool is shown below:
 
@@ -1011,7 +1009,9 @@ The usage statement for the Point2Grid tool is shown below:
 Required arguments for point2grid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **input_filename** argument indicates the name of the input NetCDF file to be processed. Currently, only NetCDF files produced from the ascii2nc, madis2nc, pb2nc, and lidar2nc are supported. And AOD dataset from GOES16/17 are supported, too. Support for additional file types will be added in future releases.
+1. The **input_filename** argument indicates the name of the input file to be processed. The input can be a MET NetCDF point observation file generated by other MET tools or a NetCDF AOD dataset from GOES16/17. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
+
+The MET point observation NetCDF file name as **input_filename** argument is equivalent with "PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py netcdf_file name'.
 
 2. The **to_grid** argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
 
@@ -1064,9 +1064,22 @@ For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So t
 
 When processing GOES-16 data, the **-qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
 
+Listed below is an example of processing the same set of observations but using python embedding instead:
+
+.. code-block:: none
+		
+		point2grid \
+		'PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py ascii2nc_edr_hourly.20130827.nc' \
+		G212 python_gridded_ascii_python.nc -config Point2GridConfig_edr \
+		-field 'name="200"; level="*"; valid_time="20130827_205959";' -method MAX -v 1
+
+The user should replace the python script with the customized python script for the custom point observation data. This is an example for the python embedding.
+
+Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
+
 
 point2grid output
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The point2grid tool will output a gridded NetCDF file containing the following:
 
@@ -1094,15 +1107,14 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 For MET observation input and CF complaint NetCDF input with 2D time variable: The latest observation time within the target grid is saved as the observation time. If the "valid_time" is configured at the configuration file, the valid_time from the configuration file is saved into the output file.
 
 point2grid configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 
 The default configuration file for the point2grid tool named **Point2GridConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
 
 The point2grid configuration file is optional and only necessary when defining the variable name instead of GRIB code or filtering by time. The contents of the default MADIS2NC configuration file are described below.
 
-_______________
-
+_____________________
 
 .. code-block:: none
 
@@ -1111,8 +1123,7 @@ _______________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-__________________
-
+_____________________
 
 .. code-block:: none
 		

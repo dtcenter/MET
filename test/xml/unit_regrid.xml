@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: None -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -368,6 +370,22 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_WRAP_LON.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- Regrid rotated lat/lon NetCDF data -->
+
+  <test name="regrid_data_plane_NC_ROT_LAT_LON">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/india_rotated_unrotated_grid.nc \
+      "latlon 250 220 -10 54 0.25 0.25" \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_NC_ROT_LAT_LON.nc \
+      -field 'name="number_of_lightning_flashes"; level="(*,*)";' \
+      -method MAX -width 5
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_NC_ROT_LAT_LON.nc</grid_nc>
     </output>
   </test>
 

@@ -12,6 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_nc_obs.a
 libvx_nc_obs_a_SOURCES = \
+              met_point_data.cc met_point_data.h \
               nc_obs_util.cc nc_obs_util.h \
               nc_point_obs.cc nc_point_obs.h \
               nc_point_obs_in.cc nc_point_obs_in.h \

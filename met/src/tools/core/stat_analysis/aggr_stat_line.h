@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -141,6 +141,7 @@ struct AggrMPRInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
    PairDataPoint pd;
+   ClimoCDFInfo cdf_info;
 };
 
 struct AggrISCInfo {
@@ -152,6 +153,7 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
+   ClimoCDFInfo cdf_info;
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
    void clear();
 };

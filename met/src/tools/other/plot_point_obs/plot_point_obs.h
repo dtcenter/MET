@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -43,12 +43,13 @@ using namespace netCDF;
 
 #include "plot_point_obs_conf_info.h"
 
-#include "vx_data2d_factory.h"
-#include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_stat_out.h"
 #include "vx_gsl_prob.h"
 #include "nc_utils.h"
+#ifdef WITH_PYTHON
+#include "pointdata_python.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,6 +30,7 @@
 //   010    12/11/19  Halley Gotway  Reorganize logic to support the use
 //                    of python embedding.
 //   011    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
+//   012    01/20/22  Halley Gotway  MET #2003 Add PSTD BRIERCL output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -338,6 +339,9 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
    // Process masking regions
    conf_info.process_masks(grid);
+
+   // Set the block size, if needed
+   if(is_bad_data(conf_info.block_size)) conf_info.block_size = nxy;
 
    // Compute the number of reads required
    n_reads = nint(ceil((double) nxy / conf_info.block_size));
@@ -658,6 +662,7 @@ void process_scores() {
    VarInfo *obs_info  = (VarInfo *) 0;
    PairDataPoint *pd_ptr = (PairDataPoint *) 0;
    DataPlane fcst_dp, obs_dp;
+   const char *method_name = "process_scores() ";
 
    // Climatology mean and standard deviation
    DataPlane cmn_dp, csd_dp;
@@ -667,18 +672,9 @@ void process_scores() {
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
 
-   // Allocate space to store the pairs for each grid point
-   pd_ptr = new PairDataPoint [conf_info.block_size];
-   for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
-
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
-
-      // Initialize PairDataPoint objects
-      for(i=0; i<conf_info.block_size; i++) pd_ptr[i].erase();
-
-      // Starting grid point
-      i_point = i_read*conf_info.block_size;
+      i_point = 0;
 
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
@@ -695,7 +691,23 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
+         // Allocate PairDataPoint objects, if needed
+         if(!pd_ptr) {
+            pd_ptr = new PairDataPoint [conf_info.block_size];
+            for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
+         }
+
+         // Re-initialize the PairDataPoint objects, if needed
          if(i_series == 0) {
+
+            for(i=0; i<conf_info.block_size; i++) {
+               pd_ptr[i].erase();
+               pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            }
+
+            // Starting grid point
+            i_point = i_read*conf_info.block_size;
+
             mlog << Debug(2)
                  << "Processing data pass number " << i_read + 1 << " of "
                  << n_reads << " for grid points " << i_point + 1 << " to "
@@ -714,8 +726,8 @@ void process_scores() {
          csd_flag = (csd_dp.nx() == fcst_dp.nx() && csd_dp.ny() == fcst_dp.ny());
 
          mlog << Debug(3)
-           << "Found " << (cmn_flag ? 0 : 1)
-           << " climatology mean and " << (csd_flag == 0 ? 0 : 1)
+           << "Found " << (cmn_flag ? 1 : 0)
+           << " climatology mean and " << (csd_flag ? 1 : 0)
            << " climatology standard deviation field(s) for forecast "
            << fcst_info->magic_str() << ".\n";
 
@@ -751,6 +763,12 @@ void process_scores() {
          } // end for i
 
       } // end for i_series
+
+      if(0 == pd_ptr) {
+         mlog << Debug(3) << method_name
+              << "PairDataPoint is not set. Skip computing statistics for each grid point in the block.\n";
+         continue;
+      }
 
       // Compute statistics for each grid point in the block
       for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
@@ -1845,7 +1863,11 @@ void store_stat_pstd(int n, const ConcatString &col,
       else if(c == "BRIER")       { v = pct_info.brier.v;                  }
       else if(c == "BRIER_NCL")   { v = pct_info.brier.v_ncl[i];           }
       else if(c == "BRIER_NCU")   { v = pct_info.brier.v_ncu[i];           }
+      else if(c == "BRIERCL")     { v = pct_info.briercl.v;                }
+      else if(c == "BRIERCL_NCL") { v = pct_info.briercl.v_ncl[i];         }
+      else if(c == "BRIERCL_NCU") { v = pct_info.briercl.v_ncu[i];         }
       else if(c == "BSS")         { v = pct_info.bss;                      }
+      else if(c == "BSS_SMPL")    { v = pct_info.bss_smpl;                 }
       else {
         mlog << Error << "\nstore_stat_pstd() -> "
              << "unsupported column name requested \"" << c

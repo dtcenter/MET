@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -127,6 +127,8 @@ class DictionaryEntry {
 
       const ConcatString string_value () const;
 
+      Dictionary * dict () const;   //  doesn't check for dict vs array
+
       Dictionary * dict_value () const;
 
       Dictionary * array_value () const;
@@ -164,6 +166,8 @@ inline bool DictionaryEntry::is_array() const { return ( Type == ArrayType ); }
 inline int DictionaryEntry::n_args() const { return ( Nargs ); }
 
 inline const IcodeVector * DictionaryEntry::icv() const { return ( v ); }
+
+inline Dictionary * DictionaryEntry::dict() const { return ( Dict ); }
 
 
 ////////////////////////////////////////////////////////////////////////

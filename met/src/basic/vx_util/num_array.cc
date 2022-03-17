@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -262,6 +262,27 @@ int NumArray::has(double d, bool forward) const
    }
    
    return ( found );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool NumArray::is_const(double d) const
+
+{
+
+   bool status = true;
+
+   for (int j=0; j<n_elements(); ++j)  {
+      if ( !is_eq(e[j], d) )  {
+         status = false;
+         break;
+      }
+   }
+
+   return ( status && n_elements() > 0 );
 
 }
 

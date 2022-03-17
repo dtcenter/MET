@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,8 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+
+#include "mode_field_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -65,103 +67,75 @@ class ModeConfInfo {
 
       void init_from_scratch();
 
+      int Field_Index;
+
+      int N_fields;    //  = 1 for traditional MODE
+                       //  > 1 for multivar MODE
+                       //  should always be at least 1
+
    public:
+
 
       ModeConfInfo();
      ~ModeConfInfo();
 
       void clear();
 
-      void read_config    (const char * default_filename, const char * user_filename);
+      void set_field_index(int);
 
-      void process_config (GrdFileType ftype, GrdFileType otype);
+      int field_index() const;
 
-      void set_perc_thresh(const DataPlane &, const DataPlane &);
+      bool is_multivar();
 
-      void parse_nc_info  ();
+      ConcatString  fcst_multivar_logic;
+      ConcatString   obs_multivar_logic;
 
-      void set_conv_radius_by_index  (int);
-      void set_conv_thresh_by_index (int);
+      void get_multivar_programs();
 
-      void set_fcst_merge_thresh_by_index (int);
-      void set_obs_merge_thresh_by_index  (int);
 
-      int n_conv_threshs  () const;
-      int n_conv_radii    () const;
+   /////////////////////////////////////////////////////////////////////
 
-      int n_fcst_merge_threshs () const;
-      int n_obs_merge_threshs  () const;
 
-      int n_runs() const;   //  # threshs times # radii
+      Mode_Field_Info * fcst_array;   //  allocated
+      Mode_Field_Info *  obs_array;   //  allocated
 
-      int get_compression_level();
+      Mode_Field_Info * Fcst;         //  points to current field, not allocated
+      Mode_Field_Info *  Obs;         //  points to current field, not allocated
 
-      // Store data parsed from the MODE configuration object
+
+   /////////////////////////////////////////////////////////////////////
+
+
+         //
+         //  configuration file
+         //
 
       MetConfig conf;                          // MODE configuration object
 
-      ConcatString     model;                  // Model name
-      ConcatString     desc;                   // Description
-      ConcatString     obtype;                 // Observation type
+      void read_config    (const char * default_filename, const char * user_filename);
+      void process_config (GrdFileType ftype, GrdFileType otype);
 
-      double           grid_res;
+      void read_fields (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
 
-      VarInfo *        fcst_info;              // allocated
-      VarInfo *         obs_info;              // allocated
+         //
+         //  weights
+         //
 
-      bool             quilt;                  // default: false
+      double  centroid_dist_wt;       // Weights used as input to the fuzzy engine
+      double  boundary_dist_wt;
+      double  convex_hull_dist_wt;
+      double  angle_diff_wt;
+      double  aspect_diff_wt;
+      double  area_ratio_wt;
+      double  int_area_ratio_wt;
+      double  curvature_ratio_wt;
+      double  complexity_ratio_wt;
+      double  inten_perc_ratio_wt;
 
-      IntArray         fcst_conv_radius_array; // List of convolution radii in grid squares
-      IntArray          obs_conv_radius_array;
 
-      int              fcst_conv_radius;       // Convolution radius in grid squares
-      int               obs_conv_radius;
-
-      ThreshArray      fcst_conv_thresh_array; // List of conv thresholds to use
-      ThreshArray       obs_conv_thresh_array;
-
-      SingleThresh     fcst_conv_thresh;       // Convolution threshold to define objects
-      SingleThresh      obs_conv_thresh;
-
-      double           fcst_vld_thresh;        // Minimum ratio of valid data points in the convolution area
-      double            obs_vld_thresh;
-
-      map<ConcatString,ThreshArray> fcst_filter_attr_map; // Discard objects that don't meet these attribute thresholds
-      map<ConcatString,ThreshArray>  obs_filter_attr_map;
-
-      ThreshArray      fcst_merge_thresh_array; // Lower convolution threshold used for double merging method
-      ThreshArray       obs_merge_thresh_array;
-
-      SingleThresh      fcst_merge_thresh;      // Lower convolution threshold used for double merging method
-      SingleThresh       obs_merge_thresh;
-
-      MergeType        fcst_merge_flag;        // Define which merging methods should be employed
-      MergeType         obs_merge_flag;
-
-      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs
-
-      MatchType        match_flag;             // Define which matching methods should be employed
-
-      double           max_centroid_dist;      // Only compare objects whose centroids are close enough (in grid squares)
-
-      ConcatString     mask_grid_name;         // Path for masking grid area
-      FieldType        mask_grid_flag;         // Define which fields should be masked out
-
-      ConcatString     mask_poly_name;         // Path for masking poly area
-      FieldType        mask_poly_flag;         // Define which fields should be masked out
-
-      double           centroid_dist_wt;       // Weights used as input to the fuzzy engine
-      double           boundary_dist_wt;
-      double           convex_hull_dist_wt;
-      double           angle_diff_wt;
-      double           aspect_diff_wt;
-      double           area_ratio_wt;
-      double           int_area_ratio_wt;
-      double           curvature_ratio_wt;
-      double           complexity_ratio_wt;
-      double           inten_perc_ratio_wt;
-
-      int              inten_perc_value;       // Intensity percentile used for the intensity percentile ratio
+         //
+         //  interest maps
+         //
 
       PiecewiseLinear * centroid_dist_if;      // Interest functions used as input to the fuzzy engine
       PiecewiseLinear * boundary_dist_if;      // not allocated
@@ -174,30 +148,81 @@ class ModeConfInfo {
       PiecewiseLinear * complexity_ratio_if;
       PiecewiseLinear * inten_perc_ratio_if;
 
-      double           total_interest_thresh;  // Total interest threshold defining significance
+         //
+         //  interest thresholds
+         //
 
+      double           total_interest_thresh;  // Total interest threshold defining significance
       double           print_interest_thresh;  // Only write output for pairs with this interest
 
-      ConcatString     met_data_dir;           // MET data directory
+         //
+         //  limits
+         //
 
-      PlotInfo         fcst_raw_pi;            // Raw forecast plotting info
-      PlotInfo         obs_raw_pi;             // Raw observation plotting info
-      PlotInfo         object_pi;              // Object plotting info
+      double           max_centroid_dist;      // Only compare objects whose centroids are close enough (in grid squares)
 
+
+         //
+         //  flags
+         //
+
+      bool             quilt;                  // default: false
       bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
       bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
       bool             ps_plot_flag;           // Flag for the output PostScript image file
-      // bool             nc_pairs_flag;          // output NetCDF file
-      ModeNcOutInfo    nc_info;
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
+
+      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs
+      MatchType        match_flag;             // Define which matching methods should be employed
+      FieldType        mask_grid_flag;         // Define which fields should be masked out
+      FieldType        mask_poly_flag;         // Define which fields should be masked out
+
+
+         //
+         //  misc member data
+         //
+
+      int              inten_perc_value;       // Intensity percentile used for the intensity percentile ratio
+      double           grid_res;
+
+      ConcatString     model;                  // Model name
+      ConcatString     desc;                   // Description
+      ConcatString     obtype;                 // Observation type
+
+      ConcatString     mask_grid_name;         // Path for masking grid area
+      ConcatString     mask_poly_name;         // Path for masking poly area
+
+      ConcatString     met_data_dir;           // MET data directory
+
+      PlotInfo         object_pi;              // Object plotting info
+
+      ModeNcOutInfo    nc_info;
 
       int              shift_right;            //  shift amount for global grids
 
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
-      bool             need_fcst_merge_thresh () const;   //  mergetype is both or thresh
-      bool             need_obs_merge_thresh  () const;   //  mergetype is both or thresh
+         //
+         //  misc member functions
+         //
+
+      void set_perc_thresh(const DataPlane &, const DataPlane &);
+
+      void parse_nc_info  ();
+
+      void set_conv_radius_by_index  (int);
+      void set_conv_thresh_by_index  (int);
+
+      int n_conv_threshs  () const;
+      int n_conv_radii    () const;
+
+      int n_runs() const;   //  # threshs times # radii
+
+      int get_compression_level();
+
+      void  set_fcst_merge_thresh_by_index (int);
+      void  set_obs_merge_thresh_by_index  (int);
 
 };
 
@@ -205,22 +230,16 @@ class ModeConfInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ModeConfInfo::n_conv_radii() const { return ( fcst_conv_radius_array.n_elements() ); }   //  should be the same as
-                                                                                                    //  obs_conv_radius_array.n_elements()
+inline int ModeConfInfo::n_conv_radii() const { return ( Fcst->conv_radius_array.n_elements() ); }   //  should be the same as
+                                                                                                     //  obs_conv_radius_array.n_elements()
 
-
-inline int ModeConfInfo::n_conv_threshs() const { return ( fcst_conv_thresh_array.n_elements() ); }   //  should be the same as
-                                                                                                      //  obs_conv_thresh_array.n_elements()
-
-
-inline int ModeConfInfo::n_fcst_merge_threshs () const { return ( fcst_merge_thresh_array.n_elements() ); }
-inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs_merge_thresh_array.n_elements() ); }
-
-
-inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) ); }
-inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs_merge_flag == MergeType_Both) || ( obs_merge_flag == MergeType_Thresh) ); }
+inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_array.n_elements() ); }   //  should be the same as
+                                                                                                       //  obs_conv_thresh_array.n_elements()
 
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
+
+inline int ModeConfInfo::field_index() const { return Field_Index; }
+
 
 ////////////////////////////////////////////////////////////////////////
 

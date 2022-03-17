@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1020,6 +1020,7 @@ double compute_sfc_interp(const DataPlane &dp,
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
               << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+         exit(1);
    }
 
    delete gt;

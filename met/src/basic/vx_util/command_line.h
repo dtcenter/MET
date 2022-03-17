@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -176,7 +176,10 @@ class CommandLine {
          //  set stuff
          //
 
-      void set(int argc, char ** argv);   //  includes argv[0]
+      void set(int argc, char ** argv);                  //  includes argv[0]
+
+      void set(const StringArray &);                     //  includes argv[0]
+      void set(const StringArray &, UsageFunction);      //  includes argv[0]
 
       void set_usage(UsageFunction);
 

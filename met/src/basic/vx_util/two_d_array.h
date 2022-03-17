@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -94,6 +94,8 @@ class TwoD_Array {
          //
 
       void put(const T &, int _x, int _y);
+
+      T get(int _x, int _y) const;   //  there are times when operator[] or operator() are inconvenient
 
       bool s_is_on(int _x, int _y) const;
       bool f_is_on(int _x, int _y) const;
@@ -281,6 +283,20 @@ return ( E[two_to_one(_x, _y)] );
 
 template <typename T>
 
+T TwoD_Array<T>::get(int _x, int _y) const
+
+{
+
+return ( E[two_to_one(_x, _y)] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
 bool TwoD_Array<T>::s_is_on(int _x, int _y) const
 
 {
@@ -374,6 +390,12 @@ for (j=(Nx - 1); j>=0; --j)  {
 return ( -1 );
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+typedef TwoD_Array<bool> BoolPlane;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,6 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
+static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -140,9 +141,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best ||
+   if(method == InterpMthd_Best       ||
       method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian) {
+      method == InterpMthd_Gaussian   ||
+      method == InterpMthd_HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -1088,14 +1090,6 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
-   parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
-   return m;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
@@ -1498,6 +1492,7 @@ void ClimoCDFInfo::clear() {
    n_bin = 0;
    cdf_ta.clear();
    write_bins = false;
+   direct_prob = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1589,8 +1584,12 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    center = cdf_dict->lookup_bool(conf_key_center_bins);
 
    // Conf: write_bins
-   // Used by Grid-Stat and Point-Stat but not by Ensemble-Stat
+   // Used by Grid-Stat and Point-Stat
+   // Not used by Ensemble-Stat or Series-Analysis
    info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins, false, false);
+
+   // Conf: direct_prob
+   info.direct_prob = cdf_dict->lookup_bool(conf_key_direct_prob, false, false);
 
    // Check that at least one value is provided
    if(bins.n() == 0) {
@@ -2274,6 +2273,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
    else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -2978,6 +2978,36 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
    }
 
    return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NormalizeType parse_conf_normalize(Dictionary *dict) {
+   NormalizeType t = NormalizeType_None;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_normalize);
+
+   // Convert integer to enumerated NormalizeType
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
+   else {
+      mlog << Error << "\nparse_conf_normalize() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

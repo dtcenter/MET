@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research led(UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -99,6 +99,7 @@
 //   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
+//   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -127,6 +128,11 @@ using namespace std;
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#ifdef WITH_PYTHON
+#include "data2d_nc_met.h"
+#include "pointdata_python.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 #define BUFFER_SIZE (DEF_NC_BUFFER_SIZE/2)
@@ -151,7 +157,6 @@ static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDa
 static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
 static void do_hira_ens  (              int, const PairDataPoint *);
 static void do_hira_prob (              int, const PairDataPoint *);
-
 
 static void finish_txt_files();
 
@@ -672,49 +677,88 @@ void process_obs_file(int i_nc) {
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
    // output of the PB2NC or ASCII2NC tool.
+   bool status;
+   bool use_var_id = true;
+   bool use_arr_vars = false;
+   bool use_python = false;
    MetNcPointObsIn nc_point_obs;
-   if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
-      nc_point_obs.close();
+   MetPointData *met_point_obs = 0;
+#ifdef WITH_PYTHON
+   MetPythonPointDataFile met_point_file;
+   string python_command = obs_file[i_nc];
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
 
-      mlog << Warning << "\n" << method_name
-           << "can't open observation netCDF file: "
-           << obs_file[i_nc] << "\n\n";
-      return;
+      if(!met_point_file.open(python_command.substr(offset+1).c_str(), use_xarray)) {
+         met_point_file.close();
+         mlog << Error << "\n" << method_name
+              << "trouble getting point observation file from python command "
+              << python_command << ".\n\n";
+         exit(1);
+      }
+
+      met_point_obs = met_point_file.get_met_point_data();
    }
+   else {
+#endif
+      if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
+         nc_point_obs.close();
+      
+         mlog << Warning << "\n" << method_name
+              << "can't open observation netCDF file: "
+              << obs_file[i_nc] << "\n\n";
+         return;
+      }
+      
+      nc_point_obs.read_dim_headers();
+      nc_point_obs.check_nc(obs_file[i_nc].c_str(), method_name);
+      nc_point_obs.read_obs_data_table_lookups();
+      met_point_obs = (MetPointData *)&nc_point_obs;
+      use_var_id = nc_point_obs.is_using_var_id();
+      use_arr_vars = nc_point_obs.is_using_obs_arr();
+#ifdef WITH_PYTHON
+   }
+#endif
 
-   nc_point_obs.read_dim_headers();
-   nc_point_obs.check_nc(obs_file[i_nc].c_str(), method_name);
-   nc_point_obs.read_obs_data_table_lookups();
-
-   bool use_var_id = nc_point_obs.is_using_var_id();
-   int hdr_count = nc_point_obs.get_hdr_cnt();
-   int obs_count = nc_point_obs.get_obs_cnt();
+   int hdr_count = met_point_obs->get_hdr_cnt();
+   int obs_count = met_point_obs->get_obs_cnt();
    mlog << Debug(2)
         << "Searching " << obs_count
         << " observations from " << hdr_count
         << " messages.\n";
 
    ConcatString var_name("");
-   bool use_arr_vars = nc_point_obs.is_using_obs_arr();
    StringArray var_names;
-   StringArray obs_qty_array = nc_point_obs.get_qty_data();
-   if( use_var_id ) var_names = nc_point_obs.get_var_names();
+   StringArray obs_qty_array = met_point_obs->get_qty_data();
+   if( use_var_id ) var_names = met_point_obs->get_var_names();
 
-   int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
+   const int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
    // Process each observation in the file
    int str_length, block_size;
-   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=block_size) {
+   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
       block_size = (obs_count - i_block_start_idx);
-      if (block_size > BUFFER_SIZE) block_size = BUFFER_SIZE;
+      if (block_size > buf_size) block_size = buf_size;
 
-      if (!nc_point_obs.read_obs_data(block_size, i_block_start_idx,
-                                      (float *)obs_arr_block,
-                                      obs_qty_idx_block, (char *)0)) {
-         exit(1);
-      }
+#ifdef WITH_PYTHON
+      if (use_python)
+         status = met_point_obs->get_point_obs_data()->fill_obs_buf(
+                             block_size, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
+      else
+#endif
+         status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
+                                            (float *)obs_arr_block,
+                                            obs_qty_idx_block, (char *)0);
+      if (!status) exit(1);
 
       int hdr_idx;
       for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
@@ -727,7 +771,7 @@ void process_obs_file(int i_nc) {
          int qty_offset = use_arr_vars ? i_obs : obs_qty_idx_block[i_block_idx];
          obs_qty_str = obs_qty_array[qty_offset];
 
-         int headerOffset = nc_point_obs.get_header_offset(obs_arr);
+         int headerOffset = met_point_obs->get_header_offset(obs_arr);
 
          // Range check the header offset
          if(headerOffset < 0 || headerOffset >= hdr_count) {
@@ -741,11 +785,16 @@ void process_obs_file(int i_nc) {
 
          // Read the corresponding header array for this observation
          // - the corresponding header type, header Station ID, and valid time
-         nc_point_obs.get_header(headerOffset, hdr_arr, hdr_typ_str,
-                                 hdr_sid_str, hdr_vld_str);
+#ifdef WITH_PYTHON
+         if (use_python)
+            met_point_obs->get_header(headerOffset, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
+         else
+#endif
+            nc_point_obs.get_header(headerOffset, hdr_arr, hdr_typ_str,
+                                    hdr_sid_str, hdr_vld_str);
 
          // Store the variable name
-         int org_grib_code = nc_point_obs.get_grib_code_or_var_index(obs_arr);
+         int org_grib_code = met_point_obs->get_grib_code_or_var_index(obs_arr);
          int grib_code = org_grib_code;
          if (use_var_id && grib_code < var_names.n()) {
             var_name   = var_names[grib_code];
@@ -774,7 +823,7 @@ void process_obs_file(int i_nc) {
          // and at the same vertical level.
          if(vflag && is_vgrd) {
 
-            if(!nc_point_obs.is_same_obs_values(obs_arr, prev_obs_arr)) {
+            if(!met_point_obs->is_same_obs_values(obs_arr, prev_obs_arr)) {
                mlog << Error << "\n" << method_name
                     << "for observation index " << i_obs
                     << ", when computing VL1L2 and/or VAL1L2 vector winds "
@@ -802,12 +851,16 @@ void process_obs_file(int i_nc) {
                     grid, var_name.c_str());
          }
 
-         nc_point_obs.set_grib_code_or_var_index(obs_arr, org_grib_code);
+         met_point_obs->set_grib_code_or_var_index(obs_arr, org_grib_code);
       }
 
    } // end for i_block_start_idx
 
    // Deallocate and clean up
+#ifdef WITH_PYTHON
+   if (use_python) met_point_file.close();
+   else
+#endif
    nc_point_obs.close();
 
    return;
@@ -1167,7 +1220,7 @@ void process_scores() {
                // Appy HiRA verification and write ensemble output
                do_hira_ens(i, pd_ptr);
 
-            } // end HiRA for probabilities
+            } // end HiRA for ensembles
 
             // Apply HiRA probabilistic verification logic
             if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
@@ -1683,7 +1736,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       hira_pd.clear();
       hira_pd.extend(pd_ptr->n_obs);
       hira_pd.set_ens_size(gt->size());
-      hira_pd.set_climo_cdf_info(conf_info.vx_opt[i_vx].cdf_info);
+      hira_pd.set_climo_cdf_info_ptr(&conf_info.vx_opt[i_vx].cdf_info);
       f_ens.extend(gt->size());
 
       // Process each observation point
@@ -1744,11 +1797,13 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          continue;
       }
 
+      // Compute the pair values
+      hira_pd.compute_pair_vals(rng_ptr);
+
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
 
          // Compute ensemble statistics
-         hira_pd.compute_pair_vals(rng_ptr);
          ECNTInfo ecnt_info;
          ecnt_info.set(hira_pd);
 
@@ -1760,9 +1815,6 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Write out the ORANK line
       if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType_None) {
-
-         // Compute ensemble statistics
-         hira_pd.compute_pair_vals(rng_ptr);
 
          write_orank_row(shc, &hira_pd,
             conf_info.vx_opt[i_vx].output_flag[i_orank],

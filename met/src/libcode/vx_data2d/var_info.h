@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -258,9 +258,10 @@ inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
 //
 
 struct InputInfo {
-    VarInfo * var_info;         // Variable information to read
-    int file_index;             // Index in file_list of file to read
-    StringArray * file_list;    // Array of files (unallocated)
+   VarInfo * var_info;         // Variable information to read
+   int file_index;             // Index in file_list of file to read
+   StringArray * file_list;    // Array of files (unallocated)
+   ConcatString ens_member_id; // MET_ENS_MEMBER_ID string
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -270,32 +271,37 @@ struct InputInfo {
 //
 class EnsVarInfo {
 
-private:
-    vector<InputInfo> inputs;     // Vector of InputInfo
-    VarInfo * ctrl_info;          // Field info for control member
-public:
-    EnsVarInfo();
-    ~EnsVarInfo();
-    EnsVarInfo(const EnsVarInfo &);
+   private:
+      vector<InputInfo> inputs; // Vector of InputInfo
+      VarInfo * ctrl_info;      // Field info for control member
 
-    void clear();
-    void assign(const EnsVarInfo &);
+   public:
+      EnsVarInfo();
+      ~EnsVarInfo();
+      EnsVarInfo(const EnsVarInfo &);
 
-    void add_input(InputInfo);
-    int inputs_n();
+      void clear();
+      void assign(const EnsVarInfo &);
 
-    void set_ctrl(VarInfo *);
-    VarInfo * get_ctrl(int);
+      void add_input(InputInfo);
+      int inputs_n();
 
-    // Get VarInfo from first InputInfo if requested VarInfo is NULL
-    VarInfo * get_var_info(int index=0);
-    ConcatString get_file(int index=0);
-    int get_file_index(int index=0);
+      void set_ctrl(VarInfo *);
+      VarInfo * get_ctrl(int);
 
-    ConcatString nc_var_str;      // Ensemble variable name strings
-    ThreshArray cat_ta;           // Ensemble categorical thresholds
-    ConcatString raw_magic_str;   // Magic string w/o var substitution
+      // Get VarInfo from first InputInfo if requested VarInfo is NULL
+      VarInfo * get_var_info(int index=0);
+      ConcatString get_file(int index=0);
+      int get_file_index(int index=0);
+      ConcatString get_ens_member_id(int index=0);
+
+      ConcatString nc_var_str;      // Ensemble variable name strings
+      ThreshArray cat_ta;           // Ensemble categorical thresholds
+      ConcatString raw_magic_str;   // Magic string w/o var substitution
+
 };
+
+////////////////////////////////////////////////////////////////////////
 
 ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type);
 

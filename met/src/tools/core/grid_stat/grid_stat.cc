@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1847,7 +1847,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    pd.erase();
 
    // Store the climo CDF info
-   pd.set_climo_cdf_info(vx_opt.cdf_info);
+   pd.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
    
    // Apply the mask the data fields or fill with default values
    apply_mask(*fcst_ptr, mask_mp, pd.f_na);

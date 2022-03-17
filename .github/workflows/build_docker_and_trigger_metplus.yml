@@ -7,17 +7,34 @@ on:
     paths-ignore:
       - 'met/docs/**'
 
+env:
+  DOCKERHUB_REPO: dtcenter/met-dev
+
 jobs:
+
   build_met_docker:
     name: Handle Docker Image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and Push Docker Image
-        run: .github/jobs/build_and_push_docker_image.sh
+
+      - name: Get branch name
+        id: get_branch_name
+        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}
+
+      - name: Build Docker Image
+        run: .github/jobs/build_docker_image.sh
         env:
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
+          MET_BASE_IMAGE: minimum
+
+      - name: Push Docker Image
+        run: .github/jobs/push_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
   trigger_metplus:
     name: Trigger METplus testing workflow
     runs-on: ubuntu-latest

@@ -6,6 +6,8 @@
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
 ]>
 
+<!-- Requires: unit_tc_rmw.xml -->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>

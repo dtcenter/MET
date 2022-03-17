@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -750,7 +750,7 @@ if ( fd >= 0 )  ::close(fd);
 
 fd = -1;
 
-memset(&Header, 0, sizeof(Header));
+Header.clear();
 
 Filename.clear();
 

@@ -1,13 +1,14 @@
 .. _mode-td:
 
+*********************
 MODE Time Domain Tool
-=====================
+*********************
 
 Introduction
-____________
+============
 
 Motivation
-~~~~~~~~~~
+----------
 
 MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method is inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
 
@@ -28,17 +29,17 @@ At first glance, the addition of a third dimension would seem to entail no diffi
 In this section, we will assume that the reader has a basic familiarity with traditional MODE, its internal operation, (convolution thresholding, fuzzy logic matching and merging) and its output. We will not review these things here. Instead, we will point out differences in MTD from the way traditional MODE does things when they come up. This release is a beta version of MTD, intended mostly to encourage users to experiment with it and give us feedback and suggestions to be used in a more robust MTD release in the future.
 
 Scientific and statistical aspects
-__________________________________
+==================================
 
 Attributes
-~~~~~~~~~~
+----------
 
 Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidean/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no *metric*) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
 
 This means that some care must be taken both in determining how to generalize the calculation of a geometric attribute to three-dimensional spacetime, and also in interpreting the attributes even in the case where the generalization is straightforward. 
 
 Convolution
-~~~~~~~~~~~
+-----------
 
 As in MODE, MTD applies a convolution filter to the raw data as a preliminary step in resolving the field into objects. The convolution step in MTD differs in several respects from that performed in MODE, however. 
 
@@ -57,7 +58,7 @@ The most basic change is to use a square convolution filter rather than the circ
 Another change is that we do not allow any bad data in the convolution square. In MODE, the user may specify what percentage of bad data in the convolution region is permissible, and it will rescale the value of the filter accordingly for each data point. For the sake of speed, MTD requires that there be no bad data in the convolution region. If any bad data exists in the region, the convolved value there is set to a bad data flag.
 
 3D Single Attributes
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 MTD calculates several 3D attributes for single objects. The object could come from either the forecast field or the observed field.
 
@@ -90,7 +91,7 @@ The **start time** and **end time** of an object are attributes as well. These a
 Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the attributes are purely geometrical.
 
 3D Pair Attributes
-~~~~~~~~~~~~~~~~~~
+------------------
 
 The next category of spatial attributes is for pairs of objects - one of the pair coming from the collection of forecast objects, the other coming from the observation objects.
 
@@ -124,7 +125,7 @@ Finally, the **total interest**  gives the result of the fuzzy-logic matching an
 
 
 2D Constant-Time Attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 The final category of object attributes calculated by MTD are two-dimensional spatial attributes for horizontal (*i.e.*, constant-time) slices of a spacetime object. This is so that the behavior of these attributes over time can be examined. These 2D constant-time attributes are written out for both simple and cluster objects.
 
@@ -141,7 +142,7 @@ For such reasons, having 2D spatial attributes (as in MODE) for each object at e
 ◦ Axis Angle
 
 Matching and Merging
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 Matching and merging operations in MTD are done in a simpler fashion than in MODE. In order to understand this operation, it is necessary to discuss some very basic notions of graph theory.
 
@@ -177,17 +178,17 @@ To summarize: Any forecast simple objects that find themselves in the same equiv
 
 
 Practical information
-_____________________
+=====================
 
 MTD input
-~~~~~~~~~
+---------
 
 The formats for two-dimensional data files used as input to MTD are the same ones supported by most of the MET tools. Generally speaking, if MODE can use a forecast or observation data file as input, then that file can also be used by MTD. The only difference is that while MODE takes only one forecast and one observed data file as input, MTD takes a series of files.
 
 As shown in the next section, filenames for each time used must be given. Thus, for example, if MTD is being used for verification over a period of 24 hours, and the data file valid times are separated by one hour, then a total of 48 filenames must be specified on the MTD command line - 24 filenames for the forecast files, and 24 for the observation files. Further, the filenames must be given in order of increasing valid time. Many users will prefer to write scripts to automate this, rather than type in a lengthy command line by hand.
 
 MTD usage
-~~~~~~~~~
+---------
 
 The usage statement for the MODE-TD tool is listed below: The command line switches may be given in any order.
 
@@ -237,7 +238,7 @@ An example of the mtd calling sequence is listed below:
 In this example, the MODE-TD tool will read in a list of forecast GRIB files in the fcst_files directory and similarly spaced observation GRIB files in the obs_files directory. It uses a configuration file called **MTDConfig_default** and writes the output to the *out_dir/mtd* directory. 
 
 MTD configuration file
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents.Most of the entries in the MTD configuration file should be familiar from the corresponding file for MODE. This initial beta release of MTD does not offer all the tunable options that MODE has accumulated over the years, however. In this section, we will not bother to repeat explanations of config file details that are exactly the same as those in MODE; we will only explain those elements that are different from MODE, and those that are unique to MTD.
 
@@ -351,7 +352,7 @@ ______________________
 The **txt_output** dictionary also contains a collection of boolean flags, in this case controlling the output of ASCII attribute files. The **attributes_2d** flag controls the output of the 2D object attributes for constant-time slices of 3D objects, while the **attributes_3d** flag controls the output of single and pair 3D spacetime object attributes.
 
 mtd output
-~~~~~~~~~~
+----------
 
 MTD creates several output files after each run in ASCII and NetCDF formats. There are text files giving 2D and 3D attributes of spacetime objects and information on matches and merges, as well as a NetCDF file giving the objects themselves, in case any further or specialized analysis of the objects needs to be done.
 

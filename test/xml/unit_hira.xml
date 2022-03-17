@@ -10,6 +10,8 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!-- Requires: unit_ascii2nc.xml -->
+
 <met_test>
 
   <!--                                    -->

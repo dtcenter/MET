@@ -1043,7 +1043,7 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python3_utils ${MET_PYTHON_LD}"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
@@ -1240,6 +1240,8 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_summary/Makefile
                  src/libcode/vx_python3_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
+                 src/libcode/vx_bool_calc/Makefile
+                 src/libcode/vx_pointdata_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile

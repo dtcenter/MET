@@ -28,12 +28,22 @@ obtype = "ANALYS";
 // Verification grid
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "ens.field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
 
 //
 // Ensemble product fields to be processed
@@ -93,12 +103,25 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+eclv_points = 0.05;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
    message_type    = [ "ADPSFC" ];
-   sid_inc         = [];
-   sid_exc         = [];
    obs_quality_inc = [];
    obs_quality_exc = [];
 
@@ -111,7 +134,7 @@ fcst = {
          name       = "APCP";
          level      = "A24";
          obs_thresh = [ NA, >0, >=2.54 ];
-         obs_error = {
+         obs_error  = {
             flag      = ${OBS_ERROR_FLAG};
             dist_type = NONE;
          }
@@ -126,11 +149,16 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-obs_thresh     = [ NA ];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
-skip_const     = ${SKIP_CONST};
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = ${SKIP_CONST};
 
 //
 // Observation error options
@@ -153,12 +181,6 @@ obs_error = {
 //
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
-
-//
-// Categorical thresholds to define ensemble probabilities
-// May be set separately in each "fcst.field" entry
-//
-prob_cat_thresh = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -186,11 +208,19 @@ mask = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Interpolation methods
 //
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [
       {
@@ -213,6 +243,11 @@ output_flag = {
    orank = BOTH;
    ssvar = BOTH;
    relp  = BOTH;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +256,7 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
+   latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
    minus     = TRUE;

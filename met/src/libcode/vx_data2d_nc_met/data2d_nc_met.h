@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -50,7 +50,6 @@ class MetNcMetDataFile : public Met2dDataFile {
       
       MetNcFile * MetNc;    //  allocated
 
-
          //
          //  set stuff
          //
@@ -72,7 +71,6 @@ class MetNcMetDataFile : public Met2dDataFile {
          //  retrieve the index of the first matching record
 
       int index(VarInfo &);
-
 
          //
          //  do stuff

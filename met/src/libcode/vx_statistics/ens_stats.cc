@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -177,8 +177,8 @@ void ECNTInfo::clear() {
 
    othresh.clear();
    n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp   = bad_data_double;
-   crps_gaus  = crpscl_gaus = crpss_gaus  = bad_data_double;
+   crps_emp   = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
    ign        = bad_data_double;
    me         = rmse       = spread      = bad_data_double;
    me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
@@ -257,31 +257,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       }
    }
 
-   // Compute ME and RMSE values
-   fbar = obar = ffbar = oobar = fobar = 0.0;
-   for(i=0; i<pd.n_obs; i++) {
+   // Compute ensemble mean based statistics, if possible
+   // HiRA stores the ensemble mean as bad data
+   if(!pd.mn_na.is_const(bad_data_double)) {
 
-      if(pd.skip_ba[i]) continue;
-
-      // Track running sums
-      w      = pd.wgt_na[i]/w_sum;
-      obar  += w *  pd.o_na[i];
-      oobar += w *  pd.o_na[i] *  pd.o_na[i];
-      fbar  += w * pd.mn_na[i];
-      ffbar += w * pd.mn_na[i] * pd.mn_na[i];
-      fobar += w * pd.mn_na[i] *  pd.o_na[i];
-   }
-
-   // Derive ME and RMSE from partial sums
-   me   = fbar - obar;
-   rmse = sqrt(ffbar + oobar - 2.0*fobar);
-
-   // Compute the square root of the average variance
-   spread = square_root(pd.var_na.wmean(pd.wgt_na));
- 
-   // If observation error was specified, compute ME_OERR and RMSE_OERR
-   if(pd.has_obs_error()) {
-
+      // Compute ME and RMSE values
       fbar = obar = ffbar = oobar = fobar = 0.0;
       for(i=0; i<pd.n_obs; i++) {
 
@@ -289,21 +269,53 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
          // Track running sums
          w      = pd.wgt_na[i]/w_sum;
-         obar  += w *       pd.o_na[i];
-         oobar += w *       pd.o_na[i] *       pd.o_na[i];
-         fbar  += w * pd.mn_oerr_na[i];
-         ffbar += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
-         fobar += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+         obar  += w *  pd.o_na[i];
+         oobar += w *  pd.o_na[i] *  pd.o_na[i];
+         fbar  += w * pd.mn_na[i];
+         ffbar += w * pd.mn_na[i] * pd.mn_na[i];
+         fobar += w * pd.mn_na[i] *  pd.o_na[i];
       }
 
-      // Derive ME_OERR and RMSE_OERR from partial sums
-      me_oerr   = fbar - obar;
-      rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
+      // Derive ME and RMSE from partial sums
+      me   = fbar - obar;
+      rmse = sqrt(ffbar + oobar - 2.0*fobar);
+
+      // If observation error was specified, compute ME_OERR and RMSE_OERR
+      if(pd.has_obs_error()) {
+
+         fbar = obar = ffbar = oobar = fobar = 0.0;
+         for(i=0; i<pd.n_obs; i++) {
+
+            if(pd.skip_ba[i]) continue;
+
+            // Track running sums
+            w      = pd.wgt_na[i]/w_sum;
+            obar  += w *       pd.o_na[i];
+            oobar += w *       pd.o_na[i] *       pd.o_na[i];
+            fbar  += w * pd.mn_oerr_na[i];
+            ffbar += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
+            fobar += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+         }
+
+         // Derive ME_OERR and RMSE_OERR from partial sums
+         me_oerr   = fbar - obar;
+         rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
+      }
+      else {
+         me_oerr   = bad_data_double;
+         rmse_oerr = bad_data_double;
+      }
    }
+   // Set ensemble mean based statistics to bad data
    else {
+      me        = bad_data_double;
+      rmse      = bad_data_double;
       me_oerr   = bad_data_double;
       rmse_oerr = bad_data_double;
    }
+
+   // Compute the square root of the average variance
+   spread = square_root(pd.var_na.wmean(pd.wgt_na));
 
    // Compute the square root of the average perturbed variance
    spread_oerr = square_root(pd.var_oerr_na.wmean(pd.wgt_na));
@@ -451,22 +463,7 @@ void RPSInfo::set_prob_cat_thresh(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
-   SingleThresh st;
-   fthresh.clear();
-
-   for(int i=0; i<ta.n(); i++) {
-
-      // Skip 0.0 and 1.0
-      if(is_eq(ta[i].get_value(), 0.0) ||
-         is_eq(ta[i].get_value(), 1.0)) continue;
-
-      // Add CDP thresholds
-      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
-
-      fthresh.add(st);
-   }
-
-   return;
+   fthresh = derive_cdp_thresh(ta);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -522,7 +519,7 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
       climo_pct.zero_out();
 
       // Derive climatological probabilities
-      if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info,
+      if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info_ptr,
                                                   pd.cmn_na, pd.csd_na,
                                                   fthresh[i]);
 

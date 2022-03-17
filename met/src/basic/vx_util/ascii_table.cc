@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2021
+// ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1002,9 +1002,10 @@ if ( DoCommaString )  {
 
    p = strchr(junk, '.');
 
-   if ( p )  *p = (char) 0;
-
-   ++p;
+   if ( p ) {
+      *p = (char) 0;
+      ++p;
+   }
 
    X = atol(junk);
 
@@ -1014,7 +1015,7 @@ if ( DoCommaString )  {
 
    s << j2;
 
-   if ( Precision > 0 )  s << '.' << p;
+   if ( Precision > 0 && p )  s << '.' << p;
 
    set_entry(r, c, s.string());
 
@@ -1327,8 +1328,8 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
 
 if ( Nrows <= 2 )  return;
 
-int left[Nrows];
-int right[Nrows];
+int * left  = new int [Nrows];
+int * right = new int [Nrows];
 
 int r, c, n, k;
 int max_left, max_right;
@@ -1336,7 +1337,7 @@ const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
 
-for (r=0; r<r_start; ++r)  {
+for (r=0; r<Nrows; ++r)  {
 
    left[r] = right[r] = 0;
 
@@ -1376,6 +1377,9 @@ for (c=0; c<Ncols; ++c)  {
    //
    //  done
    //
+
+if ( left  )  { delete [] left;   left  = 0; }
+if ( right )  { delete [] right;  right = 0; }
 
 
 DecimalPointsAligned = true;

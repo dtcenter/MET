@@ -1,22 +1,23 @@
 .. _tc-pairs:
 
+*************
 TC-Pairs Tool
-=============
+*************
 
 Introduction
-____________
+============
 
 The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`. 
 
 .. _TC-Pairs_Practical-information:
 
 Practical information
-_____________________
+=====================
 
 This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run tc_pairs on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
 
 tc_pairs usage
-~~~~~~~~~~~~~~
+--------------
 
 The usage statement for tc_pairs is shown below:
 
@@ -79,7 +80,7 @@ The TC-Pairs tool implements the following logic:
 • For each edeck/bdeck pair, write paired edeck probabilities and matching bdeck values to output PROBRIRW lines.
 
 tc_pairs configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 The default configuration file for the TC-Pairs tool named **TCPairsConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -271,7 +272,7 @@ parameter will result in missed matches.
 .. _tc_pairs-output:
 
 tc_pairs output
-~~~~~~~~~~~~~~~
+---------------
 
 TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :numref:`TCST Header`.
 

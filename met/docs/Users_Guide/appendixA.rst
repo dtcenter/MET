@@ -1,15 +1,17 @@
 .. _appendixA:
 
+********************************
 Appendix A FAQs & How do I ... ?
-================================
+********************************
 
 Frequently Asked Questions
-__________________________
+==========================
 
 File-IO
-~~~~~~~
+-------
 
-**Q. File-IO - How do I improve the speed of MET tools using Gen-Vx-Mask?**
+Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The main reason to run gen_vx_mask is to make the MET
@@ -23,7 +25,8 @@ recomputing the mask when each MET statistics tool is run. If the polyline
 only contains a small number of points or the grid is sparse running
 gen_vx_mask first would only save a second or two.
 
-**Q. File-IO - How do I use map_data?**
+Q. How do I use map_data?
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The MET repository includes several map data files. Users can modify which
@@ -64,7 +67,8 @@ in the configuration string on the command line:
      "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
      ]; }'
 
-**Q. FILE-IO - How can I understand the number of matched pairs?**
+Q. How can I understand the number of matched pairs?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Statistics are computed on matched forecast/observation pairs data.
@@ -113,7 +117,8 @@ none of the point observations match the variable name requested
 in the configuration file. So all of the 1166 observations are rejected
 for the same reason.
 
-**Q.  FILE-IO - What types of NetCDF files can MET read?**
+Q. What types of NetCDF files can MET read?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 There are three flavors of NetCDF that MET can read directly.
@@ -137,7 +142,8 @@ While MET's point2grid tool does support some satellite data inputs, it is
 limited. Using python embedding is another option for handling new datasets
 not supported natively by MET.
 
-**Q. FILE-IO - How do I choose a time slice in a NetCDF file?**
+Q. How do I choose a time slice in a NetCDF file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 When processing NetCDF files, the level information needs to be
@@ -157,7 +163,8 @@ Let's use plot_data_plane as an example:
 Assuming that the first array is the time, this will select the 6-th
 time slice of the APCP data and plot it since these indices are 0-based.
 
-**Q. FILE-IO - How do I use the UNIX time conversion?**
+Q. How do I use the UNIX time conversion?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Regarding the timing information in the NetCDF variable attributes:
@@ -195,7 +202,8 @@ subset the TRMM data if needed. Look for the section of it titled
 "Output domain specification" and define the lat/lon's that needs
 to be included in the output.
 
-**Q. Does MET use a fixed-width output format for its ASCII output files?**
+Q. Does MET use a fixed-width output format for its ASCII output files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 MET does not use the Fortran-like fixed width format in its
@@ -218,7 +226,8 @@ If a fixed-width format is needed, the easiest option would be
 writing a script to post-process the MET output into the fixed-width
 format that is needed or that the code expects.
 
-**Q. Do the ASCII output files created by MET use scientific notation?**
+Q. Do the ASCII output files created by MET use scientific notation?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 By default, the ASCII output files created by MET make use of
@@ -233,12 +242,11 @@ MET to disable the use of scientific notation. That enhancement
 is planned for a future release.
 
 Gen-Vx-Mask
-~~~~~~~~~~~
+-----------
 
-**Q. Gen-Vx-Mask - I have a list of stations to use for verification.
-I also have a poly region defined. If I specify both of these should
-the result be a union of them?**
- 
+Q. I have a list of stations to use for verification. I also have a poly region defined. If I specify both of these should the result be a union of them?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 These settings are defined in the "mask" section of the Point-Stat
 configuration file. You can define masking regions in one of 3 ways,
@@ -266,7 +274,8 @@ If so, your options are:
 
 Then aggregate the results together by running a Stat-Analysis job.
 
-**Q. Gen-Vx-Mask - How do I define a masking region with a GFS file?**
+Q. How do I define a masking region with a GFS file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Grab a sample GFS file: 
@@ -301,9 +310,10 @@ are obvious problems with the latitude and longitude values used
 to define that mask for Poland.
 
 Grid-Stat
-~~~~~~~~~
+---------
 
-**Q. Grid-Stat - How do I define a complex masking region?**
+Q. How do I define a complex masking region?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A user can define intersections and unions of multiple fields to define masks.
@@ -359,8 +369,8 @@ apply complex masking logic and then pass the output mask file
 to Grid-Stat in its configuration file.
 
 
-**Q. Grid-Stat - How do I use neighborhood methods to compute fraction
-skill score?**
+Q. How do I use neighborhood methods to compute fraction skill score?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 A common application of fraction skill score (FSS) is comparing forecast
@@ -400,7 +410,8 @@ Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
 points where all NxN values contain valid data. Setting it to 0.5 only
 requires half of them.
 
-**Q. Grid-Stat - Is an example of verifying forecast probabilities?**
+Q. Is an example of verifying forecast probabilities?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 There is an example of verifying probabilities in the test scripts
@@ -443,8 +454,8 @@ values between 0 and 1. Note that if the probability data contains
 values from 0 to 100, MET automatically divides by 100 to rescale to
 the 0 to 1 range.
 
-**Q. What is an example of using Grid-Stat with regridding and masking
-turned on?**
+Q. What is an example of using Grid-Stat with regridding and masking turned on?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Run Grid-Stat using the following commands and the attached config file 
@@ -503,9 +514,9 @@ gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
 The advantage to gen_vx_mask is that it will make grid_stat run a
 bit faster. It can be used to construct much more complex masking areas.
 
-**Q. How do I use one mask for the forecast field and a different
-mask for the observation field??**
-
+Q. How do I use one mask for the forecast field and a different mask for the observation field?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 You can't define different
 masks for the forecast and observation fields in MET tools. MET only lets you
@@ -577,9 +588,10 @@ In the resulting plot, anywhere you see the pink value of 10, that's
 where gen_vx_mask has masked out the grid point.
 
 Pcp-Combine
-~~~~~~~~~~~
+-----------
 
-**Q.  Pcp-Combine -  How do I add and subtract with Pcp-Combine?**
+Q. How do I add and subtract with Pcp-Combine?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 An example of running the MET pcp_combine tool to put NAM 3-hourly
@@ -616,8 +628,8 @@ same file format, and can use the same configuration file settings for
 the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
 of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
-**Q. Pcp-Combine - How do I combine 12-hour accumulated precipitation
-from two different initialization times?**
+Q. How do I combine 12-hour accumulated precipitation from two different initialization times?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A. 
 The "-sum" command assumes the same initialization time. Use the "-add"
@@ -658,7 +670,8 @@ Here are 3 commands you could use to plot these data files:
 
 		plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
-**Q. Pcp-Combine - How do I correct a precipitation time range?**
+Q. How do I correct a precipitation time range?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Typically, accumulated precipitation is stored in GRIB files using an
@@ -707,8 +720,8 @@ Here is an example:
 		
 The resulting file should have the accumulation listed at 24h rather than 0-24.
 
-**Pcp-Combine - How do I use Pcp-Combine as a pass-through to simply reformat
-from GRIB to NetCDF or to change output variable name?**
+Q. How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The pcp_combine tool is typically used to modify the accumulation interval
@@ -745,7 +758,8 @@ appear in the output of downstream tools:
 		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
 		forecast.nc -name CompositeReflectivity
 
-**Q. Pcp-Combine - How do I use “-pcprx" to run a project faster?**
+Q. How do I use “-pcprx" to run a project faster?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 To run a project faster, the “-pcprx” option may be used to narrow the
@@ -765,7 +779,8 @@ examples:
 		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
 		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
 
-**Q. Pcp-Combine - How do I enter the time format correctly?**
+Q. How do I enter the time format correctly?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Here is an **incorrect example** of running pcp_combine with sub-hourly
@@ -796,9 +811,9 @@ time strings, like this:
 		pcp_combine -subtract forecast.grb 005500 \
 		forecast2.grb 000500 forecast.nc -field APCP		
 
-**Q. Pcp-Combine - How do I use Pcp-Combine when my GRIB data doesn't have the
-appropriate accumulation interval time range indicator?**
-
+Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accumulation interval time range indicator?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Run wgrib on the data files and the output is listed below:
 
@@ -855,9 +870,9 @@ Some things to point out here:
    chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
    tell that tool what variable to process.
 
-**Q. Pcp_Combine - How do I use “-sum”, “-add”, and “-subtract“ to achieve
-the same accumulation interval?**
-
+Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A. 
 Here is an example of using pcp_combine to put GFS into 24- hour intervals
 for comparison against 24-hourly StageIV precipitation with GFS data
@@ -921,14 +936,16 @@ This example explicitly tells pcp_combine which files to read and
 what accumulation interval (6 hours) to extract from them. The resulting
 output should be identical to the output of the "-sum" command.
 
-**Q. Pcp-Combine - What is the difference between “-sum” vs. “-add”?**
+Q. What is the difference between “-sum” vs. “-add”?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 The -sum and -add options both do the same thing. It's just that
 '-sum' could find files more quickly with the use of the -pcprx flag.
 This could also be accomplished by using a calling script.
 
-**Q. Pcp-Combine - How do I select a specific GRIB record?**
+Q. How do I select a specific GRIB record?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 In this example, record 735 needs to be selected. 
@@ -943,9 +960,10 @@ Instead of having the level as "L0", tell it to use "R735" to select
 grib record 735.
 
 Plot-Data-Plane
-~~~~~~~~~~~~~~~
+---------------
 
-**Q. Plot-Data-Plane - How do I inspect Gen-Vx-Mask output?**
+Q. How do I inspect Gen-Vx-Mask output?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Check to see if the call to Gen-Vx-Mask actually did create good output
@@ -971,8 +989,9 @@ file is what the user expects. It always a good idea to start with
 plot_data_plane when working with data to make sure MET
 is plotting the data correctly and in the expected location.
 
-**Q. Plot-Data-Plane - How do I specify the GRIB version?**
-
+Q. How do I specify the GRIB version?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 When MET reads Gridded data files, it must determine the type of
 file it's reading. The first thing it checks is the suffix of the file.
@@ -1002,8 +1021,8 @@ MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
 		-plot_range 0 100
 
 
-**Q. Plot-Data-Plane - How do I test the variable naming convention?
-(Record number example)**
+Q. How do I test the variable naming convention? (Record number example.)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
@@ -1022,8 +1041,9 @@ contain temperature data and 2-meters. Here's some wgrib2 output:
 
 The GRIB id info has been the same between records 1 and 2.
 
-**Q. Plot-Data-Plane - How do I compute and verify wind speed?**
-
+Q. How do I compute and verify wind speed?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Here's how to compute and verify wind speed using MET. Good news, MET
 already includes logic for deriving wind speed on the fly. The GRIB
@@ -1053,10 +1073,11 @@ In the second one, this won't appear since wind speed already exists
 in the RTMA file.
 
 Stat-Analysis
-~~~~~~~~~~~~~
+-------------
 
-**Q. Stat-Analysis - How does '-aggregate_stat' work?**
-
+Q. How does '-aggregate_stat' work?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 In Stat-Analysis, there is a "-vx_mask" job filtering option. That option
 reads the VX_MASK column from the input STAT lines and applies string
@@ -1098,10 +1119,9 @@ of the unique values found in that column. Presumably, all the input
 VX_MASK columns say "FULL" so that's what the output would say. Use
 "-set_hdr" to explicitly set the output value.
 
-**Q. Stat-Analysis - What is the best way to average the FSS scores
-within several days or even several months using
-'Aggregate to Average Scores'?**
-
+Q. What is the best way to average the FSS scores within several days or even several months using 'Aggregate to Average Scores'?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Below is the best way to aggregate together the Neighborhood Continuous
 (NBRCNT) lines across multiple days, specifically the fractions skill
@@ -1129,8 +1149,9 @@ combination of those header column entries.
 The output is printed to the screen, or use the "-out_stat" option to
 also write the aggregated output to a file named "agg_nbrcnt.txt".
 
-**Q. Stat-Analysis - How do I use '-by' to capture unique entries?**
-
+Q. How do I use '-by' to capture unique entries?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Here is a stat-analysis job that could be used to run, read the MPR lines,
 define the probabilistic forecast thresholds, define the single observation
@@ -1149,8 +1170,9 @@ to run the job separately for each unique entry found in the FCST_VAR column.
 
 The output statistics are written to "out_pstd.txt".
 
-**Q. Stat-Analysis - How do I use '-filter' to refine my output?**
-
+Q. How do I use '-filter' to refine my output?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Here is an example of running a Stat-Analysis filter job to discard any
 CNT lines (continuous statistics) where the forecast rate and observation
@@ -1180,8 +1202,9 @@ cases without having to modify the source code.
 This job reads find 56 CTS lines, but only keeps 36 of them where both
 the BASER and FMEAN columns are at least 0.05.
 
-**Q. Stat-Analysis - How do I use the “-by” flag to stratify results?**
-
+Q. How do I use the “-by” flag to stratify results?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Adding "-by FCST_VAR" is a great way to associate a single value,
 of say RMSE, with each of the forecast variables (UGRD,VGRD and WIND).
@@ -1199,8 +1222,9 @@ Run the following job on the output from Grid-Stat generated when the
 The resulting cnt.txt file includes separate output for 6 different
 FCST_VAR values at different levels.
 
-**Q. Stat-Analysis - How do I speed up run times?**
-
+Q. How do I speed up run times?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 By default, Stat-Analysis has two options enabled which slow it down.
 Disabling these two options will create quicker run times:
@@ -1234,10 +1258,11 @@ Adding the "-by FCST_VAR" option to compute stats for all variables and
 runs quickly.
 
 TC-Stat
-~~~~~~~
+-------
 
-**Q. TC-Stat - How do I use the “-by” flag to stratify results?**
-
+Q. How do I use the “-by” flag to stratify results?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 To perform tropical cyclone evaluations for multiple models use the
 "-by AMODEL" option with the tc_stat tool. Here is an example.
@@ -1257,8 +1282,9 @@ all grouped together.
 This will result in all 48 hour HWFI and H3WI track forecasts to be
 aggregated (statistics and scores computed) for each model separately.
 
-**Q. TC-Stat - How do I use rapid intensification verification?**
-
+Q. How do I use rapid intensification verification?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 To get the most output, run something like this:
 
@@ -1297,10 +1323,11 @@ To stratify your results by lead time, you could add the "-by LEAD" option.
 		-out_line_type CTC,CTS,MPR
 
 Utilities
-~~~~~~~~~
+---------
 
-**Q. Utilities - What would be an example of scripting to call MET?**
-
+Q. What would be an example of scripting to call MET?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 The following is an example of how to call MET from a bash script
 including passing in variables. This shell script is listed below to run
@@ -1322,8 +1349,9 @@ and call convert to reformat from PostScript to PNG.
 		done
 
 
-**Q. Utility - How do I convert TRMM data files?**
-
+Q. How do I convert TRMM data files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Here is an example of NetCDF that the MET software is not expecting. Here
 is an option for accessing that same TRMM data, following links from the
@@ -1371,8 +1399,9 @@ It may be possible that the domain of the data is smaller. Here are some options
 That tells Grid-Stat to automatically regrid the TRMM observations to
 the model domain.
 
-**Q. Other Utilities - How do I convert a PostScript to png?**
-
+Q. How do I convert a PostScript to png?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Use the linux “convert” tool to convert a Plot-Data-Plane PostScript
 file to a png: 
@@ -1392,8 +1421,9 @@ seperate .png with the following naming convention:
 
 mode_out-0.png, mode_out-1.png, mode_out-2.png, etc.
 
-**Q. Utility - How does pairwise differences using plot_tcmpr.R work?**
-
+Q. How does pairwise differences using plot_tcmpr.R work?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 One necessary step in computing pairwise differences is "event equalizing"
 the data. This means extracting a subset of cases that are common to
@@ -1426,10 +1456,11 @@ pairwise differences that are needed.
 
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
-**Q. Regrid-Data-Plane - How do I define a LatLon grid?**
-
+Q. Regrid-Data-Plane - How do I define a LatLon grid?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Here is an example of the NetCDF variable attributes that MET uses to
 define a LatLon grid:
@@ -1457,9 +1488,9 @@ Use ncdump to look at the attributes. As an exercise, try defining
 these global attributes (and removing the other projection-related ones)
 and then try again.
 
-**Q. Pre-processing - How do I use wgrib2, pcp_combine regrid and
-reformat to format NetCDF files?**
-
+Q. Pre-processing - How do I use wgrib2, pcp_combine regrid and reformat to format NetCDF files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 If you are extracting only one or two fields from a file, using MET's
 Regrid-Data-Plane can be used to generate a Lat-Lon projection. If
@@ -1488,9 +1519,9 @@ Then the output NetCDF file does not have this problem:
 		:lat_ll = "25.000000 degrees_north" ;
 		:lon_ll = "112.000000 degrees_east" ;
 
-**Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify
-Model Suffix?**
-
+Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify Model Suffix?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Below is a command example to run:
 
@@ -1574,8 +1605,9 @@ model on the same set of storms. They might be using the same ATCF ID
 in all their output. But this enables them to distinguish the output
 in tc_pairs.
 
-**Q. Why is the grid upside down?**
-
+Q. Why is the grid upside down?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 The user provides a gridded data file to MET and it runs without error,
 but the data is packed upside down.
@@ -1601,7 +1633,7 @@ entry is a dictionary containing information about how to handle input
 gridded data files. The "regird" entry specifies regridding logic and
 has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
 the path to a gridded data file defining the grid, or an explicit grid
-specification string. See the :ref:`regrid<regrid>` entry in
+specification string. See the :ref:`regrid` entry in
 the Configuration File Overview in the MET User's Guide for a more detailed
 description of the configuration file entries that control automated
 regridding.
@@ -1610,28 +1642,31 @@ A single model level can be plotted using the plot_data_plane utility.
 This tool can assist the user by showing the data to be verified to
 ensure that times and locations matchup as expected.
 		
-**Q. Why was the MET written largely in C++ instead of FORTRAN?**
-
+Q. Why was the MET written largely in C++ instead of FORTRAN?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 MET relies upon the object-oriented aspects of C++, particularly in
 using the MODE tool. Due to time and budget constraints, it also makes
 use of a pre-existing forecast verification library that was developed
 at NCAR.
 
-**Q. How does MET differ from the previously mentioned existing
-verification packages?**
+Q. How does MET differ from the previously mentioned existing verification packages?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
 
 A.
 MET is an actively maintained, evolving software package that is being
 made freely available to the public through controlled version releases.
 
-**Q. Will the MET work on data in native model coordinates?**
-
+Q. Will the MET work on data in native model coordinates?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 No - it will not. In the future, we may add options to allow additional
 model grid coordinate systems.
 
-**Q. How do I get help if my questions are not answered in the User's Guide?**
+Q. How do I get help if my questions are not answered in the User's Guide?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A.
 First, look on our
@@ -1640,8 +1675,9 @@ If that doesn't answer your question, create a post in the
 `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
-**Q. What graphical features does MET provide?**
-
+Q. What graphical features does MET provide?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 MET provides some :ref:`plotting and graphics support<plotting>`. The plotting
 tools, including plot_point_obs, plot_data_plane, and plot_mode_field, can
@@ -1667,15 +1703,16 @@ you create your own scripts, we encourage you to submit them to us through the
 `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_
 so that we can post them for other users. 
 
-**Q. How do I find the version of the tool I am using?**
-
+Q. How do I find the version of the tool I am using?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 Type the name of the tool followed by **-version**. For example,
 type “pb2nc **-version**”.
 
-**Q. What are MET's conventions for latitude, longitude, azimuth and
-bearing angles?**
-
+Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
 A.
 MET considers north latitude and east longitude positive. Latitudes
 have range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
@@ -1687,7 +1724,7 @@ from the north.
 .. _Troubleshooting:   
    
 Troubleshooting
-_______________
+===============
 
 The first place to look for help with individual commands is this
 User's Guide or the usage statements that are provided with the tools.
@@ -1697,7 +1734,8 @@ scripts available in the MET's *scripts/* directory show examples of how
 one might use these commands on example datasets. Here are suggestions
 on other things to check if you are having problems installing or running MET.
 
-**MET won't compile**
+MET won't compile
+-----------------
 
 * Have you specified the locations of NetCDF, GNU Scientific Library,
   and BUFRLIB, and optional additional libraries using corresponding
@@ -1709,7 +1747,8 @@ on other things to check if you are having problems installing or running MET.
 * Are you using NetCDF version 3.4 or version 4? Currently, only NetCDF
   version 3.6 can be used with MET.
 
-**BUFRLIB Errors during MET installation**
+BUFRLIB Errors during MET installation
+--------------------------------------
 
 .. code-block:: none
 
@@ -1738,11 +1777,11 @@ Try the following 2 things:
 		
 		  MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
 
-After doing that, please try recompiling MET. If it fails,
-please send met_help@ucar.edu the following log files.
-"make_install.log" as well as "config.log".
+After doing that, please try recompiling MET. If it fails, please submit the following log files: "make_install.log" as well as "config.log" with a new post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
-**Command line double quotes**
+
+Command line double quotes
+--------------------------
 
 Single quotes, double quotes, and escape characters can be difficult for
 MET to parse. If there are problems, especially in Python code, try
@@ -1755,7 +1794,8 @@ breaking the command up like the below example.
 		'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
 		'\'name="HGT"; level="P500";\'', '-v', '6']
 
-**Environment variable settings**
+Environment variable settings
+-----------------------------
 
 In the below incorrect example for many environment variables have both
 the main variable set and the INC and LIB variables set:
@@ -1786,7 +1826,8 @@ Our online tutorial can help figure out what should be set and what the
 value should be:
 https://met.readthedocs.io/en/latest/Users_Guide/installation.html
 
-**NetCDF install issues**
+NetCDF install issues
+---------------------
 
 This example shows a problem with NetCDF in the make_install.log file:
 
@@ -1811,8 +1852,8 @@ NetCDF library files are in */home/username/local/lib*, unset the
 MET_NETCDF environment variable, then run "make clean", reconfigure,
 and then run "make install" and "make test" again.
 
-**Error while loading shared libraries**
-
+Error while loading shared libraries
+------------------------------------
 
 * Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive
   the following error: "./mode_analysis: error while loading shared
@@ -1821,7 +1862,8 @@ and then run "make install" and "make test" again.
   gsl lib (for example, */home/user/MET/gsl-2.1/lib*)
   to your LD_LIBRARY_PATH.
 
-**General troubleshooting**
+General troubleshooting
+-----------------------
 
 * For configuration files used, make certain to use empty square brackets
   (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty
@@ -1833,7 +1875,7 @@ and then run "make install" and "make test" again.
   level to 4 or 5 prints much more diagnostic information to the screen. 
 
 Where to get help
-_________________
+=================
 
 If none of the above suggestions have helped solve your problem, help
 is available through the
@@ -1841,7 +1883,7 @@ is available through the
 
 
 How to contribute code
-______________________
+======================
 
 If you have code you would like to contribute, we will gladly consider
 your contribution. Please create a post in the
