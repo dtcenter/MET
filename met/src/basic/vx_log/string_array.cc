@@ -387,13 +387,8 @@ void StringArray::insert(int i, const char * text)
 bool StringArray::has(const std::string text, bool forward) const
 
 {
-
-  int index;
-
-  cout << "  From StringArray::has(), text = " << text << " forward = " << forward << endl;
-  
-  return ( has(text, index, forward) );
-
+   int index;
+   return ( has(text, index, forward) );
 }
 
 
@@ -402,77 +397,102 @@ bool StringArray::has(const std::string text, bool forward) const
 
 bool StringArray::has(const std::string text, int & index, bool forward) const
 
-{
-  bool found = false;
-  index = -1;
-
-  if(Sorted) {
-     cout << "From StringArray::has(), the vector of strings is Sorted (true)" << endl;
-  }
-  
-  if (!s.empty()) {
-    int count;
-    std::string lower_text = text;
-    cout << " lower_text = " << lower_text << endl;
-    std::vector<std::string>::const_iterator it;
-    if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+{   
+   bool found = false;
+   index = -1;
+   
+   if(Sorted) {
+      cout << "From StringArray::has(), the vector of strings is Sorted (true)" << endl;
+   }
+   else {
+      cout << "From StringArray::has(), the vector of strings is Not Sorted (false)" << endl;
+   }
+      
+   if (!s.empty()) {
+      
+      int count;
+      std::vector<std::string>::const_iterator it;
+      
+      // If the vector is Sorted (true) and IgnoreCase is false
+      // use lower_bound() to search for the text string
+      if (Sorted && !IgnoreCase) {
+         cout << "Sorted is true and IgnoreCase is false" << endl;
+         it = lower_bound(s.begin(), s.end(), text);
+         if(it != s.end() && *it == text){
+            count = it - s.begin();
+            cout << "Using lower_bound(), FOUND text = " << text.c_str() << " count = " << count << endl << endl;
+            found = true;
+         }
+         else {
+            cout << "Using lower_bound(), NO text = " << text.c_str() << endl << endl;
+            count = 0;
+         }
+      }
+      else {
+         std::string lower_text = text;
+         //std::vector<std::string>::const_iterator it;
+         if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
     
-    if (forward) {
-      count = 0;
-      for(it = s.begin(); it != s.end(); it++, count++) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          if ( lower_s == lower_text) {
-            //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
-            found = true;
-            break;
-          }
-        }
-        else {
-          cout << "(*it).c_str() = " << (*it).c_str() << endl; 
-          if ( *it == text ) {
-            found = true;
-            break;
-          }
-        }
-      }
-    }
-    else {
-      count = s.size() - 1;
-      it = s.end();
-      for(it--; it != s.begin(); it--, count--) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          if ( lower_s == lower_text) {
-            found = true;
-            break;
-          }
-        }
-        else {
-          if ( *it == text ) {
-            found = true;
-            break;
-          }
-        }
-      }
-      if (!found && it == s.begin()) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          found = ( lower_s == lower_text );
-        }
-        else found = ( *it == text );
-      }
-    }
-    if (found) index = count;
-  }
-  //mlog << Debug(9) << " StringArray::has() size=" << s.size()
-  //     << " for " << text << ", found: " << (found ? "true" : "false")
-  //     << ", forward: " << (forward ? "yes" : "no") << "\n";
+         if (forward) {
+            count = 0;
+            for(it = s.begin(); it != s.end(); it++, count++) {
+               if ( IgnoreCase ) {
+                  std::string lower_s = *it;
+                  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+                  if ( lower_s == lower_text) {
+                     //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
+                     found = true;
+                     break;
+                  }
+               }
+               else {
+                  cout << "Ignore case false, not sorted, (*it).c_str() = " << (*it).c_str() << endl << endl; 
+                  if ( *it == text ) {
+                     found = true;
+                     break;
+                  }
+               }
+            }
+         }
+         else {
+            count = s.size() - 1;
+            it = s.end();
+            for(it--; it != s.begin(); it--, count--) {
+               if ( IgnoreCase ) {
+                  std::string lower_s = *it;
+                  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+                  if ( lower_s == lower_text) {
+                     found = true;
+                     break;
+                  }
+               }
+               else {
+                  if ( *it == text ) {
+                     found = true;
+                     break;
+                  }
+               }
+            }
+            if (!found && it == s.begin()) {
+               if ( IgnoreCase ) {
+                  std::string lower_s = *it;
+                  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+                  found = ( lower_s == lower_text );
+               }
+               else found = ( *it == text );
+            }
+         }
 
-  return found;
+      } // end else not Sorted (or IgnoreCase is true)
+      
+      if (found) index = count;
+   }
+
+   //mlog << Debug(9) << " StringArray::has() size=" << s.size()
+   //     << " for " << text << ", found: " << (found ? "true" : "false")
+   //     << ", forward: " << (forward ? "yes" : "no") << "\n";
+
+   return found;
 
 }
 
