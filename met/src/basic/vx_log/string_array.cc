@@ -401,12 +401,12 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
    bool found = false;
    index = -1;
    
-   if(Sorted) {
-      cout << "From StringArray::has(), the vector of strings is Sorted (true)" << endl;
-   }
-   else {
-      cout << "From StringArray::has(), the vector of strings is Not Sorted (false)" << endl;
-   }
+   //if(Sorted) {
+   //   cout << "From StringArray::has(), the vector of strings is Sorted (true)" << endl;
+   //}
+   //else {
+   //   cout << "From StringArray::has(), the vector of strings is Not Sorted (false)" << endl;
+   //}
       
    if (!s.empty()) {
       
@@ -416,15 +416,15 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
       // If the vector is Sorted (true) and IgnoreCase is false
       // use lower_bound() to search for the text string
       if (Sorted && !IgnoreCase) {
-         cout << "Sorted is true and IgnoreCase is false" << endl;
+         //cout << "Sorted is true and IgnoreCase is false" << endl;
          it = lower_bound(s.begin(), s.end(), text);
          if(it != s.end() && *it == text){
             count = it - s.begin();
-            cout << "Using lower_bound(), FOUND text = " << text.c_str() << " count = " << count << endl << endl;
+            //cout << "Using lower_bound(), FOUND text = " << text.c_str() << " count = " << count << endl << endl;
             found = true;
          }
          else {
-            cout << "Using lower_bound(), NO text = " << text.c_str() << endl << endl;
+            //cout << "Using lower_bound(), NO text = " << text.c_str() << endl << endl;
             count = 0;
          }
       }
@@ -446,7 +446,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
                   }
                }
                else {
-                  cout << "Ignore case false, not sorted, (*it).c_str() = " << (*it).c_str() << endl << endl; 
+                  //cout << "Ignore case false, not sorted, (*it).c_str() = " << (*it).c_str() << endl << endl; 
                   if ( *it == text ) {
                      found = true;
                      break;
