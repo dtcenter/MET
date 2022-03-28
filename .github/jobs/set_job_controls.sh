@@ -81,7 +81,13 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     fi
     
   fi
-  
+
+elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
+
+    if [ "${force_tests}" == "true" ]; then
+        run_diff=true
+    fi
+
 fi
 
 # if updating truth or running diff, run unit tests
