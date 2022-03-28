@@ -351,7 +351,6 @@ void process_ioda_file(int i_pb) {
 
    ConcatString file_name, blk_prefix, blk_file, log_message;
    ConcatString prefix;
-   char     time_str[max_str_len];
    ConcatString  start_time_str, end_time_str;
    char     min_time_str[max_str_len], max_time_str[max_str_len];
 
@@ -378,10 +377,6 @@ void process_ioda_file(int i_pb) {
                            conf_info.area_mask.ny() > 0);
    bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
-   hdr_typ[0] = 0;
-   
-   file_ut = beg_ut = end_ut = hdr_vld_ut = (unixtime) 0;
-
    // List the IODA file being processed
    mlog << Debug(1) << "Processing IODA File:\t" << ioda_files[i_pb]<< "\n";
 
@@ -399,17 +394,18 @@ void process_ioda_file(int i_pb) {
    }
 
    // Initialize
+   hdr_typ[0] = 0;
+   file_ut = beg_ut = end_ut = hdr_vld_ut = (unixtime) 0;
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
    min_time_str[0] = 0;
    max_time_str[0] = 0;
+   modified_hdr_typ[0] = 0;
 
    // Set the file name for the IODA file
    file_name << ioda_files[i_pb];
 
-   
    int nrecs = 0;
-   //int nstring = 0;
    StringArray var_names, dim_names;
    StringArray metadata_vars;
    StringArray obs_value_vars;
