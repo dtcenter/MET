@@ -188,7 +188,7 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 36 executables:
+  command line) will contain the following executables:
    - ascii2nc
    - ensemble_stat
    - gen_ens_prod
@@ -200,6 +200,7 @@ sub-directory, or the MET Online Tutorial:
    - grid_diag
    - gsid2mpr
    - gsidens2orank
+   - ioda2nc
    - lidar2nc
    - madis2nc
    - mode
