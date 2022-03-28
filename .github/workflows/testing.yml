@@ -23,6 +23,13 @@ on:
     paths-ignore:
       - 'met/docs/**'
 
+  workflow_dispatch:
+    inputs:
+      force_tests:
+        description: 'Run the unit tests'
+        default: true
+        type: boolean
+
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
 
@@ -39,6 +46,7 @@ jobs:
         run: .github/jobs/set_job_controls.sh
         env:
           commit_msg: ${{ github.event.head_commit.message }}
+          force_tests: ${{ github.event.inputs.force_tests }}
 
     outputs:
       run_compile: ${{ steps.job_status.outputs.run_compile }}
