@@ -407,7 +407,9 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
    //else {
    //   cout << "From StringArray::has(), the vector of strings is Not Sorted (false)" << endl;
    //}
-      
+
+   cout << "In has(), searching for text = " << text.c_str() << endl;
+   
    if (!s.empty()) {
       
       int count;
@@ -416,37 +418,39 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
       // If the vector is Sorted (true) and IgnoreCase is false
       // use lower_bound() to search for the text string
       if (Sorted && !IgnoreCase) {
-         //cout << "Sorted is true and IgnoreCase is false" << endl;
+         cout << "Sorted is true and IgnoreCase is false" << endl;
          it = lower_bound(s.begin(), s.end(), text);
          if(it != s.end() && *it == text){
             count = it - s.begin();
-            //cout << "Using lower_bound(), FOUND text = " << text.c_str() << " count = " << count << endl << endl;
+            cout << "Using lower_bound(), FOUND text = " << text.c_str() << " count = " << count << endl << endl;
             found = true;
          }
          else {
-            //cout << "Using lower_bound(), NO text = " << text.c_str() << endl << endl;
+            cout << "Using lower_bound(), NO text = " << text.c_str() << endl << endl;
             count = 0;
          }
       }
       else {
          std::string lower_text = text;
-         //std::vector<std::string>::const_iterator it;
+         cout << "Before transform, lower_text = " << lower_text.c_str() << endl;
          if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
-    
+
+         cout << "After transform, lower_text = " << lower_text.c_str() << endl;
+         
          if (forward) {
             count = 0;
             for(it = s.begin(); it != s.end(); it++, count++) {
                if ( IgnoreCase ) {
+                  cout << "Sorted is false, IgnoreCase is true, forward is true" << endl;
                   std::string lower_s = *it;
                   transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
                   if ( lower_s == lower_text) {
-                     //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
                      found = true;
                      break;
                   }
                }
                else {
-                  //cout << "Ignore case false, not sorted, (*it).c_str() = " << (*it).c_str() << endl << endl; 
+                  cout << "Sorted is false, IgnoreCase is false, forward is true" << endl; 
                   if ( *it == text ) {
                      found = true;
                      break;
@@ -459,6 +463,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
             it = s.end();
             for(it--; it != s.begin(); it--, count--) {
                if ( IgnoreCase ) {
+                  cout << "Sorted is false, IgnoreCase is true, forward is false" << endl;
                   std::string lower_s = *it;
                   transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
                   if ( lower_s == lower_text) {
@@ -467,6 +472,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
                   }
                }
                else {
+                  cout << "Sorted is false, IgnoreCase is false, forward is false" << endl;
                   if ( *it == text ) {
                      found = true;
                      break;
@@ -475,6 +481,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
             }
             if (!found && it == s.begin()) {
                if ( IgnoreCase ) {
+                  cout << "Single string case, Sorted is false, IgnoreCase is true, forward is false" << endl;
                   std::string lower_s = *it;
                   transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
                   found = ( lower_s == lower_text );
@@ -487,7 +494,9 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
       
       if (found) index = count;
    }
-
+   
+   cout << endl;
+   
    //mlog << Debug(9) << " StringArray::has() size=" << s.size()
    //     << " for " << text << ", found: " << (found ? "true" : "false")
    //     << ", forward: " << (forward ? "yes" : "no") << "\n";
