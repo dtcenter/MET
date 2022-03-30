@@ -25,13 +25,13 @@ jobs:
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
-          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
           MET_BASE_IMAGE: minimum
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
         env:
-          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
