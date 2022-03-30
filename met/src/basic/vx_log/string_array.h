@@ -78,8 +78,10 @@ class StringArray {
 
       int length(int) const;
 
-      bool has(const std::string, bool forward=true) const;
+      bool has(const std::string) const;
 
+      bool has(const std::string, bool forward) const;
+   
       bool has(const std::string, int & index, bool forward=true) const;
 
          //
