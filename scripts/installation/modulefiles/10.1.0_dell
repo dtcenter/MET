@@ -3,7 +3,7 @@
 ##      Model Evaluation Tools
 ##
 proc ModulesHelp { } {
-  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.0.0
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.1.0
      *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
 }
 
@@ -20,8 +20,8 @@ module load zlib/1.2.11
 module load gsl/2.1
 module load g2c/1.6.3
 
-set base /gpfs/dell2/emc/verification/noscrub/emc.metplus/met/10.0.0
-set ver  10.0.0
+set base /gpfs/dell2/emc/verification/noscrub/emc.metplus/met/10.1.0
+set ver  10.1.0
 set share $base/share/met
 set lib_base $base
 

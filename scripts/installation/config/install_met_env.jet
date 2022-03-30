@@ -1,7 +1,11 @@
-export TEST_BASE=/contrib/met/10.0.0
-export COMPILER=intel_18.0.5.274
+module load intel/2022.1.2 impi/2022.1.2
+module load intel-tools
+module load intelpython/3.6.5
+
+export TEST_BASE=/contrib/met/10.1.0
+export COMPILER=intel_2020.2
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=met-10.0.0.20210510.tar.gz
+export MET_TARBALL=met-10.1.0.20220314.tar.gz
 export USE_MODULES=TRUE
 export PYTHON_MODULE=intelpython_3.6.5
 export MET_PYTHON=/apps/intel/intelpython3
