@@ -3,7 +3,7 @@
 ##      Model Evaluation Tools
 ##
 proc ModulesHelp { } {
-  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.0.0
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.1.0
      *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
 }
 
@@ -12,8 +12,8 @@ module load python3/3.7.0
 module load hdf5/1.10.4
 module load netcdf/4.6.2
 
-set base /work2/06612/tg859120/stampede2/met/10.0.0
-set ver  10.0.0
+set base /work2/06612/tg859120/stampede2/met/10.1.0
+set ver  10.1.0
 set share $base/share/met
 set lib_base $base
 
@@ -21,3 +21,4 @@ prepend-path PATH $base/bin
 
 setenv METversion V$ver
 setenv MET_ROOT $base
+
