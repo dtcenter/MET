@@ -2432,10 +2432,10 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
 
   // Derive south pole location from the north pole:
   // - Reverse the sign of the latitude
-  // - Switch longitude from degrees east to west and add 180
+  // - Add 180 to the longitude and switch from degrees east to west
   data.true_lat_south_pole = -1.0 * get_att_value_double(grid_np_lat_att);
   double np_lon = rescale_lon(get_att_value_double(grid_np_lon_att));
-  data.true_lon_south_pole = rescale_lon((-1.0 * np_lon) + 180.0);
+  data.true_lon_south_pole = rescale_lon(-1.0 * (np_lon + 180.0));
 
   // Copied from the LatLon data structure
   data.rot_lat_ll = ll_data.lat_ll;
