@@ -9,12 +9,12 @@ module load libpng/1.2.59
 module load gsl/2.1
 module load g2c/1.6.3
 
-export TEST_BASE=/gpfs/dell2/emc/verification/noscrub/emc.metplus/met/10.0.0
+export TEST_BASE=/gpfs/dell2/emc/verification/noscrub/emc.metplus/met/10.1.0
 export LIB_DIR=${TEST_BASE}/external_libs
 export BIN_DIR_PATH=${TEST_BASE}/exec
 export COMPILER=ips_18.0.5.274
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=met-10.0.0.20210510.tar.gz
+export MET_TARBALL=met-10.1.0.20220314.tar.gz
 export USE_MODULES=TRUE
 export PYTHON_MODULE=python_3.6.3
 export MET_PYTHON=/usrx/local/prod/packages/python/3.6.3/

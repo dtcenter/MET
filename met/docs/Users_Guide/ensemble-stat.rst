@@ -9,6 +9,8 @@ Introduction
 
 The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. Climatological mean and standard deviation data may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in :numref:`Appendix C, Section %s <App_C-ensemble>`.
 
+.. note:: This tool will be changing! The ensemble product generation step provided by Ensemble-Stat is now found within the :ref:`Gen-Ens-Prod Tool<gen-ens-prod>`. The Gen-Ens-Prod tool replaces and extends that functionality. Users are strongly encouraged to migrate ensemble product generation from Ensemble-Stat to Gen-Ens-Prod, as new features will only be added to Gen-Ens-Prod and the existing Ensemble-Stat functionality will be deprecated in a future version.
+
 Scientific and statistical aspects
 ==================================
 
@@ -100,7 +102,7 @@ Optional arguments for ensemble_stat
 
 4. To produce ensemble statistics using gridded observations, use the **-grid_obs file** option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
 
-5. To produce ensemble statistics using point observations, use the **-point_obs file** option to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files. The python embedding will be activated if the **file** begines with 'PYTHON_NUMPY=" and followed by a python script name.
+5. To produce ensemble statistics using point observations, use the **-point_obs file** option to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
 6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
 

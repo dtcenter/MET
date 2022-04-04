@@ -236,9 +236,10 @@ The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists 
      file_type=PYTHON_NUMPY;' \
     -title "Python enabled plot_data_plane"
 
+.. _pyembed-point-obs-data:
+
 Python Embedding for Point Observations
 =======================================
-
 
 The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is provided in :numref:`ascii2nc-pyembed`. That example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
 
@@ -248,33 +249,13 @@ The **read_ascii_point.py** sample script can be found in:
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
 
-Python Embedding for MPR data
-=============================
-
-The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
-
-The **read_ascii_mpr.py** sample script can be found in:
-
-• MET installation directory in *MET_BASE/python*.
-
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
-
-
-Python Embedding for Point Observations as input
-================================================
-
-
-The point2grid, plot_point_obs, ensemble_stat, and point_stat tools use MET point observation NetCDF. They support the python embedding by the prefix 'PYTHON_NUMPY=" and followed by a python script name instead of the MET point observastion NetCDF filename. The customized python script is expected to extend MET_BASE/python/met_point_obs.py and to produce the python variable, **met_point_data**,  which is the dictionary of the MET point observation data. They are defined at MET_BASE/python/met_point_obs.py.
-
-
-.. _pyembed-point-obs-data:
-
+The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the python command to be run. The command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. The customized python script is expected to extend MET_BASE/python/met_point_obs.py. That script creates a python variable named **met_point_data** which is a dictionary containing formatted point observation data.
 
 .. code-block:: none
 
   met_point_data = {
 
-     'use_var_id':  Trur/False,     # obs_vid are variable index if True, otherwise GRIB codes
+     'use_var_id':  True/False,     # obs_vid are variable index if True, otherwise GRIB codes
 
      # Header data
      'nhdr':        integer_value,  # number of headers
@@ -308,3 +289,14 @@ The point2grid, plot_point_obs, ensemble_stat, and point_stat tools use MET poin
      'obs_qty_table':  string_array,    # quality marks
      'obs_var_table':  string_array,    # variable names
   }
+
+Python Embedding for MPR data
+=============================
+
+The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
+
+The **read_ascii_mpr.py** sample script can be found in:
+
+• MET installation directory in *MET_BASE/python*.
+
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.

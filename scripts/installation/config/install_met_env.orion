@@ -1,10 +1,10 @@
 module load intel/2020.2
 module load intelpython3/2020.2
 
-export TEST_BASE=/apps/contrib/MET/10.0.0
+export TEST_BASE=/apps/contrib/MET/10.1.0
 export COMPILER=intel_2020
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=met-10.0.0.20210510.tar.gz
+export MET_TARBALL=met-10.1.0.20220314.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/apps/intel-2020.2/intel-2020.2/intelpython3
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m 
