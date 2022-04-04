@@ -30,7 +30,6 @@ using namespace std;
 
 #include "GridTemplate.h"
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions operating on a DataPlane
@@ -206,7 +205,7 @@ DataPlane smooth_field(const DataPlane &dp,
 ////////////////////////////////////////////////////////////////////////
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
-        int width, const GridTemplateFactory::GridTemplates shape,
+        int width, GridTemplateFactory::GridTemplates shape,
         bool wrap_lon, SingleThresh t,
         const DataPlane *cmn, const DataPlane *csd, double vld_t) {
    GridPoint *gp = NULL;
