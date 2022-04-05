@@ -390,23 +390,10 @@ bool StringArray::has(const std::string text) const
    bool found = false;
    bool forward = true;
    
-   mlog << Debug(9) << "In new has() searching for text = " << text.c_str() << "\n";
-   
-   if (Sorted && !IgnoreCase) {
-      mlog << Debug(9) << "  Sorted is true and IgnoreCase is false" << "\n";
+   if (Sorted && !IgnoreCase) 
       found = binary_search(s.begin(), s.end(), text);
-      mlog << Debug(9)  << "  After binary_search, found = " << found << "\n";
-   }
-   else {
-      mlog << Debug(9) << "  Sorted = " << Sorted << " IgnoreCase = " << IgnoreCase << "\n";
-      mlog << Debug(9) << "  Calling middle has() function" << "\n";
+   else 
       return ( has(text, forward) );
-   }
-   
-   if(found)
-      mlog << Debug(9) << "  FOUND the text string" << "\n\n";
-   else
-      mlog << Debug(9) << "  NO text string" << "\n\n";
    
    return found;
 }
@@ -434,8 +421,6 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
    bool found = false;
    index = -1;
    
-   mlog << Debug(9) << "In original has() searching for text = " << text.c_str() << "\n";
-   
    if (!s.empty()) {
       int count;
       std::string lower_text = text;
@@ -447,18 +432,14 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
          for(it = s.begin(); it != s.end(); it++, count++) {
             if ( IgnoreCase ) {
                std::string lower_s = *it;
-               mlog << Debug(9) << "  Sorted is false, IgnoreCase is true, forward is true, lower_s (*it) = " << lower_s.c_str() << "\n";
                transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
                if ( lower_s == lower_text) {
-                  mlog << Debug(9) << "  found lower_text = " << lower_text.c_str() << "\n";
                   found = true;
                   break;
                }
             }
             else {
-               mlog << Debug(9) << "  Sorted is false, IgnoreCase is false, forward is true, *it = " << (*it).c_str() << "\n";
                if ( *it == text ) {
-                  mlog << Debug(9) << "  found text = " << text.c_str() << "\n";
                   found = true;
                   break;
                }
@@ -471,7 +452,6 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
          for(it--; it != s.begin(); it--, count--) {
             if ( IgnoreCase ) {
                std::string lower_s = *it;
-               mlog << Debug(9) << "  Sorted is false, IgnoreCase is true, forward is false, lower_s (*it) = " << lower_s.c_str() << "\n";
                transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
                if ( lower_s == lower_text) {
                   found = true;
@@ -479,7 +459,6 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
                }
             }
             else {
-               mlog << Debug(9) << "  Sorted is false, IgnoreCase is false, forward is false, *it = " << (*it).c_str() << "\n\n";
                if ( *it == text ) {
                   found = true;
                   break;
@@ -497,11 +476,6 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
       }
       if (found) index = count;
    }
-   //mlog << Debug(9) << " StringArray::has() size=" << s.size()
-   //     << " for " << text << ", found: " << (found ? "true" : "false")
-   //     << ", forward: " << (forward ? "yes" : "no") << "\n";
-
-   mlog << Debug(9) << "\n";
    
    return found;
 }
