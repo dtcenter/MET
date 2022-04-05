@@ -344,6 +344,11 @@ bool NcCfFile::open(const char * filepath)
     int tim_buf_size = n_times;
     if (use_bounds_var) tim_buf_size *= 2;
     double *time_values = new double[tim_buf_size];
+
+    // TODO: Howard Soh, please remove this block of code I added
+    //       only for debugging dtcenter/MET#2123
+    for(int i=0;i<tim_buf_size;i++) time_values[i] = -10;
+
     if( get_nc_data(nc_time_var, time_values) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
       if( time_dim_count > 1 ) {
