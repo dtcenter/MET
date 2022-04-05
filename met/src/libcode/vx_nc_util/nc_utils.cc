@@ -1533,6 +1533,7 @@ bool get_nc_data(NcVar *var, float *data) {
       // Note: missing data was checked here
       //
       int type_id = GET_NC_TYPE_ID_P(var);
+      return_status = true;
       if (NcType::nc_FLOAT == type_id) {
          var->getVar(data);
       }
@@ -1565,9 +1566,26 @@ bool get_nc_data(NcVar *var, float *data) {
          if (IS_VALID_NC_P(att_scale_factor)) scale_factor = get_att_value_float(att_scale_factor);
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
-              << ", is_unsigned_value: " << unsigned_value << "\n";
+              << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
 
          switch ( type_id )  {
+            case NcType::nc_INT64:
+               {
+                  long long fill_value = bad_data_int;
+                  long long min_value =  2147483647;
+                  long long max_value = -2147483648;
+                  long long *packed_data = new long long[cell_count];
+
+                  if (IS_VALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_int(att_fill_value);
+
+                  var->getVar(packed_data);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "int",
+                                      add_offset, scale_factor);
+                  delete [] packed_data;
+               }
+               break;
             case NcType::nc_INT:
                {
                   int fill_value = bad_data_int;
@@ -1720,15 +1738,15 @@ bool get_nc_data(NcVar *var, float *data) {
                }
                break;
             default:
-               mlog << Debug(1) << method_name << "type_id: "
-                    << type_id << " type name: " << GET_NC_TYPE_NAME_P(var)
-                    << "\n";
+               return_status = false;
+               mlog << Debug(1) << method_name << "Did not read data because of unsupported data type ("
+                    << type_id << ", type name: " << GET_NC_TYPE_NAME_P(var)
+                    << ") for " << GET_NC_NAME_P(var) << "\n";
          }
          if(att_add_offset) delete att_add_offset;
          if(att_scale_factor) delete att_scale_factor;
          if(att_fill_value) delete att_fill_value;
       }
-      return_status = true;
    }
 
    mlog << Debug(6) << method_name << "took "
@@ -1821,6 +1839,7 @@ bool get_nc_data(NcVar *var, double *data) {
       //
       int unpacked_count = 0;
       int type_id = GET_NC_TYPE_ID_P(var);
+      return_status = true;
       if ((NcType::nc_DOUBLE == type_id) || (NcType::nc_FLOAT == type_id)){
          var->getVar(data);
       }
@@ -1844,9 +1863,26 @@ bool get_nc_data(NcVar *var, double *data) {
          }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
-              << ", is_unsigned_value: " << unsigned_value << "\n";
+              << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
 
          switch ( type_id )  {
+            case NcType::nc_INT64:
+               {
+                  long long fill_value = bad_data_int;
+                  long long min_value =  2147483647;
+                  long long max_value = -2147483648;
+                  long long *packed_data = new long long[cell_count];
+
+                  if (IS_VALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_int(att_fill_value);
+
+                  var->getVar(packed_data);
+                  _apply_scale_factor(data, packed_data, cell_count,
+                                      fill_value, min_value, max_value, "int",
+                                      add_offset, scale_factor);
+                  delete [] packed_data;
+               }
+               break;
             case NcType::nc_INT:
                {
                   int fill_value = bad_data_int;
@@ -2001,15 +2037,16 @@ bool get_nc_data(NcVar *var, double *data) {
                }
                break;
             default:
-                 mlog << Debug(1) << method_name << "type_id: "
-                      << type_id << " type name: " << GET_NC_TYPE_NAME_P(var)
-                      << "\n";
+                 return_status = false;
+                 mlog << Debug(1) << method_name << "Did not read data because of unsupported data type ("
+                      << type_id << ", type name: " << GET_NC_TYPE_NAME_P(var)
+                      << ") for " << GET_NC_NAME_P(var) << "\n";
+
          }
          if(att_add_offset) delete att_add_offset;
          if(att_scale_factor) delete att_scale_factor;
          if(att_fill_value) delete att_fill_value;
       }
-      return_status = true;
    }
    return(return_status);
 }
