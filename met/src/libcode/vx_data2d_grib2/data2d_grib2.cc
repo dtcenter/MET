@@ -1100,7 +1100,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       data.true_lon_south_pole = s_lon;
 
          //
-         //  auxilliary rotation around the rotated polar axis
+         //  auxiliary rotation around the rotated polar axis
          //
 
       data.aux_rotation = (t[21])*angle_factor;
