@@ -29,11 +29,13 @@ using namespace std;
    //  grid types from the GDS section
    //
 
-static const int latlon_type         = 0;
-static const int mercator_type       = 1;
-static const int lambert_type        = 3;
-static const int stereographic_type  = 5;
-static const int gaussian_type       = 4;
+static const int latlon_type         =  0;
+static const int mercator_type       =  1;
+static const int lambert_type        =  3;
+static const int gaussian_type       =  4;
+static const int stereographic_type  =  5;
+static const int rotated_latlon_type = 10;
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -62,7 +64,7 @@ void gds_to_grid(const Section2_Header & gds, Grid & gr)
 LambertData         lc_data;
 StereographicData   st_data;
 LatLonData          ll_data;
-//RotatedLatLonData  rll_data;
+RotatedLatLonData  rll_data;
 MercatorData        mc_data;
 GaussianData         g_data;
 
@@ -84,11 +86,11 @@ if ( gds.type == latlon_type )  {
 
    gr.set(ll_data);
 
-// else if ( gds.type == rotated_latlon_type )  {
-// 
-//    gds_to_rotated_latlon(gds, rll_data);
-// 
-//    gr.set(rll_data);
+} else if ( gds.type == rotated_latlon_type )  {
+
+    gds_to_rotated_latlon(gds, rll_data);
+
+    gr.set(rll_data);
 
 } else if ( gds.type == mercator_type )  {
 
@@ -143,6 +145,7 @@ void gds_to_order(const Section2_Header & gds, int & xdir, int & ydir, int & ord
    // Check GDS for the grid type.
    // The following Projection types are supported:
    //    - Lat/Lon
+   //    - Rotated Lat/Lon
    //    - Mercator
    //    - Lambert Conformal
    //    - Polar Stereographic
@@ -153,6 +156,10 @@ void gds_to_order(const Section2_Header & gds, int & xdir, int & ydir, int & ord
 if ( gds.type == latlon_type )  {
 
    scan_flag_to_order(gds.grid_type.latlon_grid.scan_flag, xdir, ydir, order);
+
+} else if ( gds.type == rotated_latlon_type )  {
+
+   scan_flag_to_order(gds.grid_type.rot_latlon_grid.scan_flag, xdir, ydir, order);
 
 } else if (gds.type == mercator_type )  {
 
@@ -278,10 +285,86 @@ void gds_to_rotated_latlon(const Section2_Header & gds, RotatedLatLonData & data
 
 {
 
-mlog << Error << "\ngds_to_rotated_latlon() -> "
-     << "Rotated Lat/Lon grids are not supported in GRIB version 1.\n\n";
+int xdir, ydir, order;
+double d;
 
-exit ( 1 );
+scan_flag_to_order(gds.grid_type.rot_latlon_grid.scan_flag, xdir, ydir, order);
+
+   // Store the grid name
+data.name = rotated_latlon_proj_type;
+
+   //
+   // Multiply longitude values by -1 since the NCAR code considers
+   // degrees west to be positive.
+   //
+
+   // Latitude of the bottom left corner
+data.rot_lat_ll = min(decode_lat_lon(gds.grid_type.rot_latlon_grid.lat1, 3),
+                      decode_lat_lon(gds.grid_type.rot_latlon_grid.lat2, 3));
+
+   // Longitude of the bottom left corner
+if ( xdir == 0 )  data.rot_lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.rot_latlon_grid.lon1, 3));
+else              data.rot_lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.rot_latlon_grid.lon2, 3));
+
+   // Number of points in the Latitudinal (y) direction
+data.Nlat = char2_to_int(gds.ny);
+
+   // Number of points in the Longitudinal (x) direction
+data.Nlon = char2_to_int(gds.nx);
+
+   // Check for thinned lat/lon grids
+if ( data.Nlon == 65535 )  {
+
+   mlog << Error << "\ngds_to_rotated_latlon() -> "
+        << "Thinned Lat/Lon grids are not supported for GRIB version 1.\n\n";
+
+   exit ( 1 );
+
+}
+
+   // Compute latitudinal increment from lat1 and lat2
+d = fabs(decode_lat_lon(gds.grid_type.rot_latlon_grid.lat1, 3)
+       - decode_lat_lon(gds.grid_type.rot_latlon_grid.lat2, 3));
+
+data.delta_rot_lat = d/(data.Nlat);
+
+   // If explicitly specified and non-zero, use it
+if ( ! all_bits_set(gds.grid_type.rot_latlon_grid.dj, 2) )  {
+
+   d = decode_lat_lon(gds.grid_type.rot_latlon_grid.dj, 2);
+
+   if ( d > 0 )  data.delta_rot_lat = d;
+
+}
+
+   // Compute longitudinal increment from lon1 and lon2
+d = fabs(decode_lat_lon(gds.grid_type.rot_latlon_grid.lon1, 3)
+       - decode_lat_lon(gds.grid_type.rot_latlon_grid.lon2, 3));
+
+data.delta_rot_lon = d/(data.Nlon);
+
+   // If explicitly specified and non-zero, use it
+if ( ! all_bits_set(gds.grid_type.rot_latlon_grid.di, 2) )  {
+
+   d = decode_lat_lon(gds.grid_type.rot_latlon_grid.di, 2);
+
+   if ( d > 0 )  data.delta_rot_lon = d;
+
+}
+
+   // Location of (rotated) south pole and auxiliary rotation hard-coded to 0
+
+data.true_lat_south_pole = -90.0;
+
+data.true_lon_south_pole = 0.0;
+
+data.aux_rotation = 0.0;
+
+data.dump();
+
+   //
+   //  done
+   //
 
 return;
 

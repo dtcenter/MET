@@ -162,7 +162,26 @@ struct Section1_Header {                     //    PDS
 ////////////////////////////////////////////////////////////////////////
 
 
-struct LatLon {                          //   Latitude/Longitude Grid
+struct LatLon {                              //   Latitude/Longitude Grid
+
+   unsigned char         lat1[3];            //   11 - 13
+   unsigned char         lon1[3];            //   14 - 16
+
+   unsigned char        res_flag;            //   17
+
+   unsigned char         lat2[3];            //   18 - 20
+   unsigned char         lon2[3];            //   21 - 23
+
+   unsigned char           di[2];            //   24 - 25
+   unsigned char           dj[2];            //   26 - 27
+
+   unsigned char       scan_flag;            //   28
+
+   unsigned char       unused[14];           //   29 - 42
+
+};
+
+struct RotLatLon {                           //   Rotated Latitude/Longitude Grid
 
    unsigned char         lat1[3];            //   11 - 13
    unsigned char         lon1[3];            //   14 - 16
@@ -282,7 +301,7 @@ struct Gaussian {
 union GridType {
 
    struct LatLon        latlon_grid;         //   Latitude/Longitude Grid
-   // struct RotLatLon     rot_latlon_grid;     //   Rotated Latitude/Longitude Grid
+   struct RotLatLon     rot_latlon_grid;     //   Rotated Latitude/Longitude Grid
    struct Mercator      mercator;            //   Mercator Grid
    struct LambertConf   lambert_conf;        //   Lambert Conformal Secant Grid
    struct Stereographic stereographic;       //   Stereographic Grid
