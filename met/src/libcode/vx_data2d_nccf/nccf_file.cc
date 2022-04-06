@@ -322,7 +322,6 @@ bool NcCfFile::open(const char * filepath)
 
     NcVar bounds_time_var;
     NcVar *nc_time_var = (NcVar *)0;
-    nc_time_var = valid_time_var;
     bool use_bounds_var = false;
     ConcatString bounds_var_name;
     nc_time_var = valid_time_var;
@@ -375,6 +374,8 @@ bool NcCfFile::open(const char * filepath)
         }
       }
     }
+    else ValidTime.add(0);  //Initialize
+    delete [] time_values;
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
