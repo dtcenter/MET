@@ -187,7 +187,8 @@ void StringArray::dump(ostream & out, int depth) const
 Indent prefix(depth);
 Indent prefix2(depth + 1);
 
-out << prefix << "IgnoreCase = " << IgnoreCase << " Sorted = " << Sorted << "\n";
+out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
+out << prefix << "Sorted     = " << (Sorted ? "true" : "false") << "\n";
 
 int j;
 
