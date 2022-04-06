@@ -135,6 +135,8 @@ MaxLength = 0;
 
 clear();
 
+Sorted = false;
+
 return;
 
 }
@@ -148,6 +150,8 @@ void StringArray::clear()
 {
 
 s.clear();
+
+Sorted = false;
 
 return;
 
@@ -166,6 +170,7 @@ clear();
 s = a.s;
 
 IgnoreCase = a.IgnoreCase;
+Sorted = a.Sorted;
 
 return;
 
@@ -183,6 +188,7 @@ Indent prefix(depth);
 Indent prefix2(depth + 1);
 
 out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
+out << prefix << "Sorted     = " << (Sorted ? "true" : "false") << "\n";
 
 int j;
 
@@ -250,6 +256,8 @@ void StringArray::add(const std::string text)
 
 s.push_back(text);
 
+Sorted = false;
+
 return;
 
 }
@@ -265,7 +273,9 @@ void StringArray::add(const StringArray & a)
 if ( a.n() == 0 )  return;
 
 s.insert(s.end(), a.s.begin(), a.s.end());
- 
+
+Sorted = false;
+
 return;
 
 }
@@ -298,6 +308,8 @@ void StringArray::add_css(const std::string text)
 
   }
 
+  Sorted = false;
+  
   return;
 
 }
@@ -313,6 +325,9 @@ void StringArray::set(const std::string text)
 s.clear();
 
 s.push_back(text);
+
+// Setting to a single value, by nature it is Sorted
+Sorted = true;
 
 return;
 
@@ -336,6 +351,8 @@ void StringArray::set(int i, const std::string text)
 
 s[i] = text;
 
+Sorted = false;
+
 return;
 
 }
@@ -358,8 +375,30 @@ void StringArray::insert(int i, const char * text)
 
   s.insert(s.begin()+i, text);
 
+  Sorted = false;
+  
   return;
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool StringArray::has(const std::string text) const
+
+{
+   bool found = false;
+   bool forward = true;
+   
+   if (Sorted && !IgnoreCase) {
+      found = binary_search(s.begin(), s.end(), text);
+}
+else {
+      return ( has(text, forward) );
+}
+
+   return found;
 }
 
 
@@ -369,86 +408,80 @@ void StringArray::insert(int i, const char * text)
 bool StringArray::has(const std::string text, bool forward) const
 
 {
-
-  int index;
-
-  return ( has(text, index, forward) );
-
+   int index;
+   return ( has(text, index, forward) );
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
 bool StringArray::has(const std::string text, int & index, bool forward) const
-
 {
-  bool found = false;
-  index = -1;
-
-  if (!s.empty()) {
-    int count;
-    std::string lower_text = text;
-    std::vector<std::string>::const_iterator it;
-    if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
-    
-    if (forward) {
-      count = 0;
-      for(it = s.begin(); it != s.end(); it++, count++) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          if ( lower_s == lower_text) {
-            //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
-            found = true;
-            break;
-          }
-        }
-        else {
-          if ( *it == text ) {
-            found = true;
-            break;
-          }
-        }
+   // This function is now used for either an un-sorted array (Sorted is false)
+   // Or for a case-insensitive search (IgnoreCase is true)
+   //
+   bool found = false;
+   index = -1;
+   
+   if (!s.empty()) {
+      int count;
+      std::string lower_text = text;
+      std::vector<std::string>::const_iterator it;
+      if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+      
+      if (forward) {
+         count = 0;
+         for(it = s.begin(); it != s.end(); it++, count++) {
+            if ( IgnoreCase ) {
+               std::string lower_s = *it;
+               transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+               if ( lower_s == lower_text) {
+                  found = true;
+                  break;
+               }
+            }
+            else {
+               if ( *it == text ) {
+                  found = true;
+                  break;
+               }
+            }
+         }
       }
-    }
-    else {
-      count = s.size() - 1;
-      it = s.end();
-      for(it--; it != s.begin(); it--, count--) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          if ( lower_s == lower_text) {
-            found = true;
-            break;
-          }
-        }
-        else {
-          if ( *it == text ) {
-            found = true;
-            break;
-          }
-        }
+      else {
+         count = s.size() - 1;
+         it = s.end();
+         for(it--; it != s.begin(); it--, count--) {
+            if ( IgnoreCase ) {
+               std::string lower_s = *it;
+               transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+               if ( lower_s == lower_text) {
+                  found = true;
+                  break;
+               }
+            }
+            else {
+               if ( *it == text ) {
+                  found = true;
+                  break;
+               }
+            }
+         }
+         if (!found && it == s.begin()) {
+            if ( IgnoreCase ) {
+               std::string lower_s = *it;
+               transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+               found = ( lower_s == lower_text );
+            }
+            else found = ( *it == text );
+         }
       }
-      if (!found && it == s.begin()) {
-        if ( IgnoreCase ) {
-          std::string lower_s = *it;
-          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-          found = ( lower_s == lower_text );
-        }
-        else found = ( *it == text );
-      }
-    }
-    if (found) index = count;
-  }
-  //mlog << Debug(9) << " StringArray::has() size=" << s.size()
-  //     << " for " << text << ", found: " << (found ? "true" : "false")
-  //     << ", forward: " << (forward ? "yes" : "no") << "\n";
-
-  return found;
-
+      if (found) index = count;
+   }
+   
+   return found;
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -500,6 +533,8 @@ void StringArray::parse_delim(const std::string text, const char *delim)
   if (start < str.length())
       s.push_back(str.substr(start).c_str());
 
+  Sorted = false;
+  
   return;
 
 }
@@ -616,13 +651,19 @@ return ( s[k].length() );
 void StringArray::sort()
 
 {
-
-if ( n() <= 1 )  return;
-
- std::sort(s.begin(), s.end());
- 
-return;
-
+   if ( n() <= 1 ) {
+      Sorted = true;
+      return;
+   }
+   
+   if ( !Sorted ) {
+      std::sort(s.begin(), s.end());
+   }
+   
+   Sorted = true;
+   
+   return;
+   
 }
 
 

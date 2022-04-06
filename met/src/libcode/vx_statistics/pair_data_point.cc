@@ -1142,6 +1142,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
          // masking SID list
          else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
             if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) {
+               mlog << Debug(9) << "Checking for the obs station id in the masking SID list: rejected hdr_sid_str = "
+                    << hdr_sid_str << "\n";
                inc_count(rej_mask, i, j);
                continue;
             }
