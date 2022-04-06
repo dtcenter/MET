@@ -352,13 +352,15 @@ if ( ! all_bits_set(gds.grid_type.rot_latlon_grid.di, 2) )  {
 
 }
 
-   // Location of (rotated) south pole and auxiliary rotation hard-coded to 0
+   // Location of (rotated) south pole
+data.true_lat_south_pole =
+   decode_lat_lon(gds.grid_type.rot_latlon_grid.lat_sp, 3);
 
-data.true_lat_south_pole = -90.0;
+data.true_lon_south_pole =
+   -1.0*rescale_lon(decode_lat_lon(gds.grid_type.rot_latlon_grid.lon_sp, 3));
 
-data.true_lon_south_pole = 0.0;
-
-data.aux_rotation = 0.0;
+  // Auxiliary rotation
+data.aux_rotation = char4_to_dbl(gds.grid_type.rot_latlon_grid.rotation);
 
 data.dump();
 

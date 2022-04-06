@@ -181,6 +181,8 @@ struct LatLon {                              //   Latitude/Longitude Grid
 
 };
 
+   // Reference: https://apps.ecmwf.int/codes/grib/format/grib1/grids/10
+
 struct RotLatLon {                           //   Rotated Latitude/Longitude Grid
 
    unsigned char         lat1[3];            //   11 - 13
@@ -196,7 +198,12 @@ struct RotLatLon {                           //   Rotated Latitude/Longitude Gri
 
    unsigned char       scan_flag;            //   28
 
-   unsigned char       unused[14];           //   29 - 42
+   unsigned char        unused[4];           //   29 - 32
+
+   unsigned char        lat_sp[3];           //   33 - 35
+   unsigned char        lon_sp[3];           //   36 - 38
+
+   unsigned char      rotation[4];           //   39 - 42
 
 };
 
