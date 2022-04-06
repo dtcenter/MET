@@ -29,7 +29,6 @@
 class StringArray {
 
    public:
-   
 
       void init_from_scratch();
 
