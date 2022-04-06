@@ -416,7 +416,6 @@ bool StringArray::has(const std::string text, bool forward) const
 
 
 bool StringArray::has(const std::string text, int & index, bool forward) const
-   
 {
    // This function is now used for either an un-sorted array (Sorted is false)
    // Or for a case-insensitive search (IgnoreCase is true)
