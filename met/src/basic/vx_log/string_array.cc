@@ -396,7 +396,8 @@ bool StringArray::has(const std::string text) const
 }
 else {
       return ( has(text, forward) );
-   
+}
+
    return found;
 }
 
