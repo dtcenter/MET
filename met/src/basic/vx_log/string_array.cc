@@ -391,7 +391,7 @@ bool StringArray::has(const std::string text) const
    bool found = false;
    bool forward = true;
    
-   if (Sorted && !IgnoreCase) 
+   if (Sorted && !IgnoreCase) {
       found = binary_search(s.begin(), s.end(), text);
    else 
       return ( has(text, forward) );
