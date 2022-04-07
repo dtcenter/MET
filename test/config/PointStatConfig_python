@@ -214,7 +214,7 @@ output_flag = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V10.1.0";
+version        = "V11.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
 
