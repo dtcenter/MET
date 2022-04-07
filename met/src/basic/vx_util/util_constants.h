@@ -18,7 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Released versions of MET
-static const char met_version_11_0_0[] = "V11.0.0";
+static const char met_version_11_0_0[] = "V11.0.0";
 static const char met_version_10_1_0[] = "V10.1.0";
 static const char met_version_10_0_0[] = "V10.0.0";
 static const char met_version_9_1[]    = "V9.1";
