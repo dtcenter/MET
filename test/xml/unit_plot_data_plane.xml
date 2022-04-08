@@ -271,13 +271,27 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_time_int64">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/precipitation_int64_time.nc \
+      &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -title "NCCF GloTEC - Total Electron Content" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_NCCF_rotlatlon">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/nccf/prods_op_ukv_rotated_latlon_20220301_00_000.nc \
       &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_rotlatlon.ps \
       'name="surface_altitude"; level="(*,*)";' \
-      -title "Rotated Lat/Lon Surface Altitude" \
+      -title "Observation precipitation" \
       -v 1
     </param>
     <output>
