@@ -17,6 +17,13 @@ if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
     run_diff=true
 
+    # if pull request into main_vX.Y branch,
+    # set truth data version to branch name and set input data version to X.Y
+    if [ "${GITHUB_BASE_REF:0:6}" == "main_v" ]); then
+      truth_data_version=${GITHUB_BASE_REF}
+      input_data_version=${GITHUB_BASE_REF:6}
+    fi
+
   fi
 
 elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
@@ -30,6 +37,11 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     run_diff=true
     truth_data_version=${branch_name:0: -4}
 
+       # if main_vX.Y-ref branch, use X.Y input data
+       if [ "${branch_name:0:6}" == "main_v" ]; then
+         input_data_version=${branch_name:6: -4}
+       fi
+
   else
 
     # if develop or main_vX.Y branch, run diff tests using branch's truth data
@@ -38,6 +50,11 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
        run_diff=true
        truth_data_version=${branch_name}
+
+       # if main_vX.Y branch, use X.Y input data
+       if [ "${branch_name:0:6}" == "main_v" ]; then
+         input_data_version=${branch_name:6}
+       fi
 
     fi
 
