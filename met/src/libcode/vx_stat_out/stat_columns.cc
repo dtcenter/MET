@@ -2953,6 +2953,7 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
      // SPD_ABSERR,   SPD_ABSERR_BCL,  SPD_ABSERR_BCU,
      // DIR_ERR,      DIR_ERR_BCL,     DIR_ERR_BCU,
      // DIR_ABSERR,   DIR_ABSERR_BCL,  DIR_ABSERR_BCU,
+     // ANOM_CORR,    ANOM_CORR_BCL,   ANOM_CORR_BCU
 
 
    at.set_entry(r, c++, vcnt_info.vcount);         // TOTAL
@@ -3028,7 +3029,11 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
    at.set_entry(r, c++, vcnt_info.DIR_ABSERR);     // DIR_ABSERR
    at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCL
    at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCU
-
+   
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR);     // ANOM_CORR
+   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCU
+   
    //
    //
    //
