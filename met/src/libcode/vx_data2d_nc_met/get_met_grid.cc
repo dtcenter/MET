@@ -309,7 +309,7 @@ data.rot_lon_ll *= -1.0;
  get_global_att(ncfile, string("true_lon_south_pole"), data.true_lon_south_pole);
 if ( !west_longitude_positive )  data.true_lon_south_pole *= -1.0;
 
-   //  auxilliary rotation
+   //  auxiliary rotation
 
  get_global_att(ncfile, string("aux_rotation"), data.aux_rotation);
 
