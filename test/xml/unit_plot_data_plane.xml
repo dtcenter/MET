@@ -277,7 +277,7 @@
       &DATA_DIR_MODEL;/nccf/precipitation_int64_time.nc \
       &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps \
       'name="precipitation"; level="(*,*)";' \
-      -title "NCCF GloTEC - Total Electron Content" \
+      -title "Observation precipitation" \
       -v 1
     </param>
     <output>
