@@ -762,6 +762,10 @@ bool is_grid_relative(const GribRecord &r) {
    else if(r.gds->type == 5) {
       res_flag = r.gds->grid_type.stereographic.res_flag;
    }
+   // Rotated LatLon
+   else if(r.gds->type == 10) {
+      res_flag = r.gds->grid_type.rot_latlon_grid.res_flag;
+   }
    else {
       mlog << Error << "\nis_grid_relative() -> "
            << "Unsupported grid type value: " << r.gds->type
