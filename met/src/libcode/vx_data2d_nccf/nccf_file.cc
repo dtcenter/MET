@@ -2225,10 +2225,10 @@ void NcCfFile::get_grid_mapping_mercator(const NcVar *grid_mapping_var)
 
   MercatorData data;
   data.name   = mercator_proj_type;
-  data.lat_ll = 0.0;
-  data.lon_ll = -160.0;
-  data.lat_ur = 60.0;
-  data.lon_ur = -80.0;
+  data.lat_ll =   0.0;
+  data.lon_ll = 110.0;
+  data.lat_ur =  30.0;
+  data.lon_ur =  60.0;
   data.nx     = _xDim->getSize();
   data.ny     = _yDim->getSize();
 
