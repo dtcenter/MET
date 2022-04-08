@@ -319,6 +319,8 @@ class VL1L2Info {
       double DIR_ERR;
       double DIR_ABSERR;
 
+      double ANOM_CORR;
+   
          //
          //  extra VL1L2 quantities for NCEP
          //
