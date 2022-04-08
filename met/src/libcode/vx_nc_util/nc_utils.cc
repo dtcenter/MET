@@ -1581,7 +1581,7 @@ bool get_nc_data(NcVar *var, float *data) {
 
                   var->getVar(packed_data);
                   _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int",
+                                      fill_value, min_value, max_value, "int64",
                                       add_offset, scale_factor);
                   delete [] packed_data;
                }
@@ -1878,7 +1878,7 @@ bool get_nc_data(NcVar *var, double *data) {
 
                   var->getVar(packed_data);
                   _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int",
+                                      fill_value, min_value, max_value, "int64",
                                       add_offset, scale_factor);
                   delete [] packed_data;
                }
