@@ -291,7 +291,7 @@
       &DATA_DIR_MODEL;/nccf/prods_op_ukv_rotated_latlon_20220301_00_000.nc \
       &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_rotlatlon.ps \
       'name="surface_altitude"; level="(*,*)";' \
-      -title "Observation precipitation" \
+      -title "Rotated Lat/Lon Surface Altitude" \
       -v 1
     </param>
     <output>
