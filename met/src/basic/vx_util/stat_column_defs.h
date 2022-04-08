@@ -155,6 +155,7 @@ static const char * vcnt_columns [] = {
    "SPEED_ABSERR", "SPEED_ABSERR_BCL", "SPEED_ABSERR_BCU",
    "DIR_ERR",      "DIR_ERR_BCL",      "DIR_ERR_BCU",
    "DIR_ABSERR",   "DIR_ABSERR_BCL",   "DIR_ABSERR_BCU",
+   "ANOM_CORR",    "ANOM_CORR_BCL",    "ANOM_CORR_BCU",
 
 };
 
