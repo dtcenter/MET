@@ -19,7 +19,7 @@ if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
     # if pull request into main_vX.Y branch,
     # set truth data version to branch name and set input data version to X.Y
-    if [ "${GITHUB_BASE_REF:0:6}" == "main_v" ]); then
+    if [ "${GITHUB_BASE_REF:0:6}" == "main_v" ]; then
       truth_data_version=${GITHUB_BASE_REF}
       input_data_version=${GITHUB_BASE_REF:6}
     fi
