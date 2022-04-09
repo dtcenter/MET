@@ -159,7 +159,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
         use_var_id = true;
         if (!obs_names.has(data_line[6], var_index)) {
            obs_names.add(data_line[6]);
-           obs_names.has(data_line[6], var_index);
+           var_index = obs_names.n() - 1;
         }
         grib_code = var_index;
         break;

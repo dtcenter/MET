@@ -690,6 +690,9 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
    }
 
+   // Sort the mask_sid's
+   mask_sid.sort();
+   
    return;
 }
 
