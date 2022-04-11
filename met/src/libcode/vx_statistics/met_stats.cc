@@ -1573,7 +1573,14 @@ void VL1L2Info::calc_ncep_stats() {
 
    DIR_ABSERR   = fabs(DIR_ERR);
 
-   ANOM_CORR    = uvfoa_bar / (sqrt(uvffa_bar * uvooa_bar));
+   // Anomaly Correlation Coefficient
+   //   Check for bad data in the denominator first
+   if(!is_bad_data(uvffa_bar) && !is_bad_data(uvooa_bar)) {
+      double den = sqrt(uvffa_bar * uvooa_bar);
+      
+      if(!is_eq(den, 0.0))
+         ANOM_CORR = uvfoa_bar / den;
+   }
    
    return;
 }
