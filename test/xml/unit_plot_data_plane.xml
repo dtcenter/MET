@@ -301,6 +301,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_time_int64">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/precipitation_int64_time.nc \
+      &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -title "Observation precipitation" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_NCCF_rotlatlon">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \

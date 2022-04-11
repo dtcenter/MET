@@ -151,6 +151,6 @@ obs_summary    = NEAREST;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V10.1.0";
+version        = "V11.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
