@@ -35,13 +35,13 @@ using namespace std;
 
 
 bool match_met_version(const char * check_version) {
-   bool match = false;
 
    //
    // Check if the major version numbers match.
    //
    ConcatString check_major(parse_version_major(check_version));
    ConcatString met_major(parse_version_major(met_version));
+
    return(check_major == met_major);
 }
 

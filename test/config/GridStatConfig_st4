@@ -218,6 +218,6 @@ nc_pairs_flag = {
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V10.1.0";
+version          = "V11.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
