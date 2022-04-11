@@ -88,6 +88,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_GRIB1_rotlatlon">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/cosmo/lfff03080000.grib \
+      &OUTPUT_DIR;/plot_data_plane/cosmo_rotlatlon_GRIB1_TMP_Z2.ps \
+      'name="T"; level="Z2";' \
+      -title "Rotated Lat/Lon 2-meter Temperature" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/cosmo_rotlatlon_GRIB1_TMP_Z2.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_GRIB2">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -128,6 +142,22 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_PROB">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F012.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
+      'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
+      -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
+      -color_table &MET_BASE;/colortables/NCL_colortables/WhBlGrYeRe.ctable \
+      -plot_range 0 100 \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps</ps>
     </output>
   </test>
 
@@ -271,6 +301,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_time_int64">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/precipitation_int64_time.nc \
+      &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -title "Observation precipitation" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_int64_time.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_NCCF_rotlatlon">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -282,22 +326,6 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_rotlatlon.ps</ps>
-    </output>
-  </test>
-
-  <test name="plot_data_plane_GRIB2_PROB">
-    <exec>&MET_BIN;/plot_data_plane</exec>
-    <param> \
-      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F012.grib2 \
-      &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
-      'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
-      -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
-      -color_table &MET_BASE;/colortables/NCL_colortables/WhBlGrYeRe.ctable \
-      -plot_range 0 100 \
-      -v 1
-    </param>
-    <output>
-      <ps>&OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps</ps>
     </output>
   </test>
 

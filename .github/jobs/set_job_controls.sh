@@ -17,9 +17,11 @@ if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
 
     run_diff=true
 
-    # if base branch starts with main_v, use that input data
+    # if pull request into main_vX.Y branch,
+    # set truth data version to branch name and set input data version to X.Y
     if [ "${GITHUB_BASE_REF:0:6}" == "main_v" ]; then
-	input_data_version=${GITHUB_BASE_REF:6}
+      truth_data_version=${GITHUB_BASE_REF}
+      input_data_version=${GITHUB_BASE_REF:6}
     fi
 
   fi
@@ -35,9 +37,9 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     run_diff=true
     truth_data_version=${branch_name:0: -4}
 
-    # if branch starts with main_v, use that input data
+    # if main_vX.Y-ref branch, use X.Y input data
     if [ "${branch_name:0:6}" == "main_v" ]; then
-      input_data_version=${branch_name:6:-4}
+      input_data_version=${branch_name:6: -4}
     fi
 
   else
@@ -46,10 +48,10 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     if [ "$branch_name" == "develop" ] ||
        [ "${branch_name:0:6}" == "main_v" ]; then
 
-       run_diff=true
-       truth_data_version=${branch_name}
+      run_diff=true
+      truth_data_version=${branch_name}
 
-      # if branch starts with main_v, use that input data
+      # if main_vX.Y branch, use X.Y input data
       if [ "${branch_name:0:6}" == "main_v" ]; then
         input_data_version=${branch_name:6}
       fi
@@ -59,24 +61,24 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     # check commit messages for skip or force keywords                                                                         
     if grep -q "ci-skip-all" <<< "$commit_msg"; then
 
-       run_compile=false
-       run_push=false
-       run_unit_tests=false
-       run_diff=false
-       run_update_truth=false
+      run_compile=false
+      run_push=false
+      run_unit_tests=false
+      run_diff=false
+      run_update_truth=false
 
     fi    
     
     # check commit messages for ci-skip or ci-run keywords
     if grep -q "ci-skip-compile" <<< "$commit_msg"; then
 
-       run_compile=false
+      run_compile=false
 
     fi
 
     if grep -q "ci-run-unit" <<< "$commit_msg"; then
 
-       run_diff=true
+      run_diff=true
 
     fi
     
@@ -84,9 +86,9 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
 elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
 
-    if [ "${force_tests}" == "true" ]; then
-        run_diff=true
-    fi
+  if [ "${force_tests}" == "true" ]; then
+    run_diff=true
+  fi
 
 fi
 

@@ -1874,6 +1874,27 @@ else if ((h.type == 5))
 
    file << "   scan_flag:  " << (int) h.grid_type.stereographic.scan_flag      << "\n\n";
 }
+else if ((h.type == 10))
+{
+
+   file << "   lat1:      " << char3_to_int(h.grid_type.rot_latlon_grid.lat1)     << "\n";
+   file << "   lon1:      " << char3_to_int(h.grid_type.rot_latlon_grid.lon1)     << "\n";
+
+   file << "   res_flag:  " << (int) h.grid_type.rot_latlon_grid.res_flag         << "\n";
+
+   file << "   lat2:      " << char3_to_int(h.grid_type.rot_latlon_grid.lat2)     << "\n";
+   file << "   lon2:      " << char3_to_int(h.grid_type.rot_latlon_grid.lon2)     << "\n";
+
+   file << "   di:        " << char2_to_int(h.grid_type.rot_latlon_grid.di)       << "\n";
+   file << "   dj:        " << char2_to_int(h.grid_type.rot_latlon_grid.dj)       << "\n";
+
+   file << "   scan_flag: " << (int) h.grid_type.rot_latlon_grid.scan_flag        << "\n";
+
+   file << "   lat_sp:    " << char3_to_int(h.grid_type.rot_latlon_grid.lat_sp)   << "\n";
+   file << "   lon_sp:    " << char3_to_int(h.grid_type.rot_latlon_grid.lon_sp)   << "\n";
+
+   file << "   rotation:  " << char4_to_dbl(h.grid_type.rot_latlon_grid.rotation) << "\n\n";
+}
 
 return ( file );
 
