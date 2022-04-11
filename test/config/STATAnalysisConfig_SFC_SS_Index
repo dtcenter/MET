@@ -114,6 +114,6 @@ hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V10.1.0";
+version        = "V11.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,7 +31,6 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-
 if [[ $MET_GIT_NAME == "v"* ]]; then
     cd /met; rm -rf MET-*;
 fi
