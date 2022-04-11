@@ -1420,6 +1420,8 @@ void VL1L2Info::zero_out() {
    DIR_ERR     = 0.0;
    DIR_ABSERR  = 0.0;
 
+   ANOM_CORR   = 0.0;
+   
    vcount      = 0;
 
    //
@@ -1525,6 +1527,8 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    DIR_ERR = c.DIR_ERR;
    DIR_ABSERR = c.DIR_ABSERR;
 
+   ANOM_CORR = c.ANOM_CORR;
+   
    return;
 }
 
@@ -1569,6 +1573,8 @@ void VL1L2Info::calc_ncep_stats() {
 
    DIR_ABSERR   = fabs(DIR_ERR);
 
+   ANOM_CORR    = uvfoa_bar / (sqrt(uvffa_bar * uvooa_bar));
+   
    return;
 }
 
@@ -1708,6 +1714,8 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       DIR_ERR       = bad_data_double;
       DIR_ABSERR    = bad_data_double;
 
+      ANOM_CORR     = bad_data_double;
+      
    } else {
       rmse          = sqrt(mse);
    }
@@ -1749,6 +1757,7 @@ double VL1L2Info::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "SPEED_ABSERR") == 0) v = SPEED_ABSERR;
    else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR;
    else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR;
+   else if(strcmp(stat_name, "ANOM_CORR"  ) == 0) v = ANOM_CORR;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
