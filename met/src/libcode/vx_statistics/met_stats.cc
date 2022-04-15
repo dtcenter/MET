@@ -1445,6 +1445,7 @@ void VL1L2Info::clear() {
    DIR_ERR.clear();
    DIR_ABSERR.clear();
    ANOM_CORR.clear();
+   ANOM_CORR_UNCNTR.clear();
    
    zero_out();
 
@@ -1529,6 +1530,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    DIR_ABSERR = c.DIR_ABSERR;
 
    ANOM_CORR = c.ANOM_CORR;
+   ANOM_CORR_UNCNTR = c.ANOM_CORR_UNCNTR;
    
    return;
 }
@@ -1569,6 +1571,7 @@ void VL1L2Info::allocate_n_alpha(int i) {
       DIR_ERR.allocate_n_alpha(n_alpha);
       DIR_ABSERR.allocate_n_alpha(n_alpha);
       ANOM_CORR.allocate_n_alpha(n_alpha);
+      ANOM_CORR_UNCNTR.allocate_n_alpha(n_alpha);
    }  
    
    return;
@@ -1621,7 +1624,7 @@ void VL1L2Info::calc_ncep_stats() {
       double den = sqrt(uvffa_bar * uvooa_bar);
       
       if(!is_eq(den, 0.0))
-         ANOM_CORR = uvfoa_bar / den;
+         ANOM_CORR_UNCNTR = uvfoa_bar / den;
    }
    
    return;
@@ -1807,6 +1810,7 @@ double VL1L2Info::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR;
    else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR;
    else if(strcmp(stat_name, "ANOM_CORR"  ) == 0) v = ANOM_CORR;
+   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR"  ) == 0) v = ANOM_CORR_UNCNTR;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name

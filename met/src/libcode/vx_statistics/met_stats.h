@@ -325,7 +325,8 @@ class VL1L2Info {
       CIInfo DIR_ABSERR;
 
       CIInfo ANOM_CORR;
-   
+      CIInfo ANOM_CORR_UNCNTR;
+      
       //
       //  extra VL1L2 quantities for NCEP
       //
