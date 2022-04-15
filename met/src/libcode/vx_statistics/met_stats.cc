@@ -1304,6 +1304,8 @@ VL1L2Info::~VL1L2Info() {
 
 VL1L2Info::VL1L2Info(const VL1L2Info &c) {
 
+   alpha = (double *) 0;
+   
    init_from_scratch();
 
    assign(c);
@@ -1393,35 +1395,6 @@ void VL1L2Info::zero_out() {
    rmse        = 0.0;
    speed_bias  = 0.0;
 
-   FBAR        = 0.0;
-   OBAR        = 0.0;
-
-   FS_RMS      = 0.0;
-   OS_RMS      = 0.0;
-
-    MSVE       = 0.0;
-   RMSVE       = 0.0;
-
-   FSTDEV      = 0.0;
-   OSTDEV      = 0.0;
-
-   FDIR        = 0.0;
-   ODIR        = 0.0;
-
-   FBAR_SPEED  = 0.0;
-   OBAR_SPEED  = 0.0;
-
-   VDIFF_SPEED = 0.0;
-   VDIFF_DIR   = 0.0;
-
-   SPEED_ERR   = 0.0;
-   SPEED_ABSERR = 0.0;
-
-   DIR_ERR     = 0.0;
-   DIR_ABSERR  = 0.0;
-
-   ANOM_CORR   = 0.0;
-   
    vcount      = 0;
 
    //
@@ -1445,10 +1418,34 @@ void VL1L2Info::zero_out() {
 
 void VL1L2Info::clear() {
 
+   n = 0;
+   n_alpha = 0;
+   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   
    fthresh.clear();
    othresh.clear();
    logic = SetLogic_None;
 
+   FBAR.clear();
+   OBAR.clear();
+   FS_RMS.clear();
+   OS_RMS.clear();
+   MSVE.clear();
+   RMSVE.clear();
+   FSTDEV.clear();
+   OSTDEV.clear();
+   FDIR.clear();
+   ODIR.clear();
+   FBAR_SPEED.clear();
+   OBAR_SPEED.clear();
+   VDIFF_SPEED.clear();
+   VDIFF_DIR.clear();
+   SPEED_ERR.clear();
+   SPEED_ABSERR.clear();
+   DIR_ERR.clear();
+   DIR_ABSERR.clear();
+   ANOM_CORR.clear();
+   
    zero_out();
 
    return;
@@ -1464,6 +1461,10 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    othresh = c.othresh;
    logic   = c.logic;
 
+   n = c.n;
+   allocate_n_alpha(c.n_alpha);
+   for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
+   
    // VL1L2 Quantities
    uf_bar      = c.uf_bar;
    vf_bar      = c.vf_bar;
@@ -1496,17 +1497,17 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    uvooa_bar = c.uvooa_bar;
    vacount   = c.vacount;
 
-      //
-      //  NCEP stats
-      //
-
+   //
+   //  NCEP stats
+   //
+   
    FBAR = c.FBAR;
    OBAR = c.OBAR;
 
    FS_RMS = c.FS_RMS;
    OS_RMS = c.OS_RMS;
 
-    MSVE = c.MSVE;
+   MSVE  = c.MSVE;
    RMSVE = c.RMSVE;
 
    FSTDEV = c.FSTDEV;
@@ -1528,6 +1529,47 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    DIR_ABSERR = c.DIR_ABSERR;
 
    ANOM_CORR = c.ANOM_CORR;
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void VL1L2Info::allocate_n_alpha(int i) {
+
+   n_alpha = i;
+   
+   if(n_alpha > 0) {
+      
+      alpha = new double [n_alpha];
+      
+      if(!alpha) {
+         mlog << Error << "\nVL1L2Info::allocate_n_alpha() -> "
+              << "Memory allocation error!\n\n";
+         exit(1);
+      }
+      
+      FBAR.allocate_n_alpha(n_alpha);
+      OBAR.allocate_n_alpha(n_alpha);
+      FS_RMS.allocate_n_alpha(n_alpha);
+      OS_RMS.allocate_n_alpha(n_alpha);
+      MSVE.allocate_n_alpha(n_alpha);
+      RMSVE.allocate_n_alpha(n_alpha);
+      FSTDEV.allocate_n_alpha(n_alpha);
+      OSTDEV.allocate_n_alpha(n_alpha);
+      FDIR.allocate_n_alpha(n_alpha);
+      ODIR.allocate_n_alpha(n_alpha);
+      FBAR_SPEED.allocate_n_alpha(n_alpha);
+      OBAR_SPEED.allocate_n_alpha(n_alpha);
+      VDIFF_SPEED.allocate_n_alpha(n_alpha);
+      VDIFF_DIR.allocate_n_alpha(n_alpha);
+      SPEED_ERR.allocate_n_alpha(n_alpha);
+      SPEED_ABSERR.allocate_n_alpha(n_alpha);
+      DIR_ERR.allocate_n_alpha(n_alpha);
+      DIR_ABSERR.allocate_n_alpha(n_alpha);
+      ANOM_CORR.allocate_n_alpha(n_alpha);
+   }  
    
    return;
 }
@@ -1694,34 +1736,34 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       rmse          = bad_data_double;
       speed_bias    = bad_data_double;
 
-      FBAR          = bad_data_double;
-      OBAR          = bad_data_double;
+      //FBAR          = bad_data_double;
+      //OBAR          = bad_data_double;
 
-      FS_RMS        = bad_data_double;
-      OS_RMS        = bad_data_double;
+      //FS_RMS        = bad_data_double;
+      //OS_RMS        = bad_data_double;
 
-       MSVE         = bad_data_double;
-      RMSVE         = bad_data_double;
+      //MSVE         = bad_data_double;
+      //RMSVE         = bad_data_double;
 
-      FSTDEV        = bad_data_double;
-      OSTDEV        = bad_data_double;
+      //FSTDEV        = bad_data_double;
+      //OSTDEV        = bad_data_double;
 
-      FDIR          = bad_data_double;
-      ODIR          = bad_data_double;
+      //FDIR          = bad_data_double;
+      //ODIR          = bad_data_double;
 
-      FBAR_SPEED    = bad_data_double;
-      OBAR_SPEED    = bad_data_double;
+      //FBAR_SPEED    = bad_data_double;
+      //OBAR_SPEED    = bad_data_double;
 
-      VDIFF_SPEED   = bad_data_double;
-      VDIFF_DIR     = bad_data_double;
+      //VDIFF_SPEED   = bad_data_double;
+      //VDIFF_DIR     = bad_data_double;
 
-      SPEED_ERR     = bad_data_double;
-      SPEED_ABSERR  = bad_data_double;
+      //SPEED_ERR     = bad_data_double;
+      //SPEED_ABSERR  = bad_data_double;
 
-      DIR_ERR       = bad_data_double;
-      DIR_ABSERR    = bad_data_double;
+      //DIR_ERR       = bad_data_double;
+      //DIR_ABSERR    = bad_data_double;
 
-      ANOM_CORR     = bad_data_double;
+      //ANOM_CORR     = bad_data_double;
       
    } else {
       rmse          = sqrt(mse);

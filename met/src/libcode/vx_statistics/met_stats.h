@@ -264,14 +264,19 @@ class VL1L2Info {
       VL1L2Info & operator=(const VL1L2Info &);
       VL1L2Info & operator+=(const VL1L2Info &);
 
-      void calc_ncep_stats();
-
       // Filtering thresholds
 
       SingleThresh fthresh;
       SingleThresh othresh;
       SetLogic     logic;
 
+      // Confidence interval alpha values
+      int     n_alpha;
+      double *alpha;
+
+      // Number of points
+      int n;
+   
       // VL1L2 Quantities
 
       double uf_bar;
@@ -352,8 +357,13 @@ class VL1L2Info {
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);
 
-      void zero_out();
+      // Calc stats
+      void calc_ncep_stats();
+   
       void clear();
+      void zero_out();
+      void allocate_n_alpha(int);
+      void compute_ci();
 
       double get_stat(const char *);
 };
