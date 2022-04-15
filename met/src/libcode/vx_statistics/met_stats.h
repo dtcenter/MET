@@ -266,13 +266,13 @@ class VL1L2Info {
 
       void calc_ncep_stats();
 
-         // Filtering thresholds
+      // Filtering thresholds
 
       SingleThresh fthresh;
       SingleThresh othresh;
       SetLogic     logic;
 
-         // VL1L2 Quantities
+      // VL1L2 Quantities
 
       double uf_bar;
       double vf_bar;
@@ -283,47 +283,47 @@ class VL1L2Info {
       double uvff_bar;
       double uvoo_bar;
 
-         // New VL1L2 Quantities added from vector stats whitepaper
+      // New VL1L2 Quantities added from vector stats whitepaper
 
       double f_speed_bar;
       double o_speed_bar;
 
-         // New VL1L2 Quantities added from vector stats whitepaper
+      // New VL1L2 Quantities added from vector stats whitepaper
 
-      double FBAR;
-      double OBAR;
+      CIInfo FBAR;
+      CIInfo OBAR;
 
-      double FS_RMS;
-      double OS_RMS;
+      CIInfo FS_RMS;
+      CIInfo OS_RMS;
 
-      double  MSVE;
-      double RMSVE;
+      CIInfo  MSVE;
+      CIInfo RMSVE;
 
-      double FSTDEV;
-      double OSTDEV;
+      CIInfo FSTDEV;
+      CIInfo OSTDEV;
 
-      // double COV;
+      // CIInfo COV;
 
-      double FDIR;
-      double ODIR;
+      CIInfo FDIR;
+      CIInfo ODIR;
 
-      double FBAR_SPEED;
-      double OBAR_SPEED;
+      CIInfo FBAR_SPEED;
+      CIInfo OBAR_SPEED;
 
-      double VDIFF_SPEED;
-      double VDIFF_DIR;
+      CIInfo VDIFF_SPEED;
+      CIInfo VDIFF_DIR;
 
-      double SPEED_ERR;
-      double SPEED_ABSERR;
+      CIInfo SPEED_ERR;
+      CIInfo SPEED_ABSERR;
 
-      double DIR_ERR;
-      double DIR_ABSERR;
+      CIInfo DIR_ERR;
+      CIInfo DIR_ABSERR;
 
-      double ANOM_CORR;
+      CIInfo ANOM_CORR;
    
-         //
-         //  extra VL1L2 quantities for NCEP
-         //
+      //
+      //  extra VL1L2 quantities for NCEP
+      //
 
       double f_bar;  //  fcst wind speed
       double o_bar;  //   obs wind speed
