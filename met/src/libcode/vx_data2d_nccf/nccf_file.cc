@@ -296,17 +296,15 @@ bool NcCfFile::open(const char * filepath)
     }
 
     // Parse the units for the time variable.
+    ut = sec_per_unit = 0;
     NcVarAtt *units_att = get_nc_att(valid_time_var, (string)"units", false);
     if (IS_VALID_NC_P(units_att))
     {
-      get_att_value_chars(units_att, units);
-
-      if (units.length() == 0)
+      if (!get_att_value_chars(units_att, units) || units.length() == 0)
       {
          mlog << Warning << "\n" << method_name
               << "the \"time\" variable must contain a \"units\" attribute. "
               << "Using valid time of 0\n\n";
-         ut = sec_per_unit = 0;
       }
       else
       {
@@ -315,14 +313,10 @@ bool NcCfFile::open(const char * filepath)
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
     }
-    else
-    {
-      ut = sec_per_unit = 0;
-    }
+    if (units_att) delete units_att;
 
     NcVar bounds_time_var;
     NcVar *nc_time_var = (NcVar *)0;
-    nc_time_var = valid_time_var;
     bool use_bounds_var = false;
     ConcatString bounds_var_name;
     nc_time_var = valid_time_var;
@@ -338,12 +332,12 @@ bool NcCfFile::open(const char * filepath)
     }
     if (bounds_att) delete bounds_att;
 
-    if (units_att) delete units_att;
     // Determine the number of times present.
     int n_times = (int) get_data_size(valid_time_var);
     int tim_buf_size = n_times;
     if (use_bounds_var) tim_buf_size *= 2;
     double *time_values = new double[tim_buf_size];
+
     if( get_nc_data(nc_time_var, time_values) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
       if( time_dim_count > 1 ) {
@@ -375,6 +369,7 @@ bool NcCfFile::open(const char * filepath)
         }
       }
     }
+    else ValidTime.add(0);  //Initialize
     delete [] time_values;
   }
 
@@ -2430,10 +2425,12 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
 
   data.name = rotated_latlon_proj_type;
 
-  // Derive south pole location from the north pole
+  // Derive south pole location from the north pole:
+  // - Reverse the sign of the latitude
+  // - Add 180 to the longitude and switch from degrees east to west
   data.true_lat_south_pole = -1.0 * get_att_value_double(grid_np_lat_att);
   double np_lon = rescale_lon(get_att_value_double(grid_np_lon_att));
-  data.true_lon_south_pole = rescale_lon(-1.0 * (180.0 - fabs(np_lon)));
+  data.true_lon_south_pole = rescale_lon(-1.0 * (np_lon + 180.0));
 
   // Copied from the LatLon data structure
   data.rot_lat_ll = ll_data.lat_ll;
