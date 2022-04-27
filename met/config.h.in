@@ -1,0 +1,275 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* "build ascii2nc" */
+#undef ENABLE_ASCII2NC
+
+/* "build ensemble_stat" */
+#undef ENABLE_ENSEMBLE_STAT
+
+/* "build gen_ens_prod" */
+#undef ENABLE_GEN_ENS_PROD
+
+/* "build gen_vx_mask" */
+#undef ENABLE_GEN_VX_MASK
+
+/* "build gis_utils" */
+#undef ENABLE_GIS_UTILS
+
+/* "build GRIB2 utilities" */
+#undef ENABLE_GRIB2
+
+/* "build grid_stat" */
+#undef ENABLE_GRID_STAT
+
+/* "build gsi_tools" */
+#undef ENABLE_GSI_TOOLS
+
+/* "build ioda2nc" */
+#undef ENABLE_IODA2NC
+
+/* "build lidar2nc" */
+#undef ENABLE_LIDAR2NC
+
+/* "build madis2nc" */
+#undef ENABLE_MADIS2NC
+
+/* "build mode" */
+#undef ENABLE_MODE
+
+/* "build mode_analysis" */
+#undef ENABLE_MODE_ANALYSIS
+
+/* "build mode_graphics" */
+#undef ENABLE_MODE_GRAPHICS
+
+/* "build mode_time_domain" */
+#undef ENABLE_MODE_TIME_DOMAIN
+
+/* "build modis" */
+#undef ENABLE_MODIS
+
+/* "build pb2nc" */
+#undef ENABLE_PB2NC
+
+/* "build pcp_combine" */
+#undef ENABLE_PCP_COMBINE
+
+/* "build plot_data_plane" */
+#undef ENABLE_PLOT_DATA_PLANE
+
+/* "build plot_point_obs" */
+#undef ENABLE_PLOT_POINT_OBS
+
+/* "build point2grid" */
+#undef ENABLE_POINT2GRID
+
+/* "build point_stat" */
+#undef ENABLE_POINT_STAT
+
+/* "build python embedding" */
+#undef ENABLE_PYTHON
+
+/* "build regrid_data_plane" */
+#undef ENABLE_REGRID_DATA_PLANE
+
+/* "build series_analysis" */
+#undef ENABLE_SERIES_ANALYSIS
+
+/* "build shift_data_plane" */
+#undef ENABLE_SHIFT_DATA_PLANE
+
+/* "build stat_analysis" */
+#undef ENABLE_STAT_ANALYSIS
+
+/* "build tc_utils" */
+#undef ENABLE_TC_UTILS
+
+/* "build wavelet_stat" */
+#undef ENABLE_WAVELET_STAT
+
+/* "build wwmca" */
+#undef ENABLE_WWMCA
+
+/* Define to 1 if you have the `dup2' function. */
+#undef HAVE_DUP2
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the `floor' function. */
+#undef HAVE_FLOOR
+
+/* Define to 1 if you have the `gethostname' function. */
+#undef HAVE_GETHOSTNAME
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `isatty' function. */
+#undef HAVE_ISATTY
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* Define to 1 if you have the `mkdir' function. */
+#undef HAVE_MKDIR
+
+/* Define to 1 if you have the `pow' function. */
+#undef HAVE_POW
+
+/* Define to 1 if you have the `regcomp' function. */
+#undef HAVE_REGCOMP
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `sqrt' function. */
+#undef HAVE_SQRT
+
+/* Define to 1 if you have the <stddef.h> header file. */
+#undef HAVE_STDDEF_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strcspn' function. */
+#undef HAVE_STRCSPN
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strncasecmp' function. */
+#undef HAVE_STRNCASECMP
+
+/* Define to 1 if you have the `strrchr' function. */
+#undef HAVE_STRRCHR
+
+/* Define to 1 if you have the `strstr' function. */
+#undef HAVE_STRSTR
+
+/* Define to 1 if you have the <sys/file.h> header file. */
+#undef HAVE_SYS_FILE_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if the system has the type `_Bool'. */
+#undef HAVE__BOOL
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
+
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT8_T
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int16_t
+
+/* Define to the type of a signed integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int32_t
+
+/* Define to the type of a signed integer type of width exactly 8 bits if such
+   a type exists and the standard includes do not define it. */
+#undef int8_t
+
+/* Define to `long int' if <sys/types.h> does not define. */
+#undef off_t
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 8 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint8_t
