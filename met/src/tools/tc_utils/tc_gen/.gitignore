@@ -3,5 +3,4 @@ tc_gen
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

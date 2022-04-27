@@ -3,5 +3,4 @@ test_read_grib1
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

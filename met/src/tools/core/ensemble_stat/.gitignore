@@ -3,5 +3,4 @@ ensemble_stat
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

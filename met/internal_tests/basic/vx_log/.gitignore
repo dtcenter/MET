@@ -4,5 +4,4 @@ test_logger
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

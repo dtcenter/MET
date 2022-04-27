@@ -4,5 +4,4 @@ dump_default_table
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

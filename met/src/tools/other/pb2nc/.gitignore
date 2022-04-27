@@ -4,5 +4,4 @@ pb2nc
 .deps
 .dirstamp
 Makefile
-Makefile.in
 *.dSYM

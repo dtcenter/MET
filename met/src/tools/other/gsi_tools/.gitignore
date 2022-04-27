@@ -4,5 +4,4 @@ gsid2mpr
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

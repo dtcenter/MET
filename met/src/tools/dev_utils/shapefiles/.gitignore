@@ -3,5 +3,4 @@ make_mapfiles
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

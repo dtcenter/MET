@@ -5,5 +5,4 @@ color_parser_yacc.h
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

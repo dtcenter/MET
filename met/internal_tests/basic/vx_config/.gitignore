@@ -11,5 +11,4 @@ test_config
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

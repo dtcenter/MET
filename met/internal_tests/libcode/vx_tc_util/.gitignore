@@ -4,5 +4,4 @@ test_read
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

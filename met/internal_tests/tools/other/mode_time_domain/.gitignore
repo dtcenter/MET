@@ -3,5 +3,4 @@ test_velocity
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

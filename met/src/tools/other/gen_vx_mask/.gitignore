@@ -3,5 +3,4 @@ gen_vx_mask
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

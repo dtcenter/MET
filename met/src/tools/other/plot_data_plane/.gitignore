@@ -3,5 +3,4 @@ plot_data_plane
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

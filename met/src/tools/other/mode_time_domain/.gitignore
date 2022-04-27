@@ -5,5 +5,4 @@ mtd
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

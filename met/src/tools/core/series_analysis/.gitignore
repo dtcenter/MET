@@ -3,5 +3,4 @@ series_analysis
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

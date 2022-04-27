@@ -3,5 +3,4 @@ grid_diag
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

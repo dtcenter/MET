@@ -3,5 +3,4 @@ gen_ens_prod
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

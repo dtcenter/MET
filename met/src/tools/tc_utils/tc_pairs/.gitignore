@@ -3,5 +3,4 @@ tc_pairs
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

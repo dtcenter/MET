@@ -5,5 +5,4 @@ gis_dump_dbf
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

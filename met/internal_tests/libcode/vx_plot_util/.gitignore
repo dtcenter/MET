@@ -3,5 +3,4 @@ test_map_region
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

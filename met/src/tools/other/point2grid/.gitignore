@@ -3,5 +3,4 @@ point2grid
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

@@ -3,5 +3,4 @@ tc_dland
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

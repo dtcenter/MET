@@ -3,5 +3,4 @@ test_read_nccf
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

@@ -3,5 +3,4 @@ test_ps
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

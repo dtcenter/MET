@@ -6,5 +6,4 @@ config.tab.h
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

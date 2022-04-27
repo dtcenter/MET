@@ -11,5 +11,4 @@ chk4copyright
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

@@ -3,5 +3,4 @@ pcp_combine
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

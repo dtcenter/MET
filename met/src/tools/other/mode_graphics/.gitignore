@@ -5,5 +5,4 @@ plot_mode_field
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

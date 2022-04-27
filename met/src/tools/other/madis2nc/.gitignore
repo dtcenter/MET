@@ -3,5 +3,4 @@ madis2nc
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

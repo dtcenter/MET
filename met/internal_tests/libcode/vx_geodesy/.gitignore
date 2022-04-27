@@ -3,5 +3,4 @@ test_spheroid
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM

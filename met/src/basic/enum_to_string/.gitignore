@@ -4,5 +4,4 @@ enum_parser.cc
 *.a
 .deps
 Makefile
-Makefile.in
 *.dSYM
