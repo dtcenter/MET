@@ -156,7 +156,7 @@ static const char * vcnt_columns [] = {
    "DIR_ERR",      "DIR_ERR_BCL",      "DIR_ERR_BCU",
    "DIR_ABSERR",   "DIR_ABSERR_BCL",   "DIR_ABSERR_BCU",
    "ANOM_CORR",    "ANOM_CORR_BCL",    "ANOM_CORR_BCU",
-
+   "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
 };
 
 static const char * pct_columns [] = {
