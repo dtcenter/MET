@@ -1455,7 +1455,8 @@ void VL1L2Info::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void VL1L2Info::assign(const VL1L2Info &c) {
-
+   int i;
+   
    clear();
 
    fthresh = c.fthresh;
@@ -1587,45 +1588,47 @@ void VL1L2Info::calc_ncep_stats() {
    u_diff       = uf_bar - uo_bar;
    v_diff       = vf_bar - vo_bar;
 
-   FBAR         = f_speed_bar;
-   OBAR         = o_speed_bar;
+   FBAR.v         = f_speed_bar;
+   OBAR.v         = o_speed_bar;
 
-   FS_RMS       = sqrt(uvff_bar);
-   OS_RMS       = sqrt(uvoo_bar);
+   FS_RMS.v       = sqrt(uvff_bar);
+   OS_RMS.v       = sqrt(uvoo_bar);
 
-   MSVE         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
+   MSVE.v         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
 
-   RMSVE        = sqrt(MSVE);
+   RMSVE.v        = sqrt(MSVE.v);
 
-   FSTDEV       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
-   OSTDEV       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
+   FSTDEV.v       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
+   OSTDEV.v       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
 
-   FDIR         = convert_u_v_to_wdir(uf_bar, vf_bar);
-   ODIR         = convert_u_v_to_wdir(uo_bar, vo_bar);
+   FDIR.v         = convert_u_v_to_wdir(uf_bar, vf_bar);
+   ODIR.v         = convert_u_v_to_wdir(uo_bar, vo_bar);
 
-   FBAR_SPEED   = convert_u_v_to_wind(uf_bar, vf_bar);
-   OBAR_SPEED   = convert_u_v_to_wind(uo_bar, vo_bar);
+   FBAR_SPEED.v   = convert_u_v_to_wind(uf_bar, vf_bar);
+   OBAR_SPEED.v   = convert_u_v_to_wind(uo_bar, vo_bar);
 
-   VDIFF_SPEED  = convert_u_v_to_wind(u_diff, v_diff);
+   VDIFF_SPEED.v  = convert_u_v_to_wind(u_diff, v_diff);
 
-   VDIFF_DIR    = convert_u_v_to_wdir(u_diff, v_diff);
+   VDIFF_DIR.v    = convert_u_v_to_wdir(u_diff, v_diff);
 
-   SPEED_ERR    = FBAR_SPEED - OBAR_SPEED;
+   SPEED_ERR.v    = FBAR_SPEED.v - OBAR_SPEED.v;
 
-   SPEED_ABSERR = fabs(SPEED_ERR);
+   SPEED_ABSERR.v = fabs(SPEED_ERR.v);
 
-   DIR_ERR      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
+   DIR_ERR.v      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
 
-   DIR_ABSERR   = fabs(DIR_ERR);
+   DIR_ABSERR.v   = fabs(DIR_ERR.v);
 
+   ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
+   
    // Anomaly Correlation Coefficient
    //   Check for bad data in the denominator first
-   if(!is_bad_data(uvffa_bar) && !is_bad_data(uvooa_bar)) {
-      double den = sqrt(uvffa_bar * uvooa_bar);
-      
-      if(!is_eq(den, 0.0))
-         ANOM_CORR_UNCNTR = uvfoa_bar / den;
-   }
+   //if(!is_bad_data(uvffa_bar) && !is_bad_data(uvooa_bar)) {
+   //   double den = sqrt(uvffa_bar * uvooa_bar);
+   //   
+   //   if(!is_eq(den, 0.0))
+   //      ANOM_CORR_UNCNTR = uvfoa_bar / den;
+   //}
    
    return;
 }
@@ -1739,34 +1742,35 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       rmse          = bad_data_double;
       speed_bias    = bad_data_double;
 
-      //FBAR          = bad_data_double;
-      //OBAR          = bad_data_double;
+      FBAR.v          = bad_data_double;
+      OBAR.v          = bad_data_double;
 
-      //FS_RMS        = bad_data_double;
-      //OS_RMS        = bad_data_double;
+      FS_RMS.v        = bad_data_double;
+      OS_RMS.v        = bad_data_double;
 
-      //MSVE         = bad_data_double;
-      //RMSVE         = bad_data_double;
+      MSVE.v         = bad_data_double;
+      RMSVE.v         = bad_data_double;
 
-      //FSTDEV        = bad_data_double;
-      //OSTDEV        = bad_data_double;
+      FSTDEV.v        = bad_data_double;
+      OSTDEV.v        = bad_data_double;
 
-      //FDIR          = bad_data_double;
-      //ODIR          = bad_data_double;
+      FDIR.v          = bad_data_double;
+      ODIR.v          = bad_data_double;
 
-      //FBAR_SPEED    = bad_data_double;
-      //OBAR_SPEED    = bad_data_double;
+      FBAR_SPEED.v    = bad_data_double;
+      OBAR_SPEED.v    = bad_data_double;
 
-      //VDIFF_SPEED   = bad_data_double;
-      //VDIFF_DIR     = bad_data_double;
+      VDIFF_SPEED.v   = bad_data_double;
+      VDIFF_DIR.v     = bad_data_double;
+      
+      SPEED_ERR.v     = bad_data_double;
+      SPEED_ABSERR.v  = bad_data_double;
 
-      //SPEED_ERR     = bad_data_double;
-      //SPEED_ABSERR  = bad_data_double;
+      DIR_ERR.v       = bad_data_double;
+      DIR_ABSERR.v    = bad_data_double;
 
-      //DIR_ERR       = bad_data_double;
-      //DIR_ABSERR    = bad_data_double;
-
-      //ANOM_CORR     = bad_data_double;
+      ANOM_CORR.v     = bad_data_double;
+      ANOM_CORR_UNCNTR.v = bad_data_double;
       
    } else {
       rmse          = sqrt(mse);
@@ -1791,26 +1795,26 @@ double VL1L2Info::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
         if(strcmp(stat_name, "TOTAL"       ) == 0) v = vcount;
-   else if(strcmp(stat_name, "FBAR"        ) == 0) v = FBAR;
-   else if(strcmp(stat_name, "OBAR"        ) == 0) v = OBAR;
-   else if(strcmp(stat_name, "FS_RMS"      ) == 0) v = FS_RMS;
-   else if(strcmp(stat_name, "OS_RMS"      ) == 0) v = OS_RMS;
-   else if(strcmp(stat_name, "MSVE"        ) == 0) v = MSVE;
-   else if(strcmp(stat_name, "RMSVE"       ) == 0) v = RMSVE;
-   else if(strcmp(stat_name, "FSTDEV"      ) == 0) v = FSTDEV;
-   else if(strcmp(stat_name, "OSTDEV"      ) == 0) v = OSTDEV;
-   else if(strcmp(stat_name, "FDIR"        ) == 0) v = FDIR;
-   else if(strcmp(stat_name, "ODIR"        ) == 0) v = ODIR;
-   else if(strcmp(stat_name, "FBAR_SPEED"  ) == 0) v = FBAR_SPEED;
-   else if(strcmp(stat_name, "OBAR_SPEED"  ) == 0) v = OBAR_SPEED;
-   else if(strcmp(stat_name, "VDIFF_SPEED" ) == 0) v = VDIFF_SPEED;
-   else if(strcmp(stat_name, "VDIFF_DIR"   ) == 0) v = VDIFF_DIR;
-   else if(strcmp(stat_name, "SPEED_ERR"   ) == 0) v = SPEED_ERR;
-   else if(strcmp(stat_name, "SPEED_ABSERR") == 0) v = SPEED_ABSERR;
-   else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR;
-   else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR;
-   else if(strcmp(stat_name, "ANOM_CORR"  ) == 0) v = ANOM_CORR;
-   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR"  ) == 0) v = ANOM_CORR_UNCNTR;
+   else if(strcmp(stat_name, "FBAR"        ) == 0) v = FBAR.v;
+   else if(strcmp(stat_name, "OBAR"        ) == 0) v = OBAR.v;
+   else if(strcmp(stat_name, "FS_RMS"      ) == 0) v = FS_RMS.v;
+   else if(strcmp(stat_name, "OS_RMS"      ) == 0) v = OS_RMS.v;
+   else if(strcmp(stat_name, "MSVE"        ) == 0) v = MSVE.v;
+   else if(strcmp(stat_name, "RMSVE"       ) == 0) v = RMSVE.v;
+   else if(strcmp(stat_name, "FSTDEV"      ) == 0) v = FSTDEV.v;
+   else if(strcmp(stat_name, "OSTDEV"      ) == 0) v = OSTDEV.v;
+   else if(strcmp(stat_name, "FDIR"        ) == 0) v = FDIR.v;
+   else if(strcmp(stat_name, "ODIR"        ) == 0) v = ODIR.v;
+   else if(strcmp(stat_name, "FBAR_SPEED"  ) == 0) v = FBAR_SPEED.v;
+   else if(strcmp(stat_name, "OBAR_SPEED"  ) == 0) v = OBAR_SPEED.v;
+   else if(strcmp(stat_name, "VDIFF_SPEED" ) == 0) v = VDIFF_SPEED.v;
+   else if(strcmp(stat_name, "VDIFF_DIR"   ) == 0) v = VDIFF_DIR.v;
+   else if(strcmp(stat_name, "SPEED_ERR"   ) == 0) v = SPEED_ERR.v;
+   else if(strcmp(stat_name, "SPEED_ABSERR") == 0) v = SPEED_ABSERR.v;
+   else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR.v;
+   else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR.v;
+   else if(strcmp(stat_name, "ANOM_CORR"  ) == 0) v = ANOM_CORR.v;
+   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR"  ) == 0) v = ANOM_CORR_UNCNTR.v;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
