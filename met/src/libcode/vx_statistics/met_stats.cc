@@ -1619,16 +1619,11 @@ void VL1L2Info::calc_ncep_stats() {
 
    DIR_ABSERR.v   = fabs(DIR_ERR.v);
 
-   ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
+   // Place holde for now
+   ANOM_CORR.v = bad_data_double;;
+   //ANOM_CORR.v = compute_corr();
    
-   // Anomaly Correlation Coefficient
-   //   Check for bad data in the denominator first
-   //if(!is_bad_data(uvffa_bar) && !is_bad_data(uvooa_bar)) {
-   //   double den = sqrt(uvffa_bar * uvooa_bar);
-   //   
-   //   if(!is_eq(den, 0.0))
-   //      ANOM_CORR_UNCNTR = uvfoa_bar / den;
-   //}
+   ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
    
    return;
 }
