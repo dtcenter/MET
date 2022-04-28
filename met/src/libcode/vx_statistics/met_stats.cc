@@ -1619,11 +1619,11 @@ void VL1L2Info::calc_ncep_stats() {
 
    DIR_ABSERR.v   = fabs(DIR_ERR.v);
 
-   // Place holde for now
-   ANOM_CORR.v = bad_data_double;;
-   //ANOM_CORR.v = compute_corr();
-   
    ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
+
+   // Place holder for now
+   ANOM_CORR.v = ANOM_CORR_UNCNTR.v;
+   //ANOM_CORR.v = compute_corr();
    
    return;
 }
