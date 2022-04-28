@@ -190,7 +190,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Allocate space based on number of fields
     data_info = new VarInfo*[n_data];
-
+    
     // Initialize pointers
     for(i=0; i<n_data; i++) {
         data_info[i] = (VarInfo*) 0;

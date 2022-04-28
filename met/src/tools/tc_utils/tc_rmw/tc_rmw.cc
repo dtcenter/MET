@@ -45,6 +45,7 @@
 #include "vx_data2d_nc_met.h"
 #include "vx_util.h"
 #include "vx_log.h"
+#include "vx_math.h"
 
 #include "met_file.h"
 
@@ -76,8 +77,9 @@ static void build_outfile_name(const ConcatString&,
 static void compute_lat_lon(TcrmwGrid&,
     double*, double*);
 static void wind_ne_to_ra(TcrmwGrid&,
-    DataPlane&, DataPlane&,
-    double*, double*, double*, double*);
+			  DataPlane&, DataPlane&,
+			  double*, double*, double*, double*);
+
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
@@ -599,11 +601,23 @@ void setup_nc_file() {
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
+    // units shared between UGRD and radial and tangential velocity
+    string unitsU = variable_units["UGRD"];
+
+    variable_levels[tangential_velocity_name] = variable_levels["UGRD"];
+    variable_long_names[tangential_velocity_name] = tangential_velocity_long_name;
+    variable_units[tangential_velocity_name] = unitsU;
+
+    variable_levels[radial_velocity_name] = variable_levels["UGRD"];
+    variable_long_names[radial_velocity_name] = radial_velocity_long_name;
+    variable_units[radial_velocity_name] = unitsU;
+
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
         range_dim, azimuth_dim, pressure_dim, track_point_dim,
         data_3d_vars);
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -628,10 +642,9 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
-    DataPlane& u_dp, DataPlane& v_dp,
-    double* lat_arr, double* lon_arr,
-    double* wind_r_arr, double* wind_a_arr) {
-
+		   DataPlane& u_dp, DataPlane& v_dp,
+		   double* lat_arr, double* lon_arr,
+		   double* wind_r_arr, double* wind_t_arr) {
     // Transform (u, v) to (radial, azimuthal)
     for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
         for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
@@ -641,13 +654,20 @@ void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
             double u = u_dp.data()[i];
             double v = v_dp.data()[i];
             double wind_r;
-            double wind_a;
-            tcrmw_grid.wind_ne_to_ra(
-                lat, lon, u, v, wind_r, wind_a);
-            // tcrmw_grid.wind_ne_to_ra_conventional(
-            //     lat, lon, u, v, wind_r, wind_a);
+            double wind_t;
+	    if(is_bad_data(u) || is_bad_data(v)) {
+	      mlog << Debug(3) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " winds are missing\n";
+	      wind_r = bad_data_double;
+	      wind_t = bad_data_double;
+	    } else {
+	      tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
+	      mlog << Debug(3) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
+		   << v << ", rt:" << wind_r << "," << wind_t <<"\n";
+	      // tcrmw_grid.wind_ne_to_ra_conventional(
+	      //     lat, lon, u, v, wind_r, wind_t);
+	    }
             wind_r_arr[i] = wind_r;
-            wind_a_arr[i] = wind_a;
+            wind_t_arr[i] = wind_t;
         }
     }
 }
@@ -665,14 +685,53 @@ void process_fields(const TrackInfoArray& tracks) {
     lon_arr = new double[
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
+    // radial winds
+    wind_r_arr = new double[
+			    tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+
+    // tangential (azimuthal) winds
+    wind_t_arr = new double[
+			    tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+
+
     // Take only first track
     TrackInfo track = tracks[0];
 
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
 
+    // create maps from levels to the ugrid/vgrid pointers
+    map<string, int> uMap;
+    map<string, int> vMap;
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+      data_info = conf_info.data_info[i_var];
+      string sname = data_info->name_attr().string();
+      string slevel = data_info->level_attr().string();
+      if (sname == "UGRD") {
+	uMap[slevel] = i_var;
+      }
+      else if (sname == "VGRD") {
+	vMap[slevel] = i_var;
+      }
+    }
+
+    // test for consistency
+    if (uMap.size() != vMap.size()) {
+      mlog << Debug(0) << " error uneven number o ugrid/vgrid\n";
+      return;
+    }
+
+    map<string,int>::const_iterator iu, iv;
+    for (iu=uMap.begin(), iv=vMap.begin(); iu!=uMap.end(); ++iu, ++iv) {
+      if (iu->first != iv->first) {
+	mlog << Debug(0) << "error ordering of ugrid/vgrid levels not the same, not implemented\n";
+	mlog << Debug(0) << "    "  << iu->first  << " " << iv->first << "\n";
+	return;
+      }
+    }
+
     // Loop over track points
-    for(int i_point = 0; i_point < track.n_points(); i_point++) {
+    for (int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
@@ -711,7 +770,25 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
+
+	    string sname = data_info->name_attr().string();
+	    string slevel = data_info->level_attr().string();
+	    bool isUV = false;
+	    int uIndex = -1;
+	    int vIndex = -1;
+	    VarInfo *data_infoV = (VarInfo *) 0;
+	    DataPlane data_dpV;
+	    Grid latlon_arrV;
+	    if (sname == "UGRD") {
+	      uIndex = uMap[slevel];
+	      vIndex = vMap[slevel];
+	      isUV = true;
+	      data_infoV = conf_info.data_info[vIndex];
+	      data_infoV->set_valid(valid_time);
+	    }
+
             data_info->set_valid(valid_time);
+
 
             // Find data for this track point
             get_series_entry(i_point, data_info, data_files, ftype, data_dp,
@@ -723,13 +800,39 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
+	    if (isUV) {
+	      get_series_entry(i_point, data_infoV, data_files, ftype, data_dpV,
+			       latlon_arrV);
+	      data_dpV.data_range(data_min, data_max);
+	      mlog << Debug(4) << "V data_min:" << data_min << "\n";
+	      mlog << Debug(4) << "V data_max:" << data_max << "\n";
+	    }
+
             // Regrid data
             data_dp = met_regrid(data_dp,
-                latlon_arr, grid, data_info->regrid());
-            data_dp.data_range(data_min, data_max);
+				 latlon_arr, grid, data_info->regrid());
+	    data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
+	    if (isUV) {
+	      data_dpV = met_regrid(data_dpV, latlon_arr, grid, data_infoV->regrid());
+	      data_dpV.data_range(data_min, data_max);
+	      mlog << Debug(4) << "V data_min:" << data_min << "\n";
+	      mlog << Debug(4) << "V data_max:" << data_max << "\n";
+	    }
+
+	    if (isUV) {
+	      wind_ne_to_ra(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
+			    wind_r_arr, wind_t_arr);
+	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
+					   pressure_level_indices, data_info->level_attr(),
+					   i_point, data_3d_vars[radial_velocity_name], wind_r_arr);
+	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
+					   pressure_level_indices, data_info->level_attr(),
+					   i_point, data_3d_vars[tangential_velocity_name], wind_t_arr);
+	    }
+	    
             // Write data
             if (variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
@@ -744,6 +847,8 @@ void process_fields(const TrackInfoArray& tracks) {
 
     delete[] lat_arr;
     delete[] lon_arr;
+    delete [] wind_r_arr;
+    delete [] wind_t_arr;
 }
 
 ////////////////////////////////////////////////////////////////////////
