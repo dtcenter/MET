@@ -44,7 +44,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 EXTRA_DIST = plot_point_obs.h \
 	plot_point_obs_conf_info.h
 
