@@ -1304,8 +1304,6 @@ VL1L2Info::~VL1L2Info() {
 
 VL1L2Info::VL1L2Info(const VL1L2Info &c) {
 
-   alpha = (double *) 0;
-   
    init_from_scratch();
 
    assign(c);
@@ -1364,6 +1362,8 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
 
 void VL1L2Info::init_from_scratch() {
 
+   alpha = (double *) 0;
+   
    clear();
 
    return;
