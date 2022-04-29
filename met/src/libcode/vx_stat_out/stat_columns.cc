@@ -2930,123 +2930,116 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
 {
 
    //
-   // VCNT Line Type
+   // Vector Continuous Statistics Line Type (VCNT)
+   // Dump out the VCNT line:
+   //    TOTAL,
+   //    FBAR,             FBAR_BCL,             FBAR_BCU,
+   //    OBAR,             OBAR_BCL,             OBAR_BCU,
+   //    FS_RMS,           FS_RMS_BCL,           FS_RMS_BCU,
+   //    OS_RMS,           OS_RMS_BCL,           OS_RMS_BCU,
+   //    MSVE,             MSVE_BCL,             MSVE_BCU,
+   //    RMSVE,            RMSVE_BCL,            RMSVE_BCU,
+   //    FSTDEV,           FSTDEV_BCL,           FSTDEV_BCU,
+   //    OSTDEV,           OSTDEV_BCL,           OSTDEV_BCU,
+   //    FDIR,             FDIR_BCL,             FDIR_BCU,
+   //    ODIR,             ODIR_BCL,             ODIR_BCU,
+   //    FBAR_SPEED,       FBAR_SPEED_BCL,       FBAR_SPEED_BCU,
+   //    OBAR_SPEED,       OBAR_SPEED_BCL,       OBAR_SPEED_BCU,
+   //    VDIFF_SPEED,      VDIFF_SPEED_BCL,      VDIFF_SPEED_BCU,
+   //    VDIFF_DIR,        VDIFF_DIR_BCL,        VDIFF_DIR_BCU,
+   //    SPD_ERR,          SPD_ERR_BCL,          SPD_ERR_BCU,
+   //    SPD_ABSERR,       SPD_ABSERR_BCL,       SPD_ABSERR_BCU,
+   //    DIR_ERR,          DIR_ERR_BCL,          DIR_ERR_BCU,
+   //    DIR_ABSERR,       DIR_ABSERR_BCL,       DIR_ABSERR_BCU,
+   //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,       ANOM_CORR_BCL,   ANOM_CORR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
    //
 
-     // TOTAL,
-     //
-     // FBAR,         FBAR_BCL,        FBAR_BCU,
-     // OBAR,         OBAR_BCL,        OBAR_BCU,
-     // FS_RMS,       FS_RMS_BCL,      FS_RMS_BCU,
-     // OS_RMS,       OS_RMS_BCL,      OS_RMS_BCU,
-     // MSVE,         MSVE_BCL,        MSVE_BCU,
-     // RMSVE,        RMSVE_BCL,       RMSVE_BCU,
-     // FSTDEV,       FSTDEV_BCL,      FSTDEV_BCU,
-     // OSTDEV,       OSTDEV_BCL,      OSTDEV_BCU,
-     // FDIR,         FDIR_BCL,        FDIR_BCU,
-     // ODIR,         ODIR_BCL,        ODIR_BCU,
-     // FBAR_SPEED,   FBAR_SPEED_BCL,  FBAR_SPEED_BCU,
-     // OBAR_SPEED,   OBAR_SPEED_BCL,  OBAR_SPEED_BCU,
-     // VDIFF_SPEED,  VDIFF_SPEED_BCL, VDIFF_SPEED_BCU,
-     // VDIFF_DIR,    VDIFF_DIR_BCL,   VDIFF_DIR_BCU,
-     // SPD_ERR,      SPD_ERR_BCL,     SPD_ERR_BCU,
-     // SPD_ABSERR,   SPD_ABSERR_BCL,  SPD_ABSERR_BCU,
-     // DIR_ERR,      DIR_ERR_BCL,     DIR_ERR_BCU,
-     // DIR_ABSERR,   DIR_ABSERR_BCL,  DIR_ABSERR_BCU,
-     // ANOM_CORR,    ANOM_CORR_NCL,   ANOM_CORR_NCU    ANOM_CORR_BCL,   ANOM_CORR_BCU
-     // ANOM_CORR_UNCNTR,    ANOM_CORR_UNCNTR_BCL,    ANOM_CORR_UNCNTR_BCU
+   at.set_entry(r, c++, vcnt_info.vcount);             //    TOTAL
 
+   at.set_entry(r, c++, vcnt_info.FBAR.v);             // FBAR
+   at.set_entry(r, c++, (string)na_str);               // FBAR_BCL
+   at.set_entry(r, c++, (string)na_str);               // FBAR_BCU
+
+   at.set_entry(r, c++, vcnt_info.OBAR.v);             // OBAR
+   at.set_entry(r, c++, (string)na_str);               // OBAR_BCL
+   at.set_entry(r, c++, (string)na_str);               // OBAR_BCU
+
+   at.set_entry(r, c++, vcnt_info.FS_RMS.v);           // FS_RMS
+   at.set_entry(r, c++, (string)na_str);               // FS_RMS_BCL
+   at.set_entry(r, c++, (string)na_str);               // FS_RMS_BCU
+
+   at.set_entry(r, c++, vcnt_info.OS_RMS.v);           // OS_RMS
+   at.set_entry(r, c++, (string)na_str);               // OS_RMS_BCL
+   at.set_entry(r, c++, (string)na_str);               // OS_RMS_BCU
+
+   at.set_entry(r, c++, vcnt_info.MSVE.v);             // MSVE
+   at.set_entry(r, c++, (string)na_str);               // MSVE_BCL
+   at.set_entry(r, c++, (string)na_str);               // MSVE_BCU
+
+   at.set_entry(r, c++, vcnt_info.RMSVE.v);            // RMSVE
+   at.set_entry(r, c++, (string)na_str);               // RMSVE_BCL
+   at.set_entry(r, c++, (string)na_str);               // RMSVE_BCU
+
+   at.set_entry(r, c++, vcnt_info.FSTDEV.v);           // FSTDEV
+   at.set_entry(r, c++, (string)na_str);               // FSTDEV_BCL
+   at.set_entry(r, c++, (string)na_str);               // FSTDEV_BCU
+
+   at.set_entry(r, c++, vcnt_info.OSTDEV.v);           // OSTDEV
+   at.set_entry(r, c++, (string)na_str);               // OSTDEV_BCL
+   at.set_entry(r, c++, (string)na_str);               // OSTDEV_BCU
+
+   at.set_entry(r, c++, vcnt_info.FDIR.v);             // FDIR
+   at.set_entry(r, c++, (string)na_str);               // FDIR_BCL
+   at.set_entry(r, c++, (string)na_str);               // FDIR_BCU
+
+   at.set_entry(r, c++, vcnt_info.ODIR.v);             // ODIR
+   at.set_entry(r, c++, (string)na_str);               // ODIR_BCL
+   at.set_entry(r, c++, (string)na_str);               // ODIR_BCU
+
+   at.set_entry(r, c++, vcnt_info.FBAR_SPEED.v);       // FBAR_SPEED
+   at.set_entry(r, c++, (string)na_str);               // FBAR_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);               // FBAR_SPEED_BCU
+
+   at.set_entry(r, c++, vcnt_info.OBAR_SPEED.v);       // OBAR_SPEED
+   at.set_entry(r, c++, (string)na_str);               // OBAR_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);               // OBAR_SPEED_BCU
+
+   at.set_entry(r, c++, vcnt_info.VDIFF_SPEED.v);      // VDIFF_SPEED
+   at.set_entry(r, c++, (string)na_str);               // VDIFF_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);               // VDIFF_SPEED_BCU
+
+   at.set_entry(r, c++, vcnt_info.VDIFF_DIR.v);        // VDIFF_DIR
+   at.set_entry(r, c++, (string)na_str);               // VDIFF_DIR_BCL
+   at.set_entry(r, c++, (string)na_str);               // VDIFF_DIR_BCU
+
+   at.set_entry(r, c++, vcnt_info.SPEED_ERR.v);        // SPEED_ERR
+   at.set_entry(r, c++, (string)na_str);               // SPEED_ERR_BCL
+   at.set_entry(r, c++, (string)na_str);               // SPEED_ERR_BCU
+
+   at.set_entry(r, c++, vcnt_info.SPEED_ABSERR.v);     // SPEED_ABSERR
+   at.set_entry(r, c++, (string)na_str);               // SPEED_ABSERR_BCL
+   at.set_entry(r, c++, (string)na_str);               // SPEED_ABSERR_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_ERR.v);          // DIR_ERR
+   at.set_entry(r, c++, (string)na_str);               // DIR_ERR_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_ERR_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_ABSERR.v);       // DIR_ABSERR
+   at.set_entry(r, c++, (string)na_str);               // DIR_ABSERR_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_ABSERR_BCU
    
-   at.set_entry(r, c++, vcnt_info.vcount);         // TOTAL
-
-   at.set_entry(r, c++, vcnt_info.FBAR.v);           // FBAR
-   at.set_entry(r, c++, (string)na_str);                   // FBAR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // FBAR_BCU
-
-   at.set_entry(r, c++, vcnt_info.OBAR.v);           // OBAR
-   at.set_entry(r, c++, (string)na_str);                   // OBAR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // OBAR_BCU
-
-   at.set_entry(r, c++, vcnt_info.FS_RMS.v);         // FS_RMS
-   at.set_entry(r, c++, (string)na_str);                   // FS_RMS_BCL
-   at.set_entry(r, c++, (string)na_str);                   // FS_RMS_BCU
-
-   at.set_entry(r, c++, vcnt_info.OS_RMS.v);         // OS_RMS
-   at.set_entry(r, c++, (string)na_str);                   // OS_RMS_BCL
-   at.set_entry(r, c++, (string)na_str);                   // OS_RMS_BCU
-
-   at.set_entry(r, c++, vcnt_info.MSVE.v);           // MSVE
-   at.set_entry(r, c++, (string)na_str);                   // MSVE_BCL
-   at.set_entry(r, c++, (string)na_str);                   // MSVE_BCU
-
-   at.set_entry(r, c++, vcnt_info.RMSVE.v);          // RMSVE
-   at.set_entry(r, c++, (string)na_str);                   // RMSVE_BCL
-   at.set_entry(r, c++, (string)na_str);                   // RMSVE_BCU
-
-   at.set_entry(r, c++, vcnt_info.FSTDEV.v);         // FSTDEV
-   at.set_entry(r, c++, (string)na_str);                   // FSTDEV_BCL
-   at.set_entry(r, c++, (string)na_str);                   // FSTDEV_BCU
-
-   at.set_entry(r, c++, vcnt_info.OSTDEV.v);         // OSTDEV
-   at.set_entry(r, c++, (string)na_str);                   // OSTDEV_BCL
-   at.set_entry(r, c++, (string)na_str);                   // OSTDEV_BCU
-
-   at.set_entry(r, c++, vcnt_info.FDIR.v);           // FDIR
-   at.set_entry(r, c++, (string)na_str);                   // FDIR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // FDIR_BCU
-
-   at.set_entry(r, c++, vcnt_info.ODIR.v);           // ODIR
-   at.set_entry(r, c++, (string)na_str);                   // ODIR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // ODIR_BCU
-
-   at.set_entry(r, c++, vcnt_info.FBAR_SPEED.v);     // FBAR_SPEED
-   at.set_entry(r, c++, (string)na_str);                   // FBAR_SPEED_BCL
-   at.set_entry(r, c++, (string)na_str);                   // FBAR_SPEED_BCU
-
-   at.set_entry(r, c++, vcnt_info.OBAR_SPEED.v);     // OBAR_SPEED
-   at.set_entry(r, c++, (string)na_str);                   // OBAR_SPEED_BCL
-   at.set_entry(r, c++, (string)na_str);                   // OBAR_SPEED_BCU
-
-   at.set_entry(r, c++, vcnt_info.VDIFF_SPEED.v);    // VDIFF_SPEED
-   at.set_entry(r, c++, (string)na_str);                   // VDIFF_SPEED_BCL
-   at.set_entry(r, c++, (string)na_str);                   // VDIFF_SPEED_BCU
-
-   at.set_entry(r, c++, vcnt_info.VDIFF_DIR.v);      // VDIFF_DIR
-   at.set_entry(r, c++, (string)na_str);                   // VDIFF_DIR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // VDIFF_DIR_BCU
-
-   at.set_entry(r, c++, vcnt_info.SPEED_ERR.v);      // SPEED_ERR
-   at.set_entry(r, c++, (string)na_str);                   // SPEED_ERR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // SPEED_ERR_BCU
-
-   at.set_entry(r, c++, vcnt_info.SPEED_ABSERR.v);   // SPEED_ABSERR
-   at.set_entry(r, c++, (string)na_str);                   // SPEED_ABSERR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // SPEED_ABSERR_BCU
-
-   at.set_entry(r, c++, vcnt_info.DIR_ERR.v);        // DIR_ERR
-   at.set_entry(r, c++, (string)na_str);                   // DIR_ERR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // DIR_ERR_BCU
-
-   at.set_entry(r, c++, vcnt_info.DIR_ABSERR.v);     // DIR_ABSERR
-   at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCU
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR.v);        // ANOM_CORR
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_NCL
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_NCU
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_BCL
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_BCU
    
-   at.set_entry(r, c++, vcnt_info.ANOM_CORR.v);     // ANOM_CORR
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_NCL
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_NCU
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCU
-   
-   at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v);   // ANOM_CORR_UNCNTR
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_UNCNTR_BCL
-   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_UNCNTR_BCU
-   
-   //
-   //
-   //
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v); // ANOM_CORR_UNCNTR
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCL
+   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCU
 
-return;
-
+   return;
 }
 
 
