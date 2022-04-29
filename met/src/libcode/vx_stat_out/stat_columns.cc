@@ -2953,10 +2953,10 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
      // SPD_ABSERR,   SPD_ABSERR_BCL,  SPD_ABSERR_BCU,
      // DIR_ERR,      DIR_ERR_BCL,     DIR_ERR_BCU,
      // DIR_ABSERR,   DIR_ABSERR_BCL,  DIR_ABSERR_BCU,
-     // ANOM_CORR,    ANOM_CORR_BCL,   ANOM_CORR_BCU
-     // ANOM_CORR_UNCNTR,    ANOM_CORR_UNCNTR_BCL,   ANOM_CORR_UNCNTR_BCU
+     // ANOM_CORR,    ANOM_CORR_NCL,   ANOM_CORR_NCU    ANOM_CORR_BCL,   ANOM_CORR_BCU
+     // ANOM_CORR_UNCNTR,    ANOM_CORR_UNCNTR_BCL,    ANOM_CORR_UNCNTR_BCU
 
-
+   
    at.set_entry(r, c++, vcnt_info.vcount);         // TOTAL
 
    at.set_entry(r, c++, vcnt_info.FBAR.v);           // FBAR
@@ -3032,10 +3032,12 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
    at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCU
    
    at.set_entry(r, c++, vcnt_info.ANOM_CORR.v);     // ANOM_CORR
+   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_NCL
+   at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_NCU
    at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCL
    at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_BCU
    
-   at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v);     // ANOM_CORR_UNCNTR
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v);   // ANOM_CORR_UNCNTR
    at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_UNCNTR_BCL
    at.set_entry(r, c++, (string)na_str);                   // ANOM_CORR_UNCNTR_BCU
    
