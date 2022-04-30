@@ -230,7 +230,7 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
    v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
 
-   v_info.calc_ncep_stats();
+   v_info.compute_stats();
 
    return;
 }
@@ -241,14 +241,18 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
 
    v_info.clear();
 
-   v_info.vacount   = atoi(l.get_item("TOTAL"));
-   v_info.ufa_bar   = atof(l.get_item("UFABAR"));
-   v_info.vfa_bar   = atof(l.get_item("VFABAR"));
-   v_info.uoa_bar   = atof(l.get_item("UOABAR"));
-   v_info.voa_bar   = atof(l.get_item("VOABAR"));
-   v_info.uvfoa_bar = atof(l.get_item("UVFOABAR"));
-   v_info.uvffa_bar = atof(l.get_item("UVFFABAR"));
-   v_info.uvooa_bar = atof(l.get_item("UVOOABAR"));
+   v_info.vacount      = atoi(l.get_item("TOTAL"));
+   v_info.ufa_bar      = atof(l.get_item("UFABAR"));
+   v_info.vfa_bar      = atof(l.get_item("VFABAR"));
+   v_info.uoa_bar      = atof(l.get_item("UOABAR"));
+   v_info.voa_bar      = atof(l.get_item("VOABAR"));
+   v_info.uvfoa_bar    = atof(l.get_item("UVFOABAR"));
+   v_info.uvffa_bar    = atof(l.get_item("UVFFABAR"));
+   v_info.uvooa_bar    = atof(l.get_item("UVOOABAR"));
+   v_info.fa_speed_bar = atof(l.get_item("FA_SPEED_BAR"));
+   v_info.oa_speed_bar = atof(l.get_item("OA_SPEED_BAR"));
+
+   v_info.compute_stats();
 
    return;
 }

@@ -2893,7 +2893,8 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c
    // Dump out the VAL1L2 line:
    //    TOTAL,       UFABAR,      VFABAR,
    //    UOABAR,      VOABAR,      UVFOABAR,
-   //    UVFFABAR,    UVOOABAR
+   //    UVFFABAR,    UVOOABAR,    FA_SPEED_BAR,
+   //    OA_SPEED_BAR
    //
 
    at.set_entry(r, c+0,  // Total Anomaly Count
@@ -2919,6 +2920,13 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c
 
    at.set_entry(r, c+7,  // UVOOABAR
       vl1l2_info.uvooa_bar);
+
+   at.set_entry(r, c+8,  // FA_SPEED_BAR
+      vl1l2_info.fa_speed_bar);
+
+   at.set_entry(r, c+9,  // OA_SPEED_BAR
+      vl1l2_info.oa_speed_bar);
+
    return;
 }
 

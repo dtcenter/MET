@@ -1297,6 +1297,12 @@ The first set of header columns are common to all of the output files generated 
   * - 32
     - UVOOABAR
     - Mean((uo-uc)²+(vo-vc)²)
+  * - 33
+    - FA_SPEED_BAR
+    - Mean forecast wind speed anomaly
+  * - 34
+    - OA_SPEED_BAR
+    - Mean observed wind speed anomaly
 
 .. _table_PS_format_info_VCNT:
 

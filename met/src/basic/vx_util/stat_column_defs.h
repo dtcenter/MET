@@ -123,18 +123,18 @@ static const char * vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
    "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR",
-   "O_SPEED_BAR",
+   "O_SPEED_BAR"
 };
 
 static const char * val1l2_columns [] = {
    "TOTAL",       "UFABAR",      "VFABAR",
    "UOABAR",      "VOABAR",      "UVFOABAR",
-   "UVFFABAR",    "UVOOABAR"
+   "UVFFABAR",    "UVOOABAR",    "FA_SPEED_BAR",
+   "OA_SPEED_BAR"
 };
 
 
 static const char * vcnt_columns [] = {
-
    "TOTAL",
    "FBAR",             "FBAR_BCL",             "FBAR_BCU",
    "OBAR",             "OBAR_BCL",             "OBAR_BCU",

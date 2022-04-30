@@ -288,12 +288,10 @@ class VL1L2Info {
       double uvff_bar;
       double uvoo_bar;
 
-      // New VL1L2 Quantities added from vector stats whitepaper
-
       double f_speed_bar;
       double o_speed_bar;
 
-      // New VL1L2 Quantities added from vector stats whitepaper
+      // Vector continuous statistics derived from VL1L2 and VAL1L2 partial sums
 
       CIInfo FBAR;
       CIInfo OBAR;
@@ -306,8 +304,6 @@ class VL1L2Info {
 
       CIInfo FSTDEV;
       CIInfo OSTDEV;
-
-      // CIInfo COV;
 
       CIInfo FDIR;
       CIInfo ODIR;
@@ -326,9 +322,9 @@ class VL1L2Info {
 
       CIInfo ANOM_CORR;
       CIInfo ANOM_CORR_UNCNTR;
-      
+
       //
-      //  extra VL1L2 quantities for NCEP
+      // Extra VL1L2 quantities
       //
 
       double f_bar;  //  fcst wind speed
@@ -349,21 +345,24 @@ class VL1L2Info {
       double vfa_bar;
       double uoa_bar;
       double voa_bar;
+
       double uvfoa_bar;
       double uvffa_bar;
       double uvooa_bar;
+
+      double fa_speed_bar;
+      double oa_speed_bar;
 
       int    vacount;
 
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);
-
-      // Calc stats
-      void calc_ncep_stats();
    
       void clear();
       void zero_out();
+
       void allocate_n_alpha(int);
+      void compute_stats();
       void compute_ci();
 
       double get_stat(const char *);
