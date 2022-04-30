@@ -954,11 +954,11 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-
 void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
                      STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
+   int i;
 
    // VL1L2 line type
    shc.set_line_type(stat_vcnt_str);
@@ -970,24 +970,30 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
-   shc.set_alpha(bad_data_double);
 
-   // Write the header columns
-   write_header_cols(shc, stat_at, stat_row);
+   // Write a line for each alpha value
+   for(i=0; i<vcnt_info.n_alpha; i++) {
 
-   // Write the data columns
-   write_vcnt_cols(vcnt_info, stat_at, stat_row, n_header_columns);
+      // Alpha value
+      shc.set_alpha(vcnt_info.alpha[i]);
 
-   // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
-      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
 
-      // Increment the text row counter
-      txt_row++;
+      // Write the data columns
+      write_vcnt_cols(vcnt_info, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
    }
-
-   // Increment the STAT row counter
-   stat_row++;
 
    return;
 }
@@ -999,6 +1005,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
+
    ConcatString mask_name = shc.get_mask();
 
    // PCT line type
@@ -2836,9 +2843,8 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_vl1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c)
-
-{
+void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
+                      AsciiTable &at, int r, int c) {
 
    //
    // Vector L1L2 Line Type (VL1L2)
@@ -2884,9 +2890,8 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c)
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_val1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c)
-
-{
+void write_val1l2_cols(const VL1L2Info &vl1l2_info,
+                       AsciiTable &at, int r, int c) {
 
    //
    // Vector Anomaly L1L2 Line Type (VAL1L2)
@@ -2932,10 +2937,8 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
-
-{
+void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
+                     AsciiTable &at, int r, int c) {
 
    //
    // Vector Continuous Statistics Line Type (VCNT)
@@ -3038,8 +3041,8 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
    at.set_entry(r, c++, (string)na_str);               // DIR_ABSERR_BCU
    
    at.set_entry(r, c++, vcnt_info.ANOM_CORR.v);        // ANOM_CORR
-   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_NCL
-   at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_NCU
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR.v_ncl[i]); // ANOM_CORR_NCL
+   at.set_entry(r, c++, vcnt_info.ANOM_CORR.v_ncu[i]); // ANOM_CORR_NCU
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_BCL
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_BCU
    

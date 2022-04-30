@@ -1863,14 +1863,15 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       // VCNT output line
       //
       else if(lt == stat_vcnt) {
+
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, (string)"VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //
@@ -3428,13 +3429,13 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_vcnt) {
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, "VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //

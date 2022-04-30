@@ -147,7 +147,7 @@ extern void write_vl1l2_cols (const VL1L2Info &,
                               AsciiTable &, int, int);
 extern void write_val1l2_cols(const VL1L2Info &,
                               AsciiTable &, int, int);
-extern void write_vcnt_cols  (const VL1L2Info &,
+extern void write_vcnt_cols  (const VL1L2Info &, int,
                               AsciiTable &, int, int);
 extern void write_pct_cols   (const PCTInfo &,
                               AsciiTable &, int, int);
