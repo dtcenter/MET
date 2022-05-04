@@ -23,8 +23,7 @@
       -track &DATA_DIR;/genesis/atcf/2016 \
       -config &CONFIG_DIR;/TCGenConfig_2016 \
       -out &OUTPUT_DIR;/tc_gen/tc_gen_2016 \
-      -log &OUTPUT_DIR;/tc_gen/tc_gen_2016.log \
-      -v 5
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_2016.log
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016.stat</stat>
