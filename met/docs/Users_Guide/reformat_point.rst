@@ -442,10 +442,10 @@ The default ASCII point observation format consists of one row of data per obser
     - Description
   * - 1
     - Message_Type
-    - Text string containing the observation message type as described in the previous section on the PB2NC tool.
+    - Text string containing the observation message type as described in the previous section on the PB2NC tool (max 40 characters).
   * - 2
     - Station_ID
-    - Text string containing the station id.
+    - Text string containing the station id (max 40 characters).
   * - 3
     - Valid_Time
     - Text string containing the observation valid time in YYYYMMDD_HHMMSS format.
@@ -460,7 +460,7 @@ The default ASCII point observation format consists of one row of data per obser
     - Elevation in msl of the observing location.
   * - 7
     - GRIB_Code or Variable_Name
-    - Integer GRIB code value or variable name corresponding to this observation type.
+    - Integer GRIB code value or variable name (max 40 characters) corresponding to this observation type.
   * - 8
     - Level
     - Pressure level in hPa or accumulation interval in hours for the observation value.
@@ -469,7 +469,7 @@ The default ASCII point observation format consists of one row of data per obser
     - Height in msl or agl of the observation value.
   * - 10
     - QC_String
-    - Quality control value.
+    - Quality control value (max 16 characters).
   * - 11
     - Observation_Value
     - Observation value in units consistent with the GRIB code definition.
