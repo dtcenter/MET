@@ -161,6 +161,14 @@ The Pcp-Combine tool will search for 24 files containing 1-hourly accumulation i
 
 This command would grab the first level of the TT variable from a pinterp NetCDF file and write it to the output tt_10.nc file.
 
+**Example 4:**
+
+.. code-block:: none
+
+  pcp_combine -subtract 2022043018_48.grib2 'name="APCP"; level="A48";' 2022043018_36.grib2 'name="APCP"; level="A36";' sample_fcst.nc
+
+The Pcp-Combine tool will subtract the 36 hour precipitation accumulations in the file 2022043018_36.grib2 (a 36hr forecast initialized at 2022-04-30 18Z) from the 48 hour accumulations in the file 2022043018_48.grib2 (a 48hr forecast from the same model cycle). This will produce the 12 hour accumulation amounts for the period in between the 36 and 48 hour forecasts. It will write out a single NetCDF file containing that 12 hours of accumulation.
+
 pcp_combine output
 ------------------
 
