@@ -25,8 +25,6 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-
 void patch_nc_name(string *var_name) {
    size_t offset;
 
@@ -3216,6 +3214,26 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
       var.setCompression(false, true, deflate_level);
    }
+
+   // Check for lat and lon dimensions
+   ConcatString cs;
+   bool has_lat_dim, has_lon_dim;
+   vector<NcDim>::const_iterator itDim;
+   for (itDim = ncDims.begin(), has_lat_dim = has_lon_dim = false;
+        itDim != ncDims.end(); ++itDim) {
+           if (itDim->getName() == "lat") has_lat_dim = true;
+      else if (itDim->getName() == "lon") has_lon_dim = true;
+      if (itDim != ncDims.begin()) cs << " ";
+      cs << itDim->getName();
+   }
+
+   // Add the coordinates variable attribute for variables
+   // with both lat and lon dimensions
+   if (has_lat_dim && var_name != "lat" &&
+       has_lon_dim && var_name != "lon") {
+      add_att(&var, "coordinates", cs.c_str());
+   }
+
    return var;
 }
 
