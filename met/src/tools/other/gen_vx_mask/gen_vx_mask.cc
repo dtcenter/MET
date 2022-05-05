@@ -556,7 +556,7 @@ void apply_poly_mask(DataPlane & dp) {
    bool inside;
    double lat, lon;
 
-   // Check the Lat/Lon of grid point being inside the polyline
+   // Check the Lat/Lon of each grid point being inside the polyline
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
