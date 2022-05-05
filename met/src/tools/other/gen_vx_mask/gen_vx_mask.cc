@@ -27,6 +27,7 @@
 //   009    06/01/21  Seth Linden     Change -type from optional to required.
 //   010    08/30/21  Halley Gotway   MET #1891 Fix input and mask fields.
 //   011    12/13/21  Halley Gotway   MET #1993 Fix -type grid.
+//   012    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,10 +78,11 @@ int main(int argc, char *argv[]) {
    process_mask_file(dp_mask);
 
    // Apply combination logic if the current mask is binary
-   if(mask_type == MaskType_Poly   ||
-      mask_type == MaskType_Shape  ||
-      mask_type == MaskType_Box    ||
-      mask_type == MaskType_Grid   ||
+   if(mask_type == MaskType_Poly    ||
+      mask_type == MaskType_Poly_XY ||
+      mask_type == MaskType_Shape   ||
+      mask_type == MaskType_Box     ||
+      mask_type == MaskType_Grid    ||
       thresh.get_type() != thresh_na) {
       dp_out = combine(dp_data, dp_mask, set_logic);
    }
@@ -211,9 +213,10 @@ void process_mask_file(DataPlane &dp) {
    solar_ut = (unixtime) 0;
 
    // Process the mask file as a lat/lon polyline file
-   if(mask_type == MaskType_Poly   ||
-      mask_type == MaskType_Box    ||
-      mask_type == MaskType_Circle ||
+   if(mask_type == MaskType_Poly    ||
+      mask_type == MaskType_Poly_XY ||
+      mask_type == MaskType_Box     ||
+      mask_type == MaskType_Circle  ||
       mask_type == MaskType_Track) {
 
       poly_mask.clear();
@@ -337,6 +340,10 @@ void process_mask_file(DataPlane &dp) {
 
       case MaskType_Poly:
          apply_poly_mask(dp);
+         break;
+
+      case MaskType_Poly_XY:
+         apply_poly_xy_mask(dp);
          break;
 
       case MaskType_Box:
@@ -549,7 +556,7 @@ void apply_poly_mask(DataPlane & dp) {
    bool inside;
    double lat, lon;
 
-   // Check each grid point being inside the polyline
+   // Check the Lat/Lon of grid point being inside the polyline
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
@@ -579,6 +586,52 @@ void apply_poly_mask(DataPlane & dp) {
    // List number of points inside the mask
    mlog << Debug(3)
         << "Polyline Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
+        << " points inside\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_poly_xy_mask(DataPlane & dp) {
+   int i, x, y, n_in;
+   bool inside;
+   double x_dbl, y_dbl;
+   GridClosedPoly poly_xy;
+
+   // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
+   for(i=0; i<poly_mask.n_points(); i++) {
+      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
+      poly_xy.add_point(x_dbl, y_dbl);
+   }
+
+   // Check the X/Y of each grid point being inside the polyline
+   for(x=0,n_in=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+
+         // Check current grid point inside polyline
+         inside = (poly_xy.is_inside((double) x, (double) y) != 0);
+
+         // Check the complement
+         if(complement) inside = !inside;
+
+         // Increment count
+         if(inside) n_in++;
+
+         // Store the current mask value
+         dp.set((inside ? 1.0 : 0.0), x, y);
+
+      } // end for y
+   } // end for x
+
+   if(complement) {
+      mlog << Debug(3)
+           << "Applying complement of polyline XY mask.\n";
+   }
+
+   // List number of points inside the mask
+   mlog << Debug(3)
+        << "Polyline XY Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
         << " points inside\n";
 
    return;
@@ -1217,8 +1270,9 @@ void write_netcdf(const DataPlane &dp) {
 
    // Set the mask_name, if not already set
    if(mask_name.length() == 0) {
-      if(mask_type == MaskType_Poly   ||
-         mask_type == MaskType_Circle ||
+      if(mask_type == MaskType_Poly    ||
+         mask_type == MaskType_Poly_XY ||
+         mask_type == MaskType_Circle  ||
          mask_type == MaskType_Track) {
          mask_name = poly_mask.name();
       }
@@ -1294,6 +1348,7 @@ MaskType string_to_masktype(const char *s) {
    MaskType t = MaskType_None;
 
         if(strcasecmp(s, "poly")      == 0) t = MaskType_Poly;
+   else if(strcasecmp(s, "poly_xy")   == 0) t = MaskType_Poly_XY;
    else if(strcasecmp(s, "box")       == 0) t = MaskType_Box;
    else if(strcasecmp(s, "circle")    == 0) t = MaskType_Circle;
    else if(strcasecmp(s, "track")     == 0) t = MaskType_Track;
@@ -1320,6 +1375,7 @@ const char * masktype_to_string(const MaskType t) {
 
    switch(t) {
       case MaskType_Poly:      s = "poly";           break;
+      case MaskType_Poly_XY:   s = "poly_xy";        break;
       case MaskType_Box:       s = "box";            break;
       case MaskType_Circle:    s = "circle";         break;
       case MaskType_Track:     s = "track";          break;
@@ -1371,8 +1427,8 @@ void usage() {
 
         << "\t\t\"mask_file\" defines the masking information "
         << "(required).\n"
-        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" "
-        << "masking, specify an ASCII Lat/Lon file.\n"
+        << "\t\t   For \"poly\", \"poly_xy\", \"box\", \"circle\", "
+        << "and \"track\" masking, specify an ASCII Lat/Lon file.\n"
         << "\t\t   For \"grid\" masking, specify a named grid, the "
         << "path to a gridded data file, or an explicit grid "
         << "specification.\n"
@@ -1390,9 +1446,9 @@ void usage() {
 
         << "\t\t\"-type string\" specify the masking type "
         << "(required).\n"
-        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
-        << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
-        << "or \"shape\"\n"
+        << "\t\t   \"poly\", \"poly_xy\", \"box\", \"circle\", \"track\", "
+        << "\"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", "
+        << "\"lon\" or \"shape\"\n"
         
         << "\t\t\"-input_field string\" reads existing mask data from "
         << "the \"input_grid\" gridded data file (optional).\n"
