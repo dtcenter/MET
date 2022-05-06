@@ -960,6 +960,8 @@ void warning(ofstream & f)
 
 {
 
+int j;
+
 const char * short_name = (const char *) NULL;
 
    //
