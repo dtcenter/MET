@@ -46,7 +46,7 @@ Required arguments for gen_vx_mask
 
 2. The **mask_file** argument defines the masking information, see below.
 
-• For "poly", "poly_xy", """box", "circle", and "track" masking, specify an ASCII Lat/Lon file.
+• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file.
 
 • For "grid" and "data" masking, specify a gridded data file.
 
@@ -81,7 +81,7 @@ Optional arguments for gen_vx_mask
 
 • For "lat" and "lon" masking, threshold the latitude and longitude values. 
 
-10. The **-height n** and **-width n** options set the size in grid units for "box"masking.
+10. The **-height n** and **-width n** options set the size in grid units for "box" masking.
 
 11. The **-shapeno n** option is only used for shapefile masking. (See description of shapefile masking below).
 
