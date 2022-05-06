@@ -18,9 +18,9 @@ static const int debug = 0;
 
 using namespace std;
 
-
 #include <iostream>
 #include <unistd.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -65,8 +65,6 @@ extern ScopeStack ss;
 
 extern ScopeStackElement sse;
 
-extern unixtime generation_gmt;
-
 
    //
    //  definitions with external linkage
@@ -90,8 +88,6 @@ bool do_array              = false;
 bool do_reverse            = false;
 
 bool verbose               = true;
-
-unixtime generation_gmt    = (unixtime) 0;
 
 const char * program_name  = (const char *) 0;
 
@@ -127,8 +123,6 @@ int main(int argc, char * argv[])
 
 {
 
-generation_gmt = time(0);
-
 int j = m_strlen(argv[0]) - 1;
 
 while ( (j >= 0) && (argv[0][j] != '/') )  --j;
@@ -139,22 +133,7 @@ program_name = argv[0] + j;
 
 parse_command_line(argc, argv);
 
-
 header_filename = argv[1];
-
-
-
-
-/*
-if ( dup2(1, 2) < 0 )  {
-
-   cerr << "\n\n  dup2 failed\n\n";
-
-   exit ( 1 );
-
-}
-*/
-
 
 yydebug = debug;
 
@@ -165,9 +144,6 @@ if ( (yyin = met_fopen(header_filename, "r")) == NULL )  {
    exit ( 1 );
 
 }
-
-
-// cout << "\n";
 
 int parse_status;
 
@@ -180,10 +156,6 @@ if ( parse_status != 0 )  {
    exit ( 1 );
 
 }
-
-
-// cout << "\n\n";
-
 
 return ( 0 );
 
@@ -432,6 +404,3 @@ return ( 1 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

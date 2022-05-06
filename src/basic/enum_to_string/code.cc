@@ -83,11 +83,7 @@ int len, scope_len, max_len;
 char * len_name = (char *) NULL;
 
 
-//    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
-
-
 max_len = 0;
-
 
 
 if ( e.scope() )  scope_len = m_strlen(e.scope()) + 2;   //  includes "::"
@@ -103,12 +99,7 @@ for (j=0; j<(e.n_ids()); ++j)  {
 
 }
 
-
-// cout << "Max len = " << max_len << "\n";
-
 ++max_len;   //  allow for trailing nul
-
-// max_len += 4;   //  allow for preceeding "max_"
 
 len_name = new char [max_len + 40];
 
@@ -274,13 +265,7 @@ char junk[256];
 int len, scope_len, max_len;
 char * len_name = (char *) NULL;
 
-
-//    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
-
-
 max_len = 0;
-
-
 
 if ( e.scope() )  scope_len = m_strlen(e.scope()) + 2;   //  includes "::"
 else              scope_len = 0;
@@ -295,12 +280,7 @@ for (int j=0; j<(e.n_ids()); ++j)  {
 
 }
 
-
-// cout << "Max len = " << max_len << "\n";
-
 ++max_len;   //  allow for trailing nul
-
-// max_len += 4;   //  allow for preceeding "max_"
 
 len_name = new char [max_len + 40];
 
@@ -406,33 +386,11 @@ if ( do_reverse )  {
      << sep
      << "\n\n";
 
-/*
-if ( do_name_len_decl )  {
-
-   f << "   //\n"
-     << "   //  minimum string length needed to hold output values from\n"
-     << "   //\n"
-     << "   //    the above function ... includes trailing nul\n"
-     << "   //\n"
-     << "\n\n"
-     << "static const int " << len_name << " = " << max_len << ";\n"
-     << "\n\n"
-     << sep
-     << "\n\n";
-
-}
-*/
-
 if ( do_array )  {
 
    make_array(e, f);
 
 }
-
-// f << "#endif   //  " << pound_define << "\n"
-//   << "\n\n"
-//   << sep
-//   << "\n\n";
 
 f << "#endif";
 
@@ -1002,42 +960,7 @@ void warning(ofstream & f)
 
 {
 
-int j;
-int month, day, year, hour, minute, second;
-unixtime t;
-char junk[256];
-const char * ampm = "am";
-const char * zone = "MST";
 const char * short_name = (const char *) NULL;
-
-
-
-   //
-   //  make date/time string
-   //
-
-t = generation_gmt;
-
-t -= 7*3600;
-
-if ( is_dst(generation_gmt) )  {
-
-   t += 3600;
-
-   zone = "MDT";
-
-}
-
-t = 60*((t + 30)/60);   //  round to nearest minute
-
-unix_to_mdyhms(t, month, day, year, hour, minute, second);
-
-if ( hour >= 12 )  ampm = "pm";
-
-hour = 1 + (hour + 11)%12;
-
-snprintf(junk, sizeof(junk), "%s %d, %d   %d:%02d %s %s", 
-              month_name[month], day, year, hour, minute, ampm, zone);
 
    //
    //  strip the leading path from header_filename
@@ -1059,13 +982,8 @@ f << "   //\n"
   << "   //\n"
   << "   //     Do not edit by hand.\n"
   << "   //\n"
-  << "   //\n"
   << "   //     Created by enum_to_string from file \"" << short_name << "\"\n"
-  << "   //\n"
-  << "   //     on " << junk << "\n"
   << "   //\n";
-
-
 
 return;
 

@@ -37,8 +37,6 @@ extern bool do_concat_string;
 
 extern bool verbose;
 
-extern unixtime generation_gmt;
-
 extern const char * header_filename;
 
 extern const char * program_name;
