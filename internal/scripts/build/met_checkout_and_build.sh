@@ -9,7 +9,7 @@
 # an existing tag or branch name.  First, go to the directory where
 # you'd like the release built.  Then run:
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/build/met_checkout_and_build.sh [new|tag|branch] [name]
+#    MET/internal/scripts/build/met_checkout_and_build.sh [new|tag|branch] [name]
 #
 # For a new release, this script will:
 # (1) Checkout the latest version of the MET source code and
@@ -87,9 +87,9 @@ run_command() {
 # Use the Git info to define version.txt
 get_git_info() {
   echo "CALLING: git config, git rev-parse, and git log"
-  git config --get remote.origin.url | sed -r 's/^/Repository:\t\t/g'       > met/data/version.txt
-  git rev-parse --short HEAD         | sed -r 's/^/Last Changed Rev:\t/g'  >> met/data/version.txt
-  git log -1 --format=%cd met        | sed -r 's/^/Last Changed Date:\t/g' >> met/data/version.txt
+  git config --get remote.origin.url | sed -r 's/^/Repository:\t\t/g'       > data/version.txt
+  git rev-parse --short HEAD         | sed -r 's/^/Last Changed Rev:\t/g'  >> data/version.txt
+  git log -1 --format=%cd .          | sed -r 's/^/Last Changed Date:\t/g' >> data/version.txt
 }
 
 # Clone repo into a working directory
@@ -103,7 +103,7 @@ if [[ ${NARGS} -eq 1 && $1 == "new" ]]; then
    echo "Checking out the latest MET develop branch without tagging."
    run_command "git checkout develop"
    BUILD_ARGS=""
-   get_git_info met
+   get_git_info
 
 elif [[ ${NARGS} -eq 2 && $1 == "new_tag" ]]; then
 

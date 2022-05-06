@@ -36,7 +36,6 @@ MAINTAINERCLEANFILES 	= \
 #   - Run the check for copyright utility
 
 dist-hook:
-	-rm -rf `find ${distdir} -name .svn`
 	-rm -rf `find ${distdir} -name "*.ll"`
 	-rm -rf `find ${distdir} -name "*.yy"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt

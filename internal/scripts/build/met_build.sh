@@ -29,14 +29,6 @@ TODAY=`date +%Y%m%d`
 # Get the current revision hash
 CUR_REV=`git rev-parse --short HEAD`
 
-# Check for a met sub-directory
-if [[ ! -e "met" ]]; then
-  echo
-  echo "ERROR: no \"met\" subdirectory found!"
-  echo
-  exit 1
-fi
-
 # Check for 0 or 1 arguments
 if [ ${NARGS} -eq 0 ]; then
   VERSION="${CUR_REV}"
@@ -54,8 +46,11 @@ export MET_BUILD_VERSION=`echo $VERSION | sed 's/v//g'`
 echo "Building MET version '${MET_BUILD_VERSION}'"
 
 # Copy the current met directory
-cp -r met met-${MET_BUILD_VERSION}
-cd met-${MET_BUILD_VERSION}
+CUR_PATH=`pwd`
+CUR_DIR=`basename $CUR_PATH`
+cd ..
+cp -r ${CUR_DIR} MET-${MET_BUILD_VERSION}
+cd MET-${MET_BUILD_VERSION}
 
 # Cleanup
 rm -f `find ./ -name ".gitignore"`
@@ -101,8 +96,8 @@ make dist > /dev/null
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
-TAR_FILE="met-${MET_BUILD_VERSION}.${TODAY}.tar.gz"
+TAR_FILE="MET-${MET_BUILD_VERSION}.${TODAY}.tar.gz"
 
 echo "Moving tar file to new name: '${TAR_FILE}'"
-mv met-* ../${TAR_FILE}
+mv MET-* ../${TAR_FILE}
 
