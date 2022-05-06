@@ -110,6 +110,40 @@
   </test>
 
   <!--                                                                  -->
+  <!-- POLY: Rectangle mask in lat/lon space                            -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_LATLON_RECTANGLE">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F012.grib2 \
+      &INPUT_DIR;/poly/RECTANGLE.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_LATLON_RECTANGLE_mask.nc \
+      -type poly
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_LATLON_RECTANGLE_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- POLY_XY: Rectangle mask in grid x/y space                        -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_XY_RECTANGLE">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F012.grib2 \
+      &INPUT_DIR;/poly/RECTANGLE.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_XY_RECTANGLE_mask.nc \
+      -type poly_xy
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_XY_RECTANGLE_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- GRID: masking grid rather than a polyline                        -->
   <!--                                                                  -->
 
