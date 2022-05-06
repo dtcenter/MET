@@ -37,10 +37,11 @@ RUN echo "Copying MET into ${MET_REPO_DIR}" \
 
 COPY . ${MET_REPO_DIR}
 
-RUN if [ ! -e "${MET_REPO_DIR}/met/configure.ac" ]; then \
+RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
     echo "ERROR: docker build must be run from the MET directory"; \
     exit 1; \
   fi
 
-RUN cd ${MET_REPO_DIR}/met \
- && ../scripts/docker/build_met_docker.sh
+RUN cd ${MET_REPO_DIR} \
+ && internal/scripts/docker/build_met_docker.sh
+
