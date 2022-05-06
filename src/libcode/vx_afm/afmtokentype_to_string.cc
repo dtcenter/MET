@@ -7,16 +7,17 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
    //
    //  Warning:
    //
-   //    This file is machine generated.
+   //     This file is machine generated.
    //
-   //    Do not edit by hand.
+   //     Do not edit by hand.
+   //
+   //     Created by enum_to_string from file "afm_token_types.h"
    //
 
 
@@ -38,28 +39,28 @@ ConcatString afmtokentype_to_string(const AfmTokenType t)
 
 {
 
-ConcatString out;
-  
+const char * s = (const char *) 0;
+
 switch ( t )  {
 
-   case afm_token_string:      out = "afm_token_string";      break;
-   case afm_token_name:        out = "afm_token_name";        break;
-   case afm_token_number:      out = "afm_token_number";      break;
-   case afm_token_integer:     out = "afm_token_integer";     break;
-   case afm_token_boolean:     out = "afm_token_boolean";     break;
+   case afm_token_string:      s = "afm_token_string";      break;
+   case afm_token_name:        s = "afm_token_name";        break;
+   case afm_token_number:      s = "afm_token_number";      break;
+   case afm_token_integer:     s = "afm_token_integer";     break;
+   case afm_token_boolean:     s = "afm_token_boolean";     break;
 
-   case afm_token_keyword:     out = "afm_token_keyword";     break;
-   case afm_token_endofline:   out = "afm_token_endofline";   break;
-   case no_afm_token_type:     out = "no_afm_token_type";     break;
+   case afm_token_keyword:     s = "afm_token_keyword";     break;
+   case afm_token_endofline:   s = "afm_token_endofline";   break;
+   case no_afm_token_type:     s = "no_afm_token_type";     break;
 
    default:
-      out = "(bad value)";
+      s = "(bad value)";
       break;
 
 }   //  switch
 
 
-return ( out );
+return ( ConcatString (s) );
 
 }
 

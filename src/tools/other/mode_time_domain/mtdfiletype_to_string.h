@@ -17,10 +17,7 @@
    //
    //     Do not edit by hand.
    //
-   //
    //     Created by enum_to_string from file "mtd_file_base.h"
-   //
-   //     on April 27, 2022   2:39 pm MDT
    //
 
 

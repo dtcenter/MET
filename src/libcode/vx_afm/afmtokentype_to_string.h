@@ -7,16 +7,17 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
    //
    //  Warning:
    //
-   //    This file is machine generated.
+   //     This file is machine generated.
    //
-   //    Do not edit by hand.
+   //     Do not edit by hand.
+   //
+   //     Created by enum_to_string from file "afm_token_types.h"
    //
 
 
@@ -30,8 +31,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "afm_token_types.h"
 #include "concat_string.h"
+#include "afm_token_types.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,7 +44,7 @@ extern ConcatString afmtokentype_to_string(const AfmTokenType);
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __AFMTOKENTYPE_TO_STRING_H__
+#endif   /*  __AFMTOKENTYPE_TO_STRING_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

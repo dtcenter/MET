@@ -726,6 +726,22 @@ uninstall-am:
 
 include ${top_srcdir}/Make-include
 
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
+
+@ENABLE_DEVELOPMENT_TRUE@    afmkeyword_to_string.h afmkeyword_to_string.cc: afm_keywords.h
+@ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string afm_keywords.h
+
+@ENABLE_DEVELOPMENT_TRUE@    afmtokentype_to_string.h afmtokentype_to_string.cc: afm_token_types.h
+@ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string afm_token_types.h
+
+@ENABLE_DEVELOPMENT_TRUE@   clean-local:
+@ENABLE_DEVELOPMENT_TRUE@	-rm -f afmkeyword_to_string.cc
+@ENABLE_DEVELOPMENT_TRUE@	-rm -f afmkeyword_to_string.h
+@ENABLE_DEVELOPMENT_TRUE@	-rm -f afmtokentype_to_string.cc
+@ENABLE_DEVELOPMENT_TRUE@	-rm -f afmtokentype_to_string.h
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

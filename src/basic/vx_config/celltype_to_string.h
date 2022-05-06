@@ -17,10 +17,7 @@
    //
    //     Do not edit by hand.
    //
-   //
    //     Created by enum_to_string from file "icode.h"
-   //
-   //     on April 27, 2022   2:34 pm MDT
    //
 
 
