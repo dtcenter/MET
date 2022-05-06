@@ -7,6 +7,7 @@ docs/_build/
 # temp files surrounded by #
 *#*#
 
+autom4te.cache
 config.h
 config.log
 config.status
