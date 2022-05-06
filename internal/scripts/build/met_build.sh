@@ -96,8 +96,8 @@ make dist > /dev/null
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
-TAR_FILE="MET-${MET_BUILD_VERSION}.${TODAY}.tar.gz"
+TAR_FILE="met-${MET_BUILD_VERSION}.${TODAY}.tar.gz"
 
 echo "Moving tar file to new name: '${TAR_FILE}'"
-mv MET-* ../${TAR_FILE}
+mv met-* ../${TAR_FILE}
 
