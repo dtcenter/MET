@@ -21,7 +21,7 @@ ACLOCAL_AMFLAGS		= -I m4
 SUBDIRS 		= data src scripts/Rscripts scripts/python
 
 if ENABLE_DEVELOPMENT
-  SUBDIRS += internal_tests
+  SUBDIRS += internal/test_util
 endif
 
 MAINTAINERCLEANFILES 	= \
@@ -40,7 +40,7 @@ dist-hook:
 	-rm -rf `find ${distdir} -name "*.ll"`
 	-rm -rf `find ${distdir} -name "*.yy"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
-	-rm -rf ${distdir}/internal_tests
+	-rm -rf ${distdir}/internal/test_util
 	-rm -rf ${distdir}/src/tools/dev_utils
 	-rm -rf ${distdir}/ylwrap
 

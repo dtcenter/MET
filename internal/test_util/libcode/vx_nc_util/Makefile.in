@@ -90,7 +90,7 @@ build_triplet = @build@
 host_triplet = @host@
 @ENABLE_PYTHON_TRUE@am__append_1 = -lvx_python3_utils
 noinst_PROGRAMS = test_pressure_levels$(EXEEXT)
-subdir = internal_tests/libcode/vx_nc_util
+subdir = internal/test_util/libcode/vx_nc_util
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -360,9 +360,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal_tests/libcode/vx_nc_util/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/libcode/vx_nc_util/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign internal_tests/libcode/vx_nc_util/Makefile
+	  $(AUTOMAKE) --foreign internal/test_util/libcode/vx_nc_util/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

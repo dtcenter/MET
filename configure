@@ -9941,7 +9941,7 @@ ac_config_files="$ac_config_files Makefile scripts/Rscripts/Makefile scripts/Rsc
 
 
 if test -n "$MET_DEVELOPMENT"; then
-   ac_config_files="$ac_config_files src/tools/dev_utils/Makefile src/tools/dev_utils/shapefiles/Makefile internal_tests/Makefile internal_tests/basic/Makefile internal_tests/basic/vx_config/Makefile internal_tests/basic/vx_log/Makefile internal_tests/basic/vx_util/Makefile internal_tests/libcode/Makefile internal_tests/libcode/vx_data2d/Makefile internal_tests/libcode/vx_data2d_factory/Makefile internal_tests/libcode/vx_data2d_grib/Makefile internal_tests/libcode/vx_data2d_nc_met/Makefile internal_tests/libcode/vx_data2d_nccf/Makefile internal_tests/libcode/vx_geodesy/Makefile internal_tests/libcode/vx_grid/Makefile internal_tests/libcode/vx_plot_util/Makefile internal_tests/libcode/vx_ps/Makefile internal_tests/libcode/vx_tc_util/Makefile internal_tests/libcode/vx_nc_util/Makefile internal_tests/libcode/vx_physics/Makefile internal_tests/libcode/vx_series_data/Makefile internal_tests/libcode/vx_solar/Makefile internal_tests/tools/Makefile internal_tests/tools/other/Makefile internal_tests/tools/other/mode_time_domain/Makefile"
+   ac_config_files="$ac_config_files src/tools/dev_utils/Makefile src/tools/dev_utils/shapefiles/Makefile internal/test_util/Makefile internal/test_util/basic/Makefile internal/test_util/basic/vx_config/Makefile internal/test_util/basic/vx_log/Makefile internal/test_util/basic/vx_util/Makefile internal/test_util/libcode/Makefile internal/test_util/libcode/vx_data2d/Makefile internal/test_util/libcode/vx_data2d_factory/Makefile internal/test_util/libcode/vx_data2d_grib/Makefile internal/test_util/libcode/vx_data2d_nc_met/Makefile internal/test_util/libcode/vx_data2d_nccf/Makefile internal/test_util/libcode/vx_geodesy/Makefile internal/test_util/libcode/vx_grid/Makefile internal/test_util/libcode/vx_plot_util/Makefile internal/test_util/libcode/vx_ps/Makefile internal/test_util/libcode/vx_tc_util/Makefile internal/test_util/libcode/vx_nc_util/Makefile internal/test_util/libcode/vx_physics/Makefile internal/test_util/libcode/vx_series_data/Makefile internal/test_util/libcode/vx_solar/Makefile internal/test_util/tools/Makefile internal/test_util/tools/other/Makefile internal/test_util/tools/other/mode_time_domain/Makefile"
 
 fi
 
@@ -10919,29 +10919,29 @@ do
     "src/tools/tc_utils/tc_rmw/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/tc_utils/tc_rmw/Makefile" ;;
     "src/tools/dev_utils/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/dev_utils/Makefile" ;;
     "src/tools/dev_utils/shapefiles/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/dev_utils/shapefiles/Makefile" ;;
-    "internal_tests/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/Makefile" ;;
-    "internal_tests/basic/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/basic/Makefile" ;;
-    "internal_tests/basic/vx_config/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/basic/vx_config/Makefile" ;;
-    "internal_tests/basic/vx_log/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/basic/vx_log/Makefile" ;;
-    "internal_tests/basic/vx_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/basic/vx_util/Makefile" ;;
-    "internal_tests/libcode/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/Makefile" ;;
-    "internal_tests/libcode/vx_data2d/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_data2d/Makefile" ;;
-    "internal_tests/libcode/vx_data2d_factory/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_data2d_factory/Makefile" ;;
-    "internal_tests/libcode/vx_data2d_grib/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_data2d_grib/Makefile" ;;
-    "internal_tests/libcode/vx_data2d_nc_met/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_data2d_nc_met/Makefile" ;;
-    "internal_tests/libcode/vx_data2d_nccf/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_data2d_nccf/Makefile" ;;
-    "internal_tests/libcode/vx_geodesy/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_geodesy/Makefile" ;;
-    "internal_tests/libcode/vx_grid/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_grid/Makefile" ;;
-    "internal_tests/libcode/vx_plot_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_plot_util/Makefile" ;;
-    "internal_tests/libcode/vx_ps/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_ps/Makefile" ;;
-    "internal_tests/libcode/vx_tc_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_tc_util/Makefile" ;;
-    "internal_tests/libcode/vx_nc_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_nc_util/Makefile" ;;
-    "internal_tests/libcode/vx_physics/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_physics/Makefile" ;;
-    "internal_tests/libcode/vx_series_data/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_series_data/Makefile" ;;
-    "internal_tests/libcode/vx_solar/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/libcode/vx_solar/Makefile" ;;
-    "internal_tests/tools/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/tools/Makefile" ;;
-    "internal_tests/tools/other/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/tools/other/Makefile" ;;
-    "internal_tests/tools/other/mode_time_domain/Makefile") CONFIG_FILES="$CONFIG_FILES internal_tests/tools/other/mode_time_domain/Makefile" ;;
+    "internal/test_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/Makefile" ;;
+    "internal/test_util/basic/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/basic/Makefile" ;;
+    "internal/test_util/basic/vx_config/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/basic/vx_config/Makefile" ;;
+    "internal/test_util/basic/vx_log/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/basic/vx_log/Makefile" ;;
+    "internal/test_util/basic/vx_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/basic/vx_util/Makefile" ;;
+    "internal/test_util/libcode/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/Makefile" ;;
+    "internal/test_util/libcode/vx_data2d/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_data2d/Makefile" ;;
+    "internal/test_util/libcode/vx_data2d_factory/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_data2d_factory/Makefile" ;;
+    "internal/test_util/libcode/vx_data2d_grib/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_data2d_grib/Makefile" ;;
+    "internal/test_util/libcode/vx_data2d_nc_met/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_data2d_nc_met/Makefile" ;;
+    "internal/test_util/libcode/vx_data2d_nccf/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_data2d_nccf/Makefile" ;;
+    "internal/test_util/libcode/vx_geodesy/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_geodesy/Makefile" ;;
+    "internal/test_util/libcode/vx_grid/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_grid/Makefile" ;;
+    "internal/test_util/libcode/vx_plot_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_plot_util/Makefile" ;;
+    "internal/test_util/libcode/vx_ps/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_ps/Makefile" ;;
+    "internal/test_util/libcode/vx_tc_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_tc_util/Makefile" ;;
+    "internal/test_util/libcode/vx_nc_util/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_nc_util/Makefile" ;;
+    "internal/test_util/libcode/vx_physics/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_physics/Makefile" ;;
+    "internal/test_util/libcode/vx_series_data/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_series_data/Makefile" ;;
+    "internal/test_util/libcode/vx_solar/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/libcode/vx_solar/Makefile" ;;
+    "internal/test_util/tools/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/tools/Makefile" ;;
+    "internal/test_util/tools/other/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/tools/other/Makefile" ;;
+    "internal/test_util/tools/other/mode_time_domain/Makefile") CONFIG_FILES="$CONFIG_FILES internal/test_util/tools/other/mode_time_domain/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -89,7 +89,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = test_table_read$(EXEEXT) dump_default_table$(EXEEXT)
-subdir = internal_tests/libcode/vx_data2d
+subdir = internal/test_util/libcode/vx_data2d
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -361,9 +361,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal_tests/libcode/vx_data2d/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign internal_tests/libcode/vx_data2d/Makefile
+	  $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

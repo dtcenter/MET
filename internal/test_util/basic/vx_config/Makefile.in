@@ -93,7 +93,7 @@ noinst_PROGRAMS = test_config$(EXEEXT) test_user_func$(EXEEXT) \
 	test_lookup3$(EXEEXT) test_string$(EXEEXT) \
 	test_thresh$(EXEEXT) test_string_then_config$(EXEEXT) \
 	test_met_478$(EXEEXT)
-subdir = internal_tests/basic/vx_config
+subdir = internal/test_util/basic/vx_config
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -445,9 +445,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal_tests/basic/vx_config/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/basic/vx_config/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign internal_tests/basic/vx_config/Makefile
+	  $(AUTOMAKE) --foreign internal/test_util/basic/vx_config/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

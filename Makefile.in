@@ -87,7 +87,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ENABLE_DEVELOPMENT_TRUE@am__append_1 = internal_tests
+@ENABLE_DEVELOPMENT_TRUE@am__append_1 = internal/test_util
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -154,9 +154,11 @@ am__define_uniq_tagged_files = \
   unique=`for i in $$list; do \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
-DIST_SUBDIRS = data src scripts/Rscripts scripts/python internal_tests
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in README \
-	compile config.guess config.sub install-sh missing
+DIST_SUBDIRS = data src scripts/Rscripts scripts/python \
+	internal/test_util
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in INSTALL \
+	README.md compile config.guess config.sub depcomp install-sh \
+	missing ylwrap
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -856,7 +858,7 @@ dist-hook:
 	-rm -rf `find ${distdir} -name "*.ll"`
 	-rm -rf `find ${distdir} -name "*.yy"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
-	-rm -rf ${distdir}/internal_tests
+	-rm -rf ${distdir}/internal/test_util
 	-rm -rf ${distdir}/src/tools/dev_utils
 	-rm -rf ${distdir}/ylwrap
 

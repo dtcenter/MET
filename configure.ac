@@ -1284,29 +1284,29 @@ AC_CONFIG_FILES([Makefile
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile
                     src/tools/dev_utils/shapefiles/Makefile
-                    internal_tests/Makefile
-                    internal_tests/basic/Makefile
-                    internal_tests/basic/vx_config/Makefile
-                    internal_tests/basic/vx_log/Makefile
-                    internal_tests/basic/vx_util/Makefile
-                    internal_tests/libcode/Makefile
-                    internal_tests/libcode/vx_data2d/Makefile
-                    internal_tests/libcode/vx_data2d_factory/Makefile
-                    internal_tests/libcode/vx_data2d_grib/Makefile
-                    internal_tests/libcode/vx_data2d_nc_met/Makefile
-                    internal_tests/libcode/vx_data2d_nccf/Makefile
-                    internal_tests/libcode/vx_geodesy/Makefile
-                    internal_tests/libcode/vx_grid/Makefile
-                    internal_tests/libcode/vx_plot_util/Makefile
-                    internal_tests/libcode/vx_ps/Makefile
-                    internal_tests/libcode/vx_tc_util/Makefile
-                    internal_tests/libcode/vx_nc_util/Makefile
-                    internal_tests/libcode/vx_physics/Makefile
-                    internal_tests/libcode/vx_series_data/Makefile
-                    internal_tests/libcode/vx_solar/Makefile
-                    internal_tests/tools/Makefile
-                    internal_tests/tools/other/Makefile
-                    internal_tests/tools/other/mode_time_domain/Makefile])
+                    internal/test_util/Makefile
+                    internal/test_util/basic/Makefile
+                    internal/test_util/basic/vx_config/Makefile
+                    internal/test_util/basic/vx_log/Makefile
+                    internal/test_util/basic/vx_util/Makefile
+                    internal/test_util/libcode/Makefile
+                    internal/test_util/libcode/vx_data2d/Makefile
+                    internal/test_util/libcode/vx_data2d_factory/Makefile
+                    internal/test_util/libcode/vx_data2d_grib/Makefile
+                    internal/test_util/libcode/vx_data2d_nc_met/Makefile
+                    internal/test_util/libcode/vx_data2d_nccf/Makefile
+                    internal/test_util/libcode/vx_geodesy/Makefile
+                    internal/test_util/libcode/vx_grid/Makefile
+                    internal/test_util/libcode/vx_plot_util/Makefile
+                    internal/test_util/libcode/vx_ps/Makefile
+                    internal/test_util/libcode/vx_tc_util/Makefile
+                    internal/test_util/libcode/vx_nc_util/Makefile
+                    internal/test_util/libcode/vx_physics/Makefile
+                    internal/test_util/libcode/vx_series_data/Makefile
+                    internal/test_util/libcode/vx_solar/Makefile
+                    internal/test_util/tools/Makefile
+                    internal/test_util/tools/other/Makefile
+                    internal/test_util/tools/other/mode_time_domain/Makefile])
 fi
 
 AC_OUTPUT
