@@ -311,8 +311,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 test_thermo_SOURCES = test_thermo.cc
-test_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../src/libcode/vx_physics
-test_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../src/libcode/vx_physics
+test_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../../src/libcode/vx_physics
+test_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../../src/libcode/vx_physics
 test_thermo_LDADD = \
 	-lvx_config \
 	-lvx_cal \

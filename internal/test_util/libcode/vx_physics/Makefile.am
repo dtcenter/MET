@@ -13,8 +13,8 @@ include ${top_srcdir}/Make-include
 noinst_PROGRAMS = test_thermo
 
 test_thermo_SOURCES = test_thermo.cc
-test_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../src/libcode/vx_physics
-test_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../src/libcode/vx_physics
+test_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../../src/libcode/vx_physics
+test_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../../src/libcode/vx_physics
 test_thermo_LDADD = \
 	-lvx_config \
 	-lvx_cal \
