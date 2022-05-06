@@ -1,5 +1,3 @@
-config.tab.cc
-config.tab.h
 *.o
 *.a
 .deps
