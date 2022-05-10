@@ -93,6 +93,7 @@ static const int boot_perc_flag = 1;
 ////////////////////////////////////////////////////////////////////////
 
 static const int max_line_len = 2048;
+static const int tmp_buf_size = 512;
 static const double grib_earth_radius_km = 6371.20;
 static const int default_nc_compression = 0;
 static const int default_precision = 5;
