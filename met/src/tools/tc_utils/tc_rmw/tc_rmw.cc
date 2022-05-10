@@ -625,15 +625,15 @@ void setup_nc_file() {
 	     << "field not found in input" << conf_info.v_wind_field_name << "\n";
       }
       if (foundU && foundV) {
-	variable_levels[conf_info.tangential_velocity_name] = variable_levels[conf_info.u_wind_field_name.string()];
-	variable_long_names[conf_info.tangential_velocity_name] = conf_info.tangential_velocity_long_name.string();
-	variable_units[conf_info.tangential_velocity_name] = unitsU;
+	variable_levels[conf_info.tangential_velocity_field_name] = variable_levels[conf_info.u_wind_field_name.string()];
+	variable_long_names[conf_info.tangential_velocity_field_name] = conf_info.tangential_velocity_long_field_name.string();
+	variable_units[conf_info.tangential_velocity_field_name] = unitsU;
 
-	variable_levels[conf_info.radial_velocity_name] = variable_levels[conf_info.u_wind_field_name.string()];
-	variable_long_names[conf_info.radial_velocity_name] = conf_info.radial_velocity_long_name.string();
-	variable_units[conf_info.radial_velocity_name] = unitsU;
+	variable_levels[conf_info.radial_velocity_field_name] = variable_levels[conf_info.u_wind_field_name.string()];
+	variable_long_names[conf_info.radial_velocity_field_name] = conf_info.radial_velocity_long_field_name.string();
+	variable_units[conf_info.radial_velocity_field_name] = unitsU;
       } else	{
-	mlog << Error <<< "\nNot computing radial and tangential winds\n\n";
+	mlog << Error << "\nNot computing radial and tangential winds\n\n";
 	conf_info.compute_tangential_and_radial_winds = false;
       }
     }

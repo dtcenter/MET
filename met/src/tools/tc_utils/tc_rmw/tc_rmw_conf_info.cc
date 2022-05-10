@@ -73,10 +73,12 @@ void TCRMWConfInfo::clear() {
     rmw_scale      = bad_data_double;
 
     compute_tangential_and_radial_winds = false;
-    u_field_name.clear();
-    v_field_name.clear();
-    tangential_wind_field_name.clear();
-    radial_wind_field_name.clear();
+    u_wind_field_name.clear();
+    v_wind_field_name.clear();
+    tangential_velocity_field_name.clear();
+    radial_velocity_field_name.clear();
+    tangential_velocity_long_field_name.clear();
+    radial_velocity_long_field_name.clear();
 
     // Clear data_info
     if(data_info) {
