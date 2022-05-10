@@ -72,6 +72,12 @@ void TCRMWConfInfo::clear() {
     delta_range_km = bad_data_double;
     rmw_scale      = bad_data_double;
 
+    compute_tangential_and_radial_winds = false;
+    u_field_name.clear();
+    v_field_name.clear();
+    tangential_wind_field_name.clear();
+    radial_wind_field_name.clear();
+
     // Clear data_info
     if(data_info) {
         for(int i = 0; i < n_data; i++) {
@@ -171,6 +177,15 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: rmw_scale
     rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
+
+    compute_tangential_and_radial_winds = Conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
+    u_wind_field_name = Conf.lookup_string(conf_key_u_wind_field_name);
+    v_wind_field_name = Conf.lookup_string(conf_key_v_wind_field_name);
+    tangential_velocity_field_name = Conf.lookup_string(conf_key_tangential_velocity_field_name);
+    radial_velocity_field_name = Conf.lookup_string(conf_key_radial_velocity_field_name);
+    tangential_velocity_long_field_name = Conf.lookup_string(conf_key_tangential_velocity_long_field_name);
+    radial_velocity_long_field_name = Conf.lookup_string(conf_key_radial_velocity_long_field_name);
+
 
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);

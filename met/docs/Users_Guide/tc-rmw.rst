@@ -123,6 +123,44 @@ _______________________
 
 The **rmw_scale** parameter overrides the **max_range_km** parameter. When this is set the radial grid spacing will be **rmw_scale** in units of the RMW, which varies along the storm track.
 
+_______________________
+
+.. code-block:: none
+
+  compute_tangential_and_radial_winds = FALSE;
+
+The **compute_tangential_and_radial_winds** parameter is a flag controlling whether a conversion from U/V to Tangential/Radial winds is done or not. If set to TRUE, additional parameters are used, otherwise they are not. 
+
+_______________________
+
+.. code-block:: none
+
+  u_wind_field_name = "UGRD";
+  v_wind_field_name = "VGRD";
+  
+The **u_wind_field_name** and **v_wind_field_name** parameters identify which input data to use in converting to tangential/radial winds. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
+
+_______________________
+
+.. code-block:: none
+
+  tangential_velocity_field_name = "VT";
+  tangential_velocity_long_field_name = "Tangential Velocity";
+
+  
+The **tangential_velocity_field_name** and **tangential_velocity_long_field_name** parameters define the field names to give the output tangential velocity grid in the netCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
+
+_______________________
+
+.. code-block:: none
+
+  radial_velocity_field_name = "VT";
+  radial_velocity_long_field_name = "Radial Velocity";
+
+  
+The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the netCDF output file. The parameters are used only if **compute_radial_and_radial_winds** is set to TRUE.
+
+
 tc_rmw output file
 ------------------
 

@@ -70,15 +70,6 @@ static const char* default_out_dir = ".";
 // Default output prefix
 static const char* default_out_prefix = "";
 
-// information for tangential velocity
-static const char* tangential_velocity_name = "VT";
-static const char* tangential_velocity_long_name = "Tangential Velocity";
-
-// information for radial velocity
-static const char* radial_velocity_name = "VR";
-static const char* radial_velocity_long_name = "Radial Velocity";
-
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments

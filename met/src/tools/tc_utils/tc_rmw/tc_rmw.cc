@@ -580,17 +580,31 @@ void setup_nc_file() {
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
         track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
 
+
+    // optionally look for configured u and v variables
+    bool foundU=false, foundV=false;
+
+    // units shared between UGRD and radial and tangential velocity
+    string unitsU = "unknown";
+
     // Find all variable levels, long names, and units
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-        variable_levels[data_info->name_attr()].push_back(
-            data_info->level_attr());
-        variable_long_names[data_info->name_attr()]
-            = data_info->long_name_attr();
-        variable_units[data_info->name_attr()]
-            = data_info->units_attr();
+	string fname = data_info->name_attr();
+        variable_levels[fname].push_back(data_info->level_attr());
+        variable_long_names[fname] = data_info->long_name_attr();
+        variable_units[fname] = data_info->units_attr();
+	if (conf_info.compute_tangential_and_radial_winds) {
+	  if (fname == conf_info.u_wind_field_name.string()) {
+	    foundU = true;
+	    unitsU = data_info->units_attr();
+	  }
+	  else if (fname == conf_info.v_wind_field_name.string()) {
+	    foundV = true;
+	  }
+	}
     }
 
     // Define pressure levels
@@ -601,17 +615,28 @@ void setup_nc_file() {
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
-    // units shared between UGRD and radial and tangential velocity
-    string unitsU = variable_units["UGRD"];
+    if (conf_info.compute_tangential_and_radial_winds) {
+      if (!foundU) {
+	mlog << Error << "\nsetup_nc_file() -> "
+	     << "field not found in input" << conf_info.u_wind_field_name << "\n";
+      }
+      if (!foundV) {
+	mlog << Error << "\nsetup_nc_file() -> "
+	     << "field not found in input" << conf_info.v_wind_field_name << "\n";
+      }
+      if (foundU && foundV) {
+	variable_levels[conf_info.tangential_velocity_name] = variable_levels[conf_info.u_wind_field_name.string()];
+	variable_long_names[conf_info.tangential_velocity_name] = conf_info.tangential_velocity_long_name.string();
+	variable_units[conf_info.tangential_velocity_name] = unitsU;
 
-    variable_levels[tangential_velocity_name] = variable_levels["UGRD"];
-    variable_long_names[tangential_velocity_name] = tangential_velocity_long_name;
-    variable_units[tangential_velocity_name] = unitsU;
-
-    variable_levels[radial_velocity_name] = variable_levels["UGRD"];
-    variable_long_names[radial_velocity_name] = radial_velocity_long_name;
-    variable_units[radial_velocity_name] = unitsU;
-
+	variable_levels[conf_info.radial_velocity_name] = variable_levels[conf_info.u_wind_field_name.string()];
+	variable_long_names[conf_info.radial_velocity_name] = conf_info.radial_velocity_long_name.string();
+	variable_units[conf_info.radial_velocity_name] = unitsU;
+      } else	{
+	mlog << Error <<< "\nNot computing radial and tangential winds\n\n";
+	conf_info.compute_tangential_and_radial_winds = false;
+      }
+    }
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
         range_dim, azimuth_dim, pressure_dim, track_point_dim,
@@ -700,33 +725,34 @@ void process_fields(const TrackInfoArray& tracks) {
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
 
-    // create maps from levels to the ugrid/vgrid pointers
+    // create maps from levels to the ugrid/vgrid pointers, if doing that conversion
     map<string, int> uMap;
     map<string, int> vMap;
-    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-      data_info = conf_info.data_info[i_var];
-      string sname = data_info->name_attr().string();
-      string slevel = data_info->level_attr().string();
-      if (sname == "UGRD") {
-	uMap[slevel] = i_var;
-      }
-      else if (sname == "VGRD") {
-	vMap[slevel] = i_var;
-      }
-    }
 
-    // test for consistency
-    if (uMap.size() != vMap.size()) {
-      mlog << Debug(0) << " error uneven number o ugrid/vgrid\n";
-      return;
-    }
-
-    map<string,int>::const_iterator iu, iv;
-    for (iu=uMap.begin(), iv=vMap.begin(); iu!=uMap.end(); ++iu, ++iv) {
-      if (iu->first != iv->first) {
-	mlog << Debug(0) << "error ordering of ugrid/vgrid levels not the same, not implemented\n";
-	mlog << Debug(0) << "    "  << iu->first  << " " << iv->first << "\n";
+    if (conf_info.compute_tangential_and_radial_winds) {
+      for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+	data_info = conf_info.data_info[i_var];
+	string sname = data_info->name_attr().string();
+	string slevel = data_info->level_attr().string();
+	if (sname == conf_info.u_wind_field_name.string()) {
+	  uMap[slevel] = i_var;
+	}
+	else if (sname == conf_info.v_wind_field_name.string()) {
+	  vMap[slevel] = i_var;
+	}
+      }
+      // test for consistency
+      if (uMap.size() != vMap.size()) {
+	mlog << Error << " error uneven number of ugrid/vgrid, no computations\n";
 	return;
+      }
+      map<string,int>::const_iterator iu, iv;
+      for (iu=uMap.begin(), iv=vMap.begin(); iu!=uMap.end(); ++iu, ++iv) {
+	if (iu->first != iv->first) {
+	  mlog << Error << "error ordering of ugrid/vgrid levels not the same, not implemented\n";
+	  mlog << Error << "    "  << iu->first  << " " << iv->first << "\n";
+	  return;
+	}
       }
     }
 
@@ -773,22 +799,27 @@ void process_fields(const TrackInfoArray& tracks) {
 
 	    string sname = data_info->name_attr().string();
 	    string slevel = data_info->level_attr().string();
+
+	    // information for u/v wind fields, for when conversion to radial/tangential
+	    // is happening
 	    bool isUV = false;
-	    int uIndex = -1;
-	    int vIndex = -1;
 	    VarInfo *data_infoV = (VarInfo *) 0;
 	    DataPlane data_dpV;
 	    Grid latlon_arrV;
-	    if (sname == "UGRD") {
-	      uIndex = uMap[slevel];
-	      vIndex = vMap[slevel];
-	      isUV = true;
-	      data_infoV = conf_info.data_info[vIndex];
-	      data_infoV->set_valid(valid_time);
+
+	    if (conf_info.compute_tangential_and_radial_winds) {
+	      int uIndex = -1;
+	      int vIndex = -1;
+	      if (sname == conf_info.u_wind_field_name.string()) {
+		uIndex = uMap[slevel];
+		vIndex = vMap[slevel];
+		isUV = true;
+		data_infoV = conf_info.data_info[vIndex];
+		data_infoV->set_valid(valid_time);
+	      }
 	    }
-
-            data_info->set_valid(valid_time);
-
+	    
+	    data_info->set_valid(valid_time);
 
             // Find data for this track point
             get_series_entry(i_point, data_info, data_files, ftype, data_dp,
@@ -801,6 +832,7 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
 	    if (isUV) {
+	      // can assume conf_info.compute_tangential_and_radial_winds is true
 	      get_series_entry(i_point, data_infoV, data_files, ftype, data_dpV,
 			       latlon_arrV);
 	      data_dpV.data_range(data_min, data_max);
@@ -816,6 +848,7 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
 	    if (isUV) {
+	      // can assume conf_info.compute_tangential_and_radial_winds is true
 	      data_dpV = met_regrid(data_dpV, latlon_arr, grid, data_infoV->regrid());
 	      data_dpV.data_range(data_min, data_max);
 	      mlog << Debug(4) << "V data_min:" << data_min << "\n";
@@ -823,14 +856,17 @@ void process_fields(const TrackInfoArray& tracks) {
 	    }
 
 	    if (isUV) {
+	      // can assume conf_info.compute_tangential_and_radial_winds is true
 	      wind_ne_to_ra(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
 			    wind_r_arr, wind_t_arr);
 	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					   pressure_level_indices, data_info->level_attr(),
-					   i_point, data_3d_vars[radial_velocity_name], wind_r_arr);
+					   pressure_level_indices, data_info->level_attr(), i_point,
+					   data_3d_vars[conf_info.radial_velocity_field_name.string()],
+					   wind_r_arr);
 	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					   pressure_level_indices, data_info->level_attr(),
-					   i_point, data_3d_vars[tangential_velocity_name], wind_t_arr);
+					   pressure_level_indices, data_info->level_attr(), i_point,
+					   data_3d_vars[conf_info.tangential_velocity_field_name.string()],
+					   wind_t_arr);
 	    }
 	    
             // Write data
