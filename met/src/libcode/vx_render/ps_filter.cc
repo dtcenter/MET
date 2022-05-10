@@ -127,7 +127,9 @@ if ( (k < 0) || (k > max_decimal_places) )  {
 
 DecimalPlaces = k;
 
-snprintf(double_format, sizeof(double_format), "%%.%df", DecimalPlaces);   // example:  "%.5f"
+int buf_size = sizeof(double_format);
+if (buf_size > filter_buf_size) buf_size = filter_buf_size;
+snprintf(double_format, buf_size, "%%.%df", DecimalPlaces);   // example:  "%.5f"
 
 
 return;
