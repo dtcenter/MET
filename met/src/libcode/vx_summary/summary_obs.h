@@ -243,8 +243,8 @@ public:
     time_struct.tm_mon  = atoi(time_string.substr(4, 2).c_str()) - 1;
     time_struct.tm_mday = atoi(time_string.substr(6, 2).c_str());
     time_struct.tm_hour = atoi(time_string.substr(9, 2).c_str());
-    time_struct.tm_min = atoi(time_string.substr(11, 2).c_str());
-    time_struct.tm_sec = atoi(time_string.substr(13, 2).c_str());
+    time_struct.tm_min  = atoi(time_string.substr(11, 2).c_str());
+    time_struct.tm_sec  = atoi(time_string.substr(13, 2).c_str());
 
     return timegm(&time_struct);
   }
