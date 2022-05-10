@@ -22,6 +22,7 @@
 //   005    04/02/21  Halley Gotway   MET #1714 Refinem matching logic
 //   006    11/04/21  Halley Gotway   MET #1809 Add -edeck option
 //   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
+//   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -605,7 +606,8 @@ void get_genesis_pairs(const TCGenVxOpt       &vx_opt,
                        conf_info.FcstSecBeg, conf_info.FcstSecEnd,
                        conf_info.InitFreqHr*sec_per_hour,
                        vx_opt.InitBeg, vx_opt.InitEnd,
-                       vx_opt.InitInc, vx_opt.InitExc);
+                       vx_opt.InitInc, vx_opt.InitExc,
+                       vx_opt.InitHour, vx_opt.Lead);
    } // end for i bga
 
    // Loop over the model genesis events looking for pairs.
