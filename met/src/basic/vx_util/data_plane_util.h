@@ -51,7 +51,7 @@ extern DataPlane smooth_field(const DataPlane &dp,
                     bool wrap_lon, double t, const GaussianInfo &gaussian);
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
-               int width, const GridTemplateFactory::GridTemplates shape,
+               int width, GridTemplateFactory::GridTemplates shape,
                bool wrap_lon, SingleThresh t,
                const DataPlane *cmn, const DataPlane *csd, double vld_t);
 
