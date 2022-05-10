@@ -200,6 +200,7 @@ extern ostream & operator<<(ostream &, const CtableEntry &);
 
 
 static const int ctable_alloc_inc = 30;
+static const int fudge_size = 256;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,7 +227,7 @@ class ColorTable {
 
       double Gamma;
 
-      unsigned char fudge[256];
+      unsigned char fudge[fudge_size];
 
 
    public:

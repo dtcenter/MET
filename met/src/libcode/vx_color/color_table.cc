@@ -332,7 +332,7 @@ Nalloc = 0;
 
 int j;
 
-for (j=0; j<256; ++j)  {
+for (j=0; j<fudge_size; ++j)  {
 
    fudge[j] = (unsigned char) j;
 
@@ -368,7 +368,7 @@ for (j=0; j<Nentries; ++j)  {
 
 }
 
-for (j=0; j<256; ++j)  {
+for (j=0; j<fudge_size; ++j)  {
 
    fudge[j] = c.fudge[j];
 
@@ -689,7 +689,7 @@ const double exponent = 1.0/Gamma;
 int j, k;
 double x, y;
 
-for (j=0; j<256; ++j)  {
+for (j=0; j<fudge_size; ++j)  {
 
    x = ((double) j)/255.0;
 
