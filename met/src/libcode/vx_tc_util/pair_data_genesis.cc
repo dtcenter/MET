@@ -260,7 +260,8 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
 void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
         const int fcst_beg, const int fcst_end, const int init_add,
         const unixtime init_beg, const unixtime init_end,
-        const TimeArray &init_inc, const TimeArray &init_exc) {
+        const TimeArray &init_inc, const TimeArray &init_exc,
+        const NumArray &init_hour, const NumArray &lead) {
 
    if(!bgi) return;
 
@@ -280,6 +281,11 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
          (init_end     > 0 &&  init_beg <   init_ut)  ||
          (init_inc.n() > 0 && !init_inc.has(init_ut)) ||
          (init_exc.n() > 0 &&  init_exc.has(init_ut)))
+         continue;
+
+      // Check if this initialization hour and lead time should be used
+      if((init_hour.n() > 0 && !init_hour.has(unix_to_sec_of_day(init_ut))) ||
+         (lead.n()      > 0 && !lead.has(nint(bgi->genesis_time() - init_ut))))
          continue;
 
       // Check if this case already exists
