@@ -5,17 +5,17 @@
 #
 # This run_sonarqube.sh script will check out the specified version
 # of MET and run the SonarQube Source Code Analyzer on it.  First,
-# go to the directory where you would like the SCA output written and
+# go to the directory where you would like the scanning output written and
 # then run:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/sonarqube/run_sonarqube_sca.sh name
+#    MET/scripts/sonarqube/run_sonarqube.sh name
 #
-# Usage: run_sonarqube_sca.sh name
+# Usage: run_sonarqube.sh name
 #    Test the specified branched version of MET:
-#       run_sonarqube_sca.sh {branch name}
+#       run_sonarqube.sh {branch name}
 #    Test the specified tagged version of MET:
-#       run_sonarqube_sca.sh {tag name}
+#       run_sonarqube.sh {tag name}
 #
 #=======================================================================
 
@@ -127,17 +127,26 @@ run_command "./configure --prefix=`pwd` \
 # Set the build id
 #BUILD_ID="MET-${1}"
 
-# Copy sonar-project.properties
-[ ! -e "sonar-project.properties" ] && cp -p $SCRIPT_DIR/sonar-project.properties .
+SONAR_PROPERTIES=sonar-project.properties
+
+# Copy sonar-project.properties for Python code
+[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+cp -p $SCRIPT_DIR/python.sonar-project.properties $SONAR_PROPERTIES
+
+# Run SonarQube scan for Python code
+run_command "${SONARQUBE_SCANNER_BIN}/sonar-scanner"
+
+# Copy sonar-project.properties for C/C++ code
+[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+cp -p $SCRIPT_DIR/$SONAR_PROPERTIES .
 
 # Run SonarQube clean
 run_command "make clean"
 
-
 # Run SonarQube make
 run_command "${SONARQUBE_WRAPPER_BIN}/build-wrapper-linux-x86-64 --out-dir $SONARQUBE_OUT_DIR make"
 
-# Run SonarQube scan
+# Run SonarQube scan for C/C++ code
 run_command "${SONARQUBE_SCANNER_BIN}/sonar-scanner"
 
 # Run SonarQube report generator to make a PDF file
