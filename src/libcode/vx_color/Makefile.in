@@ -110,7 +110,7 @@ libvx_color_a_LIBADD =
 am__libvx_color_a_SOURCES_DIST = color_parser_yacc.cc \
 	color_parser_yacc.h my_color_scanner.cc color.cc color.h \
 	color_list.cc color_list.h color_table.cc color_parser.h \
-	vx_color.h
+	vx_color.h color_parser_yacc.yy
 @ENABLE_DEVELOPMENT_FALSE@am_libvx_color_a_OBJECTS = libvx_color_a-color_parser_yacc.$(OBJEXT) \
 @ENABLE_DEVELOPMENT_FALSE@	libvx_color_a-my_color_scanner.$(OBJEXT) \
 @ENABLE_DEVELOPMENT_FALSE@	libvx_color_a-color.$(OBJEXT) \
