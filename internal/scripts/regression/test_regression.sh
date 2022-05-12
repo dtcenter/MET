@@ -10,7 +10,7 @@
 # two sets of tests.  To run this script, use the following commands:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/regression/test_regression.sh version1 version2
+#    MET/internal/scripts/regression/test_regression.sh version1 version2
 #
 # Usage: test_regression.sh version1 version2
 #    where version1 and version2 are named branches, tags, or hashes.
@@ -88,6 +88,6 @@ if [ "$FAILURE" == "1" ]; then
 fi
 
 # Run the directory comparison tool on the output from the unit tests
-export MET_BASE=$(pwd)/MET-${2}/met/share/met
-export MET_TEST_BASE=$(pwd)/MET-${2}/test
+export MET_BASE=$(pwd)/MET-${2}/share/met
+export MET_TEST_BASE=$(pwd)/MET-${2}/internal/unit_test
 run_command "${MET_TEST_BASE}/bin/comp_dir.sh MET-${1}/test_output MET-${2}/test_output"

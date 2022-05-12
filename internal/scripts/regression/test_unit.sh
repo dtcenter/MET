@@ -6,9 +6,6 @@
 # This test_unit.sh script will check out the specified revision of MET,
 # compile the code, and run the unit tests.
 #
-#    git clone https://github.com/dtcenter/MET
-#    MET/scripts/build/test_unit.sh name
-#
 # Usage: test_unit.sh name
 #    Test the specified branched version of MET:
 #       test_unit.sh {branch name}
@@ -60,12 +57,6 @@ run_command "git clone ${GIT_REPO} ${REPO_DIR}"
 run_command "cd ${REPO_DIR}"
 run_command "git checkout ${1}"
 
-# Build the MET instance
-run_command "cd met"
-
-# Run bootstrap
-run_command "./bootstrap"
-
 # Set the compilers to be used
 export CXX=${CXX_COMPILER}
 export F77=${F77_COMPILER}
@@ -80,7 +71,6 @@ run_command "./configure --prefix=`pwd` \
 
 # Compile and install the build
 run_command "make install"
-run_command "cd .."
 
 # Check that MET_TEST_INPUT is defined
 if [ -z ${MET_TEST_INPUT+x} ]; then
@@ -89,10 +79,10 @@ if [ -z ${MET_TEST_INPUT+x} ]; then
 fi
 
 # Run the unit tests
-export MET_BUILD_BASE=$(pwd)/met
+export MET_BUILD_BASE=$(pwd)
 export MET_BASE=$MET_BUILD_BASE/share/met
-export MET_TEST_BASE=$(pwd)/test
+export MET_TEST_BASE=$(pwd)/internal/test_unit
 export MET_TEST_OUTPUT=$(pwd)/test_output
-export MET_TMP_DIR=$(pwd)/test/tmp
+export MET_TMP_DIR=$(pwd)/internal/test_unit/tmp
 run_command "mkdir -p ${MET_TMP_DIR}"
-run_command "test/bin/unit_test.sh"
+run_command "internal/test_unit/bin/unit_test.sh"

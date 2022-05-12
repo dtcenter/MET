@@ -9,7 +9,7 @@
 # cron convention.  To run this script, use the following commands:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/regression/test_nightly.sh name
+#    MET/internal/scripts/regression/test_nightly.sh name
 #
 # Usage: test_nightly.sh name
 #    where "name" specifies a branch or tag for which a corresponding
