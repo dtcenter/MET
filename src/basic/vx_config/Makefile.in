@@ -117,7 +117,7 @@ am__libvx_config_a_SOURCES_DIST = config.tab.cc config.tab.h \
 	number_stack.cc number_stack.h builtin.cc builtin.h icode.cc \
 	icode.h calculator.cc calculator.h config_funcs.cc \
 	config_funcs.h data_file_type.h object_types.h scanner_stuff.h \
-	config_constants.h config_gaussian.h vx_config.h config.tab.yy
+	config_constants.h config_gaussian.h vx_config.h
 @ENABLE_DEVELOPMENT_FALSE@am_libvx_config_a_OBJECTS =  \
 @ENABLE_DEVELOPMENT_FALSE@	libvx_config_a-config.tab.$(OBJEXT) \
 @ENABLE_DEVELOPMENT_FALSE@	libvx_config_a-my_config_scanner.$(OBJEXT) \
