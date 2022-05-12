@@ -793,10 +793,10 @@ if [ $COMPILE_MET -eq 1 ]; then
   # If using source from a tar file remove everything and unpack the tar file
   # FALSE = compiling from github repo and we don't want to overwrite the files
   if [ ${USE_MET_TAR_FILE} = "TRUE" ]; then
-    rm -rf met*
+    rm -rf MET*
     tar -xzf ${MET_TARBALL}
   fi
-  cd met*
+  cd MET*
 
   if [ -z ${MET_BUFRLIB} ]; then
     export MET_BUFRLIB=${LIB_DIR}/lib
