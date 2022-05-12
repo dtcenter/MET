@@ -66,12 +66,6 @@ run_command "git clone ${GIT_REPO} ${REPO_DIR}"
 run_command "cd ${REPO_DIR}"
 run_command "git checkout ${1}"
 
-# Build the MET instance
-run_command "cd met"
-
-# Run bootstrap
-run_command "./bootstrap"
-
 # Do no manually set the CXX and F77 compilers.
 # Let the configure script pick them.
 # Otherwise, the Fortify logic does not work.

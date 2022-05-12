@@ -70,8 +70,8 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Convert Fortify report from pdf to html
-PDF_TODAY=${RUN_DIR}/MET-${1}/met/MET-${1}_${TODAY}.pdf
-HTML_TODAY=${RUN_DIR}/MET-${1}/met/MET-${1}_${TODAY}s.html
+PDF_TODAY=${RUN_DIR}/MET-${1}/MET-${1}_${TODAY}.pdf
+HTML_TODAY=${RUN_DIR}/MET-${1}/MET-${1}_${TODAY}s.html
 pdftohtml -f 2 -l 2 ${PDF_TODAY}
 
 HTML_YESTERDAY=`echo ${HTML_TODAY} | sed "s/${TODAY}/${YESTERDAY}/g"`
