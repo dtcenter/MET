@@ -47,6 +47,7 @@ static const int max_str_len          = 512;
 static const int concat_string_default_precision =  5;
 
 static const int concat_string_max_precision     = 12;
+static const int concat_string_buf_size          = concat_string_max_precision + 4;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ class ConcatString {
 
       int Precision;
 
-      char FloatFormat[16];
+      char FloatFormat[concat_string_buf_size];
 
       std::string *s;
 

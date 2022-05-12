@@ -625,7 +625,10 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
          mlog << Error << "\ncheck_prob_thresh() -> "
               << "When verifying a probability field, you must "
               << "select at least 3 thresholds beginning with 0.0 "
-              << "and ending with 1.0.\n\n";
+              << "and ending with 1.0 (current setting: "
+              << ta.get_str() << ").\n"
+              << "Consider using the ==p shorthand notation for bins "
+              << "of equal width.\n\n";
          exit(1);
       }
       else {
@@ -641,7 +644,10 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
             mlog << Error << "\ncheck_prob_thresh() -> "
                  << "When verifying a probability field, all "
                  << "thresholds must be greater than or equal to, "
-                 << "using \"ge\" or \">=\".\n\n";
+                 << "using \"ge\" or \">=\" (current setting: "
+                 << ta.get_str() << ").\n"
+                 << "Consider using the ==p shorthand notation for bins "
+                 << "of equal width.\n\n";
             exit(1);
          }
          else {
@@ -653,8 +659,11 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
       if(ta[i].get_value() < 0.0 || ta[i].get_value() > 1.0) {
          if(error_out) {
             mlog << Error << "\ncheck_prob_thresh() -> "
-                 << "When verifying a probability field, all "
-                 << "thresholds must be between 0 and 1.\n\n";
+                 << "When verifying a probability field, all thresholds "
+                 << "must be between 0 and 1 (current setting: "
+                 << ta.get_str() << ").\n"
+                 << "Consider using the ==p shorthand notation for bins "
+                 << "of equal width.\n\n";
             exit(1);
          }
          else {

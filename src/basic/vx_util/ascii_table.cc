@@ -271,8 +271,12 @@ BadDataValue = a.BadDataValue;
 
 set_bad_data_str(a.BadDataStr);
 
-memcpy(f_FloatFormat, a.f_FloatFormat, sizeof(f_FloatFormat));
-memcpy(g_FloatFormat, a.g_FloatFormat, sizeof(g_FloatFormat));
+int f_buf_size = sizeof(a.f_FloatFormat);
+int g_buf_size = sizeof(a.g_FloatFormat);
+if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
+if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
+memcpy(f_FloatFormat, a.f_FloatFormat, f_buf_size);
+memcpy(g_FloatFormat, a.g_FloatFormat, g_buf_size);
 
 DoCommaString = a.DoCommaString;
 
@@ -697,11 +701,15 @@ if ( (k < 0) || (k > ascii_table_max_precision) )  {
 
 Precision = k;
 
-memset(f_FloatFormat, 0, sizeof(f_FloatFormat));
-memset(g_FloatFormat, 0, sizeof(g_FloatFormat));
+int f_buf_size = sizeof(f_FloatFormat);
+int g_buf_size = sizeof(g_FloatFormat);
+if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
+if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
+memset(f_FloatFormat, 0, f_buf_size);
+memset(g_FloatFormat, 0, g_buf_size);
 
-snprintf(f_FloatFormat, sizeof(f_FloatFormat), "%%.%df", Precision);
-snprintf(g_FloatFormat, sizeof(g_FloatFormat), "%%.%dg", Precision);
+snprintf(f_FloatFormat, f_buf_size, "%%.%df", Precision);
+snprintf(g_FloatFormat, g_buf_size, "%%.%dg", Precision);
 
 return;
 

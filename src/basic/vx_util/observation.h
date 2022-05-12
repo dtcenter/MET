@@ -22,6 +22,7 @@
 #include <time.h>
 
 #include "config.h"
+#include "util_constants.h"
 
 #ifdef ENABLE_PYTHON
 #include "vx_python3_utils.h"
@@ -223,7 +224,7 @@ protected:
   {
     struct tm *time_struct = gmtime(&unix_time);
 
-    char time_string[80];
+    char time_string[tmp_buf_size];
 
     snprintf(time_string, sizeof(time_string),
              "%04d%02d%02d_%02d%02d%02d",
@@ -240,7 +241,7 @@ protected:
     string start_time_string = _getTimeString(start_time);
     string end_time_string = _getTimeString(end_time);
 
-    char time_string[80];
+    char time_string[tmp_buf_size];
 
     snprintf(time_string, sizeof(time_string),
              "%s-%s",

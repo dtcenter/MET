@@ -91,6 +91,16 @@ filter = [
       output_flag   = { genmpr = BOTH; }
    },
    {
+      desc          = "AL_INIT_00_06";
+      basin_mask    = "AL";
+      init_hour     = [ "00", "06" ];
+   },
+   {
+      desc          = "AL_INIT_12_18";
+      basin_mask    = "AL";
+      init_hour     = [ "12", "18" ];
+   },
+   {
       desc                 = "AL_MATCH24HR";
       basin_mask           = "AL";
       genesis_match_window = { beg = 0; end = 24; };

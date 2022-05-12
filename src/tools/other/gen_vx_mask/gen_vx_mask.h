@@ -19,6 +19,7 @@
 //   002    11/15/16  Halley Gotway   Add solar masking types.
 //   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None.
 //   004    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
+//   005    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +49,9 @@ static const char *program_name = "gen_vx_mask";
 
 enum MaskType {
 
-   MaskType_Poly,      // Polyline masking region
+   MaskType_Poly,      // Polyline masking in lat/lon space
+   MaskType_Poly_XY,   // Polyline masking in grid x/y space
+
    MaskType_Box,       // Box masking type
    MaskType_Circle,    // Circle masking region
 
@@ -129,6 +132,7 @@ static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
                     ConcatString &);
 static void      get_shapefile_outline(ShpPolyRecord &shape);
 static void      apply_poly_mask(DataPlane &dp);
+static void      apply_poly_xy_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
 static void      apply_box_mask(DataPlane &dp);
 static void      apply_circle_mask(DataPlane &dp);

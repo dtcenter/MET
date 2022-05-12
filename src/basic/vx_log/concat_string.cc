@@ -231,7 +231,10 @@ void ConcatString::assign(const ConcatString & c)
    if (c.text()) s->assign(c.text());
    else          s->clear();
 
-   memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
+   int buf_size = sizeof(c.FloatFormat);
+   if (buf_size > concat_string_buf_size) buf_size = concat_string_buf_size;
+
+   memcpy(FloatFormat, c.FloatFormat, buf_size);
    Precision = c.Precision;
 }
 
@@ -337,9 +340,12 @@ if ( (k < 0) || (k > concat_string_max_precision) )  {
 if (Precision != k) {
    Precision = k;
 
-   memset(FloatFormat, 0, sizeof(FloatFormat));
+   int buf_size = sizeof(FloatFormat);
+   if (buf_size > concat_string_buf_size) buf_size = concat_string_buf_size;
 
-   snprintf(FloatFormat, sizeof(FloatFormat), "%%.%df", Precision);
+   memset(FloatFormat, 0, buf_size);
+
+   snprintf(FloatFormat, buf_size, "%%.%df", Precision);
 }
 
 return;
