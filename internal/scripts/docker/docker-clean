@@ -4,7 +4,7 @@
 # Script to uninstall and clean up MET
 #
 
-cd /met/MET-*/met
+cd /met/MET-*
 make uninstall
 make clean
 
