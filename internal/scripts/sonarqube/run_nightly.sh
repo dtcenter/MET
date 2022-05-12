@@ -9,7 +9,7 @@
 # the following commands:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/sosnarqube/run_nightly.sh name
+#    MET/internal/scripts/sosnarqube/run_nightly.sh name
 #
 # Usage: run_nightly.sh name
 #    where "name" specifies a branch, tag, or hash

@@ -9,13 +9,13 @@
 # then run:
 #
 #    git clone https://github.com/dtcenter/MET
-#    MET/scripts/sonarqube/run_sonarqube_sca.sh name
+#    MET/internal/scripts/sonarqube/run_sonarqube.sh name
 #
-# Usage: run_sonarqube_sca.sh name
+# Usage: run_sonarqube.sh name
 #    Test the specified branched version of MET:
-#       run_sonarqube_sca.sh {branch name}
+#       run_sonarqube.sh {branch name}
 #    Test the specified tagged version of MET:
-#       run_sonarqube_sca.sh {tag name}
+#       run_sonarqube.sh {tag name}
 #
 #=======================================================================
 
@@ -104,12 +104,6 @@ fi
 run_command "git clone ${GIT_REPO} ${REPO_DIR}"
 run_command "cd ${REPO_DIR}"
 run_command "git checkout ${1}"
-
-# Build the MET instance
-run_command "cd met"
-
-# Run bootstrap
-run_command "./bootstrap"
 
 # Do no manually set the CXX and F77 compilers.
 # Let the configure script pick them.
