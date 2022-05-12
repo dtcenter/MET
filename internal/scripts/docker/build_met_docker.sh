@@ -4,9 +4,6 @@ echo "Running script to build MET in Docker"
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_configure.log
 
-echo "Running bootstrap"
-./bootstrap
-
 echo "Configuring MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 ./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python \
     MET_HDF=/usr/local/hdf MET_HDFEOS=/usr/local/hdfeos \
