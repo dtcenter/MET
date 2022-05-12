@@ -849,14 +849,13 @@ uninstall-am:
 
 
 # Cleanup for the distribution
-#   - Remove any SVN files
 #   - Remove lex/yacc source files
 #   - Run the check for copyright utility
 
 dist-hook:
 	-rm -rf `find ${distdir} -name "*.ll"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
-	-rm -rf ${distdir}/internal/test_util
+	-rm -rf ${distdir}/internal
 	-rm -rf ${distdir}/src/tools/dev_utils
 	-rm -rf ${distdir}/ylwrap
 
