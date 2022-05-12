@@ -65,6 +65,8 @@ using namespace std;
 #include <unistd.h>
 #include <vector>
 
+#include "main.h"
+
 #include <netcdf>
 using namespace netCDF;
 
@@ -147,7 +149,7 @@ static void setup_wrapper_path();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    CommandLine cline;
 
    //
@@ -189,7 +191,7 @@ int main(int argc, char *argv[]) {
    // Check for error. There should be at least two arguments left:
    // the ascii input filenames and the netCDF output filename
    //
-   if(cline.n() < 2) usage();
+   if(cline.n() < 2) { usage(); return 0; }
 
    //
    // Store the input ASCII file name and the output NetCDF file name
@@ -239,7 +241,7 @@ int main(int argc, char *argv[]) {
    if(!file_handler->readAsciiFiles(asfile_list)) {
       mlog << Error << "\n" << program_name << "-> "
            << "encountered an error while reading input files!\n\n";
-      exit(1);
+      return 1;
    }
 
    //
@@ -258,6 +260,12 @@ int main(int argc, char *argv[]) {
 
    return(0);
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char *get_tool_name() {
+   return program_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -497,7 +505,6 @@ void usage() {
 
         << flush;
 
-   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
