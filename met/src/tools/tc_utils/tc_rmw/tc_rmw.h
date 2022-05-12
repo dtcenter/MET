@@ -42,6 +42,7 @@ using namespace std;
 using namespace netCDF;
 
 #include "tc_rmw_conf_info.h"
+#include "tc_rmw_wind_converter.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_tc_util.h"
@@ -82,6 +83,8 @@ static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
+static TCRMW_WindConverter wind_converter;
+
 
 // Optional arguments
 static ConcatString out_dir;
@@ -140,8 +143,8 @@ static double* lat_arr;
 static double* lon_arr;
 
 // Wind arrays
-static double* wind_r_arr;
-static double* wind_t_arr;
+/* static double* wind_r_arr; */
+/* static double* wind_t_arr; */
 
 ////////////////////////////////////////////////////////////////////////
 
