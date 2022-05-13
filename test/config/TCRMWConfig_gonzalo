@@ -103,6 +103,18 @@ max_range_km   = 1000.0;
 delta_range_km = 10.0;
 rmw_scale      = 0.2;
 
+//
+// Optionally convert u/v winds to tangential/radial winds
+//
+compute_tangential_and_radial_winds = TRUE;
+u_wind_field_name = "UGRD";
+v_wind_field_name = "VGRD";
+tangential_velocity_field_name = "VT";
+tangential_velocity_long_field_name = "Tangential Velocity";
+radial_velocity_field_name = "VR";
+radial_velocity_long_field_name = "Radial Velocity";
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 version = "V10.1.0";

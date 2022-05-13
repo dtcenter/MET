@@ -127,7 +127,7 @@ _______________________
 
 .. code-block:: none
 
-  compute_tangential_and_radial_winds = FALSE;
+  compute_tangential_and_radial_winds = TRUE;
 
 The **compute_tangential_and_radial_winds** parameter is a flag controlling whether a conversion from U/V to Tangential/Radial winds is done or not. If set to TRUE, additional parameters are used, otherwise they are not. 
 
