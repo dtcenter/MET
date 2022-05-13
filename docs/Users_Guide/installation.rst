@@ -202,12 +202,13 @@ Example: To configure MET to install all of the available tools in the "bin" sub
   3. Type 'tail -f make_install.log' to view the execution of the make.
   4. When make is finished, type 'CTRL-C' to quit the tail.
 
-If all tools are enabled and the build is successful, the "*<prefix>/bin*" directory (where *<prefix>* is the prefix you specified on your configure command line) will contain 36 executables:
+If all tools are enabled and the build is successful, the "*<prefix>/bin*" directory (where *<prefix>* is the prefix you specified on your configure command line) will contain the following executables:
 
 .. code-block:: none
 
    - ascii2nc
    - ensemble_stat
+   - gen_ens_prod
    - gen_vx_mask
    - grid_stat
    - gis_dump_dbf
