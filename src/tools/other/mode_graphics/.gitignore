@@ -1,0 +1,6 @@
+plot_mode_field
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

@@ -1,7 +1,0 @@
-point_stat
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

@@ -1,0 +1,6 @@
+gen_ens_prod
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

@@ -1,7 +1,0 @@
-tc_rmw
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

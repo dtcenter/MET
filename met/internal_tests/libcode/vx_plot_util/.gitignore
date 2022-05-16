@@ -1,7 +1,0 @@
-test_map_region
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM
