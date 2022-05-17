@@ -1,7 +1,0 @@
-modis_regrid
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

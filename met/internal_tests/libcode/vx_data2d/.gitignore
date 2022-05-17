@@ -1,8 +1,0 @@
-test_table_read
-dump_default_table
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

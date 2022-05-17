@@ -1,0 +1,7 @@
+wwmca_regrid
+wwmca_plot
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

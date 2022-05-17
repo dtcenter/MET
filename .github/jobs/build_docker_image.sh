@@ -4,7 +4,7 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 DOCKERHUB_TAG=${DOCKERHUB_REPO}:${SOURCE_BRANCH}
 
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/scripts/docker/Dockerfile.copy
+DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.copy
 
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
 

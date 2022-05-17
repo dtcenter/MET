@@ -1,0 +1,6 @@
+make_mapfiles
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

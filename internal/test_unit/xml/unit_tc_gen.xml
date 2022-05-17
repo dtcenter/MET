@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_gen_2016">
+    <exec>&MET_BIN;/tc_gen</exec>
+    <param> \
+      -genesis &DATA_DIR;/genesis/suite1/2016*/genesis*2016* \
+      -track &DATA_DIR;/genesis/atcf/2016 \
+      -config &CONFIG_DIR;/TCGenConfig_2016 \
+      -out &OUTPUT_DIR;/tc_gen/tc_gen_2016 \
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_2016.log
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_cts.txt</stat>
+    </output>
+  </test>
+
+  <!-- Verify genesis probabilities -->
+
+  <test name="tc_gen_prob">
+    <exec>&MET_BIN;/tc_gen</exec>
+    <param> \
+      -edeck &DATA_DIR;/edeck/eal152020*dat \
+      -track &DATA_DIR;/bdeck/bal152020.dat \
+      -config &CONFIG_DIR;/TCGenConfig_prob \
+      -out &OUTPUT_DIR;/tc_gen/tc_gen_prob \
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_prob.log \
+      -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_prob_genmpr.txt</stat>
+    </output>
+  </test>
+
+  <!-- Verify genesis shapes -->
+
+  <test name="tc_gen_2021_shape">
+    <exec>&MET_BIN;/tc_gen</exec>
+    <param> \
+      -shape &DATA_DIR;/genesis/shape/atl \
+      -shape &DATA_DIR;/genesis/shape/epac \
+      -track &DATA_DIR;/genesis/atcf/2021 \
+      -config &CONFIG_DIR;/TCGenConfig_shape \
+      -out &OUTPUT_DIR;/tc_gen/tc_gen_2021_shape \
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_2021_shape.log \
+      -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2021_shape.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2021_shape_pct.txt</stat>
+    </output>
+  </test>
+
+</met_test>
