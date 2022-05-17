@@ -13,7 +13,6 @@ MET Version 10.1.2 release notes (20220516)
   * Update static arrays with hard-coded size (`METplus-Internal #14 <https://github.com/dtcenter/METplus-Internal/issues/14>`_).
   * Fix TC-Gen to only count misses from requested initialization hours and lead times (`#2148 <https://github.com/dtcenter/MET/issues/2148>`_).
 
-
 MET Version 10.1.1 release notes (20220419)
 -------------------------------------------
 
