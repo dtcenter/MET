@@ -1,8 +1,0 @@
-gsidens2orank
-gsid2mpr
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

@@ -1,7 +1,0 @@
-plot_data_plane
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

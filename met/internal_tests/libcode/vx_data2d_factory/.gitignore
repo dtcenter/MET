@@ -1,8 +1,0 @@
-test_is_grib
-test_factory
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

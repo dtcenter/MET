@@ -1,7 +1,0 @@
-make_mapfiles
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM
