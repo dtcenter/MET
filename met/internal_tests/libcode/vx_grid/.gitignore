@@ -1,7 +1,0 @@
-test_grid_area
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

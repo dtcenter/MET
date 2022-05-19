@@ -1,7 +1,0 @@
-gen_vx_mask
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

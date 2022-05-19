@@ -1,7 +1,0 @@
-grid_diag
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

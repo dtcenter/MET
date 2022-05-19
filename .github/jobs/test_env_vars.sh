@@ -1,7 +1,7 @@
 export MET_BASE=/usr/local/share/met
 
-export MET_BUILD_BASE=${MET_REPO_DIR}/met
-export MET_TEST_BASE=${MET_REPO_DIR}/test
+export MET_BUILD_BASE=${MET_REPO_DIR}
+export MET_TEST_BASE=${MET_REPO_DIR}/internal/test_unit
 export PERL5LIB=${MET_TEST_BASE}/lib
 
 export MET_TEST_INPUT=/data/input/MET_test_data/unit_test
