@@ -1,0 +1,353 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ensemble-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
+// Output observation type to be written
+//
+obtype = "MC_PCP";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "ens.field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
+
+//
+// Ensemble product fields to be processed
+//
+ens = {
+   ens_thresh = 1.0;
+   vld_thresh = 1.0;
+
+   field = [
+      {
+         name       = "APCP";
+         level      = [ "A24" ];
+         cat_thresh = [ >0.0, >=10.0 ];
+      },
+      {
+         name       = "REFC";
+         level      = [ "L0" ];
+         cat_thresh = [ >=35.0 ];
+         GRIB1_ptv  = 129;
+      },
+      {
+         name       = "UGRD";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      },
+      {
+         name       = "VGRD";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      },
+      {
+         name       = "WIND";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      }
+   ];
+}
+
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = [];
+control_id = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   message_type = [ "ADPSFC" ];
+
+   field = [
+      {
+         name  = "APCP";
+         level = [ "A24" ];
+         ens_ssvar_bin_size = 0.1;
+         ens_phist_bin_size = 0.05;
+         prob_cat_thresh = [ >0, >0.1, >0.25, >0.5, >1.0, >1.5, >2.0 ];
+      }
+   ];
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
+
+//
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   flag             = FALSE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+   min              = NA;
+   max              = NA;
+}
+
+//
+// Mapping of message type group name to comma-separated list of values
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+];
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 10;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+   direct_prob = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [ "MET_BASE/poly/HMT_masks/huc4_1605_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1803_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1804_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1805_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1806_poly.nc" ];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      },
+      {
+         method = HIRA;
+         width  = 2;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   ecnt  = BOTH;
+   rps   = BOTH;
+   rhist = BOTH;
+   phist = BOTH;
+   orank = BOTH;
+   ssvar = BOTH;
+   relp  = BOTH;
+   pct   = BOTH;
+   pstd  = BOTH;
+   pjc   = BOTH;
+   prc   = BOTH;
+   eclv  = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble product output types
+//
+ensemble_flag = {
+   latlon    = TRUE;
+   mean      = TRUE;
+   stdev     = TRUE;
+   minus     = TRUE;
+   plus      = TRUE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = TRUE;
+   vld_count = TRUE;
+   frequency = TRUE;
+   nep       = TRUE;
+   nmep      = TRUE;
+   rank      = TRUE;
+   weight    = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Random number generator
+//
+rng = {
+   type = "mt19937";
+   seed = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag = NONE;
+output_prefix    = "";
+version          = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

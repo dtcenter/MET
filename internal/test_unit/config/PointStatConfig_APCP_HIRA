@@ -1,0 +1,142 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "HIRA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = -1800;
+   end =  1800;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+cat_thresh   = [ >0.254, >2.540 ];
+sid_inc      = [];
+sid_exc      = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
+
+fcst = {
+   field = [
+      {
+         name  = "APCP_24";
+         level = "(*,*)";
+      }
+   ];
+}
+obs = {
+
+   field = [
+      {
+         name         = "APCP";
+         level        = "A24";
+         message_type = "ADPSFC";
+      }
+   ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [];
+   poly  = [ "MET_BASE/poly/NWC.poly" ];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      { method = NEAREST; width = 1; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag            = TRUE;
+   width           = [ 5, 10, 20 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.10 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [ ${HIRA_PROB_CAT_THRESH} ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = NONE;
+   ctc    = STAT;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = STAT;
+   pstd   = STAT;
+   pjc    = STAT;
+   prc    = STAT;
+   ecnt   = STAT;
+   orank  = STAT;
+   rps    = STAT;
+   eclv   = STAT;
+   mpr    = STAT;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = NONE;
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,0 @@
-*_to_string.h
-*_to_string.cc
-*.o
-*.a
-.deps
-Makefile
-Makefile.in

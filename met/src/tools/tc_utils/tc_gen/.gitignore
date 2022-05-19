@@ -1,7 +1,0 @@
-tc_gen
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

@@ -1,0 +1,209 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   sid_inc    = [];
+   sid_exc    = [];
+   cat_thresh = [ <=273, >273 ];
+
+   field = [
+      {
+        name            = "TMP";
+        level           = [ "Z2" ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [];
+        desc            = "ALL_QTY";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "P500" ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [];
+        desc            = "ALL_QTY";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "Z2" ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [ ${OBS_QUALITY_INC_SFC} ];
+        obs_quality_exc = [];
+        desc            = "QTY_INC_SFC";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "P500" ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [ ${OBS_QUALITY_INC_UPA} ];
+        obs_quality_exc = [];
+        desc            = "QTY_INC_UPA";
+      },
+      
+      {
+        name            = "TMP";
+        level           = [ "Z2" ];
+        message_type    = [ "ADPSFC" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [ ${OBS_QUALITY_EXC_SFC} ];
+        desc            = "QTY_EXC_SFC";
+      },
+
+      {
+        name            = "TMP";
+        level           = [ "P500" ];
+        message_type    = [ "ADPUPA" ];
+        obs_quality_inc = [];
+        obs_quality_exc = [ ${OBS_QUALITY_EXC_UPA} ];
+        desc            = "QTY_EXC_UPA";
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = NONE;
+   ctc    = BOTH;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = BOTH;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE;
+   orank  = NONE;
+   rps    = NONE;
+   eclv   = NONE;
+   mpr    = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

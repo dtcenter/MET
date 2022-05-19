@@ -1,7 +1,0 @@
-test_thermo
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

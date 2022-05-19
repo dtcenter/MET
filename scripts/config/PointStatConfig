@@ -1,0 +1,216 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+censor_thresh = [];
+censor_val    = [];
+mpr_column    = [];
+mpr_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   message_type = [ "ADPUPA", "ADPSFC" ];
+
+   field = [
+      {
+        name       = "TMP";
+        level      = [ "P750-900" ];
+        cat_thresh = [ <=273, >273 ];
+      },
+
+      {
+        name       = "UGRD";
+        level      = [ "Z10" ];
+        cat_thresh = [ >=5 ];
+      },
+
+      {
+        name       = "VGRD";
+        level      = [ "Z10" ];
+        cat_thresh = [ >=5 ];
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+sid_inc        = [];
+sid_exc        = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_percentile = 50;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      vld_thresh = 0.5;
+      method     = NEAREST;
+      width      = 1;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "DTC165", "DTC166" ];
+   poly  = [ "MET_BASE/poly/LMV.poly" ];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 1000;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      },
+      {
+         method = MEDIAN;
+         width  = 3;
+      },
+      {
+         method = DW_MEAN;
+         width  = 3;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = BOTH;
+   sl1l2  = BOTH;
+   sal1l2 = BOTH;
+   vl1l2  = BOTH;
+   val1l2 = BOTH;
+   vcnt   = BOTH;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE; // Only for HiRA
+   orank  = NONE; // Only for HiRA
+   rps    = NONE; // Only for HiRA
+   eclv   = BOTH;
+   mpr    = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = TRUE;
+tmp_dir        = "/tmp";
+output_prefix  = "";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

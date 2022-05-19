@@ -1,0 +1,46 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.1.0.
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+prereq intel/2020.2
+prereq intelpython3/2020.2
+
+set base /apps/contrib/MET
+set ver 10.1.0
+set share $base/$ver/share/met
+set lib_base $base/10.1.0
+
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
+
+#export CC=icc
+#export CXX=icc
+#export F77=ifort
+#module load intel/2020.2
+#module load intelpython3/2020.2
+#export libdir=/apps/contrib/met/10.1.0/external_libs/lib
+#export incdir=/apps/contrib/met/10.1.0/external_libs/include
+#export iprefix=/apps/contrib/met/10.1.0/external_libs
+#export basedir=/apps/contrib/met/10.1.0/met-10.1.0
+#export MET_HDF5=$iprefix
+#export MET_NETCDF=$incdir
+#export MET_GRIB2CINC=$incdir
+#export MET_GRIB2CLIB=$libdir
+#setenv MET_GSLLIB=$libdir
+#export MET_GSLINC=$incdir
+#export MET_BUFR=$libdir
+#export MET_HDFINC=$incdir
+#export MET_HDFLIB=$libdir
+#export MET_HDFEOSINC=$incdir
+#export MET_HDFEOSLIB=$libdir
+#export MET_PYTHON=/apps/intel-2020/intel-2020/intelpython3/
+#export MET_PYTHON_CC=-I/apps/intel-2020/intel-2020/intelpython3/include/python3.7m
+#exoprt MET_PYTHON_LD=-L/apps/intel-2020/intel-2020/intelpython3/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
+#export MET_FONT_DIR=$basedir/fonts/
+#export LDFLAGS=-Wl,--disable-new-dtags -Wl,-rpath,${libdir}:${MET_PYTHON}/lib
+#export CPPFLAGS=-I/apps/contrib/met/10.0.0/external_libs/include

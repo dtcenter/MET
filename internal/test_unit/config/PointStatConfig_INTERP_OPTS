@@ -1,0 +1,152 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "NAM";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = -1800;
+   end =  1800;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+cat_thresh  = [ ];
+eclv_points = 0.05;
+
+fcst = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "TMP";  level = "Z2"; message_type = "ADPSFC"; }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+climo_mean = fcst;
+climo_mean = {
+   file_name = [ ${CLIMO_FILE} ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [];
+   poly  = [];
+   sid   = [ "KSTL", "KORD", "KLAX", "KDEN" ];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+   vld_thresh = 1.0;
+   shape = SQUARE;
+   sigma = 1.5;
+
+   type = [
+      { method = MIN;         width = [2, 5]; },
+      { method = MAX;         width = [2, 5]; },
+      { method = MEDIAN;      width = [2, 5]; },
+      { method = UW_MEAN;     width = [2, 5]; },
+      { method = DW_MEAN;     width = [2, 5]; },
+      { method = LS_FIT;      width = [2, 5]; },
+      { method = BILIN;       width = 2;      },
+      { method = NEAREST;     width = 1;      },
+      { method = BEST;        width = [2, 5]; },
+      { method = UPPER_LEFT;  width = 1;      },
+      { method = UPPER_RIGHT; width = 1;      },
+      { method = LOWER_RIGHT; width = 1;      },
+      { method = LOWER_LEFT;  width = 1;      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE;
+   orank  = NONE;
+   rps    = NONE;
+   eclv   = NONE;
+   mpr    = STAT;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = NONE;
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////
