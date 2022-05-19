@@ -1,0 +1,7 @@
+ioda2nc
+*.o
+*.a
+.deps
+.dirstamp
+Makefile
+*.dSYM
