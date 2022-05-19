@@ -217,7 +217,7 @@ void parse_sal1l2_line(STATLine &l, SL1L2Info &s_info) {
 
 void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
 
-   v_info.clear();
+   v_info.zero_out();
 
    v_info.vcount      = atoi(l.get_item("TOTAL"));
    v_info.uf_bar      = atof(l.get_item("UFBAR"));
