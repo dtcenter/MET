@@ -118,7 +118,7 @@ protected:
   {
     struct tm *time_struct = gmtime(&unix_time);
     
-    char time_string[80];
+    char time_string[tmp_buf_size];
     
     snprintf(time_string, sizeof(time_string), 
              "%04d%02d%02d_%02d%02d%02d",
