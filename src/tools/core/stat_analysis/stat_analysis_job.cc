@@ -724,10 +724,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the vector partial sum line types:
-   //    VL1L2 -> VCNT
+   //    VL1L2, VAL1L2 -> VCNT
    //
-   else if(in_lt == stat_vl1l2 &&
-           has_line_type(out_lt, stat_vcnt)) {
+   else if((in_lt == stat_vl1l2 ||
+            in_lt == stat_val1l2) &&
+            has_line_type(out_lt, stat_vcnt)) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_psum(job, *it, psum_map, out_at);
@@ -1863,7 +1864,6 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       // VCNT output line
       //
       else if(lt == stat_vcnt) {
-
          if(job.stat_out) {
             write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);

@@ -1786,6 +1786,8 @@ void VL1L2Info::compute_stats() {
 
    if(vacount > 0) {
 
+      n = vacount;
+
       // Check for bad data since new are not present for previous versions
       if(is_bad_data(fa_speed_bar) || is_bad_data(oa_speed_bar)) {
          ANOM_CORR.v = bad_data_double;

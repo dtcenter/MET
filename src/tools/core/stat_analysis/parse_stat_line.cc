@@ -239,7 +239,7 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
 
 void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
 
-   v_info.clear();
+   v_info.zero_out();
 
    v_info.vacount      = atoi(l.get_item("TOTAL"));
    v_info.ufa_bar      = atof(l.get_item("UFABAR"));

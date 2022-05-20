@@ -2966,7 +2966,8 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
    //
 
-   at.set_entry(r, c++, vcnt_info.vcount);             //    TOTAL
+   at.set_entry(r, c++, max(vcnt_info.vcount,          // TOTAL
+                            vcnt_info.vacount));
 
    at.set_entry(r, c++, vcnt_info.FBAR.v);             // FBAR
    at.set_entry(r, c++, (string)na_str);               // FBAR_BCL
