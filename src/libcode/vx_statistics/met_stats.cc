@@ -1815,9 +1815,11 @@ void VL1L2Info::compute_ci() {
    double v, cl, cu;
 
    //
-   // Compute the confidence interval for each alpha value specified.
+   // Compute the confidence interval for each alpha value specified
    //
    for(i=0; i<n_alpha; i++) {
+
+      n = vacount;
 
       //
       // Check for the degenerate case
