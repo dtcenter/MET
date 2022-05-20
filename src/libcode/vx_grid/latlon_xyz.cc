@@ -68,7 +68,7 @@ return;
 void grid_xyz_to_latlon(double x, double y, double z, double & lat, double & lon)
 
 {
-// acount for numerical errors in which z is actually 1.0 or -1.0 but goes out of bounds
+// account for numerical errors in which z is actually 1.0 or -1.0 but goes out of bounds
 if (is_eq(z, 1.0, 1.0e-5))
     z = 1.0;
 else if (is_eq(z, -1.0, 1.0e-5))

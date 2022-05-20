@@ -71,7 +71,7 @@ class TCRMW_WindConverter {
   // an error occurs, even if configured for true
   bool _computeWinds;
 
-  // maps from level strings to the ugrid/vgrid input index values
+  // maps from level strings to the u/v wind input index values
   map<string, int> _uIndexMap;
   map<string, int> _vIndexMap;
 

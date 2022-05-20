@@ -94,16 +94,16 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
   }
   // test for consistency
   if (_uIndexMap.size() != _vIndexMap.size()) {
-    mlog << Warning << " Warning uneven number of ugrid/vgrid, no wind conversion will be done\n";
-    mlog << Warning << _conf->u_wind_field_name.string() << " had " << _uIndexMap.size() << " inputs\n";
-    mlog << Warning << _conf->v_wind_field_name.string() << " had " << _vIndexMap.size() << " inputs\n";
+    mlog << Warning << "Uneven number of u/v wind inputs, no wind conversion will be done:\n"
+         << _conf->u_wind_field_name.string() << " has " << _uIndexMap.size() << " inputs\n"
+         << _conf->v_wind_field_name.string() << " has " << _vIndexMap.size() << " inputs\n";
     _computeWinds = false;
   }
   map<string,int>::const_iterator iu, iv;
   for (iu=_uIndexMap.begin(), iv=_vIndexMap.begin(); iu!=_uIndexMap.end(); ++iu, ++iv) {
     if (iu->first != iv->first) {
-      mlog << Warning << "Warning ordering of ugrid/vgrid input levels not the same, not implemented, no wind conversions will be done\n";
-      mlog << Warning << "    "  << iu->first  << " " << iv->first << "\n";
+      mlog << Warning << "Ordering of u/v wind input levels not the same, not implemented, no wind conversions will be done:\n"
+           << "    " << iu->first  << " " << iv->first << "\n";
       _computeWinds = false;
     }
   }
@@ -143,11 +143,11 @@ void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &va
   else {
     if (!_foundUInInput) {
       mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input \"" << _conf->u_wind_field_name << "\"\n";
+	   << "field not found in input \"" << _conf->u_wind_field_name << "\"\n\n";
     }
     if (!_foundVInInput) {
       mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input \"" << _conf->v_wind_field_name << "\"\n";
+	   << "field not found in input \"" << _conf->v_wind_field_name << "\"\n\n";
     }
     mlog << Warning << "\nNot computing radial and tangential winds\n\n";
     _computeWinds = false;

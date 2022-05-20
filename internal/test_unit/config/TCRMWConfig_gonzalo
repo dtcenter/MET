@@ -114,7 +114,6 @@ tangential_velocity_long_field_name = "Tangential Velocity";
 radial_velocity_field_name = "VR";
 radial_velocity_long_field_name = "Radial Velocity";
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 version = "V11.0.0";
