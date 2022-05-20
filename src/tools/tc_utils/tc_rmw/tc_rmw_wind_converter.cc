@@ -231,8 +231,6 @@ void wind_ne_to_ra(const TcrmwGrid& tcrmw_grid,
 	      tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
 	      mlog << Debug(3) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
 		   << v << ", rt:" << wind_r << "," << wind_t <<"\n";
-	      // tcrmw_grid.wind_ne_to_ra_conventional(
-	      //     lat, lon, u, v, wind_r, wind_t);
 	    }
             wind_r_arr[i] = wind_r;
             wind_t_arr[i] = wind_t;
