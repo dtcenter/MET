@@ -1325,6 +1325,10 @@ VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    VL1L2Info v_info;
 
+   // Store alpha values
+   v_info.allocate_n_alpha(n_alpha);
+   for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
+
    v_info.vcount  = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
