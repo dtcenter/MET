@@ -94,16 +94,16 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
   }
   // test for consistency
   if (_uIndexMap.size() != _vIndexMap.size()) {
-    mlog << Error << " error uneven number of ugrid/vgrid, no wind conversion\n";
-    mlog << Error << _conf->u_wind_field_name.string() << " had " << _uIndexMap.size() << " inputs\n";
-    mlog << Error << _conf->v_wind_field_name.string() << " had " << _vIndexMap.size() << " inputs\n";
+    mlog << Warning << " Warning uneven number of ugrid/vgrid, no wind conversion will be done\n";
+    mlog << Warning << _conf->u_wind_field_name.string() << " had " << _uIndexMap.size() << " inputs\n";
+    mlog << Warning << _conf->v_wind_field_name.string() << " had " << _vIndexMap.size() << " inputs\n";
     _computeWinds = false;
   }
   map<string,int>::const_iterator iu, iv;
   for (iu=_uIndexMap.begin(), iv=_vIndexMap.begin(); iu!=_uIndexMap.end(); ++iu, ++iv) {
     if (iu->first != iv->first) {
-      mlog << Error << "error ordering of ugrid/vgrid input levels not the same, not implemented, no wind conversions\n";
-      mlog << Error << "    "  << iu->first  << " " << iv->first << "\n";
+      mlog << Warning << "Warning ordering of ugrid/vgrid input levels not the same, not implemented, no wind conversions will be done\n";
+      mlog << Warning << "    "  << iu->first  << " " << iv->first << "\n";
       _computeWinds = false;
     }
   }
@@ -142,14 +142,14 @@ void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &va
   }
   else {
     if (!_foundUInInput) {
-      mlog << Error << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input" << _conf->u_wind_field_name << "\n";
+      mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
+	   << "field not found in input \"" << _conf->u_wind_field_name << "\"\n";
     }
     if (!_foundVInInput) {
-      mlog << Error << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input" << _conf->v_wind_field_name << "\n";
+      mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
+	   << "field not found in input \"" << _conf->v_wind_field_name << "\"\n";
     }
-    mlog << Error << "\nNot computing radial and tangential winds\n\n";
+    mlog << Warning << "\nNot computing radial and tangential winds\n\n";
     _computeWinds = false;
   }
 }
