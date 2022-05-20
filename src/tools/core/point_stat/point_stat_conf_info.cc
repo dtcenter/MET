@@ -1173,11 +1173,18 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_vl1l2):
       case(i_val1l2):
-      case(i_vcnt):
          // Number of VL1L2 or VAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
+         break;
+
+      case(i_vcnt):
+         // Number of VCNT lines =
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas
+         n = (!vect_flag ? 0 : n_pd *
+              get_n_wind_thresh() * get_n_ci_alpha());
          break;
 
       case(i_pct):
