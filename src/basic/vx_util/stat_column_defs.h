@@ -36,7 +36,7 @@ static const char * fho_columns [] = {
 
 static const char * ctc_columns [] = {
    "TOTAL",       "FY_OY",       "FY_ON",
-   "FN_OY",       "FN_ON"
+   "FN_OY",       "FN_ON",       "EC_VALUE"
 };
 
 static const char * cts_columns [] = {
@@ -60,7 +60,8 @@ static const char * cts_columns [] = {
    "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
    "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
    "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
-   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU"
+   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU",
+   "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
 static const char * mctc_columns [] = {

@@ -1975,7 +1975,7 @@ void write_ctc_cols(const CTSInfo &cts_info,
    // Contingency Table Counts
    // Dump out the CTC line:
    //    TOTAL,       FY_OY,       FY_ON,
-   //    FN_OY,       FN_ON
+   //    FN_OY,       FN_ON,       EC_VALUE
    //
    at.set_entry(r, c+0,  // Total Count
       cts_info.cts.n());
@@ -1991,6 +1991,9 @@ void write_ctc_cols(const CTSInfo &cts_info,
 
    at.set_entry(r, c+4,  // FN_ON
       cts_info.cts.fn_on());
+
+   at.set_entry(r, c+5,  // Expected Correct value
+      cts_info.cts.ec_value());
 
    return;
 }
@@ -2023,7 +2026,9 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
    //    SEDS,        SEDS_NCL,    SEDS_NCU,    SEDS_BCL,    SEDS_BCU,
    //    EDI,         EDI_NCL,     EDI_NCU,     EDI_BCL,     EDI_BCU,
    //    SEDI,        SEDI_NCL,    SEDI_NCU,    SEDI_BCL,    SEDI_BCU,
-   //    BAGSS,       BAGSS_BCL,   BAGSS_BCU
+   //    BAGSS,       BAGSS_BCL,   BAGSS_BCU,
+   //    HSS_EC,      HSS_EC_BCL,  HSS_EC_BCU,
+   //    EC_VALUE
    //
    at.set_entry(r, c+0,  // Total count
       cts_info.cts.n());
@@ -2303,6 +2308,18 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
 
    at.set_entry(r, c+92, // Bias-Corrected Gilbert Skill Score BCU
       cts_info.bagss.v_bcu[i]);
+
+   at.set_entry(r, c+93, // Heidke Skill Score with Expected Correct
+      cts_info.hss_ec.v);
+
+   at.set_entry(r, c+94, // Heidke Skill Score EC BCL
+      cts_info.hss_ec.v_bcl[i]);
+
+   at.set_entry(r, c+95, // Heidke Skill Score EC BCU
+      cts_info.hss_ec.v_bcu[i]);
+
+   at.set_entry(r, c+96, // Expected Correct value
+      cts_info.cts.ec_value());
 
    return;
 }
