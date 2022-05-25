@@ -641,6 +641,9 @@ The first set of header columns are common to all of the output files generated 
   * - 29
     - FN_ON
     - Number of forecast no and observation no
+  * - 30
+    - EC_VALUE
+    - Expected correct rate, used for CTS HSS_EC
 
 .. role:: raw-html(raw)
     :format: html
@@ -739,6 +742,12 @@ The first set of header columns are common to all of the output files generated 
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+  * - 118-120
+    - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
+    - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+  * - 121
+    - EC_VALUE
+    - Expected correct rate, used for CTS HSS_EC
 
 
 .. role:: raw-html(raw)
