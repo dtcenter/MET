@@ -232,6 +232,7 @@ void CTSInfo::clear() {
    bagss.clear();
    hk.clear();
    hss.clear();
+   hss_ec.clear();
    odds.clear();
    lodds.clear();
    orss.clear();
@@ -270,6 +271,7 @@ void CTSInfo::assign(const CTSInfo &c) {
    bagss = c.bagss;
    hk = c.hk;
    hss = c.hss;
+   hss_ec = c.hss_ec;
    odds = c.odds;
    lodds = c.lodds;
    orss = c.orss;
@@ -310,6 +312,7 @@ void CTSInfo::allocate_n_alpha(int i) {
       bagss.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
+      hss_ec.allocate_n_alpha(n_alpha);
       odds.allocate_n_alpha(n_alpha);
       lodds.allocate_n_alpha(n_alpha);
       orss.allocate_n_alpha(n_alpha);
@@ -345,26 +348,27 @@ void CTSInfo::add(double f, double o, double cmn, double csd) {
 
 void CTSInfo::compute_stats() {
 
-   baser.v = cts.oy_tp();
-   fmean.v = cts.fy_tp();
-   acc.v   = cts.accuracy();
-   fbias.v = cts.fbias();
-   pody.v  = cts.pod_yes();
-   podn.v  = cts.pod_no();
-   pofd.v  = cts.pofd();
-   far.v   = cts.far();
-   csi.v   = cts.csi();
-   gss.v   = cts.gss();
-   bagss.v = cts.bagss();
-   hk.v    = cts.hk();
-   hss.v   = cts.hss();
-   odds.v  = cts.odds();
-   lodds.v = cts.lodds();
-   orss.v  = cts.orss();
-   eds.v   = cts.eds();
-   seds.v  = cts.seds();
-   edi.v   = cts.edi();
-   sedi.v  = cts.sedi();
+   baser.v  = cts.oy_tp();
+   fmean.v  = cts.fy_tp();
+   acc.v    = cts.accuracy();
+   fbias.v  = cts.fbias();
+   pody.v   = cts.pod_yes();
+   podn.v   = cts.pod_no();
+   pofd.v   = cts.pofd();
+   far.v    = cts.far();
+   csi.v    = cts.csi();
+   gss.v    = cts.gss();
+   bagss.v  = cts.bagss();
+   hk.v     = cts.hk();
+   hss.v    = cts.hss();
+   hss_ec.v = cts.gheidke_ec(cts.ec_value());
+   odds.v   = cts.odds();
+   lodds.v  = cts.lodds();
+   orss.v   = cts.orss();
+   eds.v    = cts.eds();
+   seds.v   = cts.seds();
+   edi.v    = cts.edi();
+   sedi.v   = cts.sedi();
 
    return;
 }
@@ -432,27 +436,28 @@ double CTSInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
    // Find the statistic by name
-        if(strcmp(stat_name, "TOTAL") == 0) v = cts.n();
-   else if(strcmp(stat_name, "BASER") == 0) v = cts.baser();
-   else if(strcmp(stat_name, "FMEAN") == 0) v = cts.fmean();
-   else if(strcmp(stat_name, "ACC"  ) == 0) v = cts.accuracy();
-   else if(strcmp(stat_name, "FBIAS") == 0) v = cts.fbias();
-   else if(strcmp(stat_name, "PODY" ) == 0) v = cts.pod_yes();
-   else if(strcmp(stat_name, "PODN" ) == 0) v = cts.pod_no();
-   else if(strcmp(stat_name, "POFD" ) == 0) v = cts.pofd();
-   else if(strcmp(stat_name, "FAR"  ) == 0) v = cts.far();
-   else if(strcmp(stat_name, "CSI"  ) == 0) v = cts.csi();
-   else if(strcmp(stat_name, "GSS"  ) == 0) v = cts.gss();
-   else if(strcmp(stat_name, "HK"   ) == 0) v = cts.hk();
-   else if(strcmp(stat_name, "HSS"  ) == 0) v = cts.hss();
-   else if(strcmp(stat_name, "ODDS" ) == 0) v = cts.odds();
-   else if(strcmp(stat_name, "LODDS") == 0) v = cts.lodds();
-   else if(strcmp(stat_name, "ORSS" ) == 0) v = cts.orss();
-   else if(strcmp(stat_name, "EDS"  ) == 0) v = cts.eds();
-   else if(strcmp(stat_name, "SEDS" ) == 0) v = cts.seds();
-   else if(strcmp(stat_name, "EDI"  ) == 0) v = cts.edi();
-   else if(strcmp(stat_name, "SEDI" ) == 0) v = cts.sedi();
-   else if(strcmp(stat_name, "BAGSS") == 0) v = cts.bagss();
+        if(strcmp(stat_name, "TOTAL" ) == 0) v = cts.n();
+   else if(strcmp(stat_name, "BASER" ) == 0) v = cts.baser();
+   else if(strcmp(stat_name, "FMEAN" ) == 0) v = cts.fmean();
+   else if(strcmp(stat_name, "ACC"   ) == 0) v = cts.accuracy();
+   else if(strcmp(stat_name, "FBIAS" ) == 0) v = cts.fbias();
+   else if(strcmp(stat_name, "PODY"  ) == 0) v = cts.pod_yes();
+   else if(strcmp(stat_name, "PODN"  ) == 0) v = cts.pod_no();
+   else if(strcmp(stat_name, "POFD"  ) == 0) v = cts.pofd();
+   else if(strcmp(stat_name, "FAR"   ) == 0) v = cts.far();
+   else if(strcmp(stat_name, "CSI"   ) == 0) v = cts.csi();
+   else if(strcmp(stat_name, "GSS"   ) == 0) v = cts.gss();
+   else if(strcmp(stat_name, "HK"    ) == 0) v = cts.hk();
+   else if(strcmp(stat_name, "HSS"   ) == 0) v = cts.hss();
+   else if(strcmp(stat_name, "HSS_EC") == 0) v = cts.gheidke_ec(cts.ec_value());
+   else if(strcmp(stat_name, "ODDS"  ) == 0) v = cts.odds();
+   else if(strcmp(stat_name, "LODDS" ) == 0) v = cts.lodds();
+   else if(strcmp(stat_name, "ORSS"  ) == 0) v = cts.orss();
+   else if(strcmp(stat_name, "EDS"   ) == 0) v = cts.eds();
+   else if(strcmp(stat_name, "SEDS"  ) == 0) v = cts.seds();
+   else if(strcmp(stat_name, "EDI"   ) == 0) v = cts.edi();
+   else if(strcmp(stat_name, "SEDI"  ) == 0) v = cts.sedi();
+   else if(strcmp(stat_name, "BAGSS" ) == 0) v = cts.bagss();
    else {
       mlog << Error << "\nCTSInfo::get_stat() -> "
            << "unknown categorical statistic name \"" << stat_name
