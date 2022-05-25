@@ -1210,11 +1210,12 @@ void store_stat_ctc(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Get the column value
-        if(c == "TOTAL") { v = cts_info.cts.n();     }
-   else if(c == "FY_OY") { v = cts_info.cts.fy_oy(); }
-   else if(c == "FY_ON") { v = cts_info.cts.fy_on(); }
-   else if(c == "FN_OY") { v = cts_info.cts.fn_oy(); }
-   else if(c == "FN_ON") { v = cts_info.cts.fn_on(); }
+        if(c == "TOTAL")    { v = cts_info.cts.n();        }
+   else if(c == "FY_OY")    { v = cts_info.cts.fy_oy();    }
+   else if(c == "FY_ON")    { v = cts_info.cts.fy_on();    }
+   else if(c == "FN_OY")    { v = cts_info.cts.fn_oy();    }
+   else if(c == "FN_ON")    { v = cts_info.cts.fn_on();    }
+   else if(c == "EC_VALUE") { v = cts_info.cts.ec_value(); }
    else {
      mlog << Error << "\nstore_stat_ctc() -> "
           << "unsupported column name requested \"" << c
@@ -1671,6 +1672,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "ANOM_CORR_UNCNTR")     { v = cnt_info.anom_corr_uncntr.v;        }
       else if(c == "ANOM_CORR_UNCNTR_BCL") { v = cnt_info.anom_corr_uncntr.v_bcl[i]; }
       else if(c == "ANOM_CORR_UNCNTR_BCU") { v = cnt_info.anom_corr_uncntr.v_bcu[i]; }
+      else if(c == "SI")                   { v = cnt_info.si.v;                      }
+      else if(c == "SI_BCL")               { v = cnt_info.si.v_bcl[i];               }
+      else if(c == "SI_BCU")               { v = cnt_info.si.v_bcu[i];               }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
@@ -1736,6 +1740,7 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    else if(c == "FOABAR") { v = s_info.foabar;          }
    else if(c == "FFABAR") { v = s_info.ffabar;          }
    else if(c == "OOABAR") { v = s_info.ooabar;          }
+   else if(c == "MAE")    { v = s_info.mae;             }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c
