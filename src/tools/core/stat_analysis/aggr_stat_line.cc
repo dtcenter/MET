@@ -3607,6 +3607,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    cts_info.clear();
+   cts_info.cts.set_ec_value(job.hss_ec_value);
    cts_info.fthresh = job.out_fcst_thresh[i_thresh];
    cts_info.othresh = job.out_obs_thresh[i_thresh];
 
@@ -3632,6 +3633,7 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Initialize
    //
    cts_info.clear();
+   cts_info.cts.set_ec_value(job.hss_ec_value);
    cts_info.fthresh = job.out_fcst_thresh[i_thresh];
    cts_info.othresh = job.out_obs_thresh[i_thresh];
 
