@@ -952,6 +952,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.far_ts.clear();
             aggr.csi_ts.clear();
             aggr.hk_ts.clear();
+            cur.cts.set_ec_value(job.hss_ec_value);
             aggr.cts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
@@ -1139,6 +1140,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
             aggr.valid_ts.clear();
             aggr.acc_ts.clear();
+            cur.cts.set_ec_value(job.hss_ec_value);
             aggr.mcts_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
