@@ -741,7 +741,7 @@ The first set of header columns are common to all of the output files generated 
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
-    - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
   * - 118-120
     - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
     - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
@@ -843,8 +843,8 @@ The first set of header columns are common to all of the output files generated 
     - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
   * - 96-98
-    - IQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
-    - The Interquartile Range including bootstrap upper and lower confidence limits
+    - EIQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
+    - The Interquartile Range of the error including bootstrap upper and lower confidence limits
   * - 99-101
     - MAD, :raw-html:`<br />` MAD_BCL, :raw-html:`<br />` MAD_BCU
     - The Median Absolute Deviation including bootstrap upper and lower confidence limits

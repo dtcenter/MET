@@ -360,8 +360,8 @@ where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_
 
 SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
-Bias Adjusted Gilbert Skill Score (GSS)
----------------------------------------
+Bias-Adjusted Gilbert Skill Score (BAGSS)
+-----------------------------------------
 
 Called "BAGSS" in CTS output :numref:`table_PS_format_info_CTS`
 
