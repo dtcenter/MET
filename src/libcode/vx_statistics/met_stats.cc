@@ -1353,8 +1353,8 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
       v_info.uvfoa_bar    = (uvfoa_bar*vacount + c.uvfoa_bar*c.vacount)/v_info.vacount;
       v_info.uvffa_bar    = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
       v_info.uvooa_bar    = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
-      v_info.fa_speed_bar = (fa_speed_bar*vcount + c.fa_speed_bar*c.vcount)/v_info.vcount;
-      v_info.oa_speed_bar = (oa_speed_bar*vcount + c.oa_speed_bar*c.vcount)/v_info.vcount;
+      v_info.fa_speed_bar = (fa_speed_bar*vacount + c.fa_speed_bar*c.vacount)/v_info.vacount;
+      v_info.oa_speed_bar = (oa_speed_bar*vacount + c.oa_speed_bar*c.vacount)/v_info.vacount;
    }
 
    v_info.compute_stats();
