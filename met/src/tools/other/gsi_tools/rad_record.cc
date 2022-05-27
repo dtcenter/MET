@@ -404,23 +404,23 @@ if ( n_read < 72 )  {
 unsigned char * b = buf;
 
 
-my_memcpy( &(R_params.isis),    b, 20);
-my_memcpy( &(R_params.dplat),   b, 10);
-my_memcpy( &(R_params.obstype), b, 10);
+my_memcpy( &(R_params.isis),    b, rad_isis_len);
+my_memcpy( &(R_params.dplat),   b, rad_dplat_len);
+my_memcpy( &(R_params.obstype), b, rad_obstype_len);
 
-my_memcpy( &(R_params.jiter),   b, 4);
-my_memcpy( &(R_params.nchanl),  b, 4);
-my_memcpy( &(R_params.npred),   b, 4);
-my_memcpy( &(R_params.idate),   b, 4);
-my_memcpy( &(R_params.ireal),   b, 4);
-my_memcpy( &(R_params.ipchan),  b, 4);
-my_memcpy( &(R_params.iextra),  b, 4);
-my_memcpy( &(R_params.jextra),  b, 4);
+my_memcpy( &(R_params.jiter),   b, rad_int_len);
+my_memcpy( &(R_params.nchanl),  b, rad_int_len);
+my_memcpy( &(R_params.npred),   b, rad_int_len);
+my_memcpy( &(R_params.idate),   b, rad_int_len);
+my_memcpy( &(R_params.ireal),   b, rad_int_len);
+my_memcpy( &(R_params.ipchan),  b, rad_int_len);
+my_memcpy( &(R_params.iextra),  b, rad_int_len);
+my_memcpy( &(R_params.jextra),  b, rad_int_len);
 
-my_memcpy( &(R_params.idiag),    b, 4);
-my_memcpy( &(R_params.angord),   b, 4);
-my_memcpy( &(R_params.iversion), b, 4);
-my_memcpy( &(R_params.inewpc),   b, 4);
+my_memcpy( &(R_params.idiag),    b, rad_int_len);
+my_memcpy( &(R_params.angord),   b, rad_int_len);
+my_memcpy( &(R_params.iversion), b, rad_int_len);
+my_memcpy( &(R_params.inewpc),   b, rad_int_len);
 
 
 if ( SwapEndian )  {
@@ -483,14 +483,14 @@ if ( n_read != 32 )  {
 
 unsigned char * b = buf;
 
-my_memcpy( &(cp.freq),   b, 4);
-my_memcpy( &(cp.plo),    b, 4);
-my_memcpy( &(cp.wave),   b, 4);
-my_memcpy( &(cp.varch),  b, 4);
-my_memcpy( &(cp.tlap),   b, 4);
-my_memcpy( &(cp.iuse),   b, 4);
-my_memcpy( &(cp.nuchan), b, 4);
-my_memcpy( &(cp.ich),    b, 4);
+my_memcpy( &(cp.freq),   b, rad_int_len);
+my_memcpy( &(cp.plo),    b, rad_int_len);
+my_memcpy( &(cp.wave),   b, rad_int_len);
+my_memcpy( &(cp.varch),  b, rad_int_len);
+my_memcpy( &(cp.tlap),   b, rad_int_len);
+my_memcpy( &(cp.iuse),   b, rad_int_len);
+my_memcpy( &(cp.nuchan), b, rad_int_len);
+my_memcpy( &(cp.ich),    b, rad_int_len);
 
 if ( SwapEndian )  {
 

@@ -24,12 +24,19 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+static const int rad_obstype_len = 10;
+static const int rad_dplat_len   = 10;
+static const int rad_isis_len    = 20;
+static const int rad_int_len     = 4;
+
+////////////////////////////////////////////////////////////////////////
+
 
 struct RadParams {
 
-   char obstype [11];
-   char dplat   [11];
-   char isis    [21];
+   char obstype [rad_obstype_len+1];
+   char dplat   [rad_dplat_len + 1];
+   char isis    [rad_isis_len + 1];
 
    int jiter;
    int nchanl;

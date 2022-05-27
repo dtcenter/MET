@@ -18,6 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Released versions of MET
+
+static const char met_version_10_1_2[] = "V10.1.2";
 static const char met_version_10_1_1[] = "V10.1.1";
 static const char met_version_10_1_0[] = "V10.1.0";
 static const char met_version_10_0_0[] = "V10.0.0";
@@ -41,7 +43,7 @@ static const char met_version_1_1[]    = "V1.1";
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * const met_version    = met_version_10_1_1;
+static const char * const met_version    = met_version_10_1_2;
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
@@ -93,6 +95,7 @@ static const int boot_perc_flag = 1;
 ////////////////////////////////////////////////////////////////////////
 
 static const int max_line_len = 2048;
+static const int tmp_buf_size = 512;
 static const double grib_earth_radius_km = 6371.20;
 static const int default_nc_compression = 0;
 static const int default_precision = 5;

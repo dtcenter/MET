@@ -752,7 +752,7 @@ if ( fabs(g - 1.0) < 1.0e-3 )  return;
 
 int j, k;
 int nxy;
-unsigned char fudge[256];
+unsigned char fudge[fudge_size];
 double t;
 double exponent;
 Color color;
@@ -761,7 +761,7 @@ Color color;
 exponent = 1.0/g;
 
 
-for (j=0; j<256; ++j)  {
+for (j=0; j<fudge_size; ++j)  {
 
    t = ((double) j)/255.0;
 

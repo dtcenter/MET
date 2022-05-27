@@ -19,6 +19,7 @@
 #include "observation.h"
 #include "summary_calc.h"
 #include "time_summary_interval.h"
+#include "util_constants.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -135,7 +136,7 @@ public:
 
     // Create the string
 
-    char string_buffer[20];
+    char string_buffer[tmp_buf_size];
 
     snprintf(string_buffer, sizeof(string_buffer), "%02d%02d%02d", hour, minute, second);
 
@@ -222,7 +223,7 @@ public:
   {
     struct tm *time_struct = gmtime(&unix_time);
 
-    char time_string[80];
+    char time_string[tmp_buf_size];
 
     snprintf(time_string, sizeof(time_string), 
              "%04d%02d%02d_%02d%02d%02d",
@@ -239,11 +240,11 @@ public:
     memset(&time_struct, 0, sizeof(time_struct));
 
     time_struct.tm_year = atoi(time_string.substr(0, 4).c_str()) - 1900;
-    time_struct.tm_mon = atoi(time_string.substr(4, 2).c_str()) - 1;
+    time_struct.tm_mon  = atoi(time_string.substr(4, 2).c_str()) - 1;
     time_struct.tm_mday = atoi(time_string.substr(6, 2).c_str());
     time_struct.tm_hour = atoi(time_string.substr(9, 2).c_str());
-    time_struct.tm_min = atoi(time_string.substr(11, 2).c_str());
-    time_struct.tm_sec = atoi(time_string.substr(13, 2).c_str());
+    time_struct.tm_min  = atoi(time_string.substr(11, 2).c_str());
+    time_struct.tm_sec  = atoi(time_string.substr(13, 2).c_str());
 
     return timegm(&time_struct);
   }

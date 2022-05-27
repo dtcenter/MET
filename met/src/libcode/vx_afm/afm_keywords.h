@@ -83,7 +83,13 @@ struct AfmKeywordInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-static const AfmKeywordInfo kw_info[42] = {
+static const int n_kw_infos = 42;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const AfmKeywordInfo kw_info[n_kw_infos] = {
 
    { "StartFontMetrics",   afm_keyword_StartFontMetrics   },
    { "EndFontMetrics",     afm_keyword_EndFontMetrics     },
@@ -129,12 +135,6 @@ static const AfmKeywordInfo kw_info[42] = {
    { "L",                  afm_keyword_L                  }
 
 };
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int n_kw_infos = 42;
 
 
 ////////////////////////////////////////////////////////////////////////
