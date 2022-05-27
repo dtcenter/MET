@@ -45,6 +45,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_vcnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
@@ -94,6 +95,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_vcnt.txt</stat> 
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
@@ -123,6 +125,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vcnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
@@ -150,6 +153,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_vcnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
