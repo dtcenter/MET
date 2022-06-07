@@ -294,7 +294,7 @@
       &DATA_DIR_PYTHON;/fcst.txt \
       &OUTPUT_DIR;/python/shift_data_plane_input_arg.nc \
       'name="&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; file_type=PYTHON_NUMPY;' \
-      -from 30 -110 -to 35 -115
+      -from 30 -110 -to 35 -115 \
       -v 1
     </param>
     <output>
