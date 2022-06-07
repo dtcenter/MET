@@ -20,7 +20,6 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-12-14  Halley Gotway  New
-//   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -50,10 +49,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
-
-#ifdef WITH_PYTHON
-#include "data2d_python.h"
-#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -205,11 +200,17 @@ void process_data_file() {
    // Populate the VarInfo object using config
    vinfo->set_dict(config);
 
+   // Open the input file
+   if(!mtddf->open(InputFilename.c_str())) {
+      mlog << Error << "\nprocess_data_file() -> can't open file \""
+           << InputFilename << "\"\n\n";
+      exit(1);
+   }
+
    // Get the data plane from the file for this VarInfo object
    if(!mtddf->data_plane(*vinfo, dp_in)) {
-      mlog << Error << "\nprocess_data_file() -> "
-           << "trouble getting field \"" << FieldString
-           << "\" from file \"" << InputFilename << "\"\n\n";
+      mlog << Error << "\nprocess_data_file() -> trouble getting field \""
+           << FieldString << "\" from file \"" << InputFilename << "\"\n\n";
       exit(1);
    }
 
@@ -252,6 +253,7 @@ void process_data_file() {
    mlog << Debug(2) << shift_cs << "\n";
 
    // Shift the data
+
    dp_shift = dp_in;
    for(x=0; x<dp_shift.nx(); x++) {
       for(y=0; y<dp_shift.ny(); y++) {
@@ -267,10 +269,6 @@ void process_data_file() {
    // Clean up
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
    if(vinfo) { delete vinfo; vinfo = (VarInfo *)       0; }
-
-   #ifdef  WITH_PYTHON
-      GP.finalize();
-   #endif
 
    return;
 }
