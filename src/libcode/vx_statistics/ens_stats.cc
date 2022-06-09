@@ -225,9 +225,6 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    double fbar, obar, ffbar, oobar, fobar;
    NumArray cur;
 
-   // Initalize
-   clear();
-
    // Store the number of ensemble members
    n_ens = pd.n_ens;
 
