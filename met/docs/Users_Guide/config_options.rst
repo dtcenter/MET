@@ -64,7 +64,7 @@ The configuration file language supports the following data types:
     numeric value, typically between 0 and 100.
 
   * Note that the two letter threshold type abbreviations (lt, le, eq, ne,
-    gt, gt) are not supported for percentile thresholds.
+    ge, gt) are not supported for percentile thresholds.
   
   * Thresholds may be defined as percentiles of the data being processed in
     several places:
