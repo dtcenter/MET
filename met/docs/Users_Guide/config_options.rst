@@ -58,6 +58,13 @@ The configuration file language supports the following data types:
     and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
      
 * Percentile Thresholds:
+
+  * A threshold type (<, <=, ==, !-, >=, or >), followed by a percentile
+    type description (SFP, SOP, SCP, USP, CDP, or FBIAS), followed by a
+    numeric value, typically between 0 and 100.
+
+  * Note that the two letter threshold type abbreviations (lt, le, eq, ne,
+    gt, gt) are not supported for percentile thresholds.
   
   * Thresholds may be defined as percentiles of the data being processed in
     several places:
