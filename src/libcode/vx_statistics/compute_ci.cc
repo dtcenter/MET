@@ -337,6 +337,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
+      cts_tmp[i].cts.set_ec_value(cts_info[i].cts.ec_value());
    }
 
    //
@@ -1474,6 +1475,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
+      cts_tmp[i].cts.set_ec_value(cts_info[i].cts.ec_value());
    }
 
    //
