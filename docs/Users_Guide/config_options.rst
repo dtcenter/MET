@@ -59,7 +59,7 @@ The configuration file language supports the following data types:
      
 * Percentile Thresholds:
 
-  * A threshold type (<, <=, ==, !-, >=, or >), followed by a percentile
+  * A threshold type (<, <=, ==, !=, >=, or >), followed by a percentile
     type description (SFP, SOP, SCP, USP, CDP, or FBIAS), followed by a
     numeric value, typically between 0 and 100.
 
