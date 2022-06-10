@@ -257,9 +257,17 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       }
    }
 
-   // Compute ensemble mean based statistics, if possible
+   // Check if the ensemble mean based statistics were
+   // already computed by Stat-Analysis
+   if(!is_bad_data(pd.me)) {
+      me        = pd.me;
+      rmse      = pd.rmse;
+      me_oerr   = pd.me_oerr;
+      rmse_oerr = pd.rmse_oerr;
+   }
+   // If not, compute them from the pairs, if possible
    // HiRA stores the ensemble mean as bad data
-   if(!pd.mn_na.is_const(bad_data_double)) {
+   else if(!pd.mn_na.is_const(bad_data_double)) {
 
       // Compute ME and RMSE values
       fbar = obar = ffbar = oobar = fobar = 0.0;
