@@ -274,6 +274,34 @@
     </output>
   </test>
 
+  <test name="python_numpy_shift_data_plane">
+    <exec>&MET_BIN;/shift_data_plane</exec>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/shift_data_plane.nc \
+      'name="&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
+      -from 30 -110 -to 35 -115 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/shift_data_plane.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_shift_data_plane_input_arg">
+    <exec>&MET_BIN;/shift_data_plane</exec>
+    <param> \
+      &DATA_DIR_PYTHON;/fcst.txt \
+      &OUTPUT_DIR;/python/shift_data_plane_input_arg.nc \
+      'name="&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; file_type=PYTHON_NUMPY;' \
+      -from 30 -110 -to 35 -115 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/shift_data_plane_input_arg.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="python_numpy_series_analysis">
     <exec>&MET_BIN;/series_analysis</exec>
     <env>
