@@ -35,10 +35,12 @@ F_to_K(t) = C_to_K(F_to_C(t));
 MM_to_IN(x) = x / 25.4;
 IN_to_MM(x) = x * 25.4;
 
-KFT_to_M(x)  = x / (3.28084 * 0.001);
-M_to_KFT(x)  = x * (3.28084 * 0.001);
-KFT_to_KM(x) = KFT_to_M(x) / 1000.0;
+M_to_FT(x)   = x * 3.28084;
+FT_to_M(x)   = x / 3.28084;
+M_to_KFT(x)  = M_to_FT(x) / 1000.0;
+KFT_to_M(x)  = FT_to_M(x * 1000.0);
 KM_to_KFT(x) = M_to_KFT(1000.0 * x);
+KFT_to_KM(x) = KFT_to_M(x) / 1000.0;
 
 PA_to_HPA(p) = p / 100.0;
 HPA_to_PA(p) = p * 100.0;
