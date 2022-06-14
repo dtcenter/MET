@@ -1788,7 +1788,8 @@ void VL1L2Info::compute_stats() {
 
       DIR_ABSERR.v   = fabs(DIR_ERR.v);
    }
-   else if(vacount > 0) {
+
+   if(vacount > 0) {
 
       n = vacount;
 
