@@ -36,7 +36,8 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       void nccf_init_from_scratch();
       NcVarInfo *find_first_data_var();
-      long convert_time_to_offset(long time_dim_value);
+      long convert_time_to_offset(long time_value);
+      long convert_value_to_offset(double z_value);
       LongArray collect_time_offsets(VarInfo &vinfo);
 
       MetNcCFDataFile(const MetNcCFDataFile &);
@@ -47,7 +48,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //
       
       NcCfFile * _file;    //  allocated
-      long _time_dim_offset; // current time offset to get the data plane
+      long _cur_time_index; // current time index to get the data plane (for array of data_plane)
 
    public:
 
