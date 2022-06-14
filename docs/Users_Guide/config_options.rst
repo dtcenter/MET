@@ -1010,7 +1010,7 @@ File-format specific settings for the "field" entry:
         field = [
              {
                name       = "QVAPOR";
-               level      = "(@20220601-1200,@850,*,*)";
+               level      = "(@20220601_1200,@850,*,*)";
              },
              {
                name       = "TMP_P850_ENS_MEAN";
