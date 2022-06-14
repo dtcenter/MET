@@ -150,6 +150,8 @@ void NcCfFile::close()
   // Reset the time values
 
   ValidTime.clear();
+  raw_times.clear();
+  vlevels.clear();
   InitTime = (unixtime)0;
   AccumTime = (unixtime)0;
 
@@ -183,7 +185,6 @@ bool NcCfFile::open(const char * filepath)
   // NcError err(NcError::silent_nonfatal);
 
   // Open the file
-
   _ncFile = open_ncfile(filepath);
 
   if (IS_INVALID_NC_P(_ncFile))
@@ -206,14 +207,14 @@ bool NcCfFile::open(const char * filepath)
 
   // Pull out the variables
 
+  int max_dim_count = 0;
+  NcVar *z_var = (NcVar *)0;
   NcVar *valid_time_var = (NcVar *)0;
   ConcatString att_value;
-
 
   StringArray varNames;
   Nvars = get_var_names(_ncFile, &varNames);
   Var = new NcVarInfo [Nvars];
-  //get_vars_info(Nc, &Var);
 
   for (int j=0; j<Nvars; ++j)  {
     NcVar v = get_var(_ncFile, varNames[j].c_str());
@@ -224,6 +225,7 @@ bool NcCfFile::open(const char * filepath)
 
     int dim_count = GET_NC_DIM_COUNT(v);
     Var[j].Ndims = dim_count;
+    if (dim_count > max_dim_count) max_dim_count = dim_count;
 
     Var[j].Dims = new NcDim * [dim_count];
 
@@ -236,7 +238,11 @@ bool NcCfFile::open(const char * filepath)
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
       }
+      else if ( "Z" == att_value ||  "z" == att_value ) {
+        z_var = Var[j].var;
+      }
     }
+
     if (get_nc_att_value(Var[j].var, (string)"standard_name", att_value)) {
       if ( "time" == att_value ) {
         valid_time_var = Var[j].var;
@@ -346,6 +352,7 @@ bool NcCfFile::open(const char * filepath)
           if( latest_time < time_values[i] ) latest_time = time_values[i];
         }
         ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
+        raw_times.add(latest_time);
       }
       else {
         if (use_bounds_var) {
@@ -353,6 +360,7 @@ bool NcCfFile::open(const char * filepath)
           double time_fraction;
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
+            raw_times.add(time_values[i*2+1]);
             bounds_diff = time_values[i*2+1] - time_values[i*2];
             if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
               AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
@@ -365,6 +373,7 @@ bool NcCfFile::open(const char * filepath)
         else {
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
+            raw_times.add(time_values[i]);
           }
         }
       }
@@ -431,8 +440,9 @@ bool NcCfFile::open(const char * filepath)
   // to set the slots.
   // Should be called after read_netcdf_grid() is called
 
+  string z_dim_name;
   StringArray dimNames;
-  for (int j=0; j<Nvars; ++j)  {
+  for (int j=0; j<Nvars; ++j) {
 
     int dim_count = GET_NC_DIM_COUNT_P(Var[j].var);
     NcVar *v = Var[j].var;
@@ -440,7 +450,7 @@ bool NcCfFile::open(const char * filepath)
     dimNames.clear();
     get_dim_names(v, &dimNames);
 
-    for (int k=0; k<(dim_count); ++k)  {
+    for (int k=0; k<dim_count; ++k)  {
       const ConcatString c = dimNames[k];
       NcDim *dim = Var[j].Dims[k];
       if      ((dim && dim == _xDim) || c == x_dim_var_name) {
@@ -452,8 +462,35 @@ bool NcCfFile::open(const char * filepath)
       else if ((dim && dim == _tDim) || c == t_dim_name) {
          Var[j].t_slot = k;
       }
+      else if ((dim_count == max_dim_count) && (!z_dim_name.length())) {
+         z_dim_name = dimNames[k];
+      }
     }
   }   //  for j
+
+  // Find the vertical level variable from dimension name if not found
+  if (IS_INVALID_NC_P(z_var) && (0 < z_dim_name.length())) {
+    for (int j=0; j<Nvars; ++j) {
+      if (Var[j].name == z_dim_name) {
+        z_var = Var[j].var;
+        break;
+      }
+    }   //  for j
+  }
+
+  // Pull out the vertical levels
+  if (IS_VALID_NC_P(z_var)) {
+
+    int z_count = (int) get_data_size(z_var);
+    double *z_values = new double[z_count];
+
+    if( get_nc_data(z_var, z_values) ) {
+      for(int i=0; i<z_count; i++) {
+        vlevels.add(z_values[i]);
+      }
+    }
+    delete [] z_values;
+  }
 
   //  done
 
