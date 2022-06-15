@@ -2155,7 +2155,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
-   int i;
+   int i, j;
 
    // Check that the number of pairs are the same
    if(pd_u_ptr->n_obs != pd_v_ptr->n_obs) {
@@ -2178,6 +2178,11 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].fthresh = conf_info.vx_opt[i_vx].fwind_ta[i];
       v_info[i].othresh = conf_info.vx_opt[i_vx].owind_ta[i];
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
+      v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
+
+      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+         v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
+      }
 
       //
       // Compute partial sums

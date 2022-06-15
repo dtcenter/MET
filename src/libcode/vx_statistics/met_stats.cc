@@ -1325,6 +1325,10 @@ VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    VL1L2Info v_info;
 
+   // Store alpha values
+   v_info.allocate_n_alpha(n_alpha);
+   for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
+
    v_info.vcount  = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
@@ -1342,16 +1346,18 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    v_info.vacount  = vacount + c.vacount;
 
    if(v_info.vacount > 0) {
-      v_info.ufa_bar   = (ufa_bar*vacount   + c.ufa_bar*c.vacount)  /v_info.vacount;
-      v_info.vfa_bar   = (vfa_bar*vacount   + c.vfa_bar*c.vacount)  /v_info.vacount;
-      v_info.uoa_bar   = (uoa_bar*vacount   + c.uoa_bar*c.vacount)  /v_info.vacount;
-      v_info.voa_bar   = (voa_bar*vacount   + c.voa_bar*c.vacount)  /v_info.vacount;
-      v_info.uvfoa_bar = (uvfoa_bar*vacount + c.uvfoa_bar*c.vacount)/v_info.vacount;
-      v_info.uvffa_bar = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
-      v_info.uvooa_bar = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
+      v_info.ufa_bar      = (ufa_bar*vacount   + c.ufa_bar*c.vacount)  /v_info.vacount;
+      v_info.vfa_bar      = (vfa_bar*vacount   + c.vfa_bar*c.vacount)  /v_info.vacount;
+      v_info.uoa_bar      = (uoa_bar*vacount   + c.uoa_bar*c.vacount)  /v_info.vacount;
+      v_info.voa_bar      = (voa_bar*vacount   + c.voa_bar*c.vacount)  /v_info.vacount;
+      v_info.uvfoa_bar    = (uvfoa_bar*vacount + c.uvfoa_bar*c.vacount)/v_info.vacount;
+      v_info.uvffa_bar    = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
+      v_info.uvooa_bar    = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
+      v_info.fa_speed_bar = (fa_speed_bar*vacount + c.fa_speed_bar*c.vacount)/v_info.vacount;
+      v_info.oa_speed_bar = (oa_speed_bar*vacount + c.oa_speed_bar*c.vacount)/v_info.vacount;
    }
 
-   v_info.calc_ncep_stats();
+   v_info.compute_stats();
 
    assign(v_info);
 
@@ -1362,13 +1368,14 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
 
 void VL1L2Info::init_from_scratch() {
 
+   alpha = (double *) 0;
+   
    clear();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
 
 void VL1L2Info::zero_out() {
 
@@ -1393,48 +1400,23 @@ void VL1L2Info::zero_out() {
    rmse        = 0.0;
    speed_bias  = 0.0;
 
-   FBAR        = 0.0;
-   OBAR        = 0.0;
-
-   FS_RMS      = 0.0;
-   OS_RMS      = 0.0;
-
-    MSVE       = 0.0;
-   RMSVE       = 0.0;
-
-   FSTDEV      = 0.0;
-   OSTDEV      = 0.0;
-
-   FDIR        = 0.0;
-   ODIR        = 0.0;
-
-   FBAR_SPEED  = 0.0;
-   OBAR_SPEED  = 0.0;
-
-   VDIFF_SPEED = 0.0;
-   VDIFF_DIR   = 0.0;
-
-   SPEED_ERR   = 0.0;
-   SPEED_ABSERR = 0.0;
-
-   DIR_ERR     = 0.0;
-   DIR_ABSERR  = 0.0;
-
    vcount      = 0;
 
    //
    // VAL1L2 Quantities
    //
 
-   ufa_bar     = 0.0;
-   vfa_bar     = 0.0;
-   uoa_bar     = 0.0;
-   voa_bar     = 0.0;
-   uvfoa_bar   = 0.0;
-   uvffa_bar   = 0.0;
-   uvooa_bar   = 0.0;
+   ufa_bar      = 0.0;
+   vfa_bar      = 0.0;
+   uoa_bar      = 0.0;
+   voa_bar      = 0.0;
+   uvfoa_bar    = 0.0;
+   uvffa_bar    = 0.0;
+   uvooa_bar    = 0.0;
+   fa_speed_bar = 0.0;
+   oa_speed_bar = 0.0;
 
-   vacount     = 0;
+   vacount      = 0;
 
    return;
 }
@@ -1443,10 +1425,35 @@ void VL1L2Info::zero_out() {
 
 void VL1L2Info::clear() {
 
+   n = 0;
+   n_alpha = 0;
+   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   
    fthresh.clear();
    othresh.clear();
    logic = SetLogic_None;
 
+   FBAR.clear();
+   OBAR.clear();
+   FS_RMS.clear();
+   OS_RMS.clear();
+   MSVE.clear();
+   RMSVE.clear();
+   FSTDEV.clear();
+   OSTDEV.clear();
+   FDIR.clear();
+   ODIR.clear();
+   FBAR_SPEED.clear();
+   OBAR_SPEED.clear();
+   VDIFF_SPEED.clear();
+   VDIFF_DIR.clear();
+   SPEED_ERR.clear();
+   SPEED_ABSERR.clear();
+   DIR_ERR.clear();
+   DIR_ABSERR.clear();
+   ANOM_CORR.clear();
+   ANOM_CORR_UNCNTR.clear();
+   
    zero_out();
 
    return;
@@ -1455,13 +1462,18 @@ void VL1L2Info::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void VL1L2Info::assign(const VL1L2Info &c) {
-
+   int i;
+   
    clear();
 
    fthresh = c.fthresh;
    othresh = c.othresh;
    logic   = c.logic;
 
+   n = c.n;
+   allocate_n_alpha(c.n_alpha);
+   for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
+   
    // VL1L2 Quantities
    uf_bar      = c.uf_bar;
    vf_bar      = c.vf_bar;
@@ -1473,38 +1485,38 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    f_speed_bar = c.f_speed_bar;
    o_speed_bar = c.o_speed_bar;
 
-   f_bar     = c.f_bar;
-   o_bar     = c.o_bar;
+   f_bar       = c.f_bar;
+   o_bar       = c.o_bar;
+   me          = c.me;
+   mse         = c.mse;
+   speed_bias  = c.speed_bias;
 
-   me        = c.me;
-
-   mse       = c.mse;
-
-   speed_bias = c.speed_bias;
-
-   vcount    = c.vcount;
+   vcount      = c.vcount;
 
    // VAL1L2 Quantities
-   ufa_bar   = c.ufa_bar;
-   vfa_bar   = c.vfa_bar;
-   uoa_bar   = c.uoa_bar;
-   voa_bar   = c.voa_bar;
-   uvfoa_bar = c.uvfoa_bar;
-   uvffa_bar = c.uvffa_bar;
-   uvooa_bar = c.uvooa_bar;
-   vacount   = c.vacount;
+   ufa_bar      = c.ufa_bar;
+   vfa_bar      = c.vfa_bar;
+   uoa_bar      = c.uoa_bar;
+   voa_bar      = c.voa_bar;
+   uvfoa_bar    = c.uvfoa_bar;
+   uvffa_bar    = c.uvffa_bar;
+   uvooa_bar    = c.uvooa_bar;
+   fa_speed_bar = c.fa_speed_bar;
+   oa_speed_bar = c.oa_speed_bar;
 
-      //
-      //  NCEP stats
-      //
+   vacount      = c.vacount;
 
+   //
+   // Statistics
+   //
+   
    FBAR = c.FBAR;
    OBAR = c.OBAR;
 
    FS_RMS = c.FS_RMS;
    OS_RMS = c.OS_RMS;
 
-    MSVE = c.MSVE;
+   MSVE  = c.MSVE;
    RMSVE = c.RMSVE;
 
    FSTDEV = c.FSTDEV;
@@ -1525,50 +1537,9 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    DIR_ERR = c.DIR_ERR;
    DIR_ABSERR = c.DIR_ABSERR;
 
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-void VL1L2Info::calc_ncep_stats() {
-   double u_diff, v_diff;
-   int n = vcount;
-
-   u_diff       = uf_bar - uo_bar;
-   v_diff       = vf_bar - vo_bar;
-
-   FBAR         = f_speed_bar;
-   OBAR         = o_speed_bar;
-
-   FS_RMS       = sqrt(uvff_bar);
-   OS_RMS       = sqrt(uvoo_bar);
-
-   MSVE         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
-
-   RMSVE        = sqrt(MSVE);
-
-   FSTDEV       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
-   OSTDEV       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
-
-   FDIR         = convert_u_v_to_wdir(uf_bar, vf_bar);
-   ODIR         = convert_u_v_to_wdir(uo_bar, vo_bar);
-
-   FBAR_SPEED   = convert_u_v_to_wind(uf_bar, vf_bar);
-   OBAR_SPEED   = convert_u_v_to_wind(uo_bar, vo_bar);
-
-   VDIFF_SPEED  = convert_u_v_to_wind(u_diff, v_diff);
-
-   VDIFF_DIR    = convert_u_v_to_wdir(u_diff, v_diff);
-
-   SPEED_ERR    = FBAR_SPEED - OBAR_SPEED;
-
-   SPEED_ABSERR = fabs(SPEED_ERR);
-
-   DIR_ERR      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
-
-   DIR_ABSERR   = fabs(DIR_ERR);
-
+   ANOM_CORR = c.ANOM_CORR;
+   ANOM_CORR_UNCNTR = c.ANOM_CORR_UNCNTR;
+   
    return;
 }
 
@@ -1605,7 +1576,7 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    wgt_sum = pd_u.wgt_na.sum();
 
    // Loop through the filtered pair data compute partial sums
-   for(i=0; i<pd_u.f_na.n(); i++)  {
+   for(i=0; i<pd_u.f_na.n(); i++) {
 
       // Retrieve the U,V values
       uf = pd_u.f_na[i];
@@ -1621,105 +1592,112 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       wgt = pd_u.wgt_na[i]/wgt_sum;
 
       // VL1L2 sums
-      vcount     += 1;
+      vcount      += 1;
 
-      uf_bar     += wgt*uf;
-      vf_bar     += wgt*vf;
-      uo_bar     += wgt*uo;
-      vo_bar     += wgt*vo;
+      uf_bar      += wgt*uf;
+      vf_bar      += wgt*vf;
+      uo_bar      += wgt*uo;
+      vo_bar      += wgt*vo;
 
-      uvfo_bar   += wgt*(uf*uo + vf*vo);
-      uvff_bar   += wgt*(uf*uf + vf*vf);
-      uvoo_bar   += wgt*(uo*uo + vo*vo);
-
-
-      f_bar      += wgt*sqrt(uf*uf + vf*vf);
-      o_bar      += wgt*sqrt(uo*uo + vo*vo);
-
-      me         += wgt*sqrt(u_diff*u_diff + v_diff*v_diff);
-
-      mse        += wgt*(u_diff*u_diff + v_diff*v_diff);
-
-      speed_bias += wgt*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
-
-         //
-         //  new stuff from vector stats whitepaper
-         //
+      uvfo_bar    += wgt*(uf*uo + vf*vo);
+      uvff_bar    += wgt*(uf*uf + vf*vf);
+      uvoo_bar    += wgt*(uo*uo + vo*vo);
 
       f_speed_bar += wgt*sqrt(uf*uf + vf*vf);
       o_speed_bar += wgt*sqrt(uo*uo + vo*vo);
 
+      f_bar       += wgt*sqrt(uf*uf + vf*vf);
+      o_bar       += wgt*sqrt(uo*uo + vo*vo);
+
+      me          += wgt*sqrt(u_diff*u_diff + v_diff*v_diff);
+
+      mse         += wgt*(u_diff*u_diff + v_diff*v_diff);
+
+      speed_bias  += wgt*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
+
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
-         vacount   += 1;
-         ufa_bar   += wgt*(uf-uc);
-         vfa_bar   += wgt*(vf-vc);
-         uoa_bar   += wgt*(uo-uc);
-         voa_bar   += wgt*(vo-vc);
-         uvfoa_bar += wgt*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
-         uvffa_bar += wgt*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
-         uvooa_bar += wgt*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+         vacount      += 1;
+
+         ufa_bar      += wgt*(uf-uc);
+         vfa_bar      += wgt*(vf-vc);
+         uoa_bar      += wgt*(uo-uc);
+         voa_bar      += wgt*(vo-vc);
+
+         uvfoa_bar    += wgt*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
+         uvffa_bar    += wgt*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
+         uvooa_bar    += wgt*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+
+         fa_speed_bar += wgt*sqrt((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
+         oa_speed_bar += wgt*sqrt((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
       }
 
    }  // end for i
 
-   if(vcount > 0) calc_ncep_stats();
+   if(vcount > 0) compute_stats();
 
    // Check for 0 points
    if(vcount == 0) {
 
-      uf_bar        = bad_data_double;
-      vf_bar        = bad_data_double;
-      uo_bar        = bad_data_double;
-      vo_bar        = bad_data_double;
-      uvfo_bar      = bad_data_double;
-      uvff_bar      = bad_data_double;
-      uvoo_bar      = bad_data_double;
+      uf_bar             = bad_data_double;
+      vf_bar             = bad_data_double;
+      uo_bar             = bad_data_double;
+      vo_bar             = bad_data_double;
+      uvfo_bar           = bad_data_double;
+      uvff_bar           = bad_data_double;
+      uvoo_bar           = bad_data_double;
+      f_speed_bar        = bad_data_double;
+      o_speed_bar        = bad_data_double;
 
-      me            = bad_data_double;
-      mse           = bad_data_double;
-      rmse          = bad_data_double;
-      speed_bias    = bad_data_double;
+      me                 = bad_data_double;
+      mse                = bad_data_double;
+      rmse               = bad_data_double;
+      speed_bias         = bad_data_double;
 
-      FBAR          = bad_data_double;
-      OBAR          = bad_data_double;
+      FBAR.v             = bad_data_double;
+      OBAR.v             = bad_data_double;
 
-      FS_RMS        = bad_data_double;
-      OS_RMS        = bad_data_double;
+      FS_RMS.v           = bad_data_double;
+      OS_RMS.v           = bad_data_double;
 
-       MSVE         = bad_data_double;
-      RMSVE         = bad_data_double;
+      MSVE.v             = bad_data_double;
+      RMSVE.v            = bad_data_double;
 
-      FSTDEV        = bad_data_double;
-      OSTDEV        = bad_data_double;
+      FSTDEV.v           = bad_data_double;
+      OSTDEV.v           = bad_data_double;
 
-      FDIR          = bad_data_double;
-      ODIR          = bad_data_double;
+      FDIR.v             = bad_data_double;
+      ODIR.v             = bad_data_double;
 
-      FBAR_SPEED    = bad_data_double;
-      OBAR_SPEED    = bad_data_double;
+      FBAR_SPEED.v       = bad_data_double;
+      OBAR_SPEED.v       = bad_data_double;
 
-      VDIFF_SPEED   = bad_data_double;
-      VDIFF_DIR     = bad_data_double;
+      VDIFF_SPEED.v      = bad_data_double;
+      VDIFF_DIR.v        = bad_data_double;
 
-      SPEED_ERR     = bad_data_double;
-      SPEED_ABSERR  = bad_data_double;
+      SPEED_ERR.v        = bad_data_double;
+      SPEED_ABSERR.v     = bad_data_double;
 
-      DIR_ERR       = bad_data_double;
-      DIR_ABSERR    = bad_data_double;
+      DIR_ERR.v          = bad_data_double;
+      DIR_ABSERR.v       = bad_data_double;
 
-   } else {
-      rmse          = sqrt(mse);
+      ANOM_CORR.v        = bad_data_double;
+      ANOM_CORR_UNCNTR.v = bad_data_double;
+   }
+   else {
+      rmse = sqrt(mse);
    }
 
    if(vacount == 0) {
-      ufa_bar   = bad_data_double;
-      vfa_bar   = bad_data_double;
-      uoa_bar   = bad_data_double;
-      voa_bar   = bad_data_double;
-      uvfoa_bar = bad_data_double;
-      uvffa_bar = bad_data_double;
-      uvooa_bar = bad_data_double;
+      ufa_bar      = bad_data_double;
+      vfa_bar      = bad_data_double;
+      uoa_bar      = bad_data_double;
+      voa_bar      = bad_data_double;
+      uvfoa_bar    = bad_data_double;
+      uvffa_bar    = bad_data_double;
+      uvooa_bar    = bad_data_double;
+      fa_speed_bar = bad_data_double;
+      oa_speed_bar = bad_data_double;
    }
 
    return;
@@ -1727,28 +1705,200 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VL1L2Info::allocate_n_alpha(int i) {
+
+   n_alpha = i;
+   
+   if(n_alpha > 0) {
+      
+      alpha = new double [n_alpha];
+      
+      if(!alpha) {
+         mlog << Error << "\nVL1L2Info::allocate_n_alpha() -> "
+              << "Memory allocation error!\n\n";
+         exit(1);
+      }
+      
+      FBAR.allocate_n_alpha(n_alpha);
+      OBAR.allocate_n_alpha(n_alpha);
+      FS_RMS.allocate_n_alpha(n_alpha);
+      OS_RMS.allocate_n_alpha(n_alpha);
+      MSVE.allocate_n_alpha(n_alpha);
+      RMSVE.allocate_n_alpha(n_alpha);
+      FSTDEV.allocate_n_alpha(n_alpha);
+      OSTDEV.allocate_n_alpha(n_alpha);
+      FDIR.allocate_n_alpha(n_alpha);
+      ODIR.allocate_n_alpha(n_alpha);
+      FBAR_SPEED.allocate_n_alpha(n_alpha);
+      OBAR_SPEED.allocate_n_alpha(n_alpha);
+      VDIFF_SPEED.allocate_n_alpha(n_alpha);
+      VDIFF_DIR.allocate_n_alpha(n_alpha);
+      SPEED_ERR.allocate_n_alpha(n_alpha);
+      SPEED_ABSERR.allocate_n_alpha(n_alpha);
+      DIR_ERR.allocate_n_alpha(n_alpha);
+      DIR_ABSERR.allocate_n_alpha(n_alpha);
+      ANOM_CORR.allocate_n_alpha(n_alpha);
+      ANOM_CORR_UNCNTR.allocate_n_alpha(n_alpha);
+   }  
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VL1L2Info::compute_stats() {
+   int n;
+
+   if(vcount > 0) {
+
+      n = vcount;
+
+      double u_diff  = uf_bar - uo_bar;
+      double v_diff  = vf_bar - vo_bar;
+
+      FBAR.v         = f_speed_bar;
+      OBAR.v         = o_speed_bar;
+
+      FS_RMS.v       = sqrt(uvff_bar);
+      OS_RMS.v       = sqrt(uvoo_bar);
+
+      MSVE.v         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
+
+      RMSVE.v        = sqrt(MSVE.v);
+
+      FSTDEV.v       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
+      OSTDEV.v       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
+
+      FDIR.v         = convert_u_v_to_wdir(uf_bar, vf_bar);
+      ODIR.v         = convert_u_v_to_wdir(uo_bar, vo_bar);
+
+      FBAR_SPEED.v   = convert_u_v_to_wind(uf_bar, vf_bar);
+      OBAR_SPEED.v   = convert_u_v_to_wind(uo_bar, vo_bar);
+
+      VDIFF_SPEED.v  = convert_u_v_to_wind(u_diff, v_diff);
+
+      VDIFF_DIR.v    = convert_u_v_to_wdir(u_diff, v_diff);
+
+      SPEED_ERR.v    = FBAR_SPEED.v - OBAR_SPEED.v;
+
+      SPEED_ABSERR.v = fabs(SPEED_ERR.v);
+
+      DIR_ERR.v      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar,
+                              uf_bar*uo_bar + vf_bar*vo_bar);
+
+      DIR_ABSERR.v   = fabs(DIR_ERR.v);
+   }
+
+   if(vacount > 0) {
+
+      n = vacount;
+
+      // Check for bad data since new are not present for previous versions
+      if(is_bad_data(fa_speed_bar) || is_bad_data(oa_speed_bar)) {
+         ANOM_CORR.v = bad_data_double;
+      }
+      else {
+         ANOM_CORR.v = compute_corr(fa_speed_bar*n, oa_speed_bar*n,
+                                    uvffa_bar*n, uvooa_bar*n,
+                                    uvfoa_bar*n, n);
+      }
+
+      ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
+   }
+
+   // Compute parametric confidence intervals
+   compute_ci();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VL1L2Info::compute_ci() {
+   int i;
+   double cv_normal_l, cv_normal_u;
+   double v, cl, cu;
+
+   //
+   // Compute the confidence interval for each alpha value specified
+   //
+   for(i=0; i<n_alpha; i++) {
+
+      n = vacount;
+
+      //
+      // Check for the degenerate case
+      //
+      if(n <= 1) {
+         ANOM_CORR.v_ncl[i] = ANOM_CORR.v_ncu[i] = bad_data_double;
+         continue;
+      }
+
+      //
+      // Compute the critical values for the Normal or Student's-T distribution
+      // based on the sample size
+      //
+      if(n >= large_sample_threshold) {
+         cv_normal_l = normal_cdf_inv(alpha[i]/2.0, 0.0, 1.0);
+         cv_normal_u = normal_cdf_inv(1.0 - (alpha[i]/2.0), 0.0, 1.0);
+      }
+      //
+      // If the number of samples is less than the large sample threshold,
+      // use the T-distribution
+      //
+      else {
+         cv_normal_l = students_t_cdf_inv(alpha[i]/2.0, n-1);
+         cv_normal_u = students_t_cdf_inv(1.0 - (alpha[i]/2.0), n-1);
+      }
+
+      //
+      // Compute confidence interval for the anomaly correlation coefficient
+      //
+      if(is_bad_data(ANOM_CORR.v) || n <= 3 ||
+         is_eq(ANOM_CORR.v, 1.0)  || is_eq(ANOM_CORR.v, -1.0)) {
+         ANOM_CORR.v_ncl[i] = bad_data_double;
+         ANOM_CORR.v_ncu[i] = bad_data_double;
+      }
+      else {
+         v = 0.5*log((1 + ANOM_CORR.v)/(1 - ANOM_CORR.v));
+         cl = v + cv_normal_l/sqrt((double) (n-3));
+         cu = v + cv_normal_u/sqrt((double) (n-3));
+         ANOM_CORR.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
+         ANOM_CORR.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
+      }
+
+   } // end for i
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 double VL1L2Info::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
-        if(strcmp(stat_name, "TOTAL"       ) == 0) v = vcount;
-   else if(strcmp(stat_name, "FBAR"        ) == 0) v = FBAR;
-   else if(strcmp(stat_name, "OBAR"        ) == 0) v = OBAR;
-   else if(strcmp(stat_name, "FS_RMS"      ) == 0) v = FS_RMS;
-   else if(strcmp(stat_name, "OS_RMS"      ) == 0) v = OS_RMS;
-   else if(strcmp(stat_name, "MSVE"        ) == 0) v = MSVE;
-   else if(strcmp(stat_name, "RMSVE"       ) == 0) v = RMSVE;
-   else if(strcmp(stat_name, "FSTDEV"      ) == 0) v = FSTDEV;
-   else if(strcmp(stat_name, "OSTDEV"      ) == 0) v = OSTDEV;
-   else if(strcmp(stat_name, "FDIR"        ) == 0) v = FDIR;
-   else if(strcmp(stat_name, "ODIR"        ) == 0) v = ODIR;
-   else if(strcmp(stat_name, "FBAR_SPEED"  ) == 0) v = FBAR_SPEED;
-   else if(strcmp(stat_name, "OBAR_SPEED"  ) == 0) v = OBAR_SPEED;
-   else if(strcmp(stat_name, "VDIFF_SPEED" ) == 0) v = VDIFF_SPEED;
-   else if(strcmp(stat_name, "VDIFF_DIR"   ) == 0) v = VDIFF_DIR;
-   else if(strcmp(stat_name, "SPEED_ERR"   ) == 0) v = SPEED_ERR;
-   else if(strcmp(stat_name, "SPEED_ABSERR") == 0) v = SPEED_ABSERR;
-   else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR;
-   else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR;
+        if(strcmp(stat_name, "TOTAL"           ) == 0) v = vcount;
+   else if(strcmp(stat_name, "FBAR"            ) == 0) v = FBAR.v;
+   else if(strcmp(stat_name, "OBAR"            ) == 0) v = OBAR.v;
+   else if(strcmp(stat_name, "FS_RMS"          ) == 0) v = FS_RMS.v;
+   else if(strcmp(stat_name, "OS_RMS"          ) == 0) v = OS_RMS.v;
+   else if(strcmp(stat_name, "MSVE"            ) == 0) v = MSVE.v;
+   else if(strcmp(stat_name, "RMSVE"           ) == 0) v = RMSVE.v;
+   else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = FSTDEV.v;
+   else if(strcmp(stat_name, "OSTDEV"          ) == 0) v = OSTDEV.v;
+   else if(strcmp(stat_name, "FDIR"            ) == 0) v = FDIR.v;
+   else if(strcmp(stat_name, "ODIR"            ) == 0) v = ODIR.v;
+   else if(strcmp(stat_name, "FBAR_SPEED"      ) == 0) v = FBAR_SPEED.v;
+   else if(strcmp(stat_name, "OBAR_SPEED"      ) == 0) v = OBAR_SPEED.v;
+   else if(strcmp(stat_name, "VDIFF_SPEED"     ) == 0) v = VDIFF_SPEED.v;
+   else if(strcmp(stat_name, "VDIFF_DIR"       ) == 0) v = VDIFF_DIR.v;
+   else if(strcmp(stat_name, "SPEED_ERR"       ) == 0) v = SPEED_ERR.v;
+   else if(strcmp(stat_name, "SPEED_ABSERR"    ) == 0) v = SPEED_ABSERR.v;
+   else if(strcmp(stat_name, "DIR_ERR"         ) == 0) v = DIR_ERR.v;
+   else if(strcmp(stat_name, "DIR_ABSERR"      ) == 0) v = DIR_ABSERR.v;
+   else if(strcmp(stat_name, "ANOM_CORR"       ) == 0) v = ANOM_CORR.v;
+   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = ANOM_CORR_UNCNTR.v;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name

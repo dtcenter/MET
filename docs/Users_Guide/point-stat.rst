@@ -1297,10 +1297,16 @@ The first set of header columns are common to all of the output files generated 
   * - 32
     - UVOOABAR
     - Mean((uo-uc)²+(vo-vc)²)
+  * - 33
+    - FA_SPEED_BAR
+    - Mean forecast wind speed anomaly
+  * - 34
+    - OA_SPEED_BAR
+    - Mean observed wind speed anomaly
 
 .. _table_PS_format_info_VCNT:
 
-.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that the bootstrap confidence intervals columns ending with BCL and BCU are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
   :header-rows: 2
 
@@ -1317,59 +1323,65 @@ The first set of header columns are common to all of the output files generated 
     - TOTAL
     - Total number of data points
   * - 26-28
-    - FBAR
-    - Mean value of forecast wind speed
+    - FBAR, :raw-html:`<br />` FBAR_BCL, :raw-html:`<br />` FBAR_BCU
+    - Mean value of forecast wind speed including bootstrap upper and lower confidence limits
   * - 29-31
-    - OBAR
-    - Mean value of observed wind speed
+    - OBAR, :raw-html:`<br />` OBAR_BCL, :raw-html:`<br />` OBAR_BCU
+    - Mean value of observed wind speed including bootstrap upper and lower confidence limits
   * - 32-34
-    - FS_RMS
-    - Root mean square forecast wind speed
+    - FS_RMS, :raw-html:`<br />` FS_RMS_BCL, :raw-html:`<br />` FS_RMS_BCU
+    - Root mean square forecast wind speed including bootstrap upper and lower confidence limits
   * - 35-37
-    - OS_RMS
-    - Root mean square observed wind speed
+    - OS_RMS, :raw-html:`<br />` OS_RMS_BCL, :raw-html:`<br />` OS_RMS_BCU
+    - Root mean square observed wind speed including bootstrap upper and lower confidence limits
   * - 38-40
-    - MSVE
-    - Mean squared length of the vector difference between the forecast and observed winds
+    - MSVE, :raw-html:`<br />` MSVE_BCL, :raw-html:`<br />` MSVE_BCU
+    - Mean squared length of the vector difference between the forecast and observed winds including bootstrap upper and lower confidence limits
   * - 41-43
-    - RMSVE
-    - Square root of MSVE
+    - RMSVE, :raw-html:`<br />` RMSVE_BCL, :raw-html:`<br />` RMSVE_BCU
+    - Square root of MSVE including bootstrap upper and lower confidence limits
   * - 45-46
-    - FSTDEV
-    - Standard deviation of the forecast wind speed
+    - FSTDEV, :raw-html:`<br />` FSTDEV_BCL, :raw-html:`<br />` FSTDEV_BCU
+    - Standard deviation of the forecast wind speed including bootstrap upper and lower confidence limits
   * - 47-49
-    - OSTDEV
-    - Standard deviation of the observed wind field
+    - OSTDEV, :raw-html:`<br />` OSTDEV_BCL, :raw-html:`<br />` OSTDEV_BCU
+    - Standard deviation of the observed wind field including bootstrap upper and lower confidence limits
   * - 50-52
-    - FDIR
-    - Direction of the average forecast wind vector
+    - FDIR, :raw-html:`<br />` FDIR_BCL, :raw-html:`<br />` FDIR_BCU
+    - Direction of the average forecast wind vector including bootstrap upper and lower confidence limits
   * - 53-55
-    - ODIR
-    - Direction of the average observed wind vector
+    - ODIR, :raw-html:`<br />` ODIR_BCL, :raw-html:`<br />` ODIR_BCU
+    - Direction of the average observed wind vector including bootstrap upper and lower confidence limits
   * - 56-58
-    - FBAR_SPEED
-    - Length (speed) of the average forecast wind vector
+    - FBAR_SPEED, :raw-html:`<br />` FBAR_SPEED_BCL, :raw-html:`<br />` FBAR_SPEED_BCU
+    - Length (speed) of the average forecast wind vector including bootstrap upper and lower confidence limits
   * - 59-61
-    - OBAR_SPEED
-    - Length (speed) of the average observed wind vector
+    - OBAR_SPEED, :raw-html:`<br />` OBAR_SPEED_BCL, :raw-html:`<br />` OBAR_SPEED_BCU
+    - Length (speed) of the average observed wind vector including bootstrap upper and lower confidence limits
   * - 62-64
-    - VDIFF_SPEED
-    - Length (speed) of the vector difference between the average forecast and average observed wind vectors
+    - VDIFF_SPEED, :raw-html:`<br />` VDIFF_SPEED_BCL, :raw-html:`<br />` VDIFF_SPEED_BCU
+    - Length (speed) of the vector difference between the average forecast and average observed wind vectors including bootstrap upper and lower confidence limits
   * - 65-67
-    - VDIFF_DIR
-    - Direction of the vector difference between the average forecast and average wind vectors
+    - VDIFF_DIR, :raw-html:`<br />` VDIFF_DIR_BCL, :raw-html:`<br />` VDIFF_DIR_BCU
+    - Direction of the vector difference between the average forecast and average wind vectors including bootstrap upper and lower confidence limits
   * - 68-70
-    - SPEED_ERR
-    - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O)
+    - SPEED_ERR, :raw-html:`<br />` SPEED_ERR_BCL, :raw-html:`<br />` SPEED_ERR_BCU
+    - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O) including bootstrap upper and lower confidence limits
   * - 71-73
-    - SPEED_ABSERR
-    - Absolute value of SPEED_ERR
+    - SPEED_ABSERR, :raw-html:`<br />` SPEED_ABSERR_BCL, :raw-html:`<br />` SPEED_ABSERR_BCU
+    - Absolute value of SPEED_ERR including bootstrap upper and lower confidence limits
   * - 74-76
-    - DIR_ERR
-    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector
+    - DIR_ERR, :raw-html:`<br />` DIR_ERR_BCL, :raw-html:`<br />` DIR_ERR_BCU
+    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
   * - 77-79
-    - DIR_ABSERR
-    - Absolute value of DIR_ABSERR
+    - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU
+    - Absolute value of DIR_ABSERR including bootstrap upper and lower confidence limits
+  * - 80-84
+    - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
+    - Vector Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
+  * - 85-87
+    - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
+    - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
 
 .. _table_PS_format_info_MPR:
 

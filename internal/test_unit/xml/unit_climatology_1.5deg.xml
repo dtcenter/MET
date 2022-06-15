@@ -47,7 +47,7 @@
     </output>
   </test>
   
-  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_AGG_STAT">
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_MPR_AGG_STAT">
     <exec>&MET_BIN;/stat_analysis</exec>
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
@@ -59,6 +59,21 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_VAL1L2_AGG_STAT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type VAL1L2 -out_line_type VCNT -by FCST_LEV \
+      -out_stat &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_VAL1L2_to_VCNT_out.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_VAL1L2_to_VCNT_out.stat</stat>
     </output>
   </test>
 

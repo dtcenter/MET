@@ -724,10 +724,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the vector partial sum line types:
-   //    VL1L2 -> VCNT
+   //    VL1L2, VAL1L2 -> VCNT
    //
-   else if(in_lt == stat_vl1l2 &&
-           has_line_type(out_lt, stat_vcnt)) {
+   else if((in_lt == stat_vl1l2 ||
+            in_lt == stat_val1l2) &&
+            has_line_type(out_lt, stat_vcnt)) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_psum(job, *it, psum_map, out_at);
@@ -1763,7 +1764,9 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(job.out_alpha);
+         if(lt == stat_cnt || lt == stat_vcnt || lt == stat_nbrcnt) {
+            shc.set_alpha(job.out_alpha);
+         }
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -1864,13 +1867,13 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_vcnt) {
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, (string)"VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //
@@ -3428,13 +3431,13 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_vcnt) {
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, "VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //
