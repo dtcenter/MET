@@ -471,16 +471,6 @@ void ContingencyTable::set_size(int N)
 
 ContingencyTable::set_size(N, N);
 
-   //
-   //  if square, set default expected correct value
-   //
-
-if ( N > 0 )  {
-
-   ECvalue = 1.0 / N;
-
-}
-
 return;
 
 }
@@ -513,6 +503,16 @@ E->resize(n, 0);
 
 Nrows = NR;
 Ncols = NC;
+
+   //
+   //  if square, set default expected correct value
+   //
+
+if ( Nrows == Ncols )  {
+
+   ECvalue = 1.0 / Nrows;
+
+}
 
    //
    //  done

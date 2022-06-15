@@ -273,7 +273,7 @@ HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
 Heidke Skill Score - Expected Correct (HSS_EC)
 ----------------------------------------------
 
-Called "HSS_EC" in MCTS output :numref:`table_PS_format_info_MCTS`
+Called "HSS_EC" in CTS output :numref:`table_PS_format_info_CTS` and MCTS output :numref:`table_PS_format_info_MCTS`
 
 HSS_EC is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular,
 
@@ -360,8 +360,8 @@ where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_
 
 SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
-Bias Adjusted Gilbert Skill Score (GSS)
----------------------------------------
+Bias-Adjusted Gilbert Skill Score (BAGSS)
+-----------------------------------------
 
 Called "BAGSS" in CTS output :numref:`table_PS_format_info_CTS`
 

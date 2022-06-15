@@ -189,7 +189,7 @@ class GridStatVxOpt {
       double           zhu_weight;        // Zhu Weight
       UserFunc_1Arg    beta_value_fx;     // G-Beta Value Function
 
-      double           hss_ec_value;      // MCTS HSS expected correct value
+      double           hss_ec_value;      // HSS expected correct value
       bool             rank_corr_flag;    // Flag for computing rank correlations
 
       // Output file options
