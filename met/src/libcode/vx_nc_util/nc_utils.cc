@@ -25,8 +25,6 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-
 void patch_nc_name(string *var_name) {
    size_t offset;
 
@@ -1008,6 +1006,30 @@ double get_var_fill_value(const NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
+float get_var_add_offset_value(const NcVar *var) {
+   float v;
+
+   if(!get_var_att_float(var, add_offset_att_name, v)) {
+      v = 0.f;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+float get_var_scale_factor_value(const NcVar *var) {
+   float v;
+
+   if(!get_var_att_float(var, scale_factor_att_name, v)) {
+      v = 1.f;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 char get_char_val(NcFile * nc, const char * var_name, const int index) {
    NcVar var = get_var(nc, var_name);
    return (get_char_val(&var, index));
@@ -1555,15 +1577,11 @@ bool get_nc_data(NcVar *var, float *data) {
             cell_count *= get_dim_size(var, idx);
          }
 
-         float add_offset = 0.;
-         float scale_factor = 1.;
+         float add_offset = get_var_add_offset_value(var);
+         float scale_factor = get_var_scale_factor_value(var);
          int unpacked_count = 0;
          bool unsigned_value = has_unsigned_attribute(var);
-         NcVarAtt *att_add_offset   = get_nc_att(var, string("add_offset"));
-         NcVarAtt *att_scale_factor = get_nc_att(var, string("scale_factor"));
-         NcVarAtt *att_fill_value   = get_nc_att(var, string("_FillValue"));
-         if (IS_VALID_NC_P(att_add_offset)) add_offset = get_att_value_float(att_add_offset);
-         if (IS_VALID_NC_P(att_scale_factor)) scale_factor = get_att_value_float(att_scale_factor);
+         NcVarAtt *att_fill_value = get_nc_att(var, string("_FillValue"));
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
               << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
@@ -1743,8 +1761,6 @@ bool get_nc_data(NcVar *var, float *data) {
                     << type_id << ", type name: " << GET_NC_TYPE_NAME_P(var)
                     << ") for " << GET_NC_NAME_P(var) << "\n";
          }
-         if(att_add_offset) delete att_add_offset;
-         if(att_scale_factor) delete att_scale_factor;
          if(att_fill_value) delete att_fill_value;
       }
    }
@@ -1849,18 +1865,10 @@ bool get_nc_data(NcVar *var, double *data) {
             cell_count *= get_dim_size(var, idx);
          }
 
-         double add_offset = 0.;
-         double scale_factor = 1.;
+         double add_offset = get_var_add_offset_value(var);
+         double scale_factor = get_var_scale_factor_value(var);
          bool unsigned_value = has_unsigned_attribute(var);
-         NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-         NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
          NcVarAtt *att_fill_value   = get_nc_att(var, (string)"_FillValue");
-         if (IS_VALID_NC_P(att_add_offset)) {
-            add_offset = get_att_value_double(att_add_offset);
-         }
-         if (IS_VALID_NC_P(att_scale_factor)) {
-            scale_factor = get_att_value_double(att_scale_factor);
-         }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
               << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
@@ -2043,8 +2051,6 @@ bool get_nc_data(NcVar *var, double *data) {
                       << ") for " << GET_NC_NAME_P(var) << "\n";
 
          }
-         if(att_add_offset) delete att_add_offset;
-         if(att_scale_factor) delete att_scale_factor;
          if(att_fill_value) delete att_fill_value;
       }
    }

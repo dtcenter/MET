@@ -848,19 +848,10 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   bool status = false;
   double d = bad_data_double;
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
-
   double missing_value = get_var_missing_value(var);
   double fill_value    = get_var_fill_value(var);
+  float add_offset     = get_var_add_offset_value(var);
+  float scale_factor   = get_var_scale_factor_value(var);
 
   switch (GET_NC_TYPE_ID_P(var))
   {
@@ -1025,11 +1016,13 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   const int y_slot = y_slot_tmp;
 
   //
-  //  get the bad data values
+  //  get the attributes
   //
 
   double missing_value = get_var_missing_value(v);
   double fill_value    = get_var_fill_value(v);
+  float add_offset     = get_var_add_offset_value(v);
+  float scale_factor   = get_var_scale_factor_value(v);
 
   //  set up the DataPlane object
 
@@ -1072,17 +1065,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   lengths[x_slot] = nx;
   offsets[y_slot] = 0;
   lengths[y_slot] = ny;
-
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
 
   int type_id = GET_NC_TYPE_ID_P(v);
   bool do_scale_factor = add_offset != 0.0 || scale_factor != 1.0;

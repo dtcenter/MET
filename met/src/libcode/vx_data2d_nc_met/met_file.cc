@@ -32,16 +32,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name []          = "lon";
-static const char y_dim_name []          = "lat";
+static const char x_dim_name []            = "lon";
+static const char y_dim_name []            = "lat";
 
-static const string valid_time_att_name  = "valid_time";
-static const string  init_time_att_name  = "init_time";
-static const string valid_time_ut_att_name  = "valid_time_ut";
-static const string  init_time_ut_att_name  = "init_time_ut";
-static const string accum_time_att_name  = "accum_time_sec";
+static const string valid_time_att_name    = "valid_time";
+static const string  init_time_att_name    = "init_time";
+static const string valid_time_ut_att_name = "valid_time_ut";
+static const string  init_time_ut_att_name = "init_time_ut";
+static const string accum_time_att_name    = "accum_time_sec";
 
-static const int  max_met_args           = 30;
+static const int  max_met_args             = 30;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -446,18 +446,10 @@ short s;
 float f;
 double d = bad_data_double;
 bool status;
-float add_offset   = 0.f;
-float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
+float add_offset     = get_var_add_offset_value(var);
+float scale_factor   = get_var_scale_factor_value(var);
 
 status = false;
 switch ( GET_NC_TYPE_ID_P(var) )  {
@@ -641,11 +633,13 @@ const int x_slot = x_slot_tmp;
 const int y_slot = y_slot_tmp;
  
    //
-   //  get the bad data value
+   //  get the attributes
    //
 
 double missing_value = get_var_missing_value(v);
 double fill_value    = get_var_fill_value(v);
+float add_offset     = get_var_add_offset_value(v);
+float scale_factor   = get_var_scale_factor_value(v);
 
    //
    //  set up the DataPlane object
@@ -659,16 +653,6 @@ plane.set_size(Nx, Ny);
    //
    clock_t clock_time;
    double nc_time;
-   float add_offset   = 0.f;
-   float scale_factor = 1.f;
-   NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-   NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-   if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-      add_offset = get_att_value_float(att_add_offset);
-      scale_factor = get_att_value_float(att_scale_factor);
-   }
-   if (att_add_offset) delete att_add_offset;
-   if (att_scale_factor) delete att_scale_factor;
 
    int type_id = GET_NC_TYPE_ID_P(v);
    long dim[dimCount], cur[dimCount];
