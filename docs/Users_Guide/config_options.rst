@@ -2008,13 +2008,14 @@ hss_ec_value
 ^^^^^^^^^^^^
 
 The "hss_ec_value" entry is a floating point number used in the computation
-of the HSS_EC statistic in the MCTS line type. It specifies the expected
+of the HSS_EC statistic in the CTS and MCTS line types. It specifies the expected
 correct (EC) rate by chance for multi-category contingency tables. If set
 to its default value of NA, it will automatically be replaced with 1.0
-divided by the MCTC table dimension. For example, for a 4x4 table, the
+divided by the CTC or MCTC table dimension. For example, for a 2x2 CTC table,
+the default hss_ec_value is 1.0 / 2 = 0.5. For a 4x4 MCTC table, the
 default hss_ec_value is 1.0 / 4 = 0.25.
 
-It set, it must greater than or equal to 0.0 and less than 1.0. A value of
+If set, it must greater than or equal to 0.0 and less than 1.0. A value of
 0.0 produces an HSS_EC statistic equal to the Accuracy statistic.
 
 .. code-block:: none
