@@ -230,9 +230,13 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
           zdim_slot = idx;
           org_z_offset = dim_offset;
           long z_offset = dim_offset;
-          if (!is_offset[idx] || (dim_offset < 0 || dim_offset >= z_cnt)) {
+          if (!is_offset[idx]) {
             // convert the value to index for slicing
             z_offset = convert_value_to_offset(dim_value[idx]);
+          }
+          else if ((dim_offset < 0 || dim_offset >= z_cnt)) {
+            // convert the value to index for slicing
+            z_offset = convert_value_to_offset(dim_offset);
           }
           if ((z_offset >= 0) && (z_offset < z_cnt))
             dimension[idx] = long(z_offset);
@@ -635,7 +639,7 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value) {
          = "MetNcCFDataFile::convert_value_to_offset() -> ";
 
    for (int idx=0; idx<dim_size; idx++) {
-      if (_file->vlevels[idx] == z_value) {
+      if (is_eq(_file->vlevels[idx], z_value)) {
          z_offset = idx;
          mlog << Debug(7) << method_name << " Found " << z_value
               << " at index " << z_offset << " from raw vertical level value\n";
