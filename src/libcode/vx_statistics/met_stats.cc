@@ -1747,42 +1747,47 @@ void VL1L2Info::allocate_n_alpha(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 void VL1L2Info::compute_stats() {
-   double u_diff, v_diff;
-   int n = vcount;
+   int n;
 
-   u_diff         = uf_bar - uo_bar;
-   v_diff         = vf_bar - vo_bar;
+   if(vcount > 0) {
 
-   FBAR.v         = f_speed_bar;
-   OBAR.v         = o_speed_bar;
+      n = vcount;
 
-   FS_RMS.v       = sqrt(uvff_bar);
-   OS_RMS.v       = sqrt(uvoo_bar);
+      double u_diff  = uf_bar - uo_bar;
+      double v_diff  = vf_bar - vo_bar;
 
-   MSVE.v         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
+      FBAR.v         = f_speed_bar;
+      OBAR.v         = o_speed_bar;
 
-   RMSVE.v        = sqrt(MSVE.v);
+      FS_RMS.v       = sqrt(uvff_bar);
+      OS_RMS.v       = sqrt(uvoo_bar);
 
-   FSTDEV.v       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
-   OSTDEV.v       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
+      MSVE.v         = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
 
-   FDIR.v         = convert_u_v_to_wdir(uf_bar, vf_bar);
-   ODIR.v         = convert_u_v_to_wdir(uo_bar, vo_bar);
+      RMSVE.v        = sqrt(MSVE.v);
 
-   FBAR_SPEED.v   = convert_u_v_to_wind(uf_bar, vf_bar);
-   OBAR_SPEED.v   = convert_u_v_to_wind(uo_bar, vo_bar);
+      FSTDEV.v       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
+      OSTDEV.v       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
 
-   VDIFF_SPEED.v  = convert_u_v_to_wind(u_diff, v_diff);
+      FDIR.v         = convert_u_v_to_wdir(uf_bar, vf_bar);
+      ODIR.v         = convert_u_v_to_wdir(uo_bar, vo_bar);
 
-   VDIFF_DIR.v    = convert_u_v_to_wdir(u_diff, v_diff);
+      FBAR_SPEED.v   = convert_u_v_to_wind(uf_bar, vf_bar);
+      OBAR_SPEED.v   = convert_u_v_to_wind(uo_bar, vo_bar);
 
-   SPEED_ERR.v    = FBAR_SPEED.v - OBAR_SPEED.v;
+      VDIFF_SPEED.v  = convert_u_v_to_wind(u_diff, v_diff);
 
-   SPEED_ABSERR.v = fabs(SPEED_ERR.v);
+      VDIFF_DIR.v    = convert_u_v_to_wdir(u_diff, v_diff);
 
-   DIR_ERR.v      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
+      SPEED_ERR.v    = FBAR_SPEED.v - OBAR_SPEED.v;
 
-   DIR_ABSERR.v   = fabs(DIR_ERR.v);
+      SPEED_ABSERR.v = fabs(SPEED_ERR.v);
+
+      DIR_ERR.v      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar,
+                              uf_bar*uo_bar + vf_bar*vo_bar);
+
+      DIR_ABSERR.v   = fabs(DIR_ERR.v);
+   }
 
    if(vacount > 0) {
 
