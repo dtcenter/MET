@@ -131,6 +131,8 @@ static const char nc_att_met_point_nccf[] = "MET_point_NCCF";
 
 static const string description_att_name   = "description";
 static const string fill_value_att_name    = "_FillValue";
+static const string add_offset_att_name    = "add_offset";
+static const string scale_factor_att_name  = "scale_factor";
 static const string level_att_name         = "level";
 static const string long_name_att_name     = "long_name";
 static const string missing_value_att_name = "missing_value";
@@ -217,6 +219,9 @@ extern bool   get_var_units(const NcVar *, ConcatString &);
 extern bool   get_var_level(const NcVar *, ConcatString &);
 extern double get_var_missing_value(const NcVar *);
 extern double get_var_fill_value(const NcVar *);
+
+extern float  get_var_add_offset_value(const NcVar *);
+extern float  get_var_scale_factor_value(const NcVar *);
 
 extern bool   args_ok(const LongArray &);
 
