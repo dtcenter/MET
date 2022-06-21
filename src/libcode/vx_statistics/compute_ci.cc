@@ -337,6 +337,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
+      cts_tmp[i].cts.set_ec_value(cts_info[i].cts.ec_value());
    }
 
    //
@@ -575,6 +576,18 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  cts_info[i].alpha[j],
                                  cts_info[i].hss.v_bcl[j],
                                  cts_info[i].hss.v_bcu[j]);
+
+         //
+         // Compute bootstrap interval for hss_ec
+         //
+         s = cts_info[i].hss_ec.v;
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
+         for(j=0; j<cts_info[i].n_alpha; j++)
+            compute_bca_interval(s, si_na, sr_na,
+                                 cts_info[i].alpha[j],
+                                 cts_info[i].hss_ec.v_bcl[j],
+                                 cts_info[i].hss_ec.v_bcu[j]);
 
          //
          // Compute bootstrap interval for odds
@@ -1462,6 +1475,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
+      cts_tmp[i].cts.set_ec_value(cts_info[i].cts.ec_value());
    }
 
    //
@@ -1663,6 +1677,17 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                  cts_info[i].alpha[j],
                                  cts_info[i].hss.v_bcl[j],
                                  cts_info[i].hss.v_bcu[j]);
+
+         //
+         // Compute bootstrap interval for hss_ec
+         //
+         s = cts_info[i].hss_ec.v;
+         read_ldf(cts_r_file[i], c++, sr_na);
+         for(j=0; j<cts_info[i].n_alpha; j++)
+            compute_perc_interval(s, sr_na,
+                                 cts_info[i].alpha[j],
+                                 cts_info[i].hss_ec.v_bcl[j],
+                                 cts_info[i].hss_ec.v_bcu[j]);
 
          //
          // Compute bootstrap interval for odds
@@ -3923,12 +3948,13 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
    char line[max_line_len];
 
    snprintf(line, max_line_len,
-           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
            c.baser.v,   c.fmean.v,   c.acc.v,     c.fbias.v,
            c.pody.v,    c.podn.v,    c.pofd.v,    c.far.v,
            c.csi.v,     c.gss.v,     c.hk.v,      c.hss.v,
-           c.odds.v,    c.lodds.v,   c.orss.v,    c.eds.v,
-           c.seds.v,    c.edi.v,     c.sedi.v,    c.bagss.v
+           c.hss_ec.v,  c.odds.v,    c.lodds.v,   c.orss.v,
+           c.eds.v,     c.seds.v,    c.edi.v,     c.sedi.v,
+           c.bagss.v
           );
 
    tmp_out << line << "\n";

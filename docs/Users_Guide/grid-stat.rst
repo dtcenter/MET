@@ -681,7 +681,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
-    - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
 
 
 .. role:: raw-html(raw)

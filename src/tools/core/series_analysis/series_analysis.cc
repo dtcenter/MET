@@ -31,6 +31,7 @@
 //                    of python embedding.
 //   011    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   012    01/20/22  Halley Gotway  MET #2003 Add PSTD BRIERCL output.
+//   013    05/25/22  Halley Gotway  MET #2147 Add CTS HSS_EC output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -897,6 +898,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
 
    // Setup CTSInfo objects
    for(i=0; i<n_cts; i++) {
+      cts_info[i].cts.set_ec_value(conf_info.hss_ec_value);
       cts_info[i].fthresh = conf_info.fcat_ta[i];
       cts_info[i].othresh = conf_info.ocat_ta[i];
 
@@ -1208,11 +1210,12 @@ void store_stat_ctc(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Get the column value
-        if(c == "TOTAL") { v = cts_info.cts.n();     }
-   else if(c == "FY_OY") { v = cts_info.cts.fy_oy(); }
-   else if(c == "FY_ON") { v = cts_info.cts.fy_on(); }
-   else if(c == "FN_OY") { v = cts_info.cts.fn_oy(); }
-   else if(c == "FN_ON") { v = cts_info.cts.fn_on(); }
+        if(c == "TOTAL")    { v = cts_info.cts.n();        }
+   else if(c == "FY_OY")    { v = cts_info.cts.fy_oy();    }
+   else if(c == "FY_ON")    { v = cts_info.cts.fy_on();    }
+   else if(c == "FN_OY")    { v = cts_info.cts.fn_oy();    }
+   else if(c == "FN_ON")    { v = cts_info.cts.fn_on();    }
+   else if(c == "EC_VALUE") { v = cts_info.cts.ec_value(); }
    else {
      mlog << Error << "\nstore_stat_ctc() -> "
           << "unsupported column name requested \"" << c
@@ -1270,99 +1273,103 @@ void store_stat_cts(int n, const ConcatString &col,
    for(i=0; i<n_ci; i++) {
 
       // Get the column value
-           if(c == "TOTAL")     { v = (double) cts_info.cts.n(); }
-      else if(c == "BASER")     { v = cts_info.baser.v;          }
-      else if(c == "BASER_NCL") { v = cts_info.baser.v_ncl[i];   }
-      else if(c == "BASER_NCU") { v = cts_info.baser.v_ncu[i];   }
-      else if(c == "BASER_BCL") { v = cts_info.baser.v_bcl[i];   }
-      else if(c == "BASER_BCU") { v = cts_info.baser.v_bcu[i];   }
-      else if(c == "FMEAN")     { v = cts_info.fmean.v;          }
-      else if(c == "FMEAN_NCL") { v = cts_info.fmean.v_ncl[i];   }
-      else if(c == "FMEAN_NCU") { v = cts_info.fmean.v_ncu[i];   }
-      else if(c == "FMEAN_BCL") { v = cts_info.fmean.v_bcl[i];   }
-      else if(c == "FMEAN_BCU") { v = cts_info.fmean.v_bcu[i];   }
-      else if(c == "ACC")       { v = cts_info.acc.v;            }
-      else if(c == "ACC_NCL")   { v = cts_info.acc.v_ncl[i];     }
-      else if(c == "ACC_NCU")   { v = cts_info.acc.v_ncu[i];     }
-      else if(c == "ACC_BCL")   { v = cts_info.acc.v_bcl[i];     }
-      else if(c == "ACC_BCU")   { v = cts_info.acc.v_bcu[i];     }
-      else if(c == "FBIAS")     { v = cts_info.fbias.v;          }
-      else if(c == "FBIAS_BCL") { v = cts_info.fbias.v_bcl[i];   }
-      else if(c == "FBIAS_BCU") { v = cts_info.fbias.v_bcu[i];   }
-      else if(c == "PODY")      { v = cts_info.pody.v;           }
-      else if(c == "PODY_NCL")  { v = cts_info.pody.v_ncl[i];    }
-      else if(c == "PODY_NCU")  { v = cts_info.pody.v_ncu[i];    }
-      else if(c == "PODY_BCL")  { v = cts_info.pody.v_bcl[i];    }
-      else if(c == "PODY_BCU")  { v = cts_info.pody.v_bcu[i];    }
-      else if(c == "PODN")      { v = cts_info.podn.v;           }
-      else if(c == "PODN_NCL")  { v = cts_info.podn.v_ncl[i];    }
-      else if(c == "PODN_NCU")  { v = cts_info.podn.v_ncu[i];    }
-      else if(c == "PODN_BCL")  { v = cts_info.podn.v_bcl[i];    }
-      else if(c == "PODN_BCU")  { v = cts_info.podn.v_bcu[i];    }
-      else if(c == "POFD")      { v = cts_info.pofd.v;           }
-      else if(c == "POFD_NCL")  { v = cts_info.pofd.v_ncl[i];    }
-      else if(c == "POFD_NCU")  { v = cts_info.pofd.v_ncu[i];    }
-      else if(c == "POFD_BCL")  { v = cts_info.pofd.v_bcl[i];    }
-      else if(c == "POFD_BCU")  { v = cts_info.pofd.v_bcu[i];    }
-      else if(c == "FAR")       { v = cts_info.far.v;            }
-      else if(c == "FAR_NCL")   { v = cts_info.far.v_ncl[i];     }
-      else if(c == "FAR_NCU")   { v = cts_info.far.v_ncu[i];     }
-      else if(c == "FAR_BCL")   { v = cts_info.far.v_bcl[i];     }
-      else if(c == "FAR_BCU")   { v = cts_info.far.v_bcu[i];     }
-      else if(c == "CSI")       { v = cts_info.csi.v;            }
-      else if(c == "CSI_NCL")   { v = cts_info.csi.v_ncl[i];     }
-      else if(c == "CSI_NCU")   { v = cts_info.csi.v_ncu[i];     }
-      else if(c == "CSI_BCL")   { v = cts_info.csi.v_bcl[i];     }
-      else if(c == "CSI_BCU")   { v = cts_info.csi.v_bcu[i];     }
-      else if(c == "GSS")       { v = cts_info.gss.v;            }
-      else if(c == "GSS_BCL")   { v = cts_info.gss.v_bcl[i];     }
-      else if(c == "GSS_BCU")   { v = cts_info.gss.v_bcu[i];     }
-      else if(c == "HK")        { v = cts_info.hk.v;             }
-      else if(c == "HK_NCL")    { v = cts_info.hk.v_ncl[i];      }
-      else if(c == "HK_NCU")    { v = cts_info.hk.v_ncu[i];      }
-      else if(c == "HK_BCL")    { v = cts_info.hk.v_bcl[i];      }
-      else if(c == "HK_BCU")    { v = cts_info.hk.v_bcu[i];      }
-      else if(c == "HSS")       { v = cts_info.hss.v;            }
-      else if(c == "HSS_BCL")   { v = cts_info.hss.v_bcl[i];     }
-      else if(c == "HSS_BCU")   { v = cts_info.hss.v_bcu[i];     }
-      else if(c == "ODDS")      { v = cts_info.odds.v;           }
-      else if(c == "ODDS_NCL")  { v = cts_info.odds.v_ncl[i];    }
-      else if(c == "ODDS_NCU")  { v = cts_info.odds.v_ncu[i];    }
-      else if(c == "ODDS_BCL")  { v = cts_info.odds.v_bcl[i];    }
-      else if(c == "ODDS_BCU")  { v = cts_info.odds.v_bcu[i];    }
-      else if(c == "LODDS")     { v = cts_info.lodds.v;          }
-      else if(c == "LODDS_NCL") { v = cts_info.lodds.v_ncl[i];   }
-      else if(c == "LODDS_NCU") { v = cts_info.lodds.v_ncu[i];   }
-      else if(c == "LODDS_BCL") { v = cts_info.lodds.v_bcl[i];   }
-      else if(c == "LODDS_BCU") { v = cts_info.lodds.v_bcu[i];   }
-      else if(c == "ORSS")      { v = cts_info.orss.v;           }
-      else if(c == "ORSS_NCL")  { v = cts_info.orss.v_ncl[i];    }
-      else if(c == "ORSS_NCU")  { v = cts_info.orss.v_ncu[i];    }
-      else if(c == "ORSS_BCL")  { v = cts_info.orss.v_bcl[i];    }
-      else if(c == "ORSS_BCU")  { v = cts_info.orss.v_bcu[i];    }
-      else if(c == "EDS")       { v = cts_info.eds.v;            }
-      else if(c == "EDS_NCL")   { v = cts_info.eds.v_ncl[i];     }
-      else if(c == "EDS_NCU")   { v = cts_info.eds.v_ncu[i];     }
-      else if(c == "EDS_BCL")   { v = cts_info.eds.v_bcl[i];     }
-      else if(c == "EDS_BCU")   { v = cts_info.eds.v_bcu[i];     }
-      else if(c == "SEDS")      { v = cts_info.seds.v;           }
-      else if(c == "SEDS_NCL")  { v = cts_info.seds.v_ncl[i];    }
-      else if(c == "SEDS_NCU")  { v = cts_info.seds.v_ncu[i];    }
-      else if(c == "SEDS_BCL")  { v = cts_info.seds.v_bcl[i];    }
-      else if(c == "SEDS_BCU")  { v = cts_info.seds.v_bcu[i];    }
-      else if(c == "EDI")       { v = cts_info.edi.v;            }
-      else if(c == "EDI_NCL")   { v = cts_info.edi.v_ncl[i];     }
-      else if(c == "EDI_NCU")   { v = cts_info.edi.v_ncu[i];     }
-      else if(c == "EDI_BCL")   { v = cts_info.edi.v_bcl[i];     }
-      else if(c == "EDI_BCU")   { v = cts_info.edi.v_bcu[i];     }
-      else if(c == "SEDI")      { v = cts_info.sedi.v;           }
-      else if(c == "SEDI_NCL")  { v = cts_info.sedi.v_ncl[i];    }
-      else if(c == "SEDI_NCU")  { v = cts_info.sedi.v_ncu[i];    }
-      else if(c == "SEDI_BCL")  { v = cts_info.sedi.v_bcl[i];    }
-      else if(c == "SEDI_BCU")  { v = cts_info.sedi.v_bcu[i];    }
-      else if(c == "BAGSS")     { v = cts_info.bagss.v;          }
-      else if(c == "BAGSS_BCL") { v = cts_info.bagss.v_bcl[i];   }
-      else if(c == "BAGSS_BCU") { v = cts_info.bagss.v_bcu[i];   }
+           if(c == "TOTAL")      { v = (double) cts_info.cts.n(); }
+      else if(c == "BASER")      { v = cts_info.baser.v;          }
+      else if(c == "BASER_NCL")  { v = cts_info.baser.v_ncl[i];   }
+      else if(c == "BASER_NCU")  { v = cts_info.baser.v_ncu[i];   }
+      else if(c == "BASER_BCL")  { v = cts_info.baser.v_bcl[i];   }
+      else if(c == "BASER_BCU")  { v = cts_info.baser.v_bcu[i];   }
+      else if(c == "FMEAN")      { v = cts_info.fmean.v;          }
+      else if(c == "FMEAN_NCL")  { v = cts_info.fmean.v_ncl[i];   }
+      else if(c == "FMEAN_NCU")  { v = cts_info.fmean.v_ncu[i];   }
+      else if(c == "FMEAN_BCL")  { v = cts_info.fmean.v_bcl[i];   }
+      else if(c == "FMEAN_BCU")  { v = cts_info.fmean.v_bcu[i];   }
+      else if(c == "ACC")        { v = cts_info.acc.v;            }
+      else if(c == "ACC_NCL")    { v = cts_info.acc.v_ncl[i];     }
+      else if(c == "ACC_NCU")    { v = cts_info.acc.v_ncu[i];     }
+      else if(c == "ACC_BCL")    { v = cts_info.acc.v_bcl[i];     }
+      else if(c == "ACC_BCU")    { v = cts_info.acc.v_bcu[i];     }
+      else if(c == "FBIAS")      { v = cts_info.fbias.v;          }
+      else if(c == "FBIAS_BCL")  { v = cts_info.fbias.v_bcl[i];   }
+      else if(c == "FBIAS_BCU")  { v = cts_info.fbias.v_bcu[i];   }
+      else if(c == "PODY")       { v = cts_info.pody.v;           }
+      else if(c == "PODY_NCL")   { v = cts_info.pody.v_ncl[i];    }
+      else if(c == "PODY_NCU")   { v = cts_info.pody.v_ncu[i];    }
+      else if(c == "PODY_BCL")   { v = cts_info.pody.v_bcl[i];    }
+      else if(c == "PODY_BCU")   { v = cts_info.pody.v_bcu[i];    }
+      else if(c == "PODN")       { v = cts_info.podn.v;           }
+      else if(c == "PODN_NCL")   { v = cts_info.podn.v_ncl[i];    }
+      else if(c == "PODN_NCU")   { v = cts_info.podn.v_ncu[i];    }
+      else if(c == "PODN_BCL")   { v = cts_info.podn.v_bcl[i];    }
+      else if(c == "PODN_BCU")   { v = cts_info.podn.v_bcu[i];    }
+      else if(c == "POFD")       { v = cts_info.pofd.v;           }
+      else if(c == "POFD_NCL")   { v = cts_info.pofd.v_ncl[i];    }
+      else if(c == "POFD_NCU")   { v = cts_info.pofd.v_ncu[i];    }
+      else if(c == "POFD_BCL")   { v = cts_info.pofd.v_bcl[i];    }
+      else if(c == "POFD_BCU")   { v = cts_info.pofd.v_bcu[i];    }
+      else if(c == "FAR")        { v = cts_info.far.v;            }
+      else if(c == "FAR_NCL")    { v = cts_info.far.v_ncl[i];     }
+      else if(c == "FAR_NCU")    { v = cts_info.far.v_ncu[i];     }
+      else if(c == "FAR_BCL")    { v = cts_info.far.v_bcl[i];     }
+      else if(c == "FAR_BCU")    { v = cts_info.far.v_bcu[i];     }
+      else if(c == "CSI")        { v = cts_info.csi.v;            }
+      else if(c == "CSI_NCL")    { v = cts_info.csi.v_ncl[i];     }
+      else if(c == "CSI_NCU")    { v = cts_info.csi.v_ncu[i];     }
+      else if(c == "CSI_BCL")    { v = cts_info.csi.v_bcl[i];     }
+      else if(c == "CSI_BCU")    { v = cts_info.csi.v_bcu[i];     }
+      else if(c == "GSS")        { v = cts_info.gss.v;            }
+      else if(c == "GSS_BCL")    { v = cts_info.gss.v_bcl[i];     }
+      else if(c == "GSS_BCU")    { v = cts_info.gss.v_bcu[i];     }
+      else if(c == "HK")         { v = cts_info.hk.v;             }
+      else if(c == "HK_NCL")     { v = cts_info.hk.v_ncl[i];      }
+      else if(c == "HK_NCU")     { v = cts_info.hk.v_ncu[i];      }
+      else if(c == "HK_BCL")     { v = cts_info.hk.v_bcl[i];      }
+      else if(c == "HK_BCU")     { v = cts_info.hk.v_bcu[i];      }
+      else if(c == "HSS")        { v = cts_info.hss.v;            }
+      else if(c == "HSS_BCL")    { v = cts_info.hss.v_bcl[i];     }
+      else if(c == "HSS_BCU")    { v = cts_info.hss.v_bcu[i];     }
+      else if(c == "ODDS")       { v = cts_info.odds.v;           }
+      else if(c == "ODDS_NCL")   { v = cts_info.odds.v_ncl[i];    }
+      else if(c == "ODDS_NCU")   { v = cts_info.odds.v_ncu[i];    }
+      else if(c == "ODDS_BCL")   { v = cts_info.odds.v_bcl[i];    }
+      else if(c == "ODDS_BCU")   { v = cts_info.odds.v_bcu[i];    }
+      else if(c == "LODDS")      { v = cts_info.lodds.v;          }
+      else if(c == "LODDS_NCL")  { v = cts_info.lodds.v_ncl[i];   }
+      else if(c == "LODDS_NCU")  { v = cts_info.lodds.v_ncu[i];   }
+      else if(c == "LODDS_BCL")  { v = cts_info.lodds.v_bcl[i];   }
+      else if(c == "LODDS_BCU")  { v = cts_info.lodds.v_bcu[i];   }
+      else if(c == "ORSS")       { v = cts_info.orss.v;           }
+      else if(c == "ORSS_NCL")   { v = cts_info.orss.v_ncl[i];    }
+      else if(c == "ORSS_NCU")   { v = cts_info.orss.v_ncu[i];    }
+      else if(c == "ORSS_BCL")   { v = cts_info.orss.v_bcl[i];    }
+      else if(c == "ORSS_BCU")   { v = cts_info.orss.v_bcu[i];    }
+      else if(c == "EDS")        { v = cts_info.eds.v;            }
+      else if(c == "EDS_NCL")    { v = cts_info.eds.v_ncl[i];     }
+      else if(c == "EDS_NCU")    { v = cts_info.eds.v_ncu[i];     }
+      else if(c == "EDS_BCL")    { v = cts_info.eds.v_bcl[i];     }
+      else if(c == "EDS_BCU")    { v = cts_info.eds.v_bcu[i];     }
+      else if(c == "SEDS")       { v = cts_info.seds.v;           }
+      else if(c == "SEDS_NCL")   { v = cts_info.seds.v_ncl[i];    }
+      else if(c == "SEDS_NCU")   { v = cts_info.seds.v_ncu[i];    }
+      else if(c == "SEDS_BCL")   { v = cts_info.seds.v_bcl[i];    }
+      else if(c == "SEDS_BCU")   { v = cts_info.seds.v_bcu[i];    }
+      else if(c == "EDI")        { v = cts_info.edi.v;            }
+      else if(c == "EDI_NCL")    { v = cts_info.edi.v_ncl[i];     }
+      else if(c == "EDI_NCU")    { v = cts_info.edi.v_ncu[i];     }
+      else if(c == "EDI_BCL")    { v = cts_info.edi.v_bcl[i];     }
+      else if(c == "EDI_BCU")    { v = cts_info.edi.v_bcu[i];     }
+      else if(c == "SEDI")       { v = cts_info.sedi.v;           }
+      else if(c == "SEDI_NCL")   { v = cts_info.sedi.v_ncl[i];    }
+      else if(c == "SEDI_NCU")   { v = cts_info.sedi.v_ncu[i];    }
+      else if(c == "SEDI_BCL")   { v = cts_info.sedi.v_bcl[i];    }
+      else if(c == "SEDI_BCU")   { v = cts_info.sedi.v_bcu[i];    }
+      else if(c == "BAGSS")      { v = cts_info.bagss.v;          }
+      else if(c == "BAGSS_BCL")  { v = cts_info.bagss.v_bcl[i];   }
+      else if(c == "BAGSS_BCU")  { v = cts_info.bagss.v_bcu[i];   }
+      else if(c == "HSS_EC")     { v = cts_info.hss_ec.v;         }
+      else if(c == "HSS_EC_BCL") { v = cts_info.hss_ec.v_bcl[i];  }
+      else if(c == "HSS_EC_BCU") { v = cts_info.hss_ec.v_bcu[i];  }
+      else if(c == "EC_VALUE")   { v = cts_info.cts.ec_value();   }
       else {
         mlog << Error << "\nstore_stat_cts() -> "
              << "unsupported column name requested \"" << c
@@ -1665,6 +1672,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "ANOM_CORR_UNCNTR")     { v = cnt_info.anom_corr_uncntr.v;        }
       else if(c == "ANOM_CORR_UNCNTR_BCL") { v = cnt_info.anom_corr_uncntr.v_bcl[i]; }
       else if(c == "ANOM_CORR_UNCNTR_BCU") { v = cnt_info.anom_corr_uncntr.v_bcu[i]; }
+      else if(c == "SI")                   { v = cnt_info.si.v;                      }
+      else if(c == "SI_BCL")               { v = cnt_info.si.v_bcl[i];               }
+      else if(c == "SI_BCU")               { v = cnt_info.si.v_bcu[i];               }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
@@ -1730,6 +1740,7 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    else if(c == "FOABAR") { v = s_info.foabar;          }
    else if(c == "FFABAR") { v = s_info.ffabar;          }
    else if(c == "OOABAR") { v = s_info.ooabar;          }
+   else if(c == "MAE")    { v = s_info.mae;             }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c

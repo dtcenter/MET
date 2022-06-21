@@ -1268,6 +1268,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    //
    n_cat = conf_info.vx_opt[i_vx].fcat_ta.n();
    for(i=0; i<n_cat; i++) {
+      cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
