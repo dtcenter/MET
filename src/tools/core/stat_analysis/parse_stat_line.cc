@@ -92,6 +92,9 @@ void parse_ctc_ctable(STATLine &l, TTContingencyTable &ct) {
    // FN_ON
    ct.set_fn_on(atoi(l.get_item("FN_ON")));
 
+   // EC_VALUE
+   ct.set_ec_value(atof(l.get_item("EC_VALUE")));
+
    return;
 }
 

@@ -1764,7 +1764,9 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(job.out_alpha);
+         if(lt == stat_cnt || lt == stat_vcnt || lt == stat_nbrcnt) {
+            shc.set_alpha(job.out_alpha);
+         }
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
