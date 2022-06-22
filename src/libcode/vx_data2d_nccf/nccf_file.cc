@@ -848,66 +848,11 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   bool status = false;
   double d = bad_data_double;
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
 
   double missing_value = get_var_missing_value(var);
   double fill_value    = get_var_fill_value(var);
 
-  switch (GET_NC_TYPE_ID_P(var))
-  {
-    case NcType::nc_SHORT:
-    {
-      short s;
-
-      status = get_nc_data(var, &s, (long *)a);
-      d = (double) (s);
-      break;
-    }
-
-    case NcType::nc_INT:
-    {
-      int i;
-
-      status = get_nc_data(var, &i, (long *)a);
-      d = (double) (i);
-      break;
-    }
-
-    case NcType::nc_FLOAT:
-    {
-      float f;
-
-      status = get_nc_data(var, &f, (long *)a);
-      d = (double) (f);
-      break;
-    }
-
-    case NcType::nc_DOUBLE:
-    {
-      status = get_nc_data(var, &d, (long *)a);
-      break;
-    }
-
-    default:
-    {
-      mlog << Error << "\n" << method_name
-           << "bad type [" << GET_NC_TYPE_NAME_P(var)
-           << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
-      exit(1);
-    }
-  }   //  switch
-  if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
-    d = d * scale_factor + add_offset;
-  }
+  status = get_nc_data(var, &d, (long *)a);
 
   if (!status)
   {
@@ -1073,54 +1018,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   offsets[y_slot] = 0;
   lengths[y_slot] = ny;
 
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
-
-  int type_id = GET_NC_TYPE_ID_P(v);
-  bool do_scale_factor = add_offset != 0.0 || scale_factor != 1.0;
-
-  switch ( type_id )  {
-
-    case NcType::nc_SHORT:
-      s = new short[plane_size];
-      get_nc_data(v, s, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)s[x];
-      delete [] s;
-      break;
-
-    case NcType::nc_INT:
-      i = new int[plane_size];
-      get_nc_data(v, i, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)i[x];
-      delete [] i;
-      break;
-
-    case NcType::nc_FLOAT:
-      f = new float[plane_size];
-      get_nc_data(v, f, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)f[x];
-      delete [] f;
-      break;
-
-    case NcType::nc_DOUBLE:
-      get_nc_data(v, d, lengths, offsets);
-      break;
-  
-    default:
-      mlog << Error << "\n" << method_name
-           << " bad type [" << GET_NC_TYPE_NAME_P(v)
-           << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-      exit ( 1 );
-  
-  }   //  switch
+  get_nc_data(v, d, lengths, offsets);
 
   int offset = 0;
   if( x_slot > y_slot ) {
@@ -1134,7 +1032,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
         }
-        else if( do_scale_factor ) value = value * scale_factor + add_offset;
     
         plane.set(value, x, y_offset);
     
@@ -1152,7 +1049,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
         }
-        else if( do_scale_factor ) value = value * scale_factor + add_offset;
     
         plane.set(value, x, y_offset);
     

@@ -32,16 +32,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name []          = "lon";
-static const char y_dim_name []          = "lat";
+static const char x_dim_name []            = "lon";
+static const char y_dim_name []            = "lat";
 
-static const string valid_time_att_name  = "valid_time";
-static const string  init_time_att_name  = "init_time";
-static const string valid_time_ut_att_name  = "valid_time_ut";
-static const string  init_time_ut_att_name  = "init_time_ut";
-static const string accum_time_att_name  = "accum_time_sec";
+static const string valid_time_att_name    = "valid_time";
+static const string  init_time_att_name    = "init_time";
+static const string valid_time_ut_att_name = "valid_time_ut";
+static const string  init_time_ut_att_name = "init_time_ut";
+static const string accum_time_att_name    = "accum_time_sec";
 
-static const int  max_met_args           = 30;
+static const int  max_met_args             = 30;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -50,59 +50,30 @@ template <typename T>
 void copy_nc_data_as_double(double *to_array, const T *from_array,
                             const int x_slot, const int y_slot,
                             const int nx, const int ny,
-                            double missing_value, double fill_value,
-                            float add_offset, float scale_factor) {
+                            double missing_value, double fill_value) {
    double value;
    int x, y, offset, start_offset;
 
    offset = 0;
-   if (add_offset != 0.0 || scale_factor != 1.0) {
-      if (x_slot > y_slot) {
-         for (y=0; y<ny; ++y) {
-            start_offset = y * nx;
-            for (x=0; x<nx; ++x) {
-               value = (double)from_array[x + start_offset];
-               if(is_eq(value, missing_value) || is_eq(value, fill_value))
-                  value = bad_data_double;
-               else value = value * scale_factor + add_offset;
-               to_array[offset++] = value;
-            }
-         }
-      }
-      else {
+   if (x_slot > y_slot) {
+      for (y=0; y<ny; ++y) {
+         start_offset = y * nx;
          for (x=0; x<nx; ++x) {
-            start_offset = x * ny;
-            for (y=0; y<ny; ++y) {
-               value = (double)from_array[y + start_offset];
-               if(is_eq(value, missing_value) || is_eq(value, fill_value))
-                  value = bad_data_double;
-               else value = value * scale_factor + add_offset;
-               to_array[offset++] = value;
-            }
+            value = (double)from_array[x + start_offset];
+            if(is_eq(value, missing_value) || is_eq(value, fill_value))
+               value = bad_data_double;
+            to_array[offset++] = value;
          }
       }
    }
    else {
-      if (x_slot > y_slot) {
+      for (x=0; x<nx; ++x) {
+         start_offset = x * ny;
          for (y=0; y<ny; ++y) {
-            start_offset = y * nx;
-            for (x=0; x<nx; ++x) {
-               value = (double)from_array[x + start_offset];
-               if(is_eq(value, missing_value) || is_eq(value, fill_value))
-                  value = bad_data_double;
-               to_array[offset++] = value;
-            }
-         }
-      }
-      else {
-         for (x=0; x<nx; ++x) {
-            start_offset = x * ny;
-            for (y=0; y<ny; ++y) {
-               value = (double)from_array[y + start_offset];
-               if(is_eq(value, missing_value) || is_eq(value, fill_value))
-                  value = bad_data_double;
-               to_array[offset++] = value;
-            }
+            value = (double)from_array[y + start_offset];
+            if(is_eq(value, missing_value) || is_eq(value, fill_value))
+               value = bad_data_double;
+            to_array[offset++] = value;
          }
       }
    }
@@ -446,56 +417,10 @@ short s;
 float f;
 double d = bad_data_double;
 bool status;
-float add_offset   = 0.f;
-float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
 
-status = false;
-switch ( GET_NC_TYPE_ID_P(var) )  {
-
-   case NcType::nc_INT:
-      get_nc_data(var, &i, (long *)a);
-      d = (double) (i);
-      status = true;
-      break;
-
-   case NcType::nc_SHORT:
-      get_nc_data(var, &s, (long *)a);
-      d = (double) (s);
-      status = true;
-      break;
-
-   case NcType::nc_FLOAT:
-      get_nc_data(var, &f, (long *)a);
-      d = (double) (f);
-      status = true;
-      break;
-
-   case NcType::nc_DOUBLE:
-      get_nc_data(var, &d, (long *)a);
-      status = true;
-      break;
-
-   default:
-      mlog << Error << "\n" << method_name << " bad type (" << GET_NC_TYPE_ID_P(var)
-           << ") for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
-   d = d * scale_factor + add_offset;
-}
-
+status = get_nc_data(var, &d, (long *)a);
 
 if ( !status )  {
 
@@ -639,7 +564,7 @@ else {
 
 const int x_slot = x_slot_tmp;
 const int y_slot = y_slot_tmp;
- 
+
    //
    //  get the bad data value
    //
@@ -659,18 +584,7 @@ plane.set_size(Nx, Ny);
    //
    clock_t clock_time;
    double nc_time;
-   float add_offset   = 0.f;
-   float scale_factor = 1.f;
-   NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-   NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-   if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-      add_offset = get_att_value_float(att_add_offset);
-      scale_factor = get_att_value_float(att_scale_factor);
-   }
-   if (att_add_offset) delete att_add_offset;
-   if (att_scale_factor) delete att_scale_factor;
 
-   int type_id = GET_NC_TYPE_ID_P(v);
    long dim[dimCount], cur[dimCount];
    for (int index=0; index<dimCount; index++) {
       dim[index] = 1;
@@ -679,54 +593,14 @@ plane.set_size(Nx, Ny);
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
 
-   int *int_array = (int *)0;
-   short *short_array = (short *)0;
-   float *float_array = (float *)0;
-   double *double_array = (double *)0;
-
    double *data_array = new double[cell_count];
+   double *double_array = new double[cell_count];
+
    clock_time = clock();
-   
-   switch ( type_id ) {
-      case NcType::nc_INT:
-         int_array = new int[cell_count];
-         get_nc_data(v, int_array, dim, cur);
-         copy_nc_data_as_double(data_array, int_array, x_slot, y_slot, Nx, Ny,
-                                missing_value, fill_value, add_offset, scale_factor);
-         if (int_array) delete[] int_array;
-         break;
 
-      case NcType::nc_SHORT:
-         short_array = new short[cell_count];
-         get_nc_data(v, short_array, dim, cur);
-         copy_nc_data_as_double(data_array, short_array, x_slot, y_slot, Nx, Ny,
-                                missing_value, fill_value, add_offset, scale_factor);
-         if (short_array) delete[] short_array;
-         break;
-
-      case NcType::nc_FLOAT:
-         float_array = new float[cell_count];
-         get_nc_data(v, float_array, dim, cur);
-         copy_nc_data_as_double(data_array, float_array, x_slot, y_slot, Nx, Ny,
-                                missing_value, fill_value, add_offset, scale_factor);
-         if (float_array) delete[] float_array;
-         break;
-
-      case NcType::nc_DOUBLE:
-         double_array = new double[cell_count];
-         get_nc_data(v, double_array, dim, cur);
-         copy_nc_data_as_double(data_array, double_array, x_slot, y_slot, Nx, Ny,
-                                missing_value, fill_value, add_offset, scale_factor);
-         if (double_array) delete[] double_array;
-         break;
-
-      default:
-         mlog << Error << "\n" << method_name << " bad type (" << GET_NC_TYPE_NAME_P(v)
-              << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-         exit ( 1 );
-         break;
-
-   }   //  switch
+   get_nc_data(v, double_array, dim, cur);
+   copy_nc_data_as_double(data_array, double_array, x_slot, y_slot, Nx, Ny,
+                          missing_value, fill_value);
 
    nc_time = clock();
    if (mlog.verbosity_level() >= 7) {
@@ -735,17 +609,18 @@ plane.set_size(Nx, Ny);
       mlog << Debug(7) << method_name_short << "took " << duration_sec
            << " seconds to read NetCDF data\n";
    }
-   
+
    plane.set_block(data_array, Nx, Ny);
-   
+
    if (mlog.verbosity_level() >= 7) {
       double duration_sec = (double)(clock() - nc_time)/CLOCKS_PER_SEC;
       mlog << Debug(7) << method_name_short << "took " << duration_sec
            << " seconds to fill data plane\n";
    }
-   
+
    if (data_array) delete[] data_array;
-   
+   if (double_array) delete[] double_array;
+
    //
    //  done
    //
