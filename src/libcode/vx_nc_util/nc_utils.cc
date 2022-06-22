@@ -1334,7 +1334,7 @@ void apply_scale_factor_T(T *data, const int cell_count,
                           const char *data_type, const char *var_name) {
    const int debug_level = 7;
    clock_t start_clock = clock();
-   const char *method_name = "apply_scale_factor_T(T) ";
+   const char *method_name = "apply_scale_factor(T) ";
 
    if (cell_count > 0) {
       int idx;
