@@ -129,12 +129,14 @@ static const string nc_att_use_var_id   = "use_var_id";
 static const char nc_att_obs_version[]  = "MET_Obs_version";
 static const char nc_att_met_point_nccf[] = "MET_point_NCCF";
 
+static const string add_offset_att_name    = "add_offset";
 static const string description_att_name   = "description";
 static const string fill_value_att_name    = "_FillValue";
 static const string level_att_name         = "level";
 static const string long_name_att_name     = "long_name";
 static const string missing_value_att_name = "missing_value";
 static const string name_att_name          = "name";
+static const string scale_factor_att_name  = "scale_factor";
 static const string units_att_name         = "units";
 
 
@@ -184,7 +186,8 @@ extern bool get_nc_att_value(const NcVar *, const ConcatString &, ConcatString &
 extern bool get_nc_att_value(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 
-extern bool has_att(NcFile *, const ConcatString name, bool exit_on_error = false);
+extern bool has_att(NcFile *, const ConcatString name, bool exit_on_error=false);
+extern bool has_att(NcVar *, const ConcatString name, bool do_log=false);
 extern bool has_unsigned_attribute(NcVar *);
 
 extern bool get_global_att(const NcGroupAtt *, ConcatString &);
