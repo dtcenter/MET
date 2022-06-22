@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -567,53 +565,10 @@ int i;
 short s;
 float f;
 double d = bad_data_double;
-float add_offset   = 0.f;
-float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
 
-switch ( GET_NC_TYPE_ID_P(var) )  {
-
-   case NcType::nc_INT:
-      status = get_nc_data(var, &i, (long *)a);
-      d = (double) (i);
-      break;
-
-   case NcType::nc_SHORT:
-      status = get_nc_data(var, &s, (long *)a);
-      d = (double) (s);
-      break;
-
-   case NcType::nc_FLOAT:
-      status = get_nc_data(var, &f, (long *)a);
-      d = (double) (f);
-      break;
-
-   case NcType::nc_DOUBLE:
-      status = get_nc_data(var, &d, (long *)a);
-      break;
-
-   default:
-      mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-if ((add_offset != 0.0 || scale_factor != 1.0) &&
-    !is_eq(d, missing_value)                   &&
-    !is_eq(d, fill_value)) {
-   d = d * scale_factor + add_offset;
-}
+status = get_nc_data(var, &d, (long *)a);
 
 if ( !status )  {
 
@@ -784,22 +739,9 @@ plane.set_size(Nx, Ny);
    //  get the data
    //
 double d[Ny];
-int    i[Ny];
-short  s[Ny];
-float  f[Ny];
 
 long offsets[dim_count];
 long lengths[dim_count];
-float add_offset   = 0.f;
-float scale_factor = 1.f;
-NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
 
 for (int k=0; k<dim_count; k++) {
   offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
@@ -810,41 +752,7 @@ lengths[y_slot] = Ny;
 int type_id = GET_NC_TYPE_ID_P(v);
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;
-   switch ( type_id )  {
-
-      case NcType::nc_INT:
-         get_nc_data(v, (int *)&i, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)i[y];
-         }
-         break;
-
-      case NcType::nc_SHORT:
-         get_nc_data(v, (short *)&s, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)s[y];
-         }
-         break;
-
-      case NcType::nc_FLOAT:
-         get_nc_data(v, (float *)&f, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)f[y];
-         }
-         break;
-
-      case NcType::nc_DOUBLE:
-         get_nc_data(v, (double *)&d, lengths, offsets);
-         break;
-
-      default:
-         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-              << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-         exit ( 1 );
-         break;
-
-   }   //  switch
-
+   get_nc_data(v, (double *)&d, lengths, offsets);
 
    b[x_slot] = x;
 
@@ -853,9 +761,6 @@ for (x=0; x<Nx; ++x)  {
 
       if ( is_bad_data_pinterp( value ) ) {
          value = bad_data_double;
-      }
-      else if (add_offset != 0.0 || scale_factor != 1.0) {
-         value = value * scale_factor + add_offset;
       }
 
       plane.set(value, x, y);
