@@ -31,6 +31,7 @@ typedef unsigned char uchar;
 #include "int_array.h"
 #include "long_array.h"
 #include "num_array.h"
+#include "nc_var_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -130,13 +131,18 @@ static const char nc_att_obs_version[]  = "MET_Obs_version";
 static const char nc_att_met_point_nccf[] = "MET_point_NCCF";
 
 static const string add_offset_att_name    = "add_offset";
+static const string axis_att_name          = "axis";
+static const string bounds_att_name        = "bounds";
+static const string coordinates_att_name   = "coordinates";
 static const string description_att_name   = "description";
 static const string fill_value_att_name    = "_FillValue";
+static const string grid_mapping_att_name  = "grid_mapping";
 static const string level_att_name         = "level";
 static const string long_name_att_name     = "long_name";
 static const string missing_value_att_name = "missing_value";
 static const string name_att_name          = "name";
 static const string scale_factor_att_name  = "scale_factor";
+static const string standard_name_att_name = "standard_name";
 static const string units_att_name         = "units";
 
 
@@ -266,12 +272,6 @@ extern bool get_nc_data(NcVar *, float  *data, const long *dims, const long *cur
 extern bool get_nc_data(NcVar *, double *data, const long *dims, const long *curs);
 extern bool get_nc_data(NcVar *, ncbyte *data, const long *dims, const long *curs);
 
-extern bool get_nc_data(NcFile *, const char *var_name, int    *data, const long *dims, const long *curs);
-extern bool get_nc_data(NcFile *, const char *var_name, char   *data, const long *dims, const long *curs);
-extern bool get_nc_data(NcFile *, const char *var_name, float  *data, const long *dims, const long *curs);
-extern bool get_nc_data(NcFile *, const char *var_name, double *data, const long *dims, const long *curs);
-extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long *dims, const long *curs);
-
 extern bool get_nc_data_to_array(NcVar  *, StringArray *);
 extern bool get_nc_data_to_array(NcFile *, const char *, StringArray *);
 extern int  get_nc_string_length(NcVar  *);
@@ -313,6 +313,7 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
 
 extern NcVar    get_var(NcFile *, const char * var_name);   // exit if not exists
 extern NcVar get_nc_var(NcFile *, const char * var_name, bool log_as_error=false);   // continue even though not exists
+
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(NcFile *, NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( NcVar *,  NcVar *, const ConcatString attr_name);
@@ -347,6 +348,8 @@ extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 extern NcVar  get_nc_var_lat(const NcFile *nc);
 extern NcVar  get_nc_var_lon(const NcFile *nc);
 extern NcVar  get_nc_var_time(const NcFile *nc);
+extern int    get_index_for_dim(NcVarInfo *vars, const string dim_name,
+                                double value, const int var_count, bool is_time=false);
 
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
