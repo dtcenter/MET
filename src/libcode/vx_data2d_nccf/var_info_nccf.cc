@@ -116,6 +116,8 @@ void VarInfoNcCF::clear() {
    return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoNcCF::clear_dimension() {
    Dimension.clear();
    Is_offset.clear();
@@ -188,32 +190,27 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
       // If dimensions are specified, clear the default value
       if (strchr(ptr, ',') != NULL) clear_dimension();
 
-      bool as_offset = true;
       // Parse the dimensions
-      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
-      {
+      bool as_offset = true;
+      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
          // Check for wildcards
-         if (strchr(ptr2, '*') != NULL) {
-            add_dimension(vx_data2d_star);
+         if (strchr(ptr2, '*') != NULL) { add_dimension(vx_data2d_star);
          }
-         else
-         {
+         else {
             as_offset = (*ptr2 != '@');
             if (!as_offset) ptr2++;
 
             // Check for a range of levels
-            if ((ptr3 = strchr(ptr2, '-')) != NULL)
-            {
+            if ((ptr3 = strchr(ptr2, '-')) != NULL) {
+
                // Check if a range has already been supplied
-               if (Dimension.has(range_flag))
-               {
+               if (Dimension.has(range_flag)) {
                   mlog << Error << "\n" << method_name
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
                }
-               else
-               {
+               else {
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
                   add_dimension(range_flag, as_offset);
@@ -228,15 +225,13 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             // Check for a range of times
             else if ((ptr3 = strchr(ptr2, ':')) != NULL) {
                // Check if a range has already been supplied
-               if (Dimension.has(range_flag))
-               {
+               if (Dimension.has(range_flag)) {
                   mlog << Error << "\n" << method_name
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
                }
-               else
-               {
+               else {
                   int increment = 1;
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
@@ -282,8 +277,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   Level.set_is_offset(as_offset);
                }
             }
-            else
-            {
+            else {
                // Single level
                int level = 0;
                double level_value = bad_data_double;

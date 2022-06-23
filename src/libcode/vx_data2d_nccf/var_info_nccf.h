@@ -56,7 +56,7 @@ class VarInfoNcCF : public VarInfo
       // get stuff
       //
 
-      GrdFileType file_type()            const;
+      GrdFileType       file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;
@@ -72,7 +72,7 @@ class VarInfoNcCF : public VarInfo
       void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &s);
 
-      void add_dimension(int dim, bool as_index=true, double dim_value=bad_data_double);
+      void add_dimension(int dim, bool as_offset=true, double dim_value=bad_data_double);
 
       //
       // do stuff
