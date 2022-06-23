@@ -76,7 +76,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file  = (NcCfFile *) 0;
+   _file = (NcCfFile *) 0;
    _cur_time_index = -1;
 
    close();
@@ -227,23 +227,34 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       else {
         long z_cnt = (long)_file->vlevels.n();
         if (z_cnt > 0) {
+
           zdim_slot = idx;
           org_z_offset = dim_offset;
           long z_offset = dim_offset;
+          string z_dim_name;
+          if (0 <= data_var->z_slot) {
+             NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
+             if (IS_VALID_NC(z_dim)) z_dim_name = GET_NC_NAME(z_dim);
+          }
           if (!is_offset[idx]) {
             // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_value[idx]);
+            z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
           }
           else if ((dim_offset < 0 || dim_offset >= z_cnt)) {
             // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_offset);
+            z_offset = convert_value_to_offset(dim_offset, z_dim_name);
           }
           if ((z_offset >= 0) && (z_offset < z_cnt))
             dimension[idx] = long(z_offset);
           else {
-            mlog << Error << "\n" << method_name << "the requested vertical offset "
-                 << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
-                 << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
+            if (is_offset[idx])
+               mlog << Error << "\n" << method_name << "the requested vertical offset "
+                    << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
+                    << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
+            else
+               mlog << Error << "\n" << method_name << "the requested vertical value "
+                    << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
+                    << "does not exist (data size = " << z_cnt << ").\n\n";
             return false;
           }
         }
@@ -599,6 +610,7 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 
 long MetNcCFDataFile::convert_time_to_offset(long time_value) {
    bool found = false;
+   bool found_value = false;
    long time_offset = time_value;
    int dim_size = _file->ValidTime.n();
    static const string method_name
@@ -608,9 +620,6 @@ long MetNcCFDataFile::convert_time_to_offset(long time_value) {
       if (_file->ValidTime[idx] == time_value) {
          time_offset = idx;
          found = true;
-         mlog << Debug(7) << method_name << " Found "
-              << unix_to_yyyymmdd_hhmmss(time_value)
-              << " at index " << time_offset << " from time value\n";
          break;
       }
    }
@@ -620,19 +629,30 @@ long MetNcCFDataFile::convert_time_to_offset(long time_value) {
       for (int idx=0; idx<dim_size; idx++) {
          if (_file->raw_times[idx] == time_value) {
             time_offset = idx;
-            found = true;
-            mlog << Debug(7) << method_name << " Found " << time_value
-                 << " at index " << time_offset << " from raw time value\n";
+            found_value = true;
             break;
          }
       }
    }
+
+   if (found)
+      mlog << Debug(7) << method_name << " Found "
+           << unix_to_yyyymmdd_hhmmss(time_value)
+           << " at index " << time_offset << " from time value\n";
+   else if (found_value)
+      mlog << Debug(7) << method_name << " Found " << time_value
+           << " at index " << time_offset << " from time value\n";
+   else
+      mlog << Warning << "\n" << method_name << time_value
+           << " does not exist at time variable\n\n";
+
    return time_offset;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_value_to_offset(double z_value) {
+long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name) {
+   bool found = false;
    long z_offset = (long)z_value;
    int dim_size = _file->vlevels.n();
    static const string method_name
@@ -640,11 +660,15 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value) {
 
    for (int idx=0; idx<dim_size; idx++) {
       if (is_eq(_file->vlevels[idx], z_value)) {
+         found = true;
          z_offset = idx;
-         mlog << Debug(7) << method_name << " Found " << z_value
-              << " at index " << z_offset << " from raw vertical level value\n";
          break;
       }
+   }
+
+   if (!found && 0 < z_dim_name.length()) {
+      long new_offset = get_index_for_dim(_file->Var, z_dim_name, z_value, _file->Nvars);
+      if (new_offset != bad_data_int) z_offset = new_offset;
    }
 
    return z_offset;
