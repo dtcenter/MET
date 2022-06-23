@@ -4,17 +4,17 @@ Run all of the Docker commands from the top-level directory of the MET repositor
 
 ## Build image with minimum requirements needed to build MET
 
-```docker build -t dtcenter/met-base:minimum -f scripts/docker/Dockerfile.minimum .
+```docker build -t dtcenter/met-base:minimum -f internal/scripts/docker/Dockerfile.minimum .
 docker push dtcenter/met-base:minimum```
 
 ## Build image with requirements to build MET and run MET unit tests
 
-```docker build -t dtcenter/met-base:unit_test -f scripts/docker/Dockerfile.test .
+```docker build -t dtcenter/met-base:unit_test -f internal/scripts/docker/Dockerfile.test .
 docker push dtcenter/met-base:unit_test```
 
 ## Build MET from clone
 
-```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} scripts/docker
+```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} internal/scripts/docker
 docker push dtcenter/met:${TAG_NAME}```
 
 where:
@@ -23,7 +23,7 @@ where:
 
 ## Build MET from local source code with minimum requirements
 
-```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} -f scripts/docker/Dockerfile.copy .
+```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} -f internal/scripts/docker/Dockerfile.copy .
 docker push dtcenter/met:${TAG_NAME}```
 
 where:
@@ -32,7 +32,7 @@ where:
 
 ## Build MET from local source code with unit test requirements
 
-```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} --build-arg MET_BASE_IMAGE=unit_test -f scripts/docker/Dockerfile.copy .
+```docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} --build-arg MET_BASE_IMAGE=unit_test -f internal/scripts/docker/Dockerfile.copy .
 docker push dtcenter/met:${TAG_NAME}```
 
 where:

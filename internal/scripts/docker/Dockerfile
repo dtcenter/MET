@@ -36,4 +36,4 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
  && cd ${MET_REPO_DIR} \
  && git checkout ${MET_GIT_NAME} \
- && ../scripts/docker/build_met_docker.sh
+ && internal/scripts/docker/build_met_docker.sh
