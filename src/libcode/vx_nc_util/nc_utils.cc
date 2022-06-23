@@ -1372,9 +1372,10 @@ void apply_scale_factor_T(T *data, const int cell_count,
            << unpacked_count << " out of " << cell_count
            << ", scale_factor=" << scale_factor<< " add_offset=" << add_offset
            << ". FillValue(" << data_type << ")=" << nc_fill_value << "\n";
-      mlog << Debug(debug_level) << method_name << " data range [" << min_value << " - " << max_value
-           << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
-           << positive_cnt << "\n";
+      mlog << Debug(debug_level) << method_name
+           << " data range [" << min_value << " - " << max_value
+           << "] raw data: [" << raw_min_val << " - " << raw_max_val
+           << "] Positive count: " << positive_cnt << "\n";
    }
    mlog << Debug(debug_level) << method_name << " took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1732,9 +1733,10 @@ void copy_nc_data_t1(NcVar *var, float *data, const T *packed_data,
               << " apply_scale_factor unpacked data: count="
               << unpacked_count << " out of " << cell_count
               << ". FillValue(" << data_type << ")=" << missing_value << "\n";
-         mlog << Debug(7) << method_name << "data range [" << min_value << " - " << max_value
-              << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
-              << positive_cnt << "\n";
+         mlog << Debug(7) << method_name
+              << "data range [" << min_value << " - " << max_value
+              << "] raw data: [" << raw_min_val << " - " << raw_max_val
+              << "] Positive count: " << positive_cnt << "\n";
       }
       else {
          idx = 0;
@@ -2023,8 +2025,8 @@ void copy_nc_data_t1(NcVar *var, double *data, const T *packed_data,
               << unpacked_count << " out of " << cell_count
               << ". FillValue(" << data_type << ")=" << missing_value
               << " data range [" << min_value << " - " << max_value
-              << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
-              << positive_cnt << "\n";
+              << "] raw data: [" << raw_min_val << " - " << raw_max_val
+              << "] Positive count: " << positive_cnt << "\n";
       }
       else {
          idx = 0;
@@ -2386,6 +2388,26 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long *dims, const long *curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int get_index_at_nc_data(NcVar *var, double value) {
+   int offset = bad_data_int;
+   if (IS_VALID_NC_P(var)) {
+      int data_size = get_data_size(var);
+      double *values = new double[data_size];
+      if (get_nc_data(var, values)) {
+         for (int idx=0; idx<data_size; idx++) {
+            if (is_eq(values[idx], value)) {
+               offset = idx;
+               break;
+            }
+         }
+      }
+      if (values) delete [] values;
+   }
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
    bool result = false;
    static const char *method_name = "get_nc_data_to_array(NcVar) -> ";
@@ -2474,7 +2496,7 @@ int get_nc_string_length(NcFile *nc_file, NcVar var, const char *var_name) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool _put_nc_data(NcVar *var, const T data, long offset0, long offset1, long offset2) {
+bool put_nc_data_T(NcVar *var, const T data, long offset0, long offset1, long offset2) {
    vector<size_t> offsets;
    offsets.push_back((size_t)offset0);
    if (0 <= offset1) {
@@ -2490,31 +2512,31 @@ bool _put_nc_data(NcVar *var, const T data, long offset0, long offset1, long off
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const int data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float data , long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const double data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const ncbyte data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2555,7 +2577,7 @@ bool put_nc_data(NcVar *var, const ncbyte *data ) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool _put_nc_data(NcVar *var, const T *data,    const long length, const long offset) {
+bool put_nc_data_T(NcVar *var, const T *data,    const long length, const long offset) {
    vector<size_t> offsets, counts;
    int dim_count = get_dim_count(var);
    offsets.push_back(offset);
@@ -2571,42 +2593,42 @@ bool _put_nc_data(NcVar *var, const T *data,    const long length, const long of
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const int *data,    const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char *data,   const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float *data , const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const double *data, const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const ncbyte *data, const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool _put_nc_data(NcVar *var, const T *data , const long *lengths, const long *offsets) {
+bool put_nc_data_T(NcVar *var, const T *data , const long *lengths, const long *offsets) {
    int dim = get_dim_count(var);
    vector<size_t> nc_offsets, counts;
    for (int idx = 0 ; idx < dim; idx++) {
@@ -2622,29 +2644,29 @@ bool _put_nc_data(NcVar *var, const T *data , const long *lengths, const long *o
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const int *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool _put_nc_data_with_dims(NcVar *var, const T *data,
-                           const long len0, const long len1, const long len2) {
+bool put_nc_data_T_with_dims(NcVar *var, const T *data,
+                             const long len0, const long len1, const long len2) {
    vector<size_t> offsets, counts;
    if (0 < len0) {
      offsets.push_back(0);
@@ -2673,7 +2695,7 @@ bool put_nc_data_with_dims(NcVar *var, const int *data,
 
 bool put_nc_data_with_dims(NcVar *var, const int *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -2688,7 +2710,7 @@ bool put_nc_data_with_dims(NcVar *var, const float *data,
 
 bool put_nc_data_with_dims(NcVar *var, const float *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -2703,7 +2725,7 @@ bool put_nc_data_with_dims(NcVar *var, const double *data,
 
 bool put_nc_data_with_dims(NcVar *var, const double *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -3785,6 +3807,55 @@ NcVar get_nc_var_time(const NcFile *nc) {
       mlog << Debug(6) << method_name << "fail to find the time variable\n";
    }
    return var;
+}
+
+////////////////////////////////////////////////////////////////////////
+// returns matching offset or returns bad_data_int if not found
+
+int get_index_for_dim(NcVarInfo *vars, const string dim_name,
+                      double value, const int var_count, bool is_time) {
+   int offset = bad_data_int;
+   NcVar *nc_var = (NcVar *)NULL;
+   static const string method_name = "get_index_for_dim() -> ";
+
+   // Find the variable with the same dimension name
+   for (int i=0; i<var_count; i++) {
+      if (1 != get_dim_count(vars[i].var)) continue;
+      if (!dim_name.compare(GET_NC_NAME_P(vars[i].var))) {
+         nc_var = vars[i].var;
+         break;
+      }
+   }
+
+   if (IS_INVALID_NC_P(nc_var)) {
+      // Find 1D variable with the same dimension
+      for (int i=0; i<var_count; i++) {
+         if (1 != get_dim_count(vars[i].var)) continue;
+         NcDim dim = get_nc_dim(vars[i].var, 0);
+         if (IS_VALID_NC(dim) && !dim_name.compare(GET_NC_NAME(dim))) {
+            nc_var = vars[i].var;
+            break;
+         }
+      }
+   }
+
+   if (IS_VALID_NC_P(nc_var)) {
+      offset = get_index_at_nc_data(nc_var, value);
+
+      if (offset == bad_data_int)
+         mlog << Debug(7) << method_name << "Not found value " << value
+              << " at " << GET_NC_NAME_P(nc_var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      else
+         mlog << Debug(7) << method_name << "Found value " << value
+              << " (index=" << offset << ") at " << GET_NC_NAME_P(nc_var)
+              << " by dimension name \"" << dim_name << "\"\n";
+   }
+   else {
+      mlog << Debug(7) << method_name << "Not found a dimension variable for \""
+           << dim_name << "\"\n";
+   }
+   return(offset);
 }
 
 
