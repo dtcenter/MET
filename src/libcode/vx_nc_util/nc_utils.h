@@ -134,17 +134,17 @@ static const string add_offset_att_name    = "add_offset";
 static const string axis_att_name          = "axis";
 static const string bounds_att_name        = "bounds";
 static const string coordinates_att_name   = "coordinates";
+static const string coordinate_axis_type_att_name = "_CoordinateAxisType";
 static const string description_att_name   = "description";
 static const string fill_value_att_name    = "_FillValue";
 static const string grid_mapping_att_name  = "grid_mapping";
-static const string level_att_name         = "level";
+static const string grid_mapping_name_att_name = "grid_mapping_name";
 static const string long_name_att_name     = "long_name";
 static const string missing_value_att_name = "missing_value";
-static const string name_att_name          = "name";
+static const string projection_att_name    = "Projection";
 static const string scale_factor_att_name  = "scale_factor";
 static const string standard_name_att_name = "standard_name";
 static const string units_att_name         = "units";
-
 
 static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* since [0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 
@@ -191,6 +191,7 @@ extern bool get_nc_att_value(const NcVarAtt *, double       &, bool exit_on_erro
 extern bool get_nc_att_value(const NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
 extern bool get_nc_att_value(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
+extern bool get_nc_att_value(const NcVar *, const ConcatString &, double       &, bool exit_on_error = false);
 
 extern bool has_att(NcFile *, const ConcatString name, bool exit_on_error=false);
 extern bool has_att(NcVar *, const ConcatString name, bool do_log=false);
@@ -222,10 +223,16 @@ extern int    get_var_names(NcFile *, StringArray *varNames);
 extern bool   get_var_att_float (const NcVar *, const ConcatString &, float  &);
 extern bool   get_var_att_double(const NcVar *, const ConcatString &, double &);
 
-extern bool   get_var_units(const NcVar *, ConcatString &);
-extern bool   get_var_level(const NcVar *, ConcatString &);
-extern double get_var_missing_value(const NcVar *);
+template <typename T>
+extern bool   get_var_fill_value(const NcVar *var, T &att_val);
+extern bool   get_var_axis(const NcVar *var, ConcatString &att_val);
 extern double get_var_fill_value(const NcVar *);
+extern bool   get_var_grid_mapping(const NcVar *var, ConcatString &att_val);
+extern bool   get_var_grid_mapping_name(const NcVar *var, ConcatString &att_val);
+extern bool   get_var_long_name(const NcVar *, ConcatString &);
+extern double get_var_missing_value(const NcVar *);
+extern bool   get_var_standard_name(const NcVar *, ConcatString &);
+extern bool   get_var_units(const NcVar *, ConcatString &);
 
 extern bool   args_ok(const LongArray &);
 
