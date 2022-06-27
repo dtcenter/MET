@@ -418,19 +418,20 @@ static bool get_filtered_nc_data(NcVar var, float *data,
                                  const char *var_name, bool required) {
 
    bool status = false;
-   float in_fill_value;
    const char *method_name = "get_filtered_nc_data(float) ";
 
    if (IS_VALID_NC(var)) {
       if(status = get_nc_data(&var, data, dim, cur)) {
 
-         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-              << in_fillValue_str <<  "=" << in_fill_value << "\n";
-         for (int idx=0; idx<dim; idx++) {
-            if(is_eq(data[idx], in_fill_value)) {
-               data[idx] = bad_data_float;
-               rej_fill++;
+         float in_fill_value;
+         if (get_var_fill_value(&var, in_fill_value)) {
+            mlog << Debug(5)  << method_name << GET_NC_NAME(var) << " "
+                 << fill_value_att_name << "=" << in_fill_value << "\n";
+            for (int idx=0; idx<dim; idx++) {
+               if(is_eq(data[idx], in_fill_value)) {
+                  data[idx] = bad_data_float;
+                  rej_fill++;
+               }
             }
          }
       }
@@ -458,9 +459,8 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     bool count_bad) {
 
    bool status = false;
-   int in_fill_value;
    int data_len = dim[0] * dim[1];
-   const char *method_name = "get_filtered_nc_data_2d(int)";
+   const char *method_name = "get_filtered_nc_data_2d(int) ";
 
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_int;
@@ -470,14 +470,16 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
 
       if(status = get_nc_data(&var, data, dim, cur)) {
 
-         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-              << in_fillValue_str <<  "=" << in_fill_value << "\n";
+         int in_fill_value;
+         if (get_var_fill_value(&var, in_fill_value)) {
+            mlog << Debug(5)  << method_name << GET_NC_NAME(var) << " "
+                 << fill_value_att_name << "=" << in_fill_value << "\n";
 
-         for (int offset=0; offset<data_len; offset++) {
-            if(is_eq(data[offset], in_fill_value)) {
-               data[offset] = bad_data_int;
-               if(count_bad) rej_fill++;
+            for (int offset=0; offset<data_len; offset++) {
+               if(is_eq(data[offset], in_fill_value)) {
+                  data[offset] = bad_data_int;
+                  if(count_bad) rej_fill++;
+               }
             }
          }
       }
@@ -501,7 +503,6 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
                                     bool count_bad) {
 
    bool status = false;
-   float in_fill_value;
    int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(float) ";
 
@@ -513,16 +514,19 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
       if(status = get_nc_data(&var, data, dim, cur)) {
 
-         get_nc_att_value(&var, (string)in_fillValue_str, in_fill_value);
-         mlog << Debug(5)  << "    " << method_name << GET_NC_NAME(var) << " "
-              << in_fillValue_str <<  "=" << in_fill_value << "\n";
+         float in_fill_value;
+         if (get_var_fill_value(&var, in_fill_value)) {
+            mlog << Debug(5)  << method_name << GET_NC_NAME(var) << " "
+                 << fill_value_att_name << "=" << in_fill_value << "\n";
 
-         for (int offset=0; offset<data_len; offset++) {
-            if(is_eq(data[offset], in_fill_value)) {
-               data[offset] = bad_data_float;
-               if(count_bad) rej_fill++;
+            for (int offset=0; offset<data_len; offset++) {
+               if(is_eq(data[offset], in_fill_value)) {
+                  data[offset] = bad_data_float;
+                  if(count_bad) rej_fill++;
+               }
             }
          }
+
       }
       else {
          mlog << Warning << "\n" << method_name
