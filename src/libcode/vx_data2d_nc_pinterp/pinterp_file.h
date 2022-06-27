@@ -115,6 +115,7 @@ class PinterpFile {
       bool data(const char *, const LongArray &, DataPlane &,
                 double & pressure, NcVarInfo *&) const;
 
+      bool get_nc_var_info(const char *var_name, NcVarInfo *&info) const;
 };
 
 
