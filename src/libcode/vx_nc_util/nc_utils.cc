@@ -3825,9 +3825,9 @@ int get_index_for_dim(NcVarInfo *vars, const string dim_name,
    }
 
    if (IS_VALID_NC_P(nc_var)) {
-      ConcatString value_str = (is_time && (value > 10000000.))
-                               ? unix_to_yyyymmdd_hhmmss(value)
-                               : to_string(value).c_str();
+      ConcatString value_str;
+      if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
+      else value_str << value;
 
       offset = get_index_at_nc_data(nc_var, value, is_time);
       if (offset == bad_data_int)
