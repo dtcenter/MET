@@ -797,23 +797,11 @@ return ( true );
 bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
                        double & pressure, NcVarInfo *&info) const {
 
-   int j, time_index;
+   int time_index;
    bool found = false;
-
 
    if (NULL != info) found = true;
    else found = get_nc_var_info(var_name, info);
-/*
-for (j=0; j<Nvars; ++j)  {
-
-   if ( Var[j].name == var_name )  {
-      found = true;
-      info = &Var[j];
-      break;
-   }
-
-}
-*/
 
    if ( !found )  return ( false );
 
