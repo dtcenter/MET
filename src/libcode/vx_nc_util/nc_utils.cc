@@ -3825,15 +3825,17 @@ int get_index_for_dim(NcVarInfo *vars, const string dim_name,
    }
 
    if (IS_VALID_NC_P(nc_var)) {
+      ConcatString value_str = (is_time && (value > 10000000.))
+                               ? unix_to_yyyymmdd_hhmmss(value)
+                               : to_string(value).c_str();
+
       offset = get_index_at_nc_data(nc_var, value, is_time);
       if (offset == bad_data_int)
-         mlog << Debug(7) << method_name << "Not found value "
-              << (is_time && value > 10000000. ? unix_to_yyyymmdd_hhmmss(value) : value)
+         mlog << Debug(7) << method_name << "Not found value " << value_str
               << " at " << GET_NC_NAME_P(nc_var)
               << " by dimension name \"" << dim_name << "\"\n";
       else
-         mlog << Debug(7) << method_name << "Found value "
-              << (is_time && value > 10000000. ? unix_to_yyyymmdd_hhmmss(value) : value)
+         mlog << Debug(7) << method_name << "Found value " << value_str
               << " (index=" << offset << ") at " << GET_NC_NAME_P(nc_var)
               << " by dimension name \"" << dim_name << "\"\n";
    }
