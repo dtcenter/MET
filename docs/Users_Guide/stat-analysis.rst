@@ -45,7 +45,7 @@ The Stat-Analysis "aggregate" job aggregates values from multiple STAT lines of 
 Aggregate STAT lines and produce aggregated statistics
 ------------------------------------------------------
 
-The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
+The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2 or VAL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
 
 When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the "-out_thresh" (or "-out_fcst_thresh" and  "-out_obs_thresh" options) are required to compute contingnecy table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
 
@@ -757,6 +757,8 @@ Job: aggregate
 
 This job aggregates output from the STAT line type specified using the "**-line_type**" argument. The output of this job type is in the same format as the line type specified (see :numref:`point_stat-output`, :numref:`grid_stat-output`, and :numref:`wavelet_stat-output`). Again the output consists of three lines. The first line contains "**JOB_LIST**", as described above. The second line contains "**COL_NAME**", followed by a colon, then the column names for the line type selected. The third line contains the name of the line type selected followed by the statistics for that line type.
 
+The STAT line types which may be aggregated in this way are the contingency table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and other (ISC, ECNT, RPS, RHIST, PHIST, RELP, NBRCNT, SSVAR, and GRAD) line types.
+
 Job: aggregate_stat
 ^^^^^^^^^^^^^^^^^^^
 
@@ -777,7 +779,7 @@ This job is similar to the "**aggregate**" job listed above, however the format 
   * - SL1L2 or SAL1L2
     - CNT
   * - VL1L2 or VAL1L2
-    - WDIR (wind direction)
+    - WDIR (wind direction), VCNT
   * - PCT
     - PSTD, PJC, PRC
   * - NBRCTC

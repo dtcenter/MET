@@ -89,5 +89,5 @@ fi
 
 # Run the directory comparison tool on the output from the unit tests
 export MET_BASE=$(pwd)/MET-${2}/share/met
-export MET_TEST_BASE=$(pwd)/MET-${2}/internal/unit_test
+export MET_TEST_BASE=$(pwd)/MET-${2}/internal/test_unit
 run_command "${MET_TEST_BASE}/bin/comp_dir.sh MET-${1}/test_output MET-${2}/test_output"

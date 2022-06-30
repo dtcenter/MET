@@ -1499,6 +1499,12 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          cur_nbrcnt.clear();
 
          //
+         // Allocate space for confidence intervals
+         //
+         cur_vl1l2.allocate_n_alpha(1);
+         cur_vl1l2.alpha[0] = job.out_alpha;
+
+         //
          // Switch on the line type.
          // For each partial sum line type, clear out the object,
          // parse the new line, and add it to running sum.
@@ -1779,6 +1785,12 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          cur.clear();
 
          //
+         // Allocate space for confidence intervals
+         //
+         cur.allocate_n_alpha(1);
+         cur.alpha[0] = job.out_alpha;
+
+         //
          // Switch on the line type.
          // For each partial sum line type, clear out the object,
          // parse the new line and convert to unit vectors.
@@ -1933,6 +1945,12 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.pd_v.clear();
 
             //
+            // Allocate space for confidence intervals
+            //
+            aggr.vl1l2_info.allocate_n_alpha(1);
+            aggr.vl1l2_info.alpha[0] = job.out_alpha;
+
+            //
             // Initialize values
             //
             aggr.hdr_sa.add(hdr);
@@ -2015,7 +2033,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
    //
    // Loop over the map entries, discarding orphans and
-   // applyling the wind speed thresholds.
+   // applying the wind speed thresholds.
    //
    for(it = m.begin(); it != m.end(); it++) {
 
@@ -2026,6 +2044,12 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
       aggr.vl1l2_info.clear();
       aggr.pd_u.clear();
       aggr.pd_v.clear();
+
+      //
+      // Allocate space for confidence intervals
+      //
+      aggr.vl1l2_info.allocate_n_alpha(1);
+      aggr.vl1l2_info.alpha[0] = job.out_alpha;
 
       //
       // Loop over the pairs for the current map entry

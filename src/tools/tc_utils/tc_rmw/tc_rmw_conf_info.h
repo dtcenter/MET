@@ -54,6 +54,15 @@ class TCRMWConfInfo {
         double delta_range_km;
         double rmw_scale;
 
+	// Wind conversion information
+	bool compute_tangential_and_radial_winds;
+	ConcatString u_wind_field_name;
+	ConcatString v_wind_field_name;
+	ConcatString tangential_velocity_field_name;
+	ConcatString radial_velocity_field_name;
+	ConcatString tangential_velocity_long_field_name;
+	ConcatString radial_velocity_long_field_name;
+
         // Variable information
         VarInfo** data_info;
 
