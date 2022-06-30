@@ -335,7 +335,7 @@ class STATAnalysisJob {
       double ss_index_vld_thresh;
 
       //
-      // MCTS HSS Expected Correct rate
+      // HSS Expected Correct rate
       //
       double hss_ec_value;
 

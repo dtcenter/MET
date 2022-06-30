@@ -94,7 +94,6 @@ int main(int argc, char * argv[]) {
    VarInfo * var_ptr = (VarInfo * ) 0;
    VarInfoFactory v_factory;
    DataPlane data_plane;
-   DataPlaneArray data_plane_array;
    Grid grid;
    GrdFileType ftype;
    ColorTable color_table;

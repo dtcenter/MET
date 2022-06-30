@@ -74,7 +74,7 @@ class SeriesAnalysisConfInfo {
 
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
-      double           hss_ec_value;       // MCTS HSS expected correct value
+      double           hss_ec_value;       // HSS expected correct value
       bool             rank_corr_flag;     // Flag for computing rank correlations
 
       ConcatString     tmp_dir;            // Directory for temporary files
