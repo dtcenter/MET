@@ -76,8 +76,8 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) 0;
-   _cur_time_index = -1;
+   _file  = (NcCfFile *) 0;
+   _time_dim_offset = -1;
 
    close();
 
@@ -175,89 +175,51 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
     if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
   }
 
-  int zdim_slot = bad_data_int;
   int time_dim_slot = bad_data_int;
   long org_time_offset = bad_data_int;
-  long org_z_offset = bad_data_int;
-  NumArray dim_value = vinfo_nc->dim_value();
   LongArray dimension = vinfo_nc->dimension();
-  BoolArray is_offset = vinfo_nc->is_offset();
-
+  long time_cnt = (long)_file->ValidTime.n_elements();
+  long time_threshold_cnt = (time_cnt + 1000) * 1000;
+  
   data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
   if (NULL != data_var) {
     time_dim_slot = data_var->t_slot;
-    for (int idx=0; idx<is_offset.n(); idx++) {
-      long dim_offset = dimension[idx];
-      if (dim_offset == vx_data2d_star) continue;
-      if (idx == time_dim_slot) {
-        long time_cnt = (long)_file->ValidTime.n();
-        long time_threshold_cnt = 10000000;
-        org_time_offset = dim_offset;
-        long time_offset = org_time_offset;
-        if (time_offset == range_flag) time_offset = _cur_time_index;   // from data_plane_array()
-        else if (!is_offset[idx]) {
-          long time_value = dim_value[idx];
-          time_offset = convert_time_to_offset(time_value);
-          if ((0 > time_offset) || (time_offset >= time_cnt)) {
-             if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)
-                mlog << Warning << "\n" << method_name << "the requested time "
-                     << unix_to_yyyymmdd_hhmmss(time_value) << " for \""
-                     << vinfo.req_name() << "\" variable does not exist ("
-                     << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
-                     << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
-             else
-                mlog << Warning << "\n" << method_name << "the requested time value "
-                     << time_value << " for \"" << vinfo.req_name() << "\" variable "
-                     << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
-
-             return false;
-          }
-        }
-        else if ((0 > time_offset) || (time_offset >= time_cnt)) {
+    if (0 <= time_dim_slot) {
+      org_time_offset = dimension[time_dim_slot];
+      long time_offset = org_time_offset;
+      bool time_as_value = !vinfo_nc->level().is_time_as_offset();
+      if (time_as_value || (time_offset == range_flag) || (time_offset == vx_data2d_star)) {
+        if (0 <= _time_dim_offset) time_offset = _time_dim_offset;
+        if (time_as_value && time_offset > time_threshold_cnt)   // convert the unixtime to offset
           time_offset = convert_time_to_offset(time_offset);
-        }
-        if ((0 > time_offset) || (time_offset >= time_cnt)) {
-          mlog << Error << "\n" << method_name << "the requested time offset "
-               << time_offset << " for \"" << vinfo.req_name() << "\" variable "
-               << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
-          return false;
-        }
-        dimension[time_dim_slot] = time_offset;
       }
+      
+      if ((0 <= time_offset) && (time_offset < time_cnt))
+        dimension[time_dim_slot] = time_offset;
       else {
-        long z_cnt = (long)_file->vlevels.n();
-        if (z_cnt > 0) {
-
-          zdim_slot = idx;
-          org_z_offset = dim_offset;
-          long z_offset = dim_offset;
-          string z_dim_name;
-          if (0 <= data_var->z_slot) {
-             NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
-             if (IS_VALID_NC(z_dim)) z_dim_name = GET_NC_NAME(z_dim);
-          }
-          if (!is_offset[idx]) {
-            // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
-          }
-          else if ((dim_offset < 0 || dim_offset >= z_cnt)) {
-            // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_offset, z_dim_name);
-          }
-          if ((z_offset >= 0) && (z_offset < z_cnt))
-            dimension[idx] = long(z_offset);
-          else {
-            if (is_offset[idx])
-               mlog << Error << "\n" << method_name << "the requested vertical offset "
-                    << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
-                    << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
-            else
-               mlog << Error << "\n" << method_name << "the requested vertical value "
-                    << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
-                    << "does not exist (data size = " << z_cnt << ").\n\n";
-            return false;
-          }
+        bool do_stop = true;
+        if (time_offset > time_threshold_cnt)   // is from time string (yyyymmdd_hh)
+          mlog << Warning << "\n" << method_name << "the requested time "
+               << unix_to_yyyymmdd_hhmmss(time_offset) << " for \""
+               << vinfo.req_name() << "\" variable does not exist (" 
+               << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
+               << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
+        else if (org_time_offset == bad_data_int)
+          mlog << Warning << "\n" << method_name << "the requested offset for \""
+               << vinfo.req_name() << "\" variable "
+               << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+        else if (org_time_offset == vx_data2d_star) {
+          do_stop = false;
+          dimension[time_dim_slot] = 0;
+          mlog << Warning << "\n" << method_name << "returns the first available time for \""
+               << vinfo.req_name() << "\" variable.\n\n";
         }
+        else
+          mlog << Warning << "\n" << method_name << "the requested offset "
+               << org_time_offset << " for \"" << vinfo.req_name() << "\" variable "
+               << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+
+        if (do_stop) return false;
       }
     }
   }
@@ -271,8 +233,6 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
   if (org_time_offset != bad_data_int && 0 <= time_dim_slot)
     dimension[time_dim_slot] = org_time_offset;
-  if (org_z_offset != bad_data_int && 0 <= zdim_slot)
-    dimension[zdim_slot] = org_z_offset;
 
   // Check that the times match those requested
 
@@ -351,27 +311,28 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
       NcVarInfo *data_var = find_first_data_var();
       if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
    }
-
-   LongArray time_offsets = collect_time_offsets(vinfo);
+   
+   LongArray time_offsets =  collect_time_offsets(vinfo);
    if (0 < time_offsets.n_elements()) {
       LevelInfo level = vinfo.level();
       VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
+      LongArray dimension = vinfo_nc->dimension();
       long time_lower = bad_data_int;
       long time_upper = bad_data_int;
       if (level.type() == LevelType_Time) {
         time_lower = level.lower();
         time_upper = level.upper();
       }
-
+       
+      int debug_level = 7;
       for (int idx=0; idx<time_offsets.n_elements(); idx++) {
-         _cur_time_index = time_offsets[idx];
+         _time_dim_offset = time_offsets[idx];
          if (data_plane(vinfo, plane)) {
             plane_array.add(plane, time_lower, time_upper);
             n_rec++;
          }
       }
-
-      int debug_level = 7;
+      
       if (mlog.verbosity_level() >= debug_level) {
          for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
             mlog << Debug(debug_level) << method_name << "time: "
@@ -407,10 +368,10 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    int time_dim_slot = info->t_slot;
    int time_dim_size = _file->ValidTime.n_elements();
    if (0 < time_dim_size && time_dim_slot < 0) {
-      // The time dimension does not exist at the variable and the time
-      // variable exists. Stop time slicing and set the time offset to 0.
-      time_offsets.add(0);
-      return(time_offsets);
+     // The time dimension does not exist at the variable and the time
+     // variable exists. Stop time slicing and set the time offset to 0.
+     time_offsets.add(0);
+     return(time_offsets);
    }
 
    double time_lower = bad_data_double;
@@ -419,7 +380,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    LevelInfo level = vinfo.level();
    LongArray dimension = vinfo_nc->dimension();
    bool is_time_range = (level.type() == LevelType_Time);
-   bool time_as_value = !level.is_offset();
+   bool time_as_value = !level.is_time_as_offset();
 
    long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
    bool include_all_times = (dim_offset == vx_data2d_star);
@@ -483,7 +444,8 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                   if (_file->ValidTime[idx] == next_time) {
                      time_offsets.add(idx);
                      mlog << Debug(9) << method_name << " found the time "
-                          << unix_to_yyyymmdd_hhmmss(_file->ValidTime[idx]) << "\n";
+                          << (is_time_range ?
+                              unix_to_yyyymmdd_hhmmss(_file->ValidTime[idx]) : idx) << "\n";
                      next_time += time_inc;
                   }
                }
@@ -609,69 +571,18 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 ////////////////////////////////////////////////////////////////////////
 
 long MetNcCFDataFile::convert_time_to_offset(long time_value) {
-   bool found = false;
-   bool found_value = false;
    long time_offset = time_value;
-   int dim_size = _file->ValidTime.n();
-   static const string method_name
-         = "MetNcCFDataFile::convert_time_to_offset() -> ";
-
-   for (int idx=0; idx<dim_size; idx++) {
-      if (_file->ValidTime[idx] == time_value) {
-         time_offset = idx;
-         found = true;
-         break;
-      }
-   }
-
-   if (!found) {
-      dim_size = _file->raw_times.n();
+   int dim_size = _file->ValidTime.n_elements();
+   long time_threshold_cnt = (dim_size + 1000) * 1000;
+   if (time_value >= time_threshold_cnt) {
       for (int idx=0; idx<dim_size; idx++) {
-         if (_file->raw_times[idx] == time_value) {
+         if (_file->ValidTime[idx] == time_value) {
             time_offset = idx;
-            found_value = true;
             break;
          }
       }
    }
-
-   if (found)
-      mlog << Debug(7) << method_name << " Found "
-           << unix_to_yyyymmdd_hhmmss(time_value)
-           << " at index " << time_offset << " from time value\n";
-   else if (found_value)
-      mlog << Debug(7) << method_name << " Found " << time_value
-           << " at index " << time_offset << " from time value\n";
-   else
-      mlog << Warning << "\n" << method_name << time_value
-           << " does not exist at time variable\n\n";
-
    return time_offset;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name) {
-   bool found = false;
-   long z_offset = (long)z_value;
-   int dim_size = _file->vlevels.n();
-   static const string method_name
-         = "MetNcCFDataFile::convert_value_to_offset() -> ";
-
-   for (int idx=0; idx<dim_size; idx++) {
-      if (is_eq(_file->vlevels[idx], z_value)) {
-         found = true;
-         z_offset = idx;
-         break;
-      }
-   }
-
-   if (!found && 0 < z_dim_name.length()) {
-      long new_offset = get_index_for_dim(_file->Var, z_dim_name, z_value, _file->Nvars);
-      if (new_offset != bad_data_int) z_offset = new_offset;
-   }
-
-   return z_offset;
 }
 
 ////////////////////////////////////////////////////////////////////////
