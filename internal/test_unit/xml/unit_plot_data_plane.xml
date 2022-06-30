@@ -306,7 +306,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/GloTEC_TEC_2015_03_17.nc \
       &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_time.ps \
-      'name="TEC"; level="(@20150317_000500,*,*)"; file_type=NETCDF_NCCF;' \
+      'name="TEC"; level="(20150317_000500,*,*)"; file_type=NETCDF_NCCF;' \
       -title "NCCF GloTEC - Total Electron Content" \
       -v 1
     </param>
