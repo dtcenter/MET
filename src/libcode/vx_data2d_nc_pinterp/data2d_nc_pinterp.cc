@@ -133,9 +133,20 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    plane.clear();
 
    // Read the data
+   PinterpNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
+   LongArray dimension = vinfo_nc->dimension();
+   int dim_count = dimension.n_elements();
+   for (int k=0; k<dim_count; k++) {
+      if (dimension[k] == vx_data2d_dim_by_value) {
+         dimension[k] = get_index_for_dim(PinterpNc->Var,
+                                          GET_NC_NAME(get_nc_dim(info->var, k)),
+                                          vinfo_nc->dim_value(k), PinterpNc->Nvars,
+                                          (k == info->t_slot));
+      }
+   }
+
    status = PinterpNc->data(vinfo_nc->req_name().c_str(),
-                            vinfo_nc->dimension(),
-                            plane, pressure, info);
+                            dimension, plane, pressure, info);
 
    // Check that the times match those requested
    if(status) {

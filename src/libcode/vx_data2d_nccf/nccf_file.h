@@ -80,6 +80,8 @@ class NcCfFile {
          //
 
       TimeArray ValidTime;
+      NumArray raw_times;
+      NumArray vlevels;
 
       unixtime  InitTime;
       unixtime  AccumTime;
