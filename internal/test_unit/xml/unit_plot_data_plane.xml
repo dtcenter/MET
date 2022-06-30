@@ -273,20 +273,6 @@
     </output>
   </test>
 
-  <test name="plot_data_plane_NCCF_latlon_by_value">
-    <exec>&MET_BIN;/plot_data_plane</exec>
-    <param> \
-      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
-      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_20000.ps \
-      'name = "edr"; level = "(0,@20000,*,*)";' \
-      -title "NCCF Latitude/Longitude Level 0" \
-      -v 1
-    </param>
-    <output>
-      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_20000.ps</ps>
-    </output>
-  </test>
-
   <test name="plot_data_plane_NCCF_north_to_south">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -417,7 +403,7 @@
     <param> \
       &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
       &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101_12_time.ps \
-      'name="pr"; level="(@20060102_000000,*,*)";' \
+      'name="pr"; level="(20060102_000000,*,*)";' \
       -v 4
     </param>
     <output>

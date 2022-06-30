@@ -70,6 +70,7 @@ void LevelInfo::init_from_scratch() {
 
    clear();
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,8 +88,9 @@ void LevelInfo::assign(const LevelInfo &l) {
    Upper   = l.upper();
    Lower   = l.lower();
    Increment = l.increment();
-   Is_offset = l.is_offset();
+   time_as_offset = l.is_time_as_offset();
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,8 +106,9 @@ void LevelInfo::clear() {
    Upper  = 0.0;
    Lower  = 0.0;
    Increment = 0.0;
-   Is_offset = true;
+   time_as_offset = true;
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,48 +125,56 @@ void LevelInfo::dump(ostream &out) const {
        << "  Upper     = " << Upper << "\n"
        << "  Increment = " << Increment << "\n";
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_type(LevelType lt) {
    Type = lt;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_type_num(int i) {
    TypeNum = i;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_req_name(const char *str) {
    ReqName = str;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_name(const char *str) {
    Name = str;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_units(const char *str) {
    Units = str;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_upper(double u) {
    Upper = u;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_lower(double l) {
    Lower = l;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,18 +182,21 @@ void LevelInfo::set_lower(double l) {
 void LevelInfo::set_range(double l, double u) {
    Lower = l;
    Upper = u;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void LevelInfo::set_increment(double i) {
    Increment = i;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void LevelInfo::set_is_offset(bool b) {
-   Is_offset = b;
+void LevelInfo::set_time_as_offset(bool b) {
+   time_as_offset = b;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

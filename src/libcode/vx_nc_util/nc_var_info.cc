@@ -1,3 +1,5 @@
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -5,6 +7,8 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -22,8 +26,6 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_log.h"
 #include "vx_cal.h"
-
-////////////////////////////////////////////////////////////////////////
 
 unixtime get_att_value_unixtime(const NcAtt *att) {
    ConcatString s;
@@ -51,6 +53,7 @@ unixtime get_att_value_unixtime(const NcAtt *att) {
    return time_value;
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -62,7 +65,9 @@ unixtime get_att_value_unixtime(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 
-NcVarInfo::NcVarInfo() {
+NcVarInfo::NcVarInfo()
+
+{
 
 init_from_scratch();
 
@@ -72,7 +77,9 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-NcVarInfo::~NcVarInfo() {
+NcVarInfo::~NcVarInfo()
+
+{
 
 clear();
 
@@ -82,7 +89,9 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-NcVarInfo::NcVarInfo(const NcVarInfo & i) {
+NcVarInfo::NcVarInfo(const NcVarInfo & i)
+
+{
 
 init_from_scratch();
 
@@ -94,7 +103,9 @@ assign(i);
 ////////////////////////////////////////////////////////////////////////
 
 
-NcVarInfo & NcVarInfo::operator=(const NcVarInfo & i) {
+NcVarInfo & NcVarInfo::operator=(const NcVarInfo & i)
+
+{
 
 if ( this == &i )  return ( * this );
 
@@ -108,7 +119,9 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
-void NcVarInfo::init_from_scratch() {
+void NcVarInfo::init_from_scratch()
+
+{
 
 Dims = (NcDim **) 0;
 
@@ -122,7 +135,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NcVarInfo::clear() {
+void NcVarInfo::clear()
+
+{
 
 var = (NcVar *) 0;   //  don't delete
 
@@ -160,7 +175,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NcVarInfo::dump(ostream & out, int depth) const {
+void NcVarInfo::dump(ostream & out, int depth) const
+
+{
 
 Indent prefix(depth);
 
@@ -228,7 +245,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int NcVarInfo::lead_time() const {
+int NcVarInfo::lead_time() const
+
+{
 
 return ( (int) (ValidTime - InitTime) );
 
@@ -238,7 +257,9 @@ return ( (int) (ValidTime - InitTime) );
 ////////////////////////////////////////////////////////////////////////
 
 
-void NcVarInfo::assign(const NcVarInfo & i) {
+void NcVarInfo::assign(const NcVarInfo & i)
+
+{
 
 clear();
 
@@ -294,8 +315,10 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
-                 ConcatString &att_value) {
+
+bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatString &att_value)
+
+{
 
    NcVarAtt *att ;
    bool found = false;
@@ -326,10 +349,13 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
-bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
-                 int &att_value) {
+
+bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_value)
+
+{
 
    att_value = bad_data_int;
    
@@ -359,32 +385,17 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
 
 }
 
-////////////////////////////////////////////////////////////////////////
-
-bool get_att_accum_time(const NcVarInfo &info, int &att_value) {
-   return get_att_int(info, accum_time_sec_att_name, att_value);
-}
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_att_level(const NcVarInfo &info, ConcatString &att_value) {
-   return get_att_str(info, level_att_name, att_value);
-}
 
-////////////////////////////////////////////////////////////////////////
+bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixtime &att_value)
 
-bool get_att_name(const NcVarInfo &info, ConcatString &att_value) {
-   return get_att_str(info, name_att_name, att_value);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
-                      unixtime &att_value) {
+{
 
    att_value = (unixtime) bad_data_int;
 
-   NcVarAtt *att = get_nc_att(var, att_name, false);
+   NcVarAtt *att = get_nc_att(info.var, att_name, false);
    bool found = IS_VALID_NC_P(att);
    if( found ) att_value = get_att_value_unixtime(att);
 
@@ -398,14 +409,7 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
 
 }
 
-////////////////////////////////////////////////////////////////////////
-
-bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name,
-                      unixtime &att_value) {
-
-   return get_att_unixtime(info.var, att_name, att_value);
-
-}
 
 ////////////////////////////////////////////////////////////////////////
+
 

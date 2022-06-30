@@ -255,17 +255,23 @@ for (x=0; x<Nx; ++x)  {
    //  get init time, valid time, lead time from FcstRaw variable attributes
    //
 
-   if (!get_att_unixtime(FcstRaw, init_time_ut_att_name, InitTime) || InitTime < 0) {
+   att = get_nc_att(FcstRaw, (string)"init_time_ut");
+   InitTime = get_att_value_unixtime(att);
+   if (InitTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> init time should be an integer or a string!\n\n";
       exit ( 1 );
    }
+   if (att) delete att;
    
-   if (!get_att_unixtime(FcstRaw, valid_time_ut_att_name, ValidTime) || ValidTime < 0) {
+   att = get_nc_att(FcstRaw, (string)"valid_time_ut");
+   ValidTime = get_att_value_unixtime(att);
+   if (ValidTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> valid time should be an integer or a string!\n\n";
       exit ( 1 );
    }
+   if (att) delete att;
    
 // att = FcstRaw->get_att("accum_time_sec");
 // 
@@ -999,4 +1005,7 @@ return ( s );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+
 

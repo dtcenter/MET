@@ -26,16 +26,7 @@ using namespace netCDF;
 
 #include "vx_util.h"
 
-////////////////////////////////////////////////////////////////////////
-
-static const string accum_time_att_name     = "accum_time";
-static const string accum_time_sec_att_name = "accum_time_sec";
-static const string init_time_att_name      = "init_time";
-static const string init_time_ut_att_name   = "init_time_ut";
-static const string level_att_name          = "level";
-static const string name_att_name           = "name";
-static const string valid_time_att_name     = "valid_time";
-static const string valid_time_ut_att_name  = "valid_time_ut";
+extern unixtime  get_att_value_unixtime(const NcAtt *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -94,18 +85,15 @@ class NcVarInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
+
 extern bool get_att_str(const NcVarInfo &, const ConcatString, ConcatString &);
+
 extern bool get_att_int(const NcVarInfo &, const ConcatString, int &);
 
-extern bool get_att_accum_time(const NcVarInfo &, int &);
-extern bool get_att_level(const NcVarInfo &, ConcatString &);
-extern bool get_att_name(const NcVarInfo &, ConcatString &);
+   //  unixtimes could be ints or strings
 
-//  unixtimes could be ints or strings
-extern bool get_att_unixtime(const NcVar *, const ConcatString, unixtime &);
 extern bool get_att_unixtime(const NcVarInfo &, const ConcatString, unixtime &);
 
-extern unixtime  get_att_value_unixtime(const NcAtt *);
 
 ////////////////////////////////////////////////////////////////////////
 
