@@ -451,20 +451,24 @@ bool NcCfFile::open(const char * filepath)
          Var[j].t_slot = k;
       }
       else if (dim_count == max_dim_count) {
-         Var[j].z_slot = k;
-         if (0 == z_dim_name.length()) z_dim_name = dimNames[k];
+         NcVarInfo *info = find_var_by_dim_name(c.c_str());
+         if (info) {
+            if (is_nc_unit_time(info->units_att.c_str())) {
+               Var[j].t_slot = k;
+            }
+            else {
+               Var[j].z_slot = k;
+               if (0 == z_dim_name.length()) z_dim_name = dimNames[k];
+            }
+         }
       }
     }
   }   //  for j
 
   // Find the vertical level variable from dimension name if not found
   if (IS_INVALID_NC_P(z_var) && (0 < z_dim_name.length())) {
-    for (int j=0; j<Nvars; ++j) {
-      if (Var[j].name == z_dim_name) {
-        z_var = Var[j].var;
-        break;
-      }
-    }   //  for j
+    NcVarInfo *info = find_var_by_dim_name(z_dim_name.c_str());
+    if (info) z_var = info->var;
   }
 
   // Pull out the vertical levels
@@ -1143,6 +1147,27 @@ NcVarInfo* NcCfFile::find_var_name(const char * var_name) const
       return &Var[i];
 
   return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NcVarInfo* NcCfFile::find_var_by_dim_name(const char *dim_name) const
+{
+  NcVarInfo *var = find_var_name(dim_name);
+  if (!var) {
+    for (int i = 0; i < Nvars; i++) {
+      if (1 == Var[i].Ndims) {
+        if (GET_NC_NAME_P(Var[i].Dims[0]) == dim_name) {
+          var = &Var[i];
+          break;
+        }
+      }
+    }
+  }
+
+  return var;
 }
 
 
