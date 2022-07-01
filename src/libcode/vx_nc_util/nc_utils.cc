@@ -3805,8 +3805,8 @@ int get_index_for_dim(NcVarInfo *vars, const string dim_name,
 
    // Find the variable with the same dimension name
    for (int i=0; i<var_count; i++) {
-      if (1 != get_dim_count(vars[i].var)) continue;
-      if (!dim_name.compare(GET_NC_NAME_P(vars[i].var))) {
+      if (1 != vars[i].Ndims) continue;
+      if (!dim_name.compare(vars[i].name)) {
          nc_var = vars[i].var;
          break;
       }
@@ -3815,9 +3815,9 @@ int get_index_for_dim(NcVarInfo *vars, const string dim_name,
    if (IS_INVALID_NC_P(nc_var)) {
       // Find 1D variable with the same dimension
       for (int i=0; i<var_count; i++) {
-         if (1 != get_dim_count(vars[i].var)) continue;
-         NcDim dim = get_nc_dim(vars[i].var, 0);
-         if (IS_VALID_NC(dim) && !dim_name.compare(GET_NC_NAME(dim))) {
+         if (1 != vars[i].Ndims) continue;
+         NcDim *dim = vars[i].Dims[0];
+         if (IS_VALID_NC_P(dim) && !dim_name.compare(GET_NC_NAME_P(dim))) {
             nc_var = vars[i].var;
             break;
          }
