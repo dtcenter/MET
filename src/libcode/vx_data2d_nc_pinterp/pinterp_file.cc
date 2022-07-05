@@ -52,7 +52,7 @@ static const char pressure_var_wrf_interp_name [] = "LEV";
 static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
 
-static const string start_time_att_name   = "START_DATE";
+static const string init_time_att_name   = "START_DATE";
 
 static const int max_pinterp_args         = 30;
 
@@ -72,6 +72,7 @@ static unixtime parse_init_time(const char *);
 static bool is_bad_data_pinterp(double);
 
 static bool is_accumulation(const char *);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -280,7 +281,7 @@ else {
 }
 
 ConcatString att_value;
-get_global_att(Nc, start_time_att_name, att_value);
+get_global_att(Nc, init_time_att_name, att_value);
 
 InitTime = parse_init_time(att_value.c_str());
 
@@ -795,71 +796,60 @@ return ( true );
 
 
 bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
-                       double & pressure, NcVarInfo *&info) const {
+                       double & pressure, NcVarInfo *&info) const
 
-   int time_index;
-   bool found = false;
+{
 
-   if (NULL != info) found = true;
-   else found = get_nc_var_info(var_name, info);
+int j, time_index;
+bool found = false;
 
-   if ( !found )  return ( false );
+for (j=0; j<Nvars; ++j)  {
 
-   found = data(info->var, a, plane, pressure);
+   if ( Var[j].name == var_name )  {
+      found = true;
+      info = &Var[j];
+      break;
+   }
+
+}
+
+if ( !found )  return ( false );
+
+found = data(Var[j].var, a, plane, pressure);
 
    //
    //  store the times
    //
 
-   time_index = a[info->t_slot];
+time_index = a[Var[j].t_slot];
 
-   plane.set_init  ( InitTime );
-   plane.set_valid ( valid_time(time_index) );
-   plane.set_lead  ( lead_time(time_index) );
+plane.set_init  ( InitTime );
+plane.set_valid ( valid_time(time_index) );
+plane.set_lead  ( lead_time(time_index) );
 
    //
    //  since Pinterp files only contain WRF-ARW output, it is always a
    //  a runtime accumulation
    //
 
-   if ( is_accumulation(var_name) )  {
+if ( is_accumulation(var_name) )  {
 
-      plane.set_accum ( lead_time(time_index) );
+   plane.set_accum ( lead_time(time_index) );
 
-   } else  {
+} else  {
 
-      plane.set_accum ( 0 );
+   plane.set_accum ( 0 );
 
-   }
+}
 
    //
    //  done
    //
 
-   return ( found );
+return ( found );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
-   bool found = false;
-
-   if (NULL == info) {
-      for (int j=0; j<Nvars; ++j)  {
-
-         if ( Var[j].name == var_name )  {
-            found = true;
-            info = &Var[j];
-            break;
-         }
-
-      }
-   }
-
-   return found;
-}
 
 ////////////////////////////////////////////////////////////////////////
 

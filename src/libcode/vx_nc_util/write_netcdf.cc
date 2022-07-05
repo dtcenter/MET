@@ -111,13 +111,13 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    //lon_var = &lon_var_T;
 
    // Add variable attributes
-   add_att(&lat_var, long_name_att_name, "latitude");
-   add_att(&lat_var, units_att_name, "degrees_north");
-   add_att(&lat_var, standard_name_att_name, "latitude");
+   add_att(&lat_var, "long_name", "latitude");
+   add_att(&lat_var, "units", "degrees_north");
+   add_att(&lat_var, "standard_name", "latitude");
 
-   add_att(&lon_var, long_name_att_name, "longitude");
-   add_att(&lon_var, units_att_name, "degrees_east");
-   add_att(&lon_var, standard_name_att_name, "longitude");
+   add_att(&lon_var, "long_name", "longitude");
+   add_att(&lon_var, "units", "degrees_east");
+   add_att(&lon_var, "standard_name", "longitude");
 
    // Allocate space for lat/lon values
    lat_data = new float [grid.ny()];
@@ -170,14 +170,14 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    lon_var = add_var(f_out, "lon", ncFloat, dims);
 
    // Add variable attributes
-   add_att(&lat_var, long_name_att_name, "latitude");
-   add_att(&lat_var, units_att_name, "degrees_north");
-   add_att(&lat_var, standard_name_att_name, "latitude");
+   add_att(&lat_var, "long_name", "latitude");
+   add_att(&lat_var, "units", "degrees_north");
+   add_att(&lat_var, "standard_name", "latitude");
    //add_att(&lat_var, "axis", "Y");
 
-   add_att(&lon_var, long_name_att_name, "longitude");
-   add_att(&lon_var, units_att_name, "degrees_east");
-   add_att(&lon_var, standard_name_att_name, "longitude");
+   add_att(&lon_var, "long_name", "longitude");
+   add_att(&lon_var, "units", "degrees_east");
+   add_att(&lon_var, "standard_name", "longitude");
    //add_att(&lon_var, "axis", "X");
 
    // Allocate space for lat/lon values
@@ -231,18 +231,18 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    switch(t) {
 
       case GridWeightType_Cos_Lat:
-         add_att(&wgt_var, long_name_att_name, "cosine latitude grid weight");
-         add_att(&wgt_var, units_att_name, "NA");
+         add_att(&wgt_var, "long_name", "cosine latitude grid weight");
+         add_att(&wgt_var, "units", "NA");
          break;
 
       case GridWeightType_Area:
-         add_att(&wgt_var, long_name_att_name, "true area grid weight");
-         add_att(&wgt_var, units_att_name, "km^2");
+         add_att(&wgt_var, "long_name", "true area grid weight");
+         add_att(&wgt_var, "units", "km^2");
          break;
 
       default:
-         add_att(&wgt_var, long_name_att_name, "default grid weight");
-         add_att(&wgt_var, units_att_name, "NA");
+         add_att(&wgt_var, "long_name", "default grid weight");
+         add_att(&wgt_var, "units", "NA");
          break;
    }
 
@@ -289,25 +289,25 @@ ConcatString s;
 
    // Init time
    unix_to_yyyymmdd_hhmmss(init_ut, time_str);
-   add_att(var, init_time_att_name, time_str.text());
+   add_att(var, "init_time", time_str.text());
 
    s = unixtime_to_string(init_ut);
 
-   add_att(var, init_time_ut_att_name, s.text());
+   add_att(var, "init_time_ut", s.text());
 
    // Valid time
    unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
-   add_att(var, valid_time_att_name, time_str.text());
+   add_att(var, "valid_time", time_str.text());
 
    s = unixtime_to_string(valid_ut);
 
-   add_att(var, valid_time_ut_att_name, s.text());
+   add_att(var, "valid_time_ut", s.text());
 
    // Accumulation time
    if(accum_sec != 0) {
      sec_to_hhmmss(accum_sec, time_str);
-      add_att(var, accum_time_att_name, time_str.text());
-      var->putAtt(accum_time_sec_att_name, ncInt, accum_sec);
+      add_att(var, "accum_time", time_str.text());
+      var->putAtt("accum_time_sec", ncInt, accum_sec);
    }
 
    return;

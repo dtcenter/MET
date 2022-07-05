@@ -78,6 +78,7 @@ void VarInfoNcPinterp::init_from_scratch() {
 
    clear();
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,11 +90,10 @@ void VarInfoNcPinterp::assign(const VarInfoNcPinterp &v) {
    VarInfo::assign(v);
 
    // Copy
-   clear_dimension();
-   for(i=0; i<v.n_dimension(); i++) {
-      add_dimension(v.dimension(i), v.is_offset(i), v.dim_value(i));
-   }
+   Dimension.clear();
+   for(i=0; i<v.n_dimension(); i++) Dimension.add(v.dimension(i));
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,8 +104,9 @@ void VarInfoNcPinterp::clear() {
    VarInfo::clear();
 
    // Initialize
-   clear_dimension();
+   Dimension.clear();
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,27 +117,15 @@ void VarInfoNcPinterp::dump(ostream &out) const {
    out << "VarInfoNcPinterp::dump():\n"
        << "  Dimension:\n";
    Dimension.dump(out);
-   out << "  Is_offset:\n";
-   Is_offset.dump(out);
-   out << "  Dim_value:\n";
-   Dim_value.dump(out);
 
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoNcPinterp::add_dimension(int dim) {
    Dimension.add(dim);
-   Is_offset.add(as_offset);
-   Dim_value.add(dim_value);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfoNcPinterp::clear_dimension() {
-   Dimension.clear();
-   Is_offset.clear();
-   Dim_value.clear();
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,7 +140,6 @@ void VarInfoNcPinterp::set_dimension(int i_dim, int dim) {
 void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    ConcatString tmp_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
-   const char *method_name = "VarInfoNcPinterp::set_magic() -> ";
 
    // Store the magic string
    VarInfo::set_magic(nstr, lstr);
@@ -164,10 +152,10 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
    if(strchr(lstr.c_str(), '(') == NULL) {
       Level.set_req_name("0,*,*");
       Level.set_name("0,*,*");
-      clear_dimension();
-      add_dimension(0);
-      add_dimension(vx_data2d_star);
-      add_dimension(vx_data2d_star);
+      Dimension.clear();
+      Dimension.add(0);
+      Dimension.add(vx_data2d_star);
+      Dimension.add(vx_data2d_star);
    }
    // Parse the level specification
    else {
@@ -183,32 +171,28 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
       Level.set_name(ptr);
 
       // If dimensions are specified, clear the default value
-      if(strchr(ptr, ',') != NULL) clear_dimension();
+      if(strchr(ptr, ',') != NULL) Dimension.clear();
 
       // Parse the dimensions
-      bool as_offset = true;
       while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
 
          // Check for wildcards
-         if(strchr(ptr2, '*') != NULL) add_dimension(vx_data2d_star);
+         if(strchr(ptr2, '*') != NULL) Dimension.add(vx_data2d_star);
          else {
-
-            as_offset = (*ptr2 != '@');
-            if (!as_offset) ptr2++;
 
             // Check for a range of levels
             if((ptr3 = strchr(ptr2, '-')) != NULL) {
 
                // Check if a range has already been supplied
                if(Dimension.has(range_flag)) {
-                  mlog << Error << "\n" << method_name
+                  mlog << Error << "\nVarInfoNcPinterp::set_magic() -> "
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
                }
                // Store the dimension of the range and limits
                else {
-                  add_dimension(range_flag);
+                  Dimension.add(range_flag);
                   Level.set_lower(atoi(ptr2));
                   Level.set_upper(atoi(++ptr3));
 
@@ -218,29 +202,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
             }
             // Single level
             else {
-               int level = 0;
-               double level_value = bad_data_double;
-               if (is_number(ptr2)) {
-                  if (as_offset) level = atoi(ptr2);
-                  else {
-                     level = vx_data2d_dim_by_value;
-                     level_value = atof(ptr2);
-                  }
-               }
-               else if (is_datestring(ptr2)) {
-                  unixtime unix_time = timestring_to_unix(ptr2);
-                  level = vx_data2d_dim_by_value;
-                  level_value = unix_time;
-                  as_offset = false;
-               }
-               else {
-                  mlog << Error << "\n" << method_name
-                       << "trouble parsing NetCDF dimension value \""
-                       << ptr2 << "\"!\n\n";
-                  exit(1);
-               }
-               if (as_offset) add_dimension(level, as_offset);
-               else add_dimension(level, as_offset, level_value);
+               Dimension.add(atoi(ptr2));
             }
          }
 
