@@ -991,7 +991,8 @@ File-format specific settings for the "field" entry:
        
       * (i,...,j,*,*) for a single field, where i,...,j specifies fixed
         dimension values and *,* specifies the two dimensions for the
-        gridded field. For example:
+        gridded field. @ specifies the vertical level value or time value
+        instead of offset, (i,...,@NNN,*,*). For example:
 
       .. code-block:: none
 
@@ -999,6 +1000,17 @@ File-format specific settings for the "field" entry:
              {
                name       = "QVAPOR";
                level      = "(0,5,*,*)";
+             },
+             {
+               name       = "TMP_P850_ENS_MEAN";
+               level      = [ "(*,*)" ];
+             }
+           ];
+
+        field = [
+             {
+               name       = "QVAPOR";
+               level      = "(@20220601_1200,@850,*,*)";
              },
              {
                name       = "TMP_P850_ENS_MEAN";
