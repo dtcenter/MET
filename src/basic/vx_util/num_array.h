@@ -45,6 +45,7 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
+      bool operator==(const NumArray &) const;
 
       void clear();
 

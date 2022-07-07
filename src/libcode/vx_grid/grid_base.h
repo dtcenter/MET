@@ -32,6 +32,7 @@
 #include "merc_grid_defs.h"
 #include "gaussian_grid_defs.h"
 #include "goes_grid_defs.h"
+#include "unstructured_grid_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,7 @@ class GridInfo {
       void set(const GaussianData       &);
       void set(const GoesImagerData     &);
       void set(const TcrmwData          &);
+      void set(const UnstructuredData   &);
 
       void create_grid(Grid &) const;
 
@@ -87,6 +89,7 @@ class GridInfo {
       const GaussianData      * g;    //  allocated
       const GoesImagerData    * gi;   //  allocated
       const TcrmwData         * tc;   //  allocated
+      const UnstructuredData  * ug;   //  allocated
 
 };
 
@@ -205,6 +208,7 @@ class Grid : public GridInterface {
       Grid(const GaussianData      &);
       Grid(const GoesImagerData    &);
       Grid(const TcrmwData         &);
+      Grid(const UnstructuredData  &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -222,6 +226,7 @@ class Grid : public GridInterface {
       void set (const GaussianData      &);
       void set (const GoesImagerData    &);
       void set (const TcrmwData         &);
+      void set (const UnstructuredData  &);
 
       void set_swap_to_north(bool swap_to_north);
       bool get_swap_to_north() const;
@@ -275,6 +280,7 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
+extern bool is_eq(const UnstructuredData *,  const UnstructuredData *);
 
 
 ////////////////////////////////////////////////////////////////////////

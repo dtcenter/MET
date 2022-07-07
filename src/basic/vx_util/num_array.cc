@@ -93,6 +93,31 @@ NumArray & NumArray::operator=(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NumArray::operator==(const NumArray & a) const
+
+{
+
+   if ( e.size() != a.e.size() )  return ( false );
+
+   bool status = true;
+   int n = e.size();
+
+   for (int j=0; j<n; ++j)  {
+
+      if ( e[j] != a.e[j] )  {
+         status = false;
+         break;
+      }
+   }
+
+   return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::init_from_scratch()
 
 {
