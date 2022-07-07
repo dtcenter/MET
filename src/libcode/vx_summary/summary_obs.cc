@@ -22,6 +22,7 @@ using namespace std;
 #include "summary_calc_mean.h"
 #include "summary_calc_median.h"
 #include "summary_calc_min.h"
+#include "summary_calc_sum.h"
 #include "summary_calc_percentile.h"
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
@@ -364,6 +365,9 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       }
       else if (type == "median") {
         calculators.push_back(new SummaryCalcMedian);
+      }
+      else if (type == 'sum') {
+        calculators.push_back(new SummaryCalcSum(type));
       }
       else if (type[0] == 'p') {
         calculators.push_back(new SummaryCalcPercentile(type));
