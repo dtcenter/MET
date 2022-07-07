@@ -67,10 +67,84 @@ UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data)
 
 clear();
 
-// JHG work here
+Name = data.name;
+
+define_dims(data.lats,   Lats);
+define_dims(data.lons,   Lons);
+define_dims(data.levels, Levels);
+define_dims(data.times,  Times);
+
+if ( !Dim1 || !Dim2 )  {
+
+   mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
+        << "dimensions not defined from data: lats (" << Lats.n()
+        << "), lons (" << Lons.n() << ", levels (" << Levels.n()
+        << ", and times (" << Times.n() << "!\n\n";
+   exit ( 1 );
 
 }
 
+Nx = Dim1->n();
+Ny = Dim2->n();
+
+   // 1-dimensional data
+
+if ( Lats.n() > 0 && Lons.n() > 0 )  {
+
+   Is2Dim = false;
+
+   if ( Lats.n() != Lons.n() )  {
+
+      mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
+           << "for 1-dimensional arrays, the number lats and lons must match ("
+           << Lats.n() << " != " << Lons.n() << ")!\n\n";
+      exit ( 1 );
+
+   }
+
+}
+
+   // 2-dimensional data
+
+else {
+
+   Is2Dim = true;
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UnstructuredGrid::define_dims(const NumArray &data, NumArray &dim)
+
+{
+
+   // store the dimension data
+
+dim = data;
+
+   // set dimensions is non-zero
+
+if ( dim.n() == 0 )  return;
+
+     if ( !Dim1 )  Dim1 = &dim;
+else if ( !Dim2 )  Dim2 = &dim;
+else {
+
+   mlog << Error << "\nvoid UnstructuredGrid::define_dims() -> "
+        << "more than two non-zero dimensions!\n\n";
+   exit ( 1 );
+
+}
+
+return;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 

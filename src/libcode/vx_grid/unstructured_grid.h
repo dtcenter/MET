@@ -33,6 +33,8 @@ class UnstructuredGrid : public GridRep {
      ~UnstructuredGrid();
       UnstructuredGrid(const UnstructuredData &);
 
+      void define_dims(const NumArray &, NumArray &);
+
          //
          //
          //

@@ -16,6 +16,6 @@ if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build.log
   # Append the full make_install.log file
   echo "Appending make_install.log to docker_build.log. See the logs artifact for details."
-  cat ${GITHUB_WORKSPACE}/MET*/make_install.log >> ${GITHUB_WORKSPACE}/docker_build.log
+  cat ${GITHUB_WORKSPACE}/make_install.log >> ${GITHUB_WORKSPACE}/docker_build.log
   exit 1
 fi
