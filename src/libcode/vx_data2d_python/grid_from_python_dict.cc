@@ -30,6 +30,7 @@ static const char           merc_string [] = "Mercator";
 static const char         latlon_string [] = "LatLon";
 static const char rotated_latlon_string [] = "Rotated LatLon";
 static const char       gaussian_string [] = "Gaussian";
+static const char   unstructured_string [] = "Unstructured";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,9 @@ static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
 static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
 static void get_gaussian_grid       (const Python3_Dict & dict, Grid & g);
+static void get_unstructured_grid   (const Python3_Dict & dict, Grid & g);
+
+static void lookup_python_num_array(const Python3_Dict &, const char *, NumArray &);
 
 static void set_string(const char * & dest, const ConcatString & src);
 
@@ -74,6 +78,7 @@ else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g
 else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
 else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
 else if ( proj_type ==       gaussian_string )  get_gaussian_grid       (dict, g);
+else if ( proj_type ==   unstructured_string )  get_unstructured_grid   (dict, g);
 else {
 
    mlog << Error << "\ngrid_from_python_dict() -> "
@@ -455,6 +460,70 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+   //
+   //  name        (string)
+   //
+   //  lats        (array of double)
+   //
+   //  lons        (array of double)
+   //
+   //  levels      (array of double)
+   //
+   //  times       (array of double)
+   //
+
+void get_unstructured_grid   (const Python3_Dict & dict, Grid & g)
+
+{
+
+UnstructuredData data;
+ConcatString s;
+
+s = dict.lookup_string("name");
+
+set_string(data.name, s);
+
+lookup_python_num_array(dict, "lats",   data.lats);
+lookup_python_num_array(dict, "lons",   data.lons);
+lookup_python_num_array(dict, "levels", data.levels);
+lookup_python_num_array(dict, "times",  data.times);
+
+   //
+   //  done
+   //
+
+g.set(data);
+
+if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArray &vals)
+
+{
+
+PyObject * obj = dict.lookup_list(key);
+Python3_List list(obj);
+
+for (int j=0; j<(list.size()); ++j)  {
+
+   vals.add(pyobject_as_double(list[j]));
+
+}
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
    //
    //  the fact that our destination is "const char *" rather than
