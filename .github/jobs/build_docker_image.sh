@@ -14,5 +14,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build.log
+  # Append the full make_install.log file
+  cat ${GITHUB_WORKSPACE}/MET*/make_install.log >> ${GITHUB_WORKSPACE}/docker_build.log
   exit 1
 fi
