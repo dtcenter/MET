@@ -23,10 +23,10 @@ struct UnstructuredData {
 
    // Exactly 2 are specified
 
-   NumArray  lats;
-   NumArray  lons;
-   NumArray  levels;
-   TimeArray times;
+   NumArray lats;
+   NumArray lons;
+   NumArray levels;
+   NumArray times;
 
    void dump();
 };
