@@ -366,7 +366,7 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       else if (type == "median") {
         calculators.push_back(new SummaryCalcMedian);
       }
-      else if (type == 'sum') {
+      else if (type == "sum") {
         calculators.push_back(new SummaryCalcSum(type));
       }
       else if (type[0] == 'p') {
