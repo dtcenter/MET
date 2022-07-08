@@ -407,12 +407,12 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
    vector< TimeSummaryInterval > time_intervals;
    time_t interval_time = getIntervalTime(first_data_time, info.beg, info.end,
                                           info.step, info.width_beg, info.width_end);
-   while (interval_time < last_data_time) {
+   while (interval_time <= last_data_time) {
       // We need to process each day separately so that we can always start
       // at the indicated start time on each day.
       time_t day_end_time = getEndOfDay(interval_time);
       while (interval_time < day_end_time &&
-             interval_time < last_data_time)
+             interval_time <= last_data_time)
       {
          // See if the current time is within the defined time intervals
          if (isInTimeInterval(interval_time, info.beg, info.end)) {
