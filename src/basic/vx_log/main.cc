@@ -63,7 +63,7 @@ extern int met_main(int argc, char *argv[]);
 
 void do_post_process();
 void do_pre_process(int argc, char *argv[]);
-void set_signal_handlers();
+void set_handlers();
 void set_user_id();
 void store_arguments(int argc, char **argv);
 
@@ -99,7 +99,7 @@ void do_pre_process(int argc, char *argv[]) {
    msg2 << "  cmd: " << met_cmdline;
    mlog << Debug(1) << msg << msg2 << "\n";
 
-   set_signal_handlers();
+   set_handlers();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,6 +129,7 @@ string get_current_time() {
 
 ////////////////////////////////////////////////////////////////////////
 
+/* not working at Docker
 // based on blog at http://www.alexonlinux.com/how-to-handle-sigsegv-but-also-generate-core-dump
 // NOTE:  that comments on the blog indicate the core file generated on red hat or on multi-threaded programs
 //        might contain unhelpful information.
@@ -144,14 +145,15 @@ void segv_handler(int signum) {
    signal(signum, SIG_DFL);
    kill(getpid(), signum);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////
+// Need signal handlers for SIGINT, SIGHUP, SIGTERM, SIGPIPE, and SIGSEGV
+//  PORTsignal(SIGPIPE, (PORTsigfunc)SIG_IGN);
+//  PORTsignal(SIGSEGV, segv_handler);
 
-void set_signal_handlers() {
+void set_handlers() {
 
-   //Add signal handling for SIGINT, SIGHUP, SIGTERM, SIGPIPE, and SIGSEGV
-   //  PORTsignal(SIGPIPE, (PORTsigfunc)SIG_IGN);
-   //  PORTsignal(SIGSEGV, segv_handler);
    set_new_handler(oom);
 }
 
