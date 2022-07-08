@@ -177,11 +177,11 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    {
       mlog << Debug(3) << "Computing "
            << unix_to_yyyymmdd_hhmmss(time_interval->getBaseTime())
-           << " time summary from "
+           << " time summary ("
            << unix_to_yyyymmdd_hhmmss(time_interval->getStartTime())
-           << " to "
+           << " <= time < "
            << unix_to_yyyymmdd_hhmmss(time_interval->getEndTime())
-           << ".\n";
+           << ").\n";
 
       // Initialize the map used to sort observations in this time period
       // into their correct summary groups

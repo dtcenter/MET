@@ -2236,8 +2236,15 @@ one hour prior:
 		
   width = { beg = -3600; end = 0; }
 
-The summaries will only be calculated for the specified GRIB codes.
-The supported summaries are "min" (minimum), "max" (maximum), "range",
+The summaries will only be calculated for the specified GRIB codes
+or observation variable ("obs_var") names.
+
+When determining which observations fall within a time interval, data for the
+beginning timestamp is included while data for the ending timestamp is excluded.
+Users may need to adjust the "beg" and "end" settings in the "width" dictionary
+to include the desired observations in each time interval.
+
+The supported time summaries are "min" (minimum), "max" (maximum), "range",
 "mean", "stdev" (standard deviation), "median", "sum", and "p##" (percentile,
 with the desired percentile value specified in place of ##).
 
