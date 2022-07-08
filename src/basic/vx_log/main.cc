@@ -11,80 +11,173 @@
 //   Filename:   main.cc
 //
 //   Description:
-//      The main() should be inplemented here and the exisyting main() should be renamed to met_main.
+//      MET has only one main(). The common features like logging with user ID
+//      for STIG and the signal handling are implemented one place whcih
+//      prevents from copying or calling the same APIs at the multiple palces.
+//      The existing "main" at MET tools should be renamed to "met_main" and
+//      three APIs (get_tool_name, initialize, and process_command_line) must
+//      be added. Most MET tools have initialize and process_command_line.
+//
+//      int main(int argc, char *argv[])
+//      ==>
+//      int met_main(int argc, char *argv[])
+//
+//      string get_tool_name() { return "mode"; }
+//      void initialize();
+//      void process_command_line(int argc, char **argv);
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//   000    07/06/22  Howard Soh      New
+
+#include <csignal>
+#include <pwd.h>
 
 #include "main.h"
-#include <unistd.h>
-//#include <pwd.h>
-
-////////////////////////////////////////////////////////////////////////
-
-static const int tmp_buf_size = 512;
-
-////////////////////////////////////////////////////////////////////////
-
-string get_current_time()
-{
-   time_t curr_time;
-   tm * curr_tm;
-   char date_string[tmp_buf_size];
-
-   time(&curr_time);
-   curr_tm = gmtime (&curr_time);
-
-   strftime(date_string, tmp_buf_size, "%Y-%m-%d %TZ", curr_tm);
-   string time_str(date_string);
-
-   return time_str;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-uid_t get_user_id()
-{
-   register uid_t uid = geteuid ();
-   /*
-   register struct passwd *pw;
-   pw = getpwuid (uid);
-   if (pw) {
-      puts (pw->pw_name);
-      exit (EXIT_SUCCESS);
-   }
-   fprintf (stderr,"%s: cannot find username for UID %u\n",
-       _PROGRAM_NAME, (unsigned) uid);
-   exit (EXIT_FAILURE);
-   */
-   return uid;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void do_pre_process(uid_t user_id, const char *tool_name) {
-   cout << "  Started " << tool_name << " by user " << user_id << " at " << get_current_time() << "\n";
-   cout << "  Do signal handling here and other pre-processing\n";
-}
+#include "concat_string.h"
+#include "memory.h"
+#include "logger.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_post_preocess(uid_t user_id, const char *tool_name) {
-   cout << "  Do post-processing\n";
-   cout << "  Done  " << tool_name << " by user " << user_id << " at " << get_current_time() << "\n";
-}
+
+////////////////////////////////////////////////////////////////////////
+
+static std::string met_cmdline = "";
+
+static int met_start_time;
+static int met_end_time;
+static uid_t met_user_id;
+static string met_user_name;
+static string met_tool_name;
+
+////////////////////////////////////////////////////////////////////////
+
+extern string get_tool_name();
+
+extern int met_main(int argc, char *argv[]);
+
+//extern void initialize();
+//extern void process_command_line(int argc, char **argv);
+
+void do_post_process();
+void do_pre_process(int argc, char *argv[]);
+void set_signal_handlers();
+void set_user_id();
+void store_arguments(int argc, char **argv);
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
 
-   uid_t user_id = get_user_id();
-   const char * tool_name = get_tool_name();
+   do_pre_process(argc, argv);
 
-   do_pre_process(user_id, tool_name);
+   //initialize();
+   //process_command_line(argc, argv);
 
    int return_code = met_main(argc, argv);
 
-   do_post_preocess(user_id, tool_name);
+   do_post_process();
 
    return return_code;
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void do_pre_process(int argc, char *argv[]) {
+   ConcatString msg, msg2;
+
+   store_arguments(argc, argv);
+
+   set_user_id();
+   met_tool_name = get_tool_name();
+
+   msg << "Start " << met_tool_name << " by " << met_user_name
+       << "(" << met_user_id << ") at " << get_current_time();
+   msg2 << "  cmd: " << met_cmdline;
+   mlog << Debug(1) << msg << msg2 << "\n";
+
+   set_signal_handlers();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_post_process() {
+   ConcatString msg;
+   msg << "Finish " << met_tool_name << " by " << met_user_name
+       << "(" << met_user_id << ") at " << get_current_time();
+   mlog << Debug(1) << msg << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+string get_current_time() {
+   time_t curr_time;
+   tm * curr_tm;
+   char date_string[MET_BUF_SIZE];
+
+   time(&curr_time);
+   curr_tm = gmtime (&curr_time);
+
+   strftime(date_string, MET_BUF_SIZE, "%Y-%m-%d %TZ", curr_tm);
+   //string time_str(date_string);
+
+   return string(date_string);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// based on blog at http://www.alexonlinux.com/how-to-handle-sigsegv-but-also-generate-core-dump
+// NOTE:  that comments on the blog indicate the core file generated on red hat or on multi-threaded programs
+//        might contain unhelpful information.
+void segv_handler(int signum) {
+   char cwdbuffer[MET_BUF_SIZE+1];
+   string timebuffer = get_current_time();
+
+   getcwd(cwdbuffer,MET_BUF_SIZE+1);
+
+   fprintf(stderr, "FATAL ERROR (SEGFAULT): Process %d got signal %d @ local time = %s\n", getpid(), signum, timebuffer);
+   fprintf(stderr, "FATAL ERROR (SEGFAULT): Look for a core file in %s\n",cwdbuffer);
+   fprintf(stderr, "FATAL ERROR (SEGFAULT): Process command line: %s\n",met_cmdline.c_str());
+   signal(signum, SIG_DFL);
+   kill(getpid(), signum);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_signal_handlers() {
+
+   //Add signal handling for SIGINT, SIGHUP, SIGTERM, SIGPIPE, and SIGSEGV
+   //  PORTsignal(SIGPIPE, (PORTsigfunc)SIG_IGN);
+   //  PORTsignal(SIGSEGV, segv_handler);
+   set_new_handler(oom);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_user_id() {
+   met_user_id = geteuid ();
+   register struct passwd *pw;
+   pw = getpwuid (met_user_id);
+   if (pw) met_user_name = string(pw->pw_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_arguments(int argc, char **argv) {
+   for (int ix = 0; ix < argc; ix++){
+      met_cmdline += argv[ix];
+      met_cmdline += " ";
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void tidy_and_exit(int signal) {
+   printf("Exiting %d\n", signal);
+   exit(signal);
+}
+
+////////////////////////////////////////////////////////////////////////
