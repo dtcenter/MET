@@ -19,6 +19,7 @@
 //   001    05-15-17  Prestopnik P.  Added regrid shape
 //   002    04-18-19  Halley Gotway  Add FCST and OBS units.
 //   003    04-25-19  Halley Gotway  Add percentiles to 2D output.
+//   004    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_ain
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,13 +42,11 @@ static const char default_prefix               [] = "mtd";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-#include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
+#include "main.h"
 #include "vx_data2d_factory.h"
 #include "apply_mask.h"
 #include "mtd_config_info.h"
@@ -96,7 +95,7 @@ static void do_single_field(MtdConfigInfo &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -880,6 +879,14 @@ do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, c
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "mtd";
 }
 
 

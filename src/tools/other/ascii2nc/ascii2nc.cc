@@ -45,30 +45,23 @@
 //   017    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
+//   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <regex.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
 #include "main.h"
-
-#include <netcdf>
-using namespace netCDF;
 
 #include "data2d_factory.h"
 #include "mask_poly.h"
@@ -153,14 +146,9 @@ int met_main(int argc, char *argv[]) {
    CommandLine cline;
 
    //
-   // Set handler to be called for memory allocation error
-   //
-   set_new_handler(oom);
-
-   //
    // Check for zero arguments
    //
-   if(argc == 1) usage();
+   if(argc == 1) { usage(); return 0; }
 
    //
    // Parse the command line into tokens
@@ -264,7 +252,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const char *get_tool_name() {
+const string get_tool_name() {
    return program_name;
 }
 

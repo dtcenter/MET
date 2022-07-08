@@ -18,25 +18,22 @@
 //   001    07/28/20  Halley Gotway   Updates for #1391.
 //   002    03/04/21  Halley Gotway   Bugfix #1694.
 //   003    08/20/21  Halley Gotway   Bugfix #1886 for integer overflow.
+//   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <limits.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "grid_diag.h"
 #include "series_data.h"
 #include "series_pdf.h"
@@ -70,10 +67,7 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -230,6 +224,12 @@ void process_command_line(int argc, char **argv) {
 
    // Process masking regions
    conf_info.process_masks(grid);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "grid_diag";
 }
 
 ////////////////////////////////////////////////////////////////////////

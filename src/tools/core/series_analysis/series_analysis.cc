@@ -32,6 +32,7 @@
 //   011    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   012    01/20/22  Halley Gotway  MET #2003 Add PSTD BRIERCL output.
 //   013    05/25/22  Halley Gotway  MET #2147 Add CTS HSS_EC output.
+//   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,18 +40,16 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <limits.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "series_analysis.h"
 
 #include "vx_statistics.h"
@@ -120,10 +119,7 @@ static void parse_long_names();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -135,6 +131,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "series_analysis";
 }
 
 ////////////////////////////////////////////////////////////////////////

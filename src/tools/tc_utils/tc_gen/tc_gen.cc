@@ -23,25 +23,22 @@
 //   006    11/04/21  Halley Gotway   MET #1809 Add -edeck option
 //   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
+//   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <map>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "tc_gen.h"
 #include "pair_data_genesis.h"
 
@@ -155,10 +152,7 @@ static void   set_out              (const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -213,6 +207,12 @@ int main(int argc, char *argv[]) {
    }
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "tc_gen";
 }
 
 ////////////////////////////////////////////////////////////////////////

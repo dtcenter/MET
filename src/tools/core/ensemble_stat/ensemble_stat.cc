@@ -66,6 +66,7 @@
 //   034    01/14/21  McCabe         MET #1695 All members in one file.
 //   035    02/15/22  Halley Gotway  MET #1583 Add HiRA option.
 //   036    02/20/22  Halley Gotway  MET #1259 Write probabilistic statistics.
+//   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,18 +74,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <limits.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#include "main.h"
 #include "ensemble_stat.h"
 
 #include "vx_nc_util.h"
@@ -186,13 +184,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Set up OpenMP (if enabled)
    init_openmp();
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -210,6 +205,13 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name()
+{
+   return "ensemble_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
