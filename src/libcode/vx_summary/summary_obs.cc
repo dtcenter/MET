@@ -372,11 +372,10 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
         // Check for vld_thresh = 1.0
         if (!is_eq(info.vld_thresh, 1.0)) {
            mlog << Warning << "\nIn the \"time_summary\" dictionary, "
-		<< "consider setting \"vld_thresh\" (" << info.vld_thresh
-	       	<< ") to 1.0 for the \"sum\" type to better handle "
-	        << "missing data.\n\n";
-	}
-
+                << "consider setting \"vld_thresh\" (" << info.vld_thresh
+                << ") to 1.0 for the \"sum\" type to better handle "
+                << "missing data.\n\n";
+        }
       }
       else if (type[0] == 'p') {
         calculators.push_back(new SummaryCalcPercentile(type));
