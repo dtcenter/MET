@@ -67,7 +67,7 @@ UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data)
 
 clear();
 
-Name = data.name;
+if ( data.name )  Name = data.name;
 
 define_dims(data.lats,   Lats);
 define_dims(data.lons,   Lons);
@@ -77,9 +77,9 @@ define_dims(data.times,  Times);
 if ( !Dim1 || !Dim2 )  {
 
    mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
-        << "dimensions not defined from data: lats (" << Lats.n()
-        << "), lons (" << Lons.n() << ", levels (" << Levels.n()
-        << ", and times (" << Times.n() << "!\n\n";
+        << "exactly two dimensions should have non-zero length: lats ("
+        << Lats.n() << "), lons (" << Lons.n() << "), levels (" << Levels.n()
+        << "), times (" << Times.n() << ")\n\n";
    exit ( 1 );
 
 }
@@ -87,7 +87,7 @@ if ( !Dim1 || !Dim2 )  {
 Nx = Dim1->n();
 Ny = Dim2->n();
 
-   // 1-dimensional data
+   // 1-dimensional array of lat/lon locations
 
 if ( Lats.n() > 0 && Lons.n() > 0 )  {
 
@@ -96,7 +96,7 @@ if ( Lats.n() > 0 && Lons.n() > 0 )  {
    if ( Lats.n() != Lons.n() )  {
 
       mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
-           << "for 1-dimensional arrays, the number lats and lons must match ("
+           << "for one dimensional arrays, the number lats and lons must match ("
            << Lats.n() << " != " << Lons.n() << ")!\n\n";
       exit ( 1 );
 
@@ -111,6 +111,10 @@ else {
    Is2Dim = true;
 
 }
+
+   // Store the data
+
+Data = data;
 
 return;
 
@@ -153,6 +157,8 @@ void UnstructuredGrid::clear()
 
 {
 
+Name.clear();
+
 Lats.clear();
 Lons.clear();
 Levels.clear();
@@ -163,8 +169,6 @@ Dim2 = (NumArray *) 0;
 
 Nx = 0;
 Ny = 0;
-
-Name.clear();
 
 memset(&Data, 0, sizeof(Data));
 
