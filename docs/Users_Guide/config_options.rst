@@ -204,7 +204,7 @@ convenient to use them. For example, when applying the same configuration to
 the output from multiple models, consider defining the model name as an
 environment variable which the controlling script sets prior to verifying the
 output of each model. Setting MODEL to that environment variable enables you
-to use one configuration file rather than maintianing many very similar ones.
+to use one configuration file rather than maintaining many very similar ones.
 
 An error in the syntax of a configuration file will result in an error from the
 MET tool stating the location of the parsing error.
