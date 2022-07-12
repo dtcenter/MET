@@ -22,12 +22,14 @@ using namespace std;
 
 #include "mtd_read_data.h"
 
+#include "num_array.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
 void mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
-                   const StringArray & filenames, MtdFloatFile & raw)
+                   const StringArray & filenames, MtdFloatFile & raw,
+		   unixtime valid_times[])
 
 {
 
@@ -39,15 +41,10 @@ if ( filenames.n() < 2 )  {
 
 }
 
-int j;
+int j, k;
 Met2dDataFile * data_2d_file = 0;
 Met2dDataFileFactory factory;
 DataPlane plane;
-unixtime * valid_times = 0;
-
-
-
-valid_times = new unixtime [filenames.n()];
 
    //
    //  read the files
@@ -96,30 +93,45 @@ for (j=0; j<(filenames.n()); ++j)  {
 
 }   //  for j
 
-varinfo.set_valid(valid_times[0]);
+ varinfo.set_valid(valid_times[0]);
 
    //
    //  check the time intervals
    //
 
-unixtime dt_start, dt;
+unixtime dt_start, dt, *dtArray;
+int numDt = filenames.n() - 1;
+dtArray = new unixtime [numDt];
 
 dt_start = valid_times[1] - valid_times[0];
+dtArray[0] = dt_start;
 
 for (j=2; j<(filenames.n()); ++j)  {
-
    dt = valid_times[j] - valid_times[j - 1];
-
-   if ( dt != dt_start )  {
-
-      mlog << Error << "\n\n  mtd_read_data() -> file time increments are not constant!\n\n";
-
-      exit ( 1 );
-
-   }
-
+   dtArray[j - 1] = dt;
 }
-
+bool variableTimeIncs = false;
+for (j=0; j<numDt; ++j) {
+   if (variableTimeIncs) {
+      break;
+   }
+   for (k=j+1; k<numDt; ++k) {
+      if ( dt != dt_start )  {
+         variableTimeIncs = true;
+	 break;
+      }
+   }
+}
+if (variableTimeIncs) {
+   mlog << Warning << "\n\n  mtd_read_data() -> file time increments are not constant, using MODE of the increments\n\n";
+   NumArray na;
+   for (j=0; j<numDt; ++j) {
+      na.add((double)dtArray[j]);
+   }	     
+   dt_start = (unixtime)na.mode();
+}
+delete [] dtArray;
+ 
    //
    //  load up the rest of the MtdFloatFile class members
    //
@@ -137,8 +149,6 @@ raw.calc_data_minmax();
    //
    //  done
    //
-
-if ( valid_times )  { delete [] valid_times;  valid_times = 0; }
 
 return;
 

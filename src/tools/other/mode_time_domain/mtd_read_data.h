@@ -28,7 +28,8 @@
 
 
 extern void mtd_read_data(MtdConfigInfo &, VarInfo &,
-                          const StringArray & filenames, MtdFloatFile &);
+                          const StringArray & filenames, MtdFloatFile &,
+			  unixtime valid_times[]);
 
 
 ////////////////////////////////////////////////////////////////////////

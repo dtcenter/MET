@@ -207,12 +207,21 @@ MM_Engine engine;
 
 
    //
+   //  storage for valid times
+   //
+
+unixtime * valid_times_fcst = 0;
+valid_times_fcst = new unixtime [fcst_filenames.n()];
+unixtime * valid_times_obs = 0;
+valid_times_obs = new unixtime [obs_filenames.n()];
+
+   //
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
+mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw, valid_times_fcst);
 
-mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
+mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw, valid_times_obs);
 
 if ( fcst_raw.nt() != obs_raw.nt() )  {
 
@@ -443,7 +452,8 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
-      att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+      //att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+      att_2.set_valid_time(valid_times_fcst[t]);
 
       att_2.set_lead_time(fcst_obj.lead_time(t));
 
@@ -477,7 +487,8 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       att_2.set_obs();
 
-      att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+      //att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+      att_2.set_valid_time(valid_times_obs[t]);
 
       att_2.set_lead_time(obs_obj.lead_time(t));
 
@@ -692,7 +703,8 @@ if ( have_pairs )  {
 
          att_2.set_fcst();
 
-         att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+         //att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+	 att_2.set_valid_time(valid_times_fcst[t]);
 
          att_2.set_lead_time(fcst_obj.lead_time(t));
 
@@ -733,7 +745,8 @@ if ( have_pairs )  {
 
          att_2.set_obs();
 
-         att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+         //att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+	 att_2.set_valid_time(valid_times_obs[t]);
 
          att_2.set_lead_time(obs_obj.lead_time(t));
 
@@ -873,6 +886,8 @@ mlog << Debug(2)
 
 do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path.c_str());
 
+if ( valid_times_fcst )  { delete [] valid_times_fcst;  valid_times_fcst = 0; }
+if ( valid_times_obs )  { delete [] valid_times_obs;  valid_times_obs = 0; }
 
    //
    //  done
@@ -1052,10 +1067,17 @@ ConcatString path;
 
 
    //
+   //  storage for valid times
+   //
+
+unixtime * valid_times = 0;
+valid_times = new unixtime [single_filenames.n()];
+
+   //
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
+mtd_read_data(config, *(config.fcst_info), single_filenames, raw, valid_times);
 
    //
    //  copy forecast name/units/level to observation
@@ -1165,7 +1187,8 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
-      att_2.set_valid_time(obj.start_valid_time() + t*(obj.delta_t()));
+      //att_2.set_valid_time(obj.start_valid_time() + t*(obj.delta_t()));
+      att_2.set_valid_time(valid_times[t]);
 
       att_2.set_lead_time(obj.lead_time(t));
 
@@ -1225,6 +1248,7 @@ mlog << Debug(2)
 do_mtd_nc_output(config.nc_info, raw, obj, config, path.c_str());
 
 
+if ( valid_times )  { delete [] valid_times;  valid_times = 0; }
 
    //
    //  done
