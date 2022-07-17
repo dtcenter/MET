@@ -101,4 +101,20 @@
     </output>
   </test>
 
+  <test name="ascii2nc_rain_01H_sum">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_020000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_021500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_023000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_024500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_030000.txt \
+      &OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc \
+      -config &CONFIG_DIR;/Ascii2NcConfig_rain_01H_sum
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>

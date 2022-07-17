@@ -117,7 +117,7 @@ time_summary = {
   width = 600;
   grib_code = [];
   obs_var   = [ "TMP", "WDIR", "RH" ];
-  type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  type = [ "min", "max", "range", "mean", "stdev", "median", "p80", "sum" ];
   vld_freq = 0;
   vld_thresh = 0.0;
 }

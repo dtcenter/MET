@@ -2236,10 +2236,17 @@ one hour prior:
 		
   width = { beg = -3600; end = 0; }
 
-The summaries will only be calculated for the specified GRIB codes.
-The supported summaries are "min" (minimum), "max" (maximum), "range",
-"mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
-the desired percentile value specified in place of ##).
+The summaries will only be calculated for the specified GRIB codes
+or observation variable ("obs_var") names.
+
+When determining which observations fall within a time interval, data for the
+beginning timestamp is included while data for the ending timestamp is excluded.
+Users may need to adjust the "beg" and "end" settings in the "width" dictionary
+to include the desired observations in each time interval.
+
+The supported time summaries are "min" (minimum), "max" (maximum), "range",
+"mean", "stdev" (standard deviation), "median", "sum", and "p##" (percentile,
+with the desired percentile value specified in place of ##).
 
 The "vld_freq" and "vld_thresh" options may be used to require that a certain
 ratio of observations must be present and contain valid data within the time
@@ -2249,6 +2256,9 @@ summarizing 1-minute data (vld_freq = 60) over a 30 minute time window,
 setting "vld_thresh = 0.5" requires that at least 15 of the 30 expected
 observations be present and valid for a summary value to be written. The
 default "vld_thresh = 0.0" setting will skip over this logic.
+
+When using the "sum" option, users should specify "vld_thresh = 1.0" to avoid
+missing data values from affecting the resulting sum value.
 
 The variable names are saved to NetCDF file if they are given instead of
 grib_codes which are not available for non GRIB input. The "obs_var" option
