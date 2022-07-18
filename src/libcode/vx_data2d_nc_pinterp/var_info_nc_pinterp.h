@@ -23,6 +23,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+typedef CRC_Array<bool>            BoolArray;
+
+///////////////////////////////////////////////////////////////////////////////
+
 //
 // List of Pinterp precipitation variable names
 // Taken from the WRF version 3.2 Registry.EM file
@@ -184,9 +188,12 @@ class VarInfoNcPinterp : public VarInfo
          //
 
       LongArray Dimension; // Dimension values for extracting 2D field
+      BoolArray Is_offset; // boolean for Dimension value (true: offset, false: value to be an offset (false for value)
+      NumArray  Dim_value; // Dimension values as float for extracting 2D field
 
       void init_from_scratch();
       void assign(const VarInfoNcPinterp &);
+      void clear_dimension();
 
    public:
       VarInfoNcPinterp();
@@ -202,8 +209,12 @@ class VarInfoNcPinterp : public VarInfo
          //
 
       GrdFileType file_type() const;
-      const LongArray & dimension() const;
-      int dimension(int i) const;
+      const LongArray & dimension()      const;
+      int               dimension(int i) const;
+      const NumArray  & dim_value()      const;
+      double            dim_value(int i) const;
+      const BoolArray & is_offset()      const;
+      bool              is_offset(int i) const;
       int n_dimension() const;
 
          //
@@ -213,7 +224,7 @@ class VarInfoNcPinterp : public VarInfo
       void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &);
 
-      void add_dimension(int dim);
+      void add_dimension(int dim, bool as_index=true, double dim_value=bad_data_double);
       void set_dimension(int i_dim, int dim);
 
          //
@@ -235,6 +246,10 @@ inline GrdFileType       VarInfoNcPinterp::file_type()      const { return(FileT
 inline const LongArray & VarInfoNcPinterp::dimension()      const { return(Dimension);              }
 inline int               VarInfoNcPinterp::dimension(int i) const { return(Dimension[i]);           }
 inline int               VarInfoNcPinterp::n_dimension()    const { return(Dimension.n_elements()); }
+inline const NumArray  & VarInfoNcPinterp::dim_value()      const { return(Dim_value);             }
+inline double            VarInfoNcPinterp::dim_value(int i) const { return(Dim_value[i]);          }
+inline const BoolArray & VarInfoNcPinterp::is_offset()      const { return(Is_offset);             }
+inline bool              VarInfoNcPinterp::is_offset(int i) const { return(Is_offset[i]);          }
 
 ///////////////////////////////////////////////////////////////////////////////
 
