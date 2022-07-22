@@ -612,7 +612,7 @@ bool pointdata_from_python_list(PyObject * data_array, NumArray *data_out)
 
    // Support PyFloat, PyLong and numpy.float32 type
    for (int idx=0; idx<PyList_Size(data_array); idx++) {
-      data_out->add((float)PyLong_AsDouble(PyList_GetItem(data_array, idx)));
+      data_out->add((float)PyFloat_AsDouble(PyList_GetItem(data_array, idx)));
    }
 
    return ( true );
