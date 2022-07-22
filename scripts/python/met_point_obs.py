@@ -130,7 +130,7 @@ class met_point_obs(ABC):
         self.check_data_member_int(self.obs_vid,'obs_vid')
         self.check_data_member_float(self.obs_lvl,'obs_lvl')
         self.check_data_member_float(self.obs_hgt,'obs_hgt')
-        self.check_data_member_float(self.obs_val,'obs_val'0)
+        self.check_data_member_float(self.obs_val,'obs_val')
         self.check_data_member_string(self.obs_qty_table,'bs_qty_table')
         self.check_data_member_string(self.obs_var_table,'bs_var_table')
 
