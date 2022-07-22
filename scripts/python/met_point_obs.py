@@ -17,6 +17,7 @@ Created on Nov 10, 2021
     met_point_data = point_obs_data.get_point_data()
 '''
 
+import os
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -37,6 +38,7 @@ class met_point_obs(ABC):
         '''
         Constructor
         '''
+        self.input_name = None
         self.use_var_id = use_var_id    # True if variable index, False if GRIB code
 
         # Header
@@ -75,8 +77,20 @@ class met_point_obs(ABC):
 
     @abstractmethod
     def read_data(self, args):
-        # args should be list or dictionary
-        # The variables at __init__ should be filled as python list or numpy array
+        # args can be input_file_name, list, or dictionary
+        # - The variables at __init__ should be filled as python list or numpy array
+        # - set self.input_name
+        #
+        # Here is a template
+        '''
+        if isinstance(args, dict):
+            in_filename = args.get('in_name',None)
+        elif isinstance(args, list):
+            in_filename = args[0]
+        else:
+            in_filename = args
+        self.input_name = in_filename
+        '''
         pass
 
     def check_data_member_float(self, local_var, var_name):
@@ -115,24 +129,27 @@ class met_point_obs(ABC):
                     v=var_name, t=type(local_var)))
 
     def check_point_data(self):
-        self.check_data_member_int(self.hdr_typ,'hdr_typ')
-        self.check_data_member_int(self.hdr_sid,'hdr_sid')
-        self.check_data_member_int(self.hdr_vld,'hdr_vld')
-        self.check_data_member_float(self.hdr_lat,'hdr_lat')
-        self.check_data_member_float(self.hdr_lon,'hdr_lon')
-        self.check_data_member_float(self.hdr_elv,'hdr_elv')
-        self.check_data_member_string(self.hdr_typ_table,'hdr_typ_table')
-        self.check_data_member_string(self.hdr_sid_table,'hdr_sid_table')
-        self.check_data_member_string(self.hdr_vld_table,'hdr_vld_table')
+        if self.input_name is not None and not os.path.exists(self.input_name):
+            self.log_error('The netcdf input {f} does not exist'.format(f=self.input_name))
+        else:
+            self.check_data_member_int(self.hdr_typ,'hdr_typ')
+            self.check_data_member_int(self.hdr_sid,'hdr_sid')
+            self.check_data_member_int(self.hdr_vld,'hdr_vld')
+            self.check_data_member_float(self.hdr_lat,'hdr_lat')
+            self.check_data_member_float(self.hdr_lon,'hdr_lon')
+            self.check_data_member_float(self.hdr_elv,'hdr_elv')
+            self.check_data_member_string(self.hdr_typ_table,'hdr_typ_table')
+            self.check_data_member_string(self.hdr_sid_table,'hdr_sid_table')
+            self.check_data_member_string(self.hdr_vld_table,'hdr_vld_table')
 
-        self.check_data_member_int(self.obs_qty,'obs_qty')
-        self.check_data_member_int(self.obs_hid,'obs_hid')
-        self.check_data_member_int(self.obs_vid,'obs_vid')
-        self.check_data_member_float(self.obs_lvl,'obs_lvl')
-        self.check_data_member_float(self.obs_hgt,'obs_hgt')
-        self.check_data_member_float(self.obs_val,'obs_val')
-        self.check_data_member_string(self.obs_qty_table,'bs_qty_table')
-        self.check_data_member_string(self.obs_var_table,'bs_var_table')
+            self.check_data_member_int(self.obs_qty,'obs_qty')
+            self.check_data_member_int(self.obs_hid,'obs_hid')
+            self.check_data_member_int(self.obs_vid,'obs_vid')
+            self.check_data_member_float(self.obs_lvl,'obs_lvl')
+            self.check_data_member_float(self.obs_hgt,'obs_hgt')
+            self.check_data_member_float(self.obs_val,'obs_val')
+            self.check_data_member_string(self.obs_qty_table,'bs_qty_table')
+            self.check_data_member_string(self.obs_var_table,'bs_var_table')
 
     def get_point_data(self):
         if self.nhdr <= 0:
