@@ -48,7 +48,7 @@ class LevelInfo
       double Upper;         // Upper level limit
       double Lower;         // Lower level limit
       double Increment;     // Increment (time: seconds, 0 for no increment)
-      bool   time_as_offset;// default: true, false: the (time) value instead
+      bool   Is_offset;     // default: true, false: the value instead
                             // of the offset at Lower and Upper
 
       void init_from_scratch();
@@ -77,7 +77,7 @@ class LevelInfo
       double       upper()       const;
       double       lower()       const;
       double       increment()   const;
-      bool         is_time_as_offset()const;
+      bool         is_offset()    const;
 
       //
       // set stuff
@@ -92,7 +92,7 @@ class LevelInfo
       void set_lower(double l);
       void set_range(double l, double u);
       void set_increment(double i);
-      void set_time_as_offset(bool b);
+      void set_is_offset(bool b);
 
 };
 
@@ -106,7 +106,7 @@ inline ConcatString LevelInfo::units()    const { return(Units);   }
 inline double       LevelInfo::upper()    const { return(Upper);   }
 inline double       LevelInfo::lower()    const { return(Lower);   }
 inline double       LevelInfo::increment()const { return(Increment);}
-inline bool         LevelInfo::is_time_as_offset()const { return(time_as_offset);}
+inline bool         LevelInfo::is_offset()const { return(Is_offset);}
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -17,17 +17,17 @@
 //
 
 time_summary = {
-  flag = FALSE;
+  flag = TRUE;
   raw_data = FALSE;
-  beg = "000000";
-  end = "235959";
-  step = 300;
-  width = 600;
-  grib_code = [ 11, 204, 211 ];
-  obs_var   = [];
-  type = [ "min", "max", "range", "mean", "stdev", "median", "p80", "sum" ];
-  vld_freq = 0;
-  vld_thresh = 0.0;
+  beg = "00";
+  end = "23";
+  step = 3600;
+  width = { beg = -3599; end = 1; }
+  grib_code = [ ];
+  obs_var   = [ "rain" ];
+  type = [ "sum" ];
+  vld_freq = 15*60;
+  vld_thresh = 1.0;
 }
 
 //

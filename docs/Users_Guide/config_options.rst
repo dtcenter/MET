@@ -204,7 +204,7 @@ convenient to use them. For example, when applying the same configuration to
 the output from multiple models, consider defining the model name as an
 environment variable which the controlling script sets prior to verifying the
 output of each model. Setting MODEL to that environment variable enables you
-to use one configuration file rather than maintianing many very similar ones.
+to use one configuration file rather than maintaining many very similar ones.
 
 An error in the syntax of a configuration file will result in an error from the
 MET tool stating the location of the parsing error.
@@ -991,7 +991,8 @@ File-format specific settings for the "field" entry:
        
       * (i,...,j,*,*) for a single field, where i,...,j specifies fixed
         dimension values and *,* specifies the two dimensions for the
-        gridded field. For example:
+        gridded field. @ specifies the vertical level value or time value
+        instead of offset, (i,...,@NNN,*,*). For example:
 
       .. code-block:: none
 
@@ -999,6 +1000,17 @@ File-format specific settings for the "field" entry:
              {
                name       = "QVAPOR";
                level      = "(0,5,*,*)";
+             },
+             {
+               name       = "TMP_P850_ENS_MEAN";
+               level      = [ "(*,*)" ];
+             }
+           ];
+
+        field = [
+             {
+               name       = "QVAPOR";
+               level      = "(@20220601_1200,@850,*,*)";
              },
              {
                name       = "TMP_P850_ENS_MEAN";
@@ -2236,10 +2248,17 @@ one hour prior:
 		
   width = { beg = -3600; end = 0; }
 
-The summaries will only be calculated for the specified GRIB codes.
-The supported summaries are "min" (minimum), "max" (maximum), "range",
-"mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
-the desired percentile value specified in place of ##).
+The summaries will only be calculated for the specified GRIB codes
+or observation variable ("obs_var") names.
+
+When determining which observations fall within a time interval, data for the
+beginning timestamp is included while data for the ending timestamp is excluded.
+Users may need to adjust the "beg" and "end" settings in the "width" dictionary
+to include the desired observations in each time interval.
+
+The supported time summaries are "min" (minimum), "max" (maximum), "range",
+"mean", "stdev" (standard deviation), "median", "sum", and "p##" (percentile,
+with the desired percentile value specified in place of ##).
 
 The "vld_freq" and "vld_thresh" options may be used to require that a certain
 ratio of observations must be present and contain valid data within the time
@@ -2249,6 +2268,9 @@ summarizing 1-minute data (vld_freq = 60) over a 30 minute time window,
 setting "vld_thresh = 0.5" requires that at least 15 of the 30 expected
 observations be present and valid for a summary value to be written. The
 default "vld_thresh = 0.0" setting will skip over this logic.
+
+When using the "sum" option, users should specify "vld_thresh = 1.0" to avoid
+missing data values from affecting the resulting sum value.
 
 The variable names are saved to NetCDF file if they are given instead of
 grib_codes which are not available for non GRIB input. The "obs_var" option
