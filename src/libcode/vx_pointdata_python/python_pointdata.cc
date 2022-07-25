@@ -35,7 +35,7 @@ static void set_array_from_python(PyObject *python_data, const char *python_key,
    if (numpy_array_obj) {
       bool status = false;
       ConcatString py_type_name = Py_TYPE(numpy_array_obj)->tp_name;
-      if ("numpy.ndarray" == py_type_name){
+      if ("numpy.ndarray" == py_type_name || "MaskedArray" == py_type_name ){
          Python3_Numpy np;
          np.set(numpy_array_obj);
          pointdata_from_np_array(np, out);
