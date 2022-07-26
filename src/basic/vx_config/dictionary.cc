@@ -1949,7 +1949,8 @@ if ( Entry )  {
 
       mlog << Warning
            << "\nDictionary::lookup_thresh() -> "
-           << "threshold lookup failed for name \"" << name << "\"\n\n";
+           << "threshold lookup failed for name \""
+           << name << "\"\n\n";
 
    }
 }
@@ -1962,7 +1963,9 @@ if ( !Entry || !is_correct_type )  {
 
       mlog << Error
            << "\nDictionary::lookup_thresh() -> "
-           << "lookup failed for name \"" << name << "\"\n\n";
+           << "threshold \"" << name
+           << "\" must start with a valid comparison operator "
+           << "(<, <=, ==, !=, >, >=, lt, le, eq, ne, gt, ge).\n\n";
 
       exit ( 1 );
 
@@ -2008,7 +2011,6 @@ if ( Entry )  {
    }
 }
 
-
 LastLookupStatus = is_correct_type;
 
 if ( !Entry || !is_correct_type )  {
@@ -2017,7 +2019,9 @@ if ( !Entry || !is_correct_type )  {
 
       mlog << Error
            << "\nDictionary::lookup_thresh_array() -> "
-           << "lookup failed for name \"" << name << "\"\n\n";
+           << "each threshold in array \"" << name
+           << "\" must start with a valid comparison operator "
+           << "(<, <=, ==, !=, >, >=, lt, le, eq, ne, gt, ge).\n\n";
 
       exit ( 1 );
 
@@ -2056,8 +2060,9 @@ if ( Dict->n_entries() > 0 )  {
 
       mlog << Error
            << "\nDictionary::lookup_thresh_array() -> "
-           << "array \"" << name
-           << "\" does not contain ThreshType.\n\n";
+           << "each threshold in array \"" << name
+           << "\" must start with a valid comparison operator "
+           << "(<, <=, ==, !=, >, >=, lt, le, eq, ne, gt, ge).\n\n";
 
       exit ( 1 );
 
