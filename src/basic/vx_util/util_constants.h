@@ -119,6 +119,7 @@ static const double const_gop   = 9.80616; // from The Ceaseless Wind
 static const double const_rd    = 287.0;   // kg/k dry gas constant
 
 static const int vx_data2d_star = -12345;
+static const int vx_data2d_dim_by_value = -123456; // apply the value instead of offset for slicing
 
 ////////////////////////////////////////////////////////////////////////
 

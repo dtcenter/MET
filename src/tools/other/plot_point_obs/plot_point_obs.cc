@@ -250,7 +250,6 @@ void process_point_obs(const char *point_obs_filename) {
                                           obs_qty_block, (char *)0);
       if (!status) exit(1);
 
-      int typ_idx, sid_idx, vld_idx;
       for(int i_offset=0; i_offset<buf_size2; i_offset++) {
 
          i_obs = i_start + i_offset;

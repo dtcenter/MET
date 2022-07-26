@@ -80,6 +80,8 @@ class NcCfFile {
          //
 
       TimeArray ValidTime;
+      NumArray raw_times;
+      NumArray vlevels;
 
       unixtime  InitTime;
       unixtime  AccumTime;
@@ -112,6 +114,7 @@ class NcCfFile {
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
       NcVarInfo* find_var_name(const char * var_name) const;
+      NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
    private:
 
