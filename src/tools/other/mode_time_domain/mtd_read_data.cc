@@ -96,7 +96,9 @@ for (j=0; j<(filenames.n()); ++j)  {
  varinfo.set_valid(valid_times[0]);
 
    //
-   //  check the time intervals
+   //  check the time intervals for consistency
+   //  Store the time differences between succesive valid times in an array
+   //  See if differences are constant or not, and if not see if all diffs are months
    //
 
 unixtime dt_start, dt, *dtArray;
@@ -107,28 +109,53 @@ dt_start = valid_times[1] - valid_times[0];
 dtArray[0] = dt_start;
 
 for (j=2; j<(filenames.n()); ++j)  {
-   dt = valid_times[j] - valid_times[j - 1];
-   dtArray[j - 1] = dt;
+   dtArray[j - 1] = dt = valid_times[j] - valid_times[j - 1];
 }
+
 bool variableTimeIncs = false;
 for (j=0; j<numDt; ++j) {
    if (variableTimeIncs) {
       break;
    }
    for (k=j+1; k<numDt; ++k) {
-      if ( dt != dt_start )  {
+      if ( dtArray[j] != dtArray[k])  {
          variableTimeIncs = true;
 	 break;
       }
    }
 }
 if (variableTimeIncs) {
-   mlog << Warning << "\n\n  mtd_read_data() -> file time increments are not constant, using MODE of the increments\n\n";
+   // compute the mode and use it as the actual delta, by storing it to dt_start
    NumArray na;
    for (j=0; j<numDt; ++j) {
       na.add((double)dtArray[j]);
    }	     
    dt_start = (unixtime)na.mode();
+
+   // test if the differences are all months (in seconds)
+   bool isMonths = true;
+   int secondsPerDay = 24*3600;
+   for (j=0; j<numDt; ++j) {
+      int days = dtArray[j]/secondsPerDay;
+      if (days != 28 &&	days != 29 && days != 30 && days != 31) {
+	 isMonths = false;
+	 break;
+      }
+   }
+
+   if (isMonths) {
+     mlog << Warning << "\n\n mtd_read_data() -> file time increments are months (not constant), use MODE of the increments mode=" << dt_start << " seconds = " << dt_start/(24*3600) << " days\n\n";
+   } else {
+      // compute some measures that might be used to exit with an error, for now just show them to the user and go on
+      double mean, var, svar;
+      na.compute_mean_variance(mean, var);
+      svar = sqrt(var);
+      unixtime umean = (unixtime)mean;
+      unixtime uvar = (unixtime)var;
+      unixtime suvar = (unixtime)svar;
+      mlog << Warning << "\n\n mtd_read_data() -> file time increments are not constant, use MODE of the increments mode=" << dt_start << "\n";
+      mlog << Warning << " mtd_read_data() -> mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
+   }
 }
 delete [] dtArray;
  

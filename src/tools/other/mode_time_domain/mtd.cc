@@ -452,7 +452,6 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
-      //att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
       att_2.set_valid_time(valid_times_fcst[t]);
 
       att_2.set_lead_time(fcst_obj.lead_time(t));
@@ -487,7 +486,6 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       att_2.set_obs();
 
-      //att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
       att_2.set_valid_time(valid_times_obs[t]);
 
       att_2.set_lead_time(obs_obj.lead_time(t));
@@ -703,7 +701,6 @@ if ( have_pairs )  {
 
          att_2.set_fcst();
 
-         //att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
 	 att_2.set_valid_time(valid_times_fcst[t]);
 
          att_2.set_lead_time(fcst_obj.lead_time(t));
@@ -745,7 +742,6 @@ if ( have_pairs )  {
 
          att_2.set_obs();
 
-         //att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
 	 att_2.set_valid_time(valid_times_obs[t]);
 
          att_2.set_lead_time(obs_obj.lead_time(t));
@@ -799,7 +795,7 @@ mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
-do_2d_txt_output(fcst_raw, obs_raw, 
+ do_2d_txt_output(fcst_raw, obs_raw, valid_times_fcst, valid_times_obs,
                  fcst_simple_att_2d,  obs_simple_att_2d,
                  fcst_cluster_att_2d, obs_cluster_att_2d, config, path.c_str());
 
@@ -1187,7 +1183,6 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
-      //att_2.set_valid_time(obj.start_valid_time() + t*(obj.delta_t()));
       att_2.set_valid_time(valid_times[t]);
 
       att_2.set_lead_time(obj.lead_time(t));
