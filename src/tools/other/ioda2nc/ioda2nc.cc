@@ -411,10 +411,10 @@ void process_ioda_file(int i_pb) {
    get_var_names(f_in, &var_names);
    get_dim_names(f_in, &dim_names);
    for(idx=0; idx<var_names.n(); idx++) {
-      if(has_postfix(var_names[idx], "MetaData")) {
+      if(has_postfix(var_names[idx], "@MetaData")) {
          metadata_vars.add(var_names[idx].substr(0, var_names[idx].find('@')));
       }
-      if(has_postfix(var_names[idx], "ObsValue")) {
+      if(has_postfix(var_names[idx], "@ObsValue")) {
          obs_value_vars.add(var_names[idx].substr(0, var_names[idx].find('@')));
       }
    }
