@@ -691,23 +691,32 @@ void MetGrib2DataFile::read_grib2_record_list() {
       for(int i=1; i <= numfields; i++){
 
          //  validate the PDS template number
+         //
+         // Add 6, 10, 15 (07/27/22 SL)
+         // We could store the percentile (for example CWASP) as a level?
+         //
          if(  0 != gfld->ipdtnum &&     //  analysis or forecast
               1 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer at a point in time
               2 != gfld->ipdtnum &&     //  ensemble mean
               5 != gfld->ipdtnum &&     //  probability forecast
+              6 != gfld->ipdtnum &&     //  percentile forecasts at a horizontal level or in a horizontal layer at a point in time
               8 != gfld->ipdtnum &&     //  accumulation forecast
               9 != gfld->ipdtnum &&     //  probabilistic accumulation forecast
+             10 != gfld->ipdtnum &&     //  percentile forecasts at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
+             15 != gfld->ipdtnum &&     //  Average, accumulation, extreme values or other statistically-processed values over a spatial area at a horizontal level or in a horizontal layer at a point in time
              46 != gfld->ipdtnum &&     //  average, accumulation, and/or extreme values or other statistically processed values at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval for aerosol.
              48 != gfld->ipdtnum ){     //  analysis or forecast at a horizontal level or in a horizontal layer at a point in time for aerosol.
+            // Change this to a Warning (07/27/22 SL)
+            // Print Warning, continue
             mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
                  << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions\n\n";
             exit(1);
          }
-
+         
          //  store the record information
          Grib2Record *rec = new Grib2Record;
          rec->ByteOffset   = offset;
@@ -731,11 +740,17 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
 
+         // Example (07/27/22 SL)
+         // ( gfld->ipdtnum == 6) {
+         //    Could be a different index of the bytes
+         //    rec->LvlVal1 = gfld->ipdtmpl[35]
+         //    rec->LvlVal1 = gfld->ipdtmpl[35]
+                
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
             rec->LvlVal2 = rec->LvlVal1;
-
+           
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
          //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
          } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
