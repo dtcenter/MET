@@ -708,13 +708,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
              15 != gfld->ipdtnum &&     //  Average, accumulation, extreme values or other statistically-processed values over a spatial area at a horizontal level or in a horizontal layer at a point in time
              46 != gfld->ipdtnum &&     //  average, accumulation, and/or extreme values or other statistically processed values at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval for aerosol.
              48 != gfld->ipdtnum ){     //  analysis or forecast at a horizontal level or in a horizontal layer at a point in time for aerosol.
+            //
             // Change this to a Warning (07/27/22 SL)
             // Print Warning, continue
-            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+
+            //mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+            //     << "PDS template number ("
+            //     << gfld->ipdtnum << ") is not supported. "
+            //     << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions\n\n";
+            //exit(1);
+            
+            mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
-                 << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions\n\n";
-            exit(1);
+                 << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions. "
+                 << "Continuing to try and get the record information.\n\n";
+            
+            continue;
          }
          
          //  store the record information
