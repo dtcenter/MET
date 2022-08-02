@@ -42,12 +42,10 @@ extern bool pointdata_from_np_array(Python3_Numpy & np, IntArray *data_out);
 extern bool pointdata_from_np_array(Python3_Numpy & np, NumArray *data_out);
 extern bool pointdata_from_str_array(PyObject *data_array, StringArray *data_out);
 
-
-extern bool pointdata_from_xarray(PyObject *data_array, int *data_out);
-extern bool pointdata_from_xarray(PyObject *data_array, float *data_out);
-extern bool pointdata_from_xarray(PyObject *data_array, IntArray &data_out);
-extern bool pointdata_from_xarray(PyObject *data_array, NumArray &data_out);
-extern bool pointdata_from_xarray(PyObject *data_array, StringArray &data_out);
+extern bool pointdata_from_python_list(PyObject *data_array, int *data_out);
+extern bool pointdata_from_python_list(PyObject *data_array, float *data_out);
+extern bool pointdata_from_python_list(PyObject *data_array, IntArray *data_out);
+extern bool pointdata_from_python_list(PyObject *data_array, NumArray *data_out);
 
 ////////////////////////////////////////////////////////////////////////
 
