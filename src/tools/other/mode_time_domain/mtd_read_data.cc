@@ -144,7 +144,7 @@ if (variableTimeIncs) {
    }
 
    if (isMonths) {
-     mlog << Warning << "\n\n mtd_read_data() -> file time increments are months (not constant), use MODE of the increments mode=" << dt_start << " seconds = " << dt_start/(24*3600) << " days\n\n";
+     mlog << Debug(2) << "\n\n mtd_read_data() -> file time increments are months (not constant), use MODE of the increments, mode=" << dt_start << " seconds = " << dt_start/(24*3600) << " days\n\n";
    } else {
       // compute some measures that might be used to exit with an error, for now just show them to the user and go on
       double mean, var, svar;
@@ -153,8 +153,9 @@ if (variableTimeIncs) {
       unixtime umean = (unixtime)mean;
       unixtime uvar = (unixtime)var;
       unixtime suvar = (unixtime)svar;
-      mlog << Warning << "\n\n mtd_read_data() -> file time increments are not constant, use MODE of the increments mode=" << dt_start << "\n";
-      mlog << Warning << " mtd_read_data() -> mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
+      mlog << Warning << "\n\n mtd_read_data() -> file time increments are not constant, could be problematic\n";
+      mlog << Warning << " mtd_read_data() -> use MODE of the increments, mode=" << dt_start << "\n";
+      mlog << Warning << " mtd_read_data() -> time increment properties: mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
    }
 }
 delete [] dtArray;
