@@ -596,7 +596,7 @@ void process_ioda_file(int i_pb) {
    // Initialize
    diff_file_time_count = 0;
 
-   for(int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
+   for(idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the IODA messages from the input file
    for(i_read=0; i_read<npbmsg; i_read++) {
@@ -906,9 +906,9 @@ void process_ioda_file(int i_pb) {
 
 void write_netcdf_hdr_data() {
    int obs_cnt, hdr_cnt;
-   const long hdr_count = (long) nc_point_obs.get_hdr_index();
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
+   nc_point_obs.get_hdr_index();
    nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
