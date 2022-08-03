@@ -1025,6 +1025,22 @@ bool get_var_axis(const NcVar *var, ConcatString &att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_def_fill_value(ncbyte *val) { *val = bad_data_int/100; }
+void set_def_fill_value(char   *val) { *val = bad_data_char; }
+void set_def_fill_value(double *val) { *val = bad_data_double; }
+void set_def_fill_value(float  *val) { *val = bad_data_float; }
+void set_def_fill_value(int    *val) { *val = bad_data_int; }
+void set_def_fill_value(long   *val) { *val = (long)bad_data_int; }
+void set_def_fill_value(short  *val) { *val = (short)bad_data_int; }
+void set_def_fill_value(long long          *val) { *val = (long long)bad_data_int; }
+void set_def_fill_value(unsigned char      *val) { *val = (unsigned char)-1; }
+void set_def_fill_value(unsigned int       *val) { *val = (unsigned int)-1; }
+void set_def_fill_value(unsigned long      *val) { *val = (unsigned long)-1; }
+void set_def_fill_value(unsigned long long *val) { *val = (unsigned long long)-1; }
+void set_def_fill_value(unsigned short     *val) { *val = (unsigned short)-1; }
+
+////////////////////////////////////////////////////////////////////////
+
 template <typename T>
 bool get_var_fill_value(const NcVar *var, T &att_val) {
    bool found = false;
@@ -1038,6 +1054,7 @@ bool get_var_fill_value(const NcVar *var, T &att_val) {
       att->getValues(&att_val);
       found = true;
    }
+   else set_def_fill_value(&att_val);
 
    if (att) delete att;
 
@@ -1208,7 +1225,7 @@ int get_int_var(NcVar * var, const int index) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
       if (0 >= dim_size) {
-         if ((index > 0) && (0 >= dim_size)) {
+         if (index > 0) {
             mlog << Error << "\n" << method_name << "The start offset ("
                  << index << ") should be 0 because of no dimension at the variable "
                  << GET_NC_NAME_P(var) << ".\n\n";
@@ -1654,27 +1671,38 @@ bool get_nc_data(NcVar *var, short *data, const long *dims, const long *curs) {
 template <typename T>
 void copy_nc_data_t(NcVar *var, float *data, const T *packed_data,
                     const int cell_count, const char *data_type,
-                    double add_offset, double scale_factor, bool has_missing, T missing_value) {
+                    double add_offset, double scale_factor,
+                    bool has_missing, T missing_value) {
    clock_t start_clock = clock();
    const char *method_name = "copy_nc_data_t(float) ";
 
    if (cell_count > 0) {
-      int idx;
+      int idx, first_idx;
       float min_value, max_value;
       bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
 
+      idx = first_idx = 0;
       if (do_scale_factor) {
          int positive_cnt = 0;
          int unpacked_count = 0;
          T raw_min_val, raw_max_val;
 
-         for (idx=0; idx<cell_count; idx++) {
-            if (!has_missing || !is_eq(missing_value, packed_data[idx])) break;
-            data[idx] = bad_data_float;
+         if (has_missing) {
+            for (; idx<cell_count; idx++) {
+               if (!is_eq(missing_value, packed_data[idx])) {
+                  first_idx = idx;
+                  break;
+               }
+               data[idx] = bad_data_float;
+            }
          }
 
-         raw_min_val = raw_max_val = packed_data[idx];
-         min_value = max_value = ((float)packed_data[idx] * scale_factor) + add_offset;
+         raw_min_val = raw_max_val = packed_data[first_idx];
+         if (has_missing && is_eq(missing_value, raw_min_val)) {
+            min_value = max_value = bad_data_float;
+         }
+         else min_value = max_value = ((float)raw_min_val * scale_factor) + add_offset;
+
          for (; idx<cell_count; idx++) {
             if (has_missing && is_eq(missing_value, packed_data[idx]))
                data[idx] = bad_data_float;
@@ -1698,15 +1726,17 @@ void copy_nc_data_t(NcVar *var, float *data, const T *packed_data,
               << "] Positive count: " << positive_cnt << "\n";
       }
       else {
-         idx = 0;
 
          if (has_missing) {
-            for (idx=0; idx<cell_count; idx++) {
-               if (!is_eq(missing_value, packed_data[idx])) break;
+            for (; idx<cell_count; idx++) {
+               if (!is_eq(missing_value, packed_data[idx])) {
+                  first_idx = idx;
+                  break;
+               }
                data[idx] = bad_data_float;
             }
          }
-         min_value = max_value = (float)packed_data[idx];
+         min_value = max_value = (float)packed_data[first_idx];
          for (; idx<cell_count; idx++) {
             if (has_missing && is_eq(missing_value, packed_data[idx]))
                data[idx] = bad_data_float;
@@ -1950,23 +1980,33 @@ void copy_nc_data_t(NcVar *var, double *data, const T *packed_data,
    const char *method_name = "copy_nc_data_t(double) ";
 
    if (cell_count > 0) {
-      int idx;
-      T missing_value;
+      int idx, first_idx;
       double min_value, max_value;
       bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
 
+      idx = first_idx = 0;
       if (do_scale_factor) {
          int positive_cnt = 0;
          T raw_min_val, raw_max_val;
 
-         for (idx=0; idx<cell_count; idx++) {
-            if (!is_eq(missing_value, packed_data[idx])) break;
-            data[idx] = bad_data_double;
+         if (has_missing) {
+            // Skip missing values to find first min/max value
+            for (; idx<cell_count; idx++) {
+               if (!is_eq(missing_value, packed_data[idx])) {
+                  first_idx = idx;
+                  break;
+               }
+               data[idx] = bad_data_double;
+            }
          }
 
-         raw_min_val = raw_max_val = packed_data[0];
-         min_value = max_value = ((double)packed_data[0] * scale_factor) + add_offset;
-         for (int idx=0; idx<cell_count; idx++) {
+         raw_min_val = raw_max_val = packed_data[first_idx];
+         if (has_missing && is_eq(missing_value, raw_min_val)) {
+            min_value = max_value = bad_data_double;
+         }
+         else min_value = max_value = ((double)raw_min_val * scale_factor) + add_offset;
+
+         for (; idx<cell_count; idx++) {
             if (has_missing && is_eq(missing_value, packed_data[idx]))
                data[idx] = bad_data_double;
             else {
@@ -1988,15 +2028,16 @@ void copy_nc_data_t(NcVar *var, double *data, const T *packed_data,
               << "] Positive count: " << positive_cnt << "\n";
       }
       else {
-         idx = 0;
-
          if (has_missing) {
-            for (idx=0; idx<cell_count; idx++) {
-               if (!is_eq(missing_value, packed_data[idx])) break;
+            for (; idx<cell_count; idx++) {
+               if (!is_eq(missing_value, packed_data[idx])) {
+                  first_idx = idx;
+                  break;
+               }
                data[idx] = bad_data_float;
             }
          }
-         min_value = max_value = (double)packed_data[idx];
+         min_value = max_value = (double)packed_data[first_idx];
          for (; idx<cell_count; idx++) {
             if (has_missing && is_eq(missing_value, packed_data[idx]))
                data[idx] = bad_data_double;
