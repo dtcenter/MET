@@ -27,9 +27,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
-                   const StringArray & filenames, MtdFloatFile & raw,
-		   unixtime valid_times[])
+vector<unixtime> mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
+			       const StringArray & filenames, MtdFloatFile & raw)
 
 {
 
@@ -45,7 +44,7 @@ int j, k;
 Met2dDataFile * data_2d_file = 0;
 Met2dDataFileFactory factory;
 DataPlane plane;
-
+vector<unixtime> valid_times;
    //
    //  read the files
    //
@@ -73,7 +72,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    }
 
-   valid_times[j] = plane.valid();
+   valid_times.push_back(plane.valid());
 
    if ( j == 0 )  {
 
@@ -95,48 +94,51 @@ for (j=0; j<(filenames.n()); ++j)  {
 
  varinfo.set_valid(valid_times[0]);
 
+    //  store the valid times vector into the raw data for later use in do_2d_txt_output()
+ 
+ raw.init_actual_valid_times(valid_times);
+
    //
    //  check the time intervals for consistency
    //  Store the time differences between succesive valid times in an array
    //  See if differences are constant or not, and if not see if all diffs are months
    //
 
-unixtime dt_start, dt, *dtArray;
-int numDt = filenames.n() - 1;
-dtArray = new unixtime [numDt];
+unixtime dt_start;
+vector<unixtime> dtVector; 
 
 dt_start = valid_times[1] - valid_times[0];
-dtArray[0] = dt_start;
+dtVector.push_back(dt_start);
 
-for (j=2; j<(filenames.n()); ++j)  {
-   dtArray[j - 1] = dt = valid_times[j] - valid_times[j - 1];
+for (size_t k=2; k<valid_times.size(); ++k) {
+  dtVector.push_back(valid_times[k] - valid_times[k - 1]);
 }
 
 bool variableTimeIncs = false;
-for (j=0; j<numDt; ++j) {
-   if (variableTimeIncs) {
+for (size_t k=0; k<dtVector.size(); ++k) {
+  if (variableTimeIncs) {
+     break;
+  }
+  for (size_t k2=k+1; k2<dtVector.size(); ++k2) {
+    if ( dtVector[k] != dtVector[k2])  {
+      variableTimeIncs = true;
       break;
-   }
-   for (k=j+1; k<numDt; ++k) {
-      if ( dtArray[j] != dtArray[k])  {
-         variableTimeIncs = true;
-	 break;
-      }
-   }
+    }
+  }
 }
 if (variableTimeIncs) {
-   // compute the mode and use it as the actual delta, by storing it to dt_start
-   NumArray na;
-   for (j=0; j<numDt; ++j) {
-      na.add((double)dtArray[j]);
+  // compute the mode and use it as the actual delta, by storing it to dt_start
+  NumArray na;
+  for (size_t k=0; k<dtVector.size(); ++k) {
+    na.add((double)dtVector[k]);
    }	     
    dt_start = (unixtime)na.mode();
 
    // test if the differences are all months (in seconds)
    bool isMonths = true;
    int secondsPerDay = 24*3600;
-   for (j=0; j<numDt; ++j) {
-      int days = dtArray[j]/secondsPerDay;
+   for (size_t k=0; k<dtVector.size(); ++k) {
+      int days = dtVector[k]/secondsPerDay;
       if (days != 28 &&	days != 29 && days != 30 && days != 31) {
 	 isMonths = false;
 	 break;
@@ -144,7 +146,8 @@ if (variableTimeIncs) {
    }
 
    if (isMonths) {
-     mlog << Debug(2) << "\n\n mtd_read_data() -> file time increments are months (not constant), use MODE of the increments, mode=" << dt_start << " seconds = " << dt_start/(24*3600) << " days\n\n";
+     mlog << Debug(1) << "File time increments are months (not constant), use MODE of the increments, mode=" << dt_start
+	  << " seconds = " << dt_start/(24*3600) << " days\n\n";
    } else {
       // compute some measures that might be used to exit with an error, for now just show them to the user and go on
       double mean, var, svar;
@@ -153,12 +156,11 @@ if (variableTimeIncs) {
       unixtime umean = (unixtime)mean;
       unixtime uvar = (unixtime)var;
       unixtime suvar = (unixtime)svar;
-      mlog << Warning << "\n\n mtd_read_data() -> file time increments are not constant, could be problematic\n";
-      mlog << Warning << " mtd_read_data() -> use MODE of the increments, mode=" << dt_start << "\n";
-      mlog << Warning << " mtd_read_data() -> time increment properties: mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
+      mlog << Warning << "\n\n mtd_read_data() -> File time increments are not constant, could be problematic\n";
+      mlog << Warning << " mtd_read_data() -> Using MODE of the increments, mode=" << dt_start << "\n";
+      mlog << Warning << " mtd_read_data() -> Time increment properties: mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
    }
 }
-delete [] dtArray;
  
    //
    //  load up the rest of the MtdFloatFile class members
@@ -178,7 +180,7 @@ raw.calc_data_minmax();
    //  done
    //
 
-return;
+return valid_times;
 
 }
 

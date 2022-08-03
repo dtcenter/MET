@@ -210,18 +210,16 @@ MM_Engine engine;
    //  storage for valid times
    //
 
-unixtime * valid_times_fcst = 0;
-valid_times_fcst = new unixtime [fcst_filenames.n()];
-unixtime * valid_times_obs = 0;
-valid_times_obs = new unixtime [obs_filenames.n()];
+vector<unixtime> valid_times_fcst;
+vector<unixtime> valid_times_obs;
 
    //
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw, valid_times_fcst);
+valid_times_fcst = mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 
-mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw, valid_times_obs);
+valid_times_obs = mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 
 if ( fcst_raw.nt() != obs_raw.nt() )  {
 
@@ -446,6 +444,13 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       mask_2d = fcst_obj.const_t_mask(t, j + 1);   //  1-based
 
+      if (t < 0 || t >= (int)valid_times_fcst.size()) {
+	  mlog << Error 
+	       << "\n  " << program_name << ": index " << t << " out of forecast valid times range 0 to " << valid_times_fcst.size()-1
+	       << "\n\n";
+	  exit ( 1 );
+      }
+
       fcst_raw.get_data_plane(t, raw_2d);
 
       att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
@@ -479,6 +484,13 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
 
       mask_2d = obs_obj.const_t_mask(t, j + 1);   //  1-based
+
+      if (t < 0 || t >= (int)valid_times_obs.size()) {
+	  mlog << Error 
+	       << "\n  " << program_name << ": index " << t << " out of obs valid times range 0 to " << valid_times_obs.size()-1
+	       << "\n\n";
+	  exit ( 1 );
+      }
 
       obs_raw.get_data_plane(t, raw_2d);
 
@@ -695,7 +707,14 @@ if ( have_pairs )  {
 
          // cout << "j = " << j << ",   vol = " << mask_2d.object_volume(0) << '\n';
 
-         fcst_raw.get_data_plane(t, raw_2d);
+	 if (t < 0 || t >= (int)valid_times_fcst.size()) {
+	    mlog << Error 
+	       << "\n  " << program_name << ": index " << t << " out of forecast valid times range 0 to " << valid_times_fcst.size()-1
+	       << "\n\n";
+	    exit ( 1 );
+	 }
+
+	 fcst_raw.get_data_plane(t, raw_2d);
 
          att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
@@ -736,7 +755,14 @@ if ( have_pairs )  {
          // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
          mask_2d = mask.const_t_mask(t, 1);   //  1-based
 
-         obs_raw.get_data_plane(t, raw_2d);
+ 	 if (t < 0 || t >= (int)valid_times_obs.size()) {
+	     mlog << Error 
+	       << "\n  " << program_name << ": index " << t << " out of obs valid times range 0 to " << valid_times_obs.size()-1
+	       << "\n\n";
+	     exit ( 1 );
+	 }
+
+	 obs_raw.get_data_plane(t, raw_2d);
 
          att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
@@ -881,9 +907,6 @@ mlog << Debug(2)
 
 
 do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path.c_str());
-
-if ( valid_times_fcst )  { delete [] valid_times_fcst;  valid_times_fcst = 0; }
-if ( valid_times_obs )  { delete [] valid_times_obs;  valid_times_obs = 0; }
 
    //
    //  done
@@ -1066,14 +1089,13 @@ ConcatString path;
    //  storage for valid times
    //
 
-unixtime * valid_times = 0;
-valid_times = new unixtime [single_filenames.n()];
+vector<unixtime> valid_times;
 
    //
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), single_filenames, raw, valid_times);
+valid_times = mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
 
    //
    //  copy forecast name/units/level to observation
@@ -1177,7 +1199,15 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
       mask_2d = obj.const_t_mask(t, j + 1);   //  1-based
 
+      if (t < 0 || t >= (int)valid_times.size()) {
+	  mlog << Error 
+	       << "\n  " << program_name << ": index " << t << " out of valid times range 0 to " << valid_times.size()-1
+	       << "\n\n";
+	  exit ( 1 );
+	}
+
       raw.get_data_plane(t, raw_2d);
+      //raw_2d.set_valid(valid_times[t]);
 
       att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
@@ -1242,8 +1272,6 @@ mlog << Debug(2)
 
 do_mtd_nc_output(config.nc_info, raw, obj, config, path.c_str());
 
-
-if ( valid_times )  { delete [] valid_times;  valid_times = 0; }
 
    //
    //  done

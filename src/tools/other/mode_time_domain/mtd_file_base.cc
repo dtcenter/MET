@@ -91,6 +91,8 @@ Nx = Ny = Nt = 0;
  
 StartValidTime = (unixtime) 0;
 
+ActualValidTimes.clear();
+
 DeltaT = 0;
 
 Filename.clear();
@@ -292,7 +294,6 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -301,6 +302,19 @@ void MtdFileBase::set_delta_t(int seconds)
 {
 
 DeltaT = seconds;
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFileBase::init_actual_valid_times(const vector<unixtime> &validTimes)
+
+{
+
+ActualValidTimes = validTimes;
 
 return;
 
@@ -346,6 +360,25 @@ if ( (t < 0) || ( t >= Nt) )  {
 
 
 return ( StartValidTime + t*DeltaT );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime MtdFileBase::actual_valid_time(int t) const
+
+{
+
+  if ( (t < 0) || ( t >= (int)ActualValidTimes.size()) )  {
+
+   mlog << Error << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+ return ( ActualValidTimes[t] );
 
 }
 
