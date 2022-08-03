@@ -22,7 +22,7 @@ MET Version 11.0.0-beta2 release notes (20220803)
    * Refine warning/error messages when parsing thresholds (`#2211 <https://github.com/dtcenter/MET/issues/2211>`_).
    * Add "station_ob" to metadata_map as a message_type metadata variable for ioda2nc (`#2215 <https://github.com/dtcenter/MET/issues/2215>`_).
 
-* METplus-Interal Repository (non-public):
+* METplus-Internal Repository (non-public):
 
    * MET: Add the user ID and the command line being executed to the log output at beginning and end of each MET tool run (`#19 <https://github.com/dtcenter/METplus-Internal/issues/19>`_).
    * MET: Enhance MET to have better signal handling for shutdown events (`#21 <https://github.com/dtcenter/METplus-Internal/issues/21>`_).
@@ -54,6 +54,6 @@ MET Version 11.0.0-beta1 release notes (20220622)
    * Enhance Gen-Vx-Mask by adding a new poly_xy masking type option (`#2152 <https://github.com/dtcenter/MET/issues/2152>`_).
    * Add M_to_KFT and KM_to_KFT functions to ConfigConstants (`#2180 <https://github.com/dtcenter/MET/issues/2180>`_).
 
-* METplus-Interal Repository (non-public):
+* METplus-Internal Repository (non-public):
 
    * MET: Replace fixed length character arrays with strings (`#14 <https://github.com/dtcenter/METplus-Internal/issues/14>`_).
