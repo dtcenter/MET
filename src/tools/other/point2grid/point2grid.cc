@@ -19,17 +19,15 @@
 //   ----   ----      ----           -----------
 //   000    12-11-19  Howard Soh     Support GOES-16
 //   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <dirent.h>
-#include <iostream>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -204,13 +202,10 @@ static void set_qc_flags(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Store the program name
    program_name = get_short_name(argv[0]);
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -219,6 +214,12 @@ int main(int argc, char *argv[]) {
    process_data_file();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "point2grid";
 }
 
 ////////////////////////////////////////////////////////////////////////

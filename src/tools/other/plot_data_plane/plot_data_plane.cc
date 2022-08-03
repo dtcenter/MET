@@ -25,24 +25,21 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/19/11  Holmes          New
+//   001    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "vx_log.h"
 #include "data_plane.h"
 #include "vx_data2d.h"
@@ -85,7 +82,7 @@ static void set_title_string(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char * argv[]) {
+int met_main(int argc, char * argv[]) {
 
    program_name = get_short_name(argv[0]);
 
@@ -213,6 +210,12 @@ int main(int argc, char * argv[]) {
    #endif
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "plot_data_plane";
 }
 
 ////////////////////////////////////////////////////////////////////////

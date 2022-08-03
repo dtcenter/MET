@@ -16,22 +16,20 @@
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
 //   001    01/26/16  Halley Gotway   Add -no_check_dup option.
+//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_util.h"
 #include "vx_math.h"
 #include "config_constants.h"
@@ -65,7 +63,7 @@ static void set_outdir(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char * argv []) {
+int met_main(int argc, char * argv []) {
    CommandLine cline;
    ConcatString output_filename;
 
@@ -120,6 +118,12 @@ int main(int argc, char * argv []) {
 //
 // Process conventional GSI data.
 //
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "gsid2mpr";
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void process_conv(const char *conv_filename, const char *output_filename) {

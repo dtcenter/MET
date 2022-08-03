@@ -1,0 +1,40 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2022
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifndef  __MAIN_H__
+#define  __MAIN_H__
+
+
+////////////////////////////////////////////////////////////////////////
+
+#include <ctime>
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+#define MET_BUF_SIZE 4096
+
+////////////////////////////////////////////////////////////////////////
+
+//extern void log_event(int event_id, string event_msg);
+extern string get_current_time();
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   //  __MAIN_H__
+
+
+////////////////////////////////////////////////////////////////////////
+

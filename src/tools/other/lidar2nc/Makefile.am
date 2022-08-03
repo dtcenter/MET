@@ -41,7 +41,6 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_gnomon \
 	-lvx_stat_out \
 	-lvx_statistics \
-	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_util \
 	-lvx_config \
@@ -49,6 +48,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_util \
 	$(PYTHON_LIBS) \
 	-lvx_summary \
 	-lmfhdf -ldf -ljpeg \

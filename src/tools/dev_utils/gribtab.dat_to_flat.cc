@@ -12,14 +12,13 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
 
@@ -33,7 +32,7 @@ static void parse_line(const char * line);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -75,6 +74,14 @@ in.close();
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "gribtab_daT-to_flat";
 }
 
 

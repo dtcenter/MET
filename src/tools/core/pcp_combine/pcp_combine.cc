@@ -75,6 +75,7 @@
 //   022    03/08/19  Halley Gotway  Support multiple -field options.
 //   023    08/29/19  Halley Gotway  Support multiple arguments for the
 //                    the -pcpdir option.
+//   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,21 +83,16 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <netcdf>
 
-using namespace netCDF;
-
+#include "main.h"
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -198,15 +194,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i, j;
 
    program_name = get_short_name(argv[0]);
-
-   //
-   // Set handler to be called for memory allocation error
-   //
-   set_new_handler(oom);
 
    //
    // Process the command line arguments
@@ -247,6 +238,12 @@ int main(int argc, char *argv[]) {
    close_nc();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "pcp_combine";
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -12,14 +12,13 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
 
@@ -39,9 +38,9 @@ const int MAX_EDR_GRIB_CODE = 200;
 const double FEET_TO_M = 0.3048;
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 {
-  static const string method_name = "insitu_nc_to_ascii::main()";
+  static const string method_name = "insitu_nc_to_ascii::met_main()";
   
   // Check the command line and extract the arguments
 
@@ -127,6 +126,14 @@ int main(int argc, char * argv [])
   }
   fclose(output_file);  
   return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "insitu_nc_to_ascii";
 }
 
 

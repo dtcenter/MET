@@ -32,28 +32,22 @@
 //                                   observation type.
 //   006    07-23-18  Halley Gotway  Support masks from gen_vx_mask.
 //   007    01-11-19  Howard Soh     Added config file option.
+//   008    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <regex.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <netcdf>
-using namespace netCDF;
-
+#include "main.h"
 #include "madis2nc.h"
 
 #include "data2d_factory.h"
@@ -127,12 +121,7 @@ static void set_config(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   //
-   // Set handler to be called for memory allocation error
-   //
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    //
    // Initialize static variables
@@ -179,6 +168,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "madis2nc";
 }
 
 ////////////////////////////////////////////////////////////////////////

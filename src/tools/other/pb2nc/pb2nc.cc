@@ -53,26 +53,23 @@
 //          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
 //   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
+//   017    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <limits>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <assert.h>
 
+#include "main.h"
 #include "pb2nc_conf_info.h"
 #include "data_class.h"
 #include "data2d_factory.h"
@@ -413,11 +410,8 @@ derive_var_cfg::derive_var_cfg(ConcatString _var_name) {
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Initialize static variables
    initialize();
@@ -458,6 +452,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return program_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
