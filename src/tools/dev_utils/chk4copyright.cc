@@ -31,9 +31,7 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
-#include <string.h>
 #include <cstdio>
 #include <unistd.h>
 #include <cstdlib>
@@ -44,6 +42,7 @@ using namespace std;
 #include <dirent.h>
 #include <cmath>
 
+#include "main.h"
 #include "command_line.h"
 #include "string_fxns.h"
 #include "vx_log.h"
@@ -78,7 +77,7 @@ static int get_line(int &, ConcatString &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[])
+int met_main(int argc, char *argv[])
 {
    CommandLine cline;
 
@@ -151,6 +150,14 @@ int main(int argc, char *argv[])
 
    exit (0);
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "chk4copyright";
 }
 
 

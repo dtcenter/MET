@@ -16,22 +16,21 @@
 //   ----   ----      ----           -----------
 //   000   04/18/19  Fillmore        New
 //   001   05/15/20  Halley Gotway   Fix data file list option logic.
+//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "tc_rmw.h"
 
 #include "tcrmw_grid.h"
@@ -80,10 +79,7 @@ static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-    // Set handler for memory allocation error
-    set_new_handler(oom); // out of memory
+int met_main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
@@ -98,6 +94,12 @@ int main(int argc, char *argv[]) {
     process_rmw();
 
     return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "tc_rmw";
 }
 
 ////////////////////////////////////////////////////////////////////////

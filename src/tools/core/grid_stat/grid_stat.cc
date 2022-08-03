@@ -109,6 +109,7 @@
 //                    filtering options.
 //   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
+//   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,17 +117,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#include "main.h"
 #include "handle_openmp.h"
 
 #include "grid_stat.h"
@@ -185,13 +184,10 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Set up OpenMP (if enabled)
    init_openmp();
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -203,6 +199,13 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name()
+{
+   return "ensemble_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////

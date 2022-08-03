@@ -20,21 +20,18 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07-21-20  Howard Soh     New
+//   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
-#include <iostream>
 #include <fstream>
 #include <limits>
-#include <string.h>
 #include <assert.h>
 
+#include "main.h"
 #include "apply_mask.h"
 #include "ioda2nc_conf_info.h"
 #include "vx_log.h"
@@ -163,11 +160,8 @@ static bool has_postfix(std::string const &, std::string const &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Initialize static variables
    initialize();
@@ -197,6 +191,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "ioda2nc";
 }
 
 ////////////////////////////////////////////////////////////////////////

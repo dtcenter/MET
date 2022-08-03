@@ -100,6 +100,7 @@
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
+//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,17 +108,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "point_stat.h"
 
 #include "vx_statistics.h"
@@ -171,11 +170,8 @@ static void set_outdir(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -201,6 +197,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "point_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
