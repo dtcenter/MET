@@ -120,12 +120,10 @@ bool straight_python_point_data(const char * script_name, int script_argc, char 
 {
 
 int int_value;
-PyObject * module_obj      = 0;
-PyObject * module_dict_obj = 0;
-PyObject * python_key      = 0;
-PyObject * python_value    = 0;
-PyObject * numpy_array_obj = 0;
-PyObject * python_met_point_data = 0;
+PyObject *module_obj      = 0;
+PyObject *module_dict_obj = 0;
+PyObject *python_value    = 0;
+PyObject *python_met_point_data = 0;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_point_data -> ";
 const char *method_name_s = "straight_python_point_data()";

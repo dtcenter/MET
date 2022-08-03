@@ -171,6 +171,7 @@ s = a.s;
 
 IgnoreCase = a.IgnoreCase;
 Sorted = a.Sorted;
+MaxLength = a.MaxLength;
 
 return;
 

@@ -34,7 +34,7 @@ void load_numpy (void * buf,
 
 bool need_swap = (shuf != 0) && (native_endian != data_endian);
 
-int j, x, y, r, c;
+int j;
 T * u = (T *) buf;
 T value;
 
