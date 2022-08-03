@@ -21,11 +21,8 @@ MET Version 11.0.0-beta2 release notes (20220803)
    * Add a sum option to the time summaries computed by the point pre-processing tools (`#2204 <https://github.com/dtcenter/MET/issues/2204>`_).
    * Refine warning/error messages when parsing thresholds (`#2211 <https://github.com/dtcenter/MET/issues/2211>`_).
    * Add "station_ob" to metadata_map as a message_type metadata variable for ioda2nc (`#2215 <https://github.com/dtcenter/MET/issues/2215>`_).
-
-* METplus-Internal Repository (non-public):
-
-   * MET: Add the user ID and the command line being executed to the log output at beginning and end of each MET tool run (`#19 <https://github.com/dtcenter/METplus-Internal/issues/19>`_).
-   * MET: Enhance MET to have better signal handling for shutdown events (`#21 <https://github.com/dtcenter/METplus-Internal/issues/21>`_).
+   * MET: Add the user ID and the command line being executed to the log output at beginning and end of each MET tool run (`dtcenter/METplus-Internal#19 <https://github.com/dtcenter/METplus-Internal/issues/19>`_).
+   * MET: Enhance MET to have better signal handling for shutdown events (`dtcenter/METplus-Internal#21 <https://github.com/dtcenter/METplus-Internal/issues/21>`_).
 
 MET Version 11.0.0-beta1 release notes (20220622)
 -------------------------------------------------
@@ -53,7 +50,4 @@ MET Version 11.0.0-beta1 release notes (20220622)
    * Allow 2x2 HSS calculations to include user-defined EC values (`#2147 <https://github.com/dtcenter/MET/issues/2147>`_).
    * Enhance Gen-Vx-Mask by adding a new poly_xy masking type option (`#2152 <https://github.com/dtcenter/MET/issues/2152>`_).
    * Add M_to_KFT and KM_to_KFT functions to ConfigConstants (`#2180 <https://github.com/dtcenter/MET/issues/2180>`_).
-
-* METplus-Internal Repository (non-public):
-
-   * MET: Replace fixed length character arrays with strings (`#14 <https://github.com/dtcenter/METplus-Internal/issues/14>`_).
+   * MET: Replace fixed length character arrays with strings (`dtcenter/METplus-Internal#14 <https://github.com/dtcenter/METplus-Internal/issues/14>`_).
