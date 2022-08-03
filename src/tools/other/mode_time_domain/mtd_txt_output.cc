@@ -532,7 +532,6 @@ for (j=0; j<(fcst_cluster_att.n()); ++j)  {
 
    table.set_entry(r, fcst_lead_column, sec_to_hhmmss(fcst_cluster_att.lead_time(j)));
 
-   // not sure here
    table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_cluster_att.valid_time(j)));
 
    //table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_raw.valid_time(t)));
@@ -553,7 +552,6 @@ for (j=0; j<(obs_cluster_att.n()); ++j)  {
 
    table.set_entry(r,  fcst_lead_column, sec_to_hhmmss(fcst_raw.lead_time(t)));
 
-   // not sure here
    table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_cluster_att.valid_time(j)));
 
    table.set_entry(r,  obs_lead_column, sec_to_hhmmss(obs_cluster_att.lead_time(j)));
