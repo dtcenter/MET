@@ -821,9 +821,8 @@ mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
- do_2d_txt_output(fcst_raw, obs_raw, valid_times_fcst, valid_times_obs,
-                 fcst_simple_att_2d,  obs_simple_att_2d,
-                 fcst_cluster_att_2d, obs_cluster_att_2d, config, path.c_str());
+ do_2d_txt_output(fcst_raw, obs_raw, fcst_simple_att_2d,  obs_simple_att_2d,
+                  fcst_cluster_att_2d, obs_cluster_att_2d, config, path.c_str());
 
    //
    //  write simple single attributes

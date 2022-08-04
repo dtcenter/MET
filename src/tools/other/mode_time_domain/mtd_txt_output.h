@@ -48,8 +48,6 @@ extern void do_3d_pair_txt_output(const PairAtt3DArray &,
 
 extern void do_2d_txt_output(const MtdFloatFile & fcst_raw, 
                              const MtdFloatFile &  obs_raw, 
-			     const vector<unixtime> &valid_times_fcst,
-			     const vector<unixtime> &valid_times_obs,
                              const SingleAtt2DArray & fcst_single_att, 
                              const SingleAtt2DArray &  obs_single_att, 
                              const SingleAtt2DArray & fcst_cluster_att, 
