@@ -88,8 +88,8 @@ obs_name_map = [];
 // Default mapping for Metadata.
 //
 metadata_map = [
-   { key = "message_type"; val = "msg_type"; },
-   { key = "station_id";   val = "report_identifier"; },
+   { key = "message_type"; val = "msg_type,station_ob"; },
+   { key = "station_id";   val = "station_id,report_identifier"; },
    { key = "pressure";     val = "air_pressure,pressure"; },
    { key = "height";       val = "height,height_above_mean_sea_level"; },
    { key = "elevation";    val = ""; }
@@ -117,7 +117,7 @@ time_summary = {
   width = 600;
   grib_code = [];
   obs_var   = [ "TMP", "WDIR", "RH" ];
-  type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  type = [ "min", "max", "range", "mean", "stdev", "median", "p80", "sum" ];
   vld_freq = 0;
   vld_thresh = 0.0;
 }

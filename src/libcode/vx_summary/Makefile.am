@@ -17,6 +17,7 @@ libvx_summary_a_SOURCES = \
               summary_calc_mean.cc summary_calc_mean.h \
               summary_calc_median.cc summary_calc_median.h \
               summary_calc_min.cc summary_calc_min.h \
+              summary_calc_sum.cc summary_calc_sum.h \
               summary_calc_percentile.cc summary_calc_percentile.h \
               summary_calc_range.cc summary_calc_range.h \
               summary_calc_stdev.cc summary_calc_stdev.h \

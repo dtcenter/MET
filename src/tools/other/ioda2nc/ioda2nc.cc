@@ -20,21 +20,18 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07-21-20  Howard Soh     New
+//   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
-#include <iostream>
 #include <fstream>
 #include <limits>
-#include <string.h>
 #include <assert.h>
 
+#include "main.h"
 #include "apply_mask.h"
 #include "ioda2nc_conf_info.h"
 #include "vx_log.h"
@@ -102,7 +99,6 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 static IntArray filtered_times;
-//static map<ConcatString, StringArray> variableTypeMap;
 
 static bool do_summary;
 static bool save_summary_only = false;
@@ -164,11 +160,8 @@ static bool has_postfix(std::string const &, std::string const &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Initialize static variables
    initialize();
@@ -198,6 +191,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "ioda2nc";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -412,10 +411,10 @@ void process_ioda_file(int i_pb) {
    get_var_names(f_in, &var_names);
    get_dim_names(f_in, &dim_names);
    for(idx=0; idx<var_names.n(); idx++) {
-      if(has_postfix(var_names[idx], "MetaData")) {
+      if(has_postfix(var_names[idx], "@MetaData")) {
          metadata_vars.add(var_names[idx].substr(0, var_names[idx].find('@')));
       }
-      if(has_postfix(var_names[idx], "ObsValue")) {
+      if(has_postfix(var_names[idx], "@ObsValue")) {
          obs_value_vars.add(var_names[idx].substr(0, var_names[idx].find('@')));
       }
    }
@@ -505,10 +504,18 @@ void process_ioda_file(int i_pb) {
       hdr_msg_types = new char[nlocs*nstring];
       get_meta_data_strings(f_in, msg_type_name, hdr_msg_types);
    }
+   else {
+      mlog << Debug(1) << method_name
+           << "The metadata variable for message type does not exist!\n";
+   }
 
    if(has_station_id) {
       hdr_station_ids = new char[nlocs*nstring];
       get_meta_data_strings(f_in, station_id_name, hdr_station_ids);
+   }
+   else {
+      mlog << Debug(1) << method_name
+           << "The metadata variable for station ID does not exist!\n";
    }
 
    if(!get_nc_data(&in_hdr_lat_var, hdr_lat_arr, nlocs)) {
@@ -576,9 +583,9 @@ void process_ioda_file(int i_pb) {
       start_t = clock();
    }
 
-   log_message.add(" IODA messages");
+   log_message = " IODA messages";
    if(npbmsg != npbmsg_total) {
-      log_message << " (out of " << unixtime_to_string(npbmsg_total) << ")";
+      log_message << " (out of " << npbmsg_total << ")";
    }
    mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
 
@@ -589,7 +596,7 @@ void process_ioda_file(int i_pb) {
    // Initialize
    diff_file_time_count = 0;
 
-   for(int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
+   for(idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the IODA messages from the input file
    for(i_read=0; i_read<npbmsg; i_read++) {
@@ -658,7 +665,6 @@ void process_ioda_file(int i_pb) {
       }
 
       if(has_msg_type) {
-         int buf_len = sizeof(modified_hdr_typ);
          m_strncpy(hdr_typ, hdr_msg_types+(i_read*nstring), nstring, method_name_s, "hdr_typ");
          m_rstrip(hdr_typ, nstring);
 
@@ -669,20 +675,18 @@ void process_ioda_file(int i_pb) {
             rej_typ++;
             continue;
          }
-
-         if(0 < message_type_map.count((string)hdr_typ)) {
-            ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
-            mlog << Debug(6) << "\n" << method_name
-                 << "Switching report type \"" << hdr_typ
-                 << "\" to message type \"" << mappedMessageType << "\".\n";
-            if(mappedMessageType.length() < HEADER_STR_LEN) buf_len = HEADER_STR_LEN;
-            m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), buf_len,
-                      method_name_s, "modified_hdr_typ");
-         }
-         else {
-            m_strncpy(modified_hdr_typ, hdr_typ, buf_len, method_name_s, "modified_hdr_typ2");
-         }
-         modified_hdr_typ[buf_len-1] = 0;
+      }
+      else m_strncpy(hdr_typ, "NA", HEADER_STR_LEN,
+                     method_name_s, "missing_hdr_typ");
+      if(0 < message_type_map.count((string)hdr_typ)) {
+         int buf_len = sizeof(modified_hdr_typ);
+         ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
+         mlog << Debug(6) << "\n" << method_name
+              << "Switching report type \"" << hdr_typ
+              << "\" to message type \"" << mappedMessageType << "\".\n";
+         if(mappedMessageType.length() < HEADER_STR_LEN) buf_len = HEADER_STR_LEN;
+         m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), buf_len,
+                   method_name_s, "modified_hdr_typ");
       }
 
       if(has_station_id) {
@@ -768,7 +772,7 @@ void process_ioda_file(int i_pb) {
       }
 
       // Store the index to the header data
-      obs_arr[0] = (float) nc_point_obs.get_hdr_index();
+      obs_arr[0] = (float)nc_point_obs.get_hdr_index();
 
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
@@ -902,9 +906,9 @@ void process_ioda_file(int i_pb) {
 
 void write_netcdf_hdr_data() {
    int obs_cnt, hdr_cnt;
-   const long hdr_count = (long) nc_point_obs.get_hdr_index();
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
+   nc_point_obs.get_hdr_index();
    nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);

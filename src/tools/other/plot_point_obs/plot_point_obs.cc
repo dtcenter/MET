@@ -25,24 +25,21 @@
 //                                    plot.
 //   003    01/24/13  Halley Gotway   Add -dotsize.
 //   004    11/10/20  Halley Gotway   Add -config and -plot_grid.
+//   005    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_mai
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "plot_point_obs.h"
 
 #include "data_plane_plot.h"
@@ -69,7 +66,7 @@ static void set_dotsize(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    CommandLine cline;
 
    // Check for zero arguments
@@ -128,6 +125,12 @@ int main(int argc, char *argv[]) {
    create_plot();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "plot_point_obs";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -250,7 +253,6 @@ void process_point_obs(const char *point_obs_filename) {
                                           obs_qty_block, (char *)0);
       if (!status) exit(1);
 
-      int typ_idx, sid_idx, vld_idx;
       for(int i_offset=0; i_offset<buf_size2; i_offset++) {
 
          i_obs = i_start + i_offset;

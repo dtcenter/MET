@@ -42,6 +42,7 @@
 //   012    04/25/21  Halley Gotway  Replace pickle files for temporary
 //                    ascii.
 //   013    07/16/21  Halley Gotway  MET #1788 Add CBS Index.
+//   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -112,15 +113,10 @@ static void open_temps();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char * argv []) {
+int met_main(int argc, char * argv []) {
    int i;
    StringArray jobs_sa;
    ConcatString default_config_file;
-
-   //
-   // Set handler to be called for memory allocation error
-   //
-   set_new_handler(oom);
 
    //
    // Parse the command line
@@ -245,6 +241,12 @@ int main(int argc, char * argv []) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "stat_analysis";
 }
 
 ////////////////////////////////////////////////////////////////////////

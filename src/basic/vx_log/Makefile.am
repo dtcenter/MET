@@ -15,6 +15,7 @@ libvx_log_a_SOURCES = concat_string.cc concat_string.h \
                file_fxns.cc file_fxns.h \
                indent.cc indent.h \
                logger.cc logger.h \
+               main.cc main.h \
                string_array.cc string_array.h \
                str_wrappers.cc str_wrappers.h \
                vx_log.h

@@ -16,14 +16,12 @@ static const char default_units [] = "none";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-#include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 #include <ctype.h>
 
+#include "main.h"
 #include "modis_file.h"
 
 #include "vx_util.h"
@@ -84,7 +82,7 @@ int  get_compress();
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -157,6 +155,12 @@ return ( 0 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "modis_regrid";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

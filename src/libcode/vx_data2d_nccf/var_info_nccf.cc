@@ -95,8 +95,10 @@ void VarInfoNcCF::assign(const VarInfoNcCF &v) {
    VarInfo::assign(v);
 
    // Copy
-   Dimension.clear();
-   for(i=0; i<v.n_dimension(); i++) Dimension.add(v.dimension(i));
+   clear_dimension();
+   for(i=0; i<v.n_dimension(); i++) {
+      add_dimension(v.dimension(i), v.is_offset(i), v.dim_value(i));
+   }
 
    return;
 }
@@ -109,9 +111,17 @@ void VarInfoNcCF::clear() {
    VarInfo::clear();
 
    // Initialize
-   Dimension.clear();
+   clear_dimension();
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoNcCF::clear_dimension() {
+   Dimension.clear();
+   Is_offset.clear();
+   Dim_value.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,14 +132,20 @@ void VarInfoNcCF::dump(ostream &out) const {
    out << "VarInfoNcCF::dump():\n"
        << "  Dimension:\n";
    Dimension.dump(out);
+   out << "  Is_offset:\n";
+   Is_offset.dump(out);
+   out << "  Dim_value:\n";
+   Dim_value.dump(out);
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::add_dimension(int dim) {
+void VarInfoNcCF::add_dimension(int dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
+   Is_offset.add(as_offset);
+   Dim_value.add(dim_value);
    return;
 }
 
@@ -154,9 +170,9 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
    if(strchr(lstr.c_str(), '(') == NULL) {
       Level.set_req_name("*,*");
       Level.set_name("*,*");
-      Dimension.clear();
-      Dimension.add(vx_data2d_star);
-      Dimension.add(vx_data2d_star);
+      clear_dimension();
+      add_dimension(vx_data2d_star);
+      add_dimension(vx_data2d_star);
    }
    else {
 
@@ -172,53 +188,51 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
       Level.set_name(ptr);
 
       // If dimensions are specified, clear the default value
-      if (strchr(ptr, ',') != NULL) Dimension.clear();
+      if (strchr(ptr, ',') != NULL) clear_dimension();
 
-      bool as_offset = true;
       // Parse the dimensions
-      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
-      {
+      bool as_offset = true;
+      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
          // Check for wildcards
-         if (strchr(ptr2, '*') != NULL) {
-            Dimension.add(vx_data2d_star);
+         if (strchr(ptr2, '*') != NULL) { add_dimension(vx_data2d_star);
          }
-         else
-         {
+         else {
+            as_offset = (*ptr2 != '@');
+            if (!as_offset) ptr2++;
+
             // Check for a range of levels
-            if ((ptr3 = strchr(ptr2, '-')) != NULL)
-            {
+            if ((ptr3 = strchr(ptr2, '-')) != NULL) {
+
                // Check if a range has already been supplied
-               if (Dimension.has(range_flag))
-               {
+               if (Dimension.has(range_flag)) {
                   mlog << Error << "\n" << method_name
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
                }
-               else
-               {
+               else {
                   // Store the dimension of the range and limits
-                  Dimension.add(range_flag);
-                  Level.set_lower(atoi(ptr2));
-                  Level.set_upper(atoi(++ptr3));
+                  *ptr3++ = 0;
+                  add_dimension(range_flag, as_offset);
+                  Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
+                  Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
 
                   // Assume pressure level type for a range of levels
                   Level.set_type(LevelType_Pres);
+                  Level.set_is_offset(as_offset);
                }
             }
             // Check for a range of times
             else if ((ptr3 = strchr(ptr2, ':')) != NULL) {
                // Check if a range has already been supplied
-               if (Dimension.has(range_flag))
-               {
-                  mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+               if (Dimension.has(range_flag)) {
+                  mlog << Error << "\n" << method_name
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
                }
-               else
-               {
-                  int increment = 0;
+               else {
+                  int increment = 1;
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
                   char *ptr_inc = strchr(ptr3, ':');
@@ -228,42 +242,57 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
 
                   bool datestring_start = is_datestring(ptr2);
                   bool datestring_end   = is_datestring(ptr3);
+                  if (datestring_start != datestring_end) {
+                     mlog << Error << "\n" << method_name
+                          << "the time value and an index/offset can not be mixed for NetCDF variable \""
+                          << MagicStr << "\".\n\n";
+                     exit(1);
+                  }
+                  if (datestring_start && datestring_end) as_offset = false;
+
                   unixtime time_lower = datestring_start
-                      ? timestring_to_unix(ptr2) : atoi(ptr2);
+                                        ? timestring_to_unix(ptr2)
+                                        : (as_offset ? atoi(ptr2) : atof(ptr2));
                   unixtime time_upper = datestring_end
-                      ? timestring_to_unix(ptr3) : atoi(ptr3);
+                                        ? timestring_to_unix(ptr3)
+                                        : (as_offset ? atoi(ptr3) : atof(ptr3));
                   if (ptr_inc != NULL) {
-                    if (datestring_end && datestring_start) {
-                      increment = timestring_to_sec(ptr_inc);
-                      mlog << Debug(7) << method_name
-                           << " increment: \"" << ptr_inc << "\" to "
-                           << increment << " seconds.\n";
-                    }
-                    else increment = atoi(ptr_inc);
+                     if (as_offset) increment = atoi(ptr_inc);
+                     else {
+                        increment = is_float(ptr_inc)
+                                    ? atof(ptr_inc) : timestring_to_sec(ptr_inc);
+                        mlog << Debug(7) << method_name
+                             << " increment: \"" << ptr_inc << "\" to "
+                             << increment << " seconds.\n";
+                     }
                   }
 
-                  Dimension.add(range_flag);
+                  add_dimension(range_flag, as_offset);
                   Level.set_lower(time_lower);
                   Level.set_upper(time_upper);
                   Level.set_increment(increment);
 
                   // Assume time level type for a range of levels
                   Level.set_type(LevelType_Time);
-                  if (datestring_end && datestring_start)
-                    as_offset = false;
+                  Level.set_is_offset(as_offset);
                }
             }
-            else
-            {
+            else {
                // Single level
                int level = 0;
-               if (is_datestring(ptr2)) {
-                  unixtime unix_time = timestring_to_unix(ptr2);
-                  level = unix_time;
-                  as_offset = false;
+               double level_value = bad_data_double;
+               if (is_number(ptr2)) {
+                  if (as_offset) level = atoi(ptr2);
+                  else {
+                     level = vx_data2d_dim_by_value;
+                     level_value = atof(ptr2);
+                  }
                }
-               else if (is_number(ptr2)) {
-                  level = atoi(ptr2);
+               else if (is_datestring(ptr2)) {
+                  unixtime unix_time = timestring_to_unix(ptr2);
+                  level = vx_data2d_dim_by_value;
+                  level_value = unix_time;
+                  as_offset = false;
                }
                else {
                   mlog << Error << "\n" << method_name
@@ -271,7 +300,8 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                        << ptr2 << "\"!\n\n";
                   exit(1);
                }
-               Dimension.add(level);
+               if (as_offset) add_dimension(level, as_offset);
+               else add_dimension(level, as_offset, level_value);
             }
          }
 
@@ -279,7 +309,6 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
          ptr = NULL;
 
       } // end while
-      Level.set_time_as_offset(as_offset);
 
    } // end else
 

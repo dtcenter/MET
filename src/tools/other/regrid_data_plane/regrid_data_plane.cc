@@ -23,14 +23,12 @@
 //   003    09-24-17  Howard Soh     Support Gaussian filtering
 //   004    01-28-20  Howard Soh     Moved GOES-16/17 to point2grib
 //   005    04-09-20  Halley Gotway  Add convert and censor options.
+//   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
 #include <iostream>
@@ -42,6 +40,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -100,13 +99,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Store the program name
    program_name = get_short_name(argv[0]);
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -115,6 +111,17 @@ int main(int argc, char *argv[]) {
    process_data_file();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "regrid_data_plane";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void initialize() {
 }
 
 ////////////////////////////////////////////////////////////////////////

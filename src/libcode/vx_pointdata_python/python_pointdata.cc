@@ -14,7 +14,6 @@
 #include "pointdata_from_array.h"
 #include "vx_util.h"
 
-
 #include "global_python.h"
 #include "wchar_argv.h"
 
@@ -34,11 +33,39 @@ static void set_array_from_python(PyObject *python_data, const char *python_key,
    const char *method_name = "set_array_from_python(T *) -> ";
    PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
    if (numpy_array_obj) {
-      Python3_Numpy np;
-      np.set(numpy_array_obj);
-      pointdata_from_np_array(np, out);
-      mlog << Debug(7) << method_name
-           << "get the point data for " << python_key << " from python object\n";
+      bool status = false;
+      ConcatString py_type_name = Py_TYPE(numpy_array_obj)->tp_name;
+      if ("numpy.ndarray" == py_type_name || "MaskedArray" == py_type_name ){
+         Python3_Numpy np;
+         np.set(numpy_array_obj);
+         pointdata_from_np_array(np, out);
+         status = true;
+      }
+      else if (PyList_Check(numpy_array_obj)) {
+         status = pointdata_from_python_list(numpy_array_obj, out);
+         if(!status) {
+            if (PyFloat_Check(PyList_GetItem(numpy_array_obj, 0))) {
+               mlog << Error << "\n" << method_name
+                    << "Only int type is supported at python list for " << python_key << "."
+                    << " Check the data type from python and consider using numpy for python embedding\n\n";
+            }
+            else {
+               mlog << Error << "\n" << method_name
+                    << "Only int/float type is supported at python list for " << python_key << "."
+                    << " Check the data type from python and consider using numpy for python embedding\n\n";
+            }
+         }
+      }
+      else {
+         mlog << Error << "\n" << method_name
+              << "Not getting the point data by the key (" << python_key << ") from python object\n"
+              << "          The python type \"" << py_type_name << "\" is not supported\n\n";
+      }
+      if (status) {
+         mlog << Debug(7) << method_name
+              << "get the point data for " << python_key << " from python object\n";
+      }
+      else exit (1);
    }
    else {
       if (required) {
@@ -51,111 +78,7 @@ static void set_array_from_python(PyObject *python_data, const char *python_key,
    }
 }
 
-/*
-static void set_array_from_python(PyObject *python_data, const char *python_key, int *out, bool required=true) {
-   const char *method_name = "set_array_from_python(T *) -> ";
-   PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
-   if (numpy_array_obj) {
-      Python3_Numpy np;
-mlog << Debug(7) << method_name
-     << "get the point data for " << python_key << " from python object - before\n";
-      np.set(numpy_array_obj);
-mlog << Debug(7) << method_name
-     << "get the point data for " << python_key << " from python object - after np.set\n";
-      pointdata_from_np_array(np, out);
-      mlog << Debug(7) << method_name
-           << "get the point data for " << python_key << " from python object\n";
-   }
-   else {
-      if (required) {
-         mlog << Error << "\n" << method_name
-              << "error getting the point data by the key (" << python_key << ") from python object\n\n";
-         exit (1);
-      }
-      else mlog << Debug(3) << method_name
-                << "not exists the point data (" << python_key << ") from python object\n";
-   }
-}
-*/
 
-/*
-static void set_array_from_python(PyObject *python_data, const char *python_key, int *out, bool required=true) {
-   const char *method_name = "set_array_from_python(int *) -> ";
-   PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
-   if (numpy_array_obj) {
-      Python3_Numpy np;
-      np.set(numpy_array_obj);
-      pointdata_from_np_array(np, out);
-   }
-   else if (required) {
-      mlog << Error << "\nset_array_from_python(int *) -> "
-           << "error getting member (" << python_key << ") from python object\"\n\n";
-      exit (1);
-   }
-   else mlog << Debug(3) << method_name
-             << "not exists the point data (" << python_key << ") from python object\n";
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void set_array_from_python(PyObject *python_data, const char *python_key, float *out, bool required=true) {
-   const char *method_name = "set_array_from_python(float *) -> ";
-   PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
-   if (numpy_array_obj) {
-      Python3_Numpy np;
-      np.set(numpy_array_obj);
-      pointdata_from_np_array(np, out);
-      mlog << Debug(7) << method_name
-           << "get the point data for " << python_key << " from python object\n";
-   }
-   else if (required) {
-      mlog << Error << "\n" << method_name
-           << "error getting member (" << python_key << ") from python object\"\n\n";
-      exit (1);
-   }
-   else mlog << Debug(3) << method_name
-             << "not exists the point data (" << python_key << ") from python object\n";
-}
-*/
-////////////////////////////////////////////////////////////////////////
-
-/*
-static void set_met_array_from_python(PyObject *python_data, const char *python_key, IntArray *out, bool required=true) {
-   const char *method_name = "set_met_array_from_python(IntArray *) -> ";
-   PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
-   if (numpy_array_obj) {
-      Python3_Numpy np;
-      np.set(numpy_array_obj);
-      pointdata_from_np_array(np, out);
-      mlog << Debug(7) << method_name
-           << "get the point data for " << python_key << " from python object\n";
-   }
-   else if (required) {
-      mlog << Error << "\n" << method_name
-           << "error getting member (" << python_key << ") from python object\"\n\n";
-      exit (1);
-   }
-   else mlog << Debug(3) << method_name
-             << "not exists the point data (" << python_key << ") from python object\n";
-}
-*/
-/*
-////////////////////////////////////////////////////////////////////////
-
-static void set_met_array_from_python(PyObject *python_data, const char *python_key, NumArray &out) {
-   PyObject *numpy_array_obj = PyDict_GetItemString (python_data, python_key);
-   if (numpy_array_obj) {
-      Python3_Numpy np;
-      np.set(numpy_array_obj);
-      pointdata_from_np_array(np, out);
-   }
-   else {
-      mlog << Error << "\nset_array_from_python(NumArray) -> "
-           << "error getting member (" << python_key << ") from python object\"\n\n";
-      exit (1);
-   }
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 
 static void set_str_array_from_python(PyObject *python_data, const char *python_key, StringArray *out) {
@@ -197,12 +120,10 @@ bool straight_python_point_data(const char * script_name, int script_argc, char 
 {
 
 int int_value;
-PyObject * module_obj      = 0;
-PyObject * module_dict_obj = 0;
-PyObject * python_key      = 0;
-PyObject * python_value    = 0;
-PyObject * numpy_array_obj = 0;
-PyObject * python_met_point_data = 0;
+PyObject *module_obj      = 0;
+PyObject *module_dict_obj = 0;
+PyObject *python_value    = 0;
+PyObject *python_met_point_data = 0;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_point_data -> ";
 const char *method_name_s = "straight_python_point_data()";
@@ -323,10 +244,20 @@ mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id << "\" from py
 python_value = PyDict_GetItemString (python_met_point_data, python_key_nhdr);
 
 int_value = pyobject_as_int(python_value);
+if (int_value == 0) {
+   mlog << Error << "\n" << method_name
+        << "The header is empty. Please check if python input exists\n\n";
+   exit (1);
+}
 met_pd_out.set_hdr_cnt(int_value);
 
 python_value = PyDict_GetItemString (python_met_point_data, python_key_nobs);
 int_value = pyobject_as_int(python_value);
+if (int_value == 0) {
+   mlog << Error << "\n" << method_name
+        << "The point observation data is empty. Please check if python input is processed properly\n\n";
+   exit (1);
+}
 
 met_pd_out.allocate(int_value);
 
@@ -356,41 +287,65 @@ if ( use_xarray )  {
 
       //  look up the data array variable name from the dictionary
 
-/*
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_typ, header_data->typ_idx_array);
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_sid, header_data->sid_idx_array);
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_vld, header_data->vld_idx_array);
-   //IntArray    vld_num_array;   // number array for valid time
-
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_lat, header_data->lat_array);
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_lon, header_data->lon_array);
-   set_met_array_from_python(python_met_point_data, numpy_array_hdr_elv, header_data->elv_array);
-*/
    set_array_from_python(python_met_point_data, numpy_array_hdr_typ, &header_data->typ_idx_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_sid, &header_data->sid_idx_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_vld, &header_data->vld_idx_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_lat, &header_data->lat_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_lon, &header_data->lon_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_elv, &header_data->elv_array);
+   if (header_data->typ_idx_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_typ is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->sid_idx_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_sid is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->vld_idx_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_vld is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->lat_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_lat is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->lon_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_lon is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->elv_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_elv is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
 
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_typ_table, &header_data->typ_array);
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_sid_table, &header_data->sid_array);
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_vld_table, &header_data->vld_array);
+   if (header_data->typ_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_typ_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->sid_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_sid_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->vld_array.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The hdr_vld_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
    set_array_from_python(python_met_point_data, numpy_array_prpt_typ_table, &header_data->prpt_typ_array, false);
    set_array_from_python(python_met_point_data, numpy_array_irpt_typ_table, &header_data->irpt_typ_array, false);
    set_array_from_python(python_met_point_data, numpy_array_inst_typ_table, &header_data->inst_typ_array, false);
 
-
-//   if ( !numpy_array_obj )  {
-//
-//      mlog << Warning << "\n" << method_name
-//           << "trouble reading data from \""
-//           << script_name << "\"\n\n";
-//
-////      return ( false );
-//   }
-/*
-*/
    set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids);
    set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids);
    set_array_from_python(python_met_point_data, numpy_array_obs_vid, obs_data->obs_ids);
@@ -400,6 +355,16 @@ if ( use_xarray )  {
 
    set_str_array_from_python(python_met_point_data, numpy_array_obs_qty_table, &obs_data->qty_names);
    set_str_array_from_python(python_met_point_data, numpy_array_obs_var_table, &obs_data->var_names);
+   if (obs_data->qty_names.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The obs_qty_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (use_var_id && obs_data->var_names.n() == 0) {
+      mlog << Error << "\n" << method_name
+           << "The obs_var_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
    
    if(mlog.verbosity_level()>=point_data_debug_level) print_met_data(obs_data, header_data, method_name_s);
 

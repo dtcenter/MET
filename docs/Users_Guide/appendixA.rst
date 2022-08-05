@@ -147,9 +147,10 @@ Q. How do I choose a time slice in a NetCDF file?
 
 A.
 When processing NetCDF files, the level information needs to be
-specified to tell MET which 2D slice of data to use. There is
-currently no way to explicitly define which time slice to use
-other than selecting the time index.
+specified to tell MET which 2D slice of data to use. The index is selected from
+a value when it starts with "@" for vertical level (pressure or height)
+and time. The actual time, @YYYYMMDD_HHMM, is allowed instead of selecting
+the time index.
 
 Let's use plot_data_plane as an example:
 
@@ -159,6 +160,11 @@ Let's use plot_data_plane as an example:
 		MERGE_20161201_20170228.nc \ 
 		obs.ps \ 
 		'name="APCP"; level="(5,*,*)";'
+		
+		plot_data_plane \
+		gtg_obs_forecast.20130730.i00.f00.nc \
+		altitude_20000.ps \
+		'name = "edr"; level = "(@20130730_0000,@20000,*,*)";'
 		
 Assuming that the first array is the time, this will select the 6-th
 time slice of the APCP data and plot it since these indices are 0-based.

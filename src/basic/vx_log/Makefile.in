@@ -108,8 +108,8 @@ am__v_AR_1 =
 libvx_log_a_AR = $(AR) $(ARFLAGS)
 libvx_log_a_LIBADD =
 am_libvx_log_a_OBJECTS = concat_string.$(OBJEXT) file_fxns.$(OBJEXT) \
-	indent.$(OBJEXT) logger.$(OBJEXT) string_array.$(OBJEXT) \
-	str_wrappers.$(OBJEXT)
+	indent.$(OBJEXT) logger.$(OBJEXT) main.$(OBJEXT) \
+	string_array.$(OBJEXT) str_wrappers.$(OBJEXT)
 libvx_log_a_OBJECTS = $(am_libvx_log_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -128,8 +128,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/concat_string.Po \
 	./$(DEPDIR)/file_fxns.Po ./$(DEPDIR)/indent.Po \
-	./$(DEPDIR)/logger.Po ./$(DEPDIR)/str_wrappers.Po \
-	./$(DEPDIR)/string_array.Po
+	./$(DEPDIR)/logger.Po ./$(DEPDIR)/main.Po \
+	./$(DEPDIR)/str_wrappers.Po ./$(DEPDIR)/string_array.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -336,6 +336,7 @@ libvx_log_a_SOURCES = concat_string.cc concat_string.h \
                file_fxns.cc file_fxns.h \
                indent.cc indent.h \
                logger.cc logger.h \
+               main.cc main.h \
                string_array.cc string_array.h \
                str_wrappers.cc str_wrappers.h \
                vx_log.h
@@ -392,6 +393,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_fxns.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indent.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logger.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str_wrappers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string_array.Po@am__quote@ # am--include-marker
 
@@ -547,6 +549,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/file_fxns.Po
 	-rm -f ./$(DEPDIR)/indent.Po
 	-rm -f ./$(DEPDIR)/logger.Po
+	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/str_wrappers.Po
 	-rm -f ./$(DEPDIR)/string_array.Po
 	-rm -f Makefile
@@ -598,6 +601,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/file_fxns.Po
 	-rm -f ./$(DEPDIR)/indent.Po
 	-rm -f ./$(DEPDIR)/logger.Po
+	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/str_wrappers.Po
 	-rm -f ./$(DEPDIR)/string_array.Po
 	-rm -f Makefile

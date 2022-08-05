@@ -28,25 +28,22 @@
 //   010    08/30/21  Halley Gotway   MET #1891 Fix input and mask fields.
 //   011    12/13/21  Halley Gotway   MET #1993 Fix -type grid.
 //   012    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
+//   013    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "gen_vx_mask.h"
 
 #include "grib_classes.h"
@@ -62,11 +59,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    static DataPlane dp_data, dp_mask, dp_out;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -95,6 +89,12 @@ int main(int argc, char *argv[]) {
    write_netcdf(dp_out);
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "gen_vx_mask";
 }
 
 ////////////////////////////////////////////////////////////////////////

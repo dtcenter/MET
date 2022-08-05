@@ -1372,13 +1372,13 @@ if ( (pos2 = s.find('}', pos)) == string::npos )  {
 
 std::string out;
 std::string env;
-char * env_value = 0;
+char * tmp_env_value = 0;
 
 env = s.substr(pos1 + 2, pos2 - pos1 - 2);
 
-env_value = getenv(env.c_str());
+tmp_env_value = getenv(env.c_str());
 
-if ( ! env_value )  {
+if ( ! tmp_env_value )  {
 
    mlog << Error << "\nreplace_env() -> "
         << "unable to get value for environment variable \""
@@ -1390,7 +1390,7 @@ if ( ! env_value )  {
 
 out = s.substr(0, pos1);
 
-out += env_value;
+out += tmp_env_value;
 
 out += s.substr(pos2 + 1);
 
