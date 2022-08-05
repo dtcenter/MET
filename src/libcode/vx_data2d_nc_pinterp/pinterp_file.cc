@@ -563,9 +563,10 @@ bool status = false;
 int i;
 short s;
 float f;
+double fill_value;
 double d = bad_data_double;
 double missing_value = get_var_missing_value(var);
-double fill_value    = get_var_fill_value(var);
+get_var_fill_value(var, fill_value);
 
 status = get_nc_data(var, &d, (long *)a);
 

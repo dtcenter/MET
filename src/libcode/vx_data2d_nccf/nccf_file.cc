@@ -893,8 +893,9 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   bool status = false;
   double d = bad_data_double;
 
+  double fill_value;
   double missing_value = get_var_missing_value(var);
-  double fill_value    = get_var_fill_value(var);
+  get_var_fill_value(var, fill_value);
 
   status = get_nc_data(var, &d, (long *)a);
 
@@ -1017,8 +1018,9 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  get the bad data values
   //
 
+  double fill_value;
   double missing_value = get_var_missing_value(v);
-  double fill_value    = get_var_fill_value(v);
+  get_var_fill_value(v, fill_value);
 
   //  set up the DataPlane object
 
