@@ -226,7 +226,6 @@ extern bool   get_var_att_double(const NcVar *, const ConcatString &, double &);
 template <typename T>
 extern bool   get_var_fill_value(const NcVar *var, T &att_val);
 extern bool   get_var_axis(const NcVar *var, ConcatString &att_val);
-extern double get_var_fill_value(const NcVar *);
 extern bool   get_var_grid_mapping(const NcVar *var, ConcatString &att_val);
 extern bool   get_var_grid_mapping_name(const NcVar *var, ConcatString &att_val);
 extern bool   get_var_long_name(const NcVar *, ConcatString &);
@@ -368,6 +367,10 @@ extern bool is_nc_unit_latitude(const char *units);
 
 extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
+
+////////////////////////////////////////////////////////////////////////
+
+#include "nc_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 
