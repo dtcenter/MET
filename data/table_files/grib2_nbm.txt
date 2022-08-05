@@ -22,7 +22,7 @@ GRIB2
 0  1 0 255 7 1 1  226 "PWTHER"  "Predominant Weather"  "Numeric"
 0  1 0 255 7 1 1  19  "PTYPE"  "Precipitation Type" "prob"
 0  1 0 255 7 1 1  232  "PROBCIP"  "Probability Cloud Ice Present" "prob"
-0  1 0 255 7 1 19 2  "TSTM Thunderstorm Probability"  "%"
+0  1 0 255 7 1 19 2  "TSTM"  "Thunderstorm Probability"  "%"
 0  1 0 255 7 1 1  1  "RH"  "Relative Humidity"  "%"
 10 1 0 255 7 1 0  3  "HTSGW"  "Significant Height of Combined Wind Waves and Swell"  "m"
 0  1 0 255 7 1 6  1  "TCDC"  "Total Cloud Cover"  "%"
