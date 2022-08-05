@@ -370,7 +370,7 @@ unixtime MtdFileBase::actual_valid_time(int t) const
 
 {
 
-  if ( (t < 0) || ( t >= (int)ActualValidTimes.size()) )  {
+if ( (t < 0) || ( t >= (int)ActualValidTimes.size()) )  {
 
    mlog << Error << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
 
@@ -378,7 +378,7 @@ unixtime MtdFileBase::actual_valid_time(int t) const
 
 }
 
- return ( ActualValidTimes[t] );
+return ( ActualValidTimes[t] );
 
 }
 

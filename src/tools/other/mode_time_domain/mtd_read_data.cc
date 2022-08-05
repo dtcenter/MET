@@ -28,7 +28,7 @@ using namespace std;
 
 
 vector<unixtime> mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
-			       const StringArray & filenames, MtdFloatFile & raw)
+                               const StringArray & filenames, MtdFloatFile & raw)
 
 {
 
@@ -131,7 +131,7 @@ if (variableTimeIncs) {
   NumArray na;
   for (size_t k=0; k<dtVector.size(); ++k) {
     na.add((double)dtVector[k]);
-   }	     
+   }   
    dt_start = (unixtime)na.mode();
 
    // test if the differences are all months (in seconds)
@@ -139,15 +139,15 @@ if (variableTimeIncs) {
    int secondsPerDay = 24*3600;
    for (size_t k=0; k<dtVector.size(); ++k) {
       int days = dtVector[k]/secondsPerDay;
-      if (days != 28 &&	days != 29 && days != 30 && days != 31) {
-	 isMonths = false;
-	 break;
+      if (days != 28 && days != 29 && days != 30 && days != 31) {
+         isMonths = false;
+         break;
       }
    }
 
    if (isMonths) {
-     mlog << Debug(1) << "File time increments are months (not constant), use MODE of the increments, mode=" << dt_start
-	  << " seconds = " << dt_start/(24*3600) << " days\n\n";
+     mlog << Debug(1) << "File time increments are months (not constant), use MODE of the increments, mode="
+          << dt_start << " seconds = " << dt_start/(24*3600) << " days\n\n";
    } else {
       // compute some measures that might be used to exit with an error, for now just show them to the user and go on
       double mean, var, svar;

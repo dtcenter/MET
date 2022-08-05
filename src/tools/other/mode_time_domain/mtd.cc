@@ -17,8 +17,9 @@
 //   ----   ----      ----           -----------
 //   000    10-15-15  Bullock        New
 //   001    05-15-17  Prestopnik P.  Added regrid shape
-//   002    04-18-19  Halley Gotway  Add FCST and OBS units.
-//   003    04-25-19  Halley Gotway  Add percentiles to 2D output.
+//   002    04-18-19  Halley Gotway  Add FCST and OBS units
+//   003    04-25-19  Halley Gotway  Add percentiles to 2D output
+//   004    08-01-22  Albo           MET #1971 Differing time steps
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -445,10 +446,11 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
       mask_2d = fcst_obj.const_t_mask(t, j + 1);   //  1-based
 
       if (t < 0 || t >= (int)valid_times_fcst.size()) {
-	  mlog << Error 
-	       << "\n  " << program_name << ": index " << t << " out of forecast valid times range 0 to " << valid_times_fcst.size()-1
-	       << "\n\n";
-	  exit ( 1 );
+         mlog << Error
+              << "\n  " << program_name
+              << ": index " << t << " out of forecast valid times range 0 to "
+              << valid_times_fcst.size()-1 << "\n\n";
+         exit ( 1 );
       }
 
       fcst_raw.get_data_plane(t, raw_2d);
@@ -486,10 +488,11 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
       mask_2d = obs_obj.const_t_mask(t, j + 1);   //  1-based
 
       if (t < 0 || t >= (int)valid_times_obs.size()) {
-	  mlog << Error 
-	       << "\n  " << program_name << ": index " << t << " out of obs valid times range 0 to " << valid_times_obs.size()-1
-	       << "\n\n";
-	  exit ( 1 );
+         mlog << Error
+              << "\n  " << program_name << ": index " << t
+              << " out of obs valid times range 0 to "
+              << valid_times_obs.size()-1 << "\n\n";
+         exit ( 1 );
       }
 
       obs_raw.get_data_plane(t, raw_2d);
@@ -702,25 +705,23 @@ if ( have_pairs )  {
 
       for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
 
-         // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
          mask_2d = mask.const_t_mask(t, 1);   //  1-based
 
-         // cout << "j = " << j << ",   vol = " << mask_2d.object_volume(0) << '\n';
+         if (t < 0 || t >= (int)valid_times_fcst.size()) {
+            mlog << Error
+                 << "\n  " << program_name << ": index " << t
+                 << " out of forecast valid times range 0 to "
+                 << valid_times_fcst.size()-1 << "\n\n";
+            exit ( 1 );
+         }
 
-	 if (t < 0 || t >= (int)valid_times_fcst.size()) {
-	    mlog << Error 
-	       << "\n  " << program_name << ": index " << t << " out of forecast valid times range 0 to " << valid_times_fcst.size()-1
-	       << "\n\n";
-	    exit ( 1 );
-	 }
-
-	 fcst_raw.get_data_plane(t, raw_2d);
+         fcst_raw.get_data_plane(t, raw_2d);
 
          att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
          att_2.set_fcst();
 
-	 att_2.set_valid_time(valid_times_fcst[t]);
+         att_2.set_valid_time(valid_times_fcst[t]);
 
          att_2.set_lead_time(fcst_obj.lead_time(t));
 
@@ -752,23 +753,23 @@ if ( have_pairs )  {
 
       for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
 
-         // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
          mask_2d = mask.const_t_mask(t, 1);   //  1-based
 
- 	 if (t < 0 || t >= (int)valid_times_obs.size()) {
-	     mlog << Error 
-	       << "\n  " << program_name << ": index " << t << " out of obs valid times range 0 to " << valid_times_obs.size()-1
-	       << "\n\n";
-	     exit ( 1 );
-	 }
+         if (t < 0 || t >= (int)valid_times_obs.size()) {
+            mlog << Error
+                 << "\n  " << program_name << ": index " << t
+                 << " out of obs valid times range 0 to "
+                 << valid_times_obs.size()-1 << "\n\n";
+            exit ( 1 );
+         }
 
-	 obs_raw.get_data_plane(t, raw_2d);
+         obs_raw.get_data_plane(t, raw_2d);
 
          att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
          att_2.set_obs();
 
-	 att_2.set_valid_time(valid_times_obs[t]);
+         att_2.set_valid_time(valid_times_obs[t]);
 
          att_2.set_lead_time(obs_obj.lead_time(t));
 
@@ -1199,14 +1200,14 @@ for (j=0; j<(obj.n_objects()); ++j)  {
       mask_2d = obj.const_t_mask(t, j + 1);   //  1-based
 
       if (t < 0 || t >= (int)valid_times.size()) {
-	  mlog << Error 
-	       << "\n  " << program_name << ": index " << t << " out of valid times range 0 to " << valid_times.size()-1
-	       << "\n\n";
-	  exit ( 1 );
-	}
+         mlog << Error
+              << "\n  " << program_name << ": index " << t
+              << " out of valid times range 0 to "
+              << valid_times.size()-1 << "\n\n";
+         exit ( 1 );
+      }
 
       raw.get_data_plane(t, raw_2d);
-      //raw_2d.set_valid(valid_times[t]);
 
       att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 

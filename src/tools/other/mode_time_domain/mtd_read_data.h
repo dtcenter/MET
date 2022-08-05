@@ -31,7 +31,8 @@
 //
 
 extern vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
-                        const StringArray & filenames, MtdFloatFile &);
+                                      const StringArray & filenames,
+                                      MtdFloatFile &);
 
 
 ////////////////////////////////////////////////////////////////////////
