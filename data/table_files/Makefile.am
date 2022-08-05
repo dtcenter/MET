@@ -93,7 +93,7 @@ tablefiles_DATA = \
 	grib2_gpp_af.txt \
 	grib2_mrms.txt \
 	grib2_ndfd.txt \
-        grib2_nbm.txt
+	grib2_nbm.txt
 
 EXTRA_DIST = ${tablefiles_DATA}
 
