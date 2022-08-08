@@ -13,7 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_nc_util.a
 libvx_nc_util_a_SOURCES = \
               nc_var_info.cc nc_var_info.h \
-              nc_utils.cc nc_utils.h \
+              nc_utils.cc nc_utils.h nc_utils.hpp \
               write_netcdf.cc write_netcdf.h \
               grid_output.cc grid_output.h \
               load_tc_data.cc load_tc_data.h \

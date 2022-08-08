@@ -13,7 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_data2d_nc_met.a
 libvx_data2d_nc_met_a_SOURCES = \
               get_met_grid.cc get_met_grid.h \
-              met_file.cc met_file.h \
+              met_file.cc met_file.h met_file.hpp \
               var_info_nc_met.cc var_info_nc_met.h \
               data2d_nc_met.cc data2d_nc_met.h \
               vx_data2d_nc_met.h
