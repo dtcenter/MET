@@ -739,28 +739,32 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-
+         
+         cout << "gfld->ipdtnum = " << gfld->ipdtnum << endl;
+         
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
          } else {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
-
+         
+         cout << "rec->LvlTyp = " << rec->LvlTyp << endl;
+         
          //  store the full pdtmpl values
-         for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
-
-         // Example (07/27/22 SL)
-         // ( gfld->ipdtnum == 6) {
-         //    Could be a different index of the bytes
-         //    rec->LvlVal1 = gfld->ipdtmpl[35]
-         //    rec->LvlVal1 = gfld->ipdtmpl[35]
-                
+         for(int j=0; j < gfld->ipdtlen; j++) {
+            cout << "gfld->ipdtmpl[ " << j << "] = " << gfld->ipdtmpl[j] << endl;
+            rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
+         }
+         
+         // Check template number 6, set value at the percentage-level for now (ipdtmpl[15])
+         if( gfld->ipdtnum == 6) {
+            rec->LvlVal1 = gfld->ipdtmpl[15];
+            rec->LvlVal2 = rec->LvlVal1;       
          //  check for template number 46
-         if( gfld->ipdtnum == 46 ) {
+         } else if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
-            rec->LvlVal2 = rec->LvlVal1;
-           
+            rec->LvlVal2 = rec->LvlVal1;    
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
          //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
          } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
@@ -773,6 +777,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
                              rec->LvlVal1 );
          }
 
+         cout << "rec->LvlVal1 = " << rec->LvlVal1 << " rec->LvlVal2 = " << rec->LvlVal2 << endl;
+         
          rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
@@ -904,6 +910,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->ProbUpper = bad_data_double;
          }
 
+         cout << "rec->ProbLower = " << rec->ProbLower << " rec->ProbUpper = " << rec->ProbUpper << endl << endl;
+         
          //  set the accumulation interval
          g2int range_typ = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
                              9 == gfld->ipdtnum ? gfld->ipdtmpl[32] :
