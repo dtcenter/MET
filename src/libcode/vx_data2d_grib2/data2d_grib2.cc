@@ -432,7 +432,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
           (!is_bad_data(vinfo->process())   && vinfo->process()   != (*it)->Process  ) ||
           (!is_bad_data(vinfo->ens_type())  && vinfo->ens_type()  != (*it)->EnsType  ) ||
           (!is_bad_data(vinfo->der_type())  && vinfo->der_type()  != (*it)->DerType  ) ||
-          (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ){
+          (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ||
+          (!is_bad_data(vinfo->perc_val())  && vinfo->perc_val()  != (*it)->PercVal  ) ){
          continue;
       }
 
@@ -523,9 +524,12 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }  //  END: if( level match )
 
          //  if seeking a probabilistic field, check the prob info
-         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() && (*it)->ProbFlag ){
+         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag()) {
 
             rec_match_ex = rec_match_rn = false;
+
+            //  no match unless the data contains probabilities
+            if( !(*it)->ProbFlag ) { break; }
 
             SingleThresh v_thr_lo = vinfo->p_thresh_lo();
             SingleThresh v_thr_hi = vinfo->p_thresh_hi();
@@ -819,6 +823,11 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  statistical processing type for template 8 (Table 4.10)
          if( 8 == gfld->ipdtnum ){
             rec->StatType = gfld->ipdtmpl[23];
+         }
+
+         //  percentile value for templates 6 and 10
+         if( 6 == gfld->ipdtnum || 10 == gfld->ipdtnum ){
+            rec->PercVal = gfld->ipdtmpl[15];
          }
 
          //  depending on the template number, determine the reference times

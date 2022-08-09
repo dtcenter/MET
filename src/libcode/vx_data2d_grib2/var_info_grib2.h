@@ -56,6 +56,7 @@ class VarInfoGrib2 : public VarInfo
       int EnsType;    // Type of Ensemble Forecast (Table 4.6)
       int DerType;    // Derived Forecast (Table 4.7)
       int StatType;   // Statistical Processing Type (Table 4.10)
+      int PercVal;    // Percentile Value (Octet 35 for Templates 4.6 and 4.10)
 
       IntArray IPDTmplIndex; // Index into the GRIB2 ipdtmpl array
       IntArray IPDTmplVal;   // Corresponding GRIB2 ipdtmpl value
@@ -88,6 +89,7 @@ class VarInfoGrib2 : public VarInfo
       int         ens_type()    const;
       int         der_type()    const;
       int         stat_type()   const;
+      int         perc_val()    const;
 
       int         n_ipdtmpl()        const;
       int         ipdtmpl_index(int) const;
@@ -110,6 +112,7 @@ class VarInfoGrib2 : public VarInfo
       void set_ens_type(int);
       void set_der_type(int);
       void set_stat_type(int);
+      void set_perc_val(int);
       void set_ipdtmpl_index(const IntArray &);
       void set_ipdtmpl_val(const IntArray &);
 
@@ -143,6 +146,7 @@ inline int         VarInfoGrib2::process()    const { return(Process);      }
 inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
 inline int         VarInfoGrib2::stat_type()  const { return(StatType);     }
+inline int         VarInfoGrib2::perc_val()   const { return(PercVal);      }
 inline int         VarInfoGrib2::n_ipdtmpl()  const {
                                     return(IPDTmplIndex.n()); }
 inline int         VarInfoGrib2::ipdtmpl_index(int i) const {
