@@ -757,8 +757,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
          }
          
-         // Check template number 6, set value at the percentage-level for now (ipdtmpl[15])
-         if( gfld->ipdtnum == 6) {
+         // Check template number 6 or 10, set value at the percentage-level for now (ipdtmpl[15])
+         if( gfld->ipdtnum == 6 || gfld->ipdtnum == 10) {
             rec->LvlVal1 = gfld->ipdtmpl[15];
             rec->LvlVal2 = rec->LvlVal1;       
          //  check for template number 46
