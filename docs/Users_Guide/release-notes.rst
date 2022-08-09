@@ -5,7 +5,7 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.0.0-beta2 release notes (20220803)
+MET Version 11.0.0-beta2 release notes (20220809)
 -------------------------------------------------
 
 * Bugfixes:
@@ -15,6 +15,7 @@ MET Version 11.0.0-beta2 release notes (20220803)
 * Enhancements:
 
    * **Enhance MET's NetCDF library interface to support level strings that include coordinate variable values instead of just indexes** (`#1815 <https://github.com/dtcenter/MET/issues/1815>`_).
+   * **Enhance MTD to process time series with non-uniform time steps, such as monthly data** (`#1971 <https://github.com/dtcenter/MET/issues/1971>`_).
    * Define the Bukovsky masking regions for use in MET (`#1940 <https://github.com/dtcenter/MET/issues/1940>`_).
    * Update the GRIB2 MRMS table in MET (`#2081 <https://github.com/dtcenter/MET/issues/2081>`_).
    * Add more error checking for python embedding of point observations (`#2202 <https://github.com/dtcenter/MET/issues/2202>`_).
