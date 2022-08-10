@@ -525,12 +525,12 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          //  if seeking a probabilistic field, check the prob info
          if( (rec_match_ex || rec_match_rn) && vinfo->p_flag()) {
-
+            
             rec_match_ex = rec_match_rn = false;
-
+            
             //  no match unless the data contains probabilities
-            if( !(*it)->ProbFlag ) { break; }
-
+            if( !(*it)->ProbFlag ) { continue; }
+            
             SingleThresh v_thr_lo = vinfo->p_thresh_lo();
             SingleThresh v_thr_hi = vinfo->p_thresh_hi();
 
@@ -761,16 +761,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
          }
          
-         // Check template number 6 or 10, set value at the percentage-level for now (ipdtmpl[15])
-         if( gfld->ipdtnum == 6 || gfld->ipdtnum == 10) {
-            rec->LvlVal1 = gfld->ipdtmpl[15];
-            rec->LvlVal2 = rec->LvlVal1;       
          //  check for template number 46
-         } else if( gfld->ipdtnum == 46 ) {
+         if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
             rec->LvlVal2 = rec->LvlVal1;    
-         //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+           //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
+           //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
          } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
@@ -919,7 +915,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->ProbUpper = bad_data_double;
          }
 
-         cout << "rec->ProbLower = " << rec->ProbLower << " rec->ProbUpper = " << rec->ProbUpper << endl << endl;
+         cout << "rec->ProbFlag = " << rec->ProbFlag << " rec->ProbLower = " << rec->ProbLower << " rec->ProbUpper = " << rec->ProbUpper << endl << endl;
          
          //  set the accumulation interval
          g2int range_typ = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
