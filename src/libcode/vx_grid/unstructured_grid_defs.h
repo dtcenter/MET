@@ -21,7 +21,7 @@ struct UnstructuredData {
 
    const char * name;
 
-   // Exactly 2 are specified
+   // Exactly two are non-empty
 
    NumArray lats;
    NumArray lons;
