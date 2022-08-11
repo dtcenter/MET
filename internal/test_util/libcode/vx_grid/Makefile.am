@@ -19,6 +19,7 @@ test_grid_area_LDADD = -lvx_grid \
 	-lvx_nav \
 	-lvx_util \
 	-lvx_math \
+	-lvx_cal \
 	-lvx_log \
 	-lz \
 	-lm
