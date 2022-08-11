@@ -144,27 +144,16 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
    render(plot, image, render_info);
 
       //
-      // draw the map on top of the image, except for unstructured grids
+      // draw the map on top of the image and put a border around it
       //
 
-   if ( !grid.info().ug )  {
+   plot.comment("start drawing map");
 
-      plot.comment("start drawing map");
+   if ( use_flate )  plot.begin_flate();
+   draw_map(grid, grid_bb, plot, map_box, conf);
+   if ( use_flate )  plot.end_flate();
 
-      if ( use_flate )  plot.begin_flate();
-      draw_map(grid, grid_bb, plot, map_box, conf);
-      if ( use_flate )  plot.end_flate();
-
-      plot.comment("end drawing map");
-   }
-   else {
-      mlog << Debug(4) << "data_plane_plot() -> "
-           << "Map data is not plotted for unstructured grids.\n";
-   }
-
-      //
-      // draw a border around the image
-      //
+   plot.comment("end drawing map");
 
    draw_border(plot, map_box, 2.0);
 

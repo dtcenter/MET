@@ -36,6 +36,14 @@ using namespace std;
 
 void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
               MetConfig *conf) {
+
+   // Skip plotting map data for unstructured grids
+   if ( gr.info().ug )  {
+      mlog << Debug(4) << "draw_map() -> "
+           << "Map data is not plotted for unstructured grids.\n";
+      return;
+   }
+
    int i;
    Dictionary *map_dict = (Dictionary *) 0;
    ConcatString file_name, line_dash;
