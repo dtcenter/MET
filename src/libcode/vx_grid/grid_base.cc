@@ -588,7 +588,12 @@ UnstructuredData * D = (UnstructuredData *) 0;
 
 D = new UnstructuredData;
 
-memcpy(D, &data, sizeof(data));
+   //
+   //  deep copy instead of memcpy because the struct
+   //  contains dynamically allocated NumArray objects
+   //
+
+*D = data;
 
 ug = D;  D = (UnstructuredData *) 0;
 
