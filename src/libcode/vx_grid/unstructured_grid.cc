@@ -69,12 +69,20 @@ clear();
 
 if ( data.name )  Name = data.name;
 
-define_dims(data.lats,   Lats);
-define_dims(data.lons,   Lons);
-define_dims(data.levels, Levels);
-define_dims(data.times,  Times);
+  // Process the lat/lon dimensions
 
-if ( !Dim1 || !Dim2 )  {
+Lats = data.lats;
+Lons = data.lons;
+
+if ( Lons.n() > 0 )  xDim = &Lons;
+if ( Lats.n() > 0 )  yDim = &Lats;
+
+  // Process the other dimensions
+
+add_dimension(data.levels, Levels);
+add_dimension(data.times,  Times);
+
+if ( !xDim || !yDim )  {
 
    mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
         << "exactly two dimensions should have non-zero length: lats ("
@@ -84,8 +92,8 @@ if ( !Dim1 || !Dim2 )  {
 
 }
 
-Nx = Dim1->n();
-Ny = Dim2->n();
+Nx = xDim->n();
+Ny = yDim->n();
 
    // 1-dimensional array of lat/lon locations
 
@@ -124,7 +132,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::define_dims(const NumArray &data, NumArray &dim)
+void UnstructuredGrid::add_dimension(const NumArray &data, NumArray &dim)
 
 {
 
@@ -136,11 +144,11 @@ dim = data;
 
 if ( dim.n() == 0 )  return;
 
-     if ( !Dim1 )  Dim1 = &dim;
-else if ( !Dim2 )  Dim2 = &dim;
+     if ( !xDim )  xDim = &dim;
+else if ( !yDim )  yDim = &dim;
 else {
 
-   mlog << Error << "\nvoid UnstructuredGrid::define_dims() -> "
+   mlog << Error << "\nvoid UnstructuredGrid::add_dimension() -> "
         << "more than two non-zero dimensions!\n\n";
    exit ( 1 );
 
@@ -164,8 +172,8 @@ Lons.clear();
 Levels.clear();
 Times.clear();
 
-Dim1 = (NumArray *) 0;
-Dim2 = (NumArray *) 0;
+xDim = (NumArray *) 0;
+yDim = (NumArray *) 0;
 
 Nx = 0;
 Ny = 0;
@@ -184,7 +192,7 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double & x, double &
 
 {
 
-if ( !Dim1 || !Dim2 )  {
+if ( !xDim || !yDim )  {
    mlog << Error << "\nUnstructuredGrid::latlon_to_xy() -> "
         << "dimensions not defined!\n\n";
    exit ( 1 );
@@ -197,16 +205,16 @@ x_int = y_int = bad_data_int;
 if ( Is2Dim ) {
 
    // Search the first dimension
-   for(i=0; i<Dim1->n(); i++) {
-      if(is_eq(lat, Dim1->buf()[i])) {
+   for(i=0; i<xDim->n(); i++) {
+      if(is_eq(lat, xDim->buf()[i])) {
          x_int = i;
          break;
       }
    }
 
    // Search the second dimension
-   for(i=0; i<Dim2->n(); i++) {
-      if(is_eq(lat, Dim2->buf()[i])) {
+   for(i=0; i<yDim->n(); i++) {
+      if(is_eq(lat, yDim->buf()[i])) {
          y_int = i;
          break;
       }
@@ -215,8 +223,8 @@ if ( Is2Dim ) {
 else {
 
    // Search both dimensions
-   for(i=0; i<Dim1->n(); i++) {
-      if(is_eq(lat, Dim1->buf()[i]) && is_eq(lon, Dim2->buf()[i])) {
+   for(i=0; i<xDim->n(); i++) {
+      if(is_eq(lat, xDim->buf()[i]) && is_eq(lon, yDim->buf()[i])) {
          x_int = y_int = i;
          break;
       }
@@ -244,7 +252,7 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double & lat, double & l
 
 {
 
-if ( !Dim1 || !Dim2 )  {
+if ( !xDim || !yDim )  {
    mlog << Error << "\nUnstructuredGrid::xy_to_latlon() -> "
         << "dimensions not defined!\n\n";
    exit ( 1 );
@@ -261,8 +269,8 @@ if ( x_int < 0 || x_int >= Nx ||
    exit ( 1 );
 }
 
-lat = Dim1->buf()[x_int];
-lon = Dim2->buf()[y_int];
+lat = xDim->buf()[x_int];
+lon = yDim->buf()[y_int];
 
 return;
 

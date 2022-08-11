@@ -33,7 +33,7 @@ class UnstructuredGrid : public GridRep {
      ~UnstructuredGrid();
       UnstructuredGrid(const UnstructuredData &);
 
-      void define_dims(const NumArray &, NumArray &);
+      void add_dimension(const NumArray &, NumArray &);
 
          //
          //
@@ -50,8 +50,8 @@ class UnstructuredGrid : public GridRep {
       NumArray Levels;
       NumArray Times;
 
-      NumArray * Dim1; // not allocated
-      NumArray * Dim2; // not allocated
+      NumArray * xDim; // not allocated
+      NumArray * yDim; // not allocated
 
          // TRUE:  for lat or lon vs level or time with unique lat/lon values
          // FALSE: for a 1D list of potentially non-unique lat/lon values
