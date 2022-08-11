@@ -6,21 +6,17 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "rmw_analysis.h"
 
 #include "vx_nc_util.h"
@@ -48,10 +44,7 @@ static void read_nc_tracks(NcFile*);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-    // Set handler for memory allocation error
-    set_new_handler(oom); // out of memory
+int met_main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
@@ -69,6 +62,12 @@ int main(int argc, char *argv[]) {
     clean_up();
 
     return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "rmw_analysis";
 }
 
 ////////////////////////////////////////////////////////////////////////

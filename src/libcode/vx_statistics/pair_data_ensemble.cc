@@ -371,7 +371,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       for(j=0, n_vld=0, n_bel=0, n_tie=0; j<n_ens; j++) {
 
          // Skip bad data
-         if(!is_bad_data(e_na[j][i])) {
+         if(e_na[j].n() > i && !is_bad_data(e_na[j][i])) {
 
             // Increment the valid count
             n_vld++;

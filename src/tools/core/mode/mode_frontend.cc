@@ -89,12 +89,6 @@ int mode_frontend(const StringArray & Argv)
 {
 
    //
-   // Set handler to be called for memory allocation error
-   //
-
-set_new_handler(oom);
-
-   //
    // Process the command line arguments
    //
 

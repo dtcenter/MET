@@ -951,8 +951,8 @@ _____________________
 .. code-block:: none
 		
 		metadata_map = [
-		{ key = "message_type"; val = "msg_type"; },
-		{ key = "station_id";   val = "report_identifier"; },
+		{ key = "message_type"; val = "msg_type,station_ob"; },
+		{ key = "station_id";   val = "station_id,report_identifier"; },
 		{ key = "pressure";     val = "air_pressure,pressure"; },
 		{ key = "height";       val = "height,height_above_mean_sea_level"; },
 		{ key = "elevation";    val = ""; }

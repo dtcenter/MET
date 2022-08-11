@@ -18,25 +18,22 @@
 //   001    11/15/21  Halley Gotway  MET #1968 Ensemble -ctrl error check.
 //   002    01/14/21  McCabe         MET #1695 All members in one file.
 //   003    02/17/22  Halley Gotway  MET #1918 Add normalize config option.
+//   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <limits.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "gen_ens_prod.h"
 
 #include "vx_nc_util.h"
@@ -87,13 +84,10 @@ static void set_ctrl_file  (const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Set up OpenMP (if enabled)
    init_openmp();
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -106,6 +100,14 @@ int main(int argc, char *argv[]) {
 
    return(0);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "gen_ens_prod";
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

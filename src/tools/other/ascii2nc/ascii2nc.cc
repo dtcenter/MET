@@ -45,28 +45,23 @@
 //   017    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
+//   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <regex.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
-#include <netcdf>
-using namespace netCDF;
+#include "main.h"
 
 #include "data2d_factory.h"
 #include "mask_poly.h"
@@ -147,18 +142,13 @@ static void setup_wrapper_path();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    CommandLine cline;
-
-   //
-   // Set handler to be called for memory allocation error
-   //
-   set_new_handler(oom);
 
    //
    // Check for zero arguments
    //
-   if(argc == 1) usage();
+   if(argc == 1) { usage(); return 0; }
 
    //
    // Parse the command line into tokens
@@ -189,7 +179,7 @@ int main(int argc, char *argv[]) {
    // Check for error. There should be at least two arguments left:
    // the ascii input filenames and the netCDF output filename
    //
-   if(cline.n() < 2) usage();
+   if(cline.n() < 2) { usage(); return 0; }
 
    //
    // Store the input ASCII file name and the output NetCDF file name
@@ -239,7 +229,7 @@ int main(int argc, char *argv[]) {
    if(!file_handler->readAsciiFiles(asfile_list)) {
       mlog << Error << "\n" << program_name << "-> "
            << "encountered an error while reading input files!\n\n";
-      exit(1);
+      return 1;
    }
 
    //
@@ -258,6 +248,12 @@ int main(int argc, char *argv[]) {
 
    return(0);
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return program_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -497,7 +493,6 @@ void usage() {
 
         << flush;
 
-   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -28,16 +28,13 @@ static const char target_start [] = "const struct";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
 
@@ -69,7 +66,7 @@ static bool parse_line(const char * line);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -101,6 +98,14 @@ for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "nceptab_to_flat";
 }
 
 

@@ -39,42 +39,6 @@ static const int  max_met_args             = 30;
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-
-void copy_nc_data_as_double(double *to_array, const T *from_array,
-                            const int x_slot, const int y_slot,
-                            const int nx, const int ny,
-                            double missing_value, double fill_value) {
-   double value;
-   int x, y, offset, start_offset;
-
-   offset = 0;
-   if (x_slot > y_slot) {
-      for (y=0; y<ny; ++y) {
-         start_offset = y * nx;
-         for (x=0; x<nx; ++x) {
-            value = (double)from_array[x + start_offset];
-            if(is_eq(value, missing_value) || is_eq(value, fill_value))
-               value = bad_data_double;
-            to_array[offset++] = value;
-         }
-      }
-   }
-   else {
-      for (x=0; x<nx; ++x) {
-         start_offset = x * ny;
-         for (y=0; y<ny; ++y) {
-            value = (double)from_array[y + start_offset];
-            if(is_eq(value, missing_value) || is_eq(value, fill_value))
-               value = bad_data_double;
-            to_array[offset++] = value;
-         }
-      }
-   }
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void check_nc_data_2d(const double *from_array, const int nx, const int ny,
                       const double missing_value) {
    int count_zero, count_missing, count_valid;
@@ -411,8 +375,9 @@ short s;
 float f;
 double d = bad_data_double;
 bool status;
+double fill_value;
 double missing_value = get_var_missing_value(var);
-double fill_value    = get_var_fill_value(var);
+get_var_fill_value(var, fill_value);
 
 status = get_nc_data(var, &d, (long *)a);
 
@@ -563,8 +528,9 @@ const int y_slot = y_slot_tmp;
    //  get the bad data value
    //
 
+double fill_value;
 double missing_value = get_var_missing_value(v);
-double fill_value    = get_var_fill_value(v);
+get_var_fill_value(v, fill_value);
 
    //
    //  set up the DataPlane object

@@ -17,6 +17,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    03-22-17  Bullock        New
+//   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,18 +28,13 @@ static const char hdr_typ_string[] = "calipso";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <regex.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -49,6 +45,7 @@ using namespace std;
 #include "hdf.h"
 #include "mfhdf.h"
 
+#include "main.h"
 #include "data2d_factory.h"
 #include "mask_poly.h"
 #include "vx_grid.h"
@@ -103,17 +100,11 @@ static void write_nc_record(const float * f, int qc_value = -1);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
 program_name = get_short_name(argv[0]);
-
-   //
-   // Set handler to be called for memory allocation error
-   //
-
-set_new_handler(oom);
 
    //
    //  parse command line
@@ -158,6 +149,12 @@ return ( 0 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "lidar2nc";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -16,6 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    09-05-14  Bullock        New
+//   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -30,15 +31,6 @@ static const int ctable_text_width =  30;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
-
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -47,6 +39,7 @@ using namespace std;
 
 #include "cgraph.h"
 
+#include "main.h"
 #include "mode_nc_output_file.h"
 
 #include "vx_plot_util.h"
@@ -209,7 +202,7 @@ static void draw_raw_colortable(Cgraph &, const Box & map_box);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -261,6 +254,12 @@ return ( 0 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "plot_mode_field";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

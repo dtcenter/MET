@@ -7,40 +7,34 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MTD_READ_DATA_H__
-#define  __MTD_READ_DATA_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "string_array.h"
-#include "mtd_file_float.h"
-#include "mtd_config_info.h"
-#include "var_info.h"
+#ifndef  __MAIN_H__
+#define  __MAIN_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
-//
-// returns the actual valid times
-//
+#include <ctime>
+#include <iostream>
+#include <string.h>
 
-extern vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
-                                      const StringArray & filenames,
-                                      MtdFloatFile &);
-
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#endif   /*  __MTD_READ_DATA_H__  */
-
+#define MET_BUF_SIZE 4096
 
 ////////////////////////////////////////////////////////////////////////
 
+//extern void log_event(int event_id, string event_msg);
+extern string get_current_time();
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   //  __MAIN_H__
+
+
+////////////////////////////////////////////////////////////////////////
 

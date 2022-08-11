@@ -13,7 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_pointdata_python.a
 libvx_pointdata_python_a_SOURCES = \
               pointdata_python.h pointdata_python.cc \
-              pointdata_from_array.h pointdata_from_array.cc \
-              python_pointdata.h python_pointdata.cc
+              pointdata_from_array.h pointdata_from_array.cc pointdata_from_array.hpp \
+              python_pointdata.h python_pointdata.cc python_pointdata.hpp
 libvx_pointdata_python_a_CPPFLAGS = ${MET_CPPFLAGS} -I../vx_python2_utils ${MET_PYTHON_CC} $(MET_PYTHON_LD)
 
