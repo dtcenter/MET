@@ -189,7 +189,7 @@ return ( 0 );
 
 
 const string get_tool_name() {
-   return "make_mapfilws";
+   return "make_mapfiles";
 }
 
 
