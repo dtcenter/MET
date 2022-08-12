@@ -57,7 +57,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int buf_size = 1200000;
+static const int buf_size = 2400000;
 
 static unsigned char buf[buf_size];
 
