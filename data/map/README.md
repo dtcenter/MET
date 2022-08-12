@@ -43,9 +43,9 @@ done
 ```
 
 TODO:
-- [x] admin_by_country (307586 lines)
-- [x] admin_data (307586 lines)
-- [x] country_data
+- [x] admin_by_country (1303965 lines)
+- [x] admin_data (1303965 lines)
+- [x] country_data (10943 lines)
 - [ ] country_major_lakes_data (23440 lines)
 - [ ] major_lakes_data (12567 lines)
-- [x] usa_state_data
+- [x] usa_state_data (2425 lines)
