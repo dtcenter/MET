@@ -1,15 +1,15 @@
 module load intel/2020.2
 module load intelpython3/2020.2
 
-export TEST_BASE=/apps/contrib/MET/11.0.0-beta2
+export TEST_BASE=/apps/contrib/MET/11.0.0
 export COMPILER=intel_2020
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v11.0.0-beta2.tar.gz
+export MET_TARBALL=v11.0.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/apps/intel-2020.2/intel-2020.2/intelpython3
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
-#export EXTERNAL_LIBS=/apps/contrib/MET/11.0.0-beta2/external_libs
+#export EXTERNAL_LIBS=/apps/contrib/MET/11.0.0/external_libs
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}
 #export BUFRLIB_NAME=-lbufr
