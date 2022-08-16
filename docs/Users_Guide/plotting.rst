@@ -178,7 +178,7 @@ ______________________
 
 .. code-block:: none
 
-   dotsize(x) = 10;
+   dotsize(x) = 1.0;
 
 The **dotsize(x)** function defines the size of the circle to be plotted as a function of the observation value. The default setting shown above defines the dot size as a constant value.
 
