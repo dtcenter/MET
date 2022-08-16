@@ -732,8 +732,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
          
-         cout << "gfld->ipdtnum = " << gfld->ipdtnum << endl;
-         
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
@@ -741,11 +739,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
          
-         cout << "rec->LvlTyp = " << rec->LvlTyp << endl;
-         
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++) {
-            cout << "gfld->ipdtmpl[ " << j << "] = " << gfld->ipdtmpl[j] << endl;
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
          }
          
@@ -765,8 +760,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
                              rec->LvlVal1 );
          }
 
-         cout << "rec->LvlVal1 = " << rec->LvlVal1 << " rec->LvlVal2 = " << rec->LvlVal2 << endl;
-         
          rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
@@ -903,8 +896,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->ProbUpper = bad_data_double;
          }
 
-         cout << "rec->ProbFlag = " << rec->ProbFlag << " rec->ProbLower = " << rec->ProbLower << " rec->ProbUpper = " << rec->ProbUpper << endl << endl;
-         
          //  set the accumulation interval
          g2int range_typ = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
                              9 == gfld->ipdtnum ? gfld->ipdtmpl[32] :
