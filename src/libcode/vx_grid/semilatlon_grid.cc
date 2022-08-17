@@ -23,21 +23,21 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 #include "vx_log.h"
-#include "unstructured_grid.h"
+#include "semilatlon_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class UnstructuredGrid
+   //  Code for class SemiLatLonGrid
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-UnstructuredGrid::UnstructuredGrid()
+SemiLatLonGrid::SemiLatLonGrid()
 
 {
 
@@ -49,7 +49,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-UnstructuredGrid::~UnstructuredGrid()
+SemiLatLonGrid::~SemiLatLonGrid()
 
 {
 
@@ -61,7 +61,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data)
+SemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data)
 
 {
 
@@ -84,7 +84,7 @@ add_dimension(data.times,  Times);
 
 if ( !xDim || !yDim )  {
 
-   mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
+   mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
         << "exactly two dimensions should have non-zero length: lats ("
         << Lats.n() << "), lons (" << Lons.n() << "), levels (" << Levels.n()
         << "), times (" << Times.n() << ")\n\n";
@@ -103,7 +103,7 @@ if ( Lats.n() > 0 && Lons.n() > 0 )  {
 
    if ( Lats.n() != Lons.n() )  {
 
-      mlog << Error << "\nUnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) -> "
+      mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
            << "for one dimensional arrays, the number lats and lons must match ("
            << Lats.n() << " != " << Lons.n() << ")!\n\n";
       exit ( 1 );
@@ -132,7 +132,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::add_dimension(const NumArray &data, NumArray &dim)
+void SemiLatLonGrid::add_dimension(const NumArray &data, NumArray &dim)
 
 {
 
@@ -148,7 +148,7 @@ if ( dim.n() == 0 )  return;
 else if ( !yDim )  yDim = &dim;
 else {
 
-   mlog << Error << "\nvoid UnstructuredGrid::add_dimension() -> "
+   mlog << Error << "\nvoid SemiLatLonGrid::add_dimension() -> "
         << "more than two non-zero dimensions!\n\n";
    exit ( 1 );
 
@@ -161,7 +161,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::clear()
+void SemiLatLonGrid::clear()
 
 {
 
@@ -188,12 +188,12 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
+void SemiLatLonGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
 
 {
 
 if ( !xDim || !yDim )  {
-   mlog << Error << "\nUnstructuredGrid::latlon_to_xy() -> "
+   mlog << Error << "\nSemiLatLonGrid::latlon_to_xy() -> "
         << "dimensions not defined!\n\n";
    exit ( 1 );
 }
@@ -232,7 +232,7 @@ else {
 }
 
 if ( is_bad_data(x_int) || is_bad_data(y_int) )  {
-   mlog << Error << "\nUnstructuredGrid::latlon_to_xy() -> "
+   mlog << Error << "\nSemiLatLonGrid::latlon_to_xy() -> "
         << "no match found for (" << lat << ", " << lon << ").\n\n";
    exit ( 1 );
 }
@@ -248,12 +248,12 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
+void SemiLatLonGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
 
 {
 
 if ( !xDim || !yDim )  {
-   mlog << Error << "\nUnstructuredGrid::xy_to_latlon() -> "
+   mlog << Error << "\nSemiLatLonGrid::xy_to_latlon() -> "
         << "dimensions not defined!\n\n";
    exit ( 1 );
 }
@@ -263,7 +263,7 @@ int y_int = nint(y);
 
 if ( x_int < 0 || x_int >= Nx ||
      y_int < 0 || y_int >= Ny )  {
-   mlog << Error << "\nUnstructuredGrid::xy_to_latlon() -> "
+   mlog << Error << "\nSemiLatLonGrid::xy_to_latlon() -> "
         << "(" << x_int << ", " << y_int << ") outside of the grid dimension ("
         << Nx << ", " << Ny <<")!\n\n";
    exit ( 1 );
@@ -280,11 +280,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double UnstructuredGrid::calc_area(int x, int y) const
+double SemiLatLonGrid::calc_area(int x, int y) const
 
 {
 
-   // Grid cell area is not defined for unstructured grids
+   // Grid cell area is not defined for semilatlon grids
 
 return ( bad_data_double );
 
@@ -294,7 +294,7 @@ return ( bad_data_double );
 ////////////////////////////////////////////////////////////////////////
 
 
-int UnstructuredGrid::nx() const
+int SemiLatLonGrid::nx() const
 
 {
 
@@ -306,7 +306,7 @@ return ( Nx );
 ////////////////////////////////////////////////////////////////////////
 
 
-int UnstructuredGrid::ny() const
+int SemiLatLonGrid::ny() const
 
 {
 
@@ -318,7 +318,7 @@ return ( Ny );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString UnstructuredGrid::name() const
+ConcatString SemiLatLonGrid::name() const
 
 {
 
@@ -330,7 +330,7 @@ return ( Name );
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::dump(ostream & out, int depth) const
+void SemiLatLonGrid::dump(ostream & out, int depth) const
 
 {
 
@@ -344,7 +344,7 @@ else                      out << "(nul)\n";
 
 out << '\n';
 
-out << prefix << "Projection = Unstructured\n";
+out << prefix << "Projection = SemiLatLon\n";
 
 out << prefix << "Lats:\n";
 Lats.dump(out, depth+1);
@@ -376,13 +376,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString UnstructuredGrid::serialize(const char *sep) const
+ConcatString SemiLatLonGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 
-a << "Projection: Unstructured" << sep;
+a << "Projection: SemiLatLon" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
@@ -404,7 +404,7 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridInfo UnstructuredGrid::info() const
+GridInfo SemiLatLonGrid::info() const
 
 {
 
@@ -420,13 +420,13 @@ return ( i );
 ////////////////////////////////////////////////////////////////////////
 
 
-double UnstructuredGrid::rot_grid_to_earth(int x, int y) const
+double SemiLatLonGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
 //
 // The rotation angle from grid relative to earth relative
-// does not apply to unstructured grids
+// does not apply to semilatlon grids
 //
 
 return ( 0.0 );
@@ -437,7 +437,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool UnstructuredGrid::wrap_lon() const
+bool SemiLatLonGrid::wrap_lon() const
 
 {
 
@@ -449,11 +449,11 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredGrid::shift_right(int N)
+void SemiLatLonGrid::shift_right(int N)
 
 {
 
-mlog << Error << "\nUnstructuredGrid::shift_right(int) -> "
+mlog << Error << "\nSemiLatLonGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
@@ -466,11 +466,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * UnstructuredGrid::copy() const
+GridRep * SemiLatLonGrid::copy() const
 
 {
 
-UnstructuredGrid * p = new UnstructuredGrid (Data);
+SemiLatLonGrid * p = new SemiLatLonGrid (Data);
 
 p->Name = Name;
 
@@ -490,7 +490,7 @@ return ( p );
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const UnstructuredData & data)
+Grid::Grid(const SemiLatLonData & data)
 
 {
 
@@ -504,17 +504,17 @@ set(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::set(const UnstructuredData & data)
+void Grid::set(const SemiLatLonData & data)
 
 {
 
 clear();
 
-rep = new UnstructuredGrid (data);
+rep = new SemiLatLonGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const UnstructuredData &) -> "
+   mlog << Error << "\nGrid::set(const SemiLatLonData &) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );

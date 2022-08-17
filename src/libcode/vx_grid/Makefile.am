@@ -30,7 +30,7 @@ libvx_grid_a_SOURCES = \
               tcrmw_grid.cc tcrmw_grid.h \
               goes_grid_defs.h \
               goes_grid.cc goes_grid.h \
-              unstructured_grid_defs.h \
-              unstructured_grid.cc unstructured_grid.h \
+              semilatlon_grid_defs.h \
+              semilatlon_grid.cc semilatlon_grid.h \
               vx_grid.h
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}

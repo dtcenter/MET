@@ -37,10 +37,10 @@ using namespace std;
 void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
               MetConfig *conf) {
 
-   // Skip plotting map data for unstructured grids
-   if ( gr.info().ug )  {
+   // Skip plotting map data for SemiLatLon grids
+   if ( gr.info().sl )  {
       mlog << Debug(4) << "draw_map() -> "
-           << "Map data is not plotted for unstructured grids.\n";
+           << "Map data is not plotted for SemiLatLon grids.\n";
       return;
    }
 

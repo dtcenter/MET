@@ -30,7 +30,7 @@ static const char           merc_string [] = "Mercator";
 static const char         latlon_string [] = "LatLon";
 static const char rotated_latlon_string [] = "Rotated LatLon";
 static const char       gaussian_string [] = "Gaussian";
-static const char   unstructured_string [] = "Unstructured";
+static const char     semilatlon_string [] = "SemiLatLon";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
 static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
 static void get_gaussian_grid       (const Python3_Dict & dict, Grid & g);
-static void get_unstructured_grid   (const Python3_Dict & dict, Grid & g);
+static void get_semilatlon_grid     (const Python3_Dict & dict, Grid & g);
 
 static void lookup_python_num_array(const Python3_Dict &, const char *, NumArray &);
 
@@ -78,7 +78,7 @@ else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g
 else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
 else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
 else if ( proj_type ==       gaussian_string )  get_gaussian_grid       (dict, g);
-else if ( proj_type ==   unstructured_string )  get_unstructured_grid   (dict, g);
+else if ( proj_type ==     semilatlon_string )  get_semilatlon_grid     (dict, g);
 else {
 
    mlog << Error << "\ngrid_from_python_dict() -> "
@@ -473,11 +473,11 @@ return;
    //  times       (array of double)
    //
 
-void get_unstructured_grid   (const Python3_Dict & dict, Grid & g)
+void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
 
 {
 
-UnstructuredData data;
+SemiLatLonData data;
 ConcatString s;
 
 s = dict.lookup_string("name");

@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_UNSTRUCTURED_GRID_H__
-#define  __MET_UNSTRUCTURED_GRID_H__
+#ifndef  __MET_SEMILATLON_GRID_H__
+#define  __MET_SEMILATLON_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -23,15 +23,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class UnstructuredGrid : public GridRep {
+class SemiLatLonGrid : public GridRep {
 
       friend class Grid;
 
    private:
 
-      UnstructuredGrid();
-     ~UnstructuredGrid();
-      UnstructuredGrid(const UnstructuredData &);
+      SemiLatLonGrid();
+     ~SemiLatLonGrid();
+      SemiLatLonGrid(const SemiLatLonData &);
 
       void add_dimension(const NumArray &, NumArray &);
 
@@ -43,7 +43,8 @@ class UnstructuredGrid : public GridRep {
 
       ConcatString Name;
 
-         // Exactly 2 have non-zero length
+         // Lat and/or Lon are non-empty and Levels or Times are non-empty
+         // When Lat and Lon are specified, they must be the same length
 
       NumArray Lats;
       NumArray Lons;
@@ -60,7 +61,7 @@ class UnstructuredGrid : public GridRep {
       int Nx;
       int Ny;
 
-      UnstructuredData Data;
+      SemiLatLonData Data;
 
          //
          //  grid interface
@@ -99,13 +100,13 @@ class UnstructuredGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double UnstructuredGrid::scale_km() const { return ( -1.0 ); }
+inline double SemiLatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_UNSTRUCTURED_GRID_H__  */
+#endif   /*  __MET_SEMILATLON_GRID_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

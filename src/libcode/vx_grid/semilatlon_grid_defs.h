@@ -10,18 +10,18 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __UNSTRUCTURED_GRID_DEFINITIONS_H__
-#define  __UNSTRUCTURED_GRID_DEFINITIONS_H__
+#ifndef  __SEMILATLON_GRID_DEFINITIONS_H__
+#define  __SEMILATLON_GRID_DEFINITIONS_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-struct UnstructuredData {
+struct SemiLatLonData {
 
    const char * name;
 
-   // Exactly two are non-empty
+   // Arrays to define SemiLatLon dimensions
 
    NumArray lats;
    NumArray lons;
@@ -35,7 +35,7 @@ struct UnstructuredData {
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __UNSTRUCTURED_GRID_DEFINITIONS_H__  */
+#endif   /*  __SEMILATLON_GRID_DEFINITIONS_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

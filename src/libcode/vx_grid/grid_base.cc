@@ -226,12 +226,12 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void UnstructuredData::dump()
+void SemiLatLonData::dump()
 
 {
 
 mlog << Debug(grid_debug_level)
-     << "\nUnstructured Grid Data:\n"
+     << "\nSemiLatLon Grid Data:\n"
      << "    lats: " << lats.serialize() << "\n"
      << "    lons: " << lons.serialize() << "\n"
      << "  levels: " << levels.serialize() << "\n"
@@ -316,7 +316,7 @@ m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
 tc  = (const TcrmwData *)         0;
-ug  = (const UnstructuredData *)  0;
+sl  = (const SemiLatLonData *)    0;
 
 clear();
 
@@ -340,7 +340,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
-if ( ug  )  { delete ug;   ug  = (const UnstructuredData *)  0; };
+if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
 
 return;
 
@@ -361,7 +361,7 @@ if ( info.rll )  set( *(info.rll) );
 if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
 if ( info.gi  )  set( *(info.gi ) );
-if ( info.ug  )  set( *(info.ug ) );
+if ( info.sl  )  set( *(info.sl ) );
 
 return;
 
@@ -384,7 +384,7 @@ if ( rll ) ++count;
 if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
-if ( ug  ) ++count;
+if ( sl  ) ++count;
 
 return ( count == 1 );
 
@@ -413,7 +413,7 @@ else if ( rll )  gg.set( *rll );
 else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
-else if ( ug  )  gg.set( *ug  );
+else if ( sl  )  gg.set( *sl  );
 
 
 return;
@@ -578,15 +578,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void GridInfo::set(const UnstructuredData & data)
+void GridInfo::set(const SemiLatLonData & data)
 
 {
 
 clear();
 
-UnstructuredData * D = (UnstructuredData *) 0;
+SemiLatLonData * D = (SemiLatLonData *) 0;
 
-D = new UnstructuredData;
+D = new SemiLatLonData;
 
    //
    //  deep copy instead of memcpy because the struct
@@ -595,7 +595,7 @@ D = new UnstructuredData;
 
 *D = data;
 
-ug = D;  D = (UnstructuredData *) 0;
+sl = D;  D = (SemiLatLonData *) 0;
 
 return;
 
@@ -1141,13 +1141,12 @@ if ( info_new.lc )  {
 
    g_new.set(m_new);
 
-} else if ( info_new.ug )  {
+} else if ( info_new.sl )  {
 
-   UnstructuredData ug_new = *(info_new.ug);
+   mlog << Error << "\n\n  Grid::subset_ll() const -> "
+        << "subsetting is not supported for SemiLatLon grids\n\n";
 
-   // JHG, define the subsetting logic here
-
-   g_new.set(ug_new);
+   exit ( 1 );
 
 } else {
 
@@ -1253,7 +1252,7 @@ else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
-else if ( i1.ug  && i2.ug  )  return ( is_eq(i1.ug,  i2.ug ) );
+else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 
 return ( false );
 
@@ -1459,7 +1458,7 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_eq(const UnstructuredData * gi1, const UnstructuredData * gi2)
+bool is_eq(const SemiLatLonData * gi1, const SemiLatLonData * gi2)
 {
 
 if ( !gi1 || !gi2 )  return ( false );
