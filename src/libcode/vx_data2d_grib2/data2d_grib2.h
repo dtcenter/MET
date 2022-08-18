@@ -61,6 +61,7 @@ typedef struct {
    int EnsNumber;
    int DerType;
    int StatType;
+   int PercVal;
    IntArray IPDTmpl;
 } Grib2Record;
 
