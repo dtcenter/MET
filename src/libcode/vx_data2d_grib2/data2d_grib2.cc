@@ -718,7 +718,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
             
             continue;
          }
-         
+
          //  store the record information
          Grib2Record *rec = new Grib2Record;
          rec->ByteOffset   = offset;
@@ -731,14 +731,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-         
+
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
          } else {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
-         
+
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++) {
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
