@@ -525,7 +525,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          //  if seeking a probabilistic field, check the prob info
          if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() ) {
-            
+
             rec_match_ex = rec_match_rn = false;
             
             //  no match unless the data contains probabilities
