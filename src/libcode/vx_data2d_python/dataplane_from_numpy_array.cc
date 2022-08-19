@@ -43,49 +43,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-template <typename T>
-void load_numpy (void * buf,
-                 const int Nx, const int Ny,
-                 const int data_endian,
-                 void (*shuf)(void *), 
-                 DataPlane & out)
-
-
-{
-
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j, x, y, r, c;
-const int Nxy = Nx*Ny;
-T * u = (T *) buf;
-T value;
-
-for (j=0; j<Nxy; ++j)  {
-
-   nympy_array_one_to_two(j, Nx, r, c);
-
-   x = c;
-
-   y = Ny - 1 - r;
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out.set((double) value, x, y);
-
-}   //  for j
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 bool dataplane_from_numpy_array(Python3_Numpy & np, const Python3_Dict & attrs, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {

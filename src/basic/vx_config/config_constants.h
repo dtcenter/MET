@@ -525,6 +525,7 @@ static const char conf_key_GRIB2_process[]     = "GRIB2_process";
 static const char conf_key_GRIB2_ens_type[]    = "GRIB2_ens_type";
 static const char conf_key_GRIB2_der_type[]    = "GRIB2_der_type";
 static const char conf_key_GRIB2_stat_type[]   = "GRIB2_stat_type";
+static const char conf_key_GRIB2_perc_val[]    = "GRIB2_perc_val";
 static const char conf_key_GRIB2_ipdtmpl_index[] = "GRIB2_ipdtmpl_index";
 static const char conf_key_GRIB2_ipdtmpl_val[]   = "GRIB2_ipdtmpl_val";
 static const char conf_key_level[]             = "level";

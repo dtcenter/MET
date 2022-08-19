@@ -98,7 +98,6 @@ bool MetPointData::get_header(int header_offset, float hdr_arr[HDR_ARRAY_LEN],
 ////////////////////////////////////////////////////////////////////////
 
 bool MetPointData::get_header_type(int header_offset, int hdr_typ_arr[HDR_TYPE_ARR_LEN]) {
-   int hdr_idx;
    // Read the header integer types
    hdr_typ_arr[0] = (header_data.prpt_typ_array.n() > header_offset ?
                      header_data.prpt_typ_array[header_offset] : bad_data_int);
