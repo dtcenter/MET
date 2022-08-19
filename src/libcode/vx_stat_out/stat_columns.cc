@@ -1567,6 +1567,58 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
+                     STATOutputType out_type,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row,
+                     bool update_thresh) {
+   int i;
+
+   // SEEPS line type
+   shc.set_line_type(stat_seeps_str);
+cout << " DEBUG HS write_seeps_row() is called\n";
+
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(na_str);
+      shc.set_obs_thresh(na_str);
+      shc.set_thresh_logic(SetLogic_None);
+      shc.set_cov_thresh(na_str);
+   }
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each matched pair
+   for(i=0; i<pd_ptr->n_obs; i++) {
+
+      // Set the observation valid time
+      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
+      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      if (pd_ptr->s_ba[i]) write_seeps_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
                    STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
@@ -3928,6 +3980,7 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
 
+   //string sid_str = (string)pd_ptr->sid_sa[i];
    at.set_entry(r, c+2,  // Station ID
       (string)pd_ptr->sid_sa[i]);
 
@@ -3960,6 +4013,43 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
 
    at.set_entry(r, c+12, // Climatological CDF Value
       pd_ptr->cdf_na[i]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
+                      AsciiTable &at, int r, int c) {
+   //
+   // Stable Equitable Error in Probability Space (SEEPS)
+   // Dump out the SEEPS line:
+   //    TOTAL,       INDEX,       OBS_SID,
+   //    OBS_LAT,     OBS_LON,     OBS_LVL,
+   //    OBS_ELV,     FCST,        OBS,
+   //    OBS_QC,      SEEPS
+
+   at.set_entry(r, c+0, pd_ptr->n_obs); // Total Number of Pairs
+
+   at.set_entry(r, c+1, i+1);           // Index of Current Pair
+
+   at.set_entry(r, c+2, (string)pd_ptr->sid_sa[i]); // Station ID
+
+   at.set_entry(r, c+3, pd_ptr->lat_na[i]); // Latitude
+
+   at.set_entry(r, c+4, pd_ptr->lon_na[i]); // Longitude
+
+   at.set_entry(r, c+5, pd_ptr->lvl_na[i]); // Level
+
+   at.set_entry(r, c+6, pd_ptr->elv_na[i]); // Elevation
+
+   at.set_entry(r, c+7, pd_ptr->f_na[i]); // Forecast Value
+
+   at.set_entry(r, c+8, pd_ptr->o_na[i]); // Observation Value
+
+   at.set_entry(r, c+9, (string)pd_ptr->o_qc_sa[i]);    // Observation Quality Control
+
+   at.set_entry(r, c+10, pd_ptr->s_na[i]);  // SEEPS score
 
    return;
 }

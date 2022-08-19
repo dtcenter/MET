@@ -629,6 +629,9 @@ void PointStatVxOpt::clear() {
    mpr_sa.clear();
    mpr_ta.clear();
 
+   seeps_sa.clear();
+   seeps_ta.clear();
+
    mask_name.clear();
 
    eclv_points.clear();
@@ -802,12 +805,18 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
    mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
 
+   // Conf: seeps_column and seeps_thresh
+   seeps_sa = odict.lookup_string_array(conf_key_seeps_column);
+   seeps_ta = odict.lookup_thresh_array(conf_key_seeps_thresh);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
            << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
            << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
+           << "SEEPS columns:     "               << write_css(seeps_sa) << "\n"
+           << "SEEPS thresholds:  "               << seeps_ta.get_str() << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -971,6 +980,9 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Store the MPR filter threshold
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
 
+   // Store the SEEPS threshold
+   vx_pd.set_seeps_thresh(seeps_sa, seeps_ta);
+
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
@@ -1099,10 +1111,11 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
    int n_bin;
+   const char *method_name = "PointStatVxOpt::n_txt_row(int) -> ";
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
-      mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+      mlog << Error << "\n" << method_name
            << "range check error for " << i_txt_row << "\n\n";
       exit(1);
    }
@@ -1280,13 +1293,19 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
+      case(i_seeps):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
       default:
-         mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+         mlog << Error << "\n" << method_name
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
    }
-
+cout << "   DEBUG HS " << method_name << " i_txt_row=" << i_txt_row << "  n="  << n << "\n";
    return(n);
 }
 

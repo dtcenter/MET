@@ -123,6 +123,7 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "vx_seeps.h"
 
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
@@ -131,6 +132,10 @@ using namespace std;
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
 #endif
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -365,8 +370,8 @@ void setup_txt_files() {
 
    // Determine the maximum number of data columns
    max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
-   max_col = (max_mctc_col  > max_col      ? max_mctc_col  : max_col);
-   max_col = (max_orank_col > max_col      ? max_orank_col : max_col);
+   if (max_mctc_col  > max_col) max_col = max_mctc_col;
+   if (max_orank_col > max_col) max_col = max_orank_col;
 
    // Add the header columns
    max_col += n_header_columns + 1;
@@ -747,6 +752,7 @@ void process_obs_file(int i_nc) {
 
    // Process each observation in the file
    int str_length, block_size;
+   int prev_grib_code = bad_data_int;
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
       block_size = (obs_count - i_block_start_idx);
       if (block_size > buf_size) block_size = buf_size;
@@ -798,19 +804,22 @@ void process_obs_file(int i_nc) {
          // Store the variable name
          int org_grib_code = met_point_obs->get_grib_code_or_var_index(obs_arr);
          int grib_code = org_grib_code;
-         if (use_var_id && grib_code < var_names.n()) {
-            var_name   = var_names[grib_code];
-            grib_code = bad_data_int;
-         }
-         else {
-            var_name = "";
-         }
+         if (prev_grib_code != org_grib_code) {
+            if (use_var_id && grib_code < var_names.n()) {
+               var_name   = var_names[grib_code];
+               grib_code = bad_data_int;
+            }
+            else {
+               var_name = "";
+            }
 
-         // Check for wind components
-         is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
-                   (!use_var_id && nint(grib_code) == ugrd_grib_code);
-         is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
-                   (!use_var_id && nint(grib_code) == vgrd_grib_code);
+            // Check for wind components
+            is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
+                      (!use_var_id && nint(grib_code) == ugrd_grib_code);
+            is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
+                      (!use_var_id && nint(grib_code) == vgrd_grib_code);
+            prev_grib_code = org_grib_code;
+         }
 
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
@@ -1011,6 +1020,18 @@ void process_scores() {
                      conf_info.vx_opt[i].output_flag[i_mpr],
                      stat_at, i_stat_row,
                      txt_at[i_mpr], i_txt_row[i_mpr]);
+
+                  // Reset the observation valid time
+                  shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
+                  shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
+               }
+
+               // Write out the SEEPS lines
+               if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
+                  write_seeps_row(shc, pd_ptr,
+                     conf_info.vx_opt[i].output_flag[i_seeps],
+                     stat_at, i_stat_row,
+                     txt_at[i_seeps], i_txt_row[i_seeps]);
 
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
@@ -1901,6 +1922,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
+   bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
+                      conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
 
    shc.set_interp_mthd(InterpMthd_Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);

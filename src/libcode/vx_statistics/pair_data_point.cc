@@ -69,6 +69,7 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 void PairDataPoint::init_from_scratch() {
 
    clear();
+   seeps_climo = get_seeps_climo();
 
    return;
 }
@@ -80,6 +81,8 @@ void PairDataPoint::clear() {
    PairBase::clear();
 
    f_na.clear();
+   s_na.clear();
+   s_ba.clear();
 
    return;
 }
@@ -91,6 +94,8 @@ void PairDataPoint::erase() {
    PairBase::erase();
 
    f_na.erase();
+   s_na.erase();
+   //s_ba.erase();
 
    return;
 }
@@ -102,6 +107,8 @@ void PairDataPoint::extend(int n) {
    PairBase::extend(n);
 
    f_na.extend(n);
+   s_na.extend(n);
+   s_ba.extend(n);
 
    return;
 }
@@ -136,6 +143,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                         pd.lvl_na[i], pd.elv_na[i],
                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                         pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+         if (i < pd.s_na.n()) set_seeps(pd.s_na[i], i);
       }
    }
    // Handle gridded data
@@ -158,8 +166,33 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                      cmn, csd, wgt)) return(false);
 
    f_na.add(f);
+   s_na.add(bad_data_double);
+   s_ba.add(false);
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+/*
+void PairDataPoint::set_is_seeps(bool is_seeps, int index) {
+
+   if(index < 0) index = s_ba.n() - 1;
+   if(index < s_ba.n()) s_ba.set(index, is_seeps);
+   else mlog << Warning << "\nPairDataPoint::set_is_seeps index ("
+             << index << ") is out of range " << s_ba.n() << "\n\n";
+}
+*/
+
+void PairDataPoint::set_seeps(double seeps, int index) {
+
+   if(index < 0) index = s_na.n() - 1;
+   if(index < s_na.n()) {
+      s_na.set(index, seeps);
+      s_ba.set(index, true);
+   }
+   else mlog << Warning << "\nPairDataPoint::set_seeps index ("
+             << index << ") is out of range " << s_ba.n() << "\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -169,7 +202,8 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                                    double x, double y, unixtime ut,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
-                                   double cmn, double csd, double wgt) {
+                                   double cmn, double csd, double wgt,
+                                   double seeps) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
@@ -182,6 +216,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                  o, qc, cmn, csd, wgt);
 
    f_na.set(i_obs, f);
+   s_na.set(i_obs, seeps);
 
    return;
 }
@@ -194,6 +229,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cmn, csd, wgt);
 
    f_na.add(f);
+   s_na.add(f);
 
    return(true);
 }
@@ -229,6 +265,31 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    n_obs += o_in.n();
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static int seeps_record_count = 0;
+static int seeps_debug_level = 9;
+
+double PairDataPoint::compute_seeps(const char *sid, double f,
+                                    double o, unixtime ut) {
+   double seeps_score = bad_data_double;
+   int month, day, year, hour, minute, second;
+
+   int sid_no = atoi(sid);
+   if (sid_no) {
+      unix_to_mdyhms(ut, month, day, year, hour, minute, second);
+      seeps_score = seeps_climo->get_score(sid_no, f, o, month, hour);
+      if(mlog.verbosity_level() >= seeps_debug_level && !is_eq(seeps_score, bad_data_double)) {
+         if (seeps_record_count < 10) {
+            mlog << Debug(seeps_debug_level)
+                 << "PairDataPoint::compute_seeps() score = " << seeps_score << "\n";
+            seeps_record_count++;
+         }
+      }
+   }
+   return seeps_score;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -274,6 +335,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                       vld_ta[i], lvl_na[i], elv_na[i],
                       f_na[i], o_na[i], o_qc_sa[i].c_str(),
                       cmn_na[i], csd_na[i], wgt_na[i]);
+            out_pd.set_seeps(s_na[i]);
          }
          // Handle gridded data
          else {
@@ -376,6 +438,8 @@ void VxPairDataPoint::clear() {
    obs_qty_exc_filt.clear();
    mpr_column.clear();
    mpr_thresh.clear();
+   seeps_column.clear();
+   seeps_thresh.clear();
 
    fcst_ut     = (unixtime) 0;
    beg_ut      = (unixtime) 0;
@@ -439,6 +503,8 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    mpr_column = vx_pd.mpr_column;
    mpr_thresh = vx_pd.mpr_thresh;
+   seeps_column = vx_pd.seeps_column;
+   seeps_thresh = vx_pd.seeps_thresh;
 
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;
@@ -836,6 +902,26 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_seeps_thresh(const StringArray &sa, const ThreshArray &ta) {
+
+   // Check for constant length
+   if(sa.n() != ta.n()) {
+      mlog << Error << "\nVxPairDataPoint::set_seeps_thresh() -> "
+           << "the \"" << conf_key_seeps_column << "\" ("
+           << write_css(sa) << ") and \"" << conf_key_seeps_thresh
+           << "\" (" << write_css(ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
+   seeps_column = sa;
+   seeps_thresh = ta;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
    for(int i=0; i<n_msg_typ; i++) {
@@ -937,6 +1023,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       rej_vld++;
       return;
    }
+
+   bool precip_flag = fcst_info->is_precipitation() &&
+                      obs_info->is_precipitation();
 
    hdr_lat = hdr_arr[0];
    hdr_lon = hdr_arr[1];
@@ -1116,6 +1205,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Look through all of the PairDataPoint objects to see if the
    // observation should be added.
 
+   double seeps = bad_data_double;
+
    // Check the message types
    for(i=0; i<n_msg_typ; i++) {
 
@@ -1288,7 +1379,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << "\n";
                inc_count(rej_dup, i, j, k);
             }
-
+            if (precip_flag) {
+               seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
+               pd[i][j][k].set_seeps(seeps);
+            }
          } // end for k
       } // end for j
    } // end for i
@@ -1564,6 +1658,76 @@ bool check_mpr_thresh(double f, double o, double cmn, double csd,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool check_seeps_thresh(double f, double o,
+                        const StringArray &col_sa, const ThreshArray &col_ta,
+                        ConcatString *reason_ptr) {
+   // Initialize
+   if(reason_ptr) reason_ptr->erase();
+
+   // Check arrays
+   if(col_sa.n() == 0 || col_ta.n() == 0) return(true);
+
+   bool keep = true;
+   bool absv = false;
+   StringArray sa;
+   ConcatString cs;
+   double v, v_cur;
+   int i, j;
+
+   // Loop over all the column filter names
+   for(i=0; i<col_sa.n(); i++) {
+
+      // Check for absolute value
+      if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
+         absv = true;
+         cs   = col_sa[i];
+         sa   = cs.split("()");
+         cs   = sa[1];
+      }
+      else {
+         cs = col_sa[i];
+      }
+
+      // Split the input column name on hyphens for differences
+      sa = cs.split("-");
+
+      // Get the first value
+      v = get_seeps_column_value(f, o, sa[0].c_str());
+
+      // If multiple columns, compute the requested difference
+      if(sa.n() > 1) {
+
+         // Loop through the columns
+         for(j=1; j<sa.n(); j++) {
+
+            // Get the current column value
+            v_cur = get_seeps_column_value(f, o, sa[j].c_str());
+
+            // Compute the difference, checking for bad data
+            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+            else                                     v -= v_cur;
+         } // end for j
+      }
+
+      // Apply absolute value, if requested
+      if(absv && !is_bad_data(v)) v = fabs(v);
+
+      // Check the threshold
+      if(!col_ta[i].check(v)) {
+         if(reason_ptr) {
+            (*reason_ptr) << cs_erase << col_sa[i] << " = " << v
+                          << " is not " << col_ta[i].get_str();
+         }
+         keep = false;
+         break;
+      }
+   } // end for i
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Parse string to determine which value to use
 //
@@ -1577,6 +1741,7 @@ double get_mpr_column_value(double f, double o, double cmn, double csd,
    else if(strcasecmp(s, "OBS")         == 0) v = o;
    else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
    else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
+   else if(strcasecmp(s, "SEEPS_MEAN")  == 0) cout << "  get_mpr_column_value() FIX ME at pair_data_point.cc!!!\n";
    else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
       v = (is_bad_data(cmn) || is_bad_data(csd) ?
            bad_data_double : normal_cdf(o, cmn, csd));
@@ -1639,6 +1804,79 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
          obs_dp.buf()[i]  = bad_data_double;
          if(cmn_flag) cmn_dp.buf()[i] = bad_data_double;
          if(csd_flag) csd_dp.buf()[i] = bad_data_double;
+      }
+   } // end for i
+
+   mlog << Debug(3)
+        << "Discarded " << n_skip << " of " << nxy
+        << " pairs for matched pair filtering columns ("
+        << write_css(col_sa) << ") and thresholds ("
+        << col_ta.get_str() << ").\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Parse string to determine which value to use
+//
+////////////////////////////////////////////////////////////////////////
+
+double get_seeps_column_value(double f, double o,
+                              const char *s) {
+   double v;
+
+        if(strcasecmp(s, "FCST")        == 0) v = f;
+   else if(strcasecmp(s, "OBS")         == 0) v = o;
+   else if(strcasecmp(s, "SEEPS")       == 0) cout << "  get_mpr_column_value() FIX ME SEEPS at pair_data_point.cc!!!\n";
+   else {
+      mlog << Error << "\nget_seeps_column_value() -> "
+           << "unsupported SEEPS column name requested in \""
+           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
+      exit(1);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_seeps_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
+                             const StringArray &col_sa, const ThreshArray &col_ta) {
+
+   // Check for no work to be done
+   if(col_sa.n() == 0 && col_ta.n() == 0) return;
+
+   // Check for constant length
+   if(col_sa.n() != col_ta.n()) {
+      mlog << Error << "\napply_seeps_thresh_mask() -> "
+           << "the \"" << conf_key_mpr_column << "\" ("
+           << write_css(col_sa) << ") and \"" << conf_key_mpr_thresh
+           << "\" (" << write_css(col_ta)
+           << ") config file entries must have the same length!\n\n";
+      exit(1);
+   }
+
+   int  nxy = fcst_dp.nx() * fcst_dp.ny();
+   int  n_skip = 0;
+
+   // Loop over the pairs
+   for(int i=0; i<nxy; i++) {
+
+      // Check for bad data
+      if(is_bad_data(fcst_dp.buf()[i])  ||
+         is_bad_data(obs_dp.buf()[i])) continue;
+
+      // Discard pairs which do not meet the threshold criteria
+      if(!check_seeps_thresh(fcst_dp.buf()[i], obs_dp.buf()[i],
+                             col_sa, col_ta)) {
+
+         // Increment skip counter
+         n_skip++;
+
+         // Set point to bad data
+         fcst_dp.buf()[i] = bad_data_double;
+         obs_dp.buf()[i]  = bad_data_double;
       }
    } // end for i
 
