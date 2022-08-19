@@ -232,10 +232,10 @@ void SemiLatLonData::dump()
 
 mlog << Debug(grid_debug_level)
      << "\nSemiLatLon Grid Data:\n"
-     << "    lats: " << lats.serialize() << "\n"
-     << "    lons: " << lons.serialize() << "\n"
-     << "  levels: " << levels.serialize() << "\n"
-     << "   times: " << times.serialize() << "\n\n";
+     << "    lats: " << lats.summarize() << "\n"
+     << "    lons: " << lons.summarize() << "\n"
+     << "  levels: " << levels.summarize() << "\n"
+     << "   times: " << times.summarize() << "\n\n";
 }
 
 

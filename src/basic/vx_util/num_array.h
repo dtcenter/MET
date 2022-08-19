@@ -98,6 +98,7 @@ class NumArray {
       double range() const;
 
       ConcatString serialize() const;
+      ConcatString summarize() const;
 
       int n_elements() const;
       int n() const;         //  same as n_elements()
