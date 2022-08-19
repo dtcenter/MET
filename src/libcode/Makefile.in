@@ -162,7 +162,7 @@ DIST_SUBDIRS = vx_grid vx_data2d vx_nc_util vx_data2d_grib \
 	vx_render vx_ps vx_plot_util vx_shapedata vx_statistics \
 	vx_stat_out vx_analysis_util vx_tc_util vx_summary \
 	vx_time_series vx_physics vx_series_data vx_regrid vx_nc_obs \
-	vx_solar vx_bool_calc
+	vx_solar vx_bool_calc vx_seeps
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -341,7 +341,7 @@ SUBDIRS = vx_grid vx_data2d vx_nc_util vx_data2d_grib vx_data2d_nc_met \
 	vx_render vx_ps vx_plot_util vx_shapedata vx_statistics \
 	vx_stat_out vx_analysis_util vx_tc_util vx_summary \
 	vx_time_series vx_physics vx_series_data vx_regrid vx_nc_obs \
-	vx_solar vx_bool_calc
+	vx_solar vx_bool_calc vx_seeps
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

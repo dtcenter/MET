@@ -29,6 +29,7 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_nc_obs \
 	-lvx_nc_util \
 	-lvx_regrid \
+	-lvx_seeps \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_gsl_prob \
