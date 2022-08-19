@@ -40,6 +40,8 @@ censor_thresh  = [];
 censor_val     = [];
 mpr_column     = [];
 mpr_thresh     = [];
+seeps_column   = [];
+seeps_thresh   = [];
 cat_thresh     = [ NA ];
 cnt_thresh     = [ NA ];
 cnt_logic      = UNION;
@@ -286,6 +288,7 @@ output_flag = {
    rps    = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
+   seeps  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
