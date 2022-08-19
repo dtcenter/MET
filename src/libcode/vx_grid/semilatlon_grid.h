@@ -44,7 +44,7 @@ class SemiLatLonGrid : public GridRep {
       ConcatString Name;
 
          // Lat and/or Lon are non-empty and Levels or Times are non-empty
-         // When Lat and Lon are specified, they must be the same length
+         // When Lat and Lon are both specified, they must be the same length
 
       NumArray Lats;
       NumArray Lons;
@@ -54,10 +54,7 @@ class SemiLatLonGrid : public GridRep {
       NumArray * xDim; // not allocated
       NumArray * yDim; // not allocated
 
-         // TRUE:  for lat or lon vs level or time with unique lat/lon values
-         // FALSE: for a 1D list of potentially non-unique lat/lon values
-
-      bool Is2Dim;
+      bool IsLatLon;
       int Nx;
       int Ny;
 

@@ -74,8 +74,28 @@ if ( data.name )  Name = data.name;
 Lats = data.lats;
 Lons = data.lons;
 
-if ( Lons.n() > 0 )  xDim = &Lons;
-if ( Lats.n() > 0 )  yDim = &Lats;
+if ( Lats.n() > 0 && Lons.n() > 0 )  {
+
+   if ( Lats.n() != Lons.n() )  {
+      mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
+           << "when both are specified, the number of lats (" << Lats.n()
+           << ") and lons (" << Lons.n() << ") must match.\n\n";
+      exit ( 1 );
+   }
+
+   IsLatLon = true;
+   xDim = &Lons;
+}
+else if ( Lons.n() > 0 )  { xDim = &Lons; }
+else if ( Lats.n() > 0 )  { yDim = &Lats; }
+else {
+
+   mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
+        << "the number of lats (" << Lats.n() << ") and lons (" << Lons.n()
+        << ") cannot both be zero.\n\n";
+   exit ( 1 );
+
+}
 
   // Process the other dimensions
 
@@ -85,40 +105,14 @@ add_dimension(data.times,  Times);
 if ( !xDim || !yDim )  {
 
    mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
-        << "exactly two dimensions should have non-zero length: lats ("
-        << Lats.n() << "), lons (" << Lons.n() << "), levels (" << Levels.n()
-        << "), times (" << Times.n() << ")\n\n";
+        << "the number of levels (" << Levels.n() << ") and times (" << Times.n()
+        << ") cannot both be zero.\n\n";
    exit ( 1 );
 
 }
 
 Nx = xDim->n();
 Ny = yDim->n();
-
-   // 1-dimensional array of lat/lon locations
-
-if ( Lats.n() > 0 && Lons.n() > 0 )  {
-
-   Is2Dim = false;
-
-   if ( Lats.n() != Lons.n() )  {
-
-      mlog << Error << "\nSemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data) -> "
-           << "for one dimensional arrays, the number lats and lons must match ("
-           << Lats.n() << " != " << Lons.n() << ")!\n\n";
-      exit ( 1 );
-
-   }
-
-}
-
-   // 2-dimensional data
-
-else {
-
-   Is2Dim = true;
-
-}
 
    // Store the data
 
@@ -175,6 +169,7 @@ Times.clear();
 xDim = (NumArray *) 0;
 yDim = (NumArray *) 0;
 
+IsLatLon = false;
 Nx = 0;
 Ny = 0;
 
@@ -188,7 +183,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SemiLatLonGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
+void SemiLatLonGrid::latlon_to_xy(double xdim_val, double ydim_val, double &x, double &y) const
 
 {
 
@@ -198,42 +193,34 @@ if ( !xDim || !yDim )  {
    exit ( 1 );
 }
 
+if ( IsLatLon )  {
+   mlog << Error << "\nSemiLatLonGrid::latlon_to_xy() -> "
+        << "not supported when IsLatLon is true.\n\n";
+   exit ( 1 );
+}
+
 int i, x_int, y_int;
 x_int = y_int = bad_data_int;
 
-// Search dimensions separately for matches
-if ( Is2Dim ) {
-
-   // Search the first dimension
-   for(i=0; i<xDim->n(); i++) {
-      if(is_eq(lat, xDim->buf()[i])) {
-         x_int = i;
-         break;
-      }
-   }
-
-   // Search the second dimension
-   for(i=0; i<yDim->n(); i++) {
-      if(is_eq(lat, yDim->buf()[i])) {
-         y_int = i;
-         break;
-      }
+// Search the X dimension
+for(i=0; i<xDim->n(); i++) {
+   if(is_eq(xdim_val, xDim->buf()[i])) {
+      x_int = i;
+      break;
    }
 }
-else {
 
-   // Search both dimensions
-   for(i=0; i<xDim->n(); i++) {
-      if(is_eq(lat, xDim->buf()[i]) && is_eq(lon, yDim->buf()[i])) {
-         x_int = y_int = i;
-         break;
-      }
+// Search the Y dimension
+for(i=0; i<yDim->n(); i++) {
+   if(is_eq(ydim_val, yDim->buf()[i])) {
+      y_int = i;
+      break;
    }
 }
 
 if ( is_bad_data(x_int) || is_bad_data(y_int) )  {
    mlog << Error << "\nSemiLatLonGrid::latlon_to_xy() -> "
-        << "no match found for (" << lat << ", " << lon << ").\n\n";
+        << "no match found for (" << xdim_val << ", " << ydim_val << ").\n\n";
    exit ( 1 );
 }
 
@@ -248,7 +235,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SemiLatLonGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
+void SemiLatLonGrid::xy_to_latlon(double x, double y, double & xdim_val, double & ydim_val) const
 
 {
 
@@ -269,8 +256,8 @@ if ( x_int < 0 || x_int >= Nx ||
    exit ( 1 );
 }
 
-lat = xDim->buf()[x_int];
-lon = yDim->buf()[y_int];
+xdim_val = xDim->buf()[x_int];
+ydim_val = yDim->buf()[y_int];
 
 return;
 
@@ -358,9 +345,9 @@ Levels.dump(out, depth+1);
 out << prefix << "Times:\n";
 Times.dump(out, depth+1);
 
-out << prefix << "Is2Dim = " << bool_to_string(Is2Dim) << "\n";
-out << prefix << "Nx     = " << Nx << "\n";
-out << prefix << "Ny     = " << Ny << "\n";
+out << prefix << "IsLatLon = " << bool_to_string(IsLatLon) << "\n";
+out << prefix << "Nx       = " << Nx << "\n";
+out << prefix << "Ny       = " << Ny << "\n";
 
    //
    //  done
@@ -387,10 +374,10 @@ a << "Projection: SemiLatLon" << sep;
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-a << "Lats: " << Lats.serialize() << sep;
-a << "Lons: " << Lons.serialize() << sep;
-a << "Levels: " << Levels.serialize() << sep;
-a << "Times: " << Times.serialize() << sep;
+a << "Lats: " << Lats.summarize() << sep;
+a << "Lons: " << Lons.summarize() << sep;
+a << "Levels: " << Levels.summarize() << sep;
+a << "Times: " << Times.summarize() << sep;
 
    //
    //  done
