@@ -974,6 +974,10 @@ File-format specific settings for the "field" entry:
        
     * The "GRIB2_stat_type" is an integer specifying the statistical
       processing type (Table 4.10).
+
+    * The "GRIB2_perc_val" is an integer specifying the requested percentile
+      value (0 to 100) to be used. This applies only to GRIB2 product
+      definition templates 4.6 and 4.10.
        
     * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
       of integers which specify the product description template values to
