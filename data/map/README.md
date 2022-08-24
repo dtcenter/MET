@@ -7,7 +7,7 @@ The map data provide here is derived from [Natural Earth](https://www.naturalear
 
 The map data was reformatted using calls to the **make_mapfiles** development utility. Those calls are described below.
 
-- **country_data** contains 110m resolution country outlines.
+- **country_data** (~225K) contains 110m resolution global country outlines.
 ```
 make_mapfiles \
 110m_cultural/ne_110m_admin_0_countries.shp \
@@ -15,23 +15,39 @@ make_mapfiles \
 110m_cultural/ne_110m_admin_0_countries.dbf NAME ADMIN
 mv ne_110m_admin_0_countries_data country_data
 ```
-- **usa_state_data** contains 110m resolution state/province data for United States and Canada.
+- **major_lakes_data** (~244K) contains 110m resolution global major lake outlines.
+```
+make_mapfiles \
+110m_physical/ne_110m_lakes.shp \
+110m_physical/ne_110m_lakes.shx \
+110m_physical/ne_110m_lakes.dbf name NA
+mv 110m_cultural/110m_physical/ne_110m_lakes_data major_lakes_data
+```
+- **country_major_lakes_data** (~464K) contains 110m resolution global country and major lake outlines.
+```
+make_mapfiles \
+110m_cultural/ne_110m_admin_0_countries_lakes.shp \
+110m_cultural/ne_110m_admin_0_countries_lakes.shx \
+110m_cultural/ne_110m_admin_0_countries_lakes.dbf NAME ADMIN
+mv ne_110m_admin_0_countries_lakes_data country_major_lakes_data
+```
+- **usa_state_data** (~48K) contains 110m resolution administrative boundaries for the United States.
 ```
 make_mapfiles \
 110m_cultural/ne_110m_admin_1_states_provinces.shp \
 110m_cultural/ne_110m_admin_1_states_provinces.shx \
 110m_cultural/ne_110m_admin_1_states_provinces.dbf name NA
 mv ne_110m_admin_1_states_provinces_data usa_state_data
-``` 
-- **admin_data** contains 10m resolution state/province data for all countries.
+```
+- **country_major_lakes_detail_data** (~11M) contains 10m resolution global country and major lake outlines.
 ```
 make_mapfiles \
-10m_cultural/ne_10m_admin_1_states_provinces.shp \
-10m_cultural/ne_10m_admin_1_states_provinces.shx \
-10m_cultural/ne_10m_admin_1_states_provinces.dbf name admin
-mv ne_10m_admin_1_states_provinces_data admin_data
+10m_cultural/ne_10m_admin_0_countries_lakes.shp \
+10m_cultural/ne_10m_admin_0_countries_lakes.shx \
+10m_cultural/ne_10m_admin_0_countries_lakes.dbf NAME ADMIN
+mv ne_10m_admin_0_countries_lakes_data country_major_lakes_detail_data
 ```
-- **admin_by_country** contains 10m resolution state/province organized into separate data files for each country.
+- **admin_by_country** (~26M) contains 10m resolution state/province data organized into separate data files for each country.
 ```
 make_mapfiles -outdir admin_by_country -separate_files \
 10m_cultural/ne_10m_admin_1_states_provinces.shp \
@@ -41,11 +57,3 @@ for file in `ls admin_by_country/ne_10m_admin_1_*`; do
   mv $file `echo $file | sed 's/ne_10m_admin_1_states_provinces/admin/g'`
 done
 ```
-
-TODO:
-- [x] admin_by_country (1303965 lines)
-- [x] admin_data (1303965 lines)
-- [x] country_data (10943 lines)
-- [ ] country_major_lakes_data (23440 lines)
-- [ ] major_lakes_data (12567 lines)
-- [x] usa_state_data (2425 lines)
