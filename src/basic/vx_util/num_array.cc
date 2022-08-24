@@ -1274,3 +1274,32 @@ ConcatString write_css_hhmmss(const NumArray &na)
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mean_abs_diff() const
+
+{
+
+   int i, j, count;
+   double sum, mad;
+
+   int n = n_elements();
+   
+   for(i=0, count=0, sum=0.0; i<n; i++) {
+      for(j=i+1; j<n; j++) {
+      
+         if( is_bad_data(e[i]) || is_bad_data(e[j]) ) continue;
+         sum += abs(e[i]-e[j]);
+         count++;
+      }
+   }
+      
+   if(count == 0) mad = bad_data_double;
+   else           mad = sum / (n*(n-1));
+
+   return(mad);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////

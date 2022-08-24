@@ -109,7 +109,8 @@ class NumArray {
       double mean() const;
       double mean_sqrt() const;
       double mean_fisher() const;
-
+      double mean_abs_diff() const;
+      
       double variance(int skip_index = bad_data_int) const;
       double stdev(int skip_index = bad_data_int) const;
 
