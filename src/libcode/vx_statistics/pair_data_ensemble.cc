@@ -475,16 +475,11 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
-         crps_emp_na.add(compute_crps_emp(o_na[i], cur_ens));
-
-         // Stub in for now?
-         // Like this?
-         //crps_emp_fair_na.add(compute_crps_emp(o_na[i], cur_ens) - compute_mean_abs_diff(cur_ens));
-
-         // Or like this?
-         // Note mean_abs_diff function should be added to NumArray class
-         crps_emp_fair_na.add( crps_emp_na[i] - ens_na[i].mean_abs_diff() );
-         
+         //
+         // For crps_emp use temporary, local variable so we can use it for the crps_emp_fair calculation
+         double crps_emp = compute_crps_emp(o_na[i], cur_ens);
+         crps_emp_na.add(crps_emp);
+         crps_emp_fair_na.add(crps_emp - cur_ens.mean_abs_diff());
          crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
 
          // Ensemble mean and standard deviation
