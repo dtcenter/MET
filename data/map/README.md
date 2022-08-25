@@ -43,7 +43,7 @@ make_mapfiles \
 110m_cultural/ne_110m_admin_1_states_provinces.dbf name NA
 mv ne_110m_admin_1_states_provinces_data usa_state_data
 ```
-![plot](figure/usa_state_data.png?raw=true "usa_state_data")'
+![plot](figure/usa_state_data.png?raw=true "usa_state_data")
 
 10m Resolution Map Data
 -----------------------
@@ -68,6 +68,7 @@ for file in `ls admin_by_country/ne_10m_admin_1_*`; do
   mv $file `echo $file | sed 's/ne_10m_admin_1_states_provinces/admin/g'`
 done
 ```
+All detailed administrative boundaries are shown in the image below. However, users are encouraged to plot only the detailed map data for specific countries of interest.
 ![plot](figure/admin_by_country_data.png?raw=true "admin_by_country_data")
 
 Map Data Images
