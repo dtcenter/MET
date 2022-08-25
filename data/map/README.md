@@ -74,13 +74,13 @@ All detailed administrative boundaries are shown in the image below. However, us
 Map Data Images
 ---------------
 
-Commands used to visualize the map data, as shown above.
+Listed below are commands used to generate the map data images shown above.
 
-Generate a global data file containing all bad data:
+- Generate a global data file containing all bad data:
 ```
 gen_vx_mask G003 G003 empty.nc -type grid -value -9999 -name empty
 ```
-Plot each map data file on this global grid:
+- Plot each map data file on this global grid:
 ```
 for map in `ls *_data`; do
   export map=${map}
