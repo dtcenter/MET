@@ -81,7 +81,7 @@ done
 Map Data Images
 ---------------
 
-Commands used to visualize the map data.
+Commands used to visualize the map data, as shown above.
 
 Generate a global data file containing all bad data:
 ```
