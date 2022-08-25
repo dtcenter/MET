@@ -26,7 +26,7 @@ make_mapfiles \
 mv ne_110m_admin_0_countries_data country_data
 ```
 ![plot](figure/country_data.png?raw=true "country_data")
-- **major_lakes_data** (~244K) contains 110m resolution global major lake outlines.
+- **major_lakes_data** (~11K) contains 110m resolution global major lake outlines.
 ```
 make_mapfiles \
 110m_physical/ne_110m_lakes.shp \
@@ -35,15 +35,6 @@ make_mapfiles \
 mv 110m_cultural/110m_physical/ne_110m_lakes_data major_lakes_data
 ```
 ![plot](figure/major_lakes_data.png?raw=true "major_lakes_data")
-- **country_major_lakes_data** (~464K) contains 110m resolution global country and major lake outlines.
-```
-make_mapfiles \
-110m_cultural/ne_110m_admin_0_countries_lakes.shp \
-110m_cultural/ne_110m_admin_0_countries_lakes.shx \
-110m_cultural/ne_110m_admin_0_countries_lakes.dbf NAME ADMIN
-mv ne_110m_admin_0_countries_lakes_data country_major_lakes_data
-```
-![plot](figure/country_major_lakes_data.png?raw=true "country_major_lakes_data")
 - **usa_state_data** (~48K) contains 110m resolution administrative boundaries for the United States.
 ```
 make_mapfiles \
@@ -77,6 +68,7 @@ for file in `ls admin_by_country/ne_10m_admin_1_*`; do
   mv $file `echo $file | sed 's/ne_10m_admin_1_states_provinces/admin/g'`
 done
 ```
+![plot](figure/admin_by_country_data.png?raw=true "admin_by_country_data")
 
 Map Data Images
 ---------------
