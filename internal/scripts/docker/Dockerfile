@@ -1,6 +1,7 @@
-ARG MET_BASE_IMAGE=minimum
+ARG MET_BASE_REPO=met-base
+ARG MET_BASE_IMAGE=v1.0
 
-FROM dtcenter/met-base:${MET_BASE_IMAGE}
+FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_IMAGE}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
