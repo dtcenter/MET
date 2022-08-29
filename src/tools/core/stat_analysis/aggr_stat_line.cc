@@ -2568,7 +2568,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   double crps_emp, crpscl_emp, crps_gaus, crpscl_gaus, v;
+   double crps_emp, crps_emp_fair, crpscl_emp, crps_gaus, crpscl_gaus, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2627,6 +2627,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store the current statistics and weight (TOTAL column)
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
+         m[key].ens_pd.crps_emp_fair_na.add(cur.crps_emp_fair);
          m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
@@ -2675,6 +2676,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
       crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp_fair    = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
       crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
       crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
       crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
@@ -3181,8 +3183,10 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          derive_climo_vals(&m[key].cdf_info,
                            cur.climo_mean, cur.climo_stdev, climo_vals);
 
-         // Store empirical CRPS stats
-         m[key].ens_pd.crps_emp_na.add(compute_crps_emp(cur.obs, cur.ens_na));
+         // Store empirical CRPS stats and CRPS-Fair
+         double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
+         m[key].ens_pd.crps_emp_na.add(crps_emp);
+         m[key].ens_pd.crps_emp_fair_na.add(crps_emp - cur.ens_na.mean_abs_diff());
          m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, climo_vals));
 
          // Store Gaussian CRPS stats
