@@ -240,10 +240,6 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
             // convert the value to index for slicing
             z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
           }
-          else if ((dim_offset < 0 || dim_offset >= z_cnt)) {
-            // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_offset, z_dim_name);
-          }
           if ((z_offset >= 0) && (z_offset < z_cnt))
             dimension[idx] = long(z_offset);
           else {
@@ -611,7 +607,7 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 long MetNcCFDataFile::convert_time_to_offset(long time_value) {
    bool found = false;
    bool found_value = false;
-   long time_offset = time_value;
+   long time_offset = bad_data_int;
    int dim_size = _file->ValidTime.n();
    static const string method_name
          = "MetNcCFDataFile::convert_time_to_offset() -> ";
@@ -653,7 +649,7 @@ long MetNcCFDataFile::convert_time_to_offset(long time_value) {
 
 long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name) {
    bool found = false;
-   long z_offset = (long)z_value;
+   long z_offset = bad_data_int;
    int dim_size = _file->vlevels.n();
    static const string method_name
          = "MetNcCFDataFile::convert_value_to_offset() -> ";
