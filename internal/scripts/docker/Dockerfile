@@ -1,7 +1,7 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_IMAGE=v1.1
+ARG MET_BASE_TAG=v1.1
 
-FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_IMAGE}
+FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
