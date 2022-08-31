@@ -1913,11 +1913,7 @@ void setup_nc_file() {
 
    // Add the projection information
    Grid grid = conf_info.NcOutGrid;
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.NcInfo.do_latlon) {

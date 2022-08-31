@@ -2089,11 +2089,7 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    add_att(nc_out, "obs_units",  (string)obs_info->units_attr());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
