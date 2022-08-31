@@ -1,4 +1,4 @@
-ARG MET_BASE_REPO=met-base
+ARG MET_BASE_REPO=met-base-unit-test
 ARG MET_BASE_IMAGE=v1.1
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_IMAGE}
