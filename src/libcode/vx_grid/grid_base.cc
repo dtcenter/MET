@@ -1465,7 +1465,7 @@ if ( !gi1 || !gi2 )  return ( false );
 
 bool status = false;
 
-if ( gi1->lats   == gi2->lons &&
+if ( gi1->lats   == gi2->lats &&
      gi1->lons   == gi2->lons &&
      gi1->levels == gi2->levels &&
      gi1->times  == gi2->times )  status = true;
