@@ -13,24 +13,10 @@
 
 
 #include "vx_log.h"
+#include "vx_util.h"
 #include "vx_python3_utils.h"
 
 #include "grid_from_python_dict.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-   //
-   //  taken from src/libcode/vx_nc_util/grid_output.cc
-   //
-
-static const char             lc_string [] = "Lambert Conformal";
-static const char             st_string [] = "Polar Stereographic";
-static const char           merc_string [] = "Mercator";
-static const char         latlon_string [] = "LatLon";
-static const char rotated_latlon_string [] = "Rotated LatLon";
-static const char       gaussian_string [] = "Gaussian";
-static const char     semilatlon_string [] = "SemiLatLon";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,13 +58,13 @@ g.clear();
 
 proj_type = dict.lookup_string("type");
 
-     if ( proj_type ==             lc_string )  get_lc_grid             (dict, g);
-else if ( proj_type ==             st_string )  get_st_grid             (dict, g);
-else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g);
-else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
-else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
-else if ( proj_type ==       gaussian_string )  get_gaussian_grid       (dict, g);
-else if ( proj_type ==     semilatlon_string )  get_semilatlon_grid     (dict, g);
+     if ( proj_type ==        lambert_proj_type )  get_lc_grid             (dict, g);
+else if ( proj_type ==  stereographic_proj_type )  get_st_grid             (dict, g);
+else if ( proj_type ==       mercator_proj_type )  get_merc_grid           (dict, g);
+else if ( proj_type ==         latlon_proj_type )  get_latlon_grid         (dict, g);
+else if ( proj_type == rotated_latlon_proj_type )  get_rotated_latlon_grid (dict, g);
+else if ( proj_type ==       gaussian_proj_type )  get_gaussian_grid       (dict, g);
+else if ( proj_type ==     semilatlon_proj_type )  get_semilatlon_grid     (dict, g);
 else {
 
    mlog << Error << "\ngrid_from_python_dict() -> "
