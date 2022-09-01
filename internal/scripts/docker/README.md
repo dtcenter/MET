@@ -11,7 +11,7 @@ repository for testing.
 Descriptions of the Dockerfiles in this directory are provided below. Sample commands for building these Docker images locally are also provided. Please note that these commands should be run from the top-level directory of
 the MET repository.
 
-1. `Dockerfile` checks out MET from GitHub and compiles the specified branch
+1. `Dockerfile` checks out MET from GitHub, compiles the specified branch
 or tag from source, sets a working directory, downloads and installs MET and
 GhostScript fonts, and deletes the MET source code for tagged releases
 matching "v"*. It uses Docker image for the base compilation environment for
