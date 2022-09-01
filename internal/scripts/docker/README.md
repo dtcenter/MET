@@ -8,7 +8,7 @@ images from these Dockerfiles and push them to DockerHub repositories.  The
 MET Docker image is used in Dockerfiles in the METplus wrappers component
 repository for testing.
 
-All of the Docker commands below must be run from the top-level directory of
+Descriptions of the Dockerfiles in this directory are provided below. Sample commands for building these Docker images locally are also provided. Please note that these commands should be run from the top-level directory of
 the MET repository.
 
 1. `Dockerfile` checks out MET from GitHub and compiles the specified branch
