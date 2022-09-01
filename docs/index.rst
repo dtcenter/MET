@@ -97,9 +97,11 @@ Authors
 Many authors, listed below in alphabetical order, have contributed to the documentation of MET.
 To cite this documentation in publications, please refer to the MET User's Guide :ref:`Citation Instructions<citations>`.
 
+* Daniel Adriaansen [#NCAR]_
 * David Ahijevych [#NCAR]_
 * David Albo [#NCAR]_
 * Lindsay Blank
+* Mrinal Biswas [#NCAR]_
 * Barbara Brown [#NCAR]_
 * Randy Bullock [#NCAR]_
 * Tatiana Burek [#NCAR]_
@@ -113,6 +115,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 * Anne Holmes
 * Michelle Harrold [#NCAR]_
 * Tara Jensen [#NCAR]_
+* Christina Kalb [#NCAR]_
 * Seth Linden [#NCAR]_ 
 * George McCabe [#NCAR]_
 * Kathryn Newman [#NCAR]_
