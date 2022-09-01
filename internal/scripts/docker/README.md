@@ -30,7 +30,7 @@ where:
 * `${BRANCH_NAME}` is the MET branch to checkout
 
 2. `Dockerfile.copy` compiles MET using the specified branch or tag from local
-source code, sets a working directory, downloads and installs MET and
+source code, sets a working directory, downloads and installs 
 GhostScript fonts, and deletes the MET source code for tagged releases
 matching "v"*. It uses a local Docker image for the base compilation
 environment for MET from the
