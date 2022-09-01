@@ -1,0 +1,106 @@
+{
+    "creators": [
+        {
+            "orcid": "0000-0002-7761-4962",
+            "affiliation": "",
+            "name": "Halley Gotway, John"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Jensen, Tara"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Adriaansen, Daniel"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Ahijevych, David"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Albo, David"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Biswas, Mrinal"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Brown, Barbara"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Bullock, Randy"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Burek, Tatiana"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Fillmore, David"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Gilleland, Eric"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Goodrich, Lisa"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Hertneky, Tracy"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Harrold, Michelle"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Kalb, Christina"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Linden, Seth"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "McCabe, George"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Newman, Kathryn"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Opatz, John"
+        },
+        {
+            "orcid": "0000-0002-2379-5470",
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Prestopnik, Julie"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Prestopnik, Paul"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Soh, Howard"
+        },
+        {
+            "affiliation": "Cooperative Institute for Research in the Atmosphere",
+            "name": "Strong, Bonny"
+        },
+        {
+            "affiliation": "National Center for Atmospheric Research",
+            "name": "Win-Gildenmeister, Minna"
+        }
+    ],
+
+    "license": "Apache-2.0",
+    "keywords": ["Model Evaluation Tools", "Verification", "Validation"]
+}
+
