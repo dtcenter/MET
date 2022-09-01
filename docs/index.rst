@@ -98,6 +98,7 @@ Many authors, listed below in alphabetical order, have contributed to the docume
 To cite this documentation in publications, please refer to the MET User's Guide :ref:`Citation Instructions<citations>`.
 
 * David Ahijevych [#NCAR]_
+* Dave Albo [#NCAR]_
 * Lindsay Blank
 * Barbara Brown [#NCAR]_
 * Randy Bullock [#NCAR]_
@@ -112,6 +113,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 * Anne Holmes
 * Michelle Harrold [#NCAR]_
 * Tara Jensen [#NCAR]_
+* Seth Linden [#NCAR]_ 
 * George McCabe [#NCAR]_
 * Kathryn Newman [#NCAR]_
 * Paul Oldenburg
