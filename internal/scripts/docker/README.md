@@ -12,7 +12,7 @@ Descriptions of the Dockerfiles in this directory are provided below. Sample com
 the MET repository.
 
 1. `Dockerfile` checks out MET from GitHub, compiles the specified branch
-or tag from source, sets a working directory, downloads and installs MET and
+or tag from source, sets a working directory, downloads and installs 
 GhostScript fonts, and deletes the MET source code for tagged releases
 matching "v"*. It uses Docker image for the base compilation environment for
 MET from the
