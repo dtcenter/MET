@@ -26,7 +26,8 @@ jobs:
         run: .github/jobs/build_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
-          MET_BASE_IMAGE: minimum
+          MET_BASE_REPO: met-base
+          MET_BASE_IMAGE: v1.0
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh

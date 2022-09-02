@@ -54,6 +54,7 @@ jobs:
       run_unit_tests: ${{ steps.job_status.outputs.run_unit_tests }}
       run_diff: ${{ steps.job_status.outputs.run_diff }}
       run_update_truth: ${{ steps.job_status.outputs.run_update_truth }}
+      met_base_repo: ${{ steps.job_status.outputs.met_base_repo }}
       met_base_image: ${{ steps.job_status.outputs.met_base_image }}
       branch_name: ${{ steps.job_status.outputs.branch_name }}
       truth_data_version: ${{ steps.job_status.outputs.truth_data_version }}
@@ -74,6 +75,7 @@ jobs:
         run: .github/jobs/build_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
+          MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_IMAGE: ${{ needs.job_control.outputs.met_base_image }}
 
       - name: Copy Docker build log into logs directory
