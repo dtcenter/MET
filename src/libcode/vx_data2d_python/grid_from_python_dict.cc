@@ -17,6 +17,7 @@
 #include "vx_python3_utils.h"
 
 #include "grid_from_python_dict.h"
+#include "pointdata_from_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -497,15 +498,36 @@ void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArra
 
 PyObject * obj = dict.lookup_item(key);
 
-/* JHG 
-Python3_List list(obj);
+   //
+   //  parse values from list
+   //
 
-for (int j=0; j<(list.size()); ++j)  {
+if ( PyList_Check(obj) )  {
 
-   vals.add(pyobject_as_double(list[j]));
+   Python3_List list(obj);
+
+   for (int j=0; j<(list.size()); ++j)  vals.add(pyobject_as_double(list[j]));
 
 }
-*/
+
+   //
+   //  parse values from array
+   //
+
+else  {
+
+   Python3_Numpy np;
+   np.set(obj);
+
+   if ( ! pointdata_from_np_array(np, &vals) )  {
+
+      mlog << Error << "\nlookup_python_num_array() -> "
+	   << "can't parse values for \"" << key << "\" from python \""
+           << Py_TYPE(obj)->tp_name << "\" object.\n";
+   }
+
+}
+
 return;
 
 }
