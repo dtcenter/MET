@@ -495,7 +495,9 @@ void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArra
 
 {
 
-PyObject * obj = dict.lookup_list(key);
+PyObject * obj = dict.lookup_item(key);
+
+/* JHG 
 Python3_List list(obj);
 
 for (int j=0; j<(list.size()); ++j)  {
@@ -503,7 +505,7 @@ for (int j=0; j<(list.size()); ++j)  {
    vals.add(pyobject_as_double(list[j]));
 
 }
-
+*/
 return;
 
 }
