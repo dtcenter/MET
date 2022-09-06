@@ -291,8 +291,6 @@ if ( ! a )  {
 
 }
 
-cout << "JHG key " << key << " has type " << Py_TYPE(a)->tp_name << "\n";
-
 return ( a );
 
 }
