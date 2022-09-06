@@ -15,7 +15,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern inline void nympy_array_one_to_two(const int n, const int Ncols, int & row, int & col);
+extern inline void numpy_array_one_to_two(const int n, const int Ncols, int & row, int & col);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ T value;
 
 for (j=0; j<Nxy; ++j)  {
 
-   nympy_array_one_to_two(j, Nx, r, c);
+   numpy_array_one_to_two(j, Nx, r, c);
 
    x = c;
 
