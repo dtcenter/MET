@@ -394,7 +394,9 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_accum_time(const NcVarInfo &info, int &att_value) {
-   return get_att_int(info, accum_time_sec_att_name, att_value);
+   bool status = get_att_int(info, accum_time_sec_att_name, att_value);
+   if (is_bad_data(att_value))  att_value = 0;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
