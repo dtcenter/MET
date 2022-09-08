@@ -25,7 +25,7 @@ NCEP's BUFRLIB is written entirely in Fortran. The portion of MET that handles t
 
 The MET package is intended to be a tool for the modeling community to use and adapt. As users make upgrades and improvements to the tools, they are encouraged to offer those upgrades to the broader community by offering feedback to the developers.
 
-Required Compilers and Acripting Languages
+Required Compilers and Scripting Languages
 ==========================================
 
 The MET package was developed and tested using the GNU g++/gfortran compilers and the Intel icc/ifort compilers. As additional compilers are successfully tested, they will be added to the list of supported platforms/compilers.
@@ -38,8 +38,8 @@ In order to control the desired flow through MET, users are encouraged to run th
 
 .. _Install_Required-libraries-and:
 
-Required Libraries and Optional U1tilities
-==========================================
+Required Libraries and Optional Utilities
+=========================================
 
 Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in :numref:`Installation-of-required` :
 
@@ -143,8 +143,34 @@ Building the MET Package
 
 Building the MET package consists of three main steps: (1) install the required libraries, (2) configure the environment variables, and (3) configure and execute the build. Users can follow the instructions below or use a sample installation script.  Users can find the script and its instructions under on the `Downloads <https://dtcenter.org/community-code/model-evaluation-tools-met/download>`_ page of the MET website.
 
+Get the MET source code
+-----------------------
+
+The MET source code is available for download from the public GitHub repository.
+
+- Open a web browser and go to the `latest stable MET release<https://github.com/dtcenter/MET/releases/latest>`_. 
+
+- Click on the `Source code` link (either the *zip* or *tar.gz*) under Assets and when prompted, save it to your machine.
+
+- (Optional) Verify the checksum of the source code download
+
+    - Download the checksum file that corresponds to the source code download link that was used (checksum_zip.txt for the *zip* file and checksum_tar.txt for the *tar.gz* file). Put the checksum file into the same directory as the source code file.
+    - Run the *sha256sum* command with the --check argument to verify that the source code download file was not corrupted.
+
+Zip File::
+
+    sha256sum --check checksum_zip.txt
+
+Tar File::
+
+    sha256sum --check checksum_tar.txt
+
+Note: If the source code is downloaded using wget, then the filenames will not match the filenames listed in the checksum files. If the source code is downloaded using curl, the *-LJO* flags should be added to the command to preserve the expected filenames found in the checksum files.
+
+- Uncompress the source code (on Linux/Unix\ *: gunzip* for zip file or *tar xvfz* for the tar.gz file)
+
 Install the Required Libraries
-==============================
+------------------------------
 
 • Please refer to :numref:`Installation-of-required` and :numref:`Installation-of-optional` on how to install the required and optional libraries.
 
