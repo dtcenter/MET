@@ -71,6 +71,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                observation.h observation.cc \
                stat_column_defs.h \
                handle_openmp.h handle_openmp.cc \
+               main.cc main.h \
                RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}

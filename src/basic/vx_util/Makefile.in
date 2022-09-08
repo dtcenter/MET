@@ -134,8 +134,9 @@ am__libvx_util_a_SOURCES_DIST = ascii_table.cc ascii_table.h \
 	CircularTemplate.h CircularTemplate.cc GridTemplate.h \
 	GridTemplate.cc GridPoint.h GridPoint.cc GridOffset.h \
 	GridOffset.cc observation.h observation.cc stat_column_defs.h \
-	handle_openmp.h handle_openmp.cc RectangularTemplate.h \
-	RectangularTemplate.cc python_line.h python_line.cc
+	handle_openmp.h handle_openmp.cc main.cc main.h \
+	RectangularTemplate.h RectangularTemplate.cc python_line.h \
+	python_line.cc
 @ENABLE_PYTHON_TRUE@am__objects_1 =  \
 @ENABLE_PYTHON_TRUE@	libvx_util_a-python_line.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
@@ -181,6 +182,7 @@ am_libvx_util_a_OBJECTS = libvx_util_a-ascii_table.$(OBJEXT) \
 	libvx_util_a-GridOffset.$(OBJEXT) \
 	libvx_util_a-observation.$(OBJEXT) \
 	libvx_util_a-handle_openmp.$(OBJEXT) \
+	libvx_util_a-main.$(OBJEXT) \
 	libvx_util_a-RectangularTemplate.$(OBJEXT) $(am__objects_2)
 libvx_util_a_OBJECTS = $(am_libvx_util_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -226,6 +228,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_util_a-CircularTemplate.Po \
 	./$(DEPDIR)/libvx_util_a-interp_util.Po \
 	./$(DEPDIR)/libvx_util_a-is_number.Po \
 	./$(DEPDIR)/libvx_util_a-long_array.Po \
+	./$(DEPDIR)/libvx_util_a-main.Po \
 	./$(DEPDIR)/libvx_util_a-make_path.Po \
 	./$(DEPDIR)/libvx_util_a-mask_poly.Po \
 	./$(DEPDIR)/libvx_util_a-memory.Po \
@@ -503,6 +506,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                observation.h observation.cc \
                stat_column_defs.h \
                handle_openmp.h handle_openmp.cc \
+               main.cc main.h \
                RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -582,6 +586,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-interp_util.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-is_number.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-long_array.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-make_path.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_poly.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-memory.Po@am__quote@ # am--include-marker
@@ -1222,6 +1227,20 @@ libvx_util_a-handle_openmp.obj: handle_openmp.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-handle_openmp.obj `if test -f 'handle_openmp.cc'; then $(CYGPATH_W) 'handle_openmp.cc'; else $(CYGPATH_W) '$(srcdir)/handle_openmp.cc'; fi`
 
+libvx_util_a-main.o: main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-main.o -MD -MP -MF $(DEPDIR)/libvx_util_a-main.Tpo -c -o libvx_util_a-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-main.Tpo $(DEPDIR)/libvx_util_a-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='libvx_util_a-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+
+libvx_util_a-main.obj: main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-main.obj -MD -MP -MF $(DEPDIR)/libvx_util_a-main.Tpo -c -o libvx_util_a-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-main.Tpo $(DEPDIR)/libvx_util_a-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='libvx_util_a-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+
 libvx_util_a-RectangularTemplate.o: RectangularTemplate.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-RectangularTemplate.o -MD -MP -MF $(DEPDIR)/libvx_util_a-RectangularTemplate.Tpo -c -o libvx_util_a-RectangularTemplate.o `test -f 'RectangularTemplate.cc' || echo '$(srcdir)/'`RectangularTemplate.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-RectangularTemplate.Tpo $(DEPDIR)/libvx_util_a-RectangularTemplate.Po
@@ -1406,6 +1425,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-interp_util.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-is_number.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-long_array.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
@@ -1496,6 +1516,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-interp_util.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-is_number.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-long_array.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
