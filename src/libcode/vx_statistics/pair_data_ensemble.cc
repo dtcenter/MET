@@ -479,7 +479,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          // For crps_emp use temporary, local variable so we can use it for the crps_emp_fair calculation
          double crps_emp = compute_crps_emp(o_na[i], cur_ens);
          crps_emp_na.add(crps_emp);
-         crps_emp_fair_na.add(crps_emp - cur_ens.weighted_mean_abs_diff());
+         crps_emp_fair_na.add(crps_emp - cur_ens.wmean_abs_diff());
          crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
 
          // Ensemble mean and standard deviation
