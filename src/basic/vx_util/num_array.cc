@@ -600,8 +600,6 @@ void NumArray::reorder(const NumArray &i_na) {
    return;
 }
 
-// SETH, please review the logic of the functions below.
-// Do they still work OK after switching to STL::vector?
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1263,22 +1261,22 @@ double NumArray::mean_abs_diff() const
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::weighted_mean_abs_diff() const
+double NumArray::wmean_abs_diff() const
 
 {
 
-   double mad, weighted_mad;
+   double mad, wmad;
    
    int n = n_elements();
    
    mad = mean_abs_diff();
    
    if( is_bad_data(mad) )
-      weighted_mad = bad_data_double;
+      wmad = bad_data_double;
    else
-      weighted_mad = (1/(2*n)) * mad;
+      wmad = (1/(2*n)) * mad;
    
-   return(weighted_mad);
+   return(wmad);
 
 }
 
