@@ -184,7 +184,7 @@ static Met2dDataFileFactory mtddf_factory;
 static StatHdrColumns shc;
 
 // Arrays to store running sums and counts
-static NumArray cnt_na, min_na, max_na, sum_na;
+static NumArray cnt_na, sum_na;
 static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
 
 ////////////////////////////////////////////////////////////////////////

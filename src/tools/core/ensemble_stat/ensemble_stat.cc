@@ -1967,8 +1967,6 @@ void clear_counts() {
    int i, j;
 
    cnt_na.set_const(0.0, nxy);
-   min_na.set_const(bad_data_double, nxy);
-   max_na.set_const(bad_data_double, nxy);
    sum_na.set_const(0.0, nxy);
 
    stdev_cnt_na.set_const(0.0, nxy);
@@ -2005,10 +2003,6 @@ void track_counts(EnsVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl) 
 
          // Ensemble sum
          sum_na.buf()[i] += v;
-
-         // Ensemble min and max
-         if(v <= min_na.buf()[i] || is_bad_data(min_na.buf()[i])) min_na.buf()[i] = v;
-         if(v >= max_na.buf()[i] || is_bad_data(max_na.buf()[i])) max_na.buf()[i] = v;
 
          // Standard deviation sum, sum of squares, and count, excluding control member
          if(!is_ctrl) {
