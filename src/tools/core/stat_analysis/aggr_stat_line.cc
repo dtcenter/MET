@@ -3186,7 +3186,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store empirical CRPS stats and CRPS-Fair
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
          m[key].ens_pd.crps_emp_na.add(crps_emp);
-         m[key].ens_pd.crps_emp_fair_na.add(crps_emp - cur.ens_na.weighted_mean_abs_diff());
+         m[key].ens_pd.crps_emp_fair_na.add(crps_emp - cur.ens_na.wmean_abs_diff());
          m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, climo_vals));
 
          // Store Gaussian CRPS stats
