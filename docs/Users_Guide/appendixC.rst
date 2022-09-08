@@ -990,7 +990,7 @@ The score can be interpreted as a continuous version of the mean absolute error 
 
 To calculate CRPS_EMP_FAIR (bias adjusted, empirical ensemble CRPS)
 
-.. math:: \text{CRPS_EMP_FAIR} = \text{CRPS_EMP} -  \frac{1}{n*(n-1)} \sum|f_{i} - f_{j}|
+.. math:: \text{CRPS_EMP_FAIR} = \text{CRPS_EMP} - \frac{1}{2*n} *  \frac{1}{n*(n-1)} \sum|f_{i} - f_{j}|
           
 CRPS Skill Score
 ----------------
