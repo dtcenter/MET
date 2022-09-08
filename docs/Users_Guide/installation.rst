@@ -146,9 +146,9 @@ Building the MET package consists of three main steps: (1) install the required 
 Get the MET source code
 -----------------------
 
-The MET source code is available for download from the public `MET GitHub repository<https://github.com/dtcenter/MET>`_ .
+The MET source code is available for download from the public `MET GitHub repository <https://github.com/dtcenter/MET>`_.
 
-- Open a web browser and go to the `latest stable MET release<https://github.com/dtcenter/MET/releases/latest>`_ . 
+- Open a web browser and go to the `latest stable MET release <https://github.com/dtcenter/MET/releases/latest>`_.
 
 - Click on the `Source code` link (either the *zip* or *tar.gz*) under Assets and when prompted, save it to your machine.
 
