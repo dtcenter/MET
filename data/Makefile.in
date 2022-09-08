@@ -354,14 +354,15 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = \
+	climo \
 	colortables \
-	config \
+	colortables \
 	map \
 	poly \
 	ps \
 	table_files \
 	tc_data \
-     wrappers
+	wrappers
 
 topdir = $(pkgdatadir)
 top_DATA = \

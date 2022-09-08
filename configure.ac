@@ -1184,6 +1184,8 @@ AC_CONFIG_FILES([Makefile
                  scripts/Rscripts/include/Makefile
                  scripts/python/Makefile
                  data/Makefile
+                 data/climo/Makefile
+                 data/climo/seeps/Makefile
                  data/colortables/Makefile
                  data/colortables/NCL_colortables/Makefile
                  data/config/Makefile
