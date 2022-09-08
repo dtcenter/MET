@@ -98,9 +98,7 @@ static IntArray     n_ens_vld;     // Number of members with valid data for each
 static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
 
 static StringArray  ens_file_list;  // Array of ensemble input files
-static StringArray  fcst_file_list; // Array of ensemble input files including control
 static IntArray     ens_file_vld;   // Array of ensemble file valid status
-static IntArray     fcst_file_vld;  // Array of forecast file valid status
 static GrdFileType  etype = FileType_None;
 
 static bool         ens_mean_flag; // Flag for ensemble mean processing

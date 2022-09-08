@@ -317,9 +317,6 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Copy ensemble file list to forecast file list
-   fcst_file_list = ens_file_list;
-
    // Append the control member, if specified
    if(ctrl_file.nonempty()) {
 
@@ -331,8 +328,8 @@ void process_command_line(int argc, char **argv) {
       }
 
       // Add control member file to end of the forecast file list
-      fcst_file_list.add(ctrl_file.c_str());
-      ctrl_file_index = fcst_file_list.n()-1;
+      ens_file_list.add(ctrl_file.c_str());
+      ctrl_file_index = ens_file_list.n()-1;
    }
 
    // Check that the end_ut >= beg_ut
@@ -408,7 +405,8 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Process the configuration
-   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id, &ens_file_list, &fcst_file_list, ctrl_file.nonempty());
+   conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag,
+                            use_var_id, &ens_file_list, ctrl_file.nonempty());
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -454,21 +452,6 @@ void process_command_line(int argc, char **argv) {
       }
       else {
          ens_file_vld.add(1);
-      }
-   }
-
-   // Check for missing non-python forecast files
-   for(i=0; i<fcst_file_list.n(); i++) {
-
-      if(!file_exists(fcst_file_list[i].c_str()) &&
-         !is_python_grdfiletype(etype)) {
-         mlog << Warning << "\nprocess_command_line() -> "
-              << "can't open input forecast file: "
-              << fcst_file_list[i] << "\n\n";
-         fcst_file_vld.add(0);
-      }
-      else {
-         fcst_file_vld.add(1);
       }
    }
 
@@ -693,7 +676,7 @@ void process_n_vld() {
          j = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file_index(i_ens);
 
          // Check for valid file
-         if(!fcst_file_vld[j]) continue;
+         if(!ens_file_vld[j]) continue;
 
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
@@ -969,7 +952,7 @@ void process_vx() {
 
       // Determine the index of the control member in list of data values
       int ctrl_data_index = (is_bad_data(ctrl_file_index) ?
-                             bad_data_int : fcst_file_vld.sum()-1);
+                             bad_data_int : ens_file_vld.sum()-1);
 
       // Setup the PairDataEnsemble objects
       conf_info.set_vx_pd(n_vx_vld, ctrl_data_index);
@@ -1031,7 +1014,7 @@ void process_point_vx() {
       i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i);
 
       // If the current forecast file is valid, process it
-      if(!fcst_file_vld[i_file]) {
+      if(!ens_file_vld[i_file]) {
          n_miss++;
          continue;
       }
@@ -1266,7 +1249,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    int i_file = conf_info.vx_opt[0].vx_pd.fcst_info->get_file_index(i_ens);
 
    // Determine the correct file to process
-   if(!is_ens_mean) ens_file = ConcatString(fcst_file_list[i_file]);
+   if(!is_ens_mean) ens_file = ConcatString(ens_file_list[i_file]);
    else             ens_file = (ens_mean_user.empty() ?
                                 ens_mean_file : ens_mean_user);
 
@@ -1545,7 +1528,7 @@ void process_grid_vx() {
          fcst_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(j);
 
          // If the current ensemble file is valid, read the field
-         if(fcst_file_vld[i_file]) {
+         if(ens_file_vld[i_file]) {
             found = get_data_plane(fcst_file.c_str(), etype,
                                    var_info,
                                    fcst_dp[j], true);

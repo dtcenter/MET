@@ -245,7 +245,7 @@ class EnsembleStatConfInfo {
 
       void read_config   (const ConcatString , const ConcatString);
       void process_config(GrdFileType, GrdFileType, bool, bool, bool,
-                          StringArray *, StringArray *, bool);
+                          StringArray *, bool);
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);

@@ -128,7 +128,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           bool grid_vx, bool point_vx,
                                           bool use_var_id,
                                           StringArray * ens_files,
-                                          StringArray * fcst_files,
                                           bool use_ctrl) {
    int i, j, n_ens_files;
    VarInfoFactory info_factory;
@@ -383,7 +382,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
                                   rng_ptr, grid_vx, point_vx,
                                   use_var_id, ens_member_ids,
-                                  fcst_files, use_ctrl, control_id);
+                                  ens_files, use_ctrl, control_id);
 
          // For no point verification, store obtype as the message type
          if(!point_vx) {
@@ -753,7 +752,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        gsl_rng *rng_ptr, bool grid_vx,
                                        bool point_vx, bool use_var_id,
                                        StringArray ens_member_ids,
-                                       StringArray * fcst_files,
+                                       StringArray * ens_files,
                                        bool use_ctrl, ConcatString control_id) {
    int i, j;
    VarInfoFactory info_factory;
@@ -782,16 +781,16 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
       input_info.var_info = next_var;
       input_info.file_index = 0;
-      input_info.file_list = fcst_files;
+      input_info.file_list = ens_files;
       vx_pd.fcst_info->add_input(input_info);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to NULL to note first VarInfo should be used
-      int last_member_index = fcst_files->n() - (use_ctrl ? 1 : 0);
+      int last_member_index = ens_files->n() - (use_ctrl ? 1 : 0);
       for(j=1; j<last_member_index; j++) {
          input_info.var_info = NULL;
          input_info.file_index = j;
-         input_info.file_list = fcst_files;
+         input_info.file_list = ens_files;
          vx_pd.fcst_info->add_input(input_info);
       } // end for j
    } // end for i
@@ -809,8 +808,8 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       next_var->set_dict(fdict);
 
       input_info.var_info = next_var;
-      input_info.file_index = fcst_files->n() - 1;
-      input_info.file_list = fcst_files;
+      input_info.file_index = ens_files->n() - 1;
+      input_info.file_list = ens_files;
       vx_pd.fcst_info->add_input(input_info);
    }
 
