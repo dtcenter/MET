@@ -199,8 +199,8 @@ int met_main(int argc, char *argv[]) {
    // Process the ensemble fields
    process_ensemble();
 
-   // Only perform verification if requested
-   if(vx_flag) process_vx();
+   // Perform verification
+   process_vx();
 
    // Close the text files and deallocate memory
    clean_up();
@@ -377,6 +377,14 @@ void process_command_line(int argc, char **argv) {
    // Use a variable index from var_name instead of GRIB code
    bool use_var_id = false;
 
+   // Observation files are required
+   if(!grid_obs_flag && !point_obs_flag) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the \"-grid_obs\" or \"-point_obs\" command line option "
+           << "must be used at least once.\n\n";
+      exit(1);
+   }
+
    // Determine the input observation file type
    if(point_obs_flag) {
       otype = FileType_Gb1;
@@ -455,22 +463,6 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   // Set flag to indicate whether verification is to be performed
-   if((point_obs_flag || grid_obs_flag) &&
-      (conf_info.get_n_vx() > 0) &&
-      (conf_info.output_flag[i_ecnt]  != STATOutputType_None ||
-       conf_info.output_flag[i_rhist] != STATOutputType_None ||
-       conf_info.output_flag[i_phist] != STATOutputType_None ||
-       conf_info.output_flag[i_ssvar] != STATOutputType_None ||
-       conf_info.output_flag[i_relp]  != STATOutputType_None ||
-       conf_info.output_flag[i_orank] != STATOutputType_None ||
-       conf_info.output_flag[i_pct]   != STATOutputType_None ||
-       conf_info.output_flag[i_pstd]  != STATOutputType_None ||
-       conf_info.output_flag[i_pjc]   != STATOutputType_None ||
-       conf_info.output_flag[i_prc]   != STATOutputType_None ||
-       conf_info.output_flag[i_eclv]  != STATOutputType_None)) vx_flag = true;
-   else                                                        vx_flag = false;
-
    // Process ensemble mean information
    ens_mean_flag = false;
    bool need_ens_mean = (
@@ -491,11 +483,6 @@ void process_command_line(int argc, char **argv) {
               << "can't open input ensemble mean file: "
               << ens_mean_user << "\n\n";
          ens_mean_user = "";
-      }
-      else if(!vx_flag) {
-         mlog << Warning << "\nprocess_command_line() -> "
-              << "ignoring input -ens_mean file because no verification "
-              << "has been requested\n\n";
       }
       else {
          ens_mean_flag = true;
@@ -3184,7 +3171,7 @@ void clean_up() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Close the output text files that were open for writing
-   if(vx_flag) finish_txt_files();
+   finish_txt_files();
 
    // List the output NetCDF files
    for(i=0; i<out_nc_file_list.n(); i++) {

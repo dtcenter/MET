@@ -7,18 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-//
-//   Filename:   ensemble_stat.h
-//
-//   Description:
-//
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//   000    11/11/08  Halley Gotway  New
-//   001    06/03/14  Halley Gotway  Add PHIST line type.
-//   002    05/10/16  Halley Gotway  Add grid weighting.
-//
-////////////////////////////////////////////////////////////////////////
 
 #ifndef  __ENSEMBLE_STAT_H__
 #define  __ENSEMBLE_STAT_H__
@@ -115,8 +103,7 @@ static bool         grid_obs_flag = false;
 static StringArray  point_obs_file_list;
 static bool         point_obs_flag = false;
 
-static GrdFileType  otype   = FileType_None;
-static bool         vx_flag = false;
+static GrdFileType  otype = FileType_None;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
