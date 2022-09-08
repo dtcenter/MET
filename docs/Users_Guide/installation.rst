@@ -146,9 +146,9 @@ Building the MET package consists of three main steps: (1) install the required 
 Get the MET source code
 -----------------------
 
-The MET source code is available for download from the public GitHub repository.
+The MET source code is available for download from the public `MET GitHub repository<https://github.com/dtcenter/MET>`_ .
 
-- Open a web browser and go to the `latest stable MET release<https://github.com/dtcenter/MET/releases/latest>`_. 
+- Open a web browser and go to the `latest stable MET release<https://github.com/dtcenter/MET/releases/latest>`_ . 
 
 - Click on the `Source code` link (either the *zip* or *tar.gz*) under Assets and when prompted, save it to your machine.
 
@@ -166,6 +166,7 @@ Tar File::
     sha256sum --check checksum_tar.txt
 
 Note: If the source code is downloaded using wget, then the filenames will not match the filenames listed in the checksum files. If the source code is downloaded using curl, the *-LJO* flags should be added to the command to preserve the expected filenames found in the checksum files.
+
 
 - Uncompress the source code (on Linux/Unix\ *: gunzip* for zip file or *tar xvfz* for the tar.gz file)
 
