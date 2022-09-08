@@ -84,7 +84,7 @@ if ( cline.n() == 0 )  usage();
 
 int j;
 
-cout << "GRIB1\n";
+std::cout << "GRIB1\n";
 
 for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
 
@@ -104,7 +104,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "nceptab_to_flat";
 }
 
@@ -116,7 +116,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
+std::cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
 
 exit ( 1 );
 
@@ -149,7 +149,7 @@ void process(const char * input_filename)
 {
 
 ConcatString line;
-ifstream in;
+std::ifstream in;
 bool found = false;
 const char * short_name = get_short_name(input_filename);
 
@@ -265,7 +265,7 @@ if ( !c )  return ( false );
 
 n = atoi(c);
 
-cout << n << ' ' << table_number << ' ';
+std::cout << n << ' ' << table_number << ' ';
 
    //
    //  first string
@@ -275,7 +275,7 @@ c = strtok(s, " /*{\"");
 
 if ( !c )  return ( false );
 
-cout << '\"' << c << "\" ";
+std::cout << '\"' << c << "\" ";
 
    //
    //  second string (is this football?)
@@ -290,7 +290,7 @@ if ( c[k] == ' ' )  c[k] = (char) 0;
 
 if ( !c )  return ( false );
 
-cout << '\"' << c << "\" ";
+std::cout << '\"' << c << "\" ";
 
    //
    //  units
@@ -298,7 +298,7 @@ cout << '\"' << c << "\" ";
 
 if ( strcmp(c, "undefined") == 0 )  {
 
-   cout << "\"\" ";
+   std::cout << "\"\" ";
 
 } else {
 
@@ -306,8 +306,8 @@ if ( strcmp(c, "undefined") == 0 )  {
 
    if ( !c )  return ( false );
 
-   if ( c[0] == '}' ) cout << "\"\" ";
-   else               cout << '\"' << c << "\" ";
+   if ( c[0] == '}' ) std::cout << "\"\" ";
+   else               std::cout << '\"' << c << "\" ";
 
 }
 
@@ -315,7 +315,7 @@ if ( strcmp(c, "undefined") == 0 )  {
    //  done
    //
 
-cout << '\n' << flush;
+std::cout << '\n' << std::flush;
 
 return ( true );
 

@@ -35,7 +35,7 @@ class NumArray {
 
       void assign(const NumArray &);
 
-      vector<double> e;
+      std::vector<double> e;
 
       bool Sorted;
 
@@ -52,7 +52,7 @@ class NumArray {
 
       void extend(int);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       double operator[](int) const;
 

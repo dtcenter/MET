@@ -13,8 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <vector>
 
@@ -106,7 +104,7 @@ class AsciiHeader {
       void assign(const AsciiHeader &);
 
       StringArray             Versions;
-      vector<AsciiHeaderLine> Headers;
+      std::vector<AsciiHeaderLine> Headers;
 
    public:
 

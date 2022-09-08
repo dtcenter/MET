@@ -44,7 +44,7 @@ class AfmToken {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       //      void set_string(const char *);
       void set_string(const ConcatString);

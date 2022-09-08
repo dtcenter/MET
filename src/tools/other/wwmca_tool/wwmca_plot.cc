@@ -169,7 +169,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "wwmca_plot";
 }
 
@@ -181,22 +181,22 @@ void usage()
 
 {
 
-cout << "\nUsage: " << program_name << "\n"
-     << "\t[-outdir path]\n"
-     << "\t[-max max_minutes]\n"
-     << "\t[-log file]\n"
-     << "\t[-v level]\n"
-     << "\twwmca_cloud_pct_file_list\n\n"
-     << "\twhere\t\"-outdir path\" overrides the default output "
-     << "directory (.) (optional).\n"
-     << "\t\t\"-max max_minutes\" overrides the default maximum "
-     << "minutes of (" << max_minutes << ") (optional).\n"
-     << "\t\t\"-log file\" outputs log messages to the specified "
-     << "file (optional).\n"
-     << "\t\t\"-v level\" overrides the default level of logging ("
-     << mlog.verbosity_level() << ") (optional).\n"
-     << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
-     << "more wwmca cloud percent files to plot.\n\n";
+std::cout << "\nUsage: " << program_name << "\n"
+          << "\t[-outdir path]\n"
+          << "\t[-max max_minutes]\n"
+          << "\t[-log file]\n"
+          << "\t[-v level]\n"
+          << "\twwmca_cloud_pct_file_list\n\n"
+          << "\twhere\t\"-outdir path\" overrides the default output "
+          << "directory (.) (optional).\n"
+          << "\t\t\"-max max_minutes\" overrides the default maximum "
+          << "minutes of (" << max_minutes << ") (optional).\n"
+          << "\t\t\"-log file\" outputs log messages to the specified "
+          << "file (optional).\n"
+          << "\t\t\"-v level\" overrides the default level of logging ("
+          << mlog.verbosity_level() << ") (optional).\n"
+          << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
+          << "more wwmca cloud percent files to plot.\n\n";
 
 exit ( 1 );
 
@@ -519,7 +519,7 @@ void draw_map(PSfile & plot, const char hemisphere)
 {
 
 MapRegion r;
-ifstream in;
+std::ifstream in;
 ConcatString filename;
 
 filename = replace_path(map_filename);

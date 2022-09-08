@@ -17,6 +17,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-06-22  Prestopnik      Added "std::"; removing namespace                                                                                        
+//                                        from header files                                                                                                    
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -28,8 +30,6 @@
 #include <cstdio>
 
 ///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 class GridOffset
 {

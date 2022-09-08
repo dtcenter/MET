@@ -125,9 +125,9 @@ void TCRMW_WindConverter::update_input(const std::string &variableName, const st
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &variable_levels,
-						map<string, string> &variable_long_names,
-						map<string, string> &variable_units) {
+void TCRMW_WindConverter::append_nc_output_vars(std::map<std::string, std::vector<std::string> > &variable_levels,
+						std::map<std::string, std::string> &variable_long_names,
+						std::map<std::string, std::string> &variable_units) {
   if (!_computeWinds) {
     return;
   }

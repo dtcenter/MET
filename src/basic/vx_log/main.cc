@@ -26,9 +26,11 @@
 //      void initialize();
 //      void process_command_line(int argc, char **argv);
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    07/06/22  Howard Soh      New
+//   Mod#   Date      Name        Description
+//   ----   ----      ----        -----------
+//   000    07-06-22  Soh         New
+//   001    09-06-22  Prestopnik  Added "std::"; removing namespace                                                                                      
+//                                   from header files                                                                                                    
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,12 +50,12 @@ static std::string met_cmdline = "";
 static int met_start_time;
 static int met_end_time;
 static uid_t met_user_id;
-static string met_user_name;
-static string met_tool_name;
+static std::string met_user_name;
+static std::string met_tool_name;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern string get_tool_name();
+extern std::string get_tool_name();
 
 extern int met_main(int argc, char *argv[]);
 
@@ -106,7 +108,7 @@ void do_post_process() {
 
 ////////////////////////////////////////////////////////////////////////
 
-string get_current_time() {
+std::string get_current_time() {
    time_t curr_time;
    tm * curr_tm;
    char date_string[MET_BUF_SIZE];
@@ -116,7 +118,7 @@ string get_current_time() {
 
    strftime(date_string, MET_BUF_SIZE, "%Y-%m-%d %TZ", curr_tm);
 
-   return string(date_string);
+   return std::string(date_string);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -146,7 +148,7 @@ void segv_handler(int signum) {
 
 void set_handlers() {
 
-   set_new_handler(oom);
+  std::set_new_handler(oom);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,7 +157,7 @@ void set_user_id() {
    met_user_id = geteuid ();
    register struct passwd *pw;
    pw = getpwuid (met_user_id);
-   if (pw) met_user_name = string(pw->pw_name);
+   if (pw) met_user_name = std::string(pw->pw_name);
 }
 
 ////////////////////////////////////////////////////////////////////////

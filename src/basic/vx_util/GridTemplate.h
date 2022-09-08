@@ -18,6 +18,8 @@
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
 //   001    09-07-21  Halley Gotway   Add wrap_lon.
+//   002    09-07-22  Prestopnik      Added "std::"; removing namespace
+//                                       from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +35,6 @@
 #include "GridPoint.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 class GridTemplate {
 
@@ -118,20 +118,20 @@ class GridTemplate {
       bool _wrapLon;
 
       // The offsets that make up the circle
-      vector<GridOffset*> _offsetList;
+      std::vector<GridOffset*> _offsetList;
 
       // The offsets that define the first and last rows and columns
-      vector<GridOffset*> _offsetLftEdge; // not allocated
-      vector<GridOffset*> _offsetRgtEdge; // not allocated
-      vector<GridOffset*> _offsetTopEdge; // not allocated
-      vector<GridOffset*> _offsetBotEdge; // not allocated
+      std::vector<GridOffset*> _offsetLftEdge; // not allocated
+      std::vector<GridOffset*> _offsetRgtEdge; // not allocated
+      std::vector<GridOffset*> _offsetTopEdge; // not allocated
+      std::vector<GridOffset*> _offsetBotEdge; // not allocated
 
       // Iterator for finding points within a grid
-      mutable vector<GridOffset*>::const_iterator _pointInGridIterator;
-      mutable vector<GridOffset*>::const_iterator _pointInLftEdgeIterator;
-      mutable vector<GridOffset*>::const_iterator _pointInRgtEdgeIterator;
-      mutable vector<GridOffset*>::const_iterator _pointInTopEdgeIterator;
-      mutable vector<GridOffset*>::const_iterator _pointInBotEdgeIterator;
+      mutable std::vector<GridOffset*>::const_iterator _pointInGridIterator;
+      mutable std::vector<GridOffset*>::const_iterator _pointInLftEdgeIterator;
+      mutable std::vector<GridOffset*>::const_iterator _pointInRgtEdgeIterator;
+      mutable std::vector<GridOffset*>::const_iterator _pointInTopEdgeIterator;
+      mutable std::vector<GridOffset*>::const_iterator _pointInBotEdgeIterator;
 
       mutable GridPoint _pointInGridBase;
       mutable int _pointInGridNumX;
@@ -168,12 +168,12 @@ class GridTemplateFactory {
       };
 
       // String corresponding to the enumerated values above
-      vector<string> enum_to_string;
+      std::vector<std::string> enum_to_string;
 
-      GridTemplates string2Enum(string target);
-      string enum2String(GridTemplates gt);
+      GridTemplates string2Enum(std::string target);
+      std::string enum2String(GridTemplates gt);
 
-      GridTemplate* buildGT(string gt, int width, bool wrap_lon);
+      GridTemplate* buildGT(std::string gt, int width, bool wrap_lon);
       GridTemplate* buildGT(GridTemplates gt, int width, bool wrap_lon);
 
 };

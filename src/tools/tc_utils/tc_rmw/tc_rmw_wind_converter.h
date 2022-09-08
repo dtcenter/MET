@@ -97,9 +97,9 @@ class TCRMW_WindConverter {
   // append to the input maps for tangential and radial winds data
   // if configured to compute winds, but didn't find U or V, turn off
   // the wind computations and report an error
-  void append_nc_output_vars(map<string, vector<string> > &variable_levels,
-			     map<string, string> &variable_long_names,
-			     map<string, string> &variable_units);
+  void append_nc_output_vars(std::map<std::string, std::vector<std::string> > &variable_levels,
+			     std::map<std::string, std::string> &variable_long_names,
+			     std::map<std::string, std::string> &variable_units);
 
   // Check input varName against U, and if it's a match, lookup V using the
   // map members, and then compute tangential and radial winds if it is so

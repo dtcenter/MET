@@ -63,7 +63,7 @@ class LevelInfo
 
       void clear();
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
 
          //
          // get stuff

@@ -187,7 +187,7 @@ static const double     bad_data_double       = -9999.0;
 static const char       bad_data_str[]        = "-9999";
 static const char       bad_data_char         = '\0';
 static const char       na_str[]              = "NA";
-static const string     na_string             = "NA";
+static const std::string     na_string             = "NA";
 
 
 ////////////////////////////////////////////////////////////////////////

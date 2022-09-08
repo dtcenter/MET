@@ -59,10 +59,10 @@ int met_main(int argc, char *argv[]) {
    char hdr_typ[512], time_str[512];
 
    if(argc != 2) {
-      cout << "Usage: " << program_name << " pbfile\n"
-           << "\twhere \"pbfile\" is the PrepBufr file whose center "
-           << "time should be dumped (required).\n"
-           << flush;
+      std::cout << "Usage: " << program_name << " pbfile\n"
+                << "\twhere \"pbfile\" is the PrepBufr file whose center "
+                << "time should be dumped (required).\n"
+                << std::flush;
       exit(1);
    }
 
@@ -84,7 +84,7 @@ int met_main(int argc, char *argv[]) {
    // Format and dump out the time string
    snprintf(time_str, sizeof(time_str), "%.10i", i_date);
    ut = yyyymmddhh_to_unix(time_str);
-   cout << unix_to_yyyymmdd_hhmmss(ut) << "\n" << flush;
+   std::cout << unix_to_yyyymmdd_hhmmss(ut) << "\n" << std::flush;
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
@@ -94,7 +94,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return program_name;
 }
 
