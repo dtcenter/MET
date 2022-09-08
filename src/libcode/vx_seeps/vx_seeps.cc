@@ -22,11 +22,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool debug_seeps = false;
+bool standalone_debug_seeps = false;
 
 static SeepsClimo *seeps_Climo = 0;
 
-static const char *def_seeps_filename = "PPT24_seepsweights.nc";
+static const char *def_seeps_filename = "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
 
 static const char *var_name_sid       = "sid";
 static const char *var_name_lat       = "lat";
@@ -95,7 +95,7 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
    record->lat = lat;
    record->lon = lon;
    record->elv = elv;
-   if (debug_seeps && SAMPLE_STATION_ID == sid) {
+   if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
       cout << "   sid=" << sid << ", lat=" << lat << ", lon=" << lon << ", elv=" << elv << "\n";
    }
    for (int idx=0; idx<SEEPS_MONTH; idx++) {
@@ -104,18 +104,18 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
       record->t1[idx] = t1[idx];
       record->t2[idx] = t2[idx];
 
-      if (debug_seeps && SAMPLE_STATION_ID == sid) {
+      if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
          cout << str_format("\t%2d: %6.3f %6.3f  %6.3f %6.3f   ",
                             (idx+1), record->p1[idx], record->p2[idx], record->t1[idx], record->t2[idx]);
       }
       for (int idx_m=0; idx_m<SEEPS_MATRIX_SIZE; idx_m++) {
          offset = idx*SEEPS_MATRIX_SIZE + idx_m;
          record->scores[idx][idx_m] = scores[offset];
-         if (debug_seeps && SAMPLE_STATION_ID == sid) {
+         if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
             cout << str_format(" %.3f", record->scores[idx][idx_m]);
          }
       }
-      if (debug_seeps && SAMPLE_STATION_ID == sid) cout << "\n";
+      if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) cout << "\n";
    }
 
    return record;
@@ -136,7 +136,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
       if (it != seeps_score_12_map.end()) climo_record = it->second;
    }
    if (climo_record) {
-      //if (debug_seeps) print_record(climo_record, true);
+      //if (standalone_debug_seeps) print_record(climo_record, true);
 
       record = new SeepsRecord;
       record->sid = climo_record->sid;
@@ -160,17 +160,18 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
 ConcatString SeepsClimo::get_seeps_climo_filename() {
    ConcatString seeps_filename;
 
-cout<< "\n DEBUG HS SeepsClimo::get_seeps_climo_filename() def_seeps_filename=" << def_seeps_filename << "!!!\n\n";
-
    // Use the MET_TMP_DIR environment variable, if set.
    bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
    if(use_env) {
-cout<< "\n DEBUG HS SeepsClimo::get_seeps_climo_filename() MET_ENV_SEEPS_CLIMO_NAME = " << seeps_filename.c_str() << "  !!!\n\n";
+      seeps_filename = replace_path(seeps_filename);
    }
-   else seeps_filename = def_seeps_filename;
-cout<< "\n DEBUG HS SeepsClimo::get_seeps_climo_filename() seeps_filename = " << seeps_filename.c_str() << "\n\n";
+   else seeps_filename = replace_path(def_seeps_filename);
 
-   if (!file_exists(seeps_filename.c_str())) {
+   if (file_exists(seeps_filename.c_str())) {
+      mlog << Debug(7) << "SEEPS climo name=\""
+           << seeps_filename.c_str() << "\"\n";
+   }
+   else {
       ConcatString message = " ";
       if (use_env) {
          message.add("from the env. name ");
@@ -200,6 +201,29 @@ float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
 
    return score;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+SeepsScore *SeepsClimo::get_seeps_score(int sid, float p_fcst,
+                                        float p_obs, int month, int hour) {
+   SeepsScore *score = 0;
+   SeepsRecord *record = get_record(sid, month, hour);
+
+   if (record) {
+      score = new SeepsScore();
+      score->p1 = record->p1;
+      score->p2 = record->p1;
+      score->t1 = record->t1;
+      score->t2 = record->t2;
+
+      score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
+      score->model_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
+      score->score = record->scores[(score->model_cat*3)+score->obs_cat];
+   }
+
+   return score;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -276,11 +300,10 @@ void SeepsClimo::read_records(ConcatString filename) {
    NcFile *nc_file = open_ncfile(filename.c_str());
    const char *method_name = "SeepsClimo::read_seeps_score() -> ";
 
-   cout << method_name << "is called\n";
    // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
    get_dim(nc_file, dim_name_nstn, nstn, true);
    mlog << Debug(3) << method_name << "dimension nstn = " << nstn << "\n";
-   if (debug_seeps) cout << "dimension nstn = " << nstn << "\n";
+   if (standalone_debug_seeps) cout << "dimension nstn = " << nstn << "\n";
 
    int   *sid_array = new int[nstn];
    float *lat_array = new float[nstn];
@@ -431,7 +454,7 @@ void SeepsClimo::read_records(ConcatString filename) {
 
    float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
    mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
-   if (debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
+   if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
    
 }
 

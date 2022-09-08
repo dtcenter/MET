@@ -61,6 +61,38 @@ static const char *var_name_matrix_12 = "matrix_12";
 
 ////////////////////////////////////////////////////////////////////////
 
+struct SeepsScore {
+   int   obs_cat;   // i = obs category 0,1,2
+   int   model_cat; // j = model category 0,1,2
+   float p1;
+   float p2;
+   float t1;
+   float t2;
+   float score;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+struct SeepsAggScore {
+   int   s12;
+   int   s13;
+   int   s21;
+   int   s23;
+   int   s31;
+   int   s32;
+   float pv1;
+   float pv2;
+   float pv3;
+   float pf1;
+   float pf2;
+   float pf3;
+   float mean_fcst;
+   float mean_obs;
+   float score;
+};
+
+////////////////////////////////////////////////////////////////////////
+
 
 struct SeepsRecord {
    int   sid;
@@ -116,6 +148,7 @@ class SeepsClimo {
       void clear();
       SeepsRecord *get_record(int sid, int month, int hour=0);
       float get_score(int sid, float p_fcst, float p_obs, int month, int hour=0);
+      SeepsScore *get_seeps_score(int sid, float p_fcst, float p_obs, int month, int hour=0);
       void print_all();
       void print_record(SeepsRecord *record, bool with_header=false);
 
