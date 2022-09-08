@@ -362,11 +362,21 @@ static const char * job_ramp_mpr_columns [] = {
    "CATEGORY"
 };
 
+static const char * seeps_mpr_columns [] = {
+   "OBS_SID",     "OBS_LAT",     "OBS_LON",
+   "FCST",        "OBS",         "OBS_QC",
+   "FCST_CAT",    "OBS_CAT",     "P1",
+   "P2",          "T1",          "T2",
+   "SEEPS"
+};
+
 static const char * seeps_columns [] = {
-   "TOTAL",       "INDEX",       "OBS_SID",
-   "OBS_LAT",     "OBS_LON",     "OBS_LVL",
-   "OBS_ELV",     "FCST",        "OBS",
-   "OBS_QC",      "SEEPS"
+   "TOTAL"        "S12",         "S13",
+   "S21",         "S23",         "S31",
+   "S32",         "PV1",         "PV2",
+   "PV3",         "PF1",         "PF2",
+   "PF3",         "MEAN_FCST",   "MEAN_OBS",
+   "SEEPS"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -389,6 +399,7 @@ static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_co
 static const int n_val1l2_columns       = sizeof(val1l2_columns)/sizeof(*val1l2_columns);
 static const int n_vcnt_columns         = sizeof(vcnt_columns)/sizeof(*vcnt_columns);
 static const int n_seeps_columns        = sizeof(seeps_columns)/sizeof(*seeps_columns);
+static const int n_seeps_mpr_columns    = sizeof(seeps_mpr_columns)/sizeof(*seeps_mpr_columns);
 
 static const int n_pct_columns          = sizeof(pct_columns)/sizeof(*pct_columns);
 static const int n_pstd_columns         = sizeof(pstd_columns)/sizeof(*pstd_columns);
