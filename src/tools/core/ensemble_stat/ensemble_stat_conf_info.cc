@@ -69,8 +69,6 @@ void EnsembleStatConfInfo::clear() {
    obtype.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
-   nbrhd_prob.clear();
-   nmep_smooth.clear();
    msg_typ_group_map.clear();
    msg_typ_sfc.clear();
    mask_area_map.clear();
@@ -99,8 +97,6 @@ void EnsembleStatConfInfo::clear() {
 
    // Reset counts
    n_ens_var         = 0;
-   n_nbrhd           = 0;
-   max_n_ens_thresh  = 0;
 
    n_vx              = 0;
    max_hira_size     = 0;
@@ -250,7 +246,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
    
     // Parse the ensemble field information
-   for(i=0,max_n_ens_thresh=0; i<n_ens_var; i++) {
+   for(i=0; i<n_ens_var; i++) {
 
       EnsVarInfo * ens_info = new EnsVarInfo();
 
@@ -314,26 +310,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       // Conf: ens_nc_var_str
       ens_info->nc_var_str = parse_conf_string(&i_edict, conf_key_nc_var_str, false);
 
-      // Conf: ens_nc_pairs
-      // Only parse thresholds if probabilities are requested
-      if(nc_info.do_freq || nc_info.do_nep || nc_info.do_nmep) {
-
-         // Conf: cat_thresh
-         ens_info->cat_ta = i_edict.lookup_thresh_array(conf_key_cat_thresh);
-
-         // Dump the contents of the current thresholds
-         if(mlog.verbosity_level() >= 5) {
-            mlog << Debug(5)
-                 << "Parsed thresholds for ensemble field number " << i+1 << ":\n";
-            ens_info->cat_ta.dump(cout);
-         }
-
-         // Keep track of the maximum number of thresholds
-         if(ens_info->cat_ta.n() > max_n_ens_thresh) {
-            max_n_ens_thresh = ens_info->cat_ta.n();
-         }
-      }
-
       ens_input.push_back(ens_info);
    } // end for i
 
@@ -361,40 +337,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
-
-   // Conf: nbrhd_prob
-   nbrhd_prob = parse_conf_nbrhd(&conf, conf_key_nbrhd_prob);
-   n_nbrhd = nbrhd_prob.width.n();
-
-   // Conf: nmep_smooth 
-   nmep_smooth = parse_conf_interp(&conf, conf_key_nmep_smooth);
-
-   // Loop through the neighborhood probability smoothing options
-   for(i=0; i<nmep_smooth.n_interp; i++) {
-
-      mthd = string_to_interpmthd(nmep_smooth.method[i].c_str());
-
-      // Check for unsupported neighborhood probability smoothing methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "Neighborhood probability smoothing methods DW_MEAN, "
-              << "LS_FIT, and BILIN are not supported for \""
-              << conf_key_nmep_smooth << "\".\n\n";
-         exit(1);
-      }
-
-      // Check for valid neighborhood probability interpolation widths
-      if(nmep_smooth.width[i] < 1 || nmep_smooth.width[i]%2 == 0) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "Neighborhood probability smoothing widths must be set "
-              << "to odd values greater than or equal to 1 ("
-              << nmep_smooth.width[i] << ") for \""
-              << conf_key_nmep_smooth << "\".\n\n";
-         exit(1);
-      }
-   } // end for i
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -508,15 +450,7 @@ void EnsembleStatConfInfo::parse_nc_info() {
    nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
    nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
    nc_info.do_stdev  = d->lookup_bool(conf_key_stdev_flag);
-   nc_info.do_minus  = d->lookup_bool(conf_key_minus_flag);
-   nc_info.do_plus   = d->lookup_bool(conf_key_plus_flag);
-   nc_info.do_min    = d->lookup_bool(conf_key_min_flag);
-   nc_info.do_max    = d->lookup_bool(conf_key_max_flag);
-   nc_info.do_range  = d->lookup_bool(conf_key_range_flag);
    nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
-   nc_info.do_freq   = d->lookup_bool(conf_key_frequency_flag);
-   nc_info.do_nep    = d->lookup_bool(conf_key_nep_flag);
-   nc_info.do_nmep   = d->lookup_bool(conf_key_nmep_flag);
    nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
    nc_info.do_weight = d->lookup_bool(conf_key_weight);
 
@@ -1316,10 +1250,8 @@ void EnsembleStatNcOutInfo::clear() {
 
 bool EnsembleStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_mean || do_stdev || do_minus ||
-                 do_plus   || do_min  || do_max   || do_range ||
-                 do_vld    || do_freq || do_nep   || do_nmep  ||
-                 do_orank  || do_weight;
+   bool status = do_latlon || do_mean  || do_stdev ||
+                 do_vld    || do_orank || do_weight;
 
    return(!status);
 }
@@ -1331,15 +1263,7 @@ void EnsembleStatNcOutInfo::set_all_false() {
    do_latlon = false;
    do_mean   = false;
    do_stdev  = false;
-   do_minus  = false;
-   do_plus   = false;
-   do_min    = false;
-   do_max    = false;
-   do_range  = false;
    do_vld    = false;
-   do_freq   = false;
-   do_nep    = false;
-   do_nmep   = false;
    do_orank  = false;
    do_weight = false;
 
@@ -1354,15 +1278,7 @@ void EnsembleStatNcOutInfo::set_all_true() {
    do_latlon = true;
    do_mean   = true;
    do_stdev  = true;
-   do_minus  = true;
-   do_plus   = true;
-   do_min    = true;
-   do_max    = true;
-   do_range  = true;
    do_vld    = true;
-   do_freq   = true;
-   do_nep    = true;
-   do_nmep   = true;
    do_orank  = true;
    do_weight = true;
 
@@ -1370,4 +1286,3 @@ void EnsembleStatNcOutInfo::set_all_true() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-

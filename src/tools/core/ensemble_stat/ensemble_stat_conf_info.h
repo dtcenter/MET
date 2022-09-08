@@ -55,15 +55,7 @@ struct EnsembleStatNcOutInfo {
    bool do_latlon;
    bool do_mean;
    bool do_stdev;
-   bool do_minus;
-   bool do_plus;
-   bool do_min;
-   bool do_max;
-   bool do_range;
    bool do_vld;
-   bool do_freq;
-   bool do_nep;
-   bool do_nmep;
    bool do_orank;
    bool do_weight;
 
@@ -198,7 +190,6 @@ class EnsembleStatConfInfo {
 
       // Ensemble processing
       int n_ens_var;        // Number of ensemble fields to be processed
-      int max_n_ens_thresh; // Maximum number of ensemble thresholds
 
       // Ensemble verification
       int n_vx;              // Number of ensemble fields to be verified
@@ -221,10 +212,6 @@ class EnsembleStatConfInfo {
       vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
-
-      NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
-      int                  n_nbrhd;         // Number of neighborhood sizes
-      InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
 
       EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
 
@@ -266,7 +253,6 @@ class EnsembleStatConfInfo {
 
       // Dump out the counts
       int get_n_ens_var() const;
-      int get_n_nbrhd()   const;
       int get_n_vx()      const;
 
       // Compute the maximum number of output lines possible based
@@ -275,7 +261,6 @@ class EnsembleStatConfInfo {
       int n_stat_row()     const;
 
       // Maximum across all verification tasks
-      int get_max_n_ens_thresh()      const;
       int get_max_hira_size()         const;
       int get_max_n_prob_cat_thresh() const;
       int get_max_n_prob_pct_thresh() const;
@@ -287,9 +272,7 @@ class EnsembleStatConfInfo {
 ////////////////////////////////////////////////////////////////////////
 
 inline int EnsembleStatConfInfo::get_n_ens_var()        const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_n_nbrhd()          const { return(n_nbrhd);               }
 inline int EnsembleStatConfInfo::get_n_vx()             const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_max_n_ens_thresh() const { return(max_n_ens_thresh);      }
 inline int EnsembleStatConfInfo::get_max_hira_size()    const { return(max_hira_size);         }
 inline int EnsembleStatConfInfo::get_compression_level()      { return(conf.nc_compression()); }
 

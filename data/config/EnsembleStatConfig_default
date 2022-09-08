@@ -71,33 +71,6 @@ control_id = "";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Neighborhood ensemble probabilities
-//
-nbrhd_prob = {
-   width      = [ 5 ];
-   shape      = CIRCLE;
-   vld_thresh = 0.0;
-}
-
-//
-// NMEP smoothing methods
-//
-nmep_smooth = {
-   vld_thresh      = 0.0;
-   shape           = CIRCLE;
-   gaussian_dx     = 81.27;
-   gaussian_radius = 120;
-   type = [
-      {
-         method = GAUSSIAN;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
 // May be set separately in each "fcst.field" and "obs.field" entry
 //
 prob_cat_thresh = [];
@@ -287,15 +260,7 @@ ensemble_flag = {
    latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = TRUE;
    vld_count = TRUE;
-   frequency = TRUE;
-   nep       = FALSE;
-   nmep      = FALSE;
    rank      = TRUE;
    weight    = FALSE;
 }

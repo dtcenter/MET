@@ -66,7 +66,8 @@
 //   034    01/14/21  McCabe         MET #1695 All members in one file.
 //   035    02/15/22  Halley Gotway  MET #1583 Add HiRA option.
 //   036    02/20/22  Halley Gotway  MET #1259 Write probabilistic statistics.
-//   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -411,14 +412,6 @@ void process_command_line(int argc, char **argv) {
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
-
-   // Allocate arrays to store threshold counts
-   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_ens_thresh()];
-   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_ens_thresh()];
-
-   for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
-      thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
-   }
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
@@ -1982,13 +1975,6 @@ void clear_counts() {
    stdev_sum_na.set_const(0.0, nxy);
    stdev_ssq_na.set_const(0.0, nxy);
 
-   for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
-      thresh_cnt_na[i].set_const(0.0, nxy);
-      for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-         thresh_nbrhd_cnt_na[i][j].set_const(0.0, nxy);
-      }
-   }
-
    return;
 }
 
@@ -2030,39 +2016,8 @@ void track_counts(EnsVarInfo * ens_info, const DataPlane &ens_dp, bool is_ctrl) 
             stdev_ssq_na.buf()[i] += v*v;
             stdev_cnt_na.buf()[i] += 1;
          }
-
-         // Event frequency
-         for(j=0; j<n_thr; j++) {
-            if(thr_buf[j].check(v)) thresh_cnt_na[j].inc(i, 1);
-         }
       } // end else
    } // end for i
-
-   // Increment NMEP count anywhere fractional coverage > 0
-   if(conf_info.nc_info.do_nmep) {
-      DataPlane frac_dp;
-
-      // Loop over thresholds
-      for(i=0; i<n_thr; i++) {
-
-         // Loop over neighborhood sizes
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-
-            // Compute fractional coverage
-            fractional_coverage(ens_dp, frac_dp,
-               conf_info.nbrhd_prob.width[j],
-               conf_info.nbrhd_prob.shape, grid.wrap_lon(),
-               thr_buf[i], 0, 0,
-               conf_info.nbrhd_prob.vld_thresh);
-
-            // Increment counts
-            for(k=0; k<nxy; k++) {
-               if(frac_dp.data()[k] > 0) thresh_nbrhd_cnt_na[i][j].inc(k, 1);
-            } // end for k
-
-         } // end for j
-      } // end for i
-   } // end if do_nmep
 
    return;
 }
@@ -2807,16 +2762,10 @@ void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
    int i, j, k, l;
    double t, v;
    char type_str[max_str_len];
-   DataPlane prob_dp, nbrhd_dp;
 
    // Allocate memory for storing ensemble data
    float * ens_mean  = new float [nxy];
    float * ens_stdev = new float [nxy];
-   float * ens_minus = new float [nxy];
-   float * ens_plus  = new float [nxy];
-   float * ens_min   = new float [nxy];
-   float * ens_max   = new float [nxy];
-   float * ens_range = new float [nxy];
    int   * ens_vld   = new int   [nxy];
 
    // Store the threshold for the ratio of valid data points
@@ -2832,11 +2781,6 @@ void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
       if((double) (cnt_na[i]/n_ens_vld[i_var]) < t) {
          ens_mean[i]  = bad_data_float;
          ens_stdev[i] = bad_data_float;
-         ens_minus[i] = bad_data_float;
-         ens_plus[i]  = bad_data_float;
-         ens_min[i]   = bad_data_float;
-         ens_max[i]   = bad_data_float;
-         ens_range[i] = bad_data_float;
       }
       else {
 
@@ -2844,13 +2788,6 @@ void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
          ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
          ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i],
                                               nint(stdev_cnt_na[i]));
-         ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
-         ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
-         ens_min[i]   = (float) min_na[i];
-         ens_max[i]   = (float) max_na[i];
-         v = max_na[i] - min_na[i];
-         if(is_eq(v, 0.0)) v = 0;
-         ens_range[i] = (float) v;
       }
    } // end for i
 
@@ -2868,41 +2805,6 @@ void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
                           "Ensemble Standard Deviation");
    }
 
-   // Add the ensemble mean minus one standard deviation, if requested
-   if(conf_info.nc_info.do_minus) {
-      write_ens_var_float(ens_info, ens_minus, ens_dp,
-                          "ENS_MINUS",
-                          "Ensemble Mean Minus 1 Standard Deviation");
-   }
-
-   // Add the ensemble mean plus one standard deviation, if requested
-   if(conf_info.nc_info.do_plus) {
-      write_ens_var_float(ens_info, ens_plus, ens_dp,
-                          "ENS_PLUS",
-                          "Ensemble Mean Plus 1 Standard Deviation");
-   }
-
-   // Add the ensemble minimum value, if requested
-   if(conf_info.nc_info.do_min) {
-      write_ens_var_float(ens_info, ens_min, ens_dp,
-                          "ENS_MIN",
-                          "Ensemble Minimum");
-   }
-
-   // Add the ensemble maximum value, if requested
-   if(conf_info.nc_info.do_max) {
-      write_ens_var_float(ens_info, ens_max, ens_dp,
-                          "ENS_MAX",
-                          "Ensemble Maximum");
-   }
-
-   // Add the ensemble range, if requested
-   if(conf_info.nc_info.do_range) {
-      write_ens_var_float(ens_info, ens_range, ens_dp,
-                          "ENS_RANGE",
-                          "Ensemble Range");
-   }
-
    // Add the ensemble valid data count, if requested
    if(conf_info.nc_info.do_vld) {
       write_ens_var_int(ens_info, ens_vld, ens_dp,
@@ -2910,110 +2812,9 @@ void write_ens_nc(EnsVarInfo * ens_info, int i_var, DataPlane &ens_dp) {
                         "Ensemble Valid Data Count");
    }
 
-   // Add the ensemble relative frequencies and neighborhood probabilities, if requested
-   if(conf_info.nc_info.do_freq ||
-      conf_info.nc_info.do_nep) {
-
-      prob_dp.set_size(grid.nx(), grid.ny());
-
-      // Loop through each threshold
-      for(i=0; i<ens_info->cat_ta.n(); i++) {
-
-         // Initialize
-         prob_dp.erase();
-
-         // Compute the ensemble relative frequency
-         for(j=0; j<cnt_na.n(); j++) {
-            prob_dp.buf()[j] = ((double) (cnt_na[j]/n_ens_vld[i_var]) < t ?
-                                bad_data_double :
-                                (double) (thresh_cnt_na[i][j]/cnt_na[j]));
-         }
-
-         // Write ensemble relative frequency
-         if(conf_info.nc_info.do_freq) {
-            snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
-                     ens_info->cat_ta[i].get_abbr_str().contents().c_str());
-            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str,
-                                 "Ensemble Relative Frequency");
-         }
-
-         // Write the neighborhood ensemble probability
-         if(conf_info.nc_info.do_nep) {
-            GaussianInfo info;
-
-            // Loop over the neighborhoods
-            for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-
-               nbrhd_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
-                              conf_info.nbrhd_prob.width[j],
-                              conf_info.nbrhd_prob.shape, grid.wrap_lon(),
-                              conf_info.nbrhd_prob.vld_thresh, info);
-
-               // Write neighborhood ensemble probability
-               snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
-                                    "Neighborhood Ensemble Probability");
-            } // end for j
-         } // end if do_nep
-      } // end for i
-   } // end if
-
-   // Add the neighborhood maximum ensemble probabilities, if requested
-   if(conf_info.nc_info.do_nmep) {
-
-      prob_dp.set_size(grid.nx(), grid.ny());
-
-      // Loop through each threshold
-      for(i=0; i<ens_info->cat_ta.n(); i++) {
-
-         // Loop through each neigbhorhood size
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-
-            // Initialize
-            prob_dp.erase();
-
-            // Compute the neighborhood maximum ensemble probability
-            for(k=0; k<cnt_na.n(); k++) {
-               prob_dp.buf()[k] = ((double) (cnt_na[k]/n_ens_vld[i_var]) < t ?
-                                   bad_data_double :
-                                   (double) (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
-            }
-
-            // Apply requested NMEP smoothers
-            for(k=0; k<conf_info.nmep_smooth.n_interp; k++) {
-
-               nbrhd_dp = smooth_field(prob_dp,
-                             string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
-                             conf_info.nmep_smooth.width[k],
-                             conf_info.nmep_smooth.shape, grid.wrap_lon(),
-                             conf_info.nmep_smooth.vld_thresh,
-                             conf_info.nmep_smooth.gaussian);
-
-               // Output variable name
-               snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
-                        conf_info.nmep_smooth.method[k].c_str(),
-                        conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
-                                    "Neighborhood Maximum Ensemble Probability");
-            } // end for k
-         } // end for j
-      } // end for i
-   } // end if do_nep
-
    // Deallocate and clean up
    if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) 0; }
    if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) 0; }
-   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) 0; }
-   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) 0; }
-   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) 0; }
-   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) 0; }
-   if(ens_range) { delete [] ens_range; ens_range = (float *) 0; }
    if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) 0; }
 
    return;
@@ -3412,26 +3213,6 @@ void clean_up() {
    for(i=0; i<out_nc_file_list.n(); i++) {
       mlog << Debug(1)
            << "Output file: " << out_nc_file_list[i] << "\n";
-   }
-
-   // Deallocate threshold count arrays
-   if(thresh_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
-         thresh_cnt_na[i].clear();
-      }
-      delete [] thresh_cnt_na;
-      thresh_cnt_na = (NumArray *) 0;
-   }
-   if(thresh_nbrhd_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_ens_thresh(); i++) {
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-            thresh_nbrhd_cnt_na[i][j].clear();
-         }
-         delete [] thresh_nbrhd_cnt_na[i];
-         thresh_nbrhd_cnt_na[i] = (NumArray *) 0;
-      }
-      delete [] thresh_nbrhd_cnt_na;
-      thresh_nbrhd_cnt_na = (NumArray **) 0;
    }
 
    return;
