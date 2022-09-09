@@ -68,6 +68,7 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 
 void PairDataPoint::init_from_scratch() {
 
+   seeps_mpr.clear();
    clear();
    seeps_climo = get_seeps_climo();
 
@@ -81,8 +82,10 @@ void PairDataPoint::clear() {
    PairBase::clear();
 
    f_na.clear();
-   s_na.clear();
-   s_ba.clear();
+   for (SeepsScore *seeps : seeps_mpr) {
+      if (seeps) delete seeps;
+   }
+   seeps_mpr.clear();
 
    return;
 }
@@ -94,8 +97,10 @@ void PairDataPoint::erase() {
    PairBase::erase();
 
    f_na.erase();
-   s_na.erase();
-   //s_ba.erase();
+   for (int idx=0; idx<seeps_mpr.size(); idx++) {
+      if (seeps_mpr[idx]) delete seeps_mpr[idx];
+      seeps_mpr[idx] = NULL;
+   }
 
    return;
 }
@@ -107,8 +112,7 @@ void PairDataPoint::extend(int n) {
    PairBase::extend(n);
 
    f_na.extend(n);
-   s_na.extend(n);
-   s_ba.extend(n);
+   for (int idx=seeps_mpr.size(); idx<n; idx++) seeps_mpr.push_back(NULL);
 
    return;
 }
@@ -143,7 +147,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                         pd.lvl_na[i], pd.elv_na[i],
                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                         pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
-         if (i < pd.s_na.n()) set_seeps(pd.s_na[i], i);
+         if (i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
       }
    }
    // Handle gridded data
@@ -166,33 +170,25 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                      cmn, csd, wgt)) return(false);
 
    f_na.add(f);
-   s_na.add(bad_data_double);
-   s_ba.add(false);
+   seeps_mpr.push_back((SeepsScore *)NULL);
 
    return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void PairDataPoint::set_is_seeps(bool is_seeps, int index) {
-
-   if(index < 0) index = s_ba.n() - 1;
-   if(index < s_ba.n()) s_ba.set(index, is_seeps);
-   else mlog << Warning << "\nPairDataPoint::set_is_seeps index ("
-             << index << ") is out of range " << s_ba.n() << "\n\n";
-}
-*/
-
-void PairDataPoint::set_seeps(double seeps, int index) {
-
-   if(index < 0) index = s_na.n() - 1;
-   if(index < s_na.n()) {
-      s_na.set(index, seeps);
-      s_ba.set(index, true);
+void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
+   if (seeps) {
+      int seeps_count = seeps_mpr.size();
+      if(index < 0) index = seeps_count - 1;
+      if(index < seeps_count) {
+         if (!seeps_mpr[index]) seeps_mpr[index] = new SeepsScore();
+         *seeps_mpr[index] = *seeps;
+      }
+      else mlog << Warning << "\nPairDataPoint::set_seeps_score("
+                << index << ") is out of range " << seeps_count << "\n\n";
    }
-   else mlog << Warning << "\nPairDataPoint::set_seeps index ("
-             << index << ") is out of range " << s_ba.n() << "\n\n";
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,7 +199,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
                                    double cmn, double csd, double wgt,
-                                   double seeps) {
+                                   SeepsScore *seeps) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
@@ -216,7 +212,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                  o, qc, cmn, csd, wgt);
 
    f_na.set(i_obs, f);
-   s_na.set(i_obs, seeps);
+   *seeps_mpr[i_obs] = *seeps;
 
    return;
 }
@@ -229,7 +225,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cmn, csd, wgt);
 
    f_na.add(f);
-   s_na.add(f);
+   seeps_mpr.push_back(NULL);
 
    return(true);
 }
@@ -272,24 +268,25 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 static int seeps_record_count = 0;
 static int seeps_debug_level = 9;
 
-double PairDataPoint::compute_seeps(const char *sid, double f,
-                                    double o, unixtime ut) {
-   double seeps_score = bad_data_double;
+SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
+                                         double o, unixtime ut) {
+   SeepsScore *seeps = 0;
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
    if (sid_no) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
-      seeps_score = seeps_climo->get_score(sid_no, f, o, month, hour);
-      if(mlog.verbosity_level() >= seeps_debug_level && !is_eq(seeps_score, bad_data_double)) {
+      seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
+      if(mlog.verbosity_level() >= seeps_debug_level
+         && seeps && !is_eq(seeps->score, bad_data_double)) {
          if (seeps_record_count < 10) {
             mlog << Debug(seeps_debug_level)
-                 << "PairDataPoint::compute_seeps() score = " << seeps_score << "\n";
+                 << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
             seeps_record_count++;
          }
       }
    }
-   return seeps_score;
+   return seeps;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -335,7 +332,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                       vld_ta[i], lvl_na[i], elv_na[i],
                       f_na[i], o_na[i], o_qc_sa[i].c_str(),
                       cmn_na[i], csd_na[i], wgt_na[i]);
-            out_pd.set_seeps(s_na[i]);
+            *(out_pd.seeps_mpr[i]) = *seeps_mpr[i];
          }
          // Handle gridded data
          else {
@@ -1205,7 +1202,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Look through all of the PairDataPoint objects to see if the
    // observation should be added.
 
-   double seeps = bad_data_double;
+   bool has_seeps = false;
+   SeepsScore *seeps = 0;
 
    // Check the message types
    for(i=0; i<n_msg_typ; i++) {
@@ -1379,10 +1377,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << "\n";
                inc_count(rej_dup, i, j, k);
             }
+            seeps = 0;
             if (precip_flag) {
                seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
-               pd[i][j][k].set_seeps(seeps);
             }
+            pd[i][j][k].set_seeps_score(seeps);
+            if (seeps) delete seeps;
          } // end for k
       } // end for j
    } // end for i
@@ -1741,7 +1741,6 @@ double get_mpr_column_value(double f, double o, double cmn, double csd,
    else if(strcasecmp(s, "OBS")         == 0) v = o;
    else if(strcasecmp(s, "CLIMO_MEAN")  == 0) v = cmn;
    else if(strcasecmp(s, "CLIMO_STDEV") == 0) v = csd;
-   else if(strcasecmp(s, "SEEPS_MEAN")  == 0) cout << "  get_mpr_column_value() FIX ME at pair_data_point.cc!!!\n";
    else if(strcasecmp(s, "CLIMO_CDF")   == 0) {
       v = (is_bad_data(cmn) || is_bad_data(csd) ?
            bad_data_double : normal_cdf(o, cmn, csd));

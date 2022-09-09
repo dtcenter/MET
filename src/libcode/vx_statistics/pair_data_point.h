@@ -45,8 +45,8 @@ class PairDataPoint : public PairBase {
 
       // Forecast values
       NumArray f_na; // Forecast [n_obs]
-      NumArray s_na; // Seeps score
-      IntArray s_ba; // boolean for Seeps
+      std::vector<SeepsScore *> seeps_mpr;
+      std::vector<SeepsAggScore *> seeps;
 
       //////////////////////////////////////////////////////////////////
 
@@ -62,12 +62,11 @@ class PairDataPoint : public PairBase {
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, double, double, double);
-//      void set_seeps(bool is_seeps, int index=-1);
-      void set_seeps(double seeps, int index=-1);
+      void set_seeps_score(SeepsScore *, int index=-1);
 
       void set_point_pair(int, const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double, double);
+                          const char *, double, double, double, SeepsScore *);
 
       bool add_grid_pair(double, double, double, double, double);
 
@@ -78,7 +77,7 @@ class PairDataPoint : public PairBase {
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
                                             const SingleThresh &ot,
                                             const SetLogic type) const;
-      double compute_seeps(const char *, double, double, unixtime);
+      SeepsScore *compute_seeps(const char *, double, double, unixtime);
 
 };
 
