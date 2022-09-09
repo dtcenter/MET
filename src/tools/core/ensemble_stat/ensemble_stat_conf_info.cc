@@ -96,8 +96,6 @@ void EnsembleStatConfInfo::clear() {
    ens_input.clear();
 
    // Reset counts
-   n_ens_var         = 0;
-
    n_vx              = 0;
    max_hira_size     = 0;
 
@@ -229,22 +227,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // If no ensemble member IDs were provided, add an empty string
    if(ens_member_ids.n() == 0) ens_member_ids.add("");
 
-   // Conf: ens.field
-   edict = conf.lookup_array(conf_key_ens_field);
-
-   // Determine the number of ensemble fields to be processed
-   n_ens_var = parse_conf_n_vx(edict);
-
-   // Print a warning if the ensemble dictionary is not empty
-   if(n_ens_var != 0) {
+   // Conf: ens, print warning if present
+   if(conf.lookup_dictionary(conf_key_ens)) {
       mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
-           << "Ensemble post-processing should be moved to the "
-           << "Gen-Ens-Prod tool, which replaces the logic of the "
-           << "\"ens\" dictionary. Support for the \"ens\" dictionary "
-           << "will be deprecated and removed." << "\n\n";
+           << "support for ensemble product generation with the \"ens\" "
+           << "dictionary has moved to the Gen-Ens-Prod tool." << "\n\n";
    }
-   
-    // Parse the ensemble field information
+
+   // Parse the ensemble field information
    for(i=0; i<n_ens_var; i++) {
 
       EnsVarInfo * ens_info = new EnsVarInfo();
@@ -341,70 +331,60 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
 
-   // Determine the number of fields to be verified
-   n_vx = parse_conf_n_vx(fdict);
+   // Determine the number of fields (name/level) to be verified
+   int n_fvx = parse_conf_n_vx(fdict);
+   int n_ovx = parse_conf_n_vx(odict);
 
    // Check for a valid number of verification tasks
-   if(parse_conf_n_vx(odict) != n_vx) {
+   if(n_fvx == 0 || n_fvx != n_ovx) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
-           << conf_key_obs_field
-           << "\" must match the number in \""
-           << conf_key_fcst_field << "\".\n\n";
+           << conf_key_obs_field << "\" (" << n_ovx
+           << ") must be non-zero and match the number in \""
+           << conf_key_fcst_field << "\" (" << n_fvx << ").\n\n";
       exit(1);
    }
 
-   if(n_vx > 0) {
+   // Allocate memory for the verification task options
+   n_vx   = n_fvx;
+   vx_opt = new EnsembleStatVxOpt [n_vx];
 
-      // Allocate memory for the verification task options
-      vx_opt = new EnsembleStatVxOpt [n_vx];
+   // Check climatology fields
+   check_climo_n_vx(&conf, n_vx);
 
-      // Check climatology fields
-      check_climo_n_vx(&conf, n_vx);
+   // Parse settings for each verification task
+   for(i=0,max_hira_size=0; i<n_vx; i++) {
 
-      // Check to make sure the observation file type is defined
-      if(otype == FileType_None) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "When \"fcst.field\" is non-empty, you must use "
-              << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
-              << "verifying observations.\n\n";
-         exit(1);
+      // Get the current dictionaries
+      i_fdict = parse_conf_i_vx_dict(fdict, i);
+      i_odict = parse_conf_i_vx_dict(odict, i);
+
+      // Process the options for this verification task
+      vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
+                               rng_ptr, grid_vx, point_vx,
+                               use_var_id, ens_member_ids,
+                               ens_files, use_ctrl, control_id);
+
+      // For no point verification, store obtype as the message type
+      if(!point_vx) {
+         vx_opt[i].msg_typ.clear();
+         vx_opt[i].msg_typ.add(obtype);
       }
 
-      // Parse settings for each verification task
-      for(i=0,max_hira_size=0; i<n_vx; i++) {
-
-         // Get the current dictionaries
-         i_fdict = parse_conf_i_vx_dict(fdict, i);
-         i_odict = parse_conf_i_vx_dict(odict, i);
-
-         // Process the options for this verification task
-         vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
-                                  rng_ptr, grid_vx, point_vx,
-                                  use_var_id, ens_member_ids,
-                                  ens_files, use_ctrl, control_id);
-
-         // For no point verification, store obtype as the message type
-         if(!point_vx) {
-            vx_opt[i].msg_typ.clear();
-            vx_opt[i].msg_typ.add(obtype);
-         }
-
-         // Track the maximum HiRA size
-         for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
-            if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
-               GridTemplateFactory gtf;
-               GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
-                                              vx_opt[i].interp_info.width[j],
-                                              false);
-               max_hira_size = max(max_hira_size, gt->size());
-            }
+      // Track the maximum HiRA size
+      for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
+         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
+            GridTemplateFactory gtf;
+            GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
+                                           vx_opt[i].interp_info.width[j],
+                                           false);
+            max_hira_size = max(max_hira_size, gt->size());
          }
       }
-
-      // Summarize output flags across all verification tasks
-      process_flags();
    }
+
+   // Summarize output flags across all verification tasks
+   process_flags();
 
    return;
 }
