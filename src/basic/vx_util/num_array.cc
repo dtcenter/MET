@@ -1265,16 +1265,16 @@ double NumArray::wmean_abs_diff() const
 
 {
 
-   double mad, wmad;
+   double wmad;
    
    int n = n_elements();
+   double wgt = 1.0/(2.0*n);
+   double mad = mean_abs_diff();
    
-   mad = mean_abs_diff();
-   
-   if( is_bad_data(mad) )
+   if( is_bad_data(mad) )    
       wmad = bad_data_double;
-   else
-      wmad = (1/(2*n)) * mad;
+   else 
+      wmad = wgt * mad;
    
    return(wmad);
 
