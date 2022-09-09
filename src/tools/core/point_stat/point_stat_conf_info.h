@@ -81,7 +81,7 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_eclv,   //  17
    stat_mpr,    //  18
    stat_vcnt,   //  19
-   stat_seeps,  //  20
+   stat_seeps   //  20
 
 };
 

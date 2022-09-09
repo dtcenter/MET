@@ -1305,7 +1305,6 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               << "\n\n";
          exit(1);
    }
-cout << "   DEBUG HS " << method_name << " i_txt_row=" << i_txt_row << "  n="  << n << "\n";
    return(n);
 }
 
