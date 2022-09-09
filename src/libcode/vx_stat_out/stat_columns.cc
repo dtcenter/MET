@@ -1575,8 +1575,7 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    int i;
 
    // SEEPS line type
-   shc.set_line_type(stat_seeps_str);
-cout << " DEBUG HS write_seeps_row() is called\n";
+   shc.set_line_type(stat_seeps_agg_str);
 
    // Set the threshold columns, if requested.
    if(update_thresh) {
@@ -1592,6 +1591,10 @@ cout << " DEBUG HS write_seeps_row() is called\n";
    // Write a line for each matched pair
    for(i=0; i<pd_ptr->n_obs; i++) {
 
+      if (i >= pd_ptr->seeps.size()) break;
+      if (!pd_ptr->seeps[i]
+          || is_eq(pd_ptr->seeps[i]->score, bad_data_double)) continue;
+
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
       shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
@@ -1600,7 +1603,62 @@ cout << " DEBUG HS write_seeps_row() is called\n";
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      if (pd_ptr->s_ba[i]) write_seeps_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+      write_seeps_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
+                         STATOutputType out_type,
+                         AsciiTable &stat_at, int &stat_row,
+                         AsciiTable &txt_at, int &txt_row,
+                         bool update_thresh) {
+   int i;
+
+   // SEEPS line type
+   shc.set_line_type(stat_seeps_str);
+
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(na_str);
+      shc.set_obs_thresh(na_str);
+      shc.set_thresh_logic(SetLogic_None);
+      shc.set_cov_thresh(na_str);
+   }
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each matched pair
+   for(i=0; i<pd_ptr->n_obs; i++) {
+
+      if (i >= pd_ptr->seeps_mpr.size()) break;
+      if (!pd_ptr->seeps_mpr[i]
+          || is_eq(pd_ptr->seeps_mpr[i]->score, bad_data_double)) continue;
+
+      // Set the observation valid time
+      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
+      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_seeps_mpr_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_type == STATOutputType_Both) {
@@ -4020,38 +4078,78 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
 ////////////////////////////////////////////////////////////////////////
 
 void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
+                          AsciiTable &at, int r, int c) {
+   //
+   // Stable Equitable Error in Probability Space (SEEPS)
+   // Dump out the SEEPS line:
+   //    TOTAL        S12,         S13,
+   //    S21,         S23,         S31,
+   //    S32,         PV1,         PV2,
+   //    PV3,         PF1,         PF2,
+   //    PF3,         MEAN_FCST,   MEAN_OBS,
+   //    SEEPS
+
+   at.set_entry(r, c+0, pd_ptr->n_obs); // Total Number of Pairs
+
+   at.set_entry(r, c+1, pd_ptr->seeps[i]->s12);  // s12
+   at.set_entry(r, c+2, pd_ptr->seeps[i]->s13);  // S13
+   at.set_entry(r, c+3, pd_ptr->seeps[i]->s21);  // s21
+   at.set_entry(r, c+4, pd_ptr->seeps[i]->s23);  // s23
+   at.set_entry(r, c+5, pd_ptr->seeps[i]->s31);  // s31
+   at.set_entry(r, c+6, pd_ptr->seeps[i]->s32);  // s32
+
+   at.set_entry(r, c+7, pd_ptr->seeps[i]->pv1);   // pv1
+   at.set_entry(r, c+8, pd_ptr->seeps[i]->pv2);   // pv2
+   at.set_entry(r, c+9, pd_ptr->seeps[i]->pv3);   // pv3
+
+   at.set_entry(r, c+10, pd_ptr->seeps[i]->pf1);  // pf1
+   at.set_entry(r, c+11, pd_ptr->seeps[i]->pf2);  // pf2
+   at.set_entry(r, c+12, pd_ptr->seeps[i]->pf3);  // pf3
+
+   at.set_entry(r, c+13, pd_ptr->seeps[i]->mean_fcst);  // mean_fcst
+   at.set_entry(r, c+14, pd_ptr->seeps[i]->mean_obs);   // mean_obs
+
+   at.set_entry(r, c+15, pd_ptr->seeps[i]->score);      // SEEPS score
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
                       AsciiTable &at, int r, int c) {
    //
    // Stable Equitable Error in Probability Space (SEEPS)
    // Dump out the SEEPS line:
-   //    TOTAL,       INDEX,       OBS_SID,
-   //    OBS_LAT,     OBS_LON,     OBS_LVL,
-   //    OBS_ELV,     FCST,        OBS,
-   //    OBS_QC,      SEEPS
+   //    OBS_SID,     OBS_LAT,     OBS_LON,
+   //    FCST,        OBS,         OBS_QC,
+   //    FCST_CAT,    OBS_CAT,     P1,
+   //    P2,          T1,          T2,
+   //    SEEPS
 
-   at.set_entry(r, c+0, pd_ptr->n_obs); // Total Number of Pairs
 
-   at.set_entry(r, c+1, i+1);           // Index of Current Pair
+   at.set_entry(r, c+0, (string)pd_ptr->sid_sa[i]); // Station ID
 
-   at.set_entry(r, c+2, (string)pd_ptr->sid_sa[i]); // Station ID
+   at.set_entry(r, c+1, pd_ptr->lat_na[i]); // Latitude
 
-   at.set_entry(r, c+3, pd_ptr->lat_na[i]); // Latitude
+   at.set_entry(r, c+2, pd_ptr->lon_na[i]); // Longitude
 
-   at.set_entry(r, c+4, pd_ptr->lon_na[i]); // Longitude
+   at.set_entry(r, c+3, pd_ptr->f_na[i]);   // Forecast Value
 
-   at.set_entry(r, c+5, pd_ptr->lvl_na[i]); // Level
+   at.set_entry(r, c+4, pd_ptr->o_na[i]);   // Observation Value
 
-   at.set_entry(r, c+6, pd_ptr->elv_na[i]); // Elevation
+   at.set_entry(r, c+5, (string)pd_ptr->o_qc_sa[i]);    // Observation Quality Control
 
-   at.set_entry(r, c+7, pd_ptr->f_na[i]); // Forecast Value
+   at.set_entry(r, c+6, pd_ptr->seeps_mpr[i]->model_cat);   // model category
+   at.set_entry(r, c+7, pd_ptr->seeps_mpr[i]->obs_cat);     // observation category
 
-   at.set_entry(r, c+8, pd_ptr->o_na[i]); // Observation Value
+   at.set_entry(r, c+8, pd_ptr->seeps_mpr[i]->p1);  // p1
+   at.set_entry(r, c+9, pd_ptr->seeps_mpr[i]->p2);  // p2
 
-   at.set_entry(r, c+9, (string)pd_ptr->o_qc_sa[i]);    // Observation Quality Control
+   at.set_entry(r, c+10, pd_ptr->seeps_mpr[i]->t1); // t1
+   at.set_entry(r, c+11, pd_ptr->seeps_mpr[i]->t2); // t2
 
-   at.set_entry(r, c+10, pd_ptr->s_na[i]);  // SEEPS score
-
-   return;
+   at.set_entry(r, c+12, pd_ptr->seeps_mpr[i]->score);  // SEEPS score
 }
 
 ////////////////////////////////////////////////////////////////////////
