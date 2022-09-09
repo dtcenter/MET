@@ -4,7 +4,7 @@ Testing
 
 Coming Soon!
 
-Make Test
+make test
 =========
 
 
