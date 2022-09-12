@@ -18,6 +18,8 @@
 //   ----   ----      ----           -----------
 //   000    03-22-17  Bullock        New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09-12-22  Prestopnik     Added "std::"; removing namespace
+//                                     from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -152,7 +154,7 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "lidar2nc";
 }
 
@@ -160,29 +162,29 @@ const string get_tool_name() {
 
 void usage() {
 
-cout << "\nUsage: "
-     << program_name << "\n"
-     << "\tlidar_file\n"
-     << "\t-out out_file\n"
-     << "\t[-log file]\n"
-     << "\t[-v level]\n"
-     << "\t[-compress level]\n\n"
+std::cout << "\nUsage: "
+          << program_name << "\n"
+          << "\tlidar_file\n"
+          << "\t-out out_file\n"
+          << "\t[-log file]\n"
+          << "\t[-v level]\n"
+          << "\t[-compress level]\n\n"
 
-     << "\twhere\t\"lidar_file\" is the HDF lidar point observation "
-     << "file (required).\n"
+          << "\twhere\t\"lidar_file\" is the HDF lidar point observation "
+          << "file (required).\n"
 
-     << "\t\t\"-out out_file\" is the output NetCDF file (required).\n"
+          << "\t\t\"-out out_file\" is the output NetCDF file (required).\n"
 
-     << "\t\t\"-log file\" outputs log messages to the specified "
-     << "file (optional).\n"
+          << "\t\t\"-log file\" outputs log messages to the specified "
+          << "file (optional).\n"
 
-     << "\t\t\"-v level\" overrides the default level of logging ("
-     << mlog.verbosity_level() << ") (optional).\n"
+          << "\t\t\"-v level\" overrides the default level of logging ("
+          << mlog.verbosity_level() << ") (optional).\n"
 
-     << "\t\t\"-compress level\" specifies the compression level of "
-     << "the output NetCDF variable (optional).\n\n"
+          << "\t\t\"-compress level\" specifies the compression level of "
+          << "the output NetCDF variable (optional).\n\n"
 
-     << flush;
+          << std::flush;
 
 exit (1);
 
@@ -297,7 +299,7 @@ Calipso_5km_Vars hdf_5km;
 
 hdf_5km.get_vars(hdf_sd_id);
 
-n_data = max<int> (hdf_5km.lat.dimsizes[0], hdf_5km.lat.dimsizes[1]);
+n_data = std::max<int> (hdf_5km.lat.dimsizes[0], hdf_5km.lat.dimsizes[1]);
 
 const int nhdr_dim_size = n_data;
 
@@ -311,8 +313,8 @@ const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 
 int buf_size = hdr_typ_bytes;
 
-buf_size = max<int>(buf_size, hdr_vld_bytes);
-buf_size = max<int>(buf_size, hdr_arr_bytes);
+buf_size = std::max<int>(buf_size, hdr_vld_bytes);
+buf_size = std::max<int>(buf_size, hdr_arr_bytes);
 
 
 mlog << Debug(1) << method_name << "Writing MET File:\t" << output_filename << "\n";
@@ -359,9 +361,9 @@ memset(junk, 0, sizeof(junk));
 if ( gethostname(junk, sizeof(junk) - 1) < 0 )  s << " on unknown host";
 else                                            s << " on host " << junk;
 
-(void) out->putAtt(string("FileOrigins"), string( s.text() ));
-(void) out->putAtt(string("MET_version"), string( met_version ));
-(void) out->putAtt(string("MET_tool"),    string(program_name.text()));
+(void) out->putAtt(std::string("FileOrigins"), std::string( s.text() ));
+(void) out->putAtt(std::string("MET_version"), std::string( met_version ));
+(void) out->putAtt(std::string("MET_tool"),    std::string(program_name.text()));
 
    //
    //  allocate the buffer
