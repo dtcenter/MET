@@ -6,7 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_repo=met-base
-met_base_image=v1.0
+met_base_tag=v1.1
 input_data_version=develop
 truth_data_version=develop
 
@@ -114,7 +114,7 @@ echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
 echo ::set-output name=met_base_repo::$met_base_repo
-echo ::set-output name=met_base_image::$met_base_image
+echo ::set-output name=met_base_tag::$met_base_tag
 echo ::set-output name=input_data_version::$input_data_version
 echo ::set-output name=truth_data_version::$truth_data_version
 
@@ -124,7 +124,7 @@ echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
 echo met_base_repo: $met_base_repo
-echo met_base_image: $met_base_image
+echo met_base_tag: $met_base_tag
 echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
 
