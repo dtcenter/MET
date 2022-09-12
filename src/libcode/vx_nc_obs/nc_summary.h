@@ -25,14 +25,14 @@ using namespace netCDF;
 struct NcObsOutputData {
    int  processed_hdr_cnt;
    int  deflate_level;
-   vector<Observation> observations;
+   std::vector<Observation> observations;
    SummaryObs *summary_obs;
    TimeSummaryInfo summary_info;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-extern string _secsToTimeString(const int secs);
+extern std::string _secsToTimeString(const int secs);
 
 // Not moved to nc_obs_util to reduce the dependency (library)
 

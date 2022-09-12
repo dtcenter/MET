@@ -110,7 +110,7 @@ class GenShapeInfoArray {
       void init_from_scratch();
       void assign(const GenShapeInfoArray &);
 
-      vector<GenShapeInfo> GenShape;
+      std::vector<GenShapeInfo> GenShape;
 
    public:
 

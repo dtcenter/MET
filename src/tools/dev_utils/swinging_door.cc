@@ -18,7 +18,9 @@
 //   ----   ----      ----           -----------
 //   000    08-19-14  Rehak          New
 //   001    04-27-154 Halley Gotway  List and format output files
-//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     Added "std::"; removing namespace
+//                                      from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -52,22 +54,22 @@ static const char *program_name = "swinging_door";
 ////////////////////////////////////////////////////////////////////////
 
 // Variables for command line arguments
-static string ncfile_arg;
+static std::string ncfile_arg;
 static double error_arg;
 static int grib_code_arg;
-static string message_type_arg;
-static string station_id_arg;
+static std::string message_type_arg;
+static std::string station_id_arg;
 
 ////////////////////////////////////////////////////////////////////////
 
 static bool process_file();
-static bool run_algorithm(const vector< SDObservation > &obs,
-                          vector< SDObservation > &compressed_obs);
+static bool run_algorithm(const std::vector< SDObservation > &obs,
+                          std::vector< SDObservation > &compressed_obs);
 static void usage();
-static bool write_observations(const vector< SDObservation > &observations,
-                               const string &file_path);
-static bool write_ramps(const vector< SDObservation > &observations,
-                        const string &file_path);
+static bool write_observations(const std::vector< SDObservation > &observations,
+                               const std::string &file_path);
+static bool write_ramps(const std::vector< SDObservation > &observations,
+                        const std::string &file_path);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +116,7 @@ int met_main(int argc, char *argv[])
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return program_name;
 }
 
@@ -126,7 +128,7 @@ bool process_file()
 
   MetNcFile nc_file(ncfile_arg);
 
-  vector< SDObservation > observations;
+  std::vector< SDObservation > observations;
 
   if (!nc_file.readFile(grib_code_arg, station_id_arg, message_type_arg,
                         observations))
@@ -139,7 +141,7 @@ bool process_file()
 
   // Run  the algorithm
 
-  vector< SDObservation > compressed_observations;
+  std::vector< SDObservation > compressed_observations;
 
   if (!run_algorithm(observations, compressed_observations))
     return false;
@@ -161,19 +163,19 @@ bool process_file()
 
 ////////////////////////////////////////////////////////////////////////
 
-bool run_algorithm(const vector< SDObservation > &observations,
-                   vector< SDObservation > &compressed_observations)
+bool run_algorithm(const std::vector< SDObservation > &observations,
+                   std::vector< SDObservation > &compressed_observations)
 {
   // Run the algorithm
 
-  vector< pair< SDObservation, SDObservation > > ramps;
+  std::vector< std::pair< SDObservation, SDObservation > > ramps;
 
   if (!compute_swinging_door_ramps(observations, error_arg, ramps))
     return false;
 
   // Create the compressed observations from the ramps
 
-  vector< pair< SDObservation, SDObservation > >::const_iterator ramp;
+  std::vector< std::pair< SDObservation, SDObservation > >::const_iterator ramp;
   for (ramp = ramps.begin(); ramp != ramps.end(); ++ramp)
   {
     compressed_observations.push_back(ramp->first);
@@ -187,40 +189,40 @@ bool run_algorithm(const vector< SDObservation > &observations,
 
 void usage()
 {
-  cout << "\nUsage: "
-       << program_name << "\n"
-       << "\tnetcdf_file\n"
-       << "\terror_value\n"
-       << "\tgrib_code\n"
-       << "\tmessage_type\n"
-       << "\tstation_id\n\n"
+  std::cout << "\nUsage: "
+            << program_name << "\n"
+            << "\tnetcdf_file\n"
+            << "\terror_value\n"
+            << "\tgrib_code\n"
+            << "\tmessage_type\n"
+            << "\tstation_id\n\n"
 
-       << "\twhere\t\"netcdf_file\" is the NetCDF file containing "
-       << "the raw observations (required).\n"
+            << "\twhere\t\"netcdf_file\" is the NetCDF file containing "
+            << "the raw observations (required).\n"
 
-       << "\t\t\"error_value\" is the error value (E) to use when "
-       << "computing the corridors (required).\n"
+            << "\t\t\"error_value\" is the error value (E) to use when "
+            << "computing the corridors (required).\n"
 
-       << "\t\t\"grib_code\" is the grib code of the field to use "
-       << "(required).\n"
+            << "\t\t\"grib_code\" is the grib code of the field to use "
+            << "(required).\n"
 
-       << "\t\t\"message_type\" is the message type of the observations "
-       << "to use (required).\n"
+            << "\t\t\"message_type\" is the message type of the observations "
+            << "to use (required).\n"
 
-       << "\t\t\"station_id\" is the station identifier of the "
-       << "observations to use (required).\n"
+            << "\t\t\"station_id\" is the station identifier of the "
+            << "observations to use (required).\n"
 
-       << flush;
+            << std::flush;
 
   exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool write_observations(const vector< SDObservation > &observations,
-                        const string &file_path)
+bool write_observations(const std::vector< SDObservation > &observations,
+                        const std::string &file_path)
 {
-  static const string method_name = "write_observations()";
+  static const std::string method_name = "write_observations()";
 
   mlog << Debug(2)
        << "Writing: " << file_path << "\n";
@@ -242,7 +244,7 @@ bool write_observations(const vector< SDObservation > &observations,
 
   // Write the observations
 
-  vector< SDObservation >::const_iterator obs;
+  std::vector< SDObservation >::const_iterator obs;
   for (obs = observations.begin(); obs != observations.end(); ++obs)
     fprintf(output_file, "%s,%d,%f\n",
             unix_to_yyyymmdd_hhmmss(obs->getValidTime()).text(),
@@ -257,10 +259,10 @@ bool write_observations(const vector< SDObservation > &observations,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool write_ramps(const vector< SDObservation > &observations,
-                 const string &file_path)
+bool write_ramps(const std::vector< SDObservation > &observations,
+                 const std::string &file_path)
 {
-  static const string method_name = "write_ramps()";
+  static const std::string method_name = "write_ramps()";
 
   mlog << Debug(2)
        << "Writing: " << file_path << "\n";

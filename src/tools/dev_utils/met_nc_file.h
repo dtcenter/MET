@@ -36,14 +36,14 @@ class MetNcFile
 
 public:
 
-  MetNcFile(const string &file_path);
+  MetNcFile(const std::string &file_path);
   
   virtual ~MetNcFile();
 
   bool readFile(const int desired_grib_code,
-		const string &desired_station_id,
-		const string &desired_message_type,
-		vector< SDObservation > &observations);
+		const std::string &desired_station_id,
+		const std::string &desired_message_type,
+		std::vector< SDObservation > &observations);
   
 
 protected:
@@ -52,7 +52,7 @@ protected:
   // Protected members //
   ///////////////////////
 
-  string _filePath;
+  std::string _filePath;
   
   NcFile *_ncFile;
 

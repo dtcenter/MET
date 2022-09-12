@@ -22,7 +22,7 @@ extern bool get_att_value(const NcAtt *att, unsigned int &att_val);
 extern bool get_att_value(const NcAtt *att, float &att_val);
 extern bool get_att_value(const NcAtt *att, double &att_val);
 extern ConcatString get_log_msg_for_att(const NcVarAtt *att);
-extern ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
+extern ConcatString get_log_msg_for_att(const NcVarAtt *att, std::string var_name,
                                         const ConcatString att_name);
 extern double get_var_add_offset(const NcVar *var);
 extern double get_var_scale_factor(const NcVar *var);
@@ -54,7 +54,7 @@ bool get_att_num_value_(const NcAtt *att, T &att_val, int matching_type) {
          status = true;
       }
       else if (NC_CHAR == nc_type_id) {
-         string att_value;
+         std::string att_value;
          att->getValues(att_value);
          if (matching_type == NC_FLOAT)
             att_val = atof(att_value.c_str());
@@ -132,7 +132,7 @@ bool get_global_att_value_(const NcFile *nc, const ConcatString& att_name,
    NcGroupAtt *nc_att = get_nc_att(nc, att_name);
    if (IS_VALID_NC_P(nc_att)) {
       status = get_att_value((NcAtt *)nc_att, att_val);
-      string data_type = GET_NC_TYPE_NAME_P(nc_att);
+      std::string data_type = GET_NC_TYPE_NAME_P(nc_att);
       if (error_out && !status) {
          mlog << Error << caller_name
               << "The data type \"" << data_type
@@ -636,7 +636,7 @@ void copy_nc_data_(NcVar *var, double *data, const T *packed_data,
 
 template <typename T>
 bool put_nc_data_T(NcVar *var, const T data, long offset0, long offset1, long offset2) {
-   vector<size_t> offsets;
+   std::vector<size_t> offsets;
    offsets.push_back((size_t)offset0);
    if (0 <= offset1) {
      offsets.push_back((size_t)offset1);
@@ -652,7 +652,7 @@ bool put_nc_data_T(NcVar *var, const T data, long offset0, long offset1, long of
 
 template <typename T>
 bool put_nc_data_T(NcVar *var, const T *data,    const long length, const long offset) {
-   vector<size_t> offsets, counts;
+   std::vector<size_t> offsets, counts;
    int dim_count = get_dim_count(var);
    offsets.push_back(offset);
    if (dim_count >= 2) {
@@ -669,7 +669,7 @@ bool put_nc_data_T(NcVar *var, const T *data,    const long length, const long o
 template <typename T>
 bool put_nc_data_T(NcVar *var, const T *data , const long *lengths, const long *offsets) {
    int dim = get_dim_count(var);
-   vector<size_t> nc_offsets, counts;
+   std::vector<size_t> nc_offsets, counts;
    for (int idx = 0 ; idx < dim; idx++) {
       nc_offsets.push_back(offsets[idx]);
    }
@@ -685,7 +685,7 @@ bool put_nc_data_T(NcVar *var, const T *data , const long *lengths, const long *
 template <typename T>
 bool put_nc_data_T_with_dims(NcVar *var, const T *data,
                              const long len0, const long len1, const long len2) {
-   vector<size_t> offsets, counts;
+   std::vector<size_t> offsets, counts;
    if (0 < len0) {
      offsets.push_back(0);
      counts.push_back(len0);

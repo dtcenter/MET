@@ -27,23 +27,23 @@ using namespace netCDF;
 extern void write_tc_tracks(NcFile*,
     const NcDim&, const TrackInfoArray&);
 
-extern set<string> get_pressure_level_strings(
-    map<string, vector<string> >);
+extern std::set<std::string> get_pressure_level_strings(
+    std::map<std::string, std::vector<std::string> >);
 
-extern set<double> get_pressure_levels(
-    map<string, vector<string> >);
+extern std::set<double> get_pressure_levels(
+    std::map<std::string, std::vector<std::string> >);
 
-extern set<double> get_pressure_levels(
-    set<string>);
+extern std::set<double> get_pressure_levels(
+    std::set<std::string>);
 
-extern map<double, int> get_pressure_level_indices(
-    set<double>);
+extern std::map<double, int> get_pressure_level_indices(
+    std::set<double>);
 
-extern map<string, int> get_pressure_level_indices(
-    set<string>, set<double>);
+extern std::map<std::string, int> get_pressure_level_indices(
+    std::set<std::string>, std::set<double>);
 
 extern void def_tc_pressure(NcFile*,
-    const NcDim&, set<double>);
+    const NcDim&, std::set<double>);
 
 extern void def_tc_range_azimuth(NcFile*,
     const NcDim&, const NcDim&, const TcrmwGrid&, double);
@@ -53,10 +53,10 @@ extern void def_tc_lat_lon_time(NcFile*,
     NcVar&, NcVar&, NcVar&);
 
 extern void def_tc_variables(NcFile*,
-    map<string, vector<string> >,
-    map<string, string>, map<string, string>,
+    std::map<std::string, std::vector<std::string> >,
+    std::map<std::string, std::string>, std::map<std::string, std::string>,
     const NcDim&, const NcDim&, const NcDim&, const NcDim&,
-    map<string, NcVar>&);
+    std::map<std::string, NcVar>&);
 
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
@@ -83,7 +83,7 @@ extern void write_tc_azi_mean_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, const double*);
 
 extern void write_tc_pressure_level_data(NcFile*, const TcrmwGrid&,
-    map<string, int>, const string&,
+    std::map<std::string, int>, const std::string&,
     const int&, const NcVar&, const double*);
 
 ////////////////////////////////////////////////////////////////////////

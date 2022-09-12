@@ -175,7 +175,7 @@ struct NcPointObsData : public MetPointObsData {
 extern bool add_nc_header_prepbufr (const int pb_report_type,
                                     const int in_report_type, const int instrument_type);
       
-extern long count_nc_headers   (vector< Observation > &observations);
+extern long count_nc_headers   (std::vector< Observation > &observations);
 
 extern int  get_nc_hdr_cur_index();
 extern int  get_nc_obs_buf_index();
@@ -186,7 +186,7 @@ extern bool is_using_var_id    (NcFile * nc_file);
 extern void reset_header_buffer(int buf_size, bool reset_all=false);
 extern void set_header_buffer  (int buf_size, bool reset_all=false);
 
-extern string seconds_to_time_string(const int secs);
+extern std::string seconds_to_time_string(const int secs);
 
 extern void write_nc_obs_buffer     (const int buf_size);
 extern int  write_nc_string_array   (NcVar *ncVar, StringArray &strArray,
