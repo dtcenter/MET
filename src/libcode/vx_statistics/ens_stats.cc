@@ -231,8 +231,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute empirical CRPS scores
    crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
-   // Stub in for now?
+   if(is_eq(crps_emp, 0.0)) crps_emp = 0.0;
+   
    crps_emp_fair = pd.crps_emp_fair_na.wmean(pd.wgt_na);
+   if(is_eq(crps_emp_fair, 0.0)) crps_emp_fair = 0.0;
+   
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
    crpss_emp  = (is_bad_data(crps_emp)   ||
                  is_bad_data(crpscl_emp) ||
