@@ -79,8 +79,9 @@ class PairDataEnsemble : public PairBase {
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
 
-      NumArray   crps_emp_na;     // Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   crpscl_emp_na;   // Empirical climatological CRPS [n_obs]
+      NumArray   crps_emp_na;       // Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   crps_emp_fair_na;  // Empirical Continuous Ranked Probability Score [n_obs], adjusted with the mean absolute difference of the ensmble members
+      NumArray   crpscl_emp_na;     // Empirical climatological CRPS [n_obs]
 
       NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
       NumArray   crpscl_gaus_na;  // Gaussian climatological CRPS [n_obs]
