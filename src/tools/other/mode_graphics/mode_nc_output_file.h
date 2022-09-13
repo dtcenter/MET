@@ -115,7 +115,7 @@ class ModeNcOutputFile {
 
       void close();
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
 
       ConcatString filename() const;
       ConcatString short_filename() const;
