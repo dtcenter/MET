@@ -1638,7 +1638,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
   else {
-    //const char *x_coord_units_name = x_coord_units_att->getValues(att->as_string(0);
     if (0 == x_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract X coordinate units from netCDF file -- "
@@ -1957,26 +1956,35 @@ double get_nc_var_att_double(const NcVar *nc_var, const char *att_name)
 
 void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_var)
 {
-  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic()";
+  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() --> ";
   double x_coord_to_m_cf = 1.0;
   double y_coord_to_m_cf = 1.0;
 
   // Get projection attributes
+  const char *att_name_lon = "longitude_of_projection_origin";
 
   double proj_origin_lat =
             get_nc_var_att_double(grid_mapping_var,
                               "latitude_of_projection_origin");
-  double proj_origin_lon =
-            get_nc_var_att_double(grid_mapping_var,
-                              "longitude_of_projection_origin");
+  double proj_origin_lon = has_att((NcVar *)grid_mapping_var, att_name_lon)
+            ? get_nc_var_att_double(grid_mapping_var, att_name_lon)
+            : has_att((NcVar *)grid_mapping_var, "longitude_of_prime_meridian")
+              ? get_nc_var_att_double(grid_mapping_var, "longitude_of_prime_meridian")
+              : bad_data_double;
   double proj_vertical_lon =
             get_nc_var_att_double(grid_mapping_var,
                               "straight_vertical_longitude_from_pole");
   double proj_origin_scale_factor =
-            get_nc_var_att_double(grid_mapping_var,
-                              "scale_factor_at_projection_origin");
+            get_nc_var_att_double(grid_mapping_var, "scale_factor_at_projection_origin");
 
   // Check that the scale factor at the origin is 1.
+
+  if(is_eq(proj_origin_lon, bad_data_double)) {
+    mlog << Error << "\n" << method_name << " -> "
+         << "The attribute \"" << att_name_lon << "\" of the "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable does not exist.\n\n";
+    exit(1);
+  }
 
   if(!is_eq(proj_origin_scale_factor, 1.0))
   {
@@ -2092,11 +2100,13 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
            << "assuming meters.\n\n";
     }
     else {
-           if ( x_coord_units_name == "m" ) x_coord_to_m_cf = 1.0;
+           if ( x_coord_units_name == "m" ||
+                x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if ( x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
         mlog << Error << "\n" << method_name << " -> "
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+             << "The X coordinates (" << x_coord_units_name
+             << ") must be in meters or kilometers for MET.\n\n";
         exit(1);
       }
     }
@@ -2115,11 +2125,13 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
            << "assuming meters.\n\n";
     }
     else {
-           if ( y_coord_units_name == "m" ) y_coord_to_m_cf = 1.0;
+           if ( y_coord_units_name == "m" ||
+                y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if ( y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
         mlog << Error << "\n" << method_name << " -> "
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+             << "The Y coordinates (" << y_coord_units_name
+             << ") must be in meters or kilometers for MET.\n\n";
         exit(1);
       }
     }
@@ -2148,7 +2160,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
   double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
 
-  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
+  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE && fabs(dx_m+dy_m) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
          << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
@@ -2176,7 +2188,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.r_km = 6371.20;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
+
   grid.set(data);
+  if (dy_m < 0) grid.set_swap_to_north(true);
 }
 
 
