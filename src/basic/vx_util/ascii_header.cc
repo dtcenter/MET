@@ -127,6 +127,7 @@ void AsciiHeaderLine::clear() {
 void AsciiHeaderLine::set_col_names(const char *s) {
    ConcatString cs;
    StringArray tok;
+   const char *method_name = "AsciiHeaderLine::set_col_names(const char *) -> ";
 
    // Parse the header column names
    ColNames.parse_wsss(s);
@@ -139,7 +140,7 @@ void AsciiHeaderLine::set_col_names(const char *s) {
 
          // Can only have one variable index column
          if(VarIndexName.nonempty()) {
-            mlog << Error << "\nAsciiHeaderLine::set(const char *line) -> "
+            mlog << Error << "\n" << method_name
                 << "can't have multiple variable index columns in line:\n"
                 << s << "\n\n";
             exit(1);
@@ -160,7 +161,7 @@ void AsciiHeaderLine::set_col_names(const char *s) {
 
          // Check that the variable index column has already been set
          if(VarIndexName.empty()) {
-            mlog << Error << "\nAsciiHeaderLine::set(const char *line) -> "
+            mlog << Error << "\n" << method_name
                  << "lines with variable length columns must also "
                  << "contain a variable index column:\n"
                  << s << "\n\n";
@@ -223,8 +224,8 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
 
       // Search for column names using regular expressions
       for(i=0, match=bad_data_int; i<ColNames.n_elements(); i++) {
-	reg_exp.format("^%s$", ColNames[i].c_str());
-	if(check_reg_exp(reg_exp.c_str(), name)) {
+         reg_exp.format("^%s$", ColNames[i].c_str());
+         if(check_reg_exp(reg_exp.c_str(), name)) {
             match = i;
             break;
          }
@@ -284,10 +285,11 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
 ConcatString AsciiHeaderLine::col_name(const int offset, int const dim) const {
    int i, j;
    ConcatString name, str;
+   const char *method_name = "AsciiHeaderLine::col_name() -> ";
 
    // Range check
    if(offset < 0 || offset >= length(dim)) {
-      mlog << Error << "\nAsciiHeaderLine::col_name() -> "
+      mlog << Error << "\n" << method_name
            << "range check error for data/line type \""
            << DataType << "/" << LineType << "\" and offset = "
            << offset << "\n\n";
@@ -404,6 +406,7 @@ void AsciiHeader::read(const char *version) {
    DataLine line;
    AsciiHeaderLine header_line;
    LineDataFile in;
+   const char *method_name = "AsciiHeader::read() -> ";
 
    // Set the delimiter for parsing this data
    line.set_delimiter(ascii_header_delim);
@@ -419,7 +422,7 @@ void AsciiHeader::read(const char *version) {
 
       // Open the data file
       if(!in.open(file_name.c_str())) {
-         mlog << Error << "\nAsciiHeader::read() -> "
+         mlog << Error << "\n" << method_name
               << "trouble reading file:\n" << file_name << "\n\n";
          exit(1);
       }
@@ -432,7 +435,7 @@ void AsciiHeader::read(const char *version) {
 
          // Check for the expected number of tokens
          if(line.n_items() != 4) {
-            mlog << Error << "\nAsciiHeader::read() -> "
+            mlog << Error << "\n" << method_name
                  << "expected 4 tokens but found " << line.n_items()
                  << " on line number " << line.line_number()
                  << " of file:\n" << file_name << "\n\n";
@@ -462,7 +465,7 @@ void AsciiHeader::read(const char *version) {
 const AsciiHeaderLine * AsciiHeader::header(const char *version,
                                             const char *data_type,
                                             const char *line_type) {
-
+   const char *method_name = "AsciiHeader::header() -> ";
    ConcatString version_mm(parse_version_major_minor(version));
 
    // Check if the version needs to be loaded
@@ -480,7 +483,7 @@ const AsciiHeaderLine * AsciiHeader::header(const char *version,
 
    // Check for no match
    if(it == Headers.end()) {
-      mlog << Error << "\nAsciiHeaderLine::header() -> "
+      mlog << Error << "\n" << method_name
            << "can't find header columns for MET version \"" << version
            << "\", data type \"" << data_type << "\", line type \""
            << line_type << "\"!\n\n";
