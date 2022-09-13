@@ -82,8 +82,8 @@ void PairDataPoint::clear() {
    PairBase::clear();
 
    f_na.clear();
-   for (SeepsScore *seeps : seeps_mpr) {
-      if (seeps) delete seeps;
+   for (int idx=0; idx<seeps_mpr.size(); idx++) {
+      if (seeps_mpr[idx]) delete seeps_mpr[idx];
    }
    seeps_mpr.clear();
    seeps.init();
