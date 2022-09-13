@@ -181,6 +181,8 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_seeps_mpr.txt</stat>
     </output>
   </test>
 
