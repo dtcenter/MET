@@ -37,8 +37,10 @@ private:
 
   string monitoringSiteFileName;
 
-  // all the AQSID's from the monitoring site file, set only for Hourly format
-  // associated location information from the monitoring site file, in the same order
+  // all the AQSID's from the monitoring site file, set only for Hourly format.
+  // and all the associated location information from the monitoring site file, in the same order
+  // 3 different AQSID's are found in the lookup file:  stationId, Aqsid, FullAqsid
+  // 
   vector<string> monitoringSiteStationId;
   vector<string> monitoringSiteAqsid;
   vector<string> monitoringSiteFullAqsid;
