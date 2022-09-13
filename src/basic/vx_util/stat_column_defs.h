@@ -371,7 +371,7 @@ static const char * seeps_mpr_columns [] = {
 };
 
 static const char * seeps_columns [] = {
-   "TOTAL"        "S12",         "S13",
+   "TOTAL",       "S12",         "S13",
    "S21",         "S23",         "S31",
    "S32",         "PV1",         "PV2",
    "PV3",         "PF1",         "PF2",
