@@ -7,6 +7,8 @@ on:
     paths-ignore:
       - 'met/docs/**'
 
+  workflow_dispatch:
+
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
 
