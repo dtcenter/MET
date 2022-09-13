@@ -51,9 +51,10 @@ static const int i_rps       = 16;
 static const int i_eclv      = 17;
 static const int i_mpr       = 18;
 static const int i_vcnt      = 19;
-static const int i_seeps     = 20;
+static const int i_seeps_mpr = 20;
+static const int i_seeps     = 21;
 
-static const int n_txt       = 21;
+static const int n_txt       = 22;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -81,7 +82,8 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_eclv,   //  17
    stat_mpr,    //  18
    stat_vcnt,   //  19
-   stat_seeps   //  20
+   stat_seeps_mpr,  //  20
+   stat_seeps   //  21
 
 };
 
@@ -129,9 +131,6 @@ class PointStatVxOpt {
 
       StringArray     mpr_sa;             // MPR column names
       ThreshArray     mpr_ta;             // MPR column thresholds
-
-      StringArray     seeps_sa;           // SEEPS column names
-      ThreshArray     seeps_ta;           // SEEPS column thresholds
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;
