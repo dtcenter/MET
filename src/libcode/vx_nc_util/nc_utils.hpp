@@ -85,12 +85,14 @@ bool get_nc_att_value_(const NcVar *var, const ConcatString &att_name,
    NcVarAtt *att = get_nc_att(var, att_name);
    status = get_att_value((NcAtt *)att, att_val);
    if (!status) {
-      mlog << Error << "\n" << caller_name
-           << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
       if (exit_on_error) {
+         mlog << Error << "\n" << caller_name
+              << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
          if (att) delete att;
          exit(1);
       }
+      else mlog << Warning << "\n" << caller_name
+                << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
    }
    if (att) delete att;
 
@@ -208,6 +210,7 @@ void apply_scale_factor_(T *data, const int cell_count,
 
    if (cell_count > 0) {
       int idx;
+      int missing_cnt = 0;
       int positive_cnt = 0;
       int unpacked_count = 0;
       T min_value, max_value;
@@ -218,14 +221,17 @@ void apply_scale_factor_(T *data, const int cell_count,
          for (; idx<cell_count; idx++) {
             if (!is_eq(nc_fill_value, data[idx])) break;
             data[idx] = met_fill_value;
+            missing_cnt++;
          }
       }
 
       raw_min_val = raw_max_val = data[idx];
       min_value = max_value = (data[idx] * scale_factor) + add_offset;
       for (; idx<cell_count; idx++) {
-         if (has_fill_value && is_eq(nc_fill_value, data[idx]))
+         if (has_fill_value && is_eq(nc_fill_value, data[idx])) {
             data[idx] = met_fill_value;
+            missing_cnt++;
+         }
          else {
             if (raw_min_val > data[idx]) raw_min_val = data[idx];
             if (raw_max_val < data[idx]) raw_max_val = data[idx];
@@ -245,7 +251,8 @@ void apply_scale_factor_(T *data, const int cell_count,
       mlog << Debug(debug_level) << method_name
            << " data range [" << min_value << " - " << max_value
            << "] raw data: [" << raw_min_val << " - " << raw_max_val
-           << "] Positive count: " << positive_cnt << "\n";
+           << "] Positive count: " << positive_cnt
+           << "] missing count: " << missing_cnt << "\n";
    }
    mlog << Debug(debug_level) << method_name << " took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
