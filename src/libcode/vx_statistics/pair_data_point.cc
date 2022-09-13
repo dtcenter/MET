@@ -143,12 +143,13 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    if(pd.is_point_vx()) {
 
       for(i=0; i<pd.n_obs; i++) {
-         add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
+         if (add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                         pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                         pd.lvl_na[i], pd.elv_na[i],
                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                        pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
-         if (i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
+                        pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i])) {
+            if (i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
+         }
       }
    }
    // Handle gridded data
@@ -183,8 +184,16 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
       int seeps_count = seeps_mpr.size();
       if(index < 0) index = seeps_count - 1;
       if(index < seeps_count) {
-         if (!seeps_mpr[index]) seeps_mpr[index] = new SeepsScore();
-         *seeps_mpr[index] = *seeps;
+         if (seeps) {
+            if (!seeps_mpr[index]) seeps_mpr[index] = new SeepsScore();
+            *seeps_mpr[index] = *seeps;
+         }
+         else {
+            if (seeps_mpr[index]) {
+               delete seeps_mpr[index];
+               seeps_mpr[index] = NULL;
+            }
+         }
       }
       else mlog << Warning << "\nPairDataPoint::set_seeps_score("
                 << index << ") is out of range " << seeps_count << "\n\n";
@@ -327,12 +336,13 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 
          // Handle point data
          if(is_point_vx()) {
-            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
+            if (out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
                       lon_na[i], x_na[i], y_na[i],
                       vld_ta[i], lvl_na[i], elv_na[i],
                       f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                      cmn_na[i], csd_na[i], wgt_na[i]);
-            *(out_pd.seeps_mpr[i]) = *seeps_mpr[i];
+                      cmn_na[i], csd_na[i], wgt_na[i])) {
+               out_pd.set_seeps_score(seeps_mpr[i], i);
+            }
          }
          // Handle gridded data
          else {
