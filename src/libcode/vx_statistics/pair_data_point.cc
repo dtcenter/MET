@@ -86,6 +86,7 @@ void PairDataPoint::clear() {
       if (seeps) delete seeps;
    }
    seeps_mpr.clear();
+   seeps.init();
 
    return;
 }
@@ -277,13 +278,12 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    if (sid_no) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
       seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
-      if(mlog.verbosity_level() >= seeps_debug_level
-         && seeps && !is_eq(seeps->score, bad_data_double)) {
-         if (seeps_record_count < 10) {
-            mlog << Debug(seeps_debug_level)
-                 << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
-            seeps_record_count++;
-         }
+      if (mlog.verbosity_level() >= seeps_debug_level
+          && seeps && !is_eq(seeps->score, bad_data_double)
+          && !is_eq(seeps->score, 0) && seeps_record_count < 10) {
+         mlog << Debug(seeps_debug_level)
+              << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
+         seeps_record_count++;
       }
    }
    return seeps;
@@ -893,26 +893,6 @@ void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &t
 
    mpr_column = sa;
    mpr_thresh = ta;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_seeps_thresh(const StringArray &sa, const ThreshArray &ta) {
-
-   // Check for constant length
-   if(sa.n() != ta.n()) {
-      mlog << Error << "\nVxPairDataPoint::set_seeps_thresh() -> "
-           << "the \"" << conf_key_seeps_column << "\" ("
-           << write_css(sa) << ") and \"" << conf_key_seeps_thresh
-           << "\" (" << write_css(ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
-
-   seeps_column = sa;
-   seeps_thresh = ta;
 
    return;
 }
@@ -1658,76 +1638,6 @@ bool check_mpr_thresh(double f, double o, double cmn, double csd,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-bool check_seeps_thresh(double f, double o,
-                        const StringArray &col_sa, const ThreshArray &col_ta,
-                        ConcatString *reason_ptr) {
-   // Initialize
-   if(reason_ptr) reason_ptr->erase();
-
-   // Check arrays
-   if(col_sa.n() == 0 || col_ta.n() == 0) return(true);
-
-   bool keep = true;
-   bool absv = false;
-   StringArray sa;
-   ConcatString cs;
-   double v, v_cur;
-   int i, j;
-
-   // Loop over all the column filter names
-   for(i=0; i<col_sa.n(); i++) {
-
-      // Check for absolute value
-      if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
-         absv = true;
-         cs   = col_sa[i];
-         sa   = cs.split("()");
-         cs   = sa[1];
-      }
-      else {
-         cs = col_sa[i];
-      }
-
-      // Split the input column name on hyphens for differences
-      sa = cs.split("-");
-
-      // Get the first value
-      v = get_seeps_column_value(f, o, sa[0].c_str());
-
-      // If multiple columns, compute the requested difference
-      if(sa.n() > 1) {
-
-         // Loop through the columns
-         for(j=1; j<sa.n(); j++) {
-
-            // Get the current column value
-            v_cur = get_seeps_column_value(f, o, sa[j].c_str());
-
-            // Compute the difference, checking for bad data
-            if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
-            else                                     v -= v_cur;
-         } // end for j
-      }
-
-      // Apply absolute value, if requested
-      if(absv && !is_bad_data(v)) v = fabs(v);
-
-      // Check the threshold
-      if(!col_ta[i].check(v)) {
-         if(reason_ptr) {
-            (*reason_ptr) << cs_erase << col_sa[i] << " = " << v
-                          << " is not " << col_ta[i].get_str();
-         }
-         keep = false;
-         break;
-      }
-   } // end for i
-
-   return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 // Parse string to determine which value to use
 //
@@ -1803,79 +1713,6 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
          obs_dp.buf()[i]  = bad_data_double;
          if(cmn_flag) cmn_dp.buf()[i] = bad_data_double;
          if(csd_flag) csd_dp.buf()[i] = bad_data_double;
-      }
-   } // end for i
-
-   mlog << Debug(3)
-        << "Discarded " << n_skip << " of " << nxy
-        << " pairs for matched pair filtering columns ("
-        << write_css(col_sa) << ") and thresholds ("
-        << col_ta.get_str() << ").\n";
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Parse string to determine which value to use
-//
-////////////////////////////////////////////////////////////////////////
-
-double get_seeps_column_value(double f, double o,
-                              const char *s) {
-   double v;
-
-        if(strcasecmp(s, "FCST")        == 0) v = f;
-   else if(strcasecmp(s, "OBS")         == 0) v = o;
-   else if(strcasecmp(s, "SEEPS")       == 0) cout << "  get_mpr_column_value() FIX ME SEEPS at pair_data_point.cc!!!\n";
-   else {
-      mlog << Error << "\nget_seeps_column_value() -> "
-           << "unsupported SEEPS column name requested in \""
-           << conf_key_mpr_column << "\" (" << s << ")!\n\n";
-      exit(1);
-   }
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void apply_seeps_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
-                             const StringArray &col_sa, const ThreshArray &col_ta) {
-
-   // Check for no work to be done
-   if(col_sa.n() == 0 && col_ta.n() == 0) return;
-
-   // Check for constant length
-   if(col_sa.n() != col_ta.n()) {
-      mlog << Error << "\napply_seeps_thresh_mask() -> "
-           << "the \"" << conf_key_mpr_column << "\" ("
-           << write_css(col_sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" (" << write_css(col_ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
-
-   int  nxy = fcst_dp.nx() * fcst_dp.ny();
-   int  n_skip = 0;
-
-   // Loop over the pairs
-   for(int i=0; i<nxy; i++) {
-
-      // Check for bad data
-      if(is_bad_data(fcst_dp.buf()[i])  ||
-         is_bad_data(obs_dp.buf()[i])) continue;
-
-      // Discard pairs which do not meet the threshold criteria
-      if(!check_seeps_thresh(fcst_dp.buf()[i], obs_dp.buf()[i],
-                             col_sa, col_ta)) {
-
-         // Increment skip counter
-         n_skip++;
-
-         // Set point to bad data
-         fcst_dp.buf()[i] = bad_data_double;
-         obs_dp.buf()[i]  = bad_data_double;
       }
    } // end for i
 

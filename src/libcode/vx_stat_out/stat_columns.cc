@@ -1573,9 +1573,10 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                      AsciiTable &txt_at, int &txt_row,
                      bool update_thresh) {
    int i;
+   const char *method_name = "write_seeps_row() -> ";
 
    // SEEPS line type
-   shc.set_line_type(stat_seeps_agg_str);
+   shc.set_line_type(stat_seeps_str);
 
    // Set the threshold columns, if requested.
    if(update_thresh) {
@@ -1588,16 +1589,24 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
-   // Write a line for each matched pair
    for(i=0; i<pd_ptr->n_obs; i++) {
-
-      if (i >= pd_ptr->seeps.size()) break;
-      if (!pd_ptr->seeps[i]
-          || is_eq(pd_ptr->seeps[i]->score, bad_data_double)) continue;
+      if (i >= pd_ptr->seeps_mpr.size()) {
+         mlog << Warning << "\n" << method_name
+              << "can not find the observation valid time.\n\n";
+         return;
+      }
+      if (!pd_ptr->seeps_mpr[i]
+          || is_eq(pd_ptr->seeps_mpr[i]->score, bad_data_double)) continue;
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
       shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
+      break;
+   }
+
+   // Write a line
+   if (pd_ptr->seeps.n_obs > 0
+          && !is_eq(pd_ptr->seeps.score, bad_data_double)) {
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
@@ -1627,10 +1636,9 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                          AsciiTable &stat_at, int &stat_row,
                          AsciiTable &txt_at, int &txt_row,
                          bool update_thresh) {
-   int i;
 
    // SEEPS line type
-   shc.set_line_type(stat_seeps_str);
+   shc.set_line_type(stat_seeps_mpr_str);
 
    // Set the threshold columns, if requested.
    if(update_thresh) {
@@ -1644,7 +1652,7 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pd_ptr->n_obs; i++) {
+   for(int i=0; i<pd_ptr->n_obs; i++) {
 
       if (i >= pd_ptr->seeps_mpr.size()) break;
       if (!pd_ptr->seeps_mpr[i]
@@ -4089,27 +4097,27 @@ void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
    //    PF3,         MEAN_FCST,   MEAN_OBS,
    //    SEEPS
 
-   at.set_entry(r, c+0, pd_ptr->n_obs); // Total Number of Pairs
+   at.set_entry(r, c+0, pd_ptr->seeps.n_obs); // Total Number of Pairs
 
-   at.set_entry(r, c+1, pd_ptr->seeps[i]->s12);  // s12
-   at.set_entry(r, c+2, pd_ptr->seeps[i]->s13);  // S13
-   at.set_entry(r, c+3, pd_ptr->seeps[i]->s21);  // s21
-   at.set_entry(r, c+4, pd_ptr->seeps[i]->s23);  // s23
-   at.set_entry(r, c+5, pd_ptr->seeps[i]->s31);  // s31
-   at.set_entry(r, c+6, pd_ptr->seeps[i]->s32);  // s32
+   at.set_entry(r, c+1, bad_data_double); // pd_ptr->seeps.s12);  // s12
+   at.set_entry(r, c+2, bad_data_double); // pd_ptr->seeps.s13);  // S13
+   at.set_entry(r, c+3, bad_data_double); // pd_ptr->seeps.s21);  // s21
+   at.set_entry(r, c+4, bad_data_double); // pd_ptr->seeps.s23);  // s23
+   at.set_entry(r, c+5, bad_data_double); // pd_ptr->seeps.s31);  // s31
+   at.set_entry(r, c+6, bad_data_double); // pd_ptr->seeps.s32);  // s32
 
-   at.set_entry(r, c+7, pd_ptr->seeps[i]->pv1);   // pv1
-   at.set_entry(r, c+8, pd_ptr->seeps[i]->pv2);   // pv2
-   at.set_entry(r, c+9, pd_ptr->seeps[i]->pv3);   // pv3
+   at.set_entry(r, c+7, bad_data_double); // pd_ptr->seeps.pv1);   // pv1
+   at.set_entry(r, c+8, bad_data_double); // pd_ptr->seeps.pv2);   // pv2
+   at.set_entry(r, c+9, bad_data_double); // pd_ptr->seeps.pv3);   // pv3
 
-   at.set_entry(r, c+10, pd_ptr->seeps[i]->pf1);  // pf1
-   at.set_entry(r, c+11, pd_ptr->seeps[i]->pf2);  // pf2
-   at.set_entry(r, c+12, pd_ptr->seeps[i]->pf3);  // pf3
+   at.set_entry(r, c+10, bad_data_double); // pd_ptr->seeps.pf1);  // pf1
+   at.set_entry(r, c+11, bad_data_double); // pd_ptr->seeps.pf2);  // pf2
+   at.set_entry(r, c+12, bad_data_double); // pd_ptr->seeps.pf3);  // pf3
 
-   at.set_entry(r, c+13, pd_ptr->seeps[i]->mean_fcst);  // mean_fcst
-   at.set_entry(r, c+14, pd_ptr->seeps[i]->mean_obs);   // mean_obs
+   at.set_entry(r, c+13, pd_ptr->seeps.mean_fcst);  // mean_fcst
+   at.set_entry(r, c+14, pd_ptr->seeps.mean_obs);   // mean_obs
 
-   at.set_entry(r, c+15, pd_ptr->seeps[i]->score);      // SEEPS score
+   at.set_entry(r, c+15, pd_ptr->seeps.score);      // SEEPS score
 
    return;
 }
@@ -4117,7 +4125,7 @@ void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
 ////////////////////////////////////////////////////////////////////////
 
 void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
-                      AsciiTable &at, int r, int c) {
+                          AsciiTable &at, int r, int c) {
    //
    // Stable Equitable Error in Probability Space (SEEPS)
    // Dump out the SEEPS line:
@@ -4126,7 +4134,6 @@ void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //    FCST_CAT,    OBS_CAT,     P1,
    //    P2,          T1,          T2,
    //    SEEPS
-
 
    at.set_entry(r, c+0, (string)pd_ptr->sid_sa[i]); // Station ID
 
@@ -4150,6 +4157,7 @@ void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+11, pd_ptr->seeps_mpr[i]->t2); // t2
 
    at.set_entry(r, c+12, pd_ptr->seeps_mpr[i]->score);  // SEEPS score
+
 }
 
 ////////////////////////////////////////////////////////////////////////

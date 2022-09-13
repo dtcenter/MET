@@ -17,7 +17,7 @@
 #include "vx_grid.h"
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
-#include "vx_seeps.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -46,7 +46,7 @@ class PairDataPoint : public PairBase {
       // Forecast values
       NumArray f_na; // Forecast [n_obs]
       std::vector<SeepsScore *> seeps_mpr;
-      std::vector<SeepsAggScore *> seeps;
+      SeepsAggScore seeps;
 
       //////////////////////////////////////////////////////////////////
 

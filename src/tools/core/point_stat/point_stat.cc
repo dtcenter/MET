@@ -1,4 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research led(UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -123,7 +124,7 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
-#include "vx_seeps.h"
+#include "seeps.h"
 
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
@@ -161,6 +162,7 @@ static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDa
 static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
 static void do_hira_ens  (              int, const PairDataPoint *);
 static void do_hira_prob (              int, const PairDataPoint *);
+static void do_seeps_agg (const PairDataPoint *);
 
 static void finish_txt_files();
 
@@ -1026,16 +1028,25 @@ void process_scores() {
                   shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
                }
 
-               // Write out the SEEPS lines
-               if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
+               // Write out the SEEPS MPR lines
+               if(conf_info.vx_opt[i].output_flag[i_seeps_mpr] != STATOutputType_None) {
                   write_seeps_mpr_row(shc, pd_ptr,
-                     conf_info.vx_opt[i].output_flag[i_seeps],
+                     conf_info.vx_opt[i].output_flag[i_seeps_mpr],
                      stat_at, i_stat_row,
-                     txt_at[i_seeps], i_txt_row[i_seeps]);
+                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr]);
 
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
                   shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
+               }
+
+               // Write out the SEEPS lines
+               if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
+                  compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps);
+                  write_seeps_row(shc, pd_ptr,
+                     conf_info.vx_opt[i].output_flag[i_seeps],
+                     stat_at, i_stat_row,
+                     txt_at[i_seeps], i_txt_row[i_seeps]);
                }
 
                // Compute CTS scores

@@ -122,6 +122,7 @@ enum STATLineType {
    stat_prc,
    stat_mpr,
    stat_seeps,
+   stat_seeps_mpr,
    stat_nbrctc,
    stat_nbrcts,
    stat_nbrcnt,
@@ -169,6 +170,7 @@ static const char stat_prc_str[]    = "PRC";
 static const char stat_eclv_str[]   = "ECLV";
 static const char stat_mpr_str[]    = "MPR";
 static const char stat_seeps_str[]  = "SEEPS";
+static const char stat_seeps_mpr_str[] = "SEEPS_MPR";
 static const char stat_nbrctc_str[] = "NBRCTC";
 static const char stat_nbrcts_str[] = "NBRCTS";
 static const char stat_nbrcnt_str[] = "NBRCNT";
@@ -545,8 +547,6 @@ static const char conf_key_censor_thresh[]     = "censor_thresh";
 static const char conf_key_censor_val[]        = "censor_val";
 static const char conf_key_mpr_column[]        = "mpr_column";
 static const char conf_key_mpr_thresh[]        = "mpr_thresh";
-static const char conf_key_seeps_column[]      = "seeps_column";
-static const char conf_key_seeps_thresh[]      = "seeps_thresh";
 static const char conf_key_cnt_thresh[]        = "cnt_thresh";
 static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";

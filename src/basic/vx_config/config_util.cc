@@ -2341,6 +2341,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_eclv):         s = stat_eclv_str;    break;
       case(stat_mpr):          s = stat_mpr_str;     break;
       case(stat_seeps):        s = stat_seeps_str;   break;
+      case(stat_seeps_mpr):    s = stat_seeps_mpr_str;   break;
       case(stat_nbrctc):       s = stat_nbrctc_str;  break;
       case(stat_nbrcts):       s = stat_nbrcts_str;  break;
       case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
@@ -2405,6 +2406,7 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_eclv_str)   == 0) t = stat_eclv;
    else if(strcasecmp(s, stat_mpr_str)    == 0) t = stat_mpr;
    else if(strcasecmp(s, stat_seeps_str)  == 0) t = stat_seeps;
+   else if(strcasecmp(s, stat_seeps_mpr_str)  == 0) t = stat_seeps_mpr;
    else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
    else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
    else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
