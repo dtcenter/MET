@@ -978,9 +978,9 @@ map_linewidth = get_dict_double (dict, linewidth_name);
 
 map_color     = get_dict_color  (dict, linecolor_name);
 
-std::in.open(map_filename.c_str());
+in.open(map_filename.c_str());
 
-if ( !std::in )  {
+if ( !in )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": draw_mapfile() -> unable to open map data file \""
