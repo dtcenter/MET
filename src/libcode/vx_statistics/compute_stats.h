@@ -60,6 +60,8 @@ extern void   compute_i_mean_stdev(const NumArray &,
                                    bool, double, int,
                                    CIInfo &, CIInfo &);
 
+extern void   compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps);
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute means of statistics for climatological bins.
