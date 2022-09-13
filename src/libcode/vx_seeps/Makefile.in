@@ -107,7 +107,7 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libvx_seeps_a_AR = $(AR) $(ARFLAGS)
 libvx_seeps_a_LIBADD =
-am_libvx_seeps_a_OBJECTS = libvx_seeps_a-vx_seeps.$(OBJEXT)
+am_libvx_seeps_a_OBJECTS = libvx_seeps_a-seeps.$(OBJEXT)
 libvx_seeps_a_OBJECTS = $(am_libvx_seeps_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -124,7 +124,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libvx_seeps_a-vx_seeps.Po
+am__depfiles_remade = ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -332,7 +332,7 @@ MAINTAINERCLEANFILES = Makefile.in
 # The library
 noinst_LIBRARIES = libvx_seeps.a
 libvx_seeps_a_SOURCES = \
-              vx_seeps.cc vx_seeps.h
+              seeps.cc seeps.h
 
 libvx_seeps_a_CPPFLAGS = ${MET_CPPFLAGS}
 all: all-am
@@ -383,7 +383,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_seeps_a-vx_seeps.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_seeps_a-seeps.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -405,19 +405,19 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-libvx_seeps_a-vx_seeps.o: vx_seeps.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-vx_seeps.o -MD -MP -MF $(DEPDIR)/libvx_seeps_a-vx_seeps.Tpo -c -o libvx_seeps_a-vx_seeps.o `test -f 'vx_seeps.cc' || echo '$(srcdir)/'`vx_seeps.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-vx_seeps.Tpo $(DEPDIR)/libvx_seeps_a-vx_seeps.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vx_seeps.cc' object='libvx_seeps_a-vx_seeps.o' libtool=no @AMDEPBACKSLASH@
+libvx_seeps_a-seeps.o: seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-seeps.o -MD -MP -MF $(DEPDIR)/libvx_seeps_a-seeps.Tpo -c -o libvx_seeps_a-seeps.o `test -f 'seeps.cc' || echo '$(srcdir)/'`seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-seeps.Tpo $(DEPDIR)/libvx_seeps_a-seeps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='seeps.cc' object='libvx_seeps_a-seeps.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-vx_seeps.o `test -f 'vx_seeps.cc' || echo '$(srcdir)/'`vx_seeps.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-seeps.o `test -f 'seeps.cc' || echo '$(srcdir)/'`seeps.cc
 
-libvx_seeps_a-vx_seeps.obj: vx_seeps.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-vx_seeps.obj -MD -MP -MF $(DEPDIR)/libvx_seeps_a-vx_seeps.Tpo -c -o libvx_seeps_a-vx_seeps.obj `if test -f 'vx_seeps.cc'; then $(CYGPATH_W) 'vx_seeps.cc'; else $(CYGPATH_W) '$(srcdir)/vx_seeps.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-vx_seeps.Tpo $(DEPDIR)/libvx_seeps_a-vx_seeps.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vx_seeps.cc' object='libvx_seeps_a-vx_seeps.obj' libtool=no @AMDEPBACKSLASH@
+libvx_seeps_a-seeps.obj: seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-seeps.obj -MD -MP -MF $(DEPDIR)/libvx_seeps_a-seeps.Tpo -c -o libvx_seeps_a-seeps.obj `if test -f 'seeps.cc'; then $(CYGPATH_W) 'seeps.cc'; else $(CYGPATH_W) '$(srcdir)/seeps.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-seeps.Tpo $(DEPDIR)/libvx_seeps_a-seeps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='seeps.cc' object='libvx_seeps_a-seeps.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-vx_seeps.obj `if test -f 'vx_seeps.cc'; then $(CYGPATH_W) 'vx_seeps.cc'; else $(CYGPATH_W) '$(srcdir)/vx_seeps.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-seeps.obj `if test -f 'seeps.cc'; then $(CYGPATH_W) 'seeps.cc'; else $(CYGPATH_W) '$(srcdir)/seeps.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -544,7 +544,7 @@ clean: clean-am
 clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libvx_seeps_a-vx_seeps.Po
+		-rm -f ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -590,7 +590,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libvx_seeps_a-vx_seeps.Po
+		-rm -f ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

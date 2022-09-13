@@ -12,5 +12,5 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_seeps.a
 libvx_seeps_a_SOURCES = \
-              vx_seeps.cc vx_seeps.h
+              seeps.cc seeps.h
 libvx_seeps_a_CPPFLAGS = ${MET_CPPFLAGS}
