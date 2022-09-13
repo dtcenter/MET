@@ -130,7 +130,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
    if (seeps_ready) {
       SeepsClimoRecord *climo_record = 0;
       map<int,SeepsClimoRecord *>::iterator it;
-      if (hour == 0) {
+      if (hour < 6 || hour >= 18) {
          it = seeps_score_00_map.find(sid);
          if (it != seeps_score_00_map.end()) climo_record = it->second;
       }
