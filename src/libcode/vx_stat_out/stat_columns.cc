@@ -4092,9 +4092,9 @@ void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
    // Dump out the SEEPS line:
    //    TOTAL        S12,         S13,
    //    S21,         S23,         S31,
-   //    S32,         PV1,         PV2,
-   //    PV3,         PF1,         PF2,
-   //    PF3,         MEAN_FCST,   MEAN_OBS,
+   //    S32,         PF1,         PF2,
+   //    PF3,         PV1,         PV2,
+   //    PV3,         MEAN_FCST,   MEAN_OBS,
    //    SEEPS
 
    at.set_entry(r, c+0, pd_ptr->seeps.n_obs); // Total Number of Pairs
@@ -4106,13 +4106,13 @@ void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+5, bad_data_double); // pd_ptr->seeps.s31);  // s31
    at.set_entry(r, c+6, bad_data_double); // pd_ptr->seeps.s32);  // s32
 
-   at.set_entry(r, c+7, bad_data_double); // pd_ptr->seeps.pv1);   // pv1
-   at.set_entry(r, c+8, bad_data_double); // pd_ptr->seeps.pv2);   // pv2
-   at.set_entry(r, c+9, bad_data_double); // pd_ptr->seeps.pv3);   // pv3
+   at.set_entry(r, c+7, bad_data_double); // pd_ptr->seeps.pf1);  // pf1
+   at.set_entry(r, c+8, bad_data_double); // pd_ptr->seeps.pf2);  // pf2
+   at.set_entry(r, c+9, bad_data_double); // pd_ptr->seeps.pf3);  // pf3
 
-   at.set_entry(r, c+10, bad_data_double); // pd_ptr->seeps.pf1);  // pf1
-   at.set_entry(r, c+11, bad_data_double); // pd_ptr->seeps.pf2);  // pf2
-   at.set_entry(r, c+12, bad_data_double); // pd_ptr->seeps.pf3);  // pf3
+   at.set_entry(r, c+10, bad_data_double); // pd_ptr->seeps.pv1);   // pv1
+   at.set_entry(r, c+11, bad_data_double); // pd_ptr->seeps.pv2);   // pv2
+   at.set_entry(r, c+12, bad_data_double); // pd_ptr->seeps.pv3);   // pv3
 
    at.set_entry(r, c+13, pd_ptr->seeps.mean_fcst);  // mean_fcst
    at.set_entry(r, c+14, pd_ptr->seeps.mean_obs);   // mean_obs
