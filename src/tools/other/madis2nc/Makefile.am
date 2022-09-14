@@ -34,6 +34,7 @@ madis2nc_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_color \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
