@@ -42,6 +42,7 @@ test_pressure_levels_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

@@ -29,6 +29,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    07/06/22  Howard Soh      New
+//
+////////////////////////////////////////////////////////////////////////
 
 #include <csignal>
 #include <pwd.h>
@@ -37,9 +39,6 @@
 #include "concat_string.h"
 #include "memory.h"
 #include "logger.h"
-
-
-////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,9 +57,6 @@ extern string get_tool_name();
 
 extern int met_main(int argc, char *argv[]);
 
-//extern void initialize();
-//extern void process_command_line(int argc, char **argv);
-
 void do_post_process();
 void do_pre_process(int argc, char *argv[]);
 void set_handlers();
@@ -72,9 +68,6 @@ void store_arguments(int argc, char **argv);
 int main(int argc, char *argv[]) {
 
    do_pre_process(argc, argv);
-
-   //initialize();
-   //process_command_line(argc, argv);
 
    int return_code = met_main(argc, argv);
 
@@ -122,7 +115,6 @@ string get_current_time() {
    curr_tm = gmtime (&curr_time);
 
    strftime(date_string, MET_BUF_SIZE, "%Y-%m-%d %TZ", curr_tm);
-   //string time_str(date_string);
 
    return string(date_string);
 }

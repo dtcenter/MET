@@ -5,7 +5,8 @@ run_push=false
 run_unit_tests=false
 run_diff=false
 run_update_truth=false
-met_base_image=minimum
+met_base_repo=met-base
+met_base_tag=v1.0
 input_data_version=develop
 truth_data_version=develop
 
@@ -102,7 +103,7 @@ fi
 # if running unit tests, use unit_test MET base image and push image
 if [ "$run_unit_tests" == "true" ]; then
 
-  met_base_image=unit_test
+  met_base_repo=met-base-unit-test
   run_push=true
 
 fi
@@ -112,7 +113,8 @@ echo ::set-output name=run_push::$run_push
 echo ::set-output name=run_unit_tests::$run_unit_tests
 echo ::set-output name=run_diff::$run_diff
 echo ::set-output name=run_update_truth::$run_update_truth
-echo ::set-output name=met_base_image::$met_base_image
+echo ::set-output name=met_base_repo::$met_base_repo
+echo ::set-output name=met_base_tag::$met_base_tag
 echo ::set-output name=input_data_version::$input_data_version
 echo ::set-output name=truth_data_version::$truth_data_version
 
@@ -121,7 +123,8 @@ echo run_push: $run_push
 echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
-echo met_base_image: $met_base_image
+echo met_base_repo: $met_base_repo
+echo met_base_tag: $met_base_tag
 echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
 
