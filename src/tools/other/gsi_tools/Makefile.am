@@ -53,6 +53,7 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -99,6 +100,7 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

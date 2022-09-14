@@ -432,7 +432,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
           (!is_bad_data(vinfo->process())   && vinfo->process()   != (*it)->Process  ) ||
           (!is_bad_data(vinfo->ens_type())  && vinfo->ens_type()  != (*it)->EnsType  ) ||
           (!is_bad_data(vinfo->der_type())  && vinfo->der_type()  != (*it)->DerType  ) ||
-          (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ){
+          (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ||
+          (!is_bad_data(vinfo->perc_val())  && vinfo->perc_val()  != (*it)->PercVal  ) ){
          continue;
       }
 
@@ -523,10 +524,13 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }  //  END: if( level match )
 
          //  if seeking a probabilistic field, check the prob info
-         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() && (*it)->ProbFlag ){
+         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() ) {
 
             rec_match_ex = rec_match_rn = false;
-
+            
+            //  no match unless the data contains probabilities
+            if( !(*it)->ProbFlag ) { continue; }
+            
             SingleThresh v_thr_lo = vinfo->p_thresh_lo();
             SingleThresh v_thr_hi = vinfo->p_thresh_hi();
 
@@ -695,17 +699,24 @@ void MetGrib2DataFile::read_grib2_record_list() {
               1 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer at a point in time
               2 != gfld->ipdtnum &&     //  ensemble mean
               5 != gfld->ipdtnum &&     //  probability forecast
+              6 != gfld->ipdtnum &&     //  percentile forecasts at a horizontal level or in a horizontal layer at a point in time
               8 != gfld->ipdtnum &&     //  accumulation forecast
               9 != gfld->ipdtnum &&     //  probabilistic accumulation forecast
+             10 != gfld->ipdtnum &&     //  percentile forecasts at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
+             15 != gfld->ipdtnum &&     //  Average, accumulation, extreme values or other statistically-processed values over a spatial area at a horizontal level or in a horizontal layer at a point in time
              46 != gfld->ipdtnum &&     //  average, accumulation, and/or extreme values or other statistically processed values at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval for aerosol.
              48 != gfld->ipdtnum ){     //  analysis or forecast at a horizontal level or in a horizontal layer at a point in time for aerosol.
-            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+            
+            // Print Warning, continue
+            mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
-                 << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions\n\n";
-            exit(1);
+                 << "Please create a new post with this information in the METplus GitHub Discussions forum at https://github.com/dtcenter/METplus/discussions. "
+                 << "Continuing to try and get the record information.\n\n";
+            
+            continue;
          }
 
          //  store the record information
@@ -729,15 +740,16 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  store the full pdtmpl values
-         for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
-
+         for(int j=0; j < gfld->ipdtlen; j++) {
+            rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
+         }
+         
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
-            rec->LvlVal2 = rec->LvlVal1;
-
-         //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+            rec->LvlVal2 = rec->LvlVal1;    
+           //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
+           //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
          } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
@@ -788,6 +800,11 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  statistical processing type for template 8 (Table 4.10)
          if( 8 == gfld->ipdtnum ){
             rec->StatType = gfld->ipdtmpl[23];
+         }
+
+         //  percentile value for templates 6 and 10
+         if( 6 == gfld->ipdtnum || 10 == gfld->ipdtnum ){
+            rec->PercVal = gfld->ipdtmpl[15];
          }
 
          //  depending on the template number, determine the reference times

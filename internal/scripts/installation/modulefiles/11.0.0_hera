@@ -1,0 +1,22 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v11.0.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+# The intel compiler is required to run MET
+prereq intel
+prereq anaconda/latest
+
+set base /contrib/met
+set ver  11.0.0
+set share $base/$ver/share/met
+set lib_base $base/11.0.0
+setenv MET_ROOT $base/$ver/MET-11.0.0
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
+
+

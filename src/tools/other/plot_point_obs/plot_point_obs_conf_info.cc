@@ -95,7 +95,7 @@ void PlotPointObsOpt::clear() {
    store_obs_val = false;
    fill_point = false;
    outline_point = false;
-    
+
    return;
 }
 
@@ -368,6 +368,9 @@ void PlotPointObsConfInfo::clear() {
    point_opts.clear();
    do_colorbar = false;
 
+   tmp_dir.clear();
+   version.clear();
+
    // Delete allocated memory
    if(grid_data_info) { delete grid_data_info; grid_data_info = 0; }
 
@@ -417,6 +420,12 @@ void PlotPointObsConfInfo::process_config(
 
    // Initialize
    clear();
+
+   // Conf: version
+   version = parse_conf_version(&conf);
+
+   // Conf: tmp_dir
+   tmp_dir = parse_conf_tmp_dir(&conf);
 
    // Conf: grid_data
    dict = conf.lookup_dictionary(conf_key_grid_data);

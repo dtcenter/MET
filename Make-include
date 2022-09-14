@@ -3,6 +3,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/basic/vx_log \
 	     -I${top_builddir}/src/basic/vx_math \
 	     -I${top_builddir}/src/basic/vx_util \
+	     -I${top_builddir}/src/basic/vx_util_math \
 	     -I${top_builddir}/src/libcode/vx_afm \
 	     -I${top_builddir}/src/libcode/vx_analysis_util \
 	     -I${top_builddir}/src/libcode/vx_color \
@@ -48,6 +49,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/basic/vx_log \
 	     -L${top_builddir}/src/basic/vx_math \
 	     -L${top_builddir}/src/basic/vx_util \
+	     -L${top_builddir}/src/basic/vx_util_math \
 	     -L${top_builddir}/src/libcode/vx_afm \
 	     -L${top_builddir}/src/libcode/vx_analysis_util \
 	     -L${top_builddir}/src/libcode/vx_color \

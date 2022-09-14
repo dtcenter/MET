@@ -81,6 +81,14 @@ plot_point_obs configuration file
 The default configuration file for the Plot-Point-Obs tool named **PlotPointObsConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+________________________
+
+.. code-block:: none
+
+  tmp_dir        = "/tmp";
+  version        = "VN.N";
+
+The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
 ______________________
 
@@ -178,7 +186,7 @@ ______________________
 
 .. code-block:: none
 
-   dotsize(x) = 10;
+   dotsize(x) = 1.0;
 
 The **dotsize(x)** function defines the size of the circle to be plotted as a function of the observation value. The default setting shown above defines the dot size as a constant value.
 
@@ -208,7 +216,7 @@ The circles are filled in based on the setting of the **fill_color** and **fill_
 
 Users are encouraged to define as many **point_data** array entries as needed to filter and plot the input observations in the way they would like. Each point observation is plotted using the options specified in the first matching array entry. Note that the filtering, processing, and plotting options specified inside each **point_data** array entry take precedence over ones specified at the higher level of configuration file context.
 
-For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **plot_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
+For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **point_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
 
 .. _plot_data_plane-usage:
 

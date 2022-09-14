@@ -1206,6 +1206,7 @@ AC_CONFIG_FILES([Makefile
                  src/basic/vx_log/Makefile
                  src/basic/vx_math/Makefile
                  src/basic/vx_util/Makefile
+                 src/basic/vx_util_math/Makefile
                  src/libcode/Makefile
                  src/libcode/vx_afm/Makefile
                  src/libcode/vx_analysis_util/Makefile

@@ -339,6 +339,7 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_gnomon \
 	-lvx_nav \
 	-lvx_log \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_config \
 	-lvx_gsl_prob \

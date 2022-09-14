@@ -81,7 +81,7 @@ return ( 0 );
 
 
 const string get_tool_name() {
-   return "gribtab_daT-to_flat";
+   return "gribtab_dat_to_flat";
 }
 
 
