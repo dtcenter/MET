@@ -1702,7 +1702,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
   double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
 
-  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
+  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE && fabs(dx_m + dy_m) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
          << "MET can only process Lambert Conformal files where the x-axis and y-axis deltas are the same\n\n";
@@ -1769,6 +1769,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.so2_angle = 0.0;
 
   grid.set(data);
+  if (dy_m < 0) grid.set_swap_to_north(true);
+
   if(std_parallel_att) delete std_parallel_att;
   if(central_lon_att) delete central_lon_att;
   if(proj_origin_lat_att) delete proj_origin_lat_att;
