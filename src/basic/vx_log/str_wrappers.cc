@@ -109,7 +109,7 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
 
 ////////////////////////////////////////////////////////////////////////
 
-void m_rstrip(char *str_buf, int buf_len) {
+void m_rstrip(char *str_buf, int buf_len, bool find_white_ch) {
    // Make sure it's NULL terminated
    if (buf_len >= 0) str_buf[buf_len] = '\0';
    // Change the trailing blank space to a null
@@ -119,6 +119,7 @@ void m_rstrip(char *str_buf, int buf_len) {
          str_buf[idx] = '\0';
          if((idx > 0) && !is_whitespaces(str_buf[idx-1])) break;
       }
+      else if (!find_white_ch) break;
    }
 }
 

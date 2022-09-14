@@ -27,7 +27,7 @@ extern void m_strncpy(char *to_str, const char *from_str, const int buf_len,
                       const char *method_name, const char *extra_msg=(char *)0,
                       bool truncate=false);
 
-extern void m_rstrip(char *str_buf, const int buf_len=-1);
+extern void m_rstrip(char *str_buf, const int buf_len=-1, bool find_white_ch=true);
 
 extern bool is_whitespaces(char cur_char);
 
