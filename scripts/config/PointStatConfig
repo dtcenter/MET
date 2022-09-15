@@ -204,6 +204,8 @@ output_flag = {
    rps    = NONE; // Only for HiRA
    eclv   = BOTH;
    mpr    = BOTH;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
