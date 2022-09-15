@@ -19,6 +19,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+bool is_whitespaces(char cur_char) {
+   return (' ' == cur_char || '\t' == cur_char || '\n' == cur_char || '\r' == cur_char);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int m_strlen(const char *str) {
    int str_len = -1;
    if (str) str_len = strlen(str);
@@ -109,6 +115,21 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool m_replace_char(char *str_buf, char from_ch, char to_ch, bool all_instances) {
+   bool replaced = false;
+   int str_len = m_strlen(str_buf);
+   for(int idx=0; idx<str_len; idx++) {
+      if (from_ch == str_buf[idx]) {
+         replaced = true;
+         str_buf[idx] = to_ch;
+         if (!all_instances) break;
+      }
+   }
+   return replaced;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void m_rstrip(char *str_buf, int buf_len, bool find_white_ch) {
    // Make sure it's NULL terminated
    if (buf_len >= 0) str_buf[buf_len] = '\0';
@@ -121,12 +142,6 @@ void m_rstrip(char *str_buf, int buf_len, bool find_white_ch) {
       }
       else if (!find_white_ch) break;
    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool is_whitespaces(char cur_char) {
-   return (' ' == cur_char || '\t' == cur_char || '\n' == cur_char || '\r' == cur_char);
 }
 
 ////////////////////////////////////////////////////////////////////////
