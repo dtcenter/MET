@@ -16,9 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS =
-
-seepsdir = $(pkgdatadir)/seeps
+seepsdir = $(pkgdatadir)/climo/seeps
 
 seeps_DATA = \
      PPT24_seepsweights.nc

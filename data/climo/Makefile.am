@@ -16,7 +16,8 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS =  \
-	seeps
+SUBDIRS = seeps
+
+climodir = $(pkgdatadir)/climo
 
 MAINTAINERCLEANFILES 	= Makefile.in 

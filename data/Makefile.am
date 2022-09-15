@@ -19,7 +19,7 @@
 SUBDIRS = \
 	climo \
 	colortables \
-	colortables \
+	config \
 	map \
 	poly \
 	ps \
