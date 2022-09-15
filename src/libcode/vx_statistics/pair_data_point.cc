@@ -445,8 +445,6 @@ void VxPairDataPoint::clear() {
    obs_qty_exc_filt.clear();
    mpr_column.clear();
    mpr_thresh.clear();
-   seeps_column.clear();
-   seeps_thresh.clear();
 
    fcst_ut     = (unixtime) 0;
    beg_ut      = (unixtime) 0;
@@ -510,8 +508,6 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    mpr_column = vx_pd.mpr_column;
    mpr_thresh = vx_pd.mpr_thresh;
-   seeps_column = vx_pd.seeps_column;
-   seeps_thresh = vx_pd.seeps_thresh;
 
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;

@@ -4046,7 +4046,6 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
 
-   //string sid_str = (string)pd_ptr->sid_sa[i];
    at.set_entry(r, c+2,  // Station ID
       (string)pd_ptr->sid_sa[i]);
 
@@ -4096,6 +4095,7 @@ void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
    //    PF3,         PV1,         PV2,
    //    PV3,         MEAN_FCST,   MEAN_OBS,
    //    SEEPS
+   //
 
    at.set_entry(r, c+0, pd_ptr->seeps.n_obs); // Total Number of Pairs
 
@@ -4134,6 +4134,7 @@ void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //    FCST_CAT,    OBS_CAT,     P1,
    //    P2,          T1,          T2,
    //    SEEPS
+   //
 
    at.set_entry(r, c+0, (string)pd_ptr->sid_sa[i]); // Station ID
 

@@ -55,9 +55,6 @@ SeepsClimo::SeepsClimo() {
    if (file_exists(seeps_name.c_str())) {
       read_records(seeps_name);
    }
-   //else {
-   //   exit(1);
-   //}
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,7 +136,6 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
          if (it != seeps_score_12_map.end()) climo_record = it->second;
       }
       if (climo_record) {
-         //if (standalone_debug_seeps) print_record(climo_record, true);
 
          record = new SeepsRecord;
          record->sid = climo_record->sid;
@@ -204,7 +200,7 @@ float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
    SeepsRecord *record = get_record(sid, month, hour);
 
    if (record) {
-      /* Determine location in contingency table */
+      // Determine location in contingency table
       int ic = (p_obs>record->t1)+(p_obs>record->t2);
       int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
 

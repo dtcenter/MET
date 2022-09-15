@@ -55,10 +55,6 @@ class PairDataPoint : public PairBase {
 
       void extend(int);
 
-//      bool add_point_pair(const char *, double, double, double, double,
-//                          unixtime, double, double, double, double,
-//                          const char *, double, double, double,
-//                          double seeps=bad_data_double);
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, double, double, double);
@@ -146,11 +142,6 @@ class VxPairDataPoint {
 
       StringArray mpr_column;    // Names of MPR columns or diffs of columns
       ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
-
-      //////////////////////////////////////////////////////////////////
-
-      StringArray seeps_column;  // Names of MPR columns or diffs of columns
-      ThreshArray seeps_thresh;  // Filtering thresholds for the MPR columns
 
       //////////////////////////////////////////////////////////////////
 

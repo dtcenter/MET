@@ -11,7 +11,6 @@
 
 
 #include <map>
-//#include <vector>
 
 #include "concat_string.h"
 
@@ -39,25 +38,6 @@ static const char *var_name_t1_12     = "t1_12";
 static const char *var_name_t2_12     = "t2_12";
 static const char *var_name_matrix_00 = "matrix_00";
 static const char *var_name_matrix_12 = "matrix_12";
-
-////////////////////////////////////////////////////////////////////////
-
-
-//extern void make_program(const char * input, Program &);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //   maximum stack depth needed to run the program
-
-//extern int max_depth(const Program &);
-
-
-   //   largest local variable number in program
-
-//extern int max_local(const Program &);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,10 +69,10 @@ struct SeepsAggScore {
    float s23;
    float s31;
    float s32;
-   float pv1;   //marginal probabilities of the observed values
+   float pv1;   // marginal probabilities of the observed values
    float pv2;
    float pv3;
-   float pf1;   //marginal probabilities of the forecast values
+   float pf1;   // marginal probabilities of the forecast values
    float pf2;
    float pf3;
    float mean_fcst;
@@ -134,8 +114,6 @@ struct SeepsClimoRecord {
 
 class SeepsClimo {
 
-      //friend class Grid;
-
    private:
 
       bool seeps_ready;
@@ -166,10 +144,6 @@ class SeepsClimo {
       //
       //
 
-
-
-      //
-
       SeepsRecord get_seeps_record(int sid) const;
 
 };
@@ -182,11 +156,8 @@ extern void release_seeps_climo();
 ////////////////////////////////////////////////////////////////////////
 
 
-//inline bool LambertGrid::is_north() const { return (   IsNorthHemisphere ); }
-
 #endif   /*  __SEEPS_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
