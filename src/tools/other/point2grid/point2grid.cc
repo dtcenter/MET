@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
+#include <string.h>
 
 #include "main.h"
 #include "vx_log.h"
@@ -101,6 +102,10 @@ static IntArray message_type_list;
 
 // Variables for command line arguments
 static ConcatString InputFilename;
+
+// New array to store input files, this will replace InputFilename
+static StringArray  obs_file;
+
 static ConcatString OutputFilename;
 static ConcatString AdpFilename;
 static ConcatString config_filename;
@@ -165,6 +170,8 @@ static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(NcFile *nc_in);
 
+static void set_point_obs(const StringArray &);
+
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
 //
@@ -203,7 +210,8 @@ static void set_qc_flags(const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
+   int i;
+   
    // Store the program name
    program_name = get_short_name(argv[0]);
 
@@ -213,6 +221,15 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
+   // This will replace the process_data_file() call above
+   // We will store the multiple input obs files in a obs_file string_array
+   //
+   // Process each observation netCDF file
+   for(i=0; i<obs_file.n(); i++) {
+      cout << "Working on obs_file: " << i << " " << obs_file[i] << endl;
+      //process_data_file(i);
+   }
+   
    return(0);
 }
 
@@ -249,6 +266,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_field,           "-field",           1);
+   cline.add(set_point_obs,       "-point_obs",       1);
    cline.add(set_method,          "-method",          1);
    cline.add(set_vld_thresh,      "-vld_thresh",      1);
    cline.add(set_name,            "-name",            1);
@@ -259,7 +277,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_prob_cat_thresh, "-prob_cat_thresh", 1);
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
    cline.add(set_gaussian_dx,     "-gaussian_dx",     1);
-
+      
    cline.allow_numbers();
 
    // Parse the command line
@@ -2763,8 +2781,9 @@ void usage() {
         << "\tinput_filename\n"
         << "\tto_grid\n"
         << "\toutput_filename\n"
-        << "\t-field string\n"
+        << "\t-field string\n"      
         << "\t[-config file]\n"
+        << "\t[-point_obs file]\n"
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-gaussian_dx n]\n"
@@ -2792,6 +2811,9 @@ void usage() {
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate gridded data (optional).\n"
 
+        << "\t\t\"-point_obs file\" specifies additional input NetCDF "
+        << "observation files to be used in conjunction with the input_file (optional).\n"
+      
         << "\t\t\"-qc flags\" specifies a comma-separated list of QC flags, for example \"0,1\" (optional).\n"
         << "\t\t\tOnly applied if grid_mapping is set to \"goes_imager_projection\" and the QC variable exists.\n"
 
@@ -2826,6 +2848,13 @@ void usage() {
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_point_obs(const StringArray & a)
+{
+   obs_file.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
