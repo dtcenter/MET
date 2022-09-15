@@ -209,6 +209,8 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_seeps_mpr.txt</stat>
     </output>
   </test>
 
@@ -241,6 +243,8 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_seeps_mpr.txt</stat>
     </output>
   </test>
 
@@ -273,6 +277,8 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_seeps_mpr.txt</stat>
     </output>
   </test>
 
