@@ -693,6 +693,7 @@ void process_ioda_file(int i_pb) {
          char tmp_sid[nstring+1];
          m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name_s, "tmp_sid");
          m_rstrip(tmp_sid, nstring, false);
+         m_replace_char(tmp_sid, ' ', '_');
          hdr_sid = tmp_sid;
       }
       else hdr_sid.clear();
