@@ -52,6 +52,9 @@ Observation::Observation(const string &header_type, const string &station_id,
   _height(height_m),
   _value(value)
 {
+
+std::replace(_stationId.begin(), _stationId.end(), ' ', '_');
+
 }
 
 
