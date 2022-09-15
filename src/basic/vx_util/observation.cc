@@ -53,7 +53,9 @@ Observation::Observation(const string &header_type, const string &station_id,
   _value(value)
 {
 
-std::replace(_stationId.begin(), _stationId.end(), ' ', '_');
+string::iterator it = _stationId.begin();
+while (' ' == *it) it++;    // skip leading spaces
+std::replace(it, _stationId.end(), ' ', '_');
 
 }
 
