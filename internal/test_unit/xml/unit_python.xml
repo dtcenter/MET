@@ -587,4 +587,45 @@
     </output>
   </test>
 
+  <test name="python_plot_data_plane_SEMILATLON_ZONAL_MEAN">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+    PYTHON_NUMPY \
+    &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_ZONAL_MEAN.ps \
+    'name="&MET_BASE;/python/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lat";' \
+    -title "WRF Zonal Mean" \
+    -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_ZONAL_MEAN.ps</ps>
+    </output>
+  </test>
+
+  <test name="python_pcp_combine_SEMILATLON_MERIDIONAL_MEAN">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+    -add PYTHON_NUMPY \
+    'name="&MET_BASE;/python/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lon";' \
+    &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.nc \
+    -name "TT_MERIDIONAL_MEAN" -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.nc</ps>
+    </output>
+  </test>
+
+  <test name="python_plot_data_plane_SEMILATLON_MERIDIONAL_MEAN">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+    &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.nc \
+    &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.ps \
+    'name="TT_MERIDIONAL_MEAN"; level="(*,*)";' \
+    -title "WRF Meridional Mean" \
+    -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.ps</ps>
+    </output>
+  </test>
+
 </met_test>
