@@ -1572,7 +1572,6 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row,
                      bool update_thresh) {
-   int i;
    const char *method_name = "write_seeps_row() -> ";
 
    // SEEPS line type
@@ -1589,30 +1588,15 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
-   for(i=0; i<pd_ptr->n_obs; i++) {
-      if (i >= pd_ptr->seeps_mpr.size()) {
-         mlog << Warning << "\n" << method_name
-              << "can not find the observation valid time.\n\n";
-         return;
-      }
-      if (!pd_ptr->seeps_mpr[i]
-          || is_eq(pd_ptr->seeps_mpr[i]->score, bad_data_double)) continue;
-
-      // Set the observation valid time
-      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
-      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
-      break;
-   }
-
    // Write a line
-   if (pd_ptr->seeps.n_obs > 0
-          && !is_eq(pd_ptr->seeps.score, bad_data_double)) {
+   if(pd_ptr->seeps.n_obs > 0 &&
+      !is_bad_data(pd_ptr->seeps.score)) {
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      write_seeps_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+      write_seeps_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_type == STATOutputType_Both) {
@@ -1654,9 +1638,9 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    // Write a line for each matched pair
    for(int i=0; i<pd_ptr->n_obs; i++) {
 
-      if (i >= pd_ptr->seeps_mpr.size()) break;
-      if (!pd_ptr->seeps_mpr[i]
-          || is_eq(pd_ptr->seeps_mpr[i]->score, bad_data_double)) continue;
+      if(i >= pd_ptr->seeps_mpr.size()) break;
+      if(!pd_ptr->seeps_mpr[i] ||
+         is_bad_data(pd_ptr->seeps_mpr[i]->score)) continue;
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
@@ -4084,7 +4068,7 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_seeps_cols(const PairDataPoint *pd_ptr, int i,
+void write_seeps_cols(const PairDataPoint *pd_ptr,
                           AsciiTable &at, int r, int c) {
    //
    // Stable Equitable Error in Probability Space (SEEPS)

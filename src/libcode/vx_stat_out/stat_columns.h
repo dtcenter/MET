@@ -179,7 +179,7 @@ extern void write_dmap_cols  (const DMAPInfo &,
                               AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *, int,
                               AsciiTable &, int, int);
-extern void write_seeps_cols (const PairDataPoint *, int,
+extern void write_seeps_cols (const PairDataPoint *,
                               AsciiTable &, int, int);
 extern void write_seeps_mpr_cols (const PairDataPoint *, int,
                               AsciiTable &, int, int);
