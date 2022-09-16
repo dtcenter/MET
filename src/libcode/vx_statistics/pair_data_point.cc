@@ -1009,6 +1009,11 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
+   int precip_interval = bad_data_int;
+   if (precip_flag) {
+      if (wgt_dp) precip_interval = wgt_dp->accum();
+      else precip_interval = fcst_dpa[0].accum();
+   }
 
    hdr_lat = hdr_arr[0];
    hdr_lon = hdr_arr[1];
@@ -1364,7 +1369,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                inc_count(rej_dup, i, j, k);
             }
             seeps = 0;
-            if (precip_flag) {
+            if (precip_flag && precip_interval == 10800) {  // 24 hour precip only
                seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
             }
             pd[i][j][k].set_seeps_score(seeps);
