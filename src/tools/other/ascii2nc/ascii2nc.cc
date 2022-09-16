@@ -556,6 +556,9 @@ void set_format(const StringArray & a) {
    else if(AirnowHandler::getFormatStringHourlyAqObs() == a[0]) {
      ascii_format = ASCIIFormat_Airnow_hourlyaqobs;
    }
+   else if(AirnowHandler::getFormatStringHourly() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_hourly;
+   }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v2;
