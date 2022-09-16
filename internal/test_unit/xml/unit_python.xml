@@ -610,7 +610,7 @@
     -name "TT_MERIDIONAL_MEAN" -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.nc</ps>
+      <grid_nc>&OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12:00:00_PLEV_MERIDIONAL_MEAN.nc</grid_nc>
     </output>
   </test>
 
