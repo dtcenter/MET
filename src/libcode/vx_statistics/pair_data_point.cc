@@ -68,7 +68,9 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 
 void PairDataPoint::init_from_scratch() {
 
+   seeps_mpr.clear();
    clear();
+   seeps_climo = get_seeps_climo();
 
    return;
 }
@@ -80,6 +82,11 @@ void PairDataPoint::clear() {
    PairBase::clear();
 
    f_na.clear();
+   for (int idx=0; idx<seeps_mpr.size(); idx++) {
+      if (seeps_mpr[idx]) delete seeps_mpr[idx];
+   }
+   seeps_mpr.clear();
+   seeps.init();
 
    return;
 }
@@ -91,6 +98,10 @@ void PairDataPoint::erase() {
    PairBase::erase();
 
    f_na.erase();
+   for (int idx=0; idx<seeps_mpr.size(); idx++) {
+      if (seeps_mpr[idx]) delete seeps_mpr[idx];
+      seeps_mpr[idx] = NULL;
+   }
 
    return;
 }
@@ -102,6 +113,7 @@ void PairDataPoint::extend(int n) {
    PairBase::extend(n);
 
    f_na.extend(n);
+   for (int idx=seeps_mpr.size(); idx<n; idx++) seeps_mpr.push_back(NULL);
 
    return;
 }
@@ -131,11 +143,13 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    if(pd.is_point_vx()) {
 
       for(i=0; i<pd.n_obs; i++) {
-         add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
+         if (add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                         pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                         pd.lvl_na[i], pd.elv_na[i],
                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                        pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+                        pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i])) {
+            if (i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
+         }
       }
    }
    // Handle gridded data
@@ -158,8 +172,33 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                      cmn, csd, wgt)) return(false);
 
    f_na.add(f);
+   seeps_mpr.push_back((SeepsScore *)NULL);
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
+   if (seeps) {
+      int seeps_count = seeps_mpr.size();
+      if(index < 0) index = seeps_count - 1;
+      if(index < seeps_count) {
+         if (seeps) {
+            if (!seeps_mpr[index]) seeps_mpr[index] = new SeepsScore();
+            *seeps_mpr[index] = *seeps;
+         }
+         else {
+            if (seeps_mpr[index]) {
+               delete seeps_mpr[index];
+               seeps_mpr[index] = NULL;
+            }
+         }
+      }
+      else mlog << Warning << "\nPairDataPoint::set_seeps_score("
+                << index << ") is out of range " << seeps_count << "\n\n";
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -169,7 +208,8 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                                    double x, double y, unixtime ut,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
-                                   double cmn, double csd, double wgt) {
+                                   double cmn, double csd, double wgt,
+                                   SeepsScore *seeps) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
@@ -182,6 +222,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                  o, qc, cmn, csd, wgt);
 
    f_na.set(i_obs, f);
+   *seeps_mpr[i_obs] = *seeps;
 
    return;
 }
@@ -194,6 +235,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cmn, csd, wgt);
 
    f_na.add(f);
+   seeps_mpr.push_back(NULL);
 
    return(true);
 }
@@ -229,6 +271,31 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    n_obs += o_in.n();
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static int seeps_record_count = 0;
+static int seeps_debug_level = 9;
+
+SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
+                                         double o, unixtime ut) {
+   SeepsScore *seeps = 0;
+   int month, day, year, hour, minute, second;
+
+   int sid_no = atoi(sid);
+   if (sid_no) {
+      unix_to_mdyhms(ut, month, day, year, hour, minute, second);
+      seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
+      if (mlog.verbosity_level() >= seeps_debug_level
+          && seeps && !is_eq(seeps->score, bad_data_double)
+          && !is_eq(seeps->score, 0) && seeps_record_count < 10) {
+         mlog << Debug(seeps_debug_level)
+              << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
+         seeps_record_count++;
+      }
+   }
+   return seeps;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -269,11 +336,13 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 
          // Handle point data
          if(is_point_vx()) {
-            out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
+            if (out_pd.add_point_pair(sid_sa[i].c_str(), lat_na[i],
                       lon_na[i], x_na[i], y_na[i],
                       vld_ta[i], lvl_na[i], elv_na[i],
                       f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                      cmn_na[i], csd_na[i], wgt_na[i]);
+                      cmn_na[i], csd_na[i], wgt_na[i])) {
+               out_pd.set_seeps_score(seeps_mpr[i], i);
+            }
          }
          // Handle gridded data
          else {
@@ -938,6 +1007,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       return;
    }
 
+   bool precip_flag = fcst_info->is_precipitation() &&
+                      obs_info->is_precipitation();
+   int precip_interval = bad_data_int;
+   if (precip_flag) {
+      if (wgt_dp) precip_interval = wgt_dp->accum();
+      else precip_interval = fcst_dpa[0].accum();
+   }
+
    hdr_lat = hdr_arr[0];
    hdr_lon = hdr_arr[1];
    hdr_elv = hdr_arr[2];
@@ -1116,6 +1193,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Look through all of the PairDataPoint objects to see if the
    // observation should be added.
 
+   bool has_seeps = false;
+   SeepsScore *seeps = 0;
+
    // Check the message types
    for(i=0; i<n_msg_typ; i++) {
 
@@ -1288,7 +1368,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << "\n";
                inc_count(rej_dup, i, j, k);
             }
-
+            seeps = 0;
+            if (precip_flag && precip_interval == 24*60*60) {  // 24 hour precip only
+               seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
+            }
+            pd[i][j][k].set_seeps_score(seeps);
+            if (seeps) delete seeps;
          } // end for k
       } // end for j
    } // end for i

@@ -1099,10 +1099,11 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
    int n_bin;
+   const char *method_name = "PointStatVxOpt::n_txt_row(int) -> ";
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
-      mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+      mlog << Error << "\n" << method_name
            << "range check error for " << i_txt_row << "\n\n";
       exit(1);
    }
@@ -1280,13 +1281,24 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
+      case(i_seeps_mpr):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
+      case(i_seeps):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
       default:
-         mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+         mlog << Error << "\n" << method_name
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
    }
-
    return(n);
 }
 

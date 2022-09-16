@@ -16,26 +16,8 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	climo \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data \
-	wrappers
+SUBDIRS = seeps
 
-topdir = $(pkgdatadir)
+climodir = $(pkgdatadir)/climo
 
-top_DATA = \
-	version.txt
-
-EXTRA_DIST = ${top_DATA} \
-	sample_fcst \
-	sample_obs \
-	python \
-	copyright_notice.txt
-
-MAINTAINERCLEANFILES 	= Makefile.in
+MAINTAINERCLEANFILES 	= Makefile.in 

@@ -8,8 +8,6 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-OPT_PYTHON_SOURCES =
-
 # The library
 
 noinst_LIBRARIES = libvx_util_math.a

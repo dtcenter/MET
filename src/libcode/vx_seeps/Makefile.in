@@ -88,8 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = series_analysis$(EXEEXT)
-subdir = src/tools/core/series_analysis
+subdir = src/libcode/vx_seeps
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -99,17 +98,17 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
-am_series_analysis_OBJECTS =  \
-	series_analysis-series_analysis.$(OBJEXT) \
-	series_analysis-series_analysis_conf_info.$(OBJEXT)
-series_analysis_OBJECTS = $(am_series_analysis_OBJECTS)
-am__DEPENDENCIES_1 =
-series_analysis_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-series_analysis_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(series_analysis_LDFLAGS) $(LDFLAGS) -o $@
+LIBRARIES = $(noinst_LIBRARIES)
+AR = ar
+ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR      " $@;
+am__v_AR_1 = 
+libvx_seeps_a_AR = $(AR) $(ARFLAGS)
+libvx_seeps_a_LIBADD =
+am_libvx_seeps_a_OBJECTS = libvx_seeps_a-seeps.$(OBJEXT)
+libvx_seeps_a_OBJECTS = $(am_libvx_seeps_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -125,8 +124,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/series_analysis-series_analysis.Po \
-	./$(DEPDIR)/series_analysis-series_analysis_conf_info.Po
+am__depfiles_remade = ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -145,8 +143,20 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(series_analysis_SOURCES)
-DIST_SOURCES = $(series_analysis_SOURCES)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+SOURCES = $(libvx_seeps_a_SOURCES)
+DIST_SOURCES = $(libvx_seeps_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -318,40 +328,13 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
-series_analysis_SOURCES = series_analysis.cc \
-	series_analysis_conf_info.cc
 
-series_analysis_CPPFLAGS = ${MET_CPPFLAGS}
-series_analysis_LDFLAGS = ${MET_LDFLAGS}
-series_analysis_LDADD = -lvx_stat_out \
-	-lvx_statistics \
-	-lvx_shapedata \
-	-lvx_gsl_prob \
-	-lvx_analysis_util \
-	-lvx_data2d_factory \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
-	-lvx_data2d_nccf \
-	-lvx_statistics \
-	-lvx_data2d \
-	-lvx_nc_util \
-	-lvx_regrid \
-	-lvx_grid \
-	-lvx_seeps \
-	-lvx_config \
-	-lvx_cal \
-	-lvx_util_math \
-	-lvx_util \
-	-lvx_math \
-	-lvx_color \
-	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+# The library
+noinst_LIBRARIES = libvx_seeps.a
+libvx_seeps_a_SOURCES = \
+              seeps.cc seeps.h
 
-EXTRA_DIST = series_analysis.h \
-	series_analysis_conf_info.h
-
+libvx_seeps_a_CPPFLAGS = ${MET_CPPFLAGS}
 all: all-am
 
 .SUFFIXES:
@@ -365,9 +348,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/tools/core/series_analysis/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/libcode/vx_seeps/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/tools/core/series_analysis/Makefile
+	  $(AUTOMAKE) --foreign src/libcode/vx_seeps/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -385,52 +368,14 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
-	fi; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p \
-	  ; then echo "$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n;h' \
-	    -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
-	    } \
-	; done
 
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' \
-	`; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-
-series_analysis$(EXEEXT): $(series_analysis_OBJECTS) $(series_analysis_DEPENDENCIES) $(EXTRA_series_analysis_DEPENDENCIES) 
-	@rm -f series_analysis$(EXEEXT)
-	$(AM_V_CXXLD)$(series_analysis_LINK) $(series_analysis_OBJECTS) $(series_analysis_LDADD) $(LIBS)
+libvx_seeps.a: $(libvx_seeps_a_OBJECTS) $(libvx_seeps_a_DEPENDENCIES) $(EXTRA_libvx_seeps_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libvx_seeps.a
+	$(AM_V_AR)$(libvx_seeps_a_AR) libvx_seeps.a $(libvx_seeps_a_OBJECTS) $(libvx_seeps_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libvx_seeps.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -438,8 +383,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/series_analysis-series_analysis.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/series_analysis-series_analysis_conf_info.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_seeps_a-seeps.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -461,33 +405,19 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-series_analysis-series_analysis.o: series_analysis.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT series_analysis-series_analysis.o -MD -MP -MF $(DEPDIR)/series_analysis-series_analysis.Tpo -c -o series_analysis-series_analysis.o `test -f 'series_analysis.cc' || echo '$(srcdir)/'`series_analysis.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/series_analysis-series_analysis.Tpo $(DEPDIR)/series_analysis-series_analysis.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='series_analysis.cc' object='series_analysis-series_analysis.o' libtool=no @AMDEPBACKSLASH@
+libvx_seeps_a-seeps.o: seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-seeps.o -MD -MP -MF $(DEPDIR)/libvx_seeps_a-seeps.Tpo -c -o libvx_seeps_a-seeps.o `test -f 'seeps.cc' || echo '$(srcdir)/'`seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-seeps.Tpo $(DEPDIR)/libvx_seeps_a-seeps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='seeps.cc' object='libvx_seeps_a-seeps.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o series_analysis-series_analysis.o `test -f 'series_analysis.cc' || echo '$(srcdir)/'`series_analysis.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-seeps.o `test -f 'seeps.cc' || echo '$(srcdir)/'`seeps.cc
 
-series_analysis-series_analysis.obj: series_analysis.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT series_analysis-series_analysis.obj -MD -MP -MF $(DEPDIR)/series_analysis-series_analysis.Tpo -c -o series_analysis-series_analysis.obj `if test -f 'series_analysis.cc'; then $(CYGPATH_W) 'series_analysis.cc'; else $(CYGPATH_W) '$(srcdir)/series_analysis.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/series_analysis-series_analysis.Tpo $(DEPDIR)/series_analysis-series_analysis.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='series_analysis.cc' object='series_analysis-series_analysis.obj' libtool=no @AMDEPBACKSLASH@
+libvx_seeps_a-seeps.obj: seeps.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_seeps_a-seeps.obj -MD -MP -MF $(DEPDIR)/libvx_seeps_a-seeps.Tpo -c -o libvx_seeps_a-seeps.obj `if test -f 'seeps.cc'; then $(CYGPATH_W) 'seeps.cc'; else $(CYGPATH_W) '$(srcdir)/seeps.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_seeps_a-seeps.Tpo $(DEPDIR)/libvx_seeps_a-seeps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='seeps.cc' object='libvx_seeps_a-seeps.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o series_analysis-series_analysis.obj `if test -f 'series_analysis.cc'; then $(CYGPATH_W) 'series_analysis.cc'; else $(CYGPATH_W) '$(srcdir)/series_analysis.cc'; fi`
-
-series_analysis-series_analysis_conf_info.o: series_analysis_conf_info.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT series_analysis-series_analysis_conf_info.o -MD -MP -MF $(DEPDIR)/series_analysis-series_analysis_conf_info.Tpo -c -o series_analysis-series_analysis_conf_info.o `test -f 'series_analysis_conf_info.cc' || echo '$(srcdir)/'`series_analysis_conf_info.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/series_analysis-series_analysis_conf_info.Tpo $(DEPDIR)/series_analysis-series_analysis_conf_info.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='series_analysis_conf_info.cc' object='series_analysis-series_analysis_conf_info.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o series_analysis-series_analysis_conf_info.o `test -f 'series_analysis_conf_info.cc' || echo '$(srcdir)/'`series_analysis_conf_info.cc
-
-series_analysis-series_analysis_conf_info.obj: series_analysis_conf_info.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT series_analysis-series_analysis_conf_info.obj -MD -MP -MF $(DEPDIR)/series_analysis-series_analysis_conf_info.Tpo -c -o series_analysis-series_analysis_conf_info.obj `if test -f 'series_analysis_conf_info.cc'; then $(CYGPATH_W) 'series_analysis_conf_info.cc'; else $(CYGPATH_W) '$(srcdir)/series_analysis_conf_info.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/series_analysis-series_analysis_conf_info.Tpo $(DEPDIR)/series_analysis-series_analysis_conf_info.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='series_analysis_conf_info.cc' object='series_analysis-series_analysis_conf_info.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(series_analysis_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o series_analysis-series_analysis_conf_info.obj `if test -f 'series_analysis_conf_info.cc'; then $(CYGPATH_W) 'series_analysis_conf_info.cc'; else $(CYGPATH_W) '$(srcdir)/series_analysis_conf_info.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_seeps_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_seeps_a-seeps.obj `if test -f 'seeps.cc'; then $(CYGPATH_W) 'seeps.cc'; else $(CYGPATH_W) '$(srcdir)/seeps.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -576,11 +506,8 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -614,11 +541,10 @@ maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/series_analysis-series_analysis.Po
-	-rm -f ./$(DEPDIR)/series_analysis-series_analysis_conf_info.Po
+		-rm -f ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -641,7 +567,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am:
 
 install-html: install-html-am
 
@@ -664,8 +590,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/series_analysis-series_analysis.Po
-	-rm -f ./$(DEPDIR)/series_analysis-series_analysis_conf_info.Po
+		-rm -f ./$(DEPDIR)/libvx_seeps_a-seeps.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -681,23 +606,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am:
 
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-binPROGRAMS clean-generic cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-binPROGRAMS install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \
+	ctags-am distclean distclean-compile distclean-generic \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 

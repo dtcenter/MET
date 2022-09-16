@@ -150,6 +150,8 @@ output_flag = {
    orank  = NONE;
    eclv   = NONE;
    mpr    = NONE;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

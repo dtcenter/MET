@@ -16,26 +16,11 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	climo \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data \
-	wrappers
+seepsdir = $(pkgdatadir)/climo/seeps
 
-topdir = $(pkgdatadir)
+seeps_DATA = \
+     PPT24_seepsweights.nc
 
-top_DATA = \
-	version.txt
+EXTRA_DIST = ${seeps_DATA}
 
-EXTRA_DIST = ${top_DATA} \
-	sample_fcst \
-	sample_obs \
-	python \
-	copyright_notice.txt
-
-MAINTAINERCLEANFILES 	= Makefile.in
+MAINTAINERCLEANFILES 	= Makefile.in 
