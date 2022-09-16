@@ -600,8 +600,6 @@ void NumArray::reorder(const NumArray &i_na) {
    return;
 }
 
-// SETH, please review the logic of the functions below.
-// Do they still work OK after switching to STL::vector?
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1230,6 +1228,57 @@ double NumArray::stdev(int skip_index) const
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mean_abs_diff() const
+
+{
+
+   int i, j, count;
+   double sum, mad;
+
+   int n = n_elements();
+   
+   for(i=0, count=0, sum=0.0; i<n; i++) {
+      for(j=i+1; j<n; j++) {
+      
+         if( is_bad_data(e[i]) || is_bad_data(e[j]) ) continue;
+         sum += abs(e[i]-e[j]);
+         count++;
+      }
+   }
+      
+   if(count == 0) mad = bad_data_double;
+   else           mad = sum / (n*(n-1));
+
+   return(mad);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::wmean_abs_diff() const
+
+{
+
+   double wmad;
+   
+   int n = n_elements();
+   double wgt = 1.0/(2.0*n);
+   double mad = mean_abs_diff();
+   
+   if( is_bad_data(mad) )    
+      wmad = bad_data_double;
+   else 
+      wmad = wgt * mad;
+   
+   return(wmad);
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -177,7 +177,7 @@ void ECNTInfo::clear() {
 
    othresh.clear();
    n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_emp   = crpscl_emp  = crpss_emp  = crps_emp_fair = bad_data_double;
    crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
    ign        = bad_data_double;
    me         = rmse       = spread      = bad_data_double;
@@ -199,7 +199,8 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    crps_emp         = c.crps_emp;
    crpscl_emp       = c.crpscl_emp;
    crpss_emp        = c.crpss_emp;
-
+   crps_emp_fair    = c.crps_emp_fair;
+   
    crps_gaus        = c.crps_gaus;
    crpscl_gaus      = c.crpscl_gaus;
    crpss_gaus       = c.crpss_gaus;
@@ -230,6 +231,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute empirical CRPS scores
    crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
+   if(is_eq(crps_emp, 0.0)) crps_emp = 0.0;
+   
+   crps_emp_fair = pd.crps_emp_fair_na.wmean(pd.wgt_na);
+   if(is_eq(crps_emp_fair, 0.0)) crps_emp_fair = 0.0;
+   
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
    crpss_emp  = (is_bad_data(crps_emp)   ||
                  is_bad_data(crpscl_emp) ||
