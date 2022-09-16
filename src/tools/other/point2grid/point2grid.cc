@@ -604,7 +604,8 @@ int get_obs_type(NcFile *nc) {
       input_type = "OBS_MET";
    }
 
-   mlog << Debug(5) << method_name << "input type: \"" << input_type << "\".\n";
+   mlog << Debug(5) << method_name << "input type: \"" << input_type << "\"\n";
+
    return obs_type;
 }
 

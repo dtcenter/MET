@@ -217,6 +217,8 @@ class Grid : public GridInterface {
 
       void dump(ostream &, int = 0) const;
 
+      bool is_set() const;
+
       void set (const char *);   //  lookup by name
       void set (const LambertData       &);
       void set (const StereographicData &);
@@ -264,6 +266,12 @@ class Grid : public GridInterface {
       Grid subset_center(double lat_center, double lon_center, int nx_new, int ny_new) const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline bool Grid::is_set() const { return ( rep != 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -175,7 +175,7 @@ string x_dim_name, y_dim_name;
    //  semilatlon dimension names
    //
 
-if ( grid.info().sl ) {
+if ( grid.is_set() && grid.info().sl ) {
 
         if ( gDimNames.has("latlon") )  x_dim_name = "latlon";
    else if ( gDimNames.has("lon")    )  x_dim_name = "lon";
