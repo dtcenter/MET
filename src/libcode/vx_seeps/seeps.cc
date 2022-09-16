@@ -306,7 +306,7 @@ void SeepsClimo::read_records(ConcatString filename) {
    float matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
    float matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
    NcFile *nc_file = open_ncfile(filename.c_str());
-   const char *method_name = "SeepsClimo::read_seeps_score() -> ";
+   const char *method_name = "SeepsClimo::read_records() -> ";
 
    // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
    get_dim(nc_file, dim_name_nstn, nstn, true);
