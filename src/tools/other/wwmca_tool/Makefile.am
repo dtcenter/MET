@@ -52,6 +52,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -95,6 +96,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

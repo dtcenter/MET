@@ -205,7 +205,7 @@ int met_main(int argc, char *argv[]) {
 
 const string get_tool_name()
 {
-   return "ensemble_stat";
+   return "grid_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////

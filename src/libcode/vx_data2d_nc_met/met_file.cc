@@ -212,11 +212,11 @@ for (j=0; j<Ndims; ++j)  {
       //
       //  parse the variable attributes
       //
-      get_att_name     ( Var[j],     Var[j].name_att      );
-      get_var_long_name( Var[j].var, Var[j].long_name_att );
-      get_att_level    ( Var[j],     Var[j].level_att     );
-      get_var_units    ( Var[j].var, Var[j].units_att     );
-      get_att_accum_time( Var[j],    Var[j].AccumTime     );
+      get_att_name      ( Var[j],     Var[j].name_att      );
+      get_var_long_name ( Var[j].var, Var[j].long_name_att );
+      get_att_level     ( Var[j],     Var[j].level_att     );
+      get_var_units     ( Var[j].var, Var[j].units_att     );
+      get_att_accum_time( Var[j],     Var[j].AccumTime     );
 
       get_att_unixtime( Var[j], init_time_ut_att_name,  ill);
       get_att_unixtime( Var[j], valid_time_ut_att_name, vll);

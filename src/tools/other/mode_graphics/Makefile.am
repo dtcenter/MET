@@ -36,6 +36,7 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_render \
 	-lvx_color \
 	-lvx_log \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_config \
 	-lvx_cal \

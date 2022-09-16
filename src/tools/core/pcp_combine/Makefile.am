@@ -27,6 +27,7 @@ pcp_combine_LDADD = -lvx_data2d_factory \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_gsl_prob \
 	-lvx_math \

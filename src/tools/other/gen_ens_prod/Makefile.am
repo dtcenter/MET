@@ -33,6 +33,7 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_color \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
