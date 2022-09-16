@@ -1369,7 +1369,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                inc_count(rej_dup, i, j, k);
             }
             seeps = 0;
-            if (precip_flag && precip_interval == 10800) {  // 24 hour precip only
+            if (precip_flag && precip_interval == 24*60*60) {  // 24 hour precip only
                seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
             }
             pd[i][j][k].set_seeps_score(seeps);
