@@ -106,7 +106,6 @@ using namespace std;
 static void process_command_line  (int, char **);
 static void process_grid          (const Grid &);
 static void process_n_vld         ();
-static void process_ensemble      ();
 static void process_vx            ();
 static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
                                    DataPlane &, bool do_regrid);
@@ -195,9 +194,6 @@ int met_main(int argc, char *argv[]) {
 
    // Check for valid ensemble data
    process_n_vld();
-
-   // Process the ensemble fields
-   process_ensemble();
 
    // Perform verification
    process_vx();
@@ -817,7 +813,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+/* JHG
 void process_ensemble() {
    int i_var, i_ens, j;
    bool reset;
@@ -918,7 +914,7 @@ void process_ensemble() {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 
 void process_vx() {

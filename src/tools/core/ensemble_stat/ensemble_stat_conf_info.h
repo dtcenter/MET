@@ -188,9 +188,6 @@ class EnsembleStatConfInfo {
 
       void init_from_scratch();
 
-      // Ensemble processing
-      int n_ens_var;        // Number of ensemble fields to be processed
-
       // Ensemble verification
       int n_vx;              // Number of ensemble fields to be verified
       int max_hira_size;     // Maximum size of a HiRA neighborhoods
@@ -209,7 +206,6 @@ class EnsembleStatConfInfo {
       ConcatString         model;           // Model name
       ConcatString         obtype;          // Observation type
 
-      vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
 
@@ -252,8 +248,7 @@ class EnsembleStatConfInfo {
       void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
-      int get_n_ens_var() const;
-      int get_n_vx()      const;
+      int get_n_vx() const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
@@ -271,7 +266,6 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()        const { return(n_ens_var);             }
 inline int EnsembleStatConfInfo::get_n_vx()             const { return(n_vx);                  }
 inline int EnsembleStatConfInfo::get_max_hira_size()    const { return(max_hira_size);         }
 inline int EnsembleStatConfInfo::get_compression_level()      { return(conf.nc_compression()); }
