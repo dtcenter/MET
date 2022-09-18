@@ -46,22 +46,6 @@ cat_thresh    = [];
 nc_var_str    = "";
 
 //
-// Ensemble product fields to be processed
-//
-ens = {
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
-
-   field = [
-      {
-         name       = "APCP";
-         level      = "A03";
-         cat_thresh = [ >0.0, >=5.0 ];
-      }
-   ];
-}
-
-//
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
@@ -89,6 +73,9 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
+   vld_thresh = 1.0;
+   ens_thresh = 1.0;
+
    field = [
       {
          name  = "APCP";
@@ -258,9 +245,8 @@ output_flag = {
 //
 ensemble_flag = {
    latlon    = TRUE;
-   mean      = TRUE;
-   stdev     = TRUE;
    vld_count = TRUE;
+   mean      = TRUE;
    rank      = TRUE;
    weight    = FALSE;
 }
