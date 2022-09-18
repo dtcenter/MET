@@ -53,9 +53,8 @@ static const STATLineType txt_file_type[n_txt] = {
 struct EnsembleStatNcOutInfo {
 
    bool do_latlon;
-   bool do_mean;
-   bool do_stdev;
    bool do_vld;
+   bool do_mean;
    bool do_orank;
    bool do_weight;
 

@@ -223,24 +223,24 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
            << "dictionary has moved to the Gen-Ens-Prod tool." << "\n\n";
    }
 
-   // Conf: ens.ens_thresh
-   vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);
+   // Conf: fcst.ens_thresh
+   vld_ens_thresh = conf.lookup_double(conf_key_fcst_ens_thresh);
 
    // Check that the valid ensemble threshold is between 0 and 1.
    if(vld_ens_thresh < 0.0 || vld_ens_thresh > 1.0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "The \"" << conf_key_ens_ens_thresh << "\" parameter ("
+           << "The \"" << conf_key_fcst_ens_thresh << "\" parameter ("
            << vld_ens_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
 
-   // Conf: ens.vld_thresh
-   vld_data_thresh = conf.lookup_double(conf_key_ens_vld_thresh);
+   // Conf: fcst.vld_thresh
+   vld_data_thresh = conf.lookup_double(conf_key_fcst_vld_thresh);
 
    // Check that the valid data threshold is between 0 and 1.
    if(vld_data_thresh < 0.0 || vld_data_thresh > 1.0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "The \"" << conf_key_ens_vld_thresh << "\" parameter ("
+           << "The \"" << conf_key_fcst_vld_thresh << "\" parameter ("
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
@@ -256,10 +256,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Check for a valid number of verification tasks
    if(n_fvx == 0 || n_fvx != n_ovx) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "The number of verification tasks in \""
-           << conf_key_obs_field << "\" (" << n_ovx
-           << ") must be non-zero and match the number in \""
-           << conf_key_fcst_field << "\" (" << n_fvx << ").\n\n";
+           << "The number of \"" << conf_key_obs_field << "\" entries ("
+           << n_ovx << ") must be greater than zero and match "
+           << "the number of \"" << conf_key_fcst_field << "\" entries ("
+           << n_fvx << ").\n\n";
       exit(1);
    }
 
@@ -345,9 +345,8 @@ void EnsembleStatConfInfo::parse_nc_info() {
    Dictionary * d = e->dict_value();
 
    nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
-   nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
-   nc_info.do_stdev  = d->lookup_bool(conf_key_stdev_flag);
    nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
+   nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
    nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
    nc_info.do_weight = d->lookup_bool(conf_key_weight);
 
@@ -1147,8 +1146,8 @@ void EnsembleStatNcOutInfo::clear() {
 
 bool EnsembleStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_mean  || do_stdev ||
-                 do_vld    || do_orank || do_weight;
+   bool status = do_latlon || do_vld    || do_mean ||
+                 do_orank  || do_weight;
 
    return(!status);
 }
@@ -1158,9 +1157,8 @@ bool EnsembleStatNcOutInfo::all_false() const {
 void EnsembleStatNcOutInfo::set_all_false() {
 
    do_latlon = false;
-   do_mean   = false;
-   do_stdev  = false;
    do_vld    = false;
+   do_mean   = false;
    do_orank  = false;
    do_weight = false;
 
@@ -1173,9 +1171,8 @@ void EnsembleStatNcOutInfo::set_all_false() {
 void EnsembleStatNcOutInfo::set_all_true() {
 
    do_latlon = true;
-   do_mean   = true;
-   do_stdev  = true;
    do_vld    = true;
+   do_mean   = true;
    do_orank  = true;
    do_weight = true;
 
