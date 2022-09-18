@@ -28,8 +28,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-
 static void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
 static void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
 
@@ -63,12 +61,23 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void write_netcdf_proj(NcFile * f_out, const Grid & grid)
+void write_netcdf_proj(NcFile * f_out, const Grid & grid, NcDim & lat_dim, NcDim & lon_dim)
 {
 
 const GridInfo info = grid.info();
 
-grid_output(info, f_out);
+   //
+   //  add lat and lon dimensions for non-SemiLatLon grids
+   //
+
+if ( !info.sl )  {
+
+   lat_dim = add_dim(f_out, "lat", (long) grid.ny() );
+   lon_dim = add_dim(f_out, "lon", (long) grid.nx() );
+
+}
+
+grid_output(info, f_out, lat_dim, lon_dim);
 
 return;
 
@@ -79,11 +88,12 @@ return;
 void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                          const Grid &grid) {
 
-   // Write 1-dimensional arrays for lat/lon grids and 2-d for all others
+   // Write 1-dimensional arrays for lat/lon grids
    if(grid.info().ll != 0) {
       write_netcdf_latlon_1d(f_out, lat_dim, lon_dim, grid);
    }
-   else {
+   // Write 2-dimensional arrays for all others, except SemiLatLon
+   else if(grid.info().sl == 0) {
       write_netcdf_latlon_2d(f_out, lat_dim, lon_dim, grid);
    }
 
@@ -96,19 +106,13 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
    int i;
    double lat, lon;
-   //NcVar *lat_var  = (NcVar *) 0;
-   //NcVar *lon_var  = (NcVar *) 0;
-   NcVar lat_var  ;
-   NcVar lon_var  ;
+   NcVar lat_var, lon_var;
    float *lat_data = (float *) 0;
    float *lon_data = (float *) 0;
 
    // Define Variables
    lat_var = f_out->addVar("lat", ncFloat, *lat_dim);
    lon_var = f_out->addVar("lon", ncFloat, *lon_dim);
-
-   //lat_var = &lat_var_T;
-   //lon_var = &lon_var_T;
 
    // Add variable attributes
    add_att(&lat_var, long_name_att_name, "latitude");
@@ -153,10 +157,7 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
    int i, x, y;
    double lat, lon;
-   //NcVar *lat_var  = (NcVar *) 0;
-   //NcVar *lon_var  = (NcVar *) 0;
-   NcVar lat_var  ;
-   NcVar lon_var  ;
+   NcVar lat_var, lon_var;
    float *lat_data = (float *) 0;
    float *lon_data = (float *) 0;
    std::vector<NcDim> dims;
@@ -173,12 +174,10 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lat_var, long_name_att_name, "latitude");
    add_att(&lat_var, units_att_name, "degrees_north");
    add_att(&lat_var, standard_name_att_name, "latitude");
-   //add_att(&lat_var, "axis", "Y");
 
    add_att(&lon_var, long_name_att_name, "longitude");
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
-   //add_att(&lon_var, "axis", "X");
 
    // Allocate space for lat/lon values
    lat_data = new float [grid.nx()*grid.ny()];

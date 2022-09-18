@@ -13,23 +13,11 @@
 
 
 #include "vx_log.h"
+#include "vx_util.h"
 #include "vx_python3_utils.h"
 
 #include "grid_from_python_dict.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-   //
-   //  taken from src/libcode/vx_nc_util/grid_output.cc
-   //
-
-static const char             lc_string [] = "Lambert Conformal";
-static const char             st_string [] = "Polar Stereographic";
-static const char           merc_string [] = "Mercator";
-static const char         latlon_string [] = "LatLon";
-static const char rotated_latlon_string [] = "Rotated LatLon";
-static const char       gaussian_string [] = "Gaussian";
+#include "pointdata_from_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,6 +29,9 @@ static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
 static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
 static void get_gaussian_grid       (const Python3_Dict & dict, Grid & g);
+static void get_semilatlon_grid     (const Python3_Dict & dict, Grid & g);
+
+static void lookup_python_num_array(const Python3_Dict &, const char *, NumArray &);
 
 static void set_string(const char * & dest, const ConcatString & src);
 
@@ -68,12 +59,13 @@ g.clear();
 
 proj_type = dict.lookup_string("type");
 
-     if ( proj_type ==             lc_string )  get_lc_grid             (dict, g);
-else if ( proj_type ==             st_string )  get_st_grid             (dict, g);
-else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g);
-else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
-else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
-else if ( proj_type ==       gaussian_string )  get_gaussian_grid       (dict, g);
+     if ( proj_type ==        lambert_proj_type )  get_lc_grid             (dict, g);
+else if ( proj_type ==  stereographic_proj_type )  get_st_grid             (dict, g);
+else if ( proj_type ==       mercator_proj_type )  get_merc_grid           (dict, g);
+else if ( proj_type ==         latlon_proj_type )  get_latlon_grid         (dict, g);
+else if ( proj_type == rotated_latlon_proj_type )  get_rotated_latlon_grid (dict, g);
+else if ( proj_type ==       gaussian_proj_type )  get_gaussian_grid       (dict, g);
+else if ( proj_type ==     semilatlon_proj_type )  get_semilatlon_grid     (dict, g);
 else {
 
    mlog << Error << "\ngrid_from_python_dict() -> "
@@ -455,6 +447,93 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+   //
+   //  name        (string)
+   //
+   //  lats        (array of double)
+   //
+   //  lons        (array of double)
+   //
+   //  levels      (array of double)
+   //
+   //  times       (array of double)
+   //
+
+void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
+
+{
+
+SemiLatLonData data;
+ConcatString s;
+
+s = dict.lookup_string("name");
+
+set_string(data.name, s);
+
+lookup_python_num_array(dict, "lats",   data.lats);
+lookup_python_num_array(dict, "lons",   data.lons);
+lookup_python_num_array(dict, "levels", data.levels);
+lookup_python_num_array(dict, "times",  data.times);
+
+   //
+   //  done
+   //
+
+g.set(data);
+
+if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArray &vals)
+
+{
+
+PyObject * obj = dict.lookup_item(key);
+
+   //
+   //  parse values from list
+   //
+
+if ( PyList_Check(obj) )  {
+
+   Python3_List list(obj);
+
+   for (int j=0; j<(list.size()); ++j)  vals.add(pyobject_as_double(list[j]));
+
+}
+
+   //
+   //  parse values from array
+   //
+
+else  {
+
+   Python3_Numpy np;
+   np.set(obj);
+
+   if ( ! pointdata_from_np_array(np, &vals) )  {
+
+      mlog << Error << "\nlookup_python_num_array() -> "
+	   << "can't parse values for \"" << key << "\" from python \""
+           << Py_TYPE(obj)->tp_name << "\" object.\n";
+   }
+
+}
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
    //
    //  the fact that our destination is "const char *" rather than

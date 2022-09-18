@@ -45,6 +45,7 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
+      bool operator==(const NumArray &) const;
 
       void clear();
 
@@ -97,6 +98,7 @@ class NumArray {
       double range() const;
 
       ConcatString serialize() const;
+      ConcatString summarize() const;
 
       int n_elements() const;
       int n() const;         //  same as n_elements()
