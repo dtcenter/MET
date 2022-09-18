@@ -32,7 +32,8 @@ pythonscripts_DATA = \
 	read_ascii_xarray.py \
 	read_ascii_point.py \
 	read_ascii_mpr.py \
-	read_met_point_obs.py
+	read_met_point_obs.py \
+	derive_WRF_semilatlon.py
 
 EXTRA_DIST = ${pythonscripts_DATA}
 

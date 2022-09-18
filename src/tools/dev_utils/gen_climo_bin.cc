@@ -251,11 +251,9 @@ void setup_nc_file() {
    write_netcdf_global(nc_out, out_file.text(), program_name.c_str(), "Climatology", "NA");
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
-   // Add dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    // The number of CDF values is one less than the number of bins

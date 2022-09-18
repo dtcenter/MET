@@ -10,30 +10,32 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __NETCDF_GRID_OUTPUT_H__
-#define  __NETCDF_GRID_OUTPUT_H__
+#ifndef  __SEMILATLON_GRID_DEFINITIONS_H__
+#define  __SEMILATLON_GRID_DEFINITIONS_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <netcdf>
-using namespace netCDF;
+struct SemiLatLonData {
 
-#include "vx_grid.h"
+   const char * name;
 
+   // Arrays to define SemiLatLon dimensions
 
-////////////////////////////////////////////////////////////////////////
+   NumArray lats;
+   NumArray lons;
+   NumArray levels;
+   NumArray times;
 
-
-extern void grid_output(const GridInfo &, NcFile *, NcDim &, NcDim &);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   /*  __NETCDF_GRID_OUTPUT_H__  */
+   void dump();
+};
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+#endif   /*  __SEMILATLON_GRID_DEFINITIONS_H__  */
+
+
+////////////////////////////////////////////////////////////////////////

@@ -2020,11 +2020,7 @@ void setup_nc_file(unixtime valid_ut, const char *suffix) {
                        conf_info.model.c_str(), conf_info.obtype.c_str());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.nc_info.do_latlon) {
@@ -2803,7 +2799,6 @@ void write_ens_var_float(EnsVarInfo * ens_info, float *ens_data, const DataPlane
 
    // Otherwise, add to the list of previously defined variables
    nc_ens_var_sa.add(ens_var_name);
-
    ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
 
    //

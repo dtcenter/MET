@@ -1259,11 +1259,7 @@ void write_netcdf(const DataPlane &dp) {
    write_netcdf_global(f_out, out_filename.c_str(), program_name);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
