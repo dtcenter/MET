@@ -212,6 +212,16 @@ MET tool stating the location of the parsing error.
 Runtime Environment Variables
 -----------------------------
 
+MET_AIRNOW_STATIONS
+^^^^^^^^
+
+The MET_AIRNOW_STATIONS environment variable can be used to specify a file that
+will override the default file. If set it should be a full path to the file.
+The default is:
+   "MET_BASE/table_files/airnow_monitoring_site_locations_v2.dat"
+This file contains ascii column data that allows lookups of latitude,longitude,
+and elevation for all airnow stations based on stationId and/or AqSid.
+
 MET_BASE
 ^^^^^^^^
 

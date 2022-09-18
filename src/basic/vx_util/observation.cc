@@ -52,6 +52,11 @@ Observation::Observation(const string &header_type, const string &station_id,
   _height(height_m),
   _value(value)
 {
+
+string::iterator it = _stationId.begin();
+while (' ' == *it) it++;    // skip leading spaces
+std::replace(it, _stationId.end(), ' ', '_');
+
 }
 
 

@@ -74,11 +74,10 @@ void WwmcaRegridder::do_output(const char * output_filename)
    write_netcdf_global(ncfile, output_filename, "wwmca_regrid");
 
    //
-   //  dimensions
+   // Add the projection information
    //
 
-   lat_dim = add_dim(ncfile, "lat", ToGrid->ny());
-   lon_dim = add_dim(ncfile, "lon", ToGrid->nx());
+   write_netcdf_proj(ncfile, *ToGrid, lat_dim, lon_dim);
 
    //
    //  lat/lon variables
@@ -184,12 +183,6 @@ void WwmcaRegridder::do_output(const char * output_filename)
                   0);
    
    write_netcdf_var_times(&data_var, init_time, valid_time, accum_time);
-
-   //
-   //  global attributes
-   //
-
-   grid_output(ToGrid->info(), ncfile);
 
    //
    //  fill in data values

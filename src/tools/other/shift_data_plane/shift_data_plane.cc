@@ -279,6 +279,7 @@ void process_data_file() {
 void write_netcdf(const DataPlane &dp, const Grid &grid,
                   const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
+   NcDim lat_dim, lon_dim;
 
    // Create a new NetCDF file and open it
    NcFile *f_out = open_ncfile(OutputFilename.c_str(), true);
@@ -297,11 +298,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    add_att(f_out, "RunCommand", shift_cs);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   NcDim lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   NcDim lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);

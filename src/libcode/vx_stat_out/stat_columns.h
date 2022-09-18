@@ -104,6 +104,12 @@ extern void write_dmap_row  (StatHdrColumns &, const DMAPInfo &, STATOutputType,
 extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
+extern void write_seeps_row (StatHdrColumns &, const PairDataPoint *, STATOutputType,
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
+extern void write_seeps_mpr_row (StatHdrColumns &, const PairDataPoint *, STATOutputType,
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
@@ -172,6 +178,10 @@ extern void write_grad_cols  (const GRADInfo &,
 extern void write_dmap_cols  (const DMAPInfo &,
                               AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *, int,
+                              AsciiTable &, int, int);
+extern void write_seeps_cols (const PairDataPoint *,
+                              AsciiTable &, int, int);
+extern void write_seeps_mpr_cols (const PairDataPoint *, int,
                               AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &, int,
                               AsciiTable &, int, int);

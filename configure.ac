@@ -1184,6 +1184,8 @@ AC_CONFIG_FILES([Makefile
                  scripts/Rscripts/include/Makefile
                  scripts/python/Makefile
                  data/Makefile
+                 data/climo/Makefile
+                 data/climo/seeps/Makefile
                  data/colortables/Makefile
                  data/colortables/NCL_colortables/Makefile
                  data/config/Makefile
@@ -1204,6 +1206,7 @@ AC_CONFIG_FILES([Makefile
                  src/basic/vx_log/Makefile
                  src/basic/vx_math/Makefile
                  src/basic/vx_util/Makefile
+                 src/basic/vx_util_math/Makefile
                  src/libcode/Makefile
                  src/libcode/vx_afm/Makefile
                  src/libcode/vx_analysis_util/Makefile
@@ -1242,6 +1245,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/libcode/vx_bool_calc/Makefile
                  src/libcode/vx_pointdata_python/Makefile
+                 src/libcode/vx_seeps/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile

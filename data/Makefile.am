@@ -17,6 +17,7 @@
 ## MA 02110-1301, USA.
 
 SUBDIRS = \
+	climo \
 	colortables \
 	config \
 	map \
@@ -24,7 +25,7 @@ SUBDIRS = \
 	ps \
 	table_files \
 	tc_data \
-     wrappers
+	wrappers
 
 topdir = $(pkgdatadir)
 
