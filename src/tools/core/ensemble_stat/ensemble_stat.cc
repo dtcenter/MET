@@ -822,8 +822,8 @@ void process_point_vx() {
       // Read the ensemble mean from a file
       if(ens_mean_file.nonempty()) {
 
-         mlog << Debug(2) << "\n" << sep_str << "\n\n"
-              << "Processing ensemble mean file: " << ens_mean_file << "\n";
+         mlog << Debug(2) << "Processing ensemble mean file: "
+              << ens_mean_file << "\n";
 
          VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
 
@@ -845,8 +845,7 @@ void process_point_vx() {
       // Otherwise, compute the ensemble mean from the members
       else {
 
-         mlog << Debug(2) << "\n" << sep_str << "\n\n"
-              << "Computing the ensemble mean from the members.\n";
+         mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
          int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
 
@@ -1081,7 +1080,8 @@ void process_point_scores() {
    ConcatString cs;
    int i, j, k, l;
 
-   mlog << Debug(2) << "\n" << sep_str << "\n\n";
+   mlog << Debug(2) << "\n" << sep_str << "\n\n"
+        << "Verifying against point observations.\n";
 
    // Create output text files as requested in the config file
    setup_txt_files();
@@ -1198,7 +1198,8 @@ void process_grid_vx() {
    VarInfo * var_info;
    ConcatString fcst_file;
 
-   mlog << Debug(2) << "\n" << sep_str << "\n\n";
+   mlog << Debug(2) << "\n" << sep_str << "\n\n"
+        << "Verifying against gridded analyses.\n";
 
    // Set the obtype column
    shc.set_obtype(conf_info.obtype.c_str());
@@ -1319,8 +1320,8 @@ void process_grid_vx() {
       // Read the ensemble mean from a file
       if(ens_mean_file.nonempty()) {
 
-         mlog << Debug(2) << "\n" << sep_str << "\n\n"
-              << "Processing ensemble mean file: " << ens_mean_file << "\n";
+         mlog << Debug(2) << "Processing ensemble mean file: "
+              << ens_mean_file << "\n";
 
          VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
 
@@ -1339,8 +1340,7 @@ void process_grid_vx() {
       // Otherwise, compute the ensemble mean from the members
       else {
 
-         mlog << Debug(2) << "\n" << sep_str << "\n\n"
-              << "Computing the ensemble mean from the members.\n";
+         mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
          int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
 
