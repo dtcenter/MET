@@ -217,7 +217,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    if(ens_member_ids.n() == 0) ens_member_ids.add("");
 
    // Conf: ens, print warning if present
-   if(conf.lookup_dictionary(conf_key_ens)) {
+   if(conf.lookup_dictionary(conf_key_ens, false, false)) {
       mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
            << "support for ensemble product generation with the \"ens\" "
            << "dictionary has moved to the Gen-Ens-Prod tool." << "\n\n";

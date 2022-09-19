@@ -2481,7 +2481,7 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    } // end for i
 
    // Add the observation values and ranks
-   if(conf_info.nc_info.do_rank) {
+   if(conf_info.nc_info.do_orank) {
       write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
                             "OBS",
                             "Observation Value");
