@@ -202,6 +202,7 @@ interp = {
 
 //
 // Statistical output types
+// May be set separately in each "obs.field" entry
 //
 output_flag = {
    ecnt  = BOTH;
@@ -222,13 +223,16 @@ output_flag = {
 
 //
 // Gridded verification output types
+// May be set separately in each "obs.field" entry
 //
-ensemble_flag = {
+nc_orank_flag = {
    latlon    = FALSE;
-   weight    = FALSE;
-   rank      = TRUE;
-   vld_count = FALSE;
    mean      = TRUE;
+   raw       = TRUE;
+   rank      = TRUE;
+   pit       = TRUE;
+   vld_count = FALSE;
+   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

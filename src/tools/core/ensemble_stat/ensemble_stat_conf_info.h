@@ -53,10 +53,12 @@ static const STATLineType txt_file_type[n_txt] = {
 struct EnsembleStatNcOutInfo {
 
    bool do_latlon;
-   bool do_weight;
-   bool do_orank;
-   bool do_vld;
    bool do_mean;
+   bool do_raw;
+   bool do_rank;
+   bool do_pit;
+   bool do_vld;
+   bool do_weight;
 
       //////////////////////////////////////////////////////////////////
 
@@ -134,6 +136,7 @@ class EnsembleStatVxOpt {
 
       // Output file options
       STATOutputType output_flag[n_txt]; // Flag for each output line type
+      EnsembleStatNcOutInfo nc_info;     // Output NetCDF pairs file contents
 
       //////////////////////////////////////////////////////////////////
 
@@ -144,6 +147,7 @@ class EnsembleStatVxOpt {
                           gsl_rng *, bool, bool, bool,
                           StringArray, StringArray *,
                           bool, ConcatString);
+      void parse_nc_info(Dictionary &);
       void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
@@ -231,8 +235,7 @@ class EnsembleStatConfInfo {
       ConcatString   version;               // Config file version
 
       STATOutputType output_flag[n_txt];    // Summary of output_flag options
-
-      EnsembleStatNcOutInfo nc_info;        // Output NetCDF file contents
+      EnsembleStatNcOutInfo nc_info;        // Summary of output NetCDF file contents
 
       //////////////////////////////////////////////////////////////////
 
@@ -242,7 +245,6 @@ class EnsembleStatConfInfo {
       void process_config(GrdFileType, GrdFileType, bool, bool, bool,
                           StringArray *, bool);
       void process_flags ();
-      void parse_nc_info ();
       void process_masks (const Grid &);
       void set_vx_pd     (const IntArray &, int);
 

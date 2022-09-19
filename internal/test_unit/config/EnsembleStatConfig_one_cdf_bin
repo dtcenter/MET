@@ -195,6 +195,7 @@ interp = {
 
 //
 // Statistical output types
+// May be set separately in each "obs.field" entry
 //
 output_flag = {
    ecnt  = BOTH;
@@ -214,9 +215,10 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Ensemble product output types
+// Gridded verification output types
+// May be set separately in each "obs.field" entry
 //
-ensemble_flag = false;
+nc_orank_flag = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 

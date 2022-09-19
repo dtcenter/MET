@@ -176,8 +176,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
      msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
    }
 
-   // Conf: ensemble_flag
-   parse_nc_info();
+// JHG summarize the nc_infos?
 
    // Conf: ens_member_ids
    ens_member_ids = parse_conf_ens_member_ids(&conf);
@@ -309,58 +308,13 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::parse_nc_info() {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
-
-   e = conf.lookup(conf_key_ensemble_flag);
-
-   if(!e) {
-      mlog << Error
-           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
-           << "lookup failed for key \"" << conf_key_ensemble_flag
-           << "\"\n\n";
-      exit(1);
-   }
-
-   const ConfigObjectType type = e->type();
-
-   if(type == BooleanType) {
-      bool value = e->b_value();
-
-      if(!value) nc_info.set_all_false();
-
-      return;
-   }
-
-   // It should be a dictionary
-   if(type != DictionaryType) {
-      mlog << Error
-           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
-           << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_ensemble_flag << "\"\n\n";
-      exit(1);
-   }
-
-   // Parse the various entries
-   Dictionary * d = e->dict_value();
-
-   nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
-   nc_info.do_weight = d->lookup_bool(conf_key_weight);
-   nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
-   nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
-   nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void EnsembleStatConfInfo::process_flags() {
    int i, j;
    bool output_ascii_flag = false;
 
    // Initialize
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   nc_info.set_all_false();
 
    // Loop over the verification tasks
    for(i=0; i<n_vx; i++) {
@@ -377,6 +331,15 @@ void EnsembleStatConfInfo::process_flags() {
             output_ascii_flag = true;
          }
       }
+
+      // Summary of nc_info flag settings
+      if(vx_opt[i].nc_info.do_latlon) nc_info.do_latlon = true;
+      if(vx_opt[i].nc_info.do_mean)   nc_info.do_mean   = true;
+      if(vx_opt[i].nc_info.do_raw)    nc_info.do_raw    = true;
+      if(vx_opt[i].nc_info.do_rank)   nc_info.do_rank   = true;
+      if(vx_opt[i].nc_info.do_pit)    nc_info.do_pit    = true;
+      if(vx_opt[i].nc_info.do_vld)    nc_info.do_vld    = true;
+      if(vx_opt[i].nc_info.do_weight) nc_info.do_weight = true;
    }
 
    // Check output_ascii_flag
@@ -639,6 +602,8 @@ void EnsembleStatVxOpt::clear() {
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
+   nc_info.clear();
+
    return;
 }
 
@@ -804,6 +769,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
 
+   // Conf: nc_orank_flag
+   parse_nc_info(odict);
+
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
@@ -879,6 +847,54 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: obs_qty_exc
    vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
    
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = odict.lookup(conf_key_nc_orank_flag);
+
+   if(!e) {
+      mlog << Error
+           << "\nEnsembleStatVxOpt::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_orank_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(!value) nc_info.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error
+           << "\nEnsembleStatVxOpt::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_nc_orank_flag << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
+   nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
+   nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
+   nc_info.do_rank   = d->lookup_bool(conf_key_rank_flag);
+   nc_info.do_pit    = d->lookup_bool(conf_key_pit_flag);
+   nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
+   nc_info.do_weight = d->lookup_bool(conf_key_weight);
+
    return;
 }
 
@@ -1146,8 +1162,9 @@ void EnsembleStatNcOutInfo::clear() {
 
 bool EnsembleStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_weight || do_rank ||
-                 do_vld    || do_mean;
+   bool status = do_latlon || do_mean || do_raw ||
+                 do_rank   || do_pit  || do_vld ||
+                 do_weight;
 
    return(!status);
 }
@@ -1157,24 +1174,27 @@ bool EnsembleStatNcOutInfo::all_false() const {
 void EnsembleStatNcOutInfo::set_all_false() {
 
    do_latlon = false;
-   do_weight = false;
-   do_orank  = false;
-   do_vld    = false;
    do_mean   = false;
+   do_raw    = false;
+   do_rank   = false;
+   do_pit    = false;
+   do_vld    = false;
+   do_weight = false;
 
    return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatNcOutInfo::set_all_true() {
 
    do_latlon = true;
-   do_weight = true;
-   do_orank  = true;
-   do_vld    = true;
    do_mean   = true;
+   do_raw    = true;
+   do_rank   = true;
+   do_pit    = true;
+   do_vld    = true;
+   do_weight = true;
 
    return;
 }

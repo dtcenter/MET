@@ -124,10 +124,11 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static StringArray out_nc_file_list;
-static NcFile      *nc_out  = (NcFile *) 0;
-static NcDim       lat_dim;
-static NcDim       lon_dim;
+static bool         out_nc_flag = false;
+static ConcatString out_nc_file;
+static NcFile       *nc_out  = (NcFile *) 0;
+static NcDim        lat_dim;
+static NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_ens_var_sa;

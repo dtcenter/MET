@@ -345,27 +345,33 @@ The **output_flag** array controls the type of output that is generated. Each fl
 _____________________
 
 .. code-block:: none
-		
-  ensemble_flag = {
+
+  nc_orank_flag = {
      latlon    = TRUE;
-     weight    = FALSE;
-     rank      = TRUE;
-     vld_count = TRUE;
      mean      = TRUE;
+     raw       = TRUE;
+     rank      = TRUE;
+     pit       = TRUE;
+     vld_count = TRUE;
+     weight    = FALSE;
   }
 
 
-The **ensemble_flag** specifies which gridded verification output types should be written to the Observation Rank (**_orank.nc**) NetCDF file. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
+The **nc_orank_flag** specifies which gridded verification output types should be written to the Observation Rank (**_orank.nc**) NetCDF file. This output file is only created when gridded observations have been provided with the -grid_obs command line option. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
 
 1. Grid Latitude and Longitude Fields
 
-2. The grid area weights.
+2. Ensemble mean field
 
-3. Observation values, ranks, and probability-integral transform values.
+3. Raw observation values
 
-4. Ensemble Valid Data Count
+4. Observation ranks
 
-5. Ensemble Mean Field
+5. Observation probability-integral transform values
+
+6. Ensemble valid data count
+
+7. Grid area weight values
 
 __________________
 
@@ -410,13 +416,13 @@ ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defin
 The output ASCII files are named similarly:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of ecnt, rps, rhist, phist, relp, orank, and ssvar to indicate the line type it contains.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of elements of the **output_flag** configuration option to indicate the line type it contains.
 
 
 When verification against gridded analyses is performed, Ensemble-Stat can produce output NetCDF files using the following naming convention:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_orank.nc contains gridded fields of observation ranks when the -grid_obs command line option is used. Its contents are specified by the **ensemble_flag** configuration option.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_orank.nc contains gridded fields of observation ranks when the -grid_obs command line option is used. Its contents are specified by the **nc_orank_flag** configuration option.
 
 The Ensemble-Stat tool can compute the following statistics for the fields specified in the fcst and obs dictionaries of the configuration file:
 

@@ -411,6 +411,9 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag,
                             use_var_id, &ens_file_list, ctrl_file.nonempty());
 
+   // Set output_nc_flag
+   out_nc_flag = (grid_obs_flag && !conf_info.nc_info.all_false());
+
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
@@ -1383,7 +1386,7 @@ void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(!conf_info.nc_info.all_false() && nc_out == (NcFile *) 0) {
+      if(out_nc_flag && nc_out == (NcFile *) 0) {
          setup_nc_file(fcst_dp[j].valid(), "_orank.nc");
       }
 
@@ -1556,9 +1559,7 @@ void process_grid_vx() {
             pd_all.compute_pair_vals(conf_info.rng_ptr);
 
             // Write NetCDF output
-            if(!conf_info.nc_info.all_false()) {
-               write_orank_nc(pd_all, obs_dp, i, j, k);
-            }
+            if(out_nc_flag) write_orank_nc(pd_all, obs_dp, i, j, k);
 
             // Write the stat output
             write_txt_files(conf_info.vx_opt[i], pd_all, false);
@@ -1737,7 +1738,6 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(unixtime valid_ut, const char *suffix) {
-   ConcatString out_nc_file;
 
    // Create output NetCDF file name
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
@@ -1769,9 +1769,6 @@ void setup_nc_file(unixtime valid_ut, const char *suffix) {
       write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
-
-   // Append to the list of output files
-   out_nc_file_list.add(out_nc_file);
 
    return;
 }
@@ -2493,18 +2490,29 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
 
    } // end for i
 
-   // Add the observation values and ranks
-   if(conf_info.nc_info.do_orank) {
+   // Add the ensemble mean values
+   if(conf_info.nc_info.do_mean) {
+      write_orank_var_float(i_vx, i_interp, i_mask, ens_mean, dp,
+                            "ENS_MEAN",
+                            "Ensemble Mean");
+   }
+
+   // Add the observation values
+   if(conf_info.nc_info.do_raw) {
       write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
                             "OBS",
                             "Observation Value");
+   }
 
-      // Add the observation ranks
+   // Add the observation ranks
+   if(conf_info.nc_info.do_rank) {
       write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, dp,
                           "OBS_RANK",
                           "Observation Rank");
+   }
 
-      // Add the probability integral transforms
+   // Add the probability integral transforms
+   if(conf_info.nc_info.do_pit) {
       write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, dp,
                             "OBS_PIT",
                             "Probability Integral Transform");
@@ -2515,13 +2523,6 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
       write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, dp,
                           "ENS_VLD",
                           "Ensemble Valid Data Count");
-   }
-
-   // Add the ensemble mean values
-   if(conf_info.nc_info.do_mean) {
-      write_orank_var_float(i_vx, i_interp, i_mask, ens_mean, dp,
-                            "ENS_MEAN",
-                            "Ensemble Mean");
    }
 
    // Deallocate and clean up
@@ -2730,10 +2731,10 @@ void clean_up() {
    // Close the output text files that were open for writing
    finish_txt_files();
 
-   // List the output NetCDF files
-   for(i=0; i<out_nc_file_list.n(); i++) {
+   // List the output NetCDF file
+   if(out_nc_flag) {
       mlog << Debug(1)
-           << "Output file: " << out_nc_file_list[i] << "\n";
+           << "Output file: " << out_nc_file << "\n";
    }
 
    return;
