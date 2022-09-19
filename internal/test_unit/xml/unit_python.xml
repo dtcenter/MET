@@ -361,7 +361,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V_ens.nc</grid_nc>
     </output>
   </test>
   
@@ -562,7 +561,6 @@
       <stat>&OUTPUT_DIR;/python/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/python/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/python/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/python/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>

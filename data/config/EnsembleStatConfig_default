@@ -38,25 +38,17 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "ens.field" entry
-//
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-nc_var_str    = "";
-
-//
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
 ens_member_ids = [];
 control_id = "";
 
-////////////////////////////////////////////////////////////////////////////////
-
 //
 // May be set separately in each "fcst.field" and "obs.field" entry
 //
+censor_thresh = [];
+censor_val    = [];
 prob_cat_thresh = [];
 
 //
@@ -67,14 +59,15 @@ prob_pct_thresh = [ ==0.25 ];
 //
 // May be set separately in each "obs.field" entry
 //
+nc_var_str  = "";
 eclv_points = 0.05;
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
-   vld_thresh = 1.0;
    ens_thresh = 1.0;
+   vld_thresh = 1.0;
 
    field = [
       {
@@ -241,14 +234,14 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Ensemble product output types
+// Gridded verification output types
 //
 ensemble_flag = {
    latlon    = TRUE;
+   weight    = FALSE;
+   rank      = TRUE;
    vld_count = TRUE;
    mean      = TRUE;
-   rank      = TRUE;
-   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

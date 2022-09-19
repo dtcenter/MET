@@ -38,63 +38,17 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "ens.field" entry
-//
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-nc_var_str    = "";
-
-tmp_field = [ { name = "TMP"; level = [ "Z2" ]; } ];
-
-//
-// Ensemble product fields to be processed
-//
-ens = {
-   ens_thresh = 0.75;
-   vld_thresh = 1.0;
-   field      = tmp_field;
-}
-
-//
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
 ens_member_ids = [];
 control_id = "";
 
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Neighborhood ensemble probabilities
-//
-nbrhd_prob = {
-   width      = [ 5 ];
-   shape      = CIRCLE;
-   vld_thresh = 0.0;
-}
-
-//
-// NMEP smoothing methods
-//
-nmep_smooth = {
-   vld_thresh      = 0.0;
-   shape           = CIRCLE;
-   gaussian_dx     = 81.27;
-   gaussian_radius = 120;
-   type = [
-      {
-         method = GAUSSIAN;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //
 // May be set separately in each "fcst.field" and "obs.field" entry
 //
+censor_thresh = [];
+censor_val    = [];
 prob_cat_thresh = [];
 
 //
@@ -105,12 +59,17 @@ prob_pct_thresh = [ ==0.25 ];
 //
 // May be set separately in each "obs.field" entry
 //
+nc_var_str  = "";
 eclv_points = 0.05;
+
+tmp_field = [ { name = "TMP"; level = [ "Z2" ]; } ];
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
    message_type    = [ "APDSFC" ];
    sid_inc         = [];
    sid_exc         = [];
@@ -250,23 +209,14 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Ensemble product output types
+// Gridded verification output types
 //
 ensemble_flag = {
    latlon    = TRUE;
-   mean      = TRUE;
-   stdev     = FALSE;
-   minus     = FALSE;
-   plus      = FALSE;
-   min       = FALSE;
-   max       = FALSE;
-   range     = FALSE;
-   vld_count = FALSE;
-   frequency = FALSE;
-   nep       = FALSE;
-   nmep      = FALSE;
-   rank      = FALSE;
    weight    = TRUE;
+   rank      = FALSE;
+   vld_count = FLASE;
+   mean      = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -61,7 +61,6 @@
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_orank.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ens.nc</grid_nc>
     </output>
   </test>
   

@@ -38,12 +38,29 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "ens.field" entry
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+control_id = "0";
+
+//
+// May be set separately in each "fcst.field" and "obs.field" entry
 //
 censor_thresh = [];
 censor_val    = [];
-cat_thresh    = [];
-nc_var_str    = "";
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+nc_var_str  = "";
+eclv_points = 0.05;
 
 //
 // Override the NetCDF CFS variable names and times 
@@ -55,75 +72,12 @@ set_attr_name  = "TMP";
 set_attr_level = "Z2";
 
 //
-// Ensemble product fields to be processed
-//
-ens = {
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
-
-   field = [
-      {
-         name  = "fcst";
-         level = "(MET_ENS_MEMBER_ID,6,*,*)";
-      }
-   ];
-}
-
-//
-// IDs for ensemble members
-// Only set if processing a single file with all ensembles
-//
-ens_member_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
-control_id = "0";
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Neighborhood ensemble probabilities
-//
-nbrhd_prob = {
-   width      = [ 5 ];
-   shape      = CIRCLE;
-   vld_thresh = 0.0;
-}
-
-//
-// NMEP smoothing methods
-//
-nmep_smooth = {
-   vld_thresh      = 0.0;
-   shape           = CIRCLE;
-   gaussian_dx     = 81.27;
-   gaussian_radius = 120;
-   type = [
-      {
-         method = GAUSSIAN;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// May be set separately in each "fcst.field" and "obs.field" entry
-//
-prob_cat_thresh = [];
-
-//
-// May be set separately in each "fcst.field" entry
-//
-prob_pct_thresh = [ ==0.25 ];
-
-//
-// May be set separately in each "obs.field" entry
-//
-eclv_points = 0.05;
-
-//
 // Forecast and observation fields to be verified
 //
 fcst = {
+   ens_thresh = 1.0;
+   vld_thresh = 1.0;
+
    field = [
       {
          name  = "fcst";
@@ -297,23 +251,14 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Ensemble product output types
+// Gridded verification output types
 //
 ensemble_flag = {
    latlon    = TRUE;
-   mean      = TRUE;
-   stdev     = TRUE;
-   minus     = FALSE;
-   plus      = FALSE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = FALSE;
-   vld_count = TRUE;
-   frequency = FALSE;
-   nep       = FALSE;
-   nmep      = FALSE;
-   rank      = TRUE;
    weight    = FALSE;
+   rank      = TRUE;
+   vld_count = TRUE;
+   mean      = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

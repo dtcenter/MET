@@ -38,73 +38,17 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "ens.field" entry
-//
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-nc_var_str    = "";
-
-//
-// Ensemble product fields to be processed
-//
-ens = {
-   ens_thresh = 0.75;
-   vld_thresh = 1.0;
-
-   field = [
-      {
-         name       = "TMP";
-         level      = "Z2";
-         cat_thresh = [ <=273.15, >273.15  ];
-      },
-      {
-         name       = "APCP";
-         level      = "A24";
-         cat_thresh = [ >0.0 ];
-      }
-   ];
-}
-
-//
 // IDs for ensemble members
 // Only set if processing a single file with all ensembles
 //
 ens_member_ids = [];
 control_id = "";
 
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Neighborhood ensemble probabilities
-//
-nbrhd_prob = {
-   width      = [ 5 ];
-   shape      = CIRCLE;
-   vld_thresh = 0.0;
-}
-
-//
-// NMEP smoothing methods
-//
-nmep_smooth = {
-   vld_thresh      = 0.0;
-   shape           = CIRCLE;
-   gaussian_dx     = 81.27;
-   gaussian_radius = 120;
-   type = [
-      {
-         method = GAUSSIAN;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //
 // May be set separately in each "fcst.field" and "obs.field" entry
 //
+censor_thresh = [];
+censor_val    = [];
 prob_cat_thresh = [];
 
 //
@@ -115,12 +59,15 @@ prob_pct_thresh = [ ==0.25 ];
 //
 // May be set separately in each "obs.field" entry
 //
+nc_var_str  = "";
 eclv_points = 0.05;
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
    message_type    = [ "ADPSFC" ];
    obs_quality_inc = [];
    obs_quality_exc = [];
@@ -253,23 +200,14 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Ensemble product output types
+// Gridded verification output types
 //
 ensemble_flag = {
    latlon    = TRUE;
-   mean      = TRUE;
-   stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = TRUE;
-   vld_count = TRUE;
-   frequency = TRUE;
-   nep       = FALSE;
-   nmep      = FALSE;
-   rank      = TRUE;
    weight    = FALSE;
+   rank      = TRUE;
+   vld_count = TRUE;
+   mean      = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
