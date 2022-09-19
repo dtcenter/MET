@@ -302,17 +302,29 @@ void process_command_line(int argc, char **argv) {
    // Append the control member, if specified
    if(ctrl_file.nonempty()) {
 
-      if(ens_file_list.has(ctrl_file) && n_ens_files != 1) {
+      if(n_ens_files == 1 && !ens_file_list.has(ctrl_file)) {
+         mlog << Error << "\nprocess_command_line() -> "
+              << "when reading all ensemble members from the same file, "
+              << "the control member must be in that file as well: "
+              << ctrl_file << "\n\n";
+         exit(1);
+      }
+      else if(n_ens_files > 1 && ens_file_list.has(ctrl_file)) {
          mlog << Error << "\nprocess_command_line() -> "
               << "the ensemble control file should not appear in the list "
-              << "of ensemble member files:\n" << ctrl_file << "\n\n";
+              << "of ensemble member files: " << ctrl_file << "\n\n";
          exit(1);
       }
 
-      // Add control member file to end of the forecast file list
-      ens_file_list.add(ctrl_file.c_str());
-      ctrl_file_index = ens_file_list.n()-1;
-      n_ens_files++;
+      // Store control member file information
+      if(n_ens_files == 1) {
+         ctrl_file_index = 0;
+      }
+      else {
+         ens_file_list.add(ctrl_file.c_str());
+         n_ens_files++;
+         ctrl_file_index = ens_file_list.n()-1;
+      }
    }
 
    // Check that the end_ut >= beg_ut
