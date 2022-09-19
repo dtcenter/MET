@@ -345,10 +345,10 @@ void EnsembleStatConfInfo::parse_nc_info() {
    Dictionary * d = e->dict_value();
 
    nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
+   nc_info.do_weight = d->lookup_bool(conf_key_weight);
+   nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
    nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
    nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
-   nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
-   nc_info.do_weight = d->lookup_bool(conf_key_weight);
 
    return;
 }
@@ -1146,8 +1146,8 @@ void EnsembleStatNcOutInfo::clear() {
 
 bool EnsembleStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_vld    || do_mean ||
-                 do_orank  || do_weight;
+   bool status = do_latlon || do_weight || do_rank ||
+                 do_vld    || do_mean;
 
    return(!status);
 }
@@ -1157,10 +1157,10 @@ bool EnsembleStatNcOutInfo::all_false() const {
 void EnsembleStatNcOutInfo::set_all_false() {
 
    do_latlon = false;
+   do_weight = false;
+   do_orank  = false;
    do_vld    = false;
    do_mean   = false;
-   do_orank  = false;
-   do_weight = false;
 
    return;
 }
@@ -1171,10 +1171,10 @@ void EnsembleStatNcOutInfo::set_all_false() {
 void EnsembleStatNcOutInfo::set_all_true() {
 
    do_latlon = true;
+   do_weight = true;
+   do_orank  = true;
    do_vld    = true;
    do_mean   = true;
-   do_orank  = true;
-   do_weight = true;
 
    return;
 }

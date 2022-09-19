@@ -2480,30 +2480,36 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
 
    } // end for i
 
-   // Add the observation values
-   write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
-                         "OBS",
-                         "Observation Value");
+   // Add the observation values and ranks
+   if(conf_info.nc_info.do_rank) {
+      write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
+                            "OBS",
+                            "Observation Value");
 
-   // Add the observation ranks
-   write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, dp,
-                       "OBS_RANK",
-                       "Observation Rank");
+      // Add the observation ranks
+      write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, dp,
+                          "OBS_RANK",
+                          "Observation Rank");
 
-   // Add the probability integral transforms
-   write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, dp,
-                         "OBS_PIT",
-                         "Probability Integral Transform");
+      // Add the probability integral transforms
+      write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, dp,
+                            "OBS_PIT",
+                            "Probability Integral Transform");
+   }
 
    // Add the number of valid ensemble members
-   write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, dp,
-                       "ENS_VLD",
-                       "Ensemble Valid Data Count");
+   if(conf_info.nc_info.do_vld) {
+      write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, dp,
+                          "ENS_VLD",
+                          "Ensemble Valid Data Count");
+   }
 
    // Add the ensemble mean values
-   write_orank_var_float(i_vx, i_interp, i_mask, ens_mean, dp,
-                       "ENS_MEAN",
-                       "Ensemble Mean");
+   if(conf_info.nc_info.do_mean) {
+      write_orank_var_float(i_vx, i_interp, i_mask, ens_mean, dp,
+                            "ENS_MEAN",
+                            "Ensemble Mean");
+   }
 
    // Deallocate and clean up
    if(obs_v)    { delete [] obs_v;    obs_v    = (float *) 0; }
