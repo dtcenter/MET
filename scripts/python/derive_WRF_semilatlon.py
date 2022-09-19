@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 import sys
 import numpy as np
@@ -13,43 +11,43 @@ from netCDF4 import Dataset,chartostring
    ##  load the data into the numpy array
    ##
 
-if len(sys.argv) == 4:
-    # Read the input file as the first argument
-    input_file = os.path.expandvars(sys.argv[1])
-    var_name   = sys.argv[2]
-    axis       = sys.argv[3]
-
-    try:
-        # Print some output to verify that this script ran
-        print("Input File: " + repr(input_file))
-        print("Variable: "   + repr(var_name))
-        print("Axis: "       + repr(axis))
-
-        # Read input file
-        f = Dataset(input_file, 'r')
-
-        data = np.float64(f.variables[var_name][0,:,:,:])
-        data[data > 1.0e30] = np.nan
-
-        pvals = list(np.float64(f.variables["pressure"][:]))
-
-        if axis == "lon":
-           met_data = np.nanmean(data[::-1], axis=1).copy()
-        elif axis == "lat":
-           met_data = np.nanmean(data[::-1], axis=2).transpose().copy()
-        elif axis == "latlon":
-           met_data = np.nanmean(data[::-1], axis=1).copy()
-        else:
-           print("ERROR: Unsupported axis type: " + axis)
-           sys.exit(1)
-
-        print("Data Shape: " + repr(met_data.shape))
-        print("Data Type:  " + repr(met_data.dtype))
-    except NameError:
-        print("Trouble reading data from input file")
-else:
+if len(sys.argv) != 4:
     print("Must specify exactly one input file, variable name, and summary axis (lat, lon, latlon).")
     sys.exit(1)
+
+# Read the input file as the first argument
+input_file = os.path.expandvars(sys.argv[1])
+var_name   = sys.argv[2]
+axis       = sys.argv[3]
+
+try:
+    # Print some output to verify that this script ran
+    print("Input File: " + repr(input_file))
+    print("Variable: "   + repr(var_name))
+    print("Axis: "       + repr(axis))
+
+    # Read input file
+    f = Dataset(input_file, 'r')
+
+    data = np.float64(f.variables[var_name][0,:,:,:])
+    data[data > 1.0e30] = np.nan
+
+    pvals = list(np.float64(f.variables["pressure"][:]))
+
+    if axis == "lon":
+       met_data = np.nanmean(data[::-1], axis=1).copy()
+    elif axis == "lat":
+       met_data = np.nanmean(data[::-1], axis=2).transpose().copy()
+    elif axis == "latlon":
+       met_data = np.nanmean(data[::-1], axis=1).copy()
+    else:
+       print("ERROR: Unsupported axis type: " + axis)
+       sys.exit(1)
+
+    print("Data Shape: " + repr(met_data.shape))
+    print("Data Type:  " + repr(met_data.dtype))
+except NameError:
+    print("Trouble reading data from input file")
 
 ###########################################
 
