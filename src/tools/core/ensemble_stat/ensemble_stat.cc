@@ -1211,6 +1211,9 @@ void process_grid_vx() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      // Initialize
+      emn_dp.clear();
+
       // Set the forecast lead time
       shc.set_fcst_lead_sec(nint(ens_lead_na.min()));
 
@@ -1287,7 +1290,6 @@ void process_grid_vx() {
 
          // Initialize
          fcst_dp[j].clear();
-         emn_dp.clear();
 
          i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
          var_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(j);
