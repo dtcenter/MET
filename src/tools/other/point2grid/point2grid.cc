@@ -217,10 +217,7 @@ int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
-
-   // Process the input data file
-   process_data_file();
-
+   
    // This will replace the process_data_file() call above
    // We will store the multiple input obs files in a obs_file string_array
    //
@@ -230,6 +227,9 @@ int met_main(int argc, char *argv[]) {
       //process_data_file(i);
    }
    
+   // Process the input data file
+   process_data_file();
+
    return(0);
 }
 
@@ -294,6 +294,9 @@ void process_command_line(int argc, char **argv) {
    RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
+   // Store input obs file in obs_file array
+   obs_file.insert(0, cline[0].c_str());
+   
    // Check if the input file
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
