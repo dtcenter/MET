@@ -312,6 +312,7 @@ void process_command_line(int argc, char **argv) {
       // Add control member file to end of the forecast file list
       ens_file_list.add(ctrl_file.c_str());
       ctrl_file_index = ens_file_list.n()-1;
+      n_ens_files++;
    }
 
    // Check that the end_ut >= beg_ut

@@ -215,7 +215,7 @@ ensemble_flag = {
    latlon    = TRUE;
    weight    = TRUE;
    rank      = FALSE;
-   vld_count = FLASE;
+   vld_count = FALSE;
    mean      = TRUE;
 }
 
