@@ -127,7 +127,10 @@ static NcDim  lon_dim ;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
+
+static void process_data_file_new(int);
 static void process_data_file();
+
 static void process_point_file(NcFile *nc_in, MetConfig &config,
                                VarInfo *, const Grid to_grid);
 #ifdef WITH_PYTHON
@@ -374,6 +377,148 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_data_file_new(int i_nc) {
+   Grid fr_grid, to_grid;
+   GrdFileType ftype;
+   ConcatString run_cs;
+   NcFile *nc_in = (NcFile *)0;
+   static const char *method_name = "process_data_file() -> ";
+
+   // Initialize configuration object
+   MetConfig config;
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[0].c_str());
+
+   // Note: The command line argument MUST processed before this
+   if (compress_level < 0) compress_level = config.nc_compression();
+
+   // Get the gridded file type from config string, if present
+   ftype = parse_conf_file_type(&config);
+
+   // Open the input file
+   mlog << Debug(1)  << "Reading data file: " << obs_file[i_nc] << "\n";
+   bool goes_data = false;
+   bool use_python = false;
+   int obs_type;
+   Met2dDataFileFactory m_factory;
+   Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
+#ifdef WITH_PYTHON
+   string python_command = obs_file[i_nc];
+   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
+   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   if (use_python) {
+      int offset = python_command.find("=");
+      if (offset == std::string::npos) {
+         mlog << Error << "\n" << method_name
+              << "trouble parsing the python command " << python_command << ".\n\n";
+         exit(1);
+      }
+
+      python_command = python_command.substr(offset+1);
+      obs_type = TYPE_PYTHON;
+      fr_mtddf = new MetNcMetDataFile();
+   }
+   else
+#endif
+   {
+      nc_in = open_ncfile(obs_file[i_nc].c_str());
+
+      // Get the obs type before opening NetCDF
+      obs_type = get_obs_type(nc_in);
+      goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+
+      if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
+
+      // Read the input data file
+      fr_mtddf = m_factory.new_met_2d_data_file(obs_file[i_nc].c_str(), ftype);
+   }
+
+   if(!fr_mtddf) {
+      mlog << Error << "\n" << method_name
+           << "\"" << obs_file[i_nc] << "\" not a valid data file\n\n";
+      exit(1);
+   }
+
+   // Store the input data file types
+   ftype = fr_mtddf->file_type();
+
+   // Setup the VarInfo request object
+   VarInfoFactory v_factory;
+   VarInfo *vinfo;
+   vinfo = v_factory.new_var_info(ftype);
+
+   if(!vinfo) {
+      mlog << Error << "\n" << method_name
+           << "unable to determine file type of \"" << obs_file[i_nc]
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // For python types read the first field to set the grid
+
+   // Determine the "from" grid
+#ifdef WITH_PYTHON
+   if (!use_python) fr_grid = fr_mtddf->grid();
+#else
+   fr_grid = fr_mtddf->grid();
+#endif
+
+   // Determine the "to" grid
+   to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
+
+   mlog << Debug(2) << "Interpolation options: "
+        << "method = " << interpmthd_to_string(RGInfo.method)
+        << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
+
+   // Build the run command string
+   run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
+   
+   if (goes_data) {
+      mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
+      ConcatString grid_string = get_goes_grid_input(config, fr_grid, to_grid);
+      if (grid_string.length() > 0) run_cs << " with " << grid_string;
+   }
+   mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
+
+   // Open the output file
+   open_nc(to_grid, run_cs);
+
+   if (goes_data) {
+      process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
+   }
+   else if (TYPE_OBS == obs_type) {
+      process_point_file(nc_in, config, vinfo, to_grid);
+   }
+   else if (TYPE_NCCF == obs_type) {
+      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
+      unsetenv(nc_att_met_point_nccf);
+   }
+#ifdef WITH_PYTHON
+   else if (TYPE_PYTHON == obs_type) {
+      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+   }
+#endif
+   else {
+      mlog << Error << "\n" << method_name
+           << "Please check the input file. Only supports GOES, MET point obs, "
+           << "and CF complaint NetCDF with time/lat/lon variables.\n\n";
+      exit(1);
+   }
+
+   // Close the output file
+   close_nc();
+
+   // Clean up
+   if(nc_in)    { delete nc_in;    nc_in  = 0; }
+   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
+   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
+
+   return;
+   // returns true if no error
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_data_file() {
    Grid fr_grid, to_grid;
    GrdFileType ftype;
@@ -511,10 +656,10 @@ void process_data_file() {
    if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
 
    return;
+   // returns true if no error
 }
 
 ////////////////////////////////////////////////////////////////////////
-// returns true if no error
 
 bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
    bool status = false;
