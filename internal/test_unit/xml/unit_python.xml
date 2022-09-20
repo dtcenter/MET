@@ -361,6 +361,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V_orank.nc</grid_nc>
     </output>
   </test>
   

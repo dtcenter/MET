@@ -96,6 +96,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_weight/ensemble_stat_NO_WEIGHT_20120410_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_weight/ensemble_stat_NO_WEIGHT_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
 
@@ -120,6 +121,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_weight/ensemble_stat_COS_LAT_WEIGHT_20120410_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_weight/ensemble_stat_COS_LAT_WEIGHT_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
 
@@ -144,6 +146,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_weight/ensemble_stat_AREA_WEIGHT_20120410_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_weight/ensemble_stat_AREA_WEIGHT_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
 
