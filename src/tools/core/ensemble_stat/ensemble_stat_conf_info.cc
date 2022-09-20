@@ -176,8 +176,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
      msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
    }
 
-// JHG summarize the nc_infos?
-
    // Conf: ens_member_ids
    ens_member_ids = parse_conf_ens_member_ids(&conf);
 
