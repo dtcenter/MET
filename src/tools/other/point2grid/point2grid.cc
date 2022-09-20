@@ -227,11 +227,11 @@ int met_main(int argc, char *argv[]) {
    // Process each observation netCDF file
    for(i=0; i<obs_file.n(); i++) {
       cout << "Working on obs_file: " << i << " " << obs_file[i] << endl;
-      //process_data_file(i);
+      process_data_file_new(i);
    }
    
    // Process the input data file
-   process_data_file();
+   //process_data_file();
 
    return(0);
 }
@@ -441,7 +441,9 @@ void process_data_file_new(int i_nc) {
 
    // Store the input data file types
    ftype = fr_mtddf->file_type();
-
+   
+   cout << "ftype = " << ftype << endl; 
+   
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
    VarInfo *vinfo;
@@ -472,6 +474,8 @@ void process_data_file_new(int i_nc) {
 
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
+
+   cout << "run_cs = " << run_cs << endl;
    
    if (goes_data) {
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
