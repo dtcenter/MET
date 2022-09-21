@@ -8,6 +8,8 @@ Important issues are listed **in bold** for emphasis.
 MET Version 11.0.0-beta3 release notes (20220921)
 -------------------------------------------------
 
+.. warning:: **Ensemble post-processing has moved from Ensemble-Stat to Gen-Ens-Prod (`#1908 <https://github.com/dtcenter/MET/issues/1908>`_)!**
+
 * Repository and build:
 
    * Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
