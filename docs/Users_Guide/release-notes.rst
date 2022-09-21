@@ -52,6 +52,7 @@ MET Version 11.0.0-beta2 release notes (20220809)
    * Add a sum option to the time summaries computed by the point pre-processing tools (`#2204 <https://github.com/dtcenter/MET/issues/2204>`_).
    * Refine warning/error messages when parsing thresholds (`#2211 <https://github.com/dtcenter/MET/issues/2211>`_).
    * Add "station_ob" to metadata_map as a message_type metadata variable for ioda2nc (`#2215 <https://github.com/dtcenter/MET/issues/2215>`_).
+   * MET: Add a timestamp to the log output at the beginning and end of each MET tool run (`dtcenter/METplus-Internal#18 <https://github.com/dtcenter/METplus-Internal/issues/18>`_).
    * MET: Add the user ID and the command line being executed to the log output at beginning and end of each MET tool run (`dtcenter/METplus-Internal#19 <https://github.com/dtcenter/METplus-Internal/issues/19>`_).
    * MET: Enhance MET to have better signal handling for shutdown events (`dtcenter/METplus-Internal#21 <https://github.com/dtcenter/METplus-Internal/issues/21>`_).
 
