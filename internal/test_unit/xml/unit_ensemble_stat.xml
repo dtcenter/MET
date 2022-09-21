@@ -52,7 +52,6 @@
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -88,7 +87,6 @@
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -119,7 +117,6 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_orank.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
 
@@ -147,7 +144,6 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CTRL_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CTRL_20120410_120000V_orank.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CTRL_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
 
@@ -175,7 +171,6 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V_orank.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
 
@@ -210,7 +205,6 @@
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -246,7 +240,6 @@
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_ssvar.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -268,7 +261,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_NO_CTRL_19820701_000000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -291,7 +283,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_NC_WITH_CTRL_19820701_000000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -313,7 +304,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL_20160608_060000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -336,7 +326,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL_20160608_060000V_orank.nc</grid_nc>
     </output>
   </test>

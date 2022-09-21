@@ -84,8 +84,6 @@ const string hdr_hourlyaqobs_co_units = "CO_Unit";
 const string hdr_hourlyaqobs_so2 = "SO2";
 const string hdr_hourlyaqobs_so2_units = "SO2_Unit";
 
-const float AIRNOW_MISSING_VALUE = -999.;
-
 string remove_quotes(string &s);
 bool doubleOrMissing(const string &s, double &value);
 vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok);
@@ -309,7 +307,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
       col = _extractColumn(data_line, elevPtr);
       elev = atof(col.c_str());
     } else {
-      elev = AIRNOW_MISSING_VALUE;
+      elev = bad_data_double;
     }
   }
   string varName;
@@ -317,8 +315,6 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   double value;
   int aqiValue;
   int aqiCategory;
-  //double height_m = AIRNOW_MISSING_VALUE;  // maybe change
-  // go with this for now, can easily replace with previous line
   double height_m = elev;
   
   if (format_version == AIRNOW_FORMAT_VERSION_DAILYV2) {
@@ -333,7 +329,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
     // for now only the single variable is written as an observation
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, 0, 
-				 AIRNOW_MISSING_VALUE, height_m,
+				 bad_data_double, height_m,
 				 value, varName));
   } else if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
     varName = _extractColumn(data_line, varnamePtr);
@@ -342,7 +338,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
     value = atof(col.c_str());
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, 0, 
-				 AIRNOW_MISSING_VALUE, height_m,
+				 bad_data_double, height_m,
 				 value, varName));
   }
   return true;
@@ -422,7 +418,7 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   if (elevPtr >= 0) {
     elev = atof(tokens[elevPtr].c_str());
   } else {
-    elev = 0.0;  // or maybe -99 missing
+    elev = 0.0;
   }
     
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
@@ -493,8 +489,6 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   int aqi;
   double value;
   string units;
-  // double height_m = AIRNOW_MISSING_VALUE;  // maybe change
-  // go with this, can easily switch to previous line
   double height_m = elev;
   
   status = atoi(data_line[measuredPtr].c_str());
@@ -505,7 +499,7 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
       // for now only the single variable is written as an observation
       _addObservations(Observation(header_type, stationId, valid_time,
 				   lat, lon, elev, na_str, 0, 
-				   AIRNOW_MISSING_VALUE, height_m,
+				   bad_data_double, height_m,
 				   value, varname));
     }	
   }
@@ -522,15 +516,13 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   string col;
   double value;
   string units;
-  // double height_m = AIRNOW_MISSING_VALUE;  // maybe change
-  // go with this, can easily switch to previous line
   double height_m = elev;
       
   if (doubleOrMissing(data_line[valuePtr], value)) {
     units = data_line[unitPtr]; // ignored for now
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, 0, 
-				 AIRNOW_MISSING_VALUE, height_m,	
+				 bad_data_double, height_m,
 				 value, varname));
   }
 }
@@ -923,7 +915,7 @@ string remove_quotes(string &s)
 bool doubleOrMissing(const string &s, double &value)
 {
   if (s.empty()) {
-    value = AIRNOW_MISSING_VALUE;
+    value = bad_data_double;
     return false;
   } else {
     value = atof(s.c_str());
@@ -964,3 +956,5 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
   }
   return tokens;
 }
+
+////////////////////////////////////////////////////////////////////////
