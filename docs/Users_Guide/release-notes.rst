@@ -5,6 +5,32 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.0.0-beta3 release notes (20220921)
+-------------------------------------------------
+
+* Repository and build:
+
+   * Restructure the MET Dockerfiles to create images based on the new METbaseimage (`#2196 <https://github.com/dtcenter/MET/issues/2196>`_).
+   * Add .zenodo.json file to add metadata about releases (`#2198 <https://github.com/dtcenter/MET/issues/2198>`_).
+
+* Bugfixes:
+
+   * Fix the truncated station_id name in the output from IODA2NC (`#2216 <https://github.com/dtcenter/MET/issues/2216>`_).
+   * Fix oom() compile time linker error (`#2238 <https://github.com/dtcenter/MET/issues/2238>`_).
+   * Store unspecified accumulation interval as 0 rather than bad data (`#2250 <https://github.com/dtcenter/MET/issues/2250>`_).
+
+* Enhancements:
+
+   * **Remove ensemble post-processing from the Ensemble-Stat tool** (`#1908 <https://github.com/dtcenter/MET/issues/1908>`_).
+   * **Enhance Point-Stat to compute SEEPS for point observations and write new SEEPS and SEEPS_MPR STAT line types** (`#1942 <https://github.com/dtcenter/MET/issues/1942>`_).
+   * **Add the fair CRPS statistic to the ECNT line type in a new CRPS_EMP_FAIR column** (`#2206 <https://github.com/dtcenter/MET/issues/2206>`_).
+   * Update map data with more recent NaturalEarth definitions (`#2207 <https://github.com/dtcenter/MET/issues/2207>`_).
+   * Define new grid class to store semi-structured grid information (e.g. lat or lon vs level or time) (`#1954 <https://github.com/dtcenter/MET/issues/1954>`_).
+   * Add support for EPA AirNow ASCII data in ASCII2NC (`#2142 <https://github.com/dtcenter/MET/issues/2142>`_).
+   * Add tmp_dir configuration option to the Plot-Point-Obs tool (`#2237 <https://github.com/dtcenter/MET/issues/2237>`_).
+   * Refine NetCDF level string handling logic to always interpret @ strings as values (`#2225 <https://github.com/dtcenter/MET/issues/2225>`_).
+   * Add support for reading National Blend Model GRIB2 data (`#2055 <https://github.com/dtcenter/MET/issues/2055>`_).
+
 MET Version 11.0.0-beta2 release notes (20220809)
 -------------------------------------------------
 
