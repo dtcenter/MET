@@ -10,6 +10,8 @@ MET Version 11.0.0-beta3 release notes (20220921)
 
 * Repository and build:
 
+   * Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
+   * Update the METbaseimage to install Python 3.8.6 from source (`dtcenter/METbaseimage#3 <https://github.com/dtcenter/METbaseimage/issues/3>`_).
    * Restructure the MET Dockerfiles to create images based on the new METbaseimage (`#2196 <https://github.com/dtcenter/MET/issues/2196>`_).
    * Add .zenodo.json file to add metadata about releases (`#2198 <https://github.com/dtcenter/MET/issues/2198>`_).
 
