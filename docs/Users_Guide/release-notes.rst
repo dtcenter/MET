@@ -8,7 +8,7 @@ Important issues are listed **in bold** for emphasis.
 MET Version 11.0.0-beta3 release notes (20220921)
 -------------------------------------------------
 
-.. warning:: **Ensemble post-processing has moved from Ensemble-Stat to Gen-Ens-Prod (`#1908 <https://github.com/dtcenter/MET/issues/1908>`_)!**
+.. warning:: **Ensemble post-processing was added to Gen-Ens-Prod in version 10.1.0 and will be *removed* from Ensemble-Stat in version 11.0.0!**
 
 * Repository and build:
 
