@@ -915,50 +915,69 @@ void CNTInfo::compute_ci() {
       cv_chi2_u = chi2_cdf_inv(1.0 - (alpha[i]/2.0), n-1);
 
       //
-      // Compute confidence interval for forecast mean using VIF
+      // Check for bad data
       //
-      v = fbar.vif*fstdev.v*fstdev.v;
-      fbar.v_ncl[i] = fbar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
-      fbar.v_ncu[i] = fbar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
+      if(is_bad_data(fstdev.v)) {
+         fbar.v_ncl[i]   = fbar.v_ncu[i]   = bad_data_double;
+         fstdev.v_ncl[i] = fstdev.v_ncu[i] = bad_data_double;
+      }
+      else {
+
+         //
+         // Compute confidence interval for forecast mean using VIF
+         //
+         v = fbar.vif*fstdev.v*fstdev.v;
+         fbar.v_ncl[i] = fbar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+         fbar.v_ncu[i] = fbar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
+
+         //
+         // Compute confidence interval for forecast standard deviation,
+         // assuming normality of the forecast values
+         //
+         v = (n-1)*fstdev.v*fstdev.v/cv_chi2_u;
+         if(v < 0) fstdev.v_ncl[i] = bad_data_double;
+         else      fstdev.v_ncl[i] = sqrt(v);
+
+         v = (n-1)*fstdev.v*fstdev.v/cv_chi2_l;
+         if(v < 0) fstdev.v_ncu[i] = bad_data_double;
+         else      fstdev.v_ncu[i] = sqrt(v);
+      }
 
       //
-      // Compute confidence interval for forecast standard deviation,
-      // assuming normality of the forecast values
+      // Check for bad data
       //
-      v = (n-1)*fstdev.v*fstdev.v/cv_chi2_u;
-      if(v < 0) fstdev.v_ncl[i] = bad_data_double;
-      else      fstdev.v_ncl[i] = sqrt(v);
+      if(is_bad_data(ostdev.v)) {
+         obar.v_ncl[i]   = obar.v_ncu[i]   = bad_data_double;
+         ostdev.v_ncl[i] = ostdev.v_ncu[i] = bad_data_double;
+      }
+      else {
 
-      v = (n-1)*fstdev.v*fstdev.v/cv_chi2_l;
-      if(v < 0) fstdev.v_ncu[i] = bad_data_double;
-      else      fstdev.v_ncu[i] = sqrt(v);
+         //
+         // Compute confidence interval for observation mean using VIF
+         //
+         v = obar.vif*ostdev.v*ostdev.v;
+         obar.v_ncl[i] = obar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+         obar.v_ncu[i] = obar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
 
-      //
-      // Compute confidence interval for observation mean using VIF
-      //
-      v = obar.vif*ostdev.v*ostdev.v;
-      obar.v_ncl[i] = obar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
-      obar.v_ncu[i] = obar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
+         //
+         // Compute confidence interval for observation standard deviation
+         // assuming normality of the observation values
+         //
+         v = (n-1)*ostdev.v*ostdev.v/cv_chi2_u;
+         if(v < 0) ostdev.v_ncl[i] = bad_data_double;
+         else      ostdev.v_ncl[i] = sqrt(v);
 
-      //
-      // Compute confidence interval for observation standard deviation
-      // assuming normality of the observation values
-      //
-      v = (n-1)*ostdev.v*ostdev.v/cv_chi2_u;
-      if(v < 0) ostdev.v_ncl[i] = bad_data_double;
-      else      ostdev.v_ncl[i] = sqrt(v);
-
-      v = (n-1)*ostdev.v*ostdev.v/cv_chi2_l;
-      if(v < 0) ostdev.v_ncu[i] = bad_data_double;
-      else      ostdev.v_ncu[i] = sqrt(v);
+         v = (n-1)*ostdev.v*ostdev.v/cv_chi2_l;
+         if(v < 0) ostdev.v_ncu[i] = bad_data_double;
+         else      ostdev.v_ncu[i] = sqrt(v);
+      }
 
       //
       // Compute confidence interval for the pearson correlation coefficient
       //
       if(is_bad_data(pr_corr.v) || n <= 3 ||
          is_eq(pr_corr.v, 1.0)  || is_eq(pr_corr.v, -1.0)) {
-         pr_corr.v_ncl[i] = bad_data_double;
-         pr_corr.v_ncu[i] = bad_data_double;
+         pr_corr.v_ncl[i] = pr_corr.v_ncu[i] = bad_data_double;
       }
       else {
          v = 0.5*log((1 + pr_corr.v)/(1 - pr_corr.v));
@@ -973,8 +992,7 @@ void CNTInfo::compute_ci() {
       //
       if(is_bad_data(anom_corr.v) || n <= 3 ||
          is_eq(anom_corr.v, 1.0)  || is_eq(anom_corr.v, -1.0)) {
-         anom_corr.v_ncl[i] = bad_data_double;
-         anom_corr.v_ncu[i] = bad_data_double;
+         anom_corr.v_ncl[i] = anom_corr.v_ncu[i] = bad_data_double;
       }
       else {
          v = 0.5*log((1 + anom_corr.v)/(1 - anom_corr.v));
@@ -985,22 +1003,32 @@ void CNTInfo::compute_ci() {
       }
 
       //
-      // Compute confidence interval for mean error using VIF
+      // Check for bad data
       //
-      v = me.vif*estdev.v*estdev.v;
-      me.v_ncl[i] = me.v + cv_normal_l*sqrt(v)/sqrt((double) n);
-      me.v_ncu[i] = me.v + cv_normal_u*sqrt(v)/sqrt((double) n);
+      if(is_bad_data(estdev.v)) {
+         me.v_ncl[i]     = me.v_ncu[i]     = bad_data_double;
+         estdev.v_ncl[i] = estdev.v_ncu[i] = bad_data_double;
+      }
+      else {
 
-      //
-      // Compute confidence interval for the error standard deviation
-      //
-      v = (n-1)*estdev.v*estdev.v/cv_chi2_u;
-      if(v < 0) estdev.v_ncl[i] = bad_data_double;
-      else      estdev.v_ncl[i] = sqrt(v);
+         //
+         // Compute confidence interval for mean error using VIF
+         //
+         v = me.vif*estdev.v*estdev.v;
+         me.v_ncl[i] = me.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+         me.v_ncu[i] = me.v + cv_normal_u*sqrt(v)/sqrt((double) n);
 
-      v = (n-1)*estdev.v*estdev.v/cv_chi2_l;
-      if(v < 0) estdev.v_ncu[i] = bad_data_double;
-      else      estdev.v_ncu[i] = sqrt(v);
+         //
+         // Compute confidence interval for the error standard deviation
+         //
+         v = (n-1)*estdev.v*estdev.v/cv_chi2_u;
+         if(v < 0) estdev.v_ncl[i] = bad_data_double;
+         else      estdev.v_ncl[i] = sqrt(v);
+
+         v = (n-1)*estdev.v*estdev.v/cv_chi2_l;
+         if(v < 0) estdev.v_ncu[i] = bad_data_double;
+         else      estdev.v_ncu[i] = sqrt(v);
+      }
 
    } // end for i
 

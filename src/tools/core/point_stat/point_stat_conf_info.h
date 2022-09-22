@@ -51,36 +51,40 @@ static const int i_rps       = 16;
 static const int i_eclv      = 17;
 static const int i_mpr       = 18;
 static const int i_vcnt      = 19;
+static const int i_seeps_mpr = 20;
+static const int i_seeps     = 21;
 
-static const int n_txt       = 20;
+static const int n_txt       = 22;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
 
-   stat_fho,    //  0
-   stat_ctc,    //  1
-   stat_cts,    //  2
-   stat_mctc,   //  3
-   stat_mcts,   //  4
+   stat_fho,       //  0
+   stat_ctc,       //  1
+   stat_cts,       //  2
+   stat_mctc,      //  3
+   stat_mcts,      //  4
 
-   stat_cnt,    //  5
-   stat_sl1l2,  //  6
-   stat_sal1l2, //  7
-   stat_vl1l2,  //  8
-   stat_val1l2, //  9
+   stat_cnt,       //  5
+   stat_sl1l2,     //  6
+   stat_sal1l2,    //  7
+   stat_vl1l2,     //  8
+   stat_val1l2,    //  9
 
-   stat_pct,    //  10   
-   stat_pstd,   //  11
-   stat_pjc,    //  12
-   stat_prc,    //  13
-   stat_ecnt,   //  14
+   stat_pct,       //  10   
+   stat_pstd,      //  11
+   stat_pjc,       //  12
+   stat_prc,       //  13
+   stat_ecnt,      //  14
 
-   stat_orank,  //  15
-   stat_rps,    //  16
-   stat_eclv,   //  17
-   stat_mpr,    //  18
-   stat_vcnt,   //  19
+   stat_orank,     //  15
+   stat_rps,       //  16
+   stat_eclv,      //  17
+   stat_mpr,       //  18
+   stat_vcnt,      //  19
 
+   stat_seeps_mpr, //  20
+   stat_seeps      //  21
 };
 
 ////////////////////////////////////////////////////////////////////////

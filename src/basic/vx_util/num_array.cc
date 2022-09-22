@@ -93,6 +93,31 @@ NumArray & NumArray::operator=(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NumArray::operator==(const NumArray & a) const
+
+{
+
+   if ( e.size() != a.e.size() )  return ( false );
+
+   bool status = true;
+   int n = e.size();
+
+   for (int j=0; j<n; ++j)  {
+
+      if ( e[j] != a.e[j] )  {
+         status = false;
+         break;
+      }
+   }
+
+   return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::init_from_scratch()
 
 {
@@ -976,6 +1001,36 @@ ConcatString NumArray::serialize() const
    s << e[0];
    for(j=1; j<n_elements(); j++) s << " " << e[j];
    
+   return(s);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString NumArray::summarize() const
+
+{
+
+   ConcatString s;
+
+   s << "n = " << n_elements();
+
+   if(n_elements() > 0) {
+
+      double min_v, max_v;
+      min_v = max_v = e[0];
+
+      for(int j=0; j<n_elements(); j++) {
+         if(is_bad_data(e[j])) continue;
+         if(e[j] < min_v) min_v = e[j];
+         if(e[j] > max_v) max_v = e[j];
+      }
+
+      s << ", min = " << min_v << ", max = " << max_v;
+   }
+
    return(s);
 
 }

@@ -173,6 +173,15 @@ When specified as a dictionary, the contents of the **grid** dictionary vary bas
   • lon_zero (double)
   • nx, ny   (int)
 
+• **SemiLatLon** grid dictionary entries:
+
+  • type     ("SemiLatLon")
+  • name     (string)
+  • lats     (list of doubles)
+  • lons     (list of doubles)
+  • levels   (list of doubles)
+  • times    (list of doubles)
+
 Additional information about supported grids can be found in :ref:`appendixB`.
 
 **Using Xarray DataArrays**

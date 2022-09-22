@@ -226,6 +226,22 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void SemiLatLonData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nSemiLatLon Grid Data:\n"
+     << "    lats: " << lats.summarize() << "\n"
+     << "    lons: " << lons.summarize() << "\n"
+     << "  levels: " << levels.summarize() << "\n"
+     << "   times: " << times.summarize() << "\n\n";
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class GridInfo
    //
@@ -300,6 +316,7 @@ m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
 tc  = (const TcrmwData *)         0;
+sl  = (const SemiLatLonData *)    0;
 
 clear();
 
@@ -323,6 +340,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
+if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
 
 return;
 
@@ -343,6 +361,7 @@ if ( info.rll )  set( *(info.rll) );
 if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
 if ( info.gi  )  set( *(info.gi ) );
+if ( info.sl  )  set( *(info.sl ) );
 
 return;
 
@@ -365,6 +384,7 @@ if ( rll ) ++count;
 if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
+if ( sl  ) ++count;
 
 return ( count == 1 );
 
@@ -393,6 +413,8 @@ else if ( rll )  gg.set( *rll );
 else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
+else if ( sl  )  gg.set( *sl  );
+
 
 return;
 
@@ -547,6 +569,33 @@ D = new GoesImagerData;
 memcpy(D, &data, sizeof(data));
 
 gi = D;  D = (GoesImagerData *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const SemiLatLonData & data)
+
+{
+
+clear();
+
+SemiLatLonData * D = (SemiLatLonData *) 0;
+
+D = new SemiLatLonData;
+
+   //
+   //  deep copy instead of memcpy because the struct
+   //  contains dynamically allocated NumArray objects
+   //
+
+*D = data;
+
+sl = D;  D = (SemiLatLonData *) 0;
 
 return;
 
@@ -743,7 +792,9 @@ bool status = find_grid_by_name(_name, *this);
 
 if ( !status )  {
 
-   mlog << Error << "\nGrid::set(const char *) -> grid lookup failed for name \"" << _name << "\"\n\n";
+   mlog << Error << "\nGrid::set(const char *) -> "
+        << "grid lookup failed for name \""
+        << _name << "\"\n\n";
 
    exit ( 1 );
 
@@ -924,7 +975,8 @@ GridInfo Grid::info() const
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::info() const -> empty grid!\n\n";
+   mlog << Error << "\nGrid::info() const -> "
+        << "empty grid!\n\n";
 
    exit ( 1 );
 
@@ -944,7 +996,8 @@ double Grid::rot_grid_to_earth(int x, int y) const
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::rot_grid_to_earth() const -> empty grid!\n\n";
+   mlog << Error << "\nGrid::rot_grid_to_earth() const -> "
+        << "empty grid!\n\n";
 
    exit ( 1 );
 
@@ -965,7 +1018,8 @@ bool Grid::wrap_lon() const
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::wrap_lon() const -> empty grid!\n\n";
+   mlog << Error << "\nGrid::wrap_lon() const -> "
+        << "empty grid!\n\n";
 
    exit ( 1 );
 
@@ -985,7 +1039,8 @@ void Grid::shift_right(int N)
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::shift_right() -> empty grid!\n\n";
+   mlog << Error << "\nGrid::shift_right() -> "
+        << "empty grid!\n\n";
 
    exit ( 1 );
 
@@ -1005,7 +1060,8 @@ Grid Grid::subset_ll(int x_ll, int y_ll, int nx_new, int ny_new) const
 
 if ( ! rep )  {
 
-   mlog << Error << "\n\n  Grid::subset_ll() const -> empty grid!\n\n";
+   mlog << Error << "\n\n  Grid::subset_ll() const -> "
+        << "empty grid!\n\n";
 
    exit ( 1 );
 
@@ -1013,7 +1069,8 @@ if ( ! rep )  {
 
 if ( (nx_new < 2) || ( ny_new < 2) )  {
 
-   mlog << Error << "\n\n  Grid::subset_ll() const -> bad size for subset grid\n\n";
+   mlog << Error << "\n\n  Grid::subset_ll() const -> "
+        << "bad size for subset grid\n\n";
 
    exit ( 1 );
 
@@ -1084,9 +1141,17 @@ if ( info_new.lc )  {
 
    g_new.set(m_new);
 
+} else if ( info_new.sl )  {
+
+   mlog << Error << "\n\n  Grid::subset_ll() const -> "
+        << "subsetting is not supported for SemiLatLon grids\n\n";
+
+   exit ( 1 );
+
 } else {
 
-   mlog << Error << "\n\n  Grid::subset_ll() const -> bad grid projection\n\n";
+   mlog << Error << "\n\n  Grid::subset_ll() const -> "
+        << "bad grid projection\n\n";
 
    exit ( 1 );
 
@@ -1187,6 +1252,7 @@ else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
+else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 
 return ( false );
 
@@ -1387,6 +1453,27 @@ if ( gi1->nx           == gi2->nx             &&
 return ( status );
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const SemiLatLonData * gi1, const SemiLatLonData * gi2)
+{
+
+if ( !gi1 || !gi2 )  return ( false );
+
+bool status = false;
+
+if ( gi1->lats   == gi2->lats &&
+     gi1->lons   == gi2->lons &&
+     gi1->levels == gi2->levels &&
+     gi1->times  == gi2->times )  status = true;
+
+return ( status );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
