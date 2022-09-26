@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <cmath>
 
-#include "tc_rmw_conf_info.h"
+#include "tc_diag_conf_info.h"
 
 #include "vx_log.h"
 

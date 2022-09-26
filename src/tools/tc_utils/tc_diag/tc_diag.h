@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   tc_rmw.h
+//   Filename:   tc_diag.h
 //
 //   Description:
 //
@@ -41,8 +41,7 @@ using namespace std;
 #include <netcdf>
 using namespace netCDF;
 
-#include "tc_rmw_conf_info.h"
-#include "tc_rmw_wind_converter.h"
+#include "tc_diag_conf_info.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_tc_util.h"
@@ -56,7 +55,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 // Program name
-static const char* program_name = "tc_rmw";
+static const char* program_name = "tc_diag";
 
 // ATCF file suffix
 static const char* atcf_suffix = ".dat";
@@ -83,7 +82,6 @@ static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
-static TCRMW_WindConverter wind_converter;
 
 
 // Optional arguments
