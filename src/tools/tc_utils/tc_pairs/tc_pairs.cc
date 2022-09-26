@@ -1502,6 +1502,8 @@ void derive_baseline_model(const ConcatString &model,
          tp_lon[ntp]  = (float) ti[i].lon();
          tp_vmax[ntp] = (float) ti[i].v_max();
 
+         cout << "ti[" << i << "].v_max() = " << ti[i].v_max() << endl;
+         
          // Increment the track point counter
          ntp++;
 
