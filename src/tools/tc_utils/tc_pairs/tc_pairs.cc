@@ -171,7 +171,7 @@ int met_main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 const string get_tool_name() {
-   return "tc_gen";
+   return "tc_pairs";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1502,8 +1502,6 @@ void derive_baseline_model(const ConcatString &model,
          tp_lon[ntp]  = (float) ti[i].lon();
          tp_vmax[ntp] = (float) ti[i].v_max();
 
-         cout << "ti[" << i << "].v_max() = " << ti[i].v_max() << endl;
-         
          // Increment the track point counter
          ntp++;
 

@@ -36,6 +36,25 @@
     </output>
   </test>
 
+  <test name="tc_pairs_CONSENSUS">
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>INIT_BEG</name> <value>"20200823_00"</value></pair>
+      <pair><name>INIT_END</name> <value>"20200823_18"</value></pair>
+    </env>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal132020.dat \
+      -bdeck &DATA_DIR;/bdeck/bal132020.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_CONSENSUS \
+      -out &OUTPUT_DIR;/tc_pairs/al132020_CONSENSUS \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_CONSENSUS.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al132020_CONSENSUS.tcst</stat>
+    </output>
+  </test>
+
   <test name="tc_pairs_INTERP12_FILL">
     <exec>&MET_BIN;/tc_pairs</exec>
     <env>
