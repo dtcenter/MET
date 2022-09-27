@@ -22,25 +22,25 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class TCRMWConfInfo
+//  Code for class TCDiagConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCRMWConfInfo::TCRMWConfInfo() {
+TCDiagConfInfo::TCDiagConfInfo() {
 
     init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-TCRMWConfInfo::~TCRMWConfInfo() {
+TCDiagConfInfo::~TCDiagConfInfo() {
 
     clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::init_from_scratch() {
+void TCDiagConfInfo::init_from_scratch() {
 
     // Initialize pointers
     data_info = (VarInfo**) 0;
@@ -52,7 +52,7 @@ void TCRMWConfInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::clear() {
+void TCDiagConfInfo::clear() {
 
     Model.clear();
     StormId.clear();
@@ -99,7 +99,7 @@ void TCRMWConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::read_config(const char* default_file_name,
+void TCDiagConfInfo::read_config(const char* default_file_name,
                                 const char* user_file_name) {
 
     // Read config file constants
@@ -116,7 +116,7 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::process_config(GrdFileType ftype) {
+void TCDiagConfInfo::process_config(GrdFileType ftype) {
     int i;
     StringArray sa;
     VarInfoFactory info_factory;
@@ -200,7 +200,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Check for empty data settings
     if(n_data == 0) {
-        mlog << Error << "\nTCRMWConfInfo::process_config() -> "
+        mlog << Error << "\nTCDiagConfInfo::process_config() -> "
              << "data may not be empty.\n\n";
         exit(1);
     }

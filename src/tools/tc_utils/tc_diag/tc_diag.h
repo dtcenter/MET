@@ -12,14 +12,14 @@
 //
 //   Description:
 //
-//   Mod#  Date      Name      Description
-//   ----  ----      ----      -----------
-//   000   04/18/19  Fillmore  New
+//   Mod#  Date      Name          Description
+//   ----  ----      ----          -----------
+//   000   09/27/22  Halley Gotway New
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __TC_RMW_H__
-#define  __TC_RMW_H__
+#ifndef  __TC_DIAG_H__
+#define  __TC_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ static const char* atcf_suffix = ".dat";
 
 // Default configuration file name
 static const char* default_config_filename =
-    "MET_BASE/config/TCRMWConfig_default";
+    "MET_BASE/config/TCDiagConfig_default";
 
 // Default output directory
 static const char* default_out_dir = ".";
@@ -77,11 +77,11 @@ static const char* default_out_prefix = "";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray   data_files;
-static StringArray   deck_source, deck_model_suffix;
-static ConcatString  config_file;
-static TCRMWConfInfo conf_info;
-static GrdFileType   ftype;
+static StringArray    data_files;
+static StringArray    deck_source, deck_model_suffix;
+static ConcatString   config_file;
+static TCDiagConfInfo conf_info;
+static GrdFileType    ftype;
 
 
 // Optional arguments
@@ -146,6 +146,6 @@ static double* lon_arr;
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif  //  __TC_RMW_H__
+#endif  //  __TC_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////

@@ -12,11 +12,9 @@
 //
 //   Description:
 //
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//   000   04/18/19  Fillmore        New
-//   001   05/15/20  Halley Gotway   Fix data file list option logic.
-//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   Mod#   Date      Name          Description
+//   ----   ----      ----          -----------
+//   000    09/27/22  Halley Gotway New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +31,6 @@
 #include "main.h"
 #include "tc_diag.h"
 
-#include "tcrmw_grid.h"
 #include "series_data.h"
 
 #include "vx_grid.h"
@@ -123,7 +120,7 @@ void usage() {
          << "\t\t\"-deck source\" is the ATCF format data source "
          << "(required).\n"
 
-         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "\t\t\"config_file\" is a TCDiagConfig file to be used "
          << "(required).\n"
 
          << "\t\t\"-out file\" is the NetCDF output file to be written "

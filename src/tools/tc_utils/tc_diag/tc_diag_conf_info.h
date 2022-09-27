@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __TC_RMW_CONF_INFO_H__
-#define  __TC_RMW_CONF_INFO_H__
+#ifndef  __TC_DIAG_CONF_INFO_H__
+#define  __TC_DIAG_CONF_INFO_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +22,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TCRMWConfInfo {
+class TCDiagConfInfo {
 
     private:
 
@@ -66,8 +66,8 @@ class TCRMWConfInfo {
         // Variable information
         VarInfo** data_info;
 
-        TCRMWConfInfo();
-        ~TCRMWConfInfo();
+        TCDiagConfInfo();
+        ~TCDiagConfInfo();
 
         void clear();
 
@@ -79,12 +79,12 @@ class TCRMWConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCRMWConfInfo::get_n_data() const {
+inline int TCDiagConfInfo::get_n_data() const {
     return n_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __TC_RMW_CONF_INFO_H__  */
+#endif   /*  __TC_DIAG_CONF_INFO_H__  */
 
 ////////////////////////////////////////////////////////////////////////
