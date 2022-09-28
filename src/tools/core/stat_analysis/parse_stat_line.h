@@ -25,6 +25,7 @@
 //   008    10/09/17  Halley Gotway   Add GRAD line type.
 //   009    04/25/18  Halley Gotway   Add ECNT line type.
 //   010    01/24/20  Halley Gotway   Add RPS line type.
+//   011    09/28/22  Prestopnik      MET #2227 Remove namespace std
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,8 +33,6 @@
 #define  __PARSE_STAT_LINE_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cmath>
 #include <cstdio>

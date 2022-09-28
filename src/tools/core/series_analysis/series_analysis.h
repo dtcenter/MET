@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/10/12  Halley Gotway   New
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +24,6 @@
 #define  __SERIES_ANALYSIS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -99,7 +99,7 @@ struct NcVarData {
 };
 
 // Mapping of NetCDF variable name to computed statistic
-map<ConcatString, NcVarData> stat_data;
+std::map<ConcatString, NcVarData> stat_data;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -149,7 +149,7 @@ static int      obs_lead_beg   = bad_data_int;
 static int      obs_lead_end   = bad_data_int;
 
 // Mapping of statistic names to descriptions
-map<ConcatString, ConcatString> stat_long_name;
+std::map<ConcatString, ConcatString> stat_long_name;
 static const char stat_long_name_file[] =
    "MET_BASE/table_files/stat_column_description.txt";
 

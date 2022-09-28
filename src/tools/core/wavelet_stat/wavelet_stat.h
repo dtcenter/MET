@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -24,8 +25,6 @@
 #define  __WAVELET_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -109,16 +108,16 @@ static ConcatString out_ps_file;
 static PSfile       *ps_out = (PSfile *) 0;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ISC output file
-static ConcatString isc_file;
-static ofstream    *isc_out = (ofstream *) 0;
-static AsciiTable   isc_at;
-static int          i_isc_row;
+static ConcatString     isc_file;
+static std::ofstream    *isc_out = (std::ofstream *) 0;
+static AsciiTable       isc_at;
+static int              i_isc_row;
 
 ////////////////////////////////////////////////////////////////////////
 //

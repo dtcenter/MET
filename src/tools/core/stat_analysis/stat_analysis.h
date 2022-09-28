@@ -16,6 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
 //   001    05/03/12  Halley Gotway   Switch to using vx_config library.
+//   002    09/28/22  Prestopnik      MET #2227 Remove namespace std
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,8 +26,6 @@
 #define  __STAT_ANALYSIS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cmath>
 #include <cstdio>
@@ -70,8 +69,8 @@ static StringArray search_dirs;
 static StringArray files;
 
 // Output file set with -out
-static ConcatString out_file;
-static ofstream   *sa_out   = (ofstream *) 0;
+static ConcatString    out_file;
+static std::ofstream   *sa_out   = (std::ofstream *) 0;
 
 // Config file set with -config
 static ConcatString config_file;
@@ -91,7 +90,7 @@ static ConcatString tmp_file;
 static ConcatString tmp_path;
 
 // Output file stream for the temporary file
-static ofstream tmp_out;
+static std::ofstream tmp_out;
 
 // STAT-Analysis configuration object
 static MetConfig conf;

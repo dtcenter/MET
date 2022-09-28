@@ -16,8 +16,9 @@
 //   ----   ----      ----           -----------
 //   000    11/11/08  Halley Gotway  New
 //   001    05/03/10  Halley Gotway  Add fcst/obs/diff variable name
-//                    arrays to keep track of NetCDF variables.
+//                                     arrays to keep track of NetCDF variables.
 //   002    05/10/16  Halley Gotway  Add grid weighting.
+//   003    09/28/22  Prestopnik     MET #2227 Remove namespace std 
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,8 +26,6 @@
 #define  __GRID_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -133,16 +132,16 @@ static NcDim        lon_dim;
 static StringArray nc_var_sa;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString     txt_file[n_txt];
+static std::ofstream    *txt_out[n_txt];
+static AsciiTable       txt_at[n_txt];
+static int              i_txt_row[n_txt];
 
 static int compress_level = -1;
 
