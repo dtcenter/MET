@@ -193,7 +193,7 @@ mode configuration file
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 _____________________
 
