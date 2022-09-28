@@ -1489,7 +1489,6 @@ The first set of header columns are common to all of the output files generated 
   * - 31
     - FCST_CAT
     - Forecast category to 3 by 3 matrix
-JHG this is a test
   * - 32
     - OBS_CAT
     - Observationtegory to 3 by 3 matrix
