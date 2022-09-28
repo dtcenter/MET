@@ -16,7 +16,8 @@
 //   ----   ----      ----           -----------
 //   000   04/18/19  Fillmore        New
 //   001   05/15/20  Halley Gotway   Fix data file list option logic.
-//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002   07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   003   09/28/22  Prestopnik      MET #2227 Remove namspace std 
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -106,34 +107,34 @@ const string get_tool_name() {
 
 void usage() {
 
-    cout << "\n*** Model Evaluation Tools (MET" << met_version
-         << ") ***\n\n"
-         << "Usage: " << program_name << "\n"
-         << "\t-data file_1 ... file_n | data_file_list\n"
-         << "\t-deck file\n"
-         << "\t-config file\n"
-         << "\t-out file\n"
-         << "\t[-log file]\n"
-         << "\t[-v level]\n\n"
+    std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+              << ") ***\n\n"
+              << "Usage: " << program_name << "\n"
+              << "\t-data file_1 ... file_n | data_file_list\n"
+              << "\t-deck file\n"
+              << "\t-config file\n"
+              << "\t-out file\n"
+              << "\t[-log file]\n"
+              << "\t[-v level]\n\n"
 
-         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
-         << "specifies the gridded data files or an ASCII file "
-         << "containing a list of files to be used (required).\n"
+              << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+              << "specifies the gridded data files or an ASCII file "
+              << "containing a list of files to be used (required).\n"
 
-         << "\t\t\"-deck source\" is the ATCF format data source "
-         << "(required).\n"
+              << "\t\t\"-deck source\" is the ATCF format data source "
+              << "(required).\n"
 
-         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
-         << "(required).\n"
+              << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+              << "(required).\n"
 
-         << "\t\t\"-out file\" is the NetCDF output file to be written "
-         << "(required).\n"
+              << "\t\t\"-out file\" is the NetCDF output file to be written "
+              << "(required).\n"
 
-         << "\t\t\"-log file\" outputs log messages to the specified "
-         << "file (optional).\n"
+              << "\t\t\"-log file\" outputs log messages to the specified "
+              << "file (optional).\n"
 
-         << "\t\t\"-v level\" overrides the default level of logging ("
-         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+              << "\t\t\"-v level\" overrides the default level of logging ("
+              << mlog.verbosity_level() << ") (optional).\n\n" << std::flush;
 
     exit(1);
 }
@@ -586,7 +587,7 @@ void setup_nc_file() {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-	string fname = data_info->name_attr();
+	std::string fname = data_info->name_attr();
         variable_levels[fname].push_back(data_info->level_attr());
         variable_long_names[fname] = data_info->long_name_attr();
         variable_units[fname] = data_info->units_attr();
@@ -689,8 +690,8 @@ void process_fields(const TrackInfoArray& tracks) {
             // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
 
-	    string sname = data_info->name_attr().string();
-	    string slevel = data_info->level_attr().string();
+	    std::string sname = data_info->name_attr().string();
+	    std::string slevel = data_info->level_attr().string();
 
 	    data_info->set_valid(valid_time);
 

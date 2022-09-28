@@ -203,7 +203,7 @@ void RMWAnalysisConfInfo::process_config() {
         if(mlog.verbosity_level() >=5) {
             mlog << Debug(5) << "Parsed data field "
             << i + 1 << ":\n";
-            data_info[i]->dump(cout);
+            data_info[i]->dump(std::cout);
         }
     }
 

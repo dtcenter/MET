@@ -12,9 +12,11 @@
 //
 //   Description:
 //
-//   Mod#  Date      Name      Description
-//   ----  ----      ----      -----------
-//   000   04/18/19  Fillmore  New
+//   Mod#  Date      Name       Description
+//   ----  ----      ----       -----------
+//   000   04/18/19  Fillmore   New
+//   001   09/28/22  Prestopnik Adding "std::"; removing namspace
+//                                from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +25,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -110,21 +111,21 @@ static NcVar        data_var;
 static NcVar        wind_r_var;
 static NcVar        wind_a_var;
 
-static vector<NcVar> data_vars;
-static vector<NcVar> azi_mean_data_vars;
+static std::vector<NcVar> data_vars;
+static std::vector<NcVar> azi_mean_data_vars;
 
-static map<string, NcVar> data_3d_vars;
+static std::map<std::string, NcVar> data_3d_vars;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
 
-static map<string, vector<string> > variable_levels;
-static map<string, string> variable_long_names;
-static map<string, string> variable_units;
+static std::map<std::string, std::vector<std::string> > variable_levels;
+static std::map<std::string, std::string> variable_long_names;
+static std::map<std::string, std::string> variable_units;
 
-static set<string> pressure_level_strings;
-static set<double> pressure_levels;
-static map<string, int> pressure_level_indices;
+static std::set<std::string> pressure_level_strings;
+static std::set<double> pressure_levels;
+static std::map<std::string, int> pressure_level_indices;
 
 ////////////////////////////////////////////////////////////////////////
 //

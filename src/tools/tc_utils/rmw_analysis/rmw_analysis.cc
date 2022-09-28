@@ -66,7 +66,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "rmw_analysis";
 }
 
@@ -74,30 +74,30 @@ const string get_tool_name() {
 
 void usage() {
 
-    cout << "\n*** Model Evaluation Tools (MET" << met_version
-         << ") ***\n\n"
-         << "Usage: " << program_name << "\n"
-         << "\t-data file_1 ... file_n | data_file_list\n"
-         << "\t-config file\n"
-         << "\t-out file\n"
-         << "\t[-log file]\n"
-         << "\t[-v level]\n\n"
+    std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+              << ") ***\n\n"
+              << "Usage: " << program_name << "\n"
+              << "\t-data file_1 ... file_n | data_file_list\n"
+              << "\t-config file\n"
+              << "\t-out file\n"
+              << "\t[-log file]\n"
+              << "\t[-v level]\n\n"
 
-         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
-         << "is the NetCDF output of TC-RMW to be processed or an "
-         << "ASCII file containing a list of files (required).\n"
+              << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+              << "is the NetCDF output of TC-RMW to be processed or an "
+              << "ASCII file containing a list of files (required).\n"
 
-         << "\t\t\"-config file\" is the RMWAnalysisConfig to be used "
-         << "(required).\n"
+              << "\t\t\"-config file\" is the RMWAnalysisConfig to be used "
+              << "(required).\n"
 
-         << "\t\t\"-out file\" is the NetCDF output file to be written "
-         << "(required).\n"
+              << "\t\t\"-out file\" is the NetCDF output file to be written "
+              << "(required).\n"
 
-         << "\t\t\"-log file\" outputs log messages to the specified "
-         << "file (optional).\n"
+              << "\t\t\"-log file\" outputs log messages to the specified "
+              << "file (optional).\n"
 
-         << "\t\t\"-v level\" overrides the default level of logging ("
-         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+              << "\t\t\"-v level\" overrides the default level of logging ("
+              << mlog.verbosity_level() << ") (optional).\n\n" << std::flush;
 
     exit(1);
 }
@@ -197,8 +197,8 @@ void setup() {
          << n_range << ", " << n_azimuth << ", " << n_level << ")\n";
 
     // Get dimension coordinates
-    vector<size_t> start;
-    vector<size_t> count;
+    std::vector<size_t> start;
+    std::vector<size_t> count;
     start.push_back(0);
 
     ConcatString s;
@@ -313,10 +313,10 @@ void process_files() {
     data_3d_sq.set_size(n_range, n_azimuth, n_level);
 
     // Set up array track point slices
-    vector<size_t> start_2d;
-    vector<size_t> count_2d;
-    vector<size_t> start_3d;
-    vector<size_t> count_3d;
+    std::vector<size_t> start_2d;
+    std::vector<size_t> count_2d;
+    std::vector<size_t> start_3d;
+    std::vector<size_t> count_3d;
     start_2d.push_back(0);
     start_2d.push_back(0);
     start_2d.push_back(0);
@@ -432,11 +432,11 @@ void write_stats() {
     azimuth_dim = add_dim(nc_out, "azimuth", n_azimuth);
     level_dim = add_dim(nc_out, level_name, n_level);
 
-    vector<NcDim> dims_2d;
+    std::vector<NcDim> dims_2d;
     dims_2d.push_back(range_dim);
     dims_2d.push_back(azimuth_dim);
 
-    vector<NcDim> dims_3d;
+    std::vector<NcDim> dims_3d;
     dims_3d.push_back(range_dim);
     dims_3d.push_back(azimuth_dim);
     dims_3d.push_back(level_dim);
@@ -445,10 +445,10 @@ void write_stats() {
     NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
     NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
 
-    vector<size_t> offset;
-    vector<size_t> count_range;
-    vector<size_t> count_azimuth;
-    vector<size_t> count_level;
+    std::vector<size_t> offset;
+    std::vector<size_t> count_range;
+    std::vector<size_t> count_azimuth;
+    std::vector<size_t> count_level;
     offset.push_back(0);
     count_range.push_back(n_range);
     count_azimuth.push_back(n_azimuth);
@@ -467,10 +467,10 @@ void write_stats() {
     level_var.putVar(offset, count_level, level_coord.data());
     add_att(&level_var, "units", level_units);
 
-    vector<size_t> offset_2d;
-    vector<size_t> count_2d;
-    vector<size_t> offset_3d;
-    vector<size_t> count_3d;
+    std::vector<size_t> offset_2d;
+    std::vector<size_t> count_2d;
+    std::vector<size_t> offset_3d;
+    std::vector<size_t> count_3d;
 
     offset_2d.push_back(0);
     offset_2d.push_back(0);
@@ -702,7 +702,7 @@ void read_nc_tracks(NcFile* nc_in) {
 
     mlog << Debug(3) << adeck_source << "\n";
 
-    ofstream f;
+    std::ofstream f;
     f.open(adeck_source.c_str());
 
     adeck_tracks.clear();
@@ -715,8 +715,8 @@ void read_nc_tracks(NcFile* nc_in) {
 
     NcVar track_lines_var = get_nc_var(nc_in, "TrackLines");
 
-    vector<size_t> counts;
-    vector<size_t> offsets;
+    std::vector<size_t> counts;
+    std::vector<size_t> offsets;
 
     for(int i = 0; i < n_track_line; i++) {
         offsets.clear();

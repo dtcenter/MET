@@ -33,7 +33,9 @@
 //                    that contain all required lead times.
 //   011    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
-//   020    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   013    09/28/22  Prestopnik      Adding "std::"; Removing namespace
+//                                      from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +172,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "tc_gen";
 }
 
@@ -1782,8 +1784,8 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    crtk_err.clear();
 
    // Get the valid time range
-   ut_min = min(adeck.valid_min(), bdeck.valid_min());
-   ut_max = max(adeck.valid_max(), bdeck.valid_max());
+   ut_min = std::min(adeck.valid_min(), bdeck.valid_min());
+   ut_max = std::max(adeck.valid_max(), bdeck.valid_max());
 
    // Determine the valid increment
    // For BEST tracks, use a constant time step
@@ -1844,8 +1846,8 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
          is_bad_data(alon[i]) || is_bad_data(blon[i])) continue;
 
       // Keep track of min/max longitudes
-      lon_min = (min(alon[i], blon[i]) < lon_min ? min(alon[i], blon[i]) : lon_min);
-      lon_max = (max(alon[i], blon[i]) > lon_max ? max(alon[i], blon[i]) : lon_max);
+      lon_min = (std::min(alon[i], blon[i]) < lon_min ? std::min(alon[i], blon[i]) : lon_min);
+      lon_max = (std::max(alon[i], blon[i]) > lon_max ? std::max(alon[i], blon[i]) : lon_max);
 
       // Compute and store track errors
       latlon_to_xytk_err(alat[i], alon[i], blat[i], blon[i], x, y, tk);
@@ -1956,7 +1958,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   std::ofstream *out = (std::ofstream *) 0;
 
    // Set the track pair output file name
    out_file << out_base << tc_stat_file_ext;
@@ -2000,11 +2002,11 @@ void write_tracks(const TrackPairInfoArray &p) {
    }
 
    // Write the AsciiTable contents and clean up
-   if(out != (ofstream *) 0) {
+   if(out != (std::ofstream *) 0) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (std::ofstream *) 0;
    }
 
    return;
@@ -2017,7 +2019,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   std::ofstream *out = (std::ofstream *) 0;
 
    // Set the track pair output file name
    out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
@@ -2078,11 +2080,11 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    }
 
    // Write the AsciiTable contents and clean up
-   if(out != (ofstream *) 0) {
+   if(out != (std::ofstream *) 0) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (std::ofstream *) 0;
    }
 
    return;
@@ -2114,48 +2116,48 @@ void setup_table(AsciiTable &at) {
 
 void usage() {
 
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+             << ") ***\n\n"
 
-        << "Usage: " << program_name << "\n"
-        << "\t-adeck source and/or -edeck source\n"
-        << "\t-bdeck source\n"
-        << "\t-config file\n"
-        << "\t[-out base]\n"
-        << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+             << "Usage: " << program_name << "\n"
+             << "\t-adeck source and/or -edeck source\n"
+             << "\t-bdeck source\n"
+             << "\t-config file\n"
+             << "\t[-out base]\n"
+             << "\t[-log file]\n"
+             << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-adeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "model output \"" << atcf_suffix
-        << "\" data to process (required if no -edeck).\n"
+             << "\twhere\t\"-adeck source\" is used one or more times to "
+             << "specify a file or top-level directory containing ATCF "
+             << "model output \"" << atcf_suffix
+             << "\" data to process (required if no -edeck).\n"
 
-        << "\t\t\"-edeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "ensemble model output \"" << atcf_suffix
-        << "\" data to process (required if no -adeck).\n"
+             << "\t\t\"-edeck source\" is used one or more times to "
+             << "specify a file or top-level directory containing ATCF "
+             << "ensemble model output \"" << atcf_suffix
+             << "\" data to process (required if no -adeck).\n"
 
-        << "\t\t\"-bdeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "best track \"" << atcf_suffix
-        << "\" data to process (required).\n"
+             << "\t\t\"-bdeck source\" is used one or more times to "
+             << "specify a file or top-level directory containing ATCF "
+             << "best track \"" << atcf_suffix
+             << "\" data to process (required).\n"
 
-        << "\t\t\"-config file\" is used once to specify the "
-        << "TCPairsConfig file containing the desired configuration "
-        << "settings (required).\n"
+             << "\t\t\"-config file\" is used once to specify the "
+             << "TCPairsConfig file containing the desired configuration "
+             << "settings (required).\n"
 
-        << "\t\t\"-out base\" overrides the default output file base "
-        << "(" << out_base << ") (optional).\n"
+             << "\t\t\"-out base\" overrides the default output file base "
+             << "(" << out_base << ") (optional).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
+             << "\t\t\"-log file\" outputs log messages to the specified "
+             << "file (optional).\n"
 
-        << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
+             << "\t\t\"-v level\" overrides the default level of logging ("
+             << mlog.verbosity_level() << ") (optional).\n\n"
 
-        << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
-        << "may include \"suffix=string\" to modify the model names "
-        << "from that source.\n\n";
+             << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
+             << "may include \"suffix=string\" to modify the model names "
+             << "from that source.\n\n";
 
    exit(1);
 }

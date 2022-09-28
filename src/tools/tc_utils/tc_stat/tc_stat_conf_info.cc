@@ -27,10 +27,10 @@ using namespace std;
 // Functions for parsing config entries
 static void parse_conf_thresh_map(MetConfig &,
                const char *, const char *,
-               map<ConcatString,ThreshArray> &);
+               std::map<ConcatString,ThreshArray> &);
 static void parse_conf_string_map(MetConfig &,
                const char *, const char *,
-               map<ConcatString,StringArray> &);
+               std::map<ConcatString,StringArray> &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -262,7 +262,7 @@ void TCStatConfInfo::process_config() {
 
 void parse_conf_thresh_map(MetConfig &conf,
                            const char *conf_key_name, const char *conf_key_val,
-                           map<ConcatString,ThreshArray> &m) {
+                           std::map<ConcatString,ThreshArray> &m) {
    StringArray sa;
    ThreshArray ta_val, ta_new;
    
@@ -297,7 +297,7 @@ void parse_conf_thresh_map(MetConfig &conf,
 
 void parse_conf_string_map(MetConfig &conf,
                            const char *conf_key_name, const char *conf_key_val,
-                           map<ConcatString,StringArray> &m) {
+                           std::map<ConcatString,StringArray> &m) {
    StringArray sa, sa_val, sa_new;
    
    sa     = conf.lookup_string_array(conf_key_name);

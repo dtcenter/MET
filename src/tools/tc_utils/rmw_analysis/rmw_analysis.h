@@ -12,9 +12,11 @@
 //
 //    Description:
 //
-//    Mod#  Date      Name      Description
-//    ----  ----      ----      -----------
-//    000   08/19/19  Fillmore  New
+//    Mod#  Date      Name       Description
+//    ----  ----      ----       -----------
+//    000   08/19/19  Fillmore   New
+//    001   09/28/22  Prestopnik Adding "std::"; Removing namspace
+//                                 from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +24,6 @@
 #define  __RMW_ANALYSIS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -92,12 +92,12 @@ static NcDim azimuth_dim;
 static NcDim level_dim;
 static NcDim track_point_dim;
 
-static string range_name;
-static string range_units;
-static string azimuth_name;
-static string azimuth_units;
-static string level_name;
-static string level_units;
+static std::string range_name;
+static std::string range_units;
+static std::string azimuth_name;
+static std::string azimuth_units;
+static std::string level_name;
+static std::string level_units;
 
 static NcVar valid_time_var;
 
@@ -108,27 +108,27 @@ static int n_level;
 static int n_track_point;
 static int n_track_line;
 
-vector<double> range_coord;
-vector<double> azimuth_coord;
-vector<double> level_coord;
+std::vector<double> range_coord;
+std::vector<double> azimuth_coord;
+std::vector<double> level_coord;
 
-vector<unixtime> track_valid_time;
-vector<double> track_lat;
-vector<double> track_lon;
-vector<double> track_rmw;
+std::vector<unixtime> track_valid_time;
+std::vector<double> track_lat;
+std::vector<double> track_lon;
+std::vector<double> track_rmw;
 
 // Variable information
-static vector<string> data_names;
-static vector<int>    data_n_dims;
-static vector<string> data_long_names;
-static vector<string> data_units;
+static std::vector<std::string> data_names;
+static std::vector<int>    data_n_dims;
+static std::vector<std::string> data_long_names;
+static std::vector<std::string> data_units;
 
 // Variable data
-static vector<DataCube*> data_counts;
-static vector<DataCube*> data_means;
-static vector<DataCube*> data_stdevs;
-static vector<DataCube*> data_mins;
-static vector<DataCube*> data_maxs;
+static std::vector<DataCube*> data_counts;
+static std::vector<DataCube*> data_means;
+static std::vector<DataCube*> data_stdevs;
+static std::vector<DataCube*> data_mins;
+static std::vector<DataCube*> data_maxs;
 
 // Track information
 static TrackInfoArray adeck_tracks;

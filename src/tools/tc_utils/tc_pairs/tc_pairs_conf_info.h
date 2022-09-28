@@ -112,7 +112,7 @@ class TCPairsConfInfo {
       int WatchWarnOffset;
 
       // Basin Map
-      map<ConcatString,ConcatString> BasinMap;
+      std::map<ConcatString,ConcatString> BasinMap;
 
       // Config file version
       ConcatString Version;
