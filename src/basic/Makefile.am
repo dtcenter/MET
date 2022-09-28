@@ -25,6 +25,7 @@ endif
 
 SUBDIRS += vx_math \
 	vx_util \
+	vx_util_math \
 	vx_config
 
 MAINTAINERCLEANFILES 	= Makefile.in

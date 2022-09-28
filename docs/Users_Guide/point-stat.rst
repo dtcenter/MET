@@ -431,6 +431,8 @@ ________________________
      rps    = BOTH;  // Only for HiRA
      eclv   = BOTH;
      mpr    = BOTH;
+     seeps  = NONE;
+     seeps_mpr = NONE;
   }
 
 The **output_flag** array controls the type of output that the Point-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
@@ -474,6 +476,10 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 19. **ECLV** for Economic Cost/Loss Relative Value
 
 20. **MPR** for Matched Pair data
+
+21. **SEEPS** for averaged SEEPS (Stable Equitable Error in Probability Space) score
+
+22. **SEEPS_MPR** for SEEPS score of Matched Pair data
 
 Note that the FHO and CTC line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
 
@@ -1446,5 +1452,121 @@ The first set of header columns are common to all of the output files generated 
   * - 37
     - CLIMO_CDF
     - Climatological cumulative distribution function value
+
+.. _table_PS_format_info_SEEPS_MPR:
+
+.. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) of MPR (Matched Pair) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SEEPS_MPR OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SEEPS_MPR Column Name
+    - Description
+  * - 24
+    - SEEPS_MPR
+    - SEEPS Matched Pair line type
+  * - 25
+    - OBS_SID
+    - Station Identifier of observation
+  * - 26
+    - OBS_LAT
+    - Latitude of the observation in degrees north
+  * - 27
+    - OBS_LON
+    - Longitude of the observation in degrees east
+  * - 28
+    - FCST
+    - Forecast value interpolated to the observation location
+  * - 29
+    - OBS
+    - Observation value
+  * - 30
+    - OBS_QC
+    - Quality control flag for observation
+  * - 31
+    - FCST_CAT
+    - Forecast category to 3 by 3 matrix
+  * - 32
+    - OBS_CAT
+    - Observationtegory to 3 by 3 matrix
+  * - 33
+    - P1
+    - Climo-derived probability value for this station (dry)
+  * - 34
+    - P2
+    - Climo-derived probability value for this station (dry + light)
+  * - 35
+    - T1
+    - Threshold 1 for p1
+  * - 36
+    - T2
+    - Threshold 2 for p2
+  * - 37
+    - SEEPS
+    - SEEPS (Stable Equitable Error in Probability Space) score
+
+
+.. _table_PS_format_info_SEEPS:
+
+.. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SEEPS OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SEEPS Column Name
+    - Description
+  * - 24
+    - SEEPS
+    - SEEPS line type
+  * - 25
+    - TOTAL
+    - Total number of SEEPS matched pairs
+  * - 26
+    - S12
+    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 2
+  * - 27
+    - S13
+    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 3
+  * - 28
+    - S21
+    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 1
+  * - 29
+    - S23
+    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 3
+  * - 30
+    - S31
+    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 1
+  * - 31
+    - S32
+    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
+LINE_TYPE TOTAL S12 S13 S21 S23 S31 S32 PV1 PV2 PV3 PF1 PF2 PF3 MEAN_FCST MEAN_OBS SEEPS
+  * - 32
+    - PF1
+    - marginal probabilities of the forecast values (FCST_CAT 1)
+  * - 33
+    - PF2
+    - marginal probabilities of the forecast values (FCST_CAT 2)
+  * - 34
+    - PF3
+    - marginal probabilities of the forecast values (FCST_CAT 3)
+  * - 35
+    - PV1
+    - marginal probabilities of the observed values (OBS_CAT 1)
+  * - 36
+    - PV2
+    - marginal probabilities of the observed values (OBS_CAT 2)
+  * - 37
+    - PV3
+    - marginal probabilities of the observed values (OBS_CAT 3)
+  * - 38
+    - SEEPS
+    - Averaged SEEPS (Stable Equitable Error in Probability Space) score
+
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.

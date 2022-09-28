@@ -217,6 +217,8 @@ output_flag = {
    rps    = BOTH;
    eclv   = NONE;
    mpr    = BOTH;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

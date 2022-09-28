@@ -3,6 +3,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/basic/vx_log \
 	     -I${top_builddir}/src/basic/vx_math \
 	     -I${top_builddir}/src/basic/vx_util \
+	     -I${top_builddir}/src/basic/vx_util_math \
 	     -I${top_builddir}/src/libcode/vx_afm \
 	     -I${top_builddir}/src/libcode/vx_analysis_util \
 	     -I${top_builddir}/src/libcode/vx_color \
@@ -38,6 +39,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_summary \
 	     -I${top_builddir}/src/libcode/vx_time_series \
 	     -I${top_builddir}/src/libcode/vx_series_data \
+	     -I${top_builddir}/src/libcode/vx_seeps \
 	     -I${top_builddir}/src/libcode/vx_tc_util
 
 #-fPIC  \
@@ -47,6 +49,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/basic/vx_log \
 	     -L${top_builddir}/src/basic/vx_math \
 	     -L${top_builddir}/src/basic/vx_util \
+	     -L${top_builddir}/src/basic/vx_util_math \
 	     -L${top_builddir}/src/libcode/vx_afm \
 	     -L${top_builddir}/src/libcode/vx_analysis_util \
 	     -L${top_builddir}/src/libcode/vx_color \
@@ -82,6 +85,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_summary \
 	     -L${top_builddir}/src/libcode/vx_time_series \
 	     -L${top_builddir}/src/libcode/vx_series_data \
+	     -L${top_builddir}/src/libcode/vx_seeps \
 	     -L${top_builddir}/src/libcode/vx_tc_util
 
 ENUM_TO_STRING = ${abs_top_builddir}/src/basic/enum_to_string/enum_to_string

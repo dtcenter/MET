@@ -223,12 +223,8 @@ void process_distances() {
 
    // Add the projection information
    mlog << Debug(3) << "Writing NetCDF map projection.\n";
-   write_netcdf_proj(f_out, grid);
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
-   // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
-   
    // Add the lat/lon variables
    if(latlon_flag) {
       mlog << Debug(3) << "Writing NetCDF lat/lon variables.\n";

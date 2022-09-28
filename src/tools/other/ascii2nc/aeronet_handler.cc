@@ -47,7 +47,7 @@ const string lat_col2      = "Latitude";            // "Latitude(degrees)"
 const string lon_col2      = "Longitude";           // "Longitude(degrees)"
 const string elv_col2      = "Elevation";           // "Elevation(meters)"
 
-const string AeronetHandler::HEADER_TYPE = "";  /////
+const string AeronetHandler::HEADER_TYPE = "";
 
 const int AeronetHandler::AOT_GRIB_CODE = 129;
 // Version 2
@@ -67,8 +67,6 @@ const string WAVELENGTHS_PW_NAME  = "Exact_Wavelengths_of_PW";  // Exact_Wavelen
 const string WAVELENGTHS_INPUT_AOD_NAME = "Exact_Wavelengths_for_Input_AOD";    // Exact_Wavelengths_for_Input_AOD(um)
 
 static int format_version;
-
-const float AERONET_MISSING_VALUE = -999.;
 
 double angstrom_power_interplation(double value_1, double value_2, double level_1, double level_2, double target_level);
 
@@ -416,7 +414,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         var_id   = header_var_index[k];
         var_name = header_var_names[k];
         dheight  = header_heights[k];
-        //if (is_eq(atof(data_line[k]), AERONET_MISSING_VALUE)) continue;
         if (strcmp(var_name.c_str(), AOD_NAME.c_str()) == 0) {
           if (is_eq(dheight, 550)) has_aod_at_550 = true;
           else if (is_eq(dheight, 440)) aod_at_440 = atof(data_line[k]);
@@ -768,9 +765,13 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
   return var_name;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 double angstrom_power_interplation(double value_1, double value_2,
     double level_1, double level_2, double target_level) {
   double angstrom_log = -log10(value_1/value_2)/log10(level_1/level_2);
   double angstrom_value = value_2 * pow((target_level/level_2),-angstrom_log);
   return angstrom_value;
 }
+
+////////////////////////////////////////////////////////////////////////

@@ -269,7 +269,6 @@
       <stat>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_NCEP_1.0DEG_20120410_120000V_prc.txt</stat>
       <stat>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_NCEP_1.0DEG_20120410_120000V_pjc.txt</stat>
       <stat>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_NCEP_1.0DEG_20120410_120000V_eclv.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_NCEP_1.0DEG_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_NCEP_1.0DEG_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
@@ -299,7 +298,6 @@
     <output>
       <stat>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_ONE_CDF_BIN_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_ONE_CDF_BIN_20120410_120000V_ecnt.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/climatology_1.0deg/ensemble_stat_ONE_CDF_BIN_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
 

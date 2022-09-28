@@ -45,6 +45,7 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
+      bool operator==(const NumArray &) const;
 
       void clear();
 
@@ -97,6 +98,7 @@ class NumArray {
       double range() const;
 
       ConcatString serialize() const;
+      ConcatString summarize() const;
 
       int n_elements() const;
       int n() const;         //  same as n_elements()
@@ -109,7 +111,9 @@ class NumArray {
       double mean() const;
       double mean_sqrt() const;
       double mean_fisher() const;
-
+      double mean_abs_diff() const;
+      double wmean_abs_diff() const;
+      
       double variance(int skip_index = bad_data_int) const;
       double stdev(int skip_index = bad_data_int) const;
 

@@ -93,6 +93,31 @@ NumArray & NumArray::operator=(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NumArray::operator==(const NumArray & a) const
+
+{
+
+   if ( e.size() != a.e.size() )  return ( false );
+
+   bool status = true;
+   int n = e.size();
+
+   for (int j=0; j<n; ++j)  {
+
+      if ( e[j] != a.e[j] )  {
+         status = false;
+         break;
+      }
+   }
+
+   return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::init_from_scratch()
 
 {
@@ -600,8 +625,6 @@ void NumArray::reorder(const NumArray &i_na) {
    return;
 }
 
-// SETH, please review the logic of the functions below.
-// Do they still work OK after switching to STL::vector?
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -986,6 +1009,36 @@ ConcatString NumArray::serialize() const
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString NumArray::summarize() const
+
+{
+
+   ConcatString s;
+
+   s << "n = " << n_elements();
+
+   if(n_elements() > 0) {
+
+      double min_v, max_v;
+      min_v = max_v = e[0];
+
+      for(int j=0; j<n_elements(); j++) {
+         if(is_bad_data(e[j])) continue;
+         if(e[j] < min_v) min_v = e[j];
+         if(e[j] > max_v) max_v = e[j];
+      }
+
+      s << ", min = " << min_v << ", max = " << max_v;
+   }
+
+   return(s);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 NumArray NumArray::subset(int beg, int end) const
 
 {
@@ -1230,6 +1283,57 @@ double NumArray::stdev(int skip_index) const
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mean_abs_diff() const
+
+{
+
+   int i, j, count;
+   double sum, mad;
+
+   int n = n_elements();
+   
+   for(i=0, count=0, sum=0.0; i<n; i++) {
+      for(j=i+1; j<n; j++) {
+      
+         if( is_bad_data(e[i]) || is_bad_data(e[j]) ) continue;
+         sum += abs(e[i]-e[j]);
+         count++;
+      }
+   }
+      
+   if(count == 0) mad = bad_data_double;
+   else           mad = sum / (n*(n-1));
+
+   return(mad);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::wmean_abs_diff() const
+
+{
+
+   double wmad;
+   
+   int n = n_elements();
+   double wgt = 1.0/(2.0*n);
+   double mad = mean_abs_diff();
+   
+   if( is_bad_data(mad) )    
+      wmad = bad_data_double;
+   else 
+      wmad = wgt * mad;
+   
+   return(wmad);
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 

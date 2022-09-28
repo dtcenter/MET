@@ -32,6 +32,7 @@
 #include "merc_grid_defs.h"
 #include "gaussian_grid_defs.h"
 #include "goes_grid_defs.h"
+#include "semilatlon_grid_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,14 +65,15 @@ class GridInfo {
 
       bool ok() const;
 
-      void set(const LambertData        &);
-      void set(const StereographicData  &);
-      void set(const LatLonData         &);
-      void set(const RotatedLatLonData  &);
-      void set(const MercatorData       &);
-      void set(const GaussianData       &);
-      void set(const GoesImagerData     &);
-      void set(const TcrmwData          &);
+      void set(const LambertData       &);
+      void set(const StereographicData &);
+      void set(const LatLonData        &);
+      void set(const RotatedLatLonData &);
+      void set(const MercatorData      &);
+      void set(const GaussianData      &);
+      void set(const GoesImagerData    &);
+      void set(const TcrmwData         &);
+      void set(const SemiLatLonData    &);
 
       void create_grid(Grid &) const;
 
@@ -87,6 +89,7 @@ class GridInfo {
       const GaussianData      * g;    //  allocated
       const GoesImagerData    * gi;   //  allocated
       const TcrmwData         * tc;   //  allocated
+      const SemiLatLonData    * sl;   //  allocated
 
 };
 
@@ -205,6 +208,7 @@ class Grid : public GridInterface {
       Grid(const GaussianData      &);
       Grid(const GoesImagerData    &);
       Grid(const TcrmwData         &);
+      Grid(const SemiLatLonData    &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -212,6 +216,8 @@ class Grid : public GridInterface {
       void clear();
 
       void dump(std::ostream &, int = 0) const;
+
+      bool is_set() const;
 
       void set (const char *);   //  lookup by name
       void set (const LambertData       &);
@@ -222,6 +228,7 @@ class Grid : public GridInterface {
       void set (const GaussianData      &);
       void set (const GoesImagerData    &);
       void set (const TcrmwData         &);
+      void set (const SemiLatLonData    &);
 
       void set_swap_to_north(bool swap_to_north);
       bool get_swap_to_north() const;
@@ -264,6 +271,12 @@ class Grid : public GridInterface {
 ////////////////////////////////////////////////////////////////////////
 
 
+inline bool Grid::is_set() const { return ( rep != 0 ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern bool operator==(const Grid &, const Grid &);
 extern bool operator!=(const Grid &, const Grid &);
 extern bool operator==(const GridInfo &, const GridInfo &);
@@ -275,6 +288,7 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
+extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 
 
 ////////////////////////////////////////////////////////////////////////

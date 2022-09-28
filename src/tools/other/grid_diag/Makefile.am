@@ -33,6 +33,7 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

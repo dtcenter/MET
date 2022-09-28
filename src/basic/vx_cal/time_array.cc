@@ -94,6 +94,30 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool TimeArray::operator==(const TimeArray & a) const
+
+{
+
+if ( Nelements != a.Nelements )  return ( false );
+
+bool status = true;
+
+for (int j=0; j<(Nelements); ++j)  {
+
+   if ( e[j] != a.e[j] )  {
+      status = false;
+      break;
+   }
+}
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void TimeArray::init_from_scratch()
 
 {
@@ -453,6 +477,27 @@ for(j=0, u=e[0]; j<Nelements; j++) {
 }
 
 return(u);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString TimeArray::serialize() const
+
+{
+
+   ConcatString s;
+
+   if(n_elements() == 0) return(s);
+
+   int j;
+
+   s << e[0];
+   for(j=1; j<n_elements(); j++) s << " " << unix_to_yyyymmdd_hhmmss(e[j]);
+
+   return(s);
 
 }
 
