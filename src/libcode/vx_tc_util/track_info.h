@@ -247,6 +247,7 @@ inline int TrackInfoArray::n() const { return(Track.size()); }
 ////////////////////////////////////////////////////////////////////////
 
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
+extern double compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
 extern void latlon_to_xytk_err(double alat, double alon,

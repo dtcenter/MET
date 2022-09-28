@@ -862,9 +862,10 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    int        pcnt;
    TrackPoint pavg, psum;
    QuadInfo   wavg;
-   NumArray   plon;
+   NumArray   plon, plat;
    double     lon_range, lon_shift, lon_avg;
-
+   double     track_spread;
+   
    // Check for at least one track
    if(tracks.n() == 0) {
       mlog << Error
@@ -926,6 +927,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       pavg.clear();
       psum.clear();
       plon.clear();
+      plat.clear();
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
@@ -948,10 +950,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         // Store the longitude values
+         // Store the latitude and longitude values
          plon.add(tracks.Track[j][i_pnt].lon());
+         plat.add(tracks.Track[j][i_pnt].lat());
       }
-
+      
       // Check for missing required member and the minimum number of points
       if(skip == true || pcnt < req) continue;
 
@@ -981,6 +984,13 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
       if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
 
+      // Call new function
+      //double compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons);
+      //
+      // Call it like
+      track_spread = compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon);
+      cout << "track_spred = " << track_spread << endl;
+      
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
@@ -1008,6 +1018,25 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    // Return the consensus track
    return(tavg);
 }
+
+
+// Stub in for now, we have move this
+double compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons) {
+
+   int i,j;
+   double spread;
+   double dist;
+   double dist_sum;
+
+   for(j=0; j<lons.n_elements(); j++) {
+         cout << "lons[ " << j << "] = " << lons[j] << " lats[" << j << "] = " << lats[j] << endl;
+      }
+   
+   // For testing only
+   spread = 2.0;
+   return(spread);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //
