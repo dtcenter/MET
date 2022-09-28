@@ -3,7 +3,7 @@
 # path to docs directory relative to top level of repository
 # $GITHUB_WORKSPACE is set if the actions/checkout@v2 action is run first
 
-DOCS_DIR=${GITHUB_WORKSPACE}/met/docs
+DOCS_DIR=${GITHUB_WORKSPACE}/docs
 
 if [ ! -e ${DOCS_DIR} ]; then
     echo "Documentation directory does not exist: ${DOCS_DIR}"
