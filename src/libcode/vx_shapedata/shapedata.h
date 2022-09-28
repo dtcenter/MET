@@ -16,15 +16,13 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-05-31  Halley Gotway  Adapated from wrfdata.h.
+//   001    22-09-28  Prestopnik     Added "std::"; removing namspace
+//                                     from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef  __SHAPE_DATA_H__
 #define  __SHAPE_DATA_H__
-
-///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -166,7 +164,7 @@ class ShapeData {
 
       void threshold(double t);
       void threshold(SingleThresh);
-      void threshold_attr(const map<ConcatString,ThreshArray>&,
+      void threshold_attr(const std::map<ConcatString,ThreshArray>&,
                           const ShapeData *,
                           const SingleThresh &,
                           const Grid *,
@@ -253,7 +251,7 @@ class Cell {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const Cell &);
+extern std::ostream & operator<<(std::ostream &, const Cell &);
 
 
 ///////////////////////////////////////////////////////////////////////////////

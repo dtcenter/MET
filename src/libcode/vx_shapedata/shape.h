@@ -17,6 +17,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11-03-06  Halley Gotway   New
+//   001    22-09-28  Prestopnik      Added "std::"; removing namespace
+//                                      from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
