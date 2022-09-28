@@ -5,6 +5,11 @@
 
 DOCS_DIR=${GITHUB_WORKSPACE}/met/docs
 
+if [ ! -e ${DOCS_DIR} ]; then
+    echo "Documentation directory does not exist: ${DOCS_DIR}"
+    exit 1
+fi
+
 # run Make to build the documentation and return to previous directory
 cd ${DOCS_DIR}
 make clean html
