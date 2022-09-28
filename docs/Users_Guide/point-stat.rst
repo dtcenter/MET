@@ -314,7 +314,7 @@ point_stat configuration file
 
 The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ________________________
 
@@ -1489,6 +1489,7 @@ The first set of header columns are common to all of the output files generated 
   * - 31
     - FCST_CAT
     - Forecast category to 3 by 3 matrix
+JHG this is a test
   * - 32
     - OBS_CAT
     - Observationtegory to 3 by 3 matrix
@@ -1545,7 +1546,6 @@ The first set of header columns are common to all of the output files generated 
   * - 31
     - S32
     - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
-LINE_TYPE TOTAL S12 S13 S21 S23 S31 S32 PV1 PV2 PV3 PF1 PF2 PF3 MEAN_FCST MEAN_OBS SEEPS
   * - 32
     - PF1
     - marginal probabilities of the forecast values (FCST_CAT 1)
