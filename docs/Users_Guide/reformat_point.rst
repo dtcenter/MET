@@ -96,15 +96,7 @@ pb2nc configuration file
 
 The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`Sample test cases` is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
-When editing configuration files, environment variables may be used for setting the configurable parameters if convenient. The configuration file parser expands any environment variables to their full value before proceeding. Within the configuration file, environment variables must be specified in the form: **${VAR_NAME}**.
-
-For example, using an environment variable to set the **message_type** (see below) parameter to use ADPUPA and ADPSFC message types might consist of the following:
-
-\* In a C-Shell: **setenv MSG_TYP ' "ADPUPA", "ADPSFC" '**
-
-\* In the configuration file: **message_type = [ ${MSG_TYP} ];**
-
-The contents of the default pb2nc configuration file are described below.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ____________________
 
