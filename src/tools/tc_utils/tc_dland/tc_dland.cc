@@ -111,7 +111,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "tc_dland";
 }
 
@@ -235,7 +235,7 @@ void process_distances() {
    if (deflate_level < 0) deflate_level = 0;
    
    // Define Variables
-   dland_var = add_var(f_out, (string)"dland", ncFloat, lat_dim, lon_dim, deflate_level);
+   dland_var = add_var(f_out, (std::string)"dland", ncFloat, lat_dim, lon_dim, deflate_level);
    add_att(&dland_var, "long_name", "distance to land");
    add_att(&dland_var, "units", "nm");
    add_att(&dland_var, "_FillValue", bad_data_float);
@@ -257,7 +257,7 @@ void process_distances() {
       for(y=0; y<grid.ny(); y++) {
 
          if(++c % nlog == 0 && mlog.verbosity_level() == 3) {
-            cout << nint((double) c/npts*100.0) << "% " << flush;
+            std::cout << nint((double) c/npts*100.0) << "% " << std::flush;
          }
 
          // Call two_to_one
@@ -281,7 +281,7 @@ void process_distances() {
       } // end for y
    } // end for x
 
-   if(mlog.verbosity_level() == 3) cout << "\n" << flush;
+   if(mlog.verbosity_level() == 3) std::cout << "\n" << std::flush;
 
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
@@ -310,41 +310,41 @@ void process_distances() {
 
 void usage() {
 
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+             << ") ***\n\n"
 
-        << "Usage: " << program_name << "\n"
-        << "\tout_file\n"
-        << "\t[-grid spec]\n"
-        << "\t[-noll]\n"
-        << "\t[-land file]\n"
-        << "\t[-log file]\n"
-        << "\t[-v level]\n"
-        << "\t[-compress level]\n\n"
+             << "Usage: " << program_name << "\n"
+             << "\tout_file\n"
+             << "\t[-grid spec]\n"
+             << "\t[-noll]\n"
+             << "\t[-land file]\n"
+             << "\t[-log file]\n"
+             << "\t[-v level]\n"
+             << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"out_file\" is the NetCDF output file containing "
-        << "the computed distances to land (required).\n"
+             << "\twhere\t\"out_file\" is the NetCDF output file containing "
+             << "the computed distances to land (required).\n"
 
-        << "\t\t\"-grid spec\" overrides the default 1/10th degree "
-        << "NW Hemisphere grid (optional).\n"
-        << "\t\t   spec = lat_ll lon_ll delta_lat delta_lon n_lat n_lon\n"
+             << "\t\t\"-grid spec\" overrides the default 1/10th degree "
+             << "NW Hemisphere grid (optional).\n"
+             << "\t\t   spec = lat_ll lon_ll delta_lat delta_lon n_lat n_lon\n"
 
-        << "\t\t\"-land file\" overwrites the default land data files "
-        << "(optional).\n"
+             << "\t\t\"-land file\" overwrites the default land data files "
+             << "(optional).\n"
 
-        << "\t\t\"-noll\" skips writing the lat/lon variables in the "
-        << "output NetCDF file to reduce the file size (optional).\n"
+             << "\t\t\"-noll\" skips writing the lat/lon variables in the "
+             << "output NetCDF file to reduce the file size (optional).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
+             << "\t\t\"-log file\" outputs log messages to the specified "
+             << "file (optional).\n"
 
-        << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n"
+             << "\t\t\"-v level\" overrides the default level of logging ("
+             << mlog.verbosity_level() << ") (optional).\n"
         
-        << "\t\t\"-compress level\" specifies the compression level of "
-        << "output NetCDF variable (optional).\n\n"
+             << "\t\t\"-compress level\" specifies the compression level of "
+             << "output NetCDF variable (optional).\n\n"
 
-        << flush;
+             << std::flush;
 
    exit (1);
 }

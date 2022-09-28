@@ -80,7 +80,7 @@ class MetNcPinterpDataFile : public Met2dDataFile {
 
       void close ();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 };
 

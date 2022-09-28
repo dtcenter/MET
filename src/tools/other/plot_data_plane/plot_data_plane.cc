@@ -25,7 +25,9 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/19/11  Holmes          New
-//   001    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   002    09/28/22  Prestopnik      Added "std::"; removing namespace
+//                                      from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,7 +62,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString program_name = (string)"plot_data_plane";
+static ConcatString program_name = (std::string)"plot_data_plane";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -214,7 +216,7 @@ int met_main(int argc, char * argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+const std::string get_tool_name() {
    return "plot_data_plane";
 }
 
@@ -277,44 +279,44 @@ void process_command_line(int argc, char **argv) {
 
 void usage() {
 
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+             << ") ***\n\n"
 
-        << "Usage: " << program_name << "\n"
-        << "\tinput_filename\n"
-        << "\toutput_filename\n"
-        << "\tfield_string\n"
-        << "\t[-color_table color_table_name]\n"
-        << "\t[-plot_range min max]\n"
-        << "\t[-title title_string]\n"
-        << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+             << "Usage: " << program_name << "\n"
+             << "\tinput_filename\n"
+             << "\toutput_filename\n"
+             << "\tfield_string\n"
+             << "\t[-color_table color_table_name]\n"
+             << "\t[-plot_range min max]\n"
+             << "\t[-title title_string]\n"
+             << "\t[-log file]\n"
+             << "\t[-v level]\n\n"
 
-        << "\twhere\t\"input_filename\" is the name of a "
-        << "gridded data file to be plotted (required).\n"
+             << "\twhere\t\"input_filename\" is the name of a "
+             << "gridded data file to be plotted (required).\n"
 
-        << "\t\t\"output_filename\" is the name of the output "
-        << "PostScript file to be written (required).\n"
+             << "\t\t\"output_filename\" is the name of the output "
+             << "PostScript file to be written (required).\n"
 
-        << "\t\t\"field_string\" defines the data to be plotted "
-        << "from the input file (required).\n"
+             << "\t\t\"field_string\" defines the data to be plotted "
+             << "from the input file (required).\n"
 
-        << "\t\t\"-color_table color_table_name\" overrides the "
-        << "default color table "
-        << "(\"colortables/met_default.ctable\") "
-        << "(optional).\n"
+             << "\t\t\"-color_table color_table_name\" overrides the "
+             << "default color table "
+             << "(\"colortables/met_default.ctable\") "
+             << "(optional).\n"
 
-        << "\t\t\"-plot_range min max\" defines the range of the "
-        << "data to be plotted (optional).\n"
+             << "\t\t\"-plot_range min max\" defines the range of the "
+             << "data to be plotted (optional).\n"
 
-        << "\t\t\"-title title_string\" specifies the plot title "
-        << "string (optional).\n"
+             << "\t\t\"-title title_string\" specifies the plot title "
+             << "string (optional).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
+             << "\t\t\"-log file\" outputs log messages to the specified "
+             << "file (optional).\n"
 
-        << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+             << "\t\t\"-v level\" overrides the default level of logging ("
+             << mlog.verbosity_level() << ") (optional).\n\n" << std::flush;
 
    exit(1);
 

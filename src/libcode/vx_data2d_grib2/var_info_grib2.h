@@ -19,8 +19,6 @@
 #include <map>
 #include <vector>
 
-using namespace std;
-
 #include "vx_config.h"
 #include "vx_util.h"
 #include "var_info.h"
