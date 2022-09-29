@@ -9,6 +9,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
+////////////////////////////////////////////////////////////////////////                                                                          
 
    //
    //  Takes a bunch of C source files from the wgrib code 
@@ -84,7 +87,7 @@ if ( cline.n() == 0 )  usage();
 
 int j;
 
-std::cout << "GRIB1\n";
+cout << "GRIB1\n";
 
 for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
 
@@ -104,7 +107,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "nceptab_to_flat";
 }
 
@@ -116,7 +119,7 @@ void usage()
 
 {
 
-std::cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
+cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
 
 exit ( 1 );
 
@@ -149,7 +152,7 @@ void process(const char * input_filename)
 {
 
 ConcatString line;
-std::ifstream in;
+ifstream in;
 bool found = false;
 const char * short_name = get_short_name(input_filename);
 
@@ -265,7 +268,7 @@ if ( !c )  return ( false );
 
 n = atoi(c);
 
-std::cout << n << ' ' << table_number << ' ';
+cout << n << ' ' << table_number << ' ';
 
    //
    //  first string
@@ -275,7 +278,7 @@ c = strtok(s, " /*{\"");
 
 if ( !c )  return ( false );
 
-std::cout << '\"' << c << "\" ";
+cout << '\"' << c << "\" ";
 
    //
    //  second string (is this football?)
@@ -290,7 +293,7 @@ if ( c[k] == ' ' )  c[k] = (char) 0;
 
 if ( !c )  return ( false );
 
-std::cout << '\"' << c << "\" ";
+cout << '\"' << c << "\" ";
 
    //
    //  units
@@ -298,7 +301,7 @@ std::cout << '\"' << c << "\" ";
 
 if ( strcmp(c, "undefined") == 0 )  {
 
-   std::cout << "\"\" ";
+   cout << "\"\" ";
 
 } else {
 
@@ -306,8 +309,8 @@ if ( strcmp(c, "undefined") == 0 )  {
 
    if ( !c )  return ( false );
 
-   if ( c[0] == '}' ) std::cout << "\"\" ";
-   else               std::cout << '\"' << c << "\" ";
+   if ( c[0] == '}' ) cout << "\"\" ";
+   else               cout << '\"' << c << "\" ";
 
 }
 
@@ -315,7 +318,7 @@ if ( strcmp(c, "undefined") == 0 )  {
    //  done
    //
 
-std::cout << '\n' << std::flush;
+cout << '\n' << flush;
 
 return ( true );
 

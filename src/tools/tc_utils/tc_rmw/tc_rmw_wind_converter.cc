@@ -16,10 +16,11 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000   05/11/22   Albo           Pulled the wind conversion into a class
-//   001   09/28/22   Prestopnik     MET #2227 Remove namespace std
+//   001   09/28/22   Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include "tc_rmw_wind_converter.h"
 #include "series_data.h"
@@ -84,8 +85,8 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
   VarInfo* data_info = (VarInfo*) 0;
   for(int i_var = 0; i_var < _conf->get_n_data(); i_var++) {
     data_info = _conf->data_info[i_var];
-    std::string varname = data_info->name_attr().string();
-    std::string varlevel = data_info->level_attr().string();
+    string varname = data_info->name_attr().string();
+    string varlevel = data_info->level_attr().string();
     if (varname == _conf->u_wind_field_name.string()) {
       _uIndexMap[varlevel] = i_var;
     }
@@ -100,7 +101,7 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
          << _conf->v_wind_field_name.string() << " has " << _vIndexMap.size() << " inputs\n";
     _computeWinds = false;
   }
-  std::map<std::string,int>::const_iterator iu, iv;
+  map<string,int>::const_iterator iu, iv;
   for (iu=_uIndexMap.begin(), iv=_vIndexMap.begin(); iu!=_uIndexMap.end(); ++iu, ++iv) {
     if (iu->first != iv->first) {
       mlog << Warning << "Ordering of u/v wind input levels not the same, not implemented, no wind conversions will be done:\n"
@@ -112,7 +113,7 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMW_WindConverter::update_input(const std::string &variableName, const std::string &units) {
+void TCRMW_WindConverter::update_input(const string &variableName, const string &units) {
   if (_computeWinds) {
     if (variableName == _conf->u_wind_field_name.string()) {
       _foundUInInput = true;
@@ -126,9 +127,9 @@ void TCRMW_WindConverter::update_input(const std::string &variableName, const st
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMW_WindConverter::append_nc_output_vars(std::map<std::string, std::vector<std::string> > &variable_levels,
-						std::map<std::string, std::string> &variable_long_names,
-						std::map<std::string, std::string> &variable_units) {
+void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &variable_levels,
+						map<string, string> &variable_long_names,
+						map<string, string> &variable_units) {
   if (!_computeWinds) {
     return;
   }
@@ -158,8 +159,8 @@ void TCRMW_WindConverter::append_nc_output_vars(std::map<std::string, std::vecto
 ////////////////////////////////////////////////////////////////////////
 
 bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
-						      const std::string &varName,
-						      const std::string &varLevel,
+						      const string &varName,
+						      const string &varLevel,
 						      unixtime valid_time,
 						      const StringArray &data_files,
 						      const GrdFileType &ftype,

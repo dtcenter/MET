@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -89,11 +90,11 @@ cline.parse();
 if ( cline.n() != 1 )  usage();
 
 
-ConcatString input_filename = (std::string)cline[0];
+ConcatString input_filename = (string)cline[0];
 ShpFile f;
 
 
-std::cout << "file = \"" << get_short_name(input_filename.c_str()) << "\"\n\n";
+cout << "file = \"" << get_short_name(input_filename.c_str()) << "\"\n\n";
 
 if ( ! f.open(input_filename.c_str()) )  {
 
@@ -109,11 +110,11 @@ if ( ! f.open(input_filename.c_str()) )  {
    //  header
    //
 
-std::cout << "File Header ... \n";
+cout << "File Header ... \n";
 
-f.header()->dump(std::cout, 1);
+f.header()->dump(cout, 1);
 
-std::cout << '\n' << std::flush;
+cout << '\n' << flush;
 
 if ( header_only )   return ( 0 );
 
@@ -156,7 +157,7 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "gis_dump_shp";
 }
 
@@ -204,22 +205,22 @@ ShpPolyRecord r;
 
 while ( f >> r )  {
 
-   std::cout << "Record Header ... \n";
+   cout << "Record Header ... \n";
 
-   r.rh.dump(std::cout, 1);
+   r.rh.dump(cout, 1);
 
-   std::cout << "\n";
+   cout << "\n";
 
-   std::cout << "Record Data ... \n";
+   cout << "Record Data ... \n";
 
-   r.dump(std::cout, 1);
+   r.dump(cout, 1);
 
-   std::cout << "\n";
+   cout << "\n";
 
 }   //  while
 
 
-std::cout << "\n\n";
+cout << "\n\n";
 
 
 
@@ -245,22 +246,22 @@ ShpPointRecord r;
 
 while ( f >> r )  {
 
-   std::cout << "Record Header ... \n";
+   cout << "Record Header ... \n";
 
-   r.rh.dump(std::cout, 1);
+   r.rh.dump(cout, 1);
 
-   std::cout << "\n";
+   cout << "\n";
 
-   std::cout << "Record Data ... \n";
+   cout << "Record Data ... \n";
 
-   r.dump(std::cout, 1);
+   r.dump(cout, 1);
 
-   std::cout << "\n";
+   cout << "\n";
 
 }   //  while
 
 
-std::cout << "\n\n";
+cout << "\n\n";
 
 
    //

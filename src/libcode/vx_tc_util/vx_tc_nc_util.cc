@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include "vx_tc_nc_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,8 +53,8 @@ void write_tc_tracks(NcFile* nc_out,
         track_mrd_data[i] = track[i].mrd();
     }
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
     mlog << Debug(2) << "Writing " << track_lines.n() << " track lines.\n";
 
@@ -61,7 +63,7 @@ void write_tc_tracks(NcFile* nc_out,
         offsets.push_back(i);
         counts.clear();
         counts.push_back(1);
-        std::string line = track_lines[i];
+        string line = track_lines[i];
         mlog << Debug(3) << line << "\n";
         const char* str = line.c_str();
         track_lines_var.putVar(offsets, counts, &str);
@@ -84,16 +86,16 @@ void write_tc_tracks(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-std::set<std::string> get_pressure_level_strings(
-    std::map<std::string, std::vector<std::string> > variable_levels) {
+set<string> get_pressure_level_strings(
+    map<string, vector<string> > variable_levels) {
 
-    std::set<std::string> pressure_level_strings;
+    set<string> pressure_level_strings;
 
-    for (std::map<std::string, std::vector<std::string> >::iterator i = variable_levels.begin();
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        std::vector<std::string> levels = variable_levels[i->first];
+        vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
-            std::string label = levels[j].substr(0, 1);
+            string label = levels[j].substr(0, 1);
             if (label == "P") {
                 pressure_level_strings.insert(levels[j]);
             }
@@ -105,16 +107,16 @@ std::set<std::string> get_pressure_level_strings(
 
 ////////////////////////////////////////////////////////////////////////
 
-std::set<double> get_pressure_levels(
-    std::map<std::string, std::vector<std::string> > variable_levels) {
+set<double> get_pressure_levels(
+    map<string, vector<string> > variable_levels) {
 
-    std::set<double> pressure_levels;
+    set<double> pressure_levels;
 
-    for (std::map<std::string, std::vector<std::string> >::iterator i = variable_levels.begin();
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        std::vector<std::string> levels = variable_levels[i->first];
+        vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
-            std::string label = levels[j].substr(0, 1);
+            string label = levels[j].substr(0, 1);
             double level = atof(levels[j].substr(1).c_str());
             if (label == "P") {
                 pressure_levels.insert(level);
@@ -127,15 +129,15 @@ std::set<double> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-std::set<double> get_pressure_levels(
-    std::set<std::string> pressure_level_strings) {
+set<double> get_pressure_levels(
+    set<string> pressure_level_strings) {
 
-    std::set<double> pressure_levels;
+    set<double> pressure_levels;
 
-    for (std::set<std::string>::iterator i = pressure_level_strings.begin();
+    for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
-        std::string level_str = *i;
+        string level_str = *i;
         double level = atof(level_str.substr(1).c_str());
         pressure_levels.insert(level);
     }
@@ -145,14 +147,14 @@ std::set<double> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-std::map<double, int> get_pressure_level_indices(
-    std::set<double> pressure_levels) {
+map<double, int> get_pressure_level_indices(
+    set<double> pressure_levels) {
 
-    std::map<double, int> pressure_level_indices;
+    map<double, int> pressure_level_indices;
 
     int k = pressure_levels.size() - 1;
 
-    for (std::set<double>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
 
         double level = *i;
@@ -165,18 +167,18 @@ std::map<double, int> get_pressure_level_indices(
 
 ////////////////////////////////////////////////////////////////////////
 
-std::map<std::string, int> get_pressure_level_indices(
-    std::set<std::string> pressure_level_strings, std::set<double> pressure_levels) {
+map<string, int> get_pressure_level_indices(
+    set<string> pressure_level_strings, set<double> pressure_levels) {
 
-    std::map<std::string, int> pressure_level_indices;
+    map<string, int> pressure_level_indices;
 
-    std::map<double, int> indices_from_levels
+    map<double, int> indices_from_levels
             = get_pressure_level_indices(pressure_levels);
 
-    for (std::set<std::string>::iterator i = pressure_level_strings.begin();
+    for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
-        std::string level_str = *i;
+        string level_str = *i;
         double level = atof(level_str.substr(1).c_str());
         pressure_level_indices[level_str] = indices_from_levels[level];
     }
@@ -187,7 +189,7 @@ std::map<std::string, int> get_pressure_level_indices(
 ////////////////////////////////////////////////////////////////////////
 
 void def_tc_pressure(NcFile* nc_out,
-    const NcDim& pressure_dim, std::set<double> pressure_levels) {
+    const NcDim& pressure_dim, set<double> pressure_levels) {
 
     NcVar pressure_var;
 
@@ -204,7 +206,7 @@ void def_tc_pressure(NcFile* nc_out,
 
     // Extract pressure coordinates
     int k = pressure_levels.size() - 1;
-    for (std::set<double>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
         pressure_data[k] = *i;
         k--;
@@ -271,7 +273,7 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     const NcDim& track_point_dim,
     NcVar& lat_var, NcVar& lon_var, NcVar& valid_time_var) {
 
-    std::vector<NcDim> dims;
+    vector<NcDim> dims;
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
@@ -301,8 +303,8 @@ void write_tc_valid_time(NcFile* nc_out,
     const int& i_point, const NcVar& var,
     const long& valid_time) {
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
     offsets.clear();
     offsets.push_back(i_point);
@@ -316,32 +318,32 @@ void write_tc_valid_time(NcFile* nc_out,
 ////////////////////////////////////////////////////////////////////////
 
 void def_tc_variables(NcFile* nc_out,
-    std::map<std::string, std::vector<std::string> > variable_levels,
-    std::map<std::string, std::string> variable_long_names,
-    std::map<std::string, std::string> variable_units,
+    map<string, vector<string> > variable_levels,
+    map<string, string> variable_long_names,
+    map<string, string> variable_units,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const NcDim& pressure_dim, const NcDim& track_point_dim,
-    std::map<std::string, NcVar>& data_vars) {
+    map<string, NcVar>& data_vars) {
 
-    std::vector<NcDim> dims;
+    vector<NcDim> dims;
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
 
-    std::vector<NcDim> dims_3d;
+    vector<NcDim> dims_3d;
     dims_3d.push_back(range_dim);
     dims_3d.push_back(azimuth_dim);
     dims_3d.push_back(pressure_dim);
     dims_3d.push_back(track_point_dim);
 
-    for (std::map<std::string, std::vector<std::string> >::iterator i = variable_levels.begin();
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
 
         NcVar data_var;
-        std::string var_name = i->first;
-        std::vector<std::string> levels = variable_levels[i->first];
-        std::string long_name = variable_long_names[i->first];
-        std::string units = variable_units[i->first];
+        string var_name = i->first;
+        vector<string> levels = variable_levels[i->first];
+        string long_name = variable_long_names[i->first];
+        string units = variable_units[i->first];
 
         if (levels.size() > 1) {
             data_var = nc_out->addVar(
@@ -367,7 +369,7 @@ void def_tc_data(NcFile* nc_out,
     const NcDim& track_point_dim,
     NcVar& data_var, VarInfo* data_info) {
 
-    std::vector<NcDim> dims;
+    vector<NcDim> dims;
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
@@ -392,7 +394,7 @@ void def_tc_data_3d(NcFile* nc_out,
     const NcDim& pressure_dim, const NcDim& track_point_dim,
     NcVar& data_var, VarInfo* data_info) {
 
-    std::vector<NcDim> dims;
+    vector<NcDim> dims;
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
     dims.push_back(pressure_dim);
@@ -414,7 +416,7 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     const NcDim& track_point_dim,
     NcVar& data_var, VarInfo* data_info) {
 
-    std::vector<NcDim> dims;
+    vector<NcDim> dims;
     dims.push_back(range_dim);
     dims.push_back(track_point_dim);
 
@@ -436,8 +438,8 @@ void def_tc_azi_mean_data(NcFile* nc_out,
 void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
     offsets.clear();
     offsets.push_back(0);
@@ -457,8 +459,8 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
 void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
     double* data_rev;
 
@@ -493,8 +495,8 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
 void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
     double* data_rev;
     double* data_azi_mean;
@@ -535,14 +537,14 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
 
 extern void write_tc_pressure_level_data(
     NcFile* nc_out, const TcrmwGrid& grid,
-    std::map<std::string, int> pressure_level_indices, const std::string& level_str,
+    map<string, int> pressure_level_indices, const string& level_str,
     const int& i_point, const NcVar& var, const double* data) {
 
-    std::vector<size_t> offsets;
-    std::vector<size_t> counts;
+    vector<size_t> offsets;
+    vector<size_t> counts;
 
-    std::vector<size_t> offsets_3d;
-    std::vector<size_t> counts_3d;
+    vector<size_t> offsets_3d;
+    vector<size_t> counts_3d;
 
     double* data_rev;
 
@@ -581,7 +583,7 @@ extern void write_tc_pressure_level_data(
         }
     }
 
-    // std::string label = level_str.substr(0, 1);
+    // string label = level_str.substr(0, 1);
     // if (label == "P") {
     //     var.putVar(offsets_3d, counts_3d, data_rev);
     // } else {

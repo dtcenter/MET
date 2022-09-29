@@ -24,10 +24,12 @@
 //   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std
+//   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std from header files
 //
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -2490,7 +2492,7 @@ void write_nc(GenCTCInfo &gci) {
       nc_var_sa.add(var_name);
 
       // Define the variable
-      nc_var = add_var(nc_out, (std::string) var_name,
+      nc_var = add_var(nc_out, (string) var_name,
                        ncFloat, lat_dim, lon_dim,
                        conf_info.compression_level());
 
@@ -2574,52 +2576,52 @@ ConcatString string_to_basin_abbr(ConcatString cs) {
 
 void usage() {
 
-   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
-             << ") ***\n\n"
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
+        << ") ***\n\n"
 
-             << "Usage: " << program_name << "\n"
-             << "\t-genesis source\n"
-             << "\t-edeck source\n"
-             << "\t-shape source\n"
-             << "\t-track source\n"
-             << "\t-config file\n"
-             << "\t[-out base]\n"
-             << "\t[-log file]\n"
-             << "\t[-v level]\n\n"
+        << "Usage: " << program_name << "\n"
+        << "\t-genesis source\n"
+        << "\t-edeck source\n"
+        << "\t-shape source\n"
+        << "\t-track source\n"
+        << "\t-config file\n"
+        << "\t[-out base]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n\n"
 
-             << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
-             << "files, an ASCII file list containing them, or a top-level "
-             << "directory with files matching the regular expression \""
-             << atcf_gen_reg_exp << "\" (required if no -edeck or -shape).\n"
+        << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_gen_reg_exp << "\" (required if no -edeck or -shape).\n"
 
-             << "\t\t\"-edeck source\" is one or more ensemble model output "
-             << "files, an ASCII file list containing them, or a top-level "
-             << "directory with files matching the regular expression \""
-             << atcf_reg_exp << "\" (required if no -genesis or -shape).\n"
+        << "\t\t\"-edeck source\" is one or more ensemble model output "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_reg_exp << "\" (required if no -genesis or -shape).\n"
 
-             << "\t\t\"-shape source\" is one or more genesis area shapefiles, "
-             << "an ASCII file list containing them, or a top-level "
-             << "directory with files matching the regular expression \""
-             << gen_shp_reg_exp << "\" (required if no -genesis or -edeck).\n"
+        << "\t\t\"-shape source\" is one or more genesis area shapefiles, "
+        << "an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << gen_shp_reg_exp << "\" (required if no -genesis or -edeck).\n"
 
-             << "\t\t\"-track source\" is one or more ATCF track "
-             << "files, an ASCII file list containing them, or a top-level "
-             << "directory with files matching the regular expression \""
-             << atcf_reg_exp << "\" for the verifying BEST and operational "
-             << "tracks (required).\n"
+        << "\t\t\"-track source\" is one or more ATCF track "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_reg_exp << "\" for the verifying BEST and operational "
+        << "tracks (required).\n"
 
-             << "\t\t\"-config file\" is used once to specify the "
-             << "TCGenConfig file containing the desired configuration "
-             << "settings (required).\n"
+        << "\t\t\"-config file\" is used once to specify the "
+        << "TCGenConfig file containing the desired configuration "
+        << "settings (required).\n"
 
-             << "\t\t\"-out base\" overrides the default output file base "
-             << "(" << out_base << ") (optional).\n"
+        << "\t\t\"-out base\" overrides the default output file base "
+        << "(" << out_base << ") (optional).\n"
 
-             << "\t\t\"-log file\" outputs log messages to the specified "
-             << "file (optional).\n"
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
 
-             << "\t\t\"-v level\" overrides the default level of logging ("
-             << mlog.verbosity_level() << ") (optional).\n\n";
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n\n";
 
    exit(1);
 }

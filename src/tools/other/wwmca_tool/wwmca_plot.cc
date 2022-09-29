@@ -9,6 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
 static const int gray_max         = 255;
@@ -169,7 +170,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "wwmca_plot";
 }
 
@@ -181,22 +182,22 @@ void usage()
 
 {
 
-std::cout << "\nUsage: " << program_name << "\n"
-          << "\t[-outdir path]\n"
-          << "\t[-max max_minutes]\n"
-          << "\t[-log file]\n"
-          << "\t[-v level]\n"
-          << "\twwmca_cloud_pct_file_list\n\n"
-          << "\twhere\t\"-outdir path\" overrides the default output "
-          << "directory (.) (optional).\n"
-          << "\t\t\"-max max_minutes\" overrides the default maximum "
-          << "minutes of (" << max_minutes << ") (optional).\n"
-          << "\t\t\"-log file\" outputs log messages to the specified "
-          << "file (optional).\n"
-          << "\t\t\"-v level\" overrides the default level of logging ("
-          << mlog.verbosity_level() << ") (optional).\n"
-          << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
-          << "more wwmca cloud percent files to plot.\n\n";
+cout << "\nUsage: " << program_name << "\n"
+     << "\t[-outdir path]\n"
+     << "\t[-max max_minutes]\n"
+     << "\t[-log file]\n"
+     << "\t[-v level]\n"
+     << "\twwmca_cloud_pct_file_list\n\n"
+     << "\twhere\t\"-outdir path\" overrides the default output "
+     << "directory (.) (optional).\n"
+     << "\t\t\"-max max_minutes\" overrides the default maximum "
+     << "minutes of (" << max_minutes << ") (optional).\n"
+     << "\t\t\"-log file\" outputs log messages to the specified "
+     << "file (optional).\n"
+     << "\t\t\"-v level\" overrides the default level of logging ("
+     << mlog.verbosity_level() << ") (optional).\n"
+     << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
+     << "more wwmca cloud percent files to plot.\n\n";
 
 exit ( 1 );
 
@@ -519,7 +520,7 @@ void draw_map(PSfile & plot, const char hemisphere)
 {
 
 MapRegion r;
-std::ifstream in;
+ifstream in;
 ConcatString filename;
 
 filename = replace_path(map_filename);

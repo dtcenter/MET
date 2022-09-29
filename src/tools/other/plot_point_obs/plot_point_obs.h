@@ -15,6 +15,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/05/20  Halley Gotway  New
+//   001    09/29/22  Prestopnik     Removing namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __PLOT_POINT_OBS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

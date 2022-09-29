@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -58,7 +59,7 @@ if ( argc != 2 )  usage();
 int fd = -1;
 int j;
 size_t n_read, bytes;
-ConcatString input_filename = (std::string)argv[1];
+ConcatString input_filename = (string)argv[1];
 DbfHeader h;
 DbfSubRecord sr;
 
@@ -73,7 +74,7 @@ if ( (fd = met_open(input_filename.c_str(), O_RDONLY)) < 0 )  {
 
 }
 
-std::cout << get_short_name(input_filename.c_str()) << '\n';
+cout << get_short_name(input_filename.c_str()) << '\n';
 
    //
    //  main header
@@ -93,7 +94,7 @@ if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
 h.set_header(buf);
 
-std::cout << "\n";
+cout << "\n";
 
    //
    //  subrecords
@@ -101,9 +102,9 @@ std::cout << "\n";
 
 h.set_subrecords(fd);
 
-h.dump(std::cout);
+h.dump(cout);
 
-std::cout << "\n";
+cout << "\n";
 
    //
    //  records
@@ -137,9 +138,9 @@ for (j=0; j<(h.n_records); ++j)  {
      buf[h.record_length] = 0;
    }
    
-   std::cout << "Record " << j << " ...\n";
+   cout << "Record " << j << " ...\n";
 
-   dump_record(std::cout, 1, buf, h);
+   dump_record(cout, 1, buf, h);
 
 }   //  for j
 
@@ -158,7 +159,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "gis_dump_dbf";
 }
 

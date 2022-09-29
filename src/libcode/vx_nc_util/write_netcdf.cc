@@ -160,7 +160,7 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    NcVar lat_var, lon_var;
    float *lat_data = (float *) 0;
    float *lon_data = (float *) 0;
-   std::vector<NcDim> dims;
+   vector<NcDim> dims;
    long  counts[2] = {grid.ny(), grid.nx()};
    long offsets[2] = {0 , 0};
 
@@ -216,8 +216,8 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    //NcVar *wgt_var  = (NcVar *) 0;
    NcVar wgt_var  ;
    float *wgt_data = (float *) 0;
-   std::vector<NcDim> dims;
-   std::vector<size_t> count;
+   vector<NcDim> dims;
+   vector<size_t> count;
 
    // Define Variables
    dims.push_back(*lat_dim);

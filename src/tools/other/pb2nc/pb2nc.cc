@@ -54,10 +54,11 @@
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
 //   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   017    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   018    09/12/22  Prestopnik     Added "std::"; removing namespace
-//                                      from header files
+//   018    09/12/22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -209,7 +210,7 @@ static int nmsg_percent = -1;
 
 // Dump contents of PrepBufr file to ASCII files
 static bool dump_flag = false;
-static ConcatString dump_dir = (std::string)".";
+static ConcatString dump_dir = (string)".";
 
 static bool do_all_vars      = false;
 static bool override_vars    = false;
@@ -285,8 +286,8 @@ static ConcatString bufr_hdrs;          // header name list to read header
 static StringArray bufr_hdr_name_arr;   // available header name list
 static StringArray bufr_obs_name_arr;   // available obs. name list
 static IntArray filtered_times;
-static std::vector<derive_var_cfg> bufr_derive_cfgs;
-static std::map<ConcatString, StringArray> variableTypeMap;
+static vector<derive_var_cfg> bufr_derive_cfgs;
+static map<ConcatString, StringArray> variableTypeMap;
 
 static bool do_summary;
 static SummaryObs *summary_obs;
@@ -294,7 +295,7 @@ static SummaryObs *summary_obs;
 ////////////////////////////////////////////////////////////////////////
 
 static int         n_total_obs;    // Running total of observations
-static std::vector< Observation > observations;
+static vector< Observation > observations;
 
 //
 // Output NetCDF file, dimensions, and variables
@@ -363,10 +364,10 @@ static bool   keep_level_category(int);
 
 static float  derive_grib_code(int, float *, float *, double, float&);
 
-static int    combine_tqz_and_uv(std::map<float, float*>,
-                                 std::map<float, float*>, std::map<float, float*> &);
-static float  compute_pbl(std::map<float, float*> pqtzuv_map_tq,
-                          std::map<float, float*> pqtzuv_map_uv);
+static int    combine_tqz_and_uv(map<float, float*>,
+                                 map<float, float*>, map<float, float*> &);
+static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
+                          map<float, float*> pqtzuv_map_uv);
 static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
 static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
                          const float pbl_p, const float pbl_h, const float pbl_qm,
@@ -376,17 +377,17 @@ static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_co
 static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
 static bool   is_valid_pb_data(float pb_value);
-static void   log_merged_tqz_uv(std::map<float, float*> pqtzuv_map_tq,
-                                std::map<float, float*> pqtzuv_map_uv,
-                                std::map<float, float*> &pqtzuv_map_merged,
+static void   log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
+                                map<float, float*> pqtzuv_map_uv,
+                                map<float, float*> &pqtzuv_map_merged,
                                 const char *method_name);
 static void   log_pbl_input(int pbl_level, const char *method_name);
-static void   log_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
-                             std::map<float, float*> pqtzuv_map_uv,
+static void   log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
+                             map<float, float*> pqtzuv_map_uv,
                              const char *method_name);
-static void   merge_records(float *first_pqtzuv, std::map<float, float*> pqtzuv_map_pivot,
-                            std::map<float, float*> pqtzuv_map_aux,
-                            std::map<float, float*> &pqtzuv_map_merged);
+static void   merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
+                            map<float, float*> pqtzuv_map_aux,
+                            map<float, float*> &pqtzuv_map_merged);
 
 static void   usage();
 static void   set_pbfile(const StringArray &);
@@ -458,7 +459,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return program_name;
 }
 
@@ -623,7 +624,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    closepb_(&file_id);
    //close(file_id);
    // Delete the temporary blocked file
-   remove_temp_file((std::string)blk_file);
+   remove_temp_file((string)blk_file);
    return tbl_filename;
 }
 
@@ -656,7 +657,7 @@ void get_variable_info(const char* tbl_filename) {
    ConcatString input_data;
    if (fp != NULL) {
       char var_name[BUFR_NAME_LEN+1];
-      char var_desc[std::max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
+      char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
 
@@ -974,7 +975,7 @@ void process_pbfile(int i_pb) {
    }
 
    int grib_code, bufr_var_index;
-   std::map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
+   map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
 
    int bin_count = nint(npbmsg/20.0);
    int bufr_hdr_length = bufr_hdrs.length();
@@ -1013,9 +1014,9 @@ void process_pbfile(int i_pb) {
    unixtime prev_hdr_vld_ut = (unixtime) 0;
    char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
-   std::map<float, float*> pqtzuv_map_tq;
-   std::map<float, float*> pqtzuv_map_uv;
-   std::vector<float*> pqtzuv_list;
+   map<float, float*> pqtzuv_map_tq;
+   map<float, float*> pqtzuv_map_uv;
+   vector<float*> pqtzuv_list;
 
    // Initialize
    prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
@@ -1054,11 +1055,11 @@ void process_pbfile(int i_pb) {
 
       if(mlog.verbosity_level() > 0) {
          if(bin_count > 0 && (i_read+1)%bin_count == 0) {
-            std::cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << std::flush;
+            cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << flush;
             showed_progress = true;
             if(mlog.verbosity_level() >= debug_level_for_performance) {
                end_t = clock();
-               std::cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
+               cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
                          << " seconds\n";
                start_t = clock();
             }
@@ -1306,8 +1307,8 @@ void process_pbfile(int i_pb) {
       bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
                         0 == strcmp("ANOWPM", hdr_typ));
 
-      if (0 < message_type_map.count((std::string)hdr_typ)) {
-         ConcatString mappedMessageType = message_type_map[(std::string)hdr_typ];
+      if (0 < message_type_map.count((string)hdr_typ)) {
+         ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
          mlog << Debug(6) << "\n" << method_name
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
@@ -1526,7 +1527,7 @@ void process_pbfile(int i_pb) {
             // continue to the next observation variable
             if(!keep_bufr_obs_index(bufr_var_index)) continue;
 
-            addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+            addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                   hdr_lat, hdr_lon, hdr_elv, quality_mark,
                   OBS_BUFFER_SIZE);
 
@@ -1565,7 +1566,7 @@ void process_pbfile(int i_pb) {
 
                   if(is_eq(obs_arr[4], fill_value)) continue;
 
-                  addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                         hdr_lat, hdr_lon, hdr_elv, quality_mark,
                         OBS_BUFFER_SIZE);
 
@@ -1700,7 +1701,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[2] = cape_p;
                   obs_arr[3] = cape_h;
                   obs_arr[4] = cape_val; // observation value
-                  addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                                  hdr_lat, hdr_lon, hdr_elv, cape_qm,
                                  OBS_BUFFER_SIZE);
                   cape_count++;
@@ -1734,7 +1735,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[2] = cape_p;
                   obs_arr[3] = cape_h;
                   obs_arr[4] = mlcape_val; // observation value
-                  addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                                  hdr_lat, hdr_lon, hdr_elv, cape_qm,
                                  OBS_BUFFER_SIZE);
                   mlcape_count++;
@@ -1865,7 +1866,7 @@ void process_pbfile(int i_pb) {
                   }
                }
 
-               addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                      hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
 
                // Increment the current and total observations counts
@@ -1896,7 +1897,7 @@ void process_pbfile(int i_pb) {
             if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                            hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-            for(std::vector<float *>::iterator it = pqtzuv_list.begin();
+            for(vector<float *>::iterator it = pqtzuv_list.begin();
                 it != pqtzuv_list.end(); ++it) {
                delete *it;
             }
@@ -1936,7 +1937,7 @@ void process_pbfile(int i_pb) {
       if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                      hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-      for(std::vector<float *>::iterator it = pqtzuv_list.begin();
+      for(vector<float *>::iterator it = pqtzuv_list.begin();
           it != pqtzuv_list.end(); ++it) {
          delete *it;
       }
@@ -1952,7 +1953,7 @@ void process_pbfile(int i_pb) {
          log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
          //start_t = clock();
       }
-      std::cout << log_message << "\n";
+      cout << log_message << "\n";
    }
 
    if(0 < diff_file_time_count && 0 < diff_file_times.n_elements()) {
@@ -1970,7 +1971,7 @@ void process_pbfile(int i_pb) {
    }
    nc_point_obs.write_observation();
 
-   if(mlog.verbosity_level() > 0) std::cout << "\n" << std::flush;
+   if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2)
         << "Total Messages processed\t\t= " << npbmsg << "\n"
@@ -2050,9 +2051,9 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       method_end = clock();
-      std::cout << " PERF: " << method_name_s << " "
-                << (method_end-method_start)/double(CLOCKS_PER_SEC)
-                << " seconds\n";
+      cout << " PERF: " << method_name_s << " "
+           << (method_end-method_start)/double(CLOCKS_PER_SEC)
+           << " seconds\n";
    }
 
    if(i_msg <= 0) {
@@ -2193,7 +2194,7 @@ void process_pbfile_metadata(int i_pb) {
       if(mlog.verbosity_level() > 0) {
          if(nint(npbmsg/20.0) > 0 && (i_read+1)%nint(npbmsg/20.0) == 0) {
             showed_progress = true;
-            std::cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << std::flush;
+            cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << flush;
          }
       }
 
@@ -2355,7 +2356,7 @@ void process_pbfile_metadata(int i_pb) {
          }
          else {
             for (index=0; index<bufr_target_variables.n_elements(); index++) {
-               const std::string bufr_var_name = bufr_target_variables[index].c_str();
+               const string bufr_var_name = bufr_target_variables[index].c_str();
                if (!tableB_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
                   mlog << Error << "\n" << method_name << " -> variable \""
                        << bufr_var_name <<"\" does not exist at BUFR file\n\n";
@@ -2416,7 +2417,7 @@ void process_pbfile_metadata(int i_pb) {
          }
       }  // end for vIdx
    } // end for
-   if(showed_progress && mlog.verbosity_level() > 0) std::cout << "\n";
+   if(showed_progress && mlog.verbosity_level() > 0) cout << "\n";
 
    int bufr_var_index = 0;
    bool has_prepbufr_vars = false;
@@ -2467,7 +2468,7 @@ void write_netcdf_hdr_data() {
    long dim_count, pb_hdr_count;
    bool is_prepbufr = is_prepbufr_file(&event_names);
    TimeSummaryInfo summary_info = conf_info.getSummaryInfo();
-   static const std::string method_name = "write_netcdf_hdr_data() ";
+   static const string method_name = "write_netcdf_hdr_data() ";
 
    pb_hdr_count = (long) nc_point_obs.get_hdr_index();
    nc_point_obs.set_nc_out_data(observations, summary_obs,
@@ -2501,10 +2502,10 @@ void write_netcdf_hdr_data() {
    StringArray nc_var_name_arr;
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
-   std::map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
+   map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
    for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
       int var_index;
-      std::string var_name;
+      string var_name;
       ConcatString unit_str, desc_str;
 
       unit_str = "";
@@ -2562,7 +2563,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 
    int var_index = obs_arr[1];
    //assert(var_index >= 0 && m_strlen("Variable index can't be negative"));
-   std::string var_name = bufr_obs_name_arr[var_index];
+   string var_name = bufr_obs_name_arr[var_index];
    Observation obs = Observation(hdr_typ.text(),
                                  hdr_sid.text(),
                                  hdr_vld,
@@ -2916,8 +2917,8 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int combine_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
-      std::map<float, float*> pqtzuv_map_uv, std::map<float, float*> &pqtzuv_map_merged) {
+int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
+      map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
@@ -2927,7 +2928,7 @@ int combine_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
       float *pqtzuv_merged = (float *) 0;
       float *next_pqtzuv, *prev_pqtzuv;
       float tq_pres_max, tq_pres_min, uv_pres_max, uv_pres_min;
-      std::map<float,float*>::iterator it, it_tq, it_uv;
+      map<float,float*>::iterator it, it_tq, it_uv;
 
       // Gets pressure levels for TQZ records
       it = pqtzuv_map_tq.begin();
@@ -3035,8 +3036,8 @@ int combine_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
 
 ////////////////////////////////////////////////////////////////////////
 
-float compute_pbl(std::map<float, float*> pqtzuv_map_tq,
-                  std::map<float, float*> pqtzuv_map_uv) {
+float compute_pbl(map<float, float*> pqtzuv_map_tq,
+                  map<float, float*> pqtzuv_map_uv) {
    int jpbl;        //       -      BOUNDARY-LAYER TOP (LEVEL NUMBER - INTEGER)
    int mzbl;        //       -      TOP OF MODEL DOMAIN (LEVEL NUMBER - INTEGER)
    float hpbl;      //       M      ATMOSPHERIC BOUNDARY-LAYER DEPTH
@@ -3044,7 +3045,7 @@ float compute_pbl(std::map<float, float*> pqtzuv_map_tq,
    int pbl_level;
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
-   std::map<float,float*>::iterator it;
+   map<float,float*>::iterator it;
    static const char *method_name = "compute_pbl() ";
 
    hpbl = bad_data_float;
@@ -3054,7 +3055,7 @@ float compute_pbl(std::map<float, float*> pqtzuv_map_tq,
       int hgt_cnt, spfh_cnt;
       IntArray selected_levels;
 
-      std::map<float, float*> pqtzuv_map_merged;
+      map<float, float*> pqtzuv_map_merged;
       pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv,
                                      pqtzuv_map_merged);
       mlog << Debug(7) << method_name << "pbl_level= " << pbl_level
@@ -3204,7 +3205,7 @@ bool insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
               << "  (" << hdr_info<< ")\n";
       }
       else {
-         addObservation(obs_arr, (std::string)hdr_typ, (std::string)hdr_sid, hdr_vld_ut,
+         addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                         hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
          added = true;
       }
@@ -3313,13 +3314,13 @@ static bool is_valid_pb_data(float pb_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void merge_records(float *first_pqtzuv, std::map<float, float*> pqtzuv_map_pivot,
-      std::map<float, float*> pqtzuv_map_aux, std::map<float, float*> &pqtzuv_map_merged) {
+void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
+      map<float, float*> pqtzuv_map_aux, map<float, float*> &pqtzuv_map_merged) {
 
    float cur_pres;
    float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
    float *pqtzuv_merged;
-   std::map<float,float*>::iterator it_pivot, it_aux;
+   map<float,float*>::iterator it_pivot, it_aux;
    static const char *method_name = "merge_records() ";
 
    float first_pres = first_pqtzuv[0];
@@ -3386,12 +3387,12 @@ void merge_records(float *first_pqtzuv, std::map<float, float*> pqtzuv_map_pivot
 
 ////////////////////////////////////////////////////////////////////////
 
-void log_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
-                    std::map<float, float*> pqtzuv_map_uv, const char *method_name) {
+void log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
+                    map<float, float*> pqtzuv_map_uv, const char *method_name) {
    int offset;
    ConcatString buf;
    StringArray log_array;
-   std::map<float,float*>::iterator it;
+   map<float,float*>::iterator it;
 
    for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
       float *pqtzuv = it->second;
@@ -3425,13 +3426,13 @@ void log_tqz_and_uv(std::map<float, float*> pqtzuv_map_tq,
 
 ////////////////////////////////////////////////////////////////////////
 
-void log_merged_tqz_uv(std::map<float, float*> pqtzuv_map_tq,
-                       std::map<float, float*> pqtzuv_map_uv,
-                       std::map<float, float*> &pqtzuv_map_merged,
+void log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
+                       map<float, float*> pqtzuv_map_uv,
+                       map<float, float*> &pqtzuv_map_merged,
                        const char *method_name) {
    ConcatString buf;
    StringArray log_array;
-   for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
+   for (map<float,float*>::iterator it=pqtzuv_map_merged.begin();
          it!=pqtzuv_map_merged.end(); ++it) {
       float *pqtzuv = it->second;
       buf.clear();
@@ -3487,68 +3488,68 @@ void log_pbl_input(int pbl_level, const char *method_name) {
 
 void usage() {
 
-   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
-             << ") ***\n\n"
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
+        << ") ***\n\n"
 
-             << "Usage: " << program_name << "\n"
-             << "\tprepbufr_file\n"
-             << "\tnetcdf_file\n"
-             << "\tconfig_file\n"
-             << "\t[-pbfile prepbufr_file]\n"
-             << "\t[-valid_beg time]\n"
-             << "\t[-valid_end time]\n"
-             << "\t[-nmsg n]\n"
-             << "\t[-index]\n"
-             << "\t[-dump path]\n"
-             << "\t[-obs_var var]\n"
-             << "\t[-log file]\n"
-             << "\t[-v level]\n"
-             << "\t[-compress level]\n\n"
+        << "Usage: " << program_name << "\n"
+        << "\tprepbufr_file\n"
+        << "\tnetcdf_file\n"
+        << "\tconfig_file\n"
+        << "\t[-pbfile prepbufr_file]\n"
+        << "\t[-valid_beg time]\n"
+        << "\t[-valid_end time]\n"
+        << "\t[-nmsg n]\n"
+        << "\t[-index]\n"
+        << "\t[-dump path]\n"
+        << "\t[-obs_var var]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
-             << "\twhere\t\"prepbufr_file\" is the input PrepBufr "
-             << "observation file to be converted to netCDF format "
-             << "(required).\n"
+        << "\twhere\t\"prepbufr_file\" is the input PrepBufr "
+        << "observation file to be converted to netCDF format "
+        << "(required).\n"
 
-             << "\t\t\"netcdf_file\" indicates the name of the output "
-             << "netCDF file to be written (required).\n"
+        << "\t\t\"netcdf_file\" indicates the name of the output "
+        << "netCDF file to be written (required).\n"
 
-             << "\t\t\"config_file\" is a PB2NCConfig file containing the "
-             << "desired configuration settings (required).\n"
+        << "\t\t\"config_file\" is a PB2NCConfig file containing the "
+        << "desired configuration settings (required).\n"
 
-             << "\t\t\"-pbfile prepbufr_file\" may be used to specify "
-             << "additional input PrepBufr observation files to be used "
-             << "(optional).\n"
+        << "\t\t\"-pbfile prepbufr_file\" may be used to specify "
+        << "additional input PrepBufr observation files to be used "
+        << "(optional).\n"
 
-             << "\t\t\"-valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
-             << "beginning of the retention time window (optional).\n"
+        << "\t\t\"-valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "beginning of the retention time window (optional).\n"
 
-             << "\t\t\"-valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
-             << "end of the retention time window (optional).\n"
+        << "\t\t\"-valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "end of the retention time window (optional).\n"
 
-             << "\t\t\"-nmsg n\" indicates the number of PrepBufr message "
-             << "to process (optional).\n"
+        << "\t\t\"-nmsg n\" indicates the number of PrepBufr message "
+        << "to process (optional).\n"
 
-             << "\t\t\"-dump path\" indicates that the entire contents of "
-             << "\"prepbufr_file\" should also be dumped to text files "
-             << "in the directory specified (optional).\n"
+        << "\t\t\"-dump path\" indicates that the entire contents of "
+        << "\"prepbufr_file\" should also be dumped to text files "
+        << "in the directory specified (optional).\n"
 
-             << "\t\t\"-obs_var var1,...\" or multiple \"-obs_var var\" sets the variable list to be saved"
-             << " from input BUFR files (optional, default: all).\n"
+        << "\t\t\"-obs_var var1,...\" or multiple \"-obs_var var\" sets the variable list to be saved"
+        << " from input BUFR files (optional, default: all).\n"
 
-             << "\t\t\"-index\" indicates that the meta data (available variables and headers)"
-             << " is extracted from \"prepbufr_file\" (optional). "
-             << "No NetCDF outputs. \"-obs_var\" is ignored.\n"
+        << "\t\t\"-index\" indicates that the meta data (available variables and headers)"
+        << " is extracted from \"prepbufr_file\" (optional). "
+        << "No NetCDF outputs. \"-obs_var\" is ignored.\n"
 
-             << "\t\t\"-log file\" outputs log messages to the specified "
-             << "file (optional).\n"
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
 
-             << "\t\t\"-v level\" overrides the default level of logging ("
-             << mlog.verbosity_level() << ") (optional).\n"
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n"
 
-             << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-             << conf_info.conf.nc_compression() << ") (optional).\n\n"
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << conf_info.conf.nc_compression() << ") (optional).\n\n"
 
-             << std::flush;
+        << flush;
 
    exit (1);
 }

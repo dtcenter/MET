@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    10/01/19  Fillmore        New
+//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __GRID_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

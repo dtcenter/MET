@@ -850,7 +850,7 @@ void TCGenConfInfo::process_config() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenConfInfo::process_flags(
-        const std::map<STATLineType,STATOutputType> &m,
+        const map<STATLineType,STATOutputType> &m,
         const TCGenNcOutInfo &n) {
    int i;
 
@@ -1224,7 +1224,7 @@ void GenCTCInfo::add_best_gen(const GenesisInfo &gi) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_pnt(double lat, double lon, const std::string &s) {
+void GenCTCInfo::inc_pnt(double lat, double lon, const string &s) {
 
    // Nothing to do if there is no DataPlane map entry
    if(DpMap.count(s) == 0) return;
@@ -1247,7 +1247,7 @@ void GenCTCInfo::inc_pnt(double lat, double lon, const std::string &s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenCTCInfo::inc_trk(const GenesisInfo &gi, const std::string &s) {
+void GenCTCInfo::inc_trk(const GenesisInfo &gi, const string &s) {
 
    // Nothing to do if there is no DataPlane map entry
    if(DpMap.count(s) == 0) return;
@@ -1367,10 +1367,10 @@ void ProbGenPCTInfo::add_probgen(const ProbGenInfo &pgi, int index,
    if(!LeadTimes.has(lead_hr)) {
 
       LeadTimes.add(lead_hr);
-      std::vector<const ProbGenInfo *> empty_pgi;
-      std::vector<int>                 empty_idx;
-      std::vector<const GenesisInfo *> empty_bgi;
-      std::vector<bool>                empty_evt;
+      vector<const ProbGenInfo *> empty_pgi;
+      vector<int>                 empty_idx;
+      vector<const GenesisInfo *> empty_bgi;
+      vector<bool>                empty_evt;
 
       PCTMap    [lead_hr] = DefaultPCT;
       ProbGenMap[lead_hr] = empty_pgi;
@@ -1422,10 +1422,10 @@ void ProbGenPCTInfo::add_genshape(const GenShapeInfo &gsi, int index,
    if(!LeadTimes.has(lead_hr)) {
 
       LeadTimes.add(lead_hr);
-      std::vector<const GenShapeInfo *> empty_gsi;
-      std::vector<int>                  empty_idx;
-      std::vector<const GenesisInfo *>  empty_bgi;
-      std::vector<bool>                 empty_evt;
+      vector<const GenShapeInfo *> empty_gsi;
+      vector<int>                  empty_idx;
+      vector<const GenesisInfo *>  empty_bgi;
+      vector<bool>                 empty_evt;
 
       PCTMap    [lead_hr]  = DefaultPCT;
       GenShapeMap[lead_hr] = empty_gsi;

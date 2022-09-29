@@ -15,6 +15,7 @@ static const char default_units [] = "none";
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -50,7 +51,7 @@ static ConcatString modis_filename;
 
 static ConcatString modis_field;
 
-static ConcatString units = (std::string)default_units;
+static ConcatString units = (string)default_units;
 
 static double data_fill_value = -9999.0;
 
@@ -158,7 +159,7 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "modis_regrid";
 }
 
@@ -229,29 +230,29 @@ ConcatString tab;
 
 tab.set_repeat(' ', 13);
 
-std::cout << "\n"
-          << "Usage: " << program_name << '\n'
-          << tab << "-data_file path\n"
-          << tab << "-field name\n"
-          << tab << "-out path\n"
-          << tab << "-scale value\n"
-          << tab << "-offset value\n"
-          << tab << "-fill value\n"
-          << tab << "[-units text]\n"
-          << tab << "[-compress level]\n"
-          << tab << "modis_file\n\n"
+cout << "\n"
+     << "Usage: " << program_name << '\n'
+     << tab << "-data_file path\n"
+     << tab << "-field name\n"
+     << tab << "-out path\n"
+     << tab << "-scale value\n"
+     << tab << "-offset value\n"
+     << tab << "-fill value\n"
+     << tab << "[-units text]\n"
+     << tab << "[-compress level]\n"
+     << tab << "modis_file\n\n"
 
-          << "  where  \"-data_file path\" specifies the data files used to get the grid information.\n"
-          << "         \"-field name\" specifies the name of the field to use in the modis data file.\n"
-          << "         \"-out path\" specifies the name of the output netcdf file.\n"
-          << "         \"-scale value\" specifies the scale factor to be used on the raw modis values.\n"
-          << "         \"-offset value\" specifies the offset value to be used on the raw modis values.\n"
-          << "         \"-fill value\" specifies the bad data value in the modis data.\n"
-          << "         \"-units text\" specifies the units string in the global attributes section of the output file (optional).\n"
-          << "         \"-compress level\" specifies the compression level of output NetCDF variable (optional).\n"
-          << "         \"modis_file\" is the name of the modis input file.\n"
+     << "  where  \"-data_file path\" specifies the data files used to get the grid information.\n"
+     << "         \"-field name\" specifies the name of the field to use in the modis data file.\n"
+     << "         \"-out path\" specifies the name of the output netcdf file.\n"
+     << "         \"-scale value\" specifies the scale factor to be used on the raw modis values.\n"
+     << "         \"-offset value\" specifies the offset value to be used on the raw modis values.\n"
+     << "         \"-fill value\" specifies the bad data value in the modis data.\n"
+     << "         \"-units text\" specifies the units string in the global attributes section of the output file (optional).\n"
+     << "         \"-compress level\" specifies the compression level of output NetCDF variable (optional).\n"
+     << "         \"modis_file\" is the name of the modis input file.\n"
 
-          << "\n";
+     << "\n";
 
 exit ( 1 );
 

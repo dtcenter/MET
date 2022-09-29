@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    09/10/21  Halley Gotway   MET #1904 Initial version.
+//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __GEN_ENS_PROD_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

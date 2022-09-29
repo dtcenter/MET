@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -58,7 +59,7 @@ if ( argc != 2 )  usage();
 int fd = -1;
 int n_read, bytes;
 int count;
-ConcatString input_filename = (std::string)argv[1];
+ConcatString input_filename = (string)argv[1];
 ShxFileHeader h;
 ShxRecord r;
 
@@ -73,7 +74,7 @@ if ( (fd = met_open(input_filename.c_str(), O_RDONLY)) < 0 )  {
 
 }
 
-std::cout << get_short_name(input_filename.c_str()) << '\n';
+cout << get_short_name(input_filename.c_str()) << '\n';
 
    //
    //  main header
@@ -93,11 +94,11 @@ if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
 h.set(buf);
 
-std::cout << "ShxFileHeader ...\n";
+cout << "ShxFileHeader ...\n";
 
-h.dump(std::cout, 1);
+h.dump(cout, 1);
 
-std::cout << "\n";
+cout << "\n";
 
    //
    //  records
@@ -109,15 +110,15 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
 
    r.set(buf);
 
-   std::cout << "Record " << (count++) << " ... \n";
+   cout << "Record " << (count++) << " ... \n";
 
-   r.dump(std::cout, 1);
+   r.dump(cout, 1);
 
-   std::cout << "\n";
+   cout << "\n";
 
 }   //  while
 
-std::cout << "\n\n   Read " << count << " records\n\n";
+cout << "\n\n   Read " << count << " records\n\n";
 
    //
    //  done
@@ -132,7 +133,7 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "gis_dump_shx";
 }
 

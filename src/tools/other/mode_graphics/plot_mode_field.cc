@@ -17,8 +17,7 @@
 //   ----   ----      ----           -----------
 //   000    09-05-14  Bullock        New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   002    09-13-22  Prestopnik     Adding "std::"; removing namespace from
-//                                      header files
+//   002    09-13-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +31,7 @@ static const int ctable_text_width =  30;
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <fstream>
 #include <unistd.h>
@@ -116,7 +116,7 @@ static bool do_anno = true;
 static bool do_data_rescale = false;
 
 static ConcatString ctable_filename;
-static ConcatString output_directory = (std::string)".";
+static ConcatString output_directory = (string)".";
 
    //
    //  default plot info
@@ -259,7 +259,7 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "plot_mode_field";
 }
 
@@ -283,7 +283,7 @@ if ( ! config.read(config_filename.c_str()) )  {
 
 }
 
-if ( mlog.verbosity_level() >= 5 ) config.dump(std::cout);
+if ( mlog.verbosity_level() >= 5 ) config.dump(cout);
 
 const DictionaryEntry * e = 0;
 const char * name = 0;
@@ -444,7 +444,7 @@ if ( ! mode_in.open(mode_nc_filename) )  {
 
 }
 
-if ( mlog.verbosity_level() >= 5 ) mode_in.dump(std::cout);
+if ( mlog.verbosity_level() >= 5 ) mode_in.dump(cout);
 
 output_filename << output_directory << '/' << get_short_name(mode_nc_filename);
 
@@ -601,31 +601,31 @@ void usage()
 
 {
 
-std::cout << "\n*** Model Evaluation Tools (MET" << met_version
-          << ") ***\n\n"
+cout << "\n*** Model Evaluation Tools (MET" << met_version
+     << ") ***\n\n"
 
-          << "Usage: " << program_name << "\n"
-          << "\tmode_nc_file_list\n"
-          << "\t-raw | -simple | -cluster\n"
-          << "\t-obs | -fcst\n"
-          << "\t-config file\n"
-          << "\t[-log file]\n"
-          << "\t[-v level]\n\n"
+     << "Usage: " << program_name << "\n"
+     << "\tmode_nc_file_list\n"
+     << "\t-raw | -simple | -cluster\n"
+     << "\t-obs | -fcst\n"
+     << "\t-config file\n"
+     << "\t[-log file]\n"
+     << "\t[-v level]\n\n"
 
-          << "\twhere\t\"-raw | -simple | -cluster\" plots the raw, simple, "
-          << "or cluster object field (required).\n"
+     << "\twhere\t\"-raw | -simple | -cluster\" plots the raw, simple, "
+     << "or cluster object field (required).\n"
 
-          << "\t\t\"-obs | -fcst\" plots the forecast or observation field "
-          << "(required).\n"
+     << "\t\t\"-obs | -fcst\" plots the forecast or observation field "
+     << "(required).\n"
 
-          << "\t\t\"-config file\" is a PlotModeFieldConfig file specifying "
-          << "the desired plotting options (required).\n"
+     << "\t\t\"-config file\" is a PlotModeFieldConfig file specifying "
+     << "the desired plotting options (required).\n"
 
-          << "\t\t\"-log file\" outputs log messages to the specified "
-          << "file (optional).\n"
+     << "\t\t\"-log file\" outputs log messages to the specified "
+     << "file (optional).\n"
 
-          << "\t\t\"-v level\" overrides the default level of logging ("
-          << mlog.verbosity_level() << ") (optional).\n\n" << std::flush;
+     << "\t\t\"-v level\" overrides the default level of logging ("
+     << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
  exit (1);
 }
@@ -781,7 +781,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
+void get_data_ppm(ModecNOutputFile & mode_in, Ppm & image)
 
 {
 
@@ -962,7 +962,7 @@ void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Diction
 
 {
 
-std::ifstream in;
+ifstream in;
 MapRegion r;
 double map_linewidth;
 ConcatString s;

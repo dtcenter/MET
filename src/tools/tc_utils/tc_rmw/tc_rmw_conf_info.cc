@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -229,7 +231,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
         if(mlog.verbosity_level() >=5) {
             mlog << Debug(5) << "Parsed data field "
                  << i + 1 << ":\n";
-            data_info[i]->dump(std::cout);
+            data_info[i]->dump(cout);
         }
     }
 

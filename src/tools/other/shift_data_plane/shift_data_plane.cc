@@ -22,10 +22,11 @@
 //   000    11-12-14  Halley Gotway  New
 //   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   003    09-12-22  Prestopnik     Added "std::"; removing namespace from
-//                                      header files
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -105,7 +106,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "shift_data_plane";
 }
 
@@ -318,14 +319,14 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   NcVar data_var = add_var(f_out, (std::string)cs, ncFloat, lat_dim, lon_dim, deflate_level);
-   add_att(&data_var, "name", (std::string)cs);
-   add_att(&data_var, "long_name", (std::string)vinfo->long_name_attr());
-   add_att(&data_var, "level", (std::string)vinfo->level_attr());
-   add_att(&data_var, "units", (std::string)vinfo->units_attr());
+   NcVar data_var = add_var(f_out, (string)cs, ncFloat, lat_dim, lon_dim, deflate_level);
+   add_att(&data_var, "name", (string)cs);
+   add_att(&data_var, "long_name", (string)vinfo->long_name_attr());
+   add_att(&data_var, "level", (string)vinfo->level_attr());
+   add_att(&data_var, "units", (string)vinfo->units_attr());
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
-   add_att(&data_var, "smoothing_method", (std::string)interpmthd_to_string(Method));
+   add_att(&data_var, "smoothing_method", (string)interpmthd_to_string(Method));
    add_att(&data_var, "smoothing_neighborhood", Width*Width);
 
    GridTemplateFactory gtf;
@@ -366,55 +367,55 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
 void usage() {
 
-   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
-             << ") ***\n\n"
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
+        << ") ***\n\n"
 
-             << "Usage: " << program_name << "\n"
-             << "\tinput_filename\n"
-             << "\toutput_filename\n"
-             << "\tfield_string\n"
-             << "\t-from lat lon\n"
-             << "\t-to   lat lon\n"
-             << "\t[-method type]\n"
-             << "\t[-width n]\n"
-	     << "\t[-shape SHAPE]\n"
-             << "\t[-log file]\n"
-             << "\t[-v level]\n"
-             << "\t[-compress level]\n\n"
+        << "Usage: " << program_name << "\n"
+        << "\tinput_filename\n"
+        << "\toutput_filename\n"
+        << "\tfield_string\n"
+        << "\t-from lat lon\n"
+        << "\t-to   lat lon\n"
+        << "\t[-method type]\n"
+        << "\t[-width n]\n"
+        << "\t[-shape SHAPE]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
-             << "\twhere\t\"input_filename\" is the name of a "
-             << "gridded data file to be plotted (required).\n"
+        << "\twhere\t\"input_filename\" is the name of a "
+        << "gridded data file to be plotted (required).\n"
 
-             << "\t\t\"output_filename\" is the name of the output "
-             << "NetCDF file to be written (required).\n"
+        << "\t\t\"output_filename\" is the name of the output "
+        << "NetCDF file to be written (required).\n"
 
-             << "\t\t\"field_string\" defines the data to be shifted "
-             << "from the input file (required).\n"
+        << "\t\t\"field_string\" defines the data to be shifted "
+        << "from the input file (required).\n"
 
-             << "\t\t\"-from lat lon\" specifies the starting latitude "
-             << "(degrees north) and longitude (degrees east) to "
-             << "define the shift.\n"
+        << "\t\t\"-from lat lon\" specifies the starting latitude "
+        << "(degrees north) and longitude (degrees east) to "
+        << "define the shift.\n"
 
-             << "\t\t\"-to lat lon\" specifies the ending latitude "
-             << "(degrees north) and longitude (degrees east) to "
-             << "define the shift.\n"
+        << "\t\t\"-to lat lon\" specifies the ending latitude "
+        << "(degrees north) and longitude (degrees east) to "
+        << "define the shift.\n"
 
-             << "\t\t\"-method type\" overrides the default interpolation "
-             << "method (DW_MEAN) (optional).\n"
+        << "\t\t\"-method type\" overrides the default interpolation "
+        << "method (DW_MEAN) (optional).\n"
 
-             << "\t\t\"-width\" overrides the default interpolation width (2) "
-             << "(optional).\n"
+        << "\t\t\"-width\" overrides the default interpolation width (2) "
+        << "(optional).\n"
 
-             << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
-             << "(optional).\n"
+        << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
+        << "(optional).\n"
 
-             << "\t\t\"-log file\" outputs log messages to the specified "
-             << "file (optional).\n"
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
 
-             << "\t\t\"-v level\" overrides the default level of logging ("
-             << mlog.verbosity_level() << ") (optional).\n"
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n"
 
-             << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << std::flush;
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
 }

@@ -39,8 +39,8 @@ static const char *TCStatJobType_ProbRIRWStr = "probrirw";
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
-static void         parse_thresh_option(const char *, const char *, std::map<ConcatString,ThreshArray> &);
-static void         parse_string_option(const char *, const char *, std::map<ConcatString,StringArray> &);
+static void         parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
+static void         parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
 static void         setup_table        (AsciiTable &, int, int);
 static ConcatString build_map_key      (const char *, const TCStatLine &, const StringArray &);
 static bool         check_masks        (const MaskPoly &, const Grid &, const MaskPlane &,
@@ -57,7 +57,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    TCStatJobType type = NoTCStatJobType;
 
    // Determine the TCStatJobType
-   type = string_to_tcstatjobtype((std::string)type_str);
+   type = string_to_tcstatjobtype((string)type_str);
 
    // Switch on job type and instantiate the appropriate class.
    // The TCStatJob object is allocated and needs to be deleted by caller.
@@ -355,10 +355,10 @@ void TCStatJob::assign(const TCStatJob & j) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump(std::ostream & out, int depth) const {
+void TCStatJob::dump(ostream & out, int depth) const {
    Indent prefix(depth);
-   std::map<ConcatString,ThreshArray>::const_iterator thr_it;
-   std::map<ConcatString,StringArray>::const_iterator str_it;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    out << prefix << "JobType = " << tcstatjobtype_to_string(JobType)
        << "\n";
@@ -512,8 +512,8 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    int i, i_init;
    double v_dbl;
    ConcatString v_str;
-   std::map<ConcatString,ThreshArray>::const_iterator thr_it;
-   std::map<ConcatString,StringArray>::const_iterator str_it;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TrackWatchWarn for each TrackPoint
    if(TrackWatchWarn.n() > 0) {
@@ -670,8 +670,8 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
    StringArray sa;
-   std::map<ConcatString,ThreshArray>::const_iterator thr_it;
-   std::map<ConcatString,StringArray>::const_iterator str_it;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TC-STAT header columns
    if(AModel.n() > 0 &&
@@ -1162,8 +1162,8 @@ void TCStatJob::dump_line(const TCStatLine &line, ofstream *out) {
 ConcatString TCStatJob::serialize() const {
    ConcatString s;
    int i;
-   std::map<ConcatString,ThreshArray>::const_iterator thr_it;
-   std::map<ConcatString,StringArray>::const_iterator str_it;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Initialize the jobstring
    s.clear();
@@ -1334,8 +1334,8 @@ void TCStatJob::event_equalize_tracks() {
    int i;
 
    // Event equalization case map
-   std::map<ConcatString,StringArray,cs_cmp> case_map;
-   std::map<ConcatString,StringArray,cs_cmp>::iterator it;
+   map<ConcatString,StringArray,cs_cmp> case_map;
+   map<ConcatString,StringArray,cs_cmp>::iterator it;
 
    mlog << Debug(3)
         << "Applying track-based event equalization logic.\n";
@@ -1422,8 +1422,8 @@ void TCStatJob::event_equalize_lines() {
    int i;
 
    // Event equalization case map
-   std::map<ConcatString,StringArray,cs_cmp> case_map;
-   std::map<ConcatString,StringArray,cs_cmp>::iterator it;
+   map<ConcatString,StringArray,cs_cmp> case_map;
+   map<ConcatString,StringArray,cs_cmp>::iterator it;
 
    mlog << Debug(3)
         << "Applying line-based event equalization logic.\n";
@@ -1673,7 +1673,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
 
    // Process the filter output
    if(JobOut) do_output(*JobOut);
-   else       do_output(std::cout);
+   else       do_output(cout);
 
    return;
 }
@@ -1756,7 +1756,7 @@ void TCStatJobFilter::filter_lines(TCLineCounts &n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobFilter::do_output(std::ostream &out) {
+void TCStatJobFilter::do_output(ostream &out) {
    ConcatString line;
 
    // Build a simple output line
@@ -2012,7 +2012,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
    // Process the filter output
    if(JobOut) do_output(*JobOut);
-   else       do_output(std::cout);
+   else       do_output(cout);
 
    return;
 }
@@ -2103,7 +2103,7 @@ void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
 
 void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
    int i, j;
-   std::map<ConcatString,SummaryMapData,cs_cmp> cur_map;
+   map<ConcatString,SummaryMapData,cs_cmp> cur_map;
    ConcatString prefix, key, cur;
    SummaryMapData data;
    double val;
@@ -2148,7 +2148,7 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
 
 void TCStatJobSummary::process_line(TCStatLine &line) {
    int i;
-   std::map<ConcatString,SummaryMapData,cs_cmp> cur_map;
+   map<ConcatString,SummaryMapData,cs_cmp> cur_map;
    ConcatString prefix, key, cur;
    SummaryMapData data;
    double val;
@@ -2186,8 +2186,8 @@ void TCStatJobSummary::process_line(TCStatLine &line) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::add_map(std::map<ConcatString,SummaryMapData,cs_cmp>&m) {
-   std::map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
+void TCStatJobSummary::add_map(map<ConcatString,SummaryMapData,cs_cmp>&m) {
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
    for(it=m.begin(); it!= m.end(); it++) {
@@ -2226,8 +2226,8 @@ void TCStatJobSummary::add_map(std::map<ConcatString,SummaryMapData,cs_cmp>&m) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::do_output(std::ostream &out) {
-   std::map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
+void TCStatJobSummary::do_output(ostream &out) {
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
    StringArray sa;
    ConcatString line;
    AsciiTable out_at;
@@ -2376,7 +2376,7 @@ void TCStatJobSummary::do_output(std::ostream &out) {
    out  << line;
 
    // Write the table
-   out << out_at << "\n" << std::flush;
+   out << out_at << "\n" << flush;
 
    return;
 }
@@ -2385,7 +2385,7 @@ void TCStatJobSummary::do_output(std::ostream &out) {
 
 void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
                                    NumArray &ties) {
-   std::map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
    StringArray case_list;
    double v, best_val;
    ConcatString best_mod, s;
@@ -2708,7 +2708,7 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_thresh_option(const char *col_name, const char *col_val,
-                         std::map<ConcatString,ThreshArray> &m) {
+                         map<ConcatString,ThreshArray> &m) {
    ConcatString cs = to_upper((string)col_name);
    ThreshArray ta;
    ta.add_css(col_val);
@@ -2723,7 +2723,7 @@ void parse_thresh_option(const char *col_name, const char *col_val,
 ////////////////////////////////////////////////////////////////////////
 
 void parse_string_option(const char *col_name, const char *col_val,
-                         std::map<ConcatString,StringArray> &m) {
+                         map<ConcatString,StringArray> &m) {
    ConcatString cs = to_upper((string)col_name);
    StringArray sa;
    sa.set_ignore_case(1);
@@ -3009,7 +3009,7 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 
    // Process the RI/RW job output
    if(JobOut) do_output(*JobOut);
-   else       do_output(std::cout);
+   else       do_output(cout);
 
    return;
 }
@@ -3018,7 +3018,7 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 
 void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    int i, j, a, b, cur_dt, min_dt, i_min_dt, lead;
-   std::map<ConcatString,RIRWMapData,cs_cmp> cur_map;
+   map<ConcatString,RIRWMapData,cs_cmp> cur_map;
    ConcatString key, cur, cat;
    RIRWMapData data;
    TrackPairInfo pair_pt;
@@ -3157,7 +3157,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
-   std::map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
    for(it=m.begin(); it!= m.end(); it++) {
@@ -3209,7 +3209,7 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::do_output(std::ostream &out) {
+void TCStatJobRIRW::do_output(ostream &out) {
    ConcatString line;
 
    // Build a simple output line
@@ -3225,8 +3225,8 @@ void TCStatJobRIRW::do_output(std::ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::do_ctc_output(std::ostream &out) {
-   std::map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+void TCStatJobRIRW::do_ctc_output(ostream &out) {
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, r, c;
    AsciiTable out_at;
@@ -3292,15 +3292,15 @@ void TCStatJobRIRW::do_ctc_output(std::ostream &out) {
    }
 
    // Write the table
-   out << out_at << "\n" << std::flush;
+   out << out_at << "\n" << flush;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::do_cts_output(std::ostream &out) {
-   std::map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+void TCStatJobRIRW::do_cts_output(ostream &out) {
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, r, c;
    AsciiTable out_at;
@@ -3374,15 +3374,15 @@ void TCStatJobRIRW::do_cts_output(std::ostream &out) {
    }
 
    // Write the table
-   out << out_at << "\n" << std::flush;
+   out << out_at << "\n" << flush;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::do_mpr_output(std::ostream &out) {
-   std::map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+void TCStatJobRIRW::do_mpr_output(ostream &out) {
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, j, r, c;
    AsciiTable out_at;
@@ -3474,7 +3474,7 @@ void TCStatJobRIRW::do_mpr_output(std::ostream &out) {
    }
 
    // Write the table
-   out << out_at << "\n" << std::flush;
+   out << out_at << "\n" << flush;
 
    return;
 }
@@ -3782,7 +3782,7 @@ void TCStatJobProbRIRW::do_job(const StringArray &file_list,
 
    // Process the ProbRIRW job output
    if(JobOut) do_output(*JobOut);
-   else       do_output(std::cout);
+   else       do_output(cout);
 
    return;
 }
@@ -3856,8 +3856,8 @@ void TCStatJobProbRIRW::process_pair(ProbRIRWPairInfo &pair) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobProbRIRW::do_output(std::ostream &out) {
-   std::map<ConcatString,ProbRIRWMapData,cs_cmp>::iterator it;
+void TCStatJobProbRIRW::do_output(ostream &out) {
+   map<ConcatString,ProbRIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int n, i, j, r, c;
    int lt_cols = 0;
@@ -3886,7 +3886,7 @@ void TCStatJobProbRIRW::do_output(std::ostream &out) {
       else if(out_lt == stat_prc)  lt_cols = get_n_prc_columns (n);
       else if(out_lt == stat_pjc)  lt_cols = get_n_pjc_columns (n);
       else {
-         mlog << Error << "\nvoid TCStatJobProbRIRW::do_output(std::ostream &out) -> "
+         mlog << Error << "\nvoid TCStatJobProbRIRW::do_output(ostream &out) -> "
               << "unsupported output line type \"" << OutLineType[i] << "\"\n\n";
          exit(1);
       }
@@ -3958,7 +3958,7 @@ void TCStatJobProbRIRW::do_output(std::ostream &out) {
       } // end for it
 
       // Write the table for the current output line type
-      out << out_at << "\n" << std::flush;
+      out << out_at << "\n" << flush;
 
    } // end for i
 

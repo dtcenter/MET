@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -22,7 +24,7 @@
 
 void init_pdf(
     int n,
-    std::vector<long long>& pdf) {
+    vector<long long>& pdf) {
 
     for(int k = 0; k < n; k++) {
         pdf.push_back(0);
@@ -35,7 +37,7 @@ void init_pdf(
     double min,
     double max,
     double delta,
-    std::vector<long long>& pdf) {
+    vector<long long>& pdf) {
 
     int n = (max - min) / delta;
     for(int k = 0; k < n; k++) {
@@ -48,7 +50,7 @@ void init_pdf(
 void init_joint_pdf(
     int n_A,
     int n_B,
-    std::vector<long long>& pdf) {
+    vector<long long>& pdf) {
 
     for(int k = 0; k < n_A * n_B; k++) {
         pdf.push_back(0);
@@ -60,7 +62,7 @@ void init_joint_pdf(
 void update_pdf(
     double min,
     double delta,
-    std::vector<long long>& pdf,
+    vector<long long>& pdf,
     const DataPlane& dp,
     const MaskPlane& mp) {
 
@@ -86,7 +88,7 @@ void update_joint_pdf(
     double min_B,
     double delta_A,
     double delta_B,
-    std::vector<long long>& pdf,
+    vector<long long>& pdf,
     const DataPlane& dp_A,
     const DataPlane& dp_B,
     const MaskPlane& mp) {
@@ -115,13 +117,13 @@ void update_joint_pdf(
 void print_pdf(
     double min,
     double delta,
-    const std::vector<long long>& pdf) {
+    const vector<long long>& pdf) {
 
     for(int k = 0; k < pdf.size(); k++) {
         double bin_min = min + k * delta;
         double bin_max = min + (k + 1) * delta;
-        std::cout << "[" << bin_min << ", " << bin_max << "] "
-                  << pdf[k] << "\n";
+        cout << "[" << bin_min << ", " << bin_max << "] "
+             << pdf[k] << "\n";
     }
 }
 
@@ -132,11 +134,11 @@ void write_nc_pdf(
     const VarInfo& info,
     double min,
     double delta,
-    const std::vector<long long>& pdf) {
+    const vector<long long>& pdf) {
 
-    std::vector<double> bin_min;
-    std::vector<double> bin_max;
-    std::vector<double> bin_mid;
+    vector<double> bin_min;
+    vector<double> bin_max;
+    vector<double> bin_mid;
 
     for(int k = 0; k < pdf.size(); k++) {
         bin_min.push_back(min + delta * k);

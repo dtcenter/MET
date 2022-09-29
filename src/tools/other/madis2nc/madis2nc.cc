@@ -33,8 +33,11 @@
 //   006    07-23-18  Halley Gotway  Support masks from gen_vx_mask.
 //   007    01-11-19  Howard Soh     Added config file option.
 //   008    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   009    09-29-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

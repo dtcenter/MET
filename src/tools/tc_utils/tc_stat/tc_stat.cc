@@ -20,9 +20,11 @@
 //   003    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
 //   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   005    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   005    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -75,7 +77,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "tc_stat";
 }
 
@@ -270,7 +272,7 @@ void open_out_file() {
    if(out_file.empty()) return;
 
    // Create an output file and point to it
-   tc_stat_out = new std::ofstream;
+   tc_stat_out = new ofstream;
    tc_stat_out->open(out_file.c_str());
 
    if(!(*tc_stat_out)) {
@@ -288,7 +290,7 @@ void open_out_file() {
 void close_out_file() {
 
    // Close the output file
-   if(tc_stat_out != (std::ofstream *) 0) {
+   if(tc_stat_out != (ofstream *) 0) {
 
       // List the file being closed
       mlog << Debug(1)
@@ -297,7 +299,7 @@ void close_out_file() {
       // Close the output file
       tc_stat_out->close();
       delete tc_stat_out;
-      tc_stat_out = (std::ofstream *) 0;
+      tc_stat_out = (ofstream *) 0;
    }
 
    return;
@@ -307,40 +309,40 @@ void close_out_file() {
 
 void usage() {
 
-   std::cout << "\n*** Model Evaluation Tools (MET" << met_version
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
              << ") ***\n\n"
 
-             << "Usage: " << program_name << "\n"
-             << "\t-lookin source\n"
-             << "\t[-out file]\n"
-             << "\t[-log file]\n"
-             << "\t[-v level]\n"
-             << "\t[-config file] | [JOB COMMAND LINE]\n\n"
+        << "Usage: " << program_name << "\n"
+        << "\t-lookin source\n"
+        << "\t[-out file]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n"
+        << "\t[-config file] | [JOB COMMAND LINE]\n\n"
 
-             << "\twhere\t\"-lookin source\" is used one or more times to "
-             << "specify a file or top-level directory containing TC-MET "
-             << "files \"" << tc_stat_file_ext << "\" data to process "
-             << "(required).\n"
+        << "\twhere\t\"-lookin source\" is used one or more times to "
+        << "specify a file or top-level directory containing TC-MET "
+        << "files \"" << tc_stat_file_ext << "\" data to process "
+        << "(required).\n"
 
-             << "\t\t\"-out file\" to redirect the job output to a "
-             << "file (optional).\n"
+        << "\t\t\"-out file\" to redirect the job output to a "
+        << "file (optional).\n"
 
-             << "\t\t\"-log file\" outputs log messages to the specified "
-             << "file (optional).\n"
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
 
-             << "\t\t\"-v level\" overrides the default level of logging ("
-             << mlog.verbosity_level() << ") (optional).\n"
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n"
 
-             << "\t\t\"-config file\" specifies the TCStatConfig file "
-             << "containing the desired configuration settings.\n"
+        << "\t\t\"-config file\" specifies the TCStatConfig file "
+        << "containing the desired configuration settings.\n"
 
-             << "\t\t\"JOB COMMAND LINE\" specifies all the arguments "
-             << "necessary to perform a single job.\n\n"
+        << "\t\t\"JOB COMMAND LINE\" specifies all the arguments "
+        << "necessary to perform a single job.\n\n"
 
-             << "\tNOTE: Refer to a TCStatConfig file for details "
-             << "on how to specify the JOB COMMAND LINE.\n\n"
+        << "\tNOTE: Refer to a TCStatConfig file for details "
+        << "on how to specify the JOB COMMAND LINE.\n\n"
 
-             << std::flush;
+        << flush;
 
    exit(1);
 }

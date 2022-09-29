@@ -9,6 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <fstream>
 #include <unistd.h>
@@ -63,7 +64,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::string get_tool_name() {
+const string get_tool_name() {
    return "reformat_country_data";
 }
 
@@ -75,7 +76,7 @@ void usage()
 
 {
 
-std::cerr << "\n\n   usage:  " << program_name << " input_filename output_filename\n\n";
+cerr << "\n\n   usage:  " << program_name << " input_filename output_filename\n\n";
 
 exit ( 1 );
 
@@ -95,8 +96,8 @@ int j, k, region_number, n_points;
 int a, b;
 double lat, lon;
 double lat_min, lat_max, lon_min, lon_max;
-std::ifstream in;
-std::ofstream out;
+ifstream in;
+ofstream out;
 char in_line[512];   // the maximum line length in any of the data files is 66
 char out_line[512];
 
@@ -108,7 +109,7 @@ met_open(in, input_filename);
 
 if ( !in )  {
 
-   std::cerr << "\n\n  " << program_name << ": reformat() -> unable to open input file \"" << input_filename << "\"\n\n";
+   cerr << "\n\n  " << program_name << ": reformat() -> unable to open input file \"" << input_filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -118,7 +119,7 @@ if ( !in )  {
 
 if ( !out )  {
 
-   std::cerr << "\n\n  " << program_name << ": reformat() -> unable to open output file \"" << output_filename << "\"\n\n";
+   cerr << "\n\n  " << program_name << ": reformat() -> unable to open output file \"" << output_filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -149,7 +150,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
    if ( k != 7 )  {
 
-      std::cerr << "\n\n  " << program_name << ": trouble reading region!\n\n";
+      cerr << "\n\n  " << program_name << ": trouble reading region!\n\n";
 
       exit ( 1 );
 
@@ -161,7 +162,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
                      region_number, n_points, 
                      lat_min, lat_max, lon_min, lon_max);
 
-   out << out_line << '\n' << std::flush;
+   out << out_line << '\n' << flush;
 
       //
       //  data points
@@ -173,7 +174,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
       if ( ! in.getline(in_line, sizeof(in_line)) )  {
 
-         std::cerr << "\n\n  " << program_name << ": trouble reading data points from region! ... j = " << j << "\n\n";
+         cerr << "\n\n  " << program_name << ": trouble reading data points from region! ... j = " << j << "\n\n";
 
          exit ( 1 );
 
@@ -183,7 +184,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
       if ( k != 2 )  {
 
-         std::cerr << "\n\n  " << program_name << ": trouble reading data points from line ... \"" << in_line << "\"\n\n";
+         cerr << "\n\n  " << program_name << ": trouble reading data points from line ... \"" << in_line << "\"\n\n";
 
          exit ( 1 );
 
@@ -193,7 +194,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
       snprintf(out_line, sizeof(out_line), "%7.3f %8.3f", lat, lon);
 
-      out << out_line << '\n' << std::flush;
+      out << out_line << '\n' << flush;
 
    }   //  for j
 
