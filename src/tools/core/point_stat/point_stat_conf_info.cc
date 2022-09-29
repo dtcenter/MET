@@ -1112,8 +1112,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
 
    bool prob_flag = vx_pd.fcst_info->is_prob();
-   bool vect_flag = (vx_pd.fcst_info->is_u_wind() &&
-                     vx_pd.obs_info->is_u_wind());
+   bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
+                    vx_pd.fcst_info->uv_index() >= 0;
 
    int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
