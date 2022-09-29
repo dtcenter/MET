@@ -18,6 +18,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_util.h"
+#include "nav.h"
 
 #include "atcf_track_line.h"
 #include "track_point.h"
