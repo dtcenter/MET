@@ -163,7 +163,7 @@ class PointStatVxOpt {
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &, Dictionary &, bool);
+      void process_config(GrdFileType, Dictionary &, Dictionary &);
       void set_vx_pd(PointStatConfInfo *);
       bool is_uv_match(const PointStatVxOpt &) const;
 
@@ -225,6 +225,7 @@ class PointStatConfInfo {
       ConcatString model;                   // Model name
 
       PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
+      bool             grib_codes_set;
 
       // Land/sea mask and topography info for data filtering
       MaskPlane    land_mask;
@@ -253,7 +254,8 @@ class PointStatConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
-      void process_config(GrdFileType, bool);
+      void process_config(GrdFileType);
+      void process_grib_codes();
       void process_flags();
       void process_masks(const Grid &);
       void process_geog(const Grid &, const char *);
