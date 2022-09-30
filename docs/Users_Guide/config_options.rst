@@ -212,6 +212,16 @@ MET tool stating the location of the parsing error.
 Runtime Environment Variables
 -----------------------------
 
+MET_NDBC_STATIONS
+^^^^^^^^
+
+The MET_NDBC_STATIONS environment variable can be used to specify a file that
+will override the default file. If set it should be a full path to the file.
+The default is:
+   "MET_BASE/table_files/ndbc_stations.xml"
+This file contains XML content for all stations that allows lookups of latitude,longitude,
+and in some cases elevation for all stations based on stationId
+
 MET_AIRNOW_STATIONS
 ^^^^^^^^
 
