@@ -14,6 +14,31 @@ The Ensemble-Stat tool verifies deterministic ensemble members against gridded a
 Scientific and statistical aspects
 ==================================
 
+.. _ES_HiRA_framework:
+
+HiRA framework
+--------------
+
+The HiRA framework described in :numref:`PS_HiRA_framework` is also supported in the Ensemble-Stat tool. That support is provided as an interpolation option via the **interp** dictionary. The interpolation dictionary defines how gridded model data is matched to each observation value. Most interpolation methods, such as **UW_MEAN** for the unweighted mean or **BILIN** for bilinear, compute a single value for each ensemble member. When the High Resolution Assessment (HiRA) interpolation method is chosen, as shown below, all of the nearby neighborhood points surrounding each observation from each member are used. Therefore, processing an N-member ensemble using a HiRA neighborhood of size M produces ensemble output with size N*M. This approach fully leverages information from all nearby grid points to evaluate the ensemble quality.
+
+.. code ::
+
+  interp = {
+    field      = BOTH;
+    vld_thresh = 1.0;
+    shape      = SQUARE;
+
+    type = [
+       {
+          method = HIRA;
+          width  = 2;
+          shape  = SQUARE;
+       }
+    ];
+  }
+
+In this example, all four grid points of the 2x2 square surrounding each observation point are used to define the ensemble. Therefore, an N-member ensemble is evaluated as an ensemble of size Nx4.
+
 Ensemble statistics
 -------------------
 
@@ -125,7 +150,7 @@ ensemble_stat configuration file
 
 The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ____________________
 
