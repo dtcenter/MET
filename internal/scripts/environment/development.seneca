@@ -53,4 +53,4 @@ export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
 # SonarQube
 export SONARQUBE_DIR=/d1/projects/SonarQube/
 export SONARQUBE_WRAPPER_BIN=$SONARQUBE_DIR/build-wrapper-linux-x86
-export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-4.6.2.2472-linux/bin
+export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-linux/bin
