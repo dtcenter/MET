@@ -224,12 +224,12 @@ void wind_ne_to_ra(const TcrmwGrid& tcrmw_grid,
             double wind_r;
             double wind_t;
 	    if(is_bad_data(u) || is_bad_data(v)) {
-	      mlog << Debug(3) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " winds are missing\n";
+	      mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " winds are missing\n";
 	      wind_r = bad_data_double;
 	      wind_t = bad_data_double;
 	    } else {
 	      tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
-	      mlog << Debug(3) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
+	      mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
 		   << v << ", rt:" << wind_r << "," << wind_t <<"\n";
 	    }
             wind_r_arr[i] = wind_r;

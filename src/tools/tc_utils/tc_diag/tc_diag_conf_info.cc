@@ -188,7 +188,6 @@ void TCDiagConfInfo::process_config(GrdFileType ftype) {
     tangential_velocity_long_field_name = Conf.lookup_string(conf_key_tangential_velocity_long_field_name);
     radial_velocity_long_field_name = Conf.lookup_string(conf_key_radial_velocity_long_field_name);
 
-
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);
 
@@ -209,9 +208,7 @@ void TCDiagConfInfo::process_config(GrdFileType ftype) {
     data_info = new VarInfo*[n_data];
 
     // Initialize pointers
-    for(i=0; i<n_data; i++) {
-        data_info[i] = (VarInfo*) 0;
-    }
+    for(i=0; i<n_data; i++) data_info[i] = (VarInfo*) 0;
 
     // Parse data field information
     for(i=0; i<n_data; i++) {

@@ -81,7 +81,7 @@ static StringArray    data_files;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;
-static GrdFileType    ftype;
+static GrdFileType    ftype = FileType_None;
 
 
 // Optional arguments
@@ -137,12 +137,8 @@ static TcrmwGrid tcrmw_grid;
 static Grid      grid;
 
 // Grid coordinate arrays
-static double* lat_arr;
-static double* lon_arr;
-
-// Wind arrays
-/* static double* wind_r_arr; */
-/* static double* wind_t_arr; */
+static double *lat_arr = (double *) 0;
+static double *lon_arr = (double *) 0;
 
 ////////////////////////////////////////////////////////////////////////
 

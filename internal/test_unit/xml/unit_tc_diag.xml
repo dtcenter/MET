@@ -16,4 +16,25 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
+  <test name="tc_diag_GONZALO">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
+                > &OUTPUT_DIR;/tc_diag/gonzalo_file_list; \
+          &MET_BIN;/tc_diag</exec>
+    <param> \
+      -deck &DATA_DIR;/adeck/aal142016_short.dat \
+      -deck &DATA_DIR;/adeck/gonzalo08l.2014101312.trak.hwrf.atcfunix \
+      -data &OUTPUT_DIR;/tc_diag/gonzalo_file_list \
+      -config &CONFIG_DIR;/TCDiagConfig_gonzalo \
+      -out &OUTPUT_DIR;/tc_diag/tc_diag_hwrf_gonzalo.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_diag/tc_diag_hwrf_gonzalo.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
