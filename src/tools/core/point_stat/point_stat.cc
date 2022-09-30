@@ -100,7 +100,8 @@
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
-//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -284,14 +285,11 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Use a variable index from var_name instead of GRIB code
-   bool use_var_id = is_using_var_id(obs_file[0].c_str());
-
    // Store the forecast file type
    ftype = fcst_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(ftype, use_var_id);
+   conf_info.process_config(ftype);
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -713,6 +711,7 @@ void process_obs_file(int i_nc) {
       }
 
       met_point_obs = met_point_file.get_met_point_data();
+      use_var_id = met_point_file.is_using_var_id();
    }
    else {
 #endif
@@ -735,6 +734,9 @@ void process_obs_file(int i_nc) {
    }
 #endif
 
+   // Perform GRIB table lookups, if needed
+   if(!use_var_id) conf_info.process_grib_codes();
+
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
    mlog << Debug(2)
@@ -745,7 +747,7 @@ void process_obs_file(int i_nc) {
    ConcatString var_name("");
    StringArray var_names;
    StringArray obs_qty_array = met_point_obs->get_qty_data();
-   if( use_var_id ) var_names = met_point_obs->get_var_names();
+   if(use_var_id) var_names = met_point_obs->get_var_names();
 
    const int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int   obs_qty_idx_block[buf_size];

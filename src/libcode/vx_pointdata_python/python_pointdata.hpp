@@ -63,8 +63,8 @@ static void set_array_from_python(PyObject *python_data, const char *python_key,
               << "error getting the point data by the key (" << python_key << ") from python object\n\n";
          exit (1);
       }
-      else mlog << Debug(3) << method_name
-                << "not exists the point data (" << python_key << ") from python object\n";
+      else mlog << Debug(7) << method_name
+                << "point data for " << python_key << " does not exist from python object\n";
    }
 }
 
