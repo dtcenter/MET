@@ -68,6 +68,7 @@
 //   036    02/20/22  Halley Gotway  MET #1259 Write probabilistic statistics.
 //   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
+//   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -369,9 +370,6 @@ void process_command_line(int argc, char **argv) {
    // Store the input ensemble file type
    etype = ens_mtddf->file_type();
 
-   // Use a variable index from var_name instead of GRIB code
-   bool use_var_id = false;
-
    // Observation files are required
    if(!grid_obs_flag && !point_obs_flag) {
       mlog << Error << "\nprocess_command_line() -> "
@@ -383,9 +381,6 @@ void process_command_line(int argc, char **argv) {
    // Determine the input observation file type
    if(point_obs_flag) {
       otype = FileType_Gb1;
-      if(point_obs_file_list.n() > 0) {
-         use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
-      }
    }
    else if(!grid_obs_flag) {
       otype = FileType_None;
@@ -409,7 +404,7 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag,
-                            use_var_id, &ens_file_list, ctrl_file.nonempty());
+                            &ens_file_list, ctrl_file.nonempty());
 
    // Set output_nc_flag
    out_nc_flag = (grid_obs_flag && !conf_info.nc_info.all_false());
@@ -930,6 +925,7 @@ void process_point_obs(int i_nc) {
       }
 
       met_point_obs = met_point_file.get_met_point_data();
+      use_var_id = met_point_file.is_using_var_id();
    }
    else {
 #endif
@@ -952,6 +948,9 @@ void process_point_obs(int i_nc) {
 #ifdef WITH_PYTHON
    }
 #endif
+
+   // Perform GRIB table lookups, if needed
+   if(!use_var_id) conf_info.process_grib_codes();
 
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
