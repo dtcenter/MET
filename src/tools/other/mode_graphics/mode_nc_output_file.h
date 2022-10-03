@@ -18,7 +18,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "data_plane.h"
 #include "vx_grid.h"
@@ -50,36 +49,36 @@ class ModeNcOutputFile {
 
       ConcatString Filename;
 
-      int    get_int   (NcVar *, int x, int y) const;
-      double get_float (NcVar *, int x, int y) const;
+      int    get_int   (netCDF::NcVar *, int x, int y) const;
+      double get_float (netCDF::NcVar *, int x, int y) const;
 
-      int count_objects(NcVar *) const;
+      int count_objects(netCDF::NcVar *) const;
 
       DataPlane select_obj(ModeObjectField, int) const;
 
-      void calc_data_range(NcVar *, double & min_value, double & max_value);
+      void calc_data_range(netCDF::NcVar *, double & min_value, double & max_value);
 
-      NcFile * f;   //  allocated
+      netCDF::NcFile * f;   //  allocated
 
       Grid * _Grid;   //  allocated
 
-      NcVar * FcstObjId;   //  NOT allocated
-      NcVar * FcstClusId;  //  NOT allocated
+      netCDF::NcVar * FcstObjId;   //  NOT allocated
+      netCDF::NcVar * FcstClusId;  //  NOT allocated
 
-      NcVar * ObsObjId;    //  NOT allocated
-      NcVar * ObsClusId;   //  NOT allocated
+      netCDF::NcVar * ObsObjId;    //  NOT allocated
+      netCDF::NcVar * ObsClusId;   //  NOT allocated
 
-      NcVar * FcstRaw;     //  NOT allocated
-      NcVar * ObsRaw;      //  NOT allocated
+      netCDF::NcVar * FcstRaw;     //  NOT allocated
+      netCDF::NcVar * ObsRaw;      //  NOT allocated
 
-      NcVar _FcstObjId;   //
-      NcVar _FcstClusId;  //
+      netCDF::NcVar _FcstObjId;   //
+      netCDF::NcVar _FcstClusId;  //
 
-      NcVar _ObsObjId;    //
-      NcVar _ObsClusId;   //
+      netCDF::NcVar _ObsObjId;    //
+      netCDF::NcVar _ObsClusId;   //
 
-      NcVar _FcstRaw;     //
-      NcVar _ObsRaw;      //
+      netCDF::NcVar _FcstRaw;     //
+      netCDF::NcVar _ObsRaw;      //
       
       ModeNcOutputFile(const ModeNcOutputFile &);
       ModeNcOutputFile & operator=(const ModeNcOutputFile &);

@@ -18,6 +18,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "main.h"
 #include "rmw_analysis.h"
 

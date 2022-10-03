@@ -15,7 +15,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/05/20  Halley Gotway  New
-//   001    09/29/22  Prestopnik     Removing namespace std from header files
+//   001    09/29/22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,8 +37,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <netcdf>
-using namespace netCDF;
 
 #include "plot_point_obs_conf_info.h"
 

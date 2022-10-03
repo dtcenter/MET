@@ -15,7 +15,7 @@
 //   Mod#  Date      Name       Description
 //   ----  ----      ----       -----------
 //   000   04/18/19  Fillmore   New
-//   001   09/28/22  Prestopnik MET #2227 Remove namespace std from header files
+//   001   09/28/22  Prestopnik MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "tc_rmw_conf_info.h"
 #include "tc_rmw_wind_converter.h"
@@ -98,22 +97,22 @@ static ConcatString out_prefix;
 
 // Output NetCDF file
 static ConcatString out_file;
-static NcFile*      nc_out = (NcFile*) 0;
-static NcDim        range_dim;
-static NcDim        azimuth_dim;
-static NcDim        pressure_dim;
-static NcDim        track_point_dim;
-static NcVar        lat_arr_var;
-static NcVar        lon_arr_var;
-static NcVar        valid_time_var;
-static NcVar        data_var;
-static NcVar        wind_r_var;
-static NcVar        wind_a_var;
+static netCDF::NcFile*      nc_out = (netCDF::NcFile*) 0;
+static netCDF::NcDim        range_dim;
+static netCDF::NcDim        azimuth_dim;
+static netCDF::NcDim        pressure_dim;
+static netCDF::NcDim        track_point_dim;
+static netCDF::NcVar        lat_arr_var;
+static netCDF::NcVar        lon_arr_var;
+static netCDF::NcVar        valid_time_var;
+static netCDF::NcVar        data_var;
+static netCDF::NcVar        wind_r_var;
+static netCDF::NcVar        wind_a_var;
 
-static std::vector<NcVar> data_vars;
-static std::vector<NcVar> azi_mean_data_vars;
+static std::vector<netCDF::NcVar> data_vars;
+static std::vector<netCDF::NcVar> azi_mean_data_vars;
 
-static std::map<std::string, NcVar> data_3d_vars;
+static std::map<std::string, netCDF::NcVar> data_3d_vars;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;

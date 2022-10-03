@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    09/10/21  Halley Gotway   MET #1904 Initial version.
-//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "gen_ens_prod_conf_info.h"
 
@@ -82,9 +81,9 @@ static unixtime           ens_valid_ut = (unixtime) 0;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
-static NcDim  lat_dim;
-static NcDim  lon_dim;
+static netCDF::NcFile *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcDim  lat_dim;
+static netCDF::NcDim  lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_ens_var_sa;

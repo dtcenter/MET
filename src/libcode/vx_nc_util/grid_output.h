@@ -18,7 +18,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_grid.h"
 
@@ -26,7 +25,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void grid_output(const GridInfo &, NcFile *, NcDim &, NcDim &);
+extern void grid_output(const GridInfo &, netCDF::NcFile *, netCDF::NcDim &, netCDF::NcDim &);
 
 
 ////////////////////////////////////////////////////////////////////////

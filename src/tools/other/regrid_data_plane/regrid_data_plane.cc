@@ -24,8 +24,11 @@
 //   004    01-28-20  Howard Soh     Moved GOES-16/17 to point2grib
 //   005    04-09-20  Halley Gotway  Add convert and censor options.
 //   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   007    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -39,6 +42,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"

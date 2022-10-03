@@ -22,7 +22,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_util.h"
 
@@ -60,7 +59,7 @@ class NcVarInfo {
       void dump(std::ostream &, int = 0) const;
 
 
-      NcVar * var;   //  not allocated
+      netCDF::NcVar * var;   //  not allocated
 
       ConcatString name;
 
@@ -82,7 +81,7 @@ class NcVarInfo {
 
       int Ndims;
 
-      NcDim ** Dims; //  allocated
+      netCDF::NcDim ** Dims; //  allocated
 
       int x_slot;    //   starting from zero
       int y_slot;    //
@@ -102,12 +101,12 @@ extern bool get_att_level(const NcVarInfo &, ConcatString &);
 extern bool get_att_name(const NcVarInfo &, ConcatString &);
 
 //  unixtimes could be ints or strings
-extern bool get_att_unixtime(const NcVar *, const ConcatString, unixtime &);
+extern bool get_att_unixtime(const netCDF::NcVar *, const ConcatString, unixtime &);
 extern bool get_att_unixtime(const NcVarInfo &, const ConcatString, unixtime &);
 
-extern unixtime  get_att_value_unixtime(const NcAtt *);
+extern unixtime  get_att_value_unixtime(const netCDF::NcAtt *);
 
-extern unixtime  get_att_value_unixtime(const NcAtt *);
+extern unixtime  get_att_value_unixtime(const netCDF::NcAtt *);
 
 extern NcVarInfo* find_var_info_by_dim_name(NcVarInfo *vars, const std::string dim_name,
                                             const int nvars);

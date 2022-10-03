@@ -33,6 +33,7 @@
 //   012    01/20/22  Halley Gotway  MET #2003 Add PSTD BRIERCL output.
 //   013    05/25/22  Halley Gotway  MET #2147 Add CTS HSS_EC output.
 //   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   015    10/03/22  Presotpnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,6 +49,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "series_analysis.h"

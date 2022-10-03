@@ -18,7 +18,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "data_plane.h"
 #include "data_class.h"

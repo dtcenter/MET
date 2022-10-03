@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 //
 ////////////////////////////////////////////////////////////////////////
@@ -39,9 +39,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#include <netcdf>
-using namespace netCDF;
 
 #include "point_stat_conf_info.h"
 

@@ -18,9 +18,12 @@
 //   001    07/28/20  Halley Gotway   Updates for #1391.
 //   002    03/04/21  Halley Gotway   Bugfix #1694.
 //   003    08/20/21  Halley Gotway   Bugfix #1886 for integer overflow.
-//   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   005    10/03/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,6 +35,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "grid_diag.h"

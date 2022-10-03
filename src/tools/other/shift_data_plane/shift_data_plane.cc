@@ -22,7 +22,8 @@
 //   000    11-12-14  Halley Gotway  New
 //   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std from header files
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +39,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "GridTemplate.h"
 

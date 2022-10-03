@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/10/12  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 //
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "series_analysis_conf_info.h"
 
@@ -89,13 +88,13 @@ static SeriesAnalysisConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
-static NcDim  lat_dim;
-static NcDim  lon_dim ;
+static netCDF::NcFile *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcDim  lat_dim;
+static netCDF::NcDim  lon_dim ;
 
 // Structure to store computed statistics and corresponding metadata
 struct NcVarData {
-   NcVar * var; // Pointer to NetCDF variable
+   netCDF::NcVar * var; // Pointer to NetCDF variable
 };
 
 // Mapping of NetCDF variable name to computed statistic

@@ -17,7 +17,6 @@
 #include <vector>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_util.h"
 #include "vx_log.h"
@@ -79,7 +78,7 @@ void print_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc_pdf(
-    NcFile* nc_out,
+    netCDF::NcFile* nc_out,
     const VarInfo& info,
     double min,
     double delta,

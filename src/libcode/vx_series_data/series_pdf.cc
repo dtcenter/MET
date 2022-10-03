@@ -18,6 +18,9 @@ using namespace std;
 #include <errno.h>
 #include <string.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "series_pdf.h"
 
 ////////////////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@
 //    Mod#  Date      Name       Description
 //    ----  ----      ----       -----------
 //    000   08/19/19  Fillmore   New
-//    001   09/28/22  Prestopnik MET #2227 Remove namespace std from header files
+//    001   09/28/22  Prestopnik MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "rmw_analysis_conf_info.h"
 
@@ -82,14 +81,14 @@ static ConcatString out_dir;
 ConcatString out_file;
 
 // NetCDF file information
-static NcFile* nc_in = (NcFile*) 0;
-static NcFile* nc_out = (NcFile*) 0;
+static netCDF::NcFile* nc_in = (netCDF::NcFile*) 0;
+static netCDF::NcFile* nc_out = (netCDF::NcFile*) 0;
 
 // Grid dimension information
-static NcDim range_dim;
-static NcDim azimuth_dim;
-static NcDim level_dim;
-static NcDim track_point_dim;
+static netCDF::NcDim range_dim;
+static netCDF::NcDim azimuth_dim;
+static netCDF::NcDim level_dim;
+static netCDF::NcDim track_point_dim;
 
 static std::string range_name;
 static std::string range_units;
@@ -98,7 +97,7 @@ static std::string azimuth_units;
 static std::string level_name;
 static std::string level_units;
 
-static NcVar valid_time_var;
+static netCDF::NcVar valid_time_var;
 
 // Grid data
 static int n_range;

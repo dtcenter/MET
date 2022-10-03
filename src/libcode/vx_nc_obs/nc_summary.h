@@ -14,7 +14,6 @@
 #define  __NC_SUMMARY_H__
 
 #include <netcdf>
-using namespace netCDF;
 #include "nc_utils.h"
 #include "nc_obs_util.h"
 #include "vx_summary.h"
@@ -36,7 +35,7 @@ extern std::string _secsToTimeString(const int secs);
 
 // Not moved to nc_obs_util to reduce the dependency (library)
 
-extern void write_summary_attributes(NcFile *, TimeSummaryInfo);
+extern void write_summary_attributes(netCDF::NcFile *, TimeSummaryInfo);
 
 ////////////////////////////////////////////////////////////////////////
 

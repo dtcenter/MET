@@ -24,7 +24,7 @@
 //   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std from header files
+//   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
 //
 //
 ////////////////////////////////////////////////////////////////////////
@@ -41,6 +41,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "tc_gen.h"

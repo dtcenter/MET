@@ -54,7 +54,8 @@
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
 //   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   017    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   018    09/12/22  Prestopnik     MET #2227 Remove namespace std from header files
+//   018    09/12/22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +72,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 #include <assert.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "pb2nc_conf_info.h"

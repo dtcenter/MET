@@ -10,6 +10,9 @@
 
 using namespace std;
 
+#include<netcdf>
+using namespace netCDF;
+
 #include "vx_tc_nc_util.h"
 
 ////////////////////////////////////////////////////////////////////////

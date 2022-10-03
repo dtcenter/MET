@@ -18,7 +18,7 @@
 //   001    05/03/10  Halley Gotway  Add fcst/obs/diff variable name
 //                                     arrays to keep track of NetCDF variables.
 //   002    05/10/16  Halley Gotway  Add grid weighting.
-//   003    09/28/22  Prestopnik     MET #2227 Remove namespace std 
+//   003    09/28/22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +41,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "grid_stat_conf_info.h"
 
@@ -122,11 +121,11 @@ static ConcatString out_dir;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Output NetCDF file
-static ConcatString out_nc_file;
-static NcFile      *nc_out = (NcFile *) 0;
-static NcDim        lat_dim;
-static NcDim        lon_dim;
+// Output Netcdf file
+static ConcatString         out_nc_file;
+static netCDF::NcFile      *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcDim        lat_dim;
+static netCDF::NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;

@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const string mode_hdr_columns [] = {
+static const std::string mode_hdr_columns [] = {
 
    "VERSION",                    //   1
    "MODEL",                      //   2
@@ -43,7 +43,7 @@ static const string mode_hdr_columns [] = {
 
 };
 
-static const string mode_obj_columns [] = {
+static const std::string mode_obj_columns [] = {
 
    "OBJECT_ID",                  //  23
    "OBJECT_CAT",                 //  24

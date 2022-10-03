@@ -17,7 +17,7 @@
 //   000   04/18/19  Fillmore        New
 //   001   05/15/20  Halley Gotway   Fix data file list option logic.
 //   002   07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   003   09/28/22  Prestopnik      MET #2227 Remove namspace std from header files
+//   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +32,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "tc_rmw.h"

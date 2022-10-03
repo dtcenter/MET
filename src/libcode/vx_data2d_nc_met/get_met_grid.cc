@@ -18,6 +18,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "get_met_grid.h"
 
 #include "nc_utils.h"

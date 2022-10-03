@@ -43,8 +43,8 @@ class MtdIntFile : public MtdFileBase {
 
       void int_assign(const MtdIntFile &);
 
-      virtual void read  (NcFile &);
-      virtual void write (NcFile &) const;
+      virtual void read  (netCDF::NcFile &);
+      virtual void write (netCDF::NcFile &) const;
 
 
 

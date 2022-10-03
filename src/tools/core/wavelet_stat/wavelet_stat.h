@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "wavelet_stat_conf_info.h"
 
@@ -94,14 +93,14 @@ static ConcatString out_dir;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static NcFile       *nc_out    = (NcFile *) 0;
-static NcDim        x_dim     ;
-static NcDim        y_dim     ;
-static NcDim        scale_dim ;
-static NcDim        tile_dim  ;
-static NcVar        fcst_var  ;
-static NcVar        obs_var   ;
-static NcVar        diff_var  ;
+static netCDF::NcFile       *nc_out    = (netCDF::NcFile *) 0;
+static netCDF::NcDim        x_dim     ;
+static netCDF::NcDim        y_dim     ;
+static netCDF::NcDim        scale_dim ;
+static netCDF::NcDim        tile_dim  ;
+static netCDF::NcVar        fcst_var  ;
+static netCDF::NcVar        obs_var   ;
+static netCDF::NcVar        diff_var  ;
 
 // Output PostScript file
 static ConcatString out_ps_file;

@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    10/01/19  Fillmore        New
-//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   001    09/29/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,6 @@
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "grid_diag_conf_info.h"
 
@@ -86,10 +85,10 @@ static GridDiagConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static NcFile *nc_out = (NcFile *) 0;
-vector<NcDim> data_var_dims;
-vector<NcVar> hist_vars;
-vector<NcVar> joint_hist_vars;
+static netCDF::NcFile *nc_out = (netCDF::NcFile *) 0;
+vector<netCDF::NcDim> data_var_dims;
+vector<netCDF::NcVar> hist_vars;
+vector<netCDF::NcVar> joint_hist_vars;
 
 ////////////////////////////////////////////////////////////////////////
 //
