@@ -781,7 +781,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_ppm(ModecNOutputFile & mode_in, Ppm & image)
+void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
 
 {
 
