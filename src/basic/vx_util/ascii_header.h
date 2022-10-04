@@ -103,7 +103,7 @@ class AsciiHeader {
 
       void assign(const AsciiHeader &);
 
-      StringArray             Versions;
+      StringArray                  Versions;
       std::vector<AsciiHeaderLine> Headers;
 
    public:
