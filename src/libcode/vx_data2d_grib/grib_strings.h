@@ -18,8 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 static const std::string missing_str        = "MISSING";
-static const char ugrd_abbr_str[]      = "UGRD";
-static const char vgrd_abbr_str[]     = "VGRD";
+static const char ugrd_abbr_str[]           = "UGRD";
+static const char vgrd_abbr_str[]           = "VGRD";
 static const std::string ugrd_vgrd_abbr_str = "UGRD_VGRD";
 static const std::string wind_abbr_str      = "WIND";
 static const std::string wdir_abbr_str      = "WDIR";
