@@ -20,12 +20,18 @@
 //   000    12-11-19  Howard Soh     Support GOES-16
 //   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    10-03-23  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
+
+#include<netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"

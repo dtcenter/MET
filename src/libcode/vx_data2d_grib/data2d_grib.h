@@ -78,7 +78,7 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       void close();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       bool read_record(const int, const bool read_plane = true);
 

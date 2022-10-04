@@ -6,6 +6,8 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+using namespace std;
+
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -15,6 +17,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "rmw_analysis.h"

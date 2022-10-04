@@ -89,7 +89,7 @@ class TrackInfo {
       void clear();
       void clear_points();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
 
@@ -214,7 +214,7 @@ class TrackInfoArray {
       void init_from_scratch();
       void assign(const TrackInfoArray &);
 
-      vector<TrackInfo> Track;
+      std::vector<TrackInfo> Track;
 
    public:
 
@@ -225,7 +225,7 @@ class TrackInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 

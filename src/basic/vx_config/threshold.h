@@ -168,7 +168,7 @@ class ThreshNode {
 
       virtual void multiply_by(const double) = 0;
 
-      virtual void get_simple_nodes(vector<Simple_Node> &) const = 0;
+      virtual void get_simple_nodes(std::vector<Simple_Node> &) const = 0;
 
       ConcatString s;
       ConcatString abbr_s;
@@ -210,7 +210,7 @@ class Or_Node : public ThreshNode {
 
       void multiply_by(const double);
 
-      void get_simple_nodes(vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const;
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -259,7 +259,7 @@ class And_Node : public ThreshNode {
 
       void multiply_by(const double);
 
-      void get_simple_nodes(vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -310,7 +310,7 @@ class Not_Node : public ThreshNode {
 
       void multiply_by(const double);
 
-      void get_simple_nodes(vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -375,7 +375,7 @@ class Simple_Node : public ThreshNode {
 
       bool need_perc() const;
 
-      void get_simple_nodes(vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const;
 
          //
          //  do stuff
@@ -421,7 +421,7 @@ class SingleThresh {
       SingleThresh(const char *);
       SingleThresh & operator=(const SingleThresh &);
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       bool operator==(const SingleThresh &) const;
 
@@ -446,7 +446,7 @@ class SingleThresh {
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
       double         get_climo_prob() const;
-      void           get_simple_nodes(vector<Simple_Node> &) const;
+      void           get_simple_nodes(std::vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
 

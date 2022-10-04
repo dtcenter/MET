@@ -14,6 +14,9 @@
 
 using namespace std;
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_log.h"
 #include "vx_math.h"
 

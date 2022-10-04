@@ -13,8 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -29,7 +27,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "ensemble_stat_conf_info.h"
 
@@ -126,25 +123,25 @@ static int compress_level = -1;
 // Output NetCDF file
 static bool         out_nc_flag = false;
 static ConcatString out_nc_file;
-static NcFile       *nc_out  = (NcFile *) 0;
-static NcDim        lat_dim;
-static NcDim        lon_dim;
+static netCDF::NcFile       *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcDim        lat_dim;
+static netCDF::NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_ens_var_sa;
 static StringArray nc_orank_var_sa;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString     txt_file[n_txt];
+static std::ofstream    *txt_out[n_txt];
+static AsciiTable       txt_at[n_txt];
+static int              i_txt_row[n_txt];
 
 ////////////////////////////////////////////////////////////////////////
 //

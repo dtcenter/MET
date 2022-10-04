@@ -31,7 +31,7 @@ public:
   SummaryCalc();
   virtual ~SummaryCalc();
 
-  virtual string getType() const = 0;
+  virtual std::string getType() const = 0;
   virtual double calcSummary(const NumArray &num_array) const = 0;
   
 };

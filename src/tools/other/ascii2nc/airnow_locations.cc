@@ -12,7 +12,6 @@
 
 using namespace std;
 
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -103,7 +102,7 @@ bool AirnowLocations::initialize(const string &fileName)
 
     // assume the full aqsid are unique compared to the non-full simple aqsid or even the station id
     // look for the 'full'
-    std::vector<string>::const_iterator it;
+    vector<string>::const_iterator it;
     it = find(monitoringSiteFullAqsid.begin(), monitoringSiteFullAqsid.end(), fullaqsid);
     if (it == monitoringSiteFullAqsid.end()) {
       monitoringSiteAqsid.push_back(aqsid);

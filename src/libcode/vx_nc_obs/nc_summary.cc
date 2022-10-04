@@ -18,6 +18,9 @@ using namespace std;
 
 #include <iostream>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "write_netcdf.h"
 
 #include "nc_obs_util.h"

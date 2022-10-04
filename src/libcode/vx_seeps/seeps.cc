@@ -13,6 +13,9 @@ using namespace std;
 #include <cmath>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "file_exists.h"
 
 #include "string_fxns.h"

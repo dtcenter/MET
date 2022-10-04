@@ -144,8 +144,8 @@ static const int n_tc_diag_cols = sizeof(tc_diag_cols)/sizeof(*tc_diag_cols);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void open_tc_txt_file (ofstream *&,  const char *);
-extern void close_tc_txt_file(ofstream *&,  const char *);
+extern void open_tc_txt_file (std::ofstream *&,  const char *);
+extern void close_tc_txt_file(std::ofstream *&,  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

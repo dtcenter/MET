@@ -201,7 +201,7 @@ class VarInfoNcPinterp : public VarInfo
       VarInfoNcPinterp(const VarInfoNcPinterp &);
       VarInfoNcPinterp & operator=(const VarInfoNcPinterp &);
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
       void clear();
 
          //

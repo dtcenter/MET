@@ -16,9 +16,12 @@
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
 //   001    01/26/16  Halley Gotway   Add -no_check_dup option.
-//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   003    10/03/22  Prestopnik      MET #2227 Remove using namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <fstream>
 #include <unistd.h>

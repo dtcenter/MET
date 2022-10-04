@@ -67,7 +67,7 @@ class Color {
 
       void reverse_video();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       bool is_gray () const;
 
@@ -172,7 +172,7 @@ class CtableEntry {
       double value_low  () const;
       double value_high () const;
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 
@@ -191,9 +191,9 @@ inline double CtableEntry::value_high() const { return ( ValueHi ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern istream & operator>>(istream &, CtableEntry &);
+extern std::istream & operator>>(std::istream &, CtableEntry &);
 
-extern ostream & operator<<(ostream &, const CtableEntry &);
+extern std::ostream & operator<<(std::ostream &, const CtableEntry &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ class ColorTable {
 
       double gamma() const;
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       CtableEntry operator[](int) const;
 

@@ -8,6 +8,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
+#include<netcdf>
+using namespace netCDF;
+
 #include "vx_tc_nc_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -171,7 +176,7 @@ map<string, int> get_pressure_level_indices(
     map<string, int> pressure_level_indices;
 
     map<double, int> indices_from_levels
-        = get_pressure_level_indices(pressure_levels);
+            = get_pressure_level_indices(pressure_levels);
 
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
