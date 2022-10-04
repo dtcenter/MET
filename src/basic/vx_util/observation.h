@@ -203,17 +203,17 @@ protected:
 
   std::string _headerType;
   std::string _stationId;
-  time_t _validTime;
-  double _latitude;
-  double _longitude;
-  double _elevation;
+  time_t      _validTime;
+  double      _latitude;
+  double      _longitude;
+  double      _elevation;
   std::string _qualityFlag;
   std::string _varName;
-  int  varCode;
-  long hdrIndex;
-  double _pressureLevel;
-  double _height;
-  double _value;
+  int         varCode;
+  long        hdrIndex;
+  double      _pressureLevel;
+  double      _height;
+  double      _value;
 
 
   ///////////////////////
