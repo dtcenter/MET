@@ -862,9 +862,9 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    int        pcnt;
    TrackPoint pavg, psum;
    QuadInfo   wavg;
-   NumArray   plon, plat;
+   NumArray   plon, plat, pvmax, pmslp;
    double     lon_range, lon_shift, lon_avg;
-   double     track_spread;
+   double     track_spread, vmax_stdev, mslp_stdev;
    
    // Check for at least one track
    if(tracks.n() == 0) {
@@ -923,11 +923,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    // Loop through the lead times and construct a TrackPoint for each
    for(i=0, skip=false; i<lead_list.n_elements(); i++) {
 
+      cout << "Working on lead-time index: " << i << endl;
+      
       // Initialize TrackPoint
       pavg.clear();
       psum.clear();
       plon.clear();
       plat.clear();
+      pvmax.clear();
+      pmslp.clear();
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
@@ -950,14 +954,24 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         // Store the latitude and longitude values
+         // Store the track point latitude, longitude v_max and mslp values
+
+         cout << "Track Point: lat: " << tracks.Track[j][i_pnt].lat() << " lon: " << tracks.Track[j][i_pnt].lon() << " v_max: " << tracks.Track[j][i_pnt].v_max() << " mslp: " << tracks.Track[j][i_pnt].mslp() << endl;
+         
          plon.add(tracks.Track[j][i_pnt].lon());
          plat.add(tracks.Track[j][i_pnt].lat());
+         pvmax.add(tracks.Track[j][i_pnt].v_max());
+         pmslp.add(tracks.Track[j][i_pnt].mslp());
       }
       
       // Check for missing required member and the minimum number of points
-      if(skip == true || pcnt < req) continue;
+      //if(skip == true || pcnt < req) continue;
 
+      if(skip == true || pcnt < req) {
+         cout << "pcnt: " << pcnt << " is less than req: " << req << " skipping computations (continuing)" << endl << endl;
+         continue;
+      }
+      
       // Compute the average point
       pavg = psum;
       if(!is_bad_data(pavg.v_max())) pavg.set_v_max(psum.v_max()/pcnt);
@@ -984,12 +998,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
       if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
 
-      // Call new function
-      //double compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons);
-      //
-      // Call it like
+      // Compute track spread
       track_spread = compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon);
-      cout << "track_spread = " << track_spread << endl << endl;
+      cout << "track_spread = " << track_spread << endl;
+      
+      // Compute wind-speed (v_max) and pressure (mslp) standard deviation
+      vmax_stdev = pvmax.stdev();
+      mslp_stdev = pmslp.stdev();
+      
+      cout << "vmax_stdev =  " << vmax_stdev << " mslp_stdev =  " << mslp_stdev << endl << endl;
       
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
@@ -1030,11 +1047,11 @@ double compute_gc_dist_stdev(const double lat, const double lon, const NumArray 
 
    // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
    for(i=0, count=0; i<lats.n_elements(); i++) {
-      cout << "member lats[ " << i << "]: " << lats[i] << " member lons[" << i << "]: " << lons[i] << " consensus lat: " << lat << " consensus lon: " << lon << endl; 
+      //cout << "member lats[ " << i << "]: " << lats[i] << " member lons[" << i << "]: " << lons[i] << " consensus lat: " << lat << " consensus lon: " << lon << endl; 
       
       if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
       
-      cout << "  gc_dist: " << gc_dist(lats[i], lons[i], lat, lon) << endl;
+      //cout << "  gc_dist: " << gc_dist(lats[i], lons[i], lat, lon) << endl;
       
       // Save great circle distance values in num-array object
       dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
