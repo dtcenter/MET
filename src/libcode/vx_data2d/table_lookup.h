@@ -43,7 +43,7 @@ class Grib1TableEntry {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       int code;
       int table_number;
@@ -94,7 +94,7 @@ class Grib2TableEntry {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       int index_a;     // Section 0 Discipline
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
@@ -139,8 +139,8 @@ class TableFlatFile {
 
       void assign(const TableFlatFile &);
 
-      bool read_grib1(istream &, const char * filename, const int n);
-      bool read_grib2(istream &, const char * filename, const int n);
+      bool read_grib1(std::istream &, const char * filename, const int n);
+      bool read_grib2(std::istream &, const char * filename, const int n);
 
       void extend_grib1(int);
       void extend_grib2(int);
@@ -164,7 +164,7 @@ class TableFlatFile {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff

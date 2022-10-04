@@ -69,6 +69,7 @@
 //   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
+//   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files                                                                                  
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +84,9 @@ using namespace std;
 #include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "ensemble_stat.h"

@@ -60,7 +60,7 @@ class TimeArray {
 
       void extend(int, bool exact = true);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       unixtime operator[](int) const;
 

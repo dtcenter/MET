@@ -69,7 +69,7 @@ class ProbInfoBase {
 
       void clear();
 
-      virtual void         dump(ostream &, int = 0)  const;
+      virtual void         dump(std::ostream &, int = 0)  const;
       virtual ConcatString serialize()               const;
       virtual ConcatString serialize_r(int, int = 0) const;
 

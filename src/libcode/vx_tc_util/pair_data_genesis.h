@@ -81,13 +81,13 @@ class PairDataGenesis {
       TimeArray   InitTime;
       IntArray    LeadTime;
 
-      vector<const GenesisInfo *> FcstGen;
-      vector<const GenesisInfo *> BestGen;
-      vector<GenesisPairDiff>     GenDiff;
+      std::vector<const GenesisInfo *> FcstGen;
+      std::vector<const GenesisInfo *> BestGen;
+      std::vector<GenesisPairDiff>     GenDiff;
 
       //////////////////////////////////////////////////////////////////
    
-      bool has_gen (const vector<const GenesisInfo *>&,
+      bool has_gen (const std::vector<const GenesisInfo *>&,
                     const GenesisInfo *, int &) const;
       bool has_case(const ConcatString &, const unixtime,
                     int &) const;

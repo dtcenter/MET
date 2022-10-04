@@ -43,7 +43,7 @@ struct ShxRecord {
 
    void set(unsigned char * buf);
 
-   void dump(ostream &, int depth = 0) const;
+   void dump(std::ostream &, int depth = 0) const;
 
 };
 

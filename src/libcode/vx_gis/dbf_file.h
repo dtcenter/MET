@@ -71,7 +71,7 @@ class DbfHeader {
 
       void set_subrecords(int fd);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       DbfSubRecord * lookup_subrec(const char * text) const;   //  matches field_name
 
@@ -119,13 +119,13 @@ class DbfSubRecord {
 
       void set(unsigned char * buf);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-void dump_record(ostream &, const int depth, const unsigned char * buf, const DbfHeader &);
+void dump_record(std::ostream &, const int depth, const unsigned char * buf, const DbfHeader &);
 
 ////////////////////////////////////////////////////////////////////////
 

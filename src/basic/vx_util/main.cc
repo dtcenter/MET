@@ -26,11 +26,14 @@
 //      void initialize();
 //      void process_command_line(int argc, char **argv);
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    07/06/22  Howard Soh      New
+//   Mod#   Date      Name        Description
+//   ----   ----      ----        -----------
+//   000    07-06-22  Soh         New
+//   001    09-06-22  Prestopnik  MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <csignal>
 #include <pwd.h>
@@ -43,7 +46,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static std::string met_cmdline = "";
+static string met_cmdline = "";
 
 static int met_start_time;
 static int met_end_time;
@@ -146,7 +149,7 @@ void segv_handler(int signum) {
 
 void set_handlers() {
 
-   set_new_handler(oom);
+  set_new_handler(oom);
 }
 
 ////////////////////////////////////////////////////////////////////////

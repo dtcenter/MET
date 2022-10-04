@@ -118,8 +118,8 @@ class SeepsClimo {
 
       bool seeps_ready;
       int nstn;
-      map<int,SeepsClimoRecord *> seeps_score_00_map;
-      map<int,SeepsClimoRecord *> seeps_score_12_map;
+      std::map<int,SeepsClimoRecord *> seeps_score_00_map;
+      std::map<int,SeepsClimoRecord *> seeps_score_12_map;
 
       SeepsClimoRecord *create_climo_record(int sid, float lat, float lon, float elv,
                                             float *p1, float *p2, float *t1, float *t2, 

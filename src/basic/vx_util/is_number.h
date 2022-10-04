@@ -38,7 +38,7 @@ struct Number {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ostream & operator<<(ostream & __out, const Number & __n)
+inline std::ostream & operator<<(std::ostream & __out, const Number & __n)
 
 {
 

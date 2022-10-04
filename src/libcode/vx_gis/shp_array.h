@@ -78,7 +78,7 @@ class Shp_Array {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void extend(int, bool exact = true);
 
@@ -232,7 +232,7 @@ return;
 
 template <typename T>
 
-void Shp_Array<T>::dump(ostream & out, int depth) const
+void Shp_Array<T>::dump(std::ostream & out, int depth) const
 
 {
 

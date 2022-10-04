@@ -14,7 +14,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_grid.h"
 #include "vx_config.h"
@@ -27,15 +26,15 @@ static const float FILL_VALUE = -9999.f;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_netcdf_global     (NcFile *, const char *, const char *,
+extern void write_netcdf_global     (netCDF::NcFile *, const char *, const char *,
                                      const char *model_name = (const char *) 0,
                                      const char *obtype     = (const char *) 0,
                                      const char *desc       = (const char *) 0);
-extern void write_netcdf_proj       (NcFile *, const Grid &, NcDim &, NcDim &);
-extern void write_netcdf_latlon     (NcFile *, NcDim *, NcDim *, const Grid &);
-extern void write_netcdf_grid_weight(NcFile *, NcDim *, NcDim *, const GridWeightType, const DataPlane &); 
-extern void write_netcdf_var_times  (NcVar *, const DataPlane &);
-extern void write_netcdf_var_times  (NcVar *, const unixtime, const unixtime, const int);
+extern void write_netcdf_proj       (netCDF::NcFile *, const Grid &, netCDF::NcDim &, netCDF::NcDim &);
+extern void write_netcdf_latlon     (netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const Grid &);
+extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const GridWeightType, const DataPlane &); 
+extern void write_netcdf_var_times  (netCDF::NcVar *, const DataPlane &);
+extern void write_netcdf_var_times  (netCDF::NcVar *, const unixtime, const unixtime, const int);
 
       
 

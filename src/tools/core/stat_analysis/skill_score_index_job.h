@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    07/28/21  Halley Gotway   New
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +24,6 @@
 #define  __SKILL_SCORE_INDEX_JOB_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -78,17 +78,17 @@ class SSIndexJobInfo {
       NumArray n_fcst_lines, n_ref_lines;
 
       // Input line type for each term
-      vector<STATLineType> job_lt;
+      std::vector<STATLineType> job_lt;
 
       // Vectors of jobs for each term
-      vector<STATAnalysisJob> fcst_job;
-      vector<STATAnalysisJob> ref_job;
+      std::vector<STATAnalysisJob> fcst_job;
+      std::vector<STATAnalysisJob> ref_job;
 
       // Vectors of partial sums and contingency tables for each term
-      vector<SL1L2Info> fcst_sl1l2;
-      vector<SL1L2Info> ref_sl1l2;
-      vector<CTSInfo>   fcst_cts;
-      vector<CTSInfo>   ref_cts;
+      std::vector<SL1L2Info> fcst_sl1l2;
+      std::vector<SL1L2Info> ref_sl1l2;
+      std::vector<CTSInfo>   fcst_cts;
+      std::vector<CTSInfo>   ref_cts;
 
       // Add jobs for each term
       void add_term(const STATAnalysisJob &,

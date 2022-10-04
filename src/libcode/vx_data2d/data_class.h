@@ -50,7 +50,7 @@ class Met2dData {
 
       void mtdd_clear();
 
-      virtual void dump(ostream &, int depth = 0) const = 0;   //  dump grid and filename, etc., not data
+      virtual void dump(std::ostream &, int depth = 0) const = 0;   //  dump grid and filename, etc., not data
 
          //
          //  set stuff
@@ -105,7 +105,7 @@ class Met2dDataFile : public Met2dData {
 
       void mtddf_clear();
 
-      virtual void dump(ostream &, int depth = 0) const = 0;   //  dump grid and filename, etc., not data
+      virtual void dump(std::ostream &, int depth = 0) const = 0;   //  dump grid and filename, etc., not data
 
          //
          //  set stuff

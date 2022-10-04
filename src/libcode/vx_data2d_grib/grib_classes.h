@@ -18,8 +18,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -366,9 +364,9 @@ class GribRecord  {
 
    public:
 
-      vector<unsigned char>        data;   //  allocated
+      std::vector<unsigned char>        data;   //  allocated
 
-      vector<unsigned char>      bitmap;   //  allocated
+      std::vector<unsigned char>      bitmap;   //  allocated
 
       Section0_Header *      is;   //  allocated
       unsigned char   *     pds;   //  allocated
@@ -579,13 +577,13 @@ extern double          char4_to_dbl(const unsigned char *);
 extern unsigned int    char3_to_int(const unsigned char *);
 extern unsigned int    char2_to_int(const unsigned char *);
 
-extern ostream & operator<<(ostream &, const GribRecord &);
+extern std::ostream & operator<<(std::ostream &, const GribRecord &);
 
-extern ostream & operator<<(ostream &, const Section0_Header &);
-extern ostream & operator<<(ostream &, const Section1_Header &);
-extern ostream & operator<<(ostream &, const Section2_Header &);
-extern ostream & operator<<(ostream &, const Section3_Header &);
-extern ostream & operator<<(ostream &, const Section4_Header &);
+extern std::ostream & operator<<(std::ostream &, const Section0_Header &);
+extern std::ostream & operator<<(std::ostream &, const Section1_Header &);
+extern std::ostream & operator<<(std::ostream &, const Section2_Header &);
+extern std::ostream & operator<<(std::ostream &, const Section3_Header &);
+extern std::ostream & operator<<(std::ostream &, const Section4_Header &);
 
 
 ////////////////////////////////////////////////////////////////////////

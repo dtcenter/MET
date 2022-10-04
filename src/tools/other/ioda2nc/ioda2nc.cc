@@ -21,8 +21,11 @@
 //   ----   ----      ----           -----------
 //   000    07-21-20  Howard Soh     New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,6 +33,9 @@
 #include <fstream>
 #include <limits>
 #include <assert.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "apply_mask.h"

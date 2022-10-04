@@ -16,6 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    03/14/12  Halley Gotway   New
 //   001    03/09/17  Halley Gotway   Define BEST track time step.
+//   002    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -23,8 +24,6 @@
 #define  __TC_PAIRS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

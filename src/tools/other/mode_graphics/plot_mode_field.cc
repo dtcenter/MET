@@ -17,6 +17,7 @@
 //   ----   ----      ----           -----------
 //   000    09-05-14  Bullock        New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09-13-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +31,7 @@ static const int ctable_text_width =  30;
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <fstream>
 #include <unistd.h>

@@ -36,8 +36,8 @@ class ProbInfoArray {
       void init_from_scratch();
       void assign(const ProbInfoArray &);
 
-      vector<ProbRIRWInfo> ProbRIRW;
-      vector<ProbGenInfo>  ProbGen;
+      std::vector<ProbRIRWInfo> ProbRIRW;
+      std::vector<ProbGenInfo>  ProbGen;
 
    public:
 
@@ -48,7 +48,7 @@ class ProbInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 

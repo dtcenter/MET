@@ -17,9 +17,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <netcdf>
-using namespace netCDF;
-
 #include "data_plane.h"
 #include "data_class.h"
 #include "var_info_nc_met.h"
@@ -80,7 +77,7 @@ class MetNcMetDataFile : public Met2dDataFile {
 
       void close ();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 };
 

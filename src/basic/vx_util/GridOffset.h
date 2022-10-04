@@ -17,6 +17,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
+//   001    09-06-22  Prestopnik      MET #2227 Remove namesapce std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -28,8 +29,6 @@
 #include <cstdio>
 
 ///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 class GridOffset
 {

@@ -133,7 +133,7 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual ConcatString name() const = 0;
 
-      virtual void dump(ostream &, int = 0) const = 0;
+      virtual void dump(std::ostream &, int = 0) const = 0;
 
       virtual GridInfo info() const = 0;
 
@@ -163,7 +163,7 @@ class GridRep : public GridInterface {
       GridRep();
       virtual ~GridRep();
 
-      virtual void dump(ostream &, int = 0) const = 0;
+      virtual void dump(std::ostream &, int = 0) const = 0;
 
       virtual ConcatString serialize(const char *sep=" ") const = 0;
 
@@ -215,7 +215,7 @@ class Grid : public GridInterface {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       bool is_set() const;
 

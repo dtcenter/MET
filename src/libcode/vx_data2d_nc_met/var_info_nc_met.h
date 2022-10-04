@@ -42,7 +42,7 @@ class VarInfoNcMet : public VarInfo
       VarInfoNcMet(const VarInfoNcMet &);
       VarInfoNcMet & operator=(const VarInfoNcMet &);
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
       void clear();
 
          //

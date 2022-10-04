@@ -53,7 +53,7 @@ class Vector {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -166,7 +166,7 @@ extern void   latlon_to_vector(double lat, double lon, double & x, double & y, d
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const Vector &);
+extern std::ostream & operator<<(std::ostream &, const Vector &);
 
 
 ////////////////////////////////////////////////////////////////////////

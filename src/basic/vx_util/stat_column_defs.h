@@ -437,16 +437,16 @@ static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int get_n_mctc_columns  (int n) { return(3  + n*n);             } // n = N_CAT
-inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); } // n = N_THRESH
-inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
-inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
-inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
-inline int get_n_relp_columns  (int n) { return(2  + n);               } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(20 + n);               } // n = N_ENS
+inline int get_n_mctc_columns  (int n) { return(3  + n*n);                  } // n = N_CAT
+inline int get_n_pct_columns   (int n) { return(3  + 3*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_pstd_columns  (int n) { return(17 +    std::max(1, n)   ); } // n = N_THRESH
+inline int get_n_pjc_columns   (int n) { return(3  + 7*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_prc_columns   (int n) { return(3  + 3*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_eclv_columns  (int n) { return(4  + 2*n);                  } // n = N_PNT
+inline int get_n_rhist_columns (int n) { return(2  + n);                    } // n = N_RANK
+inline int get_n_phist_columns (int n) { return(3  + n);                    } // n = N_BINS
+inline int get_n_relp_columns  (int n) { return(2  + n);                    } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(20 + n);                    } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 

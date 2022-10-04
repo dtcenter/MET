@@ -47,7 +47,7 @@ class ClistEntry {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void set_name(const std::string);
 
@@ -102,7 +102,7 @@ class ColorList {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       int n_elements() const;
 

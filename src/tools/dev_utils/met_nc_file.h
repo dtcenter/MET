@@ -23,9 +23,6 @@
 #include <string>
 #include <vector>
 
-#include <netcdf>
-using namespace netCDF;
-
 #include "vx_time_series.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -36,14 +33,14 @@ class MetNcFile
 
 public:
 
-  MetNcFile(const string &file_path);
+  MetNcFile(const std::string &file_path);
   
   virtual ~MetNcFile();
 
   bool readFile(const int desired_grib_code,
-		const string &desired_station_id,
-		const string &desired_message_type,
-		vector< SDObservation > &observations);
+		const std::string &desired_station_id,
+		const std::string &desired_message_type,
+		std::vector< SDObservation > &observations);
   
 
 protected:
@@ -52,34 +49,34 @@ protected:
   // Protected members //
   ///////////////////////
 
-  string _filePath;
+  std::string _filePath;
   
-  NcFile *_ncFile;
+  netCDF::NcFile *_ncFile;
 
-  NcDim *_hdrArrDim;
-  NcDim *_obsArrDim;
-  NcDim *_nhdrDim;
-  NcDim *_nobsDim;
-  NcDim *_strlDim;
+  netCDF::NcDim *_hdrArrDim;
+  netCDF::NcDim *_obsArrDim;
+  netCDF::NcDim *_nhdrDim;
+  netCDF::NcDim *_nobsDim;
+  netCDF::NcDim *_strlDim;
 
-  NcDim hdrArrDim;
-  NcDim obsArrDim;
-  NcDim nhdrDim;
-  NcDim nobsDim;
-  NcDim strlDim;
-  NcDim strllDim;
+  netCDF::NcDim hdrArrDim;
+  netCDF::NcDim obsArrDim;
+  netCDF::NcDim nhdrDim;
+  netCDF::NcDim nobsDim;
+  netCDF::NcDim strlDim;
+  netCDF::NcDim strllDim;
 
-  NcVar *_hdrArrVar;
-  NcVar *_hdrTypeVar;
-  NcVar *_hdrSidVar;
-  NcVar *_hdrVldVar;
-  NcVar *_obsArrVar;
+  netCDF::NcVar *_hdrArrVar;
+  netCDF::NcVar *_hdrTypeVar;
+  netCDF::NcVar *_hdrSidVar;
+  netCDF::NcVar *_hdrVldVar;
+  netCDF::NcVar *_obsArrVar;
   
-  NcVar hdrArrVar;
-  NcVar hdrTypeVar;
-  NcVar hdrSidVar;
-  NcVar hdrVldVar;
-  NcVar obsArrVar;
+  netCDF::NcVar hdrArrVar;
+  netCDF::NcVar hdrTypeVar;
+  netCDF::NcVar hdrSidVar;
+  netCDF::NcVar hdrVldVar;
+  netCDF::NcVar obsArrVar;
   
   ///////////////////////
   // Protected methods //

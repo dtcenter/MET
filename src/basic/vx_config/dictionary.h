@@ -85,9 +85,9 @@ class DictionaryEntry {
 
       void clear();
 
-      void dump(ostream & out, int = 0) const;
+      void dump(std::ostream & out, int = 0) const;
 
-      void dump_config_format(ostream & out, int = 0) const;
+      void dump_config_format(std::ostream & out, int = 0) const;
 
          //
          //  set stuff
@@ -219,9 +219,9 @@ class Dictionary {
 
       void clear();
 
-      virtual void dump(ostream &, int = 0) const;
+      virtual void dump(std::ostream &, int = 0) const;
 
-      virtual void dump_config_format(ostream & out, int = 0) const;
+      virtual void dump_config_format(std::ostream & out, int = 0) const;
 
          //
          //  set stuff
@@ -365,9 +365,9 @@ class DictionaryStack {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
-      void dump_config_format(ostream & out, int = 0) const;
+      void dump_config_format(std::ostream & out, int = 0) const;
 
          //
          //  set stuff

@@ -22,11 +22,11 @@
 struct ob_val_t {
   unixtime ut;
   double val;
-  string qc;
+  std::string qc;
 };
 
 struct station_values_t {
-  string sid;
+  std::string sid;
   double lat;
   double lon;
   double x;
@@ -38,7 +38,7 @@ struct station_values_t {
   double cmn;
   double csd;
   double summary_val;
-  vector<ob_val_t> obs;
+  std::vector<ob_val_t> obs;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ class PairBase {
       int        obs_perc_value; // Percentile value for ObsSummary_Perc
 
       StringArray map_key;
-      map<string,station_values_t> map_val; // Storage for single obs values
+      std::map<std::string,station_values_t> map_val; // Storage for single obs values
 
       //////////////////////////////////////////////////////////////////
 
@@ -146,13 +146,13 @@ class PairBase {
       int  has_obs_rec(const char *, double, double, double, double,
                        double, double, int &);
 
-      ob_val_t compute_nearest(string sng_key);
-      ob_val_t compute_min(string sng_key);
-      ob_val_t compute_max(string sng_key);
-      ob_val_t compute_uw_mean(string sng_key);
-      ob_val_t compute_dw_mean(string sng_key);
-      ob_val_t compute_median(string sng_key);
-      ob_val_t compute_percentile(string sng_key, int perc);
+      ob_val_t compute_nearest(std::string sng_key);
+      ob_val_t compute_min(std::string sng_key);
+      ob_val_t compute_max(std::string sng_key);
+      ob_val_t compute_uw_mean(std::string sng_key);
+      ob_val_t compute_dw_mean(std::string sng_key);
+      ob_val_t compute_median(std::string sng_key);
+      ob_val_t compute_percentile(std::string sng_key, int perc);
 
       bool add_point_obs(const char *, double, double, double, double,
                          unixtime, double, double, double, const char *,

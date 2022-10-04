@@ -25,9 +25,12 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/19/11  Holmes          New
-//   001    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   002    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -97,7 +100,7 @@ int met_main(int argc, char * argv[]) {
    double data_min, data_max;
    bool status = false;
 
-   std::ios::sync_with_stdio(true);
+   ios::sync_with_stdio(true);
 
    //
    // set the default color table

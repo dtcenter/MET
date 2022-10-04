@@ -37,7 +37,7 @@ public:
     _validTime(valid_time), _value(value)
   {}
   
-  SDObservation(const string &valid_time_string,
+  SDObservation(const std::string &valid_time_string,
                 const double value) :
     _validTime(_getTime(valid_time_string)), _value(value)
   {}
@@ -55,7 +55,7 @@ public:
     return _validTime;
   }
   
-  string getValidTimeString() const
+  std::string getValidTimeString() const
   {
     return _getTimeString(_validTime);
   }
@@ -99,7 +99,7 @@ protected:
   // Protected methods //
   ///////////////////////
 
-  static time_t _getTime(const string &time_string)
+  static time_t _getTime(const std::string &time_string)
   {
     struct tm time_struct;
     memset(&time_struct, 0, sizeof(time_struct));
@@ -114,7 +114,7 @@ protected:
     return timegm(&time_struct);
   }
   
-  static string _getTimeString(const time_t &unix_time)
+  static std::string _getTimeString(const time_t &unix_time)
   {
     struct tm *time_struct = gmtime(&unix_time);
     
@@ -126,7 +126,7 @@ protected:
              time_struct->tm_mday,
              time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
   
-    return string(time_string);
+    return std::string(time_string);
   }
 };
 
@@ -163,9 +163,9 @@ extern bool compute_swinging_door_slopes(const TimeArray &valid_times,
 // Return:
 //      Returns true if successful, false otherwise.
 
-extern bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
+extern bool compute_swinging_door_ramps(const std::vector< SDObservation > &observations,
                                         const double error,
-                                        vector< pair< SDObservation, SDObservation > > &ramps);
+                                        std::vector< std::pair< SDObservation, SDObservation > > &ramps);
 
 ////////////////////////////////////////////////////////////////////////
 
