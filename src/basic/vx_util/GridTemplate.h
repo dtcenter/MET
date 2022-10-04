@@ -18,8 +18,7 @@
 //   ----   ----      ----            -----------
 //   000    01-01-99  Rehak           Initial version.
 //   001    09-07-21  Halley Gotway   Add wrap_lon.
-//   002    09-07-22  Prestopnik      Added "std::"; removing namespace
-//                                       from header files
+//   002    09-07-22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
