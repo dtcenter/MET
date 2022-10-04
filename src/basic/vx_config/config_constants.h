@@ -1066,6 +1066,7 @@ static const char conf_key_dland_file[]               = "dland_file";
 static const char conf_key_basin_file[]               = "basin_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
 static const char conf_key_watch_warn[]               = "watch_warn";
+static const char conf_key_diag_name[]                = "diag_name";
 static const char conf_key_basin_map[]                = "basin_map";
 static const char conf_key_time_offset[]              = "time_offset";
 static const char conf_key_amodel[]                   = "amodel";

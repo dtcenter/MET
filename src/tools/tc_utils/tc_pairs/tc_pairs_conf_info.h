@@ -111,6 +111,9 @@ class TCPairsConfInfo {
       // Watch/warnings time offset
       int WatchWarnOffset;
 
+      // Diagnostics to be extracted
+      StringArray DiagName;
+
       // Basin Map
       std::map<ConcatString,ConcatString> BasinMap;
 

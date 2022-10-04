@@ -123,6 +123,8 @@ static void   process_prob_files   (const StringArray &,
 static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
+static void   process_diag_files   (TrackInfoArray &);
+
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
                                     double lat, double lon);
@@ -363,6 +365,9 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
         << "Filtering " << adeck_tracks.n()
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
+
+   // Append diagnostic data to the tracks
+   process_diag_files(adeck_tracks);
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
@@ -991,6 +996,14 @@ void filter_probs(ProbInfoArray &probs) {
         << "Rejected for valid mask  = " << n_mask_vld          << "\n";
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// JHG: Add logic to actually process this data
+// For now just add the names of the requested diagnostics
+void process_diag_files(TrackInfoArray &tracks) {
+   tracks.set_diag_name(conf_info.DiagName);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1955,7 +1968,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_tracks(const TrackPairInfoArray &p) {
-   int i_row, i;
+   int i_row, i, n_row, n_col;
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
@@ -1968,8 +1981,18 @@ void write_tracks(const TrackPairInfoArray &p) {
    // Create the output file
    open_tc_txt_file(out, out_file.c_str());
 
+   // Number of output rows and columns
+   n_row = p.n_points() + 1;
+   n_col = n_tc_mpr_cols;
+
+   // Update rows and columns for diagnosics output
+   if(conf_info.DiagName.n() > 0) {
+      n_row += p.n_points();
+      n_col = max(n_col, get_n_tc_diag_cols(conf_info.DiagName.n()));
+   }
+
    // Initialize the output AsciiTable
-   out_at.set_size(p.n_points() + 1, n_tc_header_cols + n_tc_mpr_cols);
+   out_at.set_size(n_row, n_tc_header_cols + n_col);
    setup_table(out_at);
 
    // Write the header row
@@ -1999,7 +2022,7 @@ void write_tracks(const TrackPairInfoArray &p) {
       tchc.set_storm_name(p[i].bdeck().storm_name());
 
       // Write the current TrackPairInfo object
-      write_tc_mpr_row(tchc, p[i], out_at, i_row);
+      write_track_pair_info(tchc, p[i], out_at, i_row);
    }
 
    // Write the AsciiTable contents and clean up
@@ -2077,7 +2100,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       tchc.set_storm_name(p[i].bdeck()->storm_name());
 
       // Write the current ProbRIRWPairInfo object
-      write_prob_rirw_row(tchc, p[i], out_at, i_row);
+      write_prob_rirw_pair_info(tchc, p[i], out_at, i_row);
    }
 
    // Write the AsciiTable contents and clean up

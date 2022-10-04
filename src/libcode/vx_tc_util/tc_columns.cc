@@ -108,37 +108,6 @@ void write_tc_mpr_header_row(int hdr_flag, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_prob_rirw_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
-                              int r, int c) {
-   int i;
-   ConcatString s;
-   char tmp_str[max_str_len];
-
-   // Write the header column names if requested
-   if(hdr_flag) {
-      for(i=0; i<n_tc_header_cols; i++)
-         at.set_entry(r, c++, tc_header_cols[i]);
-   }
-
-   // Write the static PROBRIRW header columns
-   for(i=0; i<n_prob_rirw_cols-2; i++) {
-      at.set_entry(r, c++, prob_rirw_cols[i]);
-   }
-
-   // Write the variable PROBRIRW header columns
-   for(i=0; i<n_thresh; i++) {
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[21], i+1);
-      at.set_entry(r, c++, tmp_str); // THRESH_i
-
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[22], i+1);
-      at.set_entry(r, c++, tmp_str); // PROB_i
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_tc_diag_header_row(int hdr_flag, int n_diag, AsciiTable &at,
                               int r, int c) {
    int i;
@@ -170,17 +139,46 @@ void write_tc_diag_header_row(int hdr_flag, int n_diag, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
-                      AsciiTable &at, int &i_row) {
+void write_prob_rirw_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
+                              int r, int c) {
    int i;
+   ConcatString s;
+   char tmp_str[max_str_len];
 
-   // TCMPR line type
-   hdr.set_line_type((string)TCStatLineType_TCMPR_Str);
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_tc_header_cols; i++)
+         at.set_entry(r, c++, tc_header_cols[i]);
+   }
+
+   // Write the static PROBRIRW header columns
+   for(i=0; i<n_prob_rirw_cols-2; i++) {
+      at.set_entry(r, c++, prob_rirw_cols[i]);
+   }
+
+   // Write the variable PROBRIRW header columns
+   for(i=0; i<n_thresh; i++) {
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[21], i+1);
+      at.set_entry(r, c++, tmp_str); // THRESH_i
+
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[22], i+1);
+      at.set_entry(r, c++, tmp_str); // PROB_i
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
+                           AsciiTable &at, int &i_row) {
+   int i;
 
    // Loop through the TrackPairInfo points
    for(i=0; i<p.n_points(); i++) {
 
-      // Timing information
+      // TCMPR line type
+      hdr.set_line_type((string) TCStatLineType_TCMPR_Str);
 
       // Initialization and lead time for the ADECK
       hdr.set_init(p.adeck().init());
@@ -202,6 +200,22 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
 
       // Increment the row counter
       i_row++;
+
+      // Write diagnostics line
+      if(p.adeck().n_diag() > 0) {
+
+         // TCDIAG line type
+         hdr.set_line_type((string) TCStatLineType_TCDIAG_Str);
+
+         // Write the header columns
+         write_tc_header_cols(hdr, at, i_row);
+
+         // Write the data columns
+         write_tc_diag_cols(p, i, at, i_row, n_tc_header_cols);
+
+         // Increment the row counter
+         i_row++;
+      }
    }
 
    return;
@@ -209,11 +223,11 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_prob_rirw_row(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
-                         AsciiTable &at, int &i_row) {
+void write_prob_rirw_pair_info(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
+                               AsciiTable &at, int &i_row) {
 
    // PROBRIRW line type
-  hdr.set_line_type((string)"PROBRIRW");
+  hdr.set_line_type((string) TCStatLineType_ProbRIRW_Str);
 
    // Timing information
    hdr.set_init (p.prob_rirw().init());
@@ -232,46 +246,6 @@ void write_prob_rirw_row(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
 
    return;
 }
-
-////////////////////////////////////////////////////////////////////////
-
-void write_tc_diag_row(TcHdrColumns &hdr, const TrackPairInfo &p,
-                         AsciiTable &at, int &i_row) {
-   int i;
-
-   // TCDIAG line type
-   hdr.set_line_type((string)"TCDIAG");
-
-   // Loop through the TrackPairInfo points
-   for(i=0; i<p.n_points(); i++) {
-
-      // Timing information
-
-      // Initialization and lead time for the ADECK
-      hdr.set_init(p.adeck().init());
-      hdr.set_lead(p.adeck()[i].lead());
-
-      // Valid time for the ADECK and/or BDECK
-      hdr.set_valid(p.valid(i));
-
-      // Set the description
-      if(p.n_lines() > i) {
-         hdr.set_desc((string)p.line(i)->get_item("DESC", false));
-      }
-
-      // Write the header columns
-      write_tc_header_cols(hdr, at, i_row);
-
-      // Write the data columns
-      write_tc_diag_cols(p, i, at, i_row, n_tc_header_cols);
-
-      // Increment the row counter
-      i_row++;
-   }
-
-   return;
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -314,7 +288,7 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
                        AsciiTable &at, int r, int c) {
    int j;
 
-   // Write tc_mpr columns
+   // Write TCMPR columns
    at.set_entry(r, c++, p.n_points());
    at.set_entry(r, c++, i+1);
    at.set_entry(r, c++, cyclonelevel_to_string(p.bdeck()[i].level()));
@@ -368,6 +342,25 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.bdeck()[i].speed());
    at.set_entry(r, c++, systemsdepth_to_string(p.adeck()[i].depth()));
    at.set_entry(r, c++, systemsdepth_to_string(p.bdeck()[i].depth()));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_diag_cols(const TrackPairInfo &p, int i,
+                        AsciiTable &at, int r, int c) {
+   int j;
+
+   // Write TCDIAG columns
+   at.set_entry(r, c++, p.n_points());
+   at.set_entry(r, c++, i+1);
+   at.set_entry(r, c++, p.adeck().n_diag());
+
+   for(j=0; j<p.adeck().n_diag(); j++) {
+      at.set_entry(r, c++, p.adeck().diag_name(j));
+      at.set_entry(r, c++, p.adeck()[i].diag_val(j));
+   }
 
    return;
 }
@@ -428,22 +421,6 @@ void write_prob_rirw_cols(const ProbRIRWPairInfo &p, int i,
       at.set_entry(r, c++, 1);
       at.set_entry(r, c++, p.prob_rirw().prob_item(i));
       at.set_entry(r, c++, p.prob_rirw().prob(i));
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_tc_diag_cols(const TrackPairInfo &p, int i,
-                        AsciiTable &at, int r, int c) {
-   int j;
-
-   // Write all the diagnostics
-   at.set_entry(r, c++, p.adeck().n_diag());
-   for(j=0; j<p.adeck().n_diag(); j++) {
-      at.set_entry(r, c++, p.adeck().diag_name(j));
-      at.set_entry(r, c++, p.adeck()[i].diag_val(j));
    }
 
    return;

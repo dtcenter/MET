@@ -1138,7 +1138,7 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
-   write_tc_mpr_row(tchc, pair, out_at, i_row);
+   write_track_pair_info(tchc, pair, out_at, i_row);
 
    // Write the AsciiTable to the file
    *out << out_at;

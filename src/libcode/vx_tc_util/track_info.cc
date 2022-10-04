@@ -863,6 +863,16 @@ bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void TrackInfoArray::set_diag_name(const StringArray &sa) {
+
+   // Set the names for each track
+   for(int i=0; i<Track.size(); i++) Track[i].set_diag_name(sa);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for misc functions
 //
