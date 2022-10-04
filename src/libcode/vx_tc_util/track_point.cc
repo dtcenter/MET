@@ -592,6 +592,12 @@ void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
+double TrackPoint::diag_val(int i) const {
+   return(i<DiagVal.n() ? DiagVal[i] : bad_data_double);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool TrackPoint::set(const ATCFTrackLine &l) {
    int i;
 

@@ -73,6 +73,9 @@ class TrackInfo {
       int          NPoints;
       int          NAlloc;
 
+      // Diagnostic names for TrackPoint vectors
+      StringArray  DiagName;
+
       // Input ATCF Track Lines
       StringArray  TrackLines;
 
@@ -108,6 +111,7 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
+      void set_diag_name(const StringArray &);
 
          //
          //  get stuff
@@ -138,6 +142,8 @@ class TrackInfo {
       int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
+      int                  n_diag()           const;
+      const char *         diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
@@ -173,6 +179,7 @@ inline void TrackInfo::set_initials(const char *s)     { Initials = s;        }
 inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
+inline void TrackInfo::set_diag_name(const StringArray &sa) { DiagName = sa;  }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
@@ -188,6 +195,7 @@ inline unixtime             TrackInfo::valid_max()        const { return(MaxVali
 inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
 inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
+inline int                  TrackInfo::n_diag()           const { return(DiagName.n());                 }
 inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
 
 ////////////////////////////////////////////////////////////////////////

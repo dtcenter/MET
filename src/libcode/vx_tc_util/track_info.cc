@@ -92,6 +92,7 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
+   DiagName.clear();
    TrackLines.clear();
 
    clear_points();
@@ -133,7 +134,8 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
-   out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
+   out << prefix << "NDiag           = " << DiagName.n() << "\n";
+   out << prefix << "NTrackLines     = " << TrackLines.n() << "\n";
 
    for(i=0; i<NPoints; i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
@@ -170,7 +172,8 @@ ConcatString TrackInfo::serialize() const {
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
-     << ", NTrackLines = " << TrackLines.n_elements();
+     << ", NDiag = " << DiagName.n()
+     << ", NTrackLines = " << TrackLines.n();
 
    return(s);
 
@@ -217,6 +220,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    MaxValidTime    = t.MaxValidTime;
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
+   DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
@@ -402,6 +406,20 @@ int TrackInfo::valid_inc() const {
 
    // Return the most common spacing
    return(nint(ut_inc.mode()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * TrackInfo::diag_name(int i) const {
+
+   // Check range
+   if(i < 0 || i >= DiagName.n()) {
+      mlog << Error << "\nTrackInfo::diag_name(int) -> "
+           << "range check error for index value " << i << "\n\n";
+      exit(1);
+   }
+
+   return(DiagName[i].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -920,7 +938,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    }
 
    // Loop through the lead times and construct a TrackPoint for each
-   for(i=0, skip=false; i<lead_list.n_elements(); i++) {
+   for(i=0, skip=false; i<lead_list.n(); i++) {
 
       // Initialize TrackPoint
       pavg.clear();
@@ -971,7 +989,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
       // Sum the longitudes, shifting negative values if we've crossed
       // the international date line
-      for(j=0, lon_avg=0; j<plon.n_elements(); j++) {
+      for(j=0, lon_avg=0; j<plon.n(); j++) {
          lon_shift = (lon_range > 180.0 && plon[j] < 0.0 ? 360.0 : 0.0);
          lon_avg += (plon[j] + lon_shift);
       }
@@ -1030,7 +1048,7 @@ bool has_storm_id(const StringArray &storm_id,
    bool match = false;
 
    // Loop over the storm id entries
-   for(i=0; i<storm_id.n_elements(); i++) {
+   for(i=0; i<storm_id.n(); i++) {
 
       // Check that the basin matches
       if(strncasecmp(storm_id[i].c_str(), basin.c_str(), 2) != 0) continue;
