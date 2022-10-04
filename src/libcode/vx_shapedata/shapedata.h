@@ -16,8 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-05-31  Halley Gotway  Adapated from wrfdata.h.
-//   001    22-09-28  Prestopnik     Added "std::"; removing namspace
-//                                     from header files
+//   001    22-09-28  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
