@@ -989,7 +989,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       //
       // Call it like
       track_spread = compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon);
-      cout << "track_spread = " << track_spread << endl;
+      cout << "track_spread = " << track_spread << endl << endl;
       
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
@@ -1028,28 +1028,20 @@ double compute_gc_dist_stdev(const double lat, const double lon, const NumArray 
    NumArray dist_na;
    double dist;
 
-   // great-distance function
-   // double gc_dist(double lat1, double lon1, double lat2, double lon2)
-
-   // For missing / bad data, set to this
-   // bad_data_double
-
-   // if( !is_bad_data(lats[i]) && !is_bad_data(lons[i]) && !is_bad_data(lat) && !is_bad_data(lon) )
-
    // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
    for(i=0, count=0; i<lats.n_elements(); i++) {
-         cout << "lats[ " << i << "] = " << lats[i] << " lons[" << i << "] = " << lons[i] << endl;
-
-         if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
-
-         //dist = gc_dist(lats[i], lons[i], lat, lon);
-
-         // Save great circle distance values in num-array object
-         dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
-         count++;
+      cout << "member lats[ " << i << "]: " << lats[i] << " member lons[" << i << "]: " << lons[i] << " consensus lat: " << lat << " consensus lon: " << lon << endl; 
+      
+      if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
+      
+      cout << "  gc_dist: " << gc_dist(lats[i], lons[i], lat, lon) << endl;
+      
+      // Save great circle distance values in num-array object
+      dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
+      count++;
    }
-
-   // For testing only
+   
+   // Compute spread (standard-deviation of the distances)
    if(count == 0) spread = bad_data_double;
    else           spread = dist_na.stdev();
    
