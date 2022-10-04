@@ -26,6 +26,7 @@ enum TCStatLineType {
 
    TCStatLineType_TCMPR,
    TCStatLineType_ProbRIRW,
+   TCStatLineType_TCDIAG,
    TCStatLineType_Header,
    NoTCStatLineType
 
@@ -38,6 +39,7 @@ extern ConcatString   tcstatlinetype_to_string(const TCStatLineType);
 
 static const char TCStatLineType_TCMPR_Str[]    = "TCMPR";
 static const char TCStatLineType_ProbRIRW_Str[] = "PROBRIRW";
+static const char TCStatLineType_TCDIAG_Str[]   = "TCDIAG";
 static const char TCStatLineType_Header_Str[]   = "LINE_TYPE";
 
 ////////////////////////////////////////////////////////////////////////
