@@ -33,7 +33,6 @@ export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
-export LDFLAGS="${LDFLAGS} -Wl,--as-needed"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64:${MET_HDF}/lib:${MET_HDFEOS}/lib"
 
 # Variables required to run MET
