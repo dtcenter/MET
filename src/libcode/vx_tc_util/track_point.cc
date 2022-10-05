@@ -384,6 +384,13 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    if(is_bad_data(Speed) || is_bad_data(p.speed())) Speed  = bad_data_double;
    else                                             Speed += p.speed();
 
+   if(is_bad_data(Spread)  || is_bad_data(p.spread())) Spread   = bad_data_double;
+   else                                                Spread  += p.spread();
+   if(is_bad_data(VmaxStdev)  || is_bad_data(p.v_max_stdev())) VmaxStdev   = bad_data_double;
+   else                                                        VmaxStdev  += p.v_max_stdev();
+   if(is_bad_data(MSLPStdev)  || is_bad_data(p.mslp_stdev()))  MSLPStdev   = bad_data_double;
+   else                                                        MSLPStdev  += p.mslp_stdev();
+   
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 
    return(*this);
@@ -423,6 +430,10 @@ void TrackPoint::clear() {
    WarmCore  = false;
    WatchWarn = NoWatchWarnType;
 
+   Spread    = bad_data_int;
+   VmaxStdev = bad_data_int;
+   MSLPStdev = bad_data_int;
+   
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
       Wind[i].clear();
@@ -455,6 +466,10 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Depth     = " << systemsdepth_to_string(Depth) << "\n";
    out << prefix << "WarmCore  = " << bool_to_string(WarmCore) << "\n";
 
+   out << prefix << "Spread    = " << Spread << "\n";
+   out << prefix << "VmaxStdev = " << VmaxStdev << "\n";
+   out << prefix << "MSLPStdev = " << MSLPStdev << "\n";
+   
    for(i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
       Wind[i].dump(out, indent_depth+1);
@@ -487,8 +502,12 @@ ConcatString TrackPoint::serialize() const {
      << ", Speed = " << Speed
      << ", Depth = " << systemsdepth_to_string(Depth)
      << ", WarmCore = " << bool_to_string(WarmCore)
-     << ", WatchWarn = " << watchwarntype_to_string(WatchWarn);
-
+     << ", WatchWarn = " << watchwarntype_to_string(WatchWarn)
+      
+     << ", Spread = " << Spread
+     << ", VmaxStdev = " << VmaxStdev      
+     << ", MSLPStdev = " << MSLPStdev;      
+   
    return(s);
 }
 
@@ -533,7 +552,11 @@ void TrackPoint::assign(const TrackPoint &t) {
    Depth     = t.Depth;
    WarmCore  = t.WarmCore;
    WatchWarn = t.WatchWarn;
-
+   
+   Spread    = t.Spread;
+   VmaxStdev = t.VmaxStdev;
+   MSLPStdev = t.MSLPStdev;
+   
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
 
    return;
@@ -562,6 +585,14 @@ void TrackPoint::initialize(const ATCFTrackLine &l) {
    Depth     = l.depth();
    WarmCore  = l.warm_core();
 
+   //Spread    = l.spread();
+   //VmaxStdev = l.v_max_stdev();
+   //MSLPStdev = l.mslp_stdev();
+
+   Spread    = bad_data_double;
+   VmaxStdev = bad_data_double;
+   MSLPStdev = bad_data_double;
+   
    return;
 }
 
