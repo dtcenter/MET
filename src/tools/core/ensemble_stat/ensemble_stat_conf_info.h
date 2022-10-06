@@ -54,17 +54,10 @@ struct EnsembleStatNcOutInfo {
 
    bool do_latlon;
    bool do_mean;
-   bool do_stdev;
-   bool do_minus;
-   bool do_plus;
-   bool do_min;
-   bool do_max;
-   bool do_range;
+   bool do_raw;
+   bool do_rank;
+   bool do_pit;
    bool do_vld;
-   bool do_freq;
-   bool do_nep;
-   bool do_nmep;
-   bool do_orank;
    bool do_weight;
 
       //////////////////////////////////////////////////////////////////
@@ -143,6 +136,7 @@ class EnsembleStatVxOpt {
 
       // Output file options
       STATOutputType output_flag[n_txt]; // Flag for each output line type
+      EnsembleStatNcOutInfo nc_info;     // Output NetCDF pairs file contents
 
       //////////////////////////////////////////////////////////////////
 
@@ -150,9 +144,10 @@ class EnsembleStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
-                          gsl_rng *, bool, bool, bool,
+                          gsl_rng *, bool, bool,
                           StringArray, StringArray *,
                           bool, ConcatString);
+      void parse_nc_info(Dictionary &);
       void set_vx_pd(EnsembleStatConfInfo *, int);
 
       void set_perc_thresh(const PairDataEnsemble *);
@@ -196,10 +191,6 @@ class EnsembleStatConfInfo {
 
       void init_from_scratch();
 
-      // Ensemble processing
-      int n_ens_var;        // Number of ensemble fields to be processed
-      int max_n_ens_thresh; // Maximum number of ensemble thresholds
-
       // Ensemble verification
       int n_vx;              // Number of ensemble fields to be verified
       int max_hira_size;     // Maximum size of a HiRA neighborhoods
@@ -218,15 +209,11 @@ class EnsembleStatConfInfo {
       ConcatString         model;           // Model name
       ConcatString         obtype;          // Observation type
 
-      vector<EnsVarInfo *> ens_input;       // Vector of EnsVarInfo pointers (allocated)
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
 
-      NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
-      int                  n_nbrhd;         // Number of neighborhood sizes
-      InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
-
       EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
+      bool                 grib_codes_set;
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point
@@ -249,25 +236,22 @@ class EnsembleStatConfInfo {
       ConcatString   version;               // Config file version
 
       STATOutputType output_flag[n_txt];    // Summary of output_flag options
-
-      EnsembleStatNcOutInfo nc_info;        // Output NetCDF file contents
+      EnsembleStatNcOutInfo nc_info;        // Summary of output NetCDF file contents
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void read_config   (const ConcatString , const ConcatString);
-      void process_config(GrdFileType, GrdFileType, bool, bool, bool,
-                          StringArray *, StringArray *, bool);
+      void process_config(GrdFileType, GrdFileType, bool, bool,
+                          StringArray *, bool);
+      void process_grib_codes();
       void process_flags ();
-      void parse_nc_info ();
       void process_masks (const Grid &);
       void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
-      int get_n_ens_var() const;
-      int get_n_nbrhd()   const;
-      int get_n_vx()      const;
+      int get_n_vx() const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
@@ -275,7 +259,6 @@ class EnsembleStatConfInfo {
       int n_stat_row()     const;
 
       // Maximum across all verification tasks
-      int get_max_n_ens_thresh()      const;
       int get_max_hira_size()         const;
       int get_max_n_prob_cat_thresh() const;
       int get_max_n_prob_pct_thresh() const;
@@ -286,10 +269,7 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()        const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_n_nbrhd()          const { return(n_nbrhd);               }
 inline int EnsembleStatConfInfo::get_n_vx()             const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_max_n_ens_thresh() const { return(max_n_ens_thresh);      }
 inline int EnsembleStatConfInfo::get_max_hira_size()    const { return(max_hira_size);         }
 inline int EnsembleStatConfInfo::get_compression_level()      { return(conf.nc_compression()); }
 

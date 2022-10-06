@@ -136,8 +136,8 @@ inline int get_n_prob_rirw_cols (int n) { return(n_prob_rirw_cols + (2*n)); } //
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void open_tc_txt_file (ofstream *&,  const char *);
-extern void close_tc_txt_file(ofstream *&,  const char *);
+extern void open_tc_txt_file (std::ofstream *&,  const char *);
+extern void close_tc_txt_file(std::ofstream *&,  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -22,6 +22,9 @@ using namespace std;
 #include <string>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"

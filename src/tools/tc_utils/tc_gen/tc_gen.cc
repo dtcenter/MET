@@ -24,8 +24,12 @@
 //   007    11/22/21  Halley Gotway   MET #1810 Add -shape option
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
+//
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -37,6 +41,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "tc_gen.h"
@@ -1913,11 +1920,7 @@ void setup_nc_file() {
 
    // Add the projection information
    Grid grid = conf_info.NcOutGrid;
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.NcInfo.do_latlon) {

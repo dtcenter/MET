@@ -77,7 +77,7 @@ class Pcm : public PxmBase {
 
       void reverse_video();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void all_black();   //  does nothing
       void all_white();   //  does nothing

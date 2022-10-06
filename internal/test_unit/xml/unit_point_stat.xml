@@ -166,6 +166,7 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB1_NAM_TRMM</value></pair>
     </env>
     <param> \
@@ -192,6 +193,7 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB2_SREF_TRMM</value></pair>
     </env>
     <param> \
@@ -217,13 +219,8 @@
       <pair><name>END_DS</name>           <value>1800</value></pair>
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
-      <pair><name>OBS_DICT</name>         <value>{ field = [
-                                                     { name         = "APCP";
-                                                       level        = "A24";
-                                                       cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
-                                                       message_type = "ADPSFC";
-                                                     }
-                                                   ]; }</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "APCP"; level = "A24"; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_HMTGAGE</value></pair>
     </env>
     <param> \
@@ -242,6 +239,35 @@
     </output>
   </test>
 
+  <test name="point_stat_NCMET_NAM_NDAS_SEEPS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>1800</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "TP24"; level = "L0"; is_precipitation = TRUE; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>BOTH</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_NDAS_SEEPS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
+      &OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_seeps_mpr.txt</stat>
+    </output>
+  </test>
+
   <test name="point_stat_NCPINT_TRMM">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
@@ -249,13 +275,8 @@
       <pair><name>END_DS</name>           <value>150000000</value></pair>
       <pair><name>FCST_FIELD_NAME</name>  <value>RAINNC</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>(0,*,*)</value></pair>
-      <pair><name>OBS_DICT</name>         <value>{ field = [
-                                                     { name         = "APCP";
-                                                       level        = "A3";
-                                                       cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
-                                                       message_type = "ADPSFC";
-                                                     }
-                                                   ]; }</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name = "APCP"; level = "A3"; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCPINT_TRMM</value></pair>
     </env>
     <param> \

@@ -57,7 +57,7 @@ class CLOptionInfo {   //  command-line option info
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 
       ConcatString option_text;
@@ -101,7 +101,7 @@ class CLOptionInfoArray {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void set_alloc_inc(int = 0);   //  0 means default value (16)
 
@@ -112,7 +112,7 @@ class CLOptionInfoArray {
 
       CLOptionInfo & operator[](int) const;
 
-      int lookup(const string &) const;
+      int lookup(const std::string &) const;
 
 };
 
@@ -143,7 +143,7 @@ class CommandLine {
       void do_log();
 
       void get_n_args(StringArray &, const int Nargs,
-                      const string & switch_name, const int pos);
+                      const std::string & switch_name, const int pos);
 
       int  get_unlimited_args(StringArray &, const int pos);
 
@@ -159,7 +159,7 @@ class CommandLine {
 
       bool AllowUnrecognizedSwitches;   //  default: false
 
-      bool is_switch(const string &) const;
+      bool is_switch(const std::string &) const;
 
    public:
 
@@ -170,7 +170,7 @@ class CommandLine {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -197,7 +197,7 @@ class CommandLine {
 
       int length(int) const;   //  length of jth arg
 
-      bool has_option(const string &) const;
+      bool has_option(const std::string &) const;
 
       int next_option(int & index) const;   //  -1 if no option found
 
@@ -207,11 +207,11 @@ class CommandLine {
 
       void shift_down(int pos, int k);
 
-      const string operator[](int) const;
+      const std::string operator[](int) const;
 
       void parse();
 
-      void add(CLSetFunction, const string & text, int n_args);   //  n_args not including switch
+      void add(CLSetFunction, const std::string & text, int n_args);   //  n_args not including switch
 
 };
 

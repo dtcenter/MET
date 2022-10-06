@@ -110,6 +110,7 @@
 //   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -124,6 +125,9 @@ using namespace std;
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "handle_openmp.h"
@@ -545,11 +549,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out,"lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out,"lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(nc_info.do_latlon) {

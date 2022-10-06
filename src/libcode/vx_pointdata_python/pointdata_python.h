@@ -30,7 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-//class MetPythonPointDataFile : public Met2dDataFile {
 class MetPythonPointDataFile {
 
    private:
@@ -44,10 +43,6 @@ class MetPythonPointDataFile {
 
       MetPointDataPython met_data;
 
-      //VarInfoPython VInfo;
-
-      //GrdFileType Type;   // FileType_Python_Xarray or FileType_Python_Numpy
-
    public:
 
       MetPythonPointDataFile();
@@ -58,21 +53,11 @@ class MetPythonPointDataFile {
          //  set stuff
          //
 
-      //void set_type(const GrdFileType);
-
          //
          //  get stuff
          //
 
-//      GrdFileType file_type() const;
-
-//      double operator () (int x, int y) const;
-
-      //double get         (int x, int y) const;
-
-//      bool data_ok       (int x, int y) const;
-
-//      void data_minmax   (double & data_min, double & data_max) const;
+      bool is_using_var_id() const;
 
          //
          //  do stuff
@@ -85,12 +70,7 @@ class MetPythonPointDataFile {
 
       void dump (ostream &, int depth = 0) const;
 
-      //MetPointData  get_met_point_data();
       MetPointDataPython *get_met_point_data();
-
-      //int  data_plane_array(VarInfo &, DataPlaneArray &);
-
-      //bool met_point_data(MetPointData &);
 
 };
 
@@ -98,8 +78,7 @@ class MetPythonPointDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-//inline double      MetPythonPointDataFile::operator  () (int x, int y) const { return ( get(x, y)    ); }
-//inline GrdFileType MetPythonPointDataFile::file_type ()                const { return ( Type ); }
+inline bool MetPythonPointDataFile::is_using_var_id() const { return(met_data.is_using_var_id()); }
 
 
 ////////////////////////////////////////////////////////////////////////

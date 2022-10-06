@@ -24,8 +24,11 @@
 //   004    01-28-20  Howard Soh     Moved GOES-16/17 to point2grib
 //   005    04-09-20  Halley Gotway  Add convert and censor options.
 //   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   007    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -39,6 +42,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -374,11 +380,7 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
    add_att(nc_out, "RunCommand", run_cs);
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);

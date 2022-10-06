@@ -7,7 +7,7 @@ Grid-Stat Tool
 Introduction
 ============
 
-The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that the verification statistics it calculates are for a matched forecast-observation grid (as opposed to a set of observation points). Neither the forecast nor the observation grid needs to be identical to the final matched grid; If the forecast grid is different than the final matched grid, then forecast values are regridded (interpolated) to the final matched grid. The same is done for observations, if desired. No regridding is necessary if the forecast and observation grids are identical but remains optional. The interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. All the matched forecast-observation grid points are used to compute the verification statistics. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
+The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that the verification statistics it calculates are for a matched forecast-observation grid (as opposed to a set of observation points). Neither the forecast nor the observation grid needs to be identical to the final matched grid. If the forecast grid is different from the final matched grid, then forecast values are regridded (interpolated) to the final matched grid. The same procedure is followed for observations. No regridding is necessary if the forecast and observation grids are identical but remains optional. A smoothing operation may be performed on the forecast and observation fields prior to verification. All the matched forecast-observation grid points are used to compute the verification statistics. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
@@ -222,7 +222,7 @@ grid_stat configuration file
 
 The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 __________________________
 

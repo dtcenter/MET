@@ -19,8 +19,11 @@
 //   002    01/14/21  McCabe         MET #1695 All members in one file.
 //   003    02/17/22  Halley Gotway  MET #1918 Add normalize config option.
 //   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   005    10/03/22  Prestopnik     MET #2227 Remove using namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,6 +35,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "gen_ens_prod.h"
@@ -788,11 +794,7 @@ void setup_nc_file() {
                        conf_info.model.c_str());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.ens_input[0]->nc_info.do_latlon) {

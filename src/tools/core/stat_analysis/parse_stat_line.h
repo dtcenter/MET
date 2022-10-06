@@ -25,6 +25,7 @@
 //   008    10/09/17  Halley Gotway   Add GRAD line type.
 //   009    04/25/18  Halley Gotway   Add ECNT line type.
 //   010    01/24/20  Halley Gotway   Add RPS line type.
+//   011    09/28/22  Prestopnik      MET #2227 Remove namespace std
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,8 +33,6 @@
 #define  __PARSE_STAT_LINE_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cmath>
 #include <cstdio>
@@ -62,7 +61,7 @@ struct MPRData {
 // Ensemble continuous statistics (ECNT) data structure
 struct ECNTData {
    int total, n_ens;
-   double crps_emp, crpscl_emp, crpss_emp;
+   double crps_emp, crps_emp_fair, crpscl_emp, crpss_emp;
    double crps_gaus, crpscl_gaus, crpss_gaus;
    double ign, me, rmse, spread;
    double me_oerr, rmse_oerr, spread_oerr;

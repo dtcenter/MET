@@ -50,7 +50,7 @@ class CgFont {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void set_by_number(int);   //  for builtin fonts
 
@@ -109,7 +109,7 @@ class CgFontCollection {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       int n_fonts() const;
 

@@ -27,7 +27,7 @@
    //  2D numpy arrays seem to store things in row-major order
    //
 
-inline void nympy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
+inline void numpy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
 
 {
 

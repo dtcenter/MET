@@ -25,6 +25,9 @@ using namespace std;
 #include <fcntl.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "is_netcdf_file.h"
 
 #include "vx_nc_util.h"

@@ -46,8 +46,12 @@
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   020    08/26/22  Dave Albo      Add AirNow observations.
+//   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -79,6 +83,7 @@
 #include "surfrad_handler.h"
 #include "wwsis_handler.h"
 #include "aeronet_handler.h"
+#include "airnow_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -102,6 +107,9 @@ enum ASCIIFormat {
    ASCIIFormat_Little_R,
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
+   ASCIIFormat_Airnow_dailyv2,
+   ASCIIFormat_Airnow_hourlyaqobs,
+   ASCIIFormat_Airnow_hourly,
    ASCIIFormat_Aeronet_v2,
    ASCIIFormat_Aeronet_v3, 
    ASCIIFormat_Python, 
@@ -286,6 +294,24 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) new WwsisHandler(program_name));
       }
 
+      case ASCIIFormat_Airnow_dailyv2: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
+         return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_Airnow_hourlyaqobs: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
+         return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_Airnow_hourly: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
+         return((FileHandler *) handler);
+      }
+
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -399,6 +425,19 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete aeronet_file;
 
    //
+   // See if this is an Airnow file.
+   //
+   f_in.rewind();
+   AirnowHandler *airnow_file = new AirnowHandler(program_name);
+
+   if(airnow_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) airnow_file);
+   }
+
+   delete airnow_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
 
@@ -441,6 +480,9 @@ void usage() {
         << LittleRHandler::getFormatString() << "\", \""
         << SurfradHandler::getFormatString() << "\", \""
         << WwsisHandler::getFormatString() << "\", \""
+        << AirnowHandler::getFormatStringDailyV2() << "\", \""
+        << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
+        << AirnowHandler::getFormatStringHourly() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -510,6 +552,15 @@ void set_format(const StringArray & a) {
    }
    else if(WwsisHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat_WWSIS;
+   }
+   else if(AirnowHandler::getFormatStringDailyV2() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_dailyv2;
+   }
+   else if(AirnowHandler::getFormatStringHourlyAqObs() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_hourlyaqobs;
+   }
+   else if(AirnowHandler::getFormatStringHourly() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_hourly;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {

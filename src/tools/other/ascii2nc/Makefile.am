@@ -24,6 +24,8 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	met_handler.cc met_handler.h \
 	surfrad_handler.cc surfrad_handler.h \
 	wwsis_handler.cc wwsis_handler.h \
+	airnow_handler.cc airnow_handler.h \
+	airnow_locations.cc airnow_locations.h \
 	aeronet_handler.cc aeronet_handler.h $(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log
@@ -48,6 +50,7 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_color \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_math \

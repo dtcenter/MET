@@ -35,7 +35,7 @@ class NumArray {
 
       void assign(const NumArray &);
 
-      vector<double> e;
+      std::vector<double> e;
 
       bool Sorted;
 
@@ -45,6 +45,7 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
+      bool operator==(const NumArray &) const;
 
       void clear();
 
@@ -52,7 +53,7 @@ class NumArray {
 
       void extend(int);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       double operator[](int) const;
 
@@ -97,6 +98,7 @@ class NumArray {
       double range() const;
 
       ConcatString serialize() const;
+      ConcatString summarize() const;
 
       int n_elements() const;
       int n() const;         //  same as n_elements()
@@ -109,7 +111,9 @@ class NumArray {
       double mean() const;
       double mean_sqrt() const;
       double mean_fisher() const;
-
+      double mean_abs_diff() const;
+      double wmean_abs_diff() const;
+      
       double variance(int skip_index = bad_data_int) const;
       double stdev(int skip_index = bad_data_int) const;
 

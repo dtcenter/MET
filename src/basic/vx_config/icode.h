@@ -153,7 +153,7 @@ class IcodeCell {
 
       double as_double() const;
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 
@@ -203,7 +203,7 @@ class IcodeVector {
       void add       (const IcodeVector &);
       void add_front (const IcodeVector &);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       bool is_mark()    const;
       bool is_mark(int) const;
@@ -257,9 +257,9 @@ class CellStack {
 
       int depth() const;
 
-      void dump_cell(ostream &, int n, int depth = 0) const;
+      void dump_cell(std::ostream &, int n, int depth = 0) const;
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 
@@ -311,7 +311,7 @@ class ICVStack {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 

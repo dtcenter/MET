@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -89,7 +90,7 @@ cline.parse();
 if ( cline.n() != 1 )  usage();
 
 
- ConcatString input_filename = (string)cline[0];
+ConcatString input_filename = (string)cline[0];
 ShpFile f;
 
 

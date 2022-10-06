@@ -31,7 +31,7 @@
 
 struct GenesisEventInfo {
    ConcatString         Technique;
-   vector<CycloneLevel> Category;
+   std::vector<CycloneLevel> Category;
    SingleThresh         VMaxThresh;
    SingleThresh         MSLPThresh;
 
@@ -72,7 +72,7 @@ class GenesisInfo : public TrackInfo {
       bool          is_storm(const GenesisInfo &) const;
 
       void         clear();
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
 
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
@@ -130,7 +130,7 @@ class GenesisInfoArray {
       void init_from_scratch();
       void assign(const GenesisInfoArray &);
 
-      vector<GenesisInfo> Genesis;
+      std::vector<GenesisInfo> Genesis;
 
    public:
 
@@ -140,7 +140,7 @@ class GenesisInfoArray {
       GenesisInfoArray & operator=(const GenesisInfoArray &);
 
       void         clear();
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
 
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;

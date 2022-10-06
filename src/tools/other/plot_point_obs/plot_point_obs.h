@@ -15,6 +15,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/05/20  Halley Gotway  New
+//   001    09/29/22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __PLOT_POINT_OBS_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -38,8 +37,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <netcdf>
-using namespace netCDF;
 
 #include "plot_point_obs_conf_info.h"
 

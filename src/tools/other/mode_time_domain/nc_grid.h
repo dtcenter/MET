@@ -25,9 +25,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool  read_nc_grid(NcFile &, Grid &);
+extern bool  read_nc_grid(netCDF::NcFile &, Grid &);
 
-extern bool write_nc_grid(NcFile &, const Grid &);
+extern bool write_nc_grid(netCDF::NcFile &, const Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////

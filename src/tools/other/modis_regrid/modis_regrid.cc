@@ -15,6 +15,7 @@ static const char default_units [] = "none";
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <stdlib.h>

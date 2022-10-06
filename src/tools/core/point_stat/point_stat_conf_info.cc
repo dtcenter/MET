@@ -23,8 +23,6 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_log.h"
 
-extern bool use_var_id;
-
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class PointStatConfInfo
@@ -61,6 +59,7 @@ void PointStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   grib_codes_set = false;
    land_mask.clear();
    topo_dp.clear();
    topo_use_obs_thresh.clear();
@@ -100,8 +99,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config(GrdFileType ftype,
-        bool cur_use_var_id) {
+void PointStatConfInfo::process_config(GrdFileType ftype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
@@ -170,7 +168,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
       i_odict = parse_conf_i_vx_dict(odict, i);
 
       // Process the options for this verification task
-      vx_opt[i].process_config(ftype, i_fdict, i_odict, cur_use_var_id);
+      vx_opt[i].process_config(ftype, i_fdict, i_odict);
    }
 
    // Summarize output flags across all verification tasks
@@ -224,6 +222,32 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
          }
       } // end for i
    } // end if
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::process_grib_codes() {
+
+   // Only needs to be set once
+   if(grib_codes_set) return;
+
+   mlog << Debug(3) << "Processing each \"" << conf_key_obs_field
+        << "\" name as a GRIB code abbreviation since the point "
+        << "observations are specified as GRIB codes.\n";
+
+   Dictionary *odict = conf.lookup_array(conf_key_obs_field);
+   Dictionary i_odict;
+
+   // Add the GRIB code by parsing each observation dictionary
+   for(int i=0; i<n_vx; i++) {
+      i_odict = parse_conf_i_vx_dict(odict, i);
+      vx_opt[i].vx_pd.obs_info->add_grib_code(i_odict);
+   }
+
+   // Flag to prevent processing more than once
+   grib_codes_set = true;
 
    return;
 }
@@ -698,7 +722,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::process_config(GrdFileType ftype,
-        Dictionary &fdict, Dictionary &odict, bool cur_use_var_id) {
+        Dictionary &fdict, Dictionary &odict) {
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -714,9 +738,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
-
-   // Set the GRIB code for point observations
-   if(!cur_use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
@@ -1099,10 +1120,11 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
    int n_bin;
+   const char *method_name = "PointStatVxOpt::n_txt_row(int) -> ";
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
-      mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+      mlog << Error << "\n" << method_name
            << "range check error for " << i_txt_row << "\n\n";
       exit(1);
    }
@@ -1111,8 +1133,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
 
    bool prob_flag = vx_pd.fcst_info->is_prob();
-   bool vect_flag = (vx_pd.fcst_info->is_u_wind() &&
-                     vx_pd.obs_info->is_u_wind());
+   bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
+                    vx_pd.fcst_info->uv_index() >= 0;
 
    int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
@@ -1280,13 +1302,24 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
+      case(i_seeps_mpr):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
+      case(i_seeps):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
       default:
-         mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+         mlog << Error << "\n" << method_name
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
    }
-
    return(n);
 }
 

@@ -96,7 +96,7 @@ class VarInfo
 
       void clear();
 
-      virtual void dump(ostream &) const;
+      virtual void dump(std::ostream &) const;
 
          //
          // get stuff
@@ -158,7 +158,7 @@ class VarInfo
 
       void set_req_name(const char *);
       void set_name(const char *);
-      void set_name(const string);
+      void set_name(const std::string);
       void set_units(const char *);
       void set_level_info(const LevelInfo &);
       void set_req_level_name(const char *);
@@ -272,7 +272,7 @@ struct InputInfo {
 class EnsVarInfo {
 
    private:
-      vector<InputInfo> inputs; // Vector of InputInfo
+      std::vector<InputInfo> inputs; // Vector of InputInfo
       VarInfo * ctrl_info;      // Field info for control member
 
    public:

@@ -76,6 +76,7 @@
 //   023    08/29/19  Halley Gotway  Support multiple arguments for the
 //                    the -pcpdir option.
 //   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +92,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -1296,11 +1300,7 @@ void open_nc(const Grid &grid) {
    add_att(nc_out, "RunCommand", command_str.c_str());
 
    // Add the projection information.
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions.
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables.
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);

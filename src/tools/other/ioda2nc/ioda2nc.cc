@@ -21,8 +21,11 @@
 //   ----   ----      ----           -----------
 //   000    07-21-20  Howard Soh     New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,6 +33,9 @@
 #include <fstream>
 #include <limits>
 #include <assert.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "apply_mask.h"
@@ -692,7 +698,8 @@ void process_ioda_file(int i_pb) {
       if(has_station_id) {
          char tmp_sid[nstring+1];
          m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name_s, "tmp_sid");
-         m_rstrip(tmp_sid, nstring);
+         m_rstrip(tmp_sid, nstring, false);
+         m_replace_char(tmp_sid, ' ', '_');
          hdr_sid = tmp_sid;
       }
       else hdr_sid.clear();

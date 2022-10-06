@@ -18,6 +18,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "get_met_grid.h"
 
 #include "nc_utils.h"
@@ -42,6 +45,8 @@ static void get_stereographic_data_v2 (NcFile *, StereographicData &);
 static void get_mercator_data_v2      (NcFile *, MercatorData &);
 
 static void get_gaussian_data         (NcFile *, GaussianData &);
+static void get_semilatlon_data       (NcFile *, SemiLatLonData &);
+static void get_semilatlon_var        (NcFile *, const char *, NumArray &);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,6 +87,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
    RotatedLatLonData rll_data;
    MercatorData       mc_data;
    GaussianData        g_data;
+   SemiLatLonData     sl_data;
 
    //
    // Parse the grid specification out of the global attributes
@@ -97,6 +103,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
    //    - Lambert Conformal
    //    - Polar Stereographic
    //    - Gaussian
+   //    - SemiLatLon
    //
 
    if (!IS_INVALID_NC(proj_att)) {
@@ -132,6 +139,11 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
 
          get_gaussian_data(f_in, g_data);
          gr.set(g_data);
+
+      } else if ( strcasecmp(proj_att_name.c_str(), semilatlon_proj_type) == 0 )  {
+
+         get_semilatlon_data(f_in, sl_data);
+         gr.set(sl_data);
 
       } else {   // Unsupported projection type
 
@@ -249,20 +261,20 @@ data.name = latlon_proj_type;
 get_global_att(ncfile, string("lat_ll"), data.lat_ll);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ll"), data.lon_ll);
+get_global_att(ncfile, string("lon_ll"), data.lon_ll);
 data.lon_ll *= -1.0;
 
    // Latitude increment
- get_global_att(ncfile, string("delta_lat"), data.delta_lat);
+get_global_att(ncfile, string("delta_lat"), data.delta_lat);
 
    // Longitude increment
- get_global_att(ncfile, string("delta_lon"), data.delta_lon);
+get_global_att(ncfile, string("delta_lon"), data.delta_lon);
 
    // Number of points in the Latitude (y) direction
- get_global_att(ncfile, string("Nlat"), data.Nlat);
+get_global_att(ncfile, string("Nlat"), data.Nlat);
 
    // Number of points in the Longitudinal (x) direction
- get_global_att(ncfile, string("Nlon"), data.Nlon);
+get_global_att(ncfile, string("Nlon"), data.Nlon);
 
 data.dump();
 
@@ -285,35 +297,33 @@ void get_rot_latlon_data_v3(NcFile * ncfile, RotatedLatLonData & data)
 data.name = latlon_proj_type;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("rot_lat_ll"), data.rot_lat_ll);
+get_global_att(ncfile, string("rot_lat_ll"), data.rot_lat_ll);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("rot_lon_ll"), data.rot_lon_ll);
+get_global_att(ncfile, string("rot_lon_ll"), data.rot_lon_ll);
 data.rot_lon_ll *= -1.0;
 
    // Latitude increment
- get_global_att(ncfile, string("delta_rot_lat"), data.delta_rot_lat);
+get_global_att(ncfile, string("delta_rot_lat"), data.delta_rot_lat);
 
    // Longitude increment
- get_global_att(ncfile, string("delta_rot_lon"), data.delta_rot_lon);
+get_global_att(ncfile, string("delta_rot_lon"), data.delta_rot_lon);
 
    // Number of points in the Latitude (y) direction
- get_global_att(ncfile, string("Nlat"), data.Nlat);
+get_global_att(ncfile, string("Nlat"), data.Nlat);
 
    // Number of points in the Longitudinal (x) direction
- get_global_att(ncfile, string("Nlon"), data.Nlon);
+get_global_att(ncfile, string("Nlon"), data.Nlon);
 
    //  true lat/lon of south pole
 
- get_global_att(ncfile, string("true_lat_south_pole"), data.true_lat_south_pole);
- get_global_att(ncfile, string("true_lon_south_pole"), data.true_lon_south_pole);
+get_global_att(ncfile, string("true_lat_south_pole"), data.true_lat_south_pole);
+get_global_att(ncfile, string("true_lon_south_pole"), data.true_lon_south_pole);
 if ( !west_longitude_positive )  data.true_lon_south_pole *= -1.0;
 
    //  auxiliary rotation
 
- get_global_att(ncfile, string("aux_rotation"), data.aux_rotation);
-
-
+get_global_att(ncfile, string("aux_rotation"), data.aux_rotation);
 
 data.dump();
 
@@ -338,43 +348,43 @@ ConcatString att_value;
 data.name = lambert_proj_type;
 
    // Hemisphere
- get_global_att(ncfile, string("hemisphere"), att_value);
+get_global_att(ncfile, string("hemisphere"), att_value);
 data.hemisphere = att_value.char_at(0);
 
    // First scale latitude
- get_global_att(ncfile, string("scale_lat_1"), data.scale_lat_1);
+get_global_att(ncfile, string("scale_lat_1"), data.scale_lat_1);
 
    // Second scale latitude
- get_global_att(ncfile, string("scale_lat_2"), data.scale_lat_2);
+get_global_att(ncfile, string("scale_lat_2"), data.scale_lat_2);
 
    // Latitude pin
- get_global_att(ncfile, string("lat_pin"), data.lat_pin);
+get_global_att(ncfile, string("lat_pin"), data.lat_pin);
 
    // Longitude pin
- get_global_att(ncfile, string("lon_pin"), data.lon_pin);
+get_global_att(ncfile, string("lon_pin"), data.lon_pin);
 data.lon_pin *= -1.0;
 
    // X pin
- get_global_att(ncfile, string("x_pin"), data.x_pin);
+get_global_att(ncfile, string("x_pin"), data.x_pin);
 
    // Y pin
- get_global_att(ncfile, string("y_pin"), data.y_pin);
+get_global_att(ncfile, string("y_pin"), data.y_pin);
 
    // Orientation longitude
- get_global_att(ncfile, string("lon_orient"), data.lon_orient);
+get_global_att(ncfile, string("lon_orient"), data.lon_orient);
 data.lon_orient *= -1.0;
 
    // Grid spacing in km
- get_global_att(ncfile, string("d_km"), data.d_km);
+get_global_att(ncfile, string("d_km"), data.d_km);
 
    // Radius of the earth
- get_global_att(ncfile, string("r_km"), data.r_km);
+get_global_att(ncfile, string("r_km"), data.r_km);
 
    // Number of points in the x-direction
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
    // Number of points in the y-direction
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
    // Rotation angle
 data.so2_angle = 0.0;
@@ -409,33 +419,33 @@ data.hemisphere = att_value.char_at(0);
 get_global_att(ncfile, (string)"scale_lat", data.scale_lat);
 
    // Latitude pin
- get_global_att(ncfile, (string)"lat_pin", data.lat_pin);
+get_global_att(ncfile, (string)"lat_pin", data.lat_pin);
 
    // Longitude pin
- get_global_att(ncfile, string("lon_pin"), data.lon_pin);
+get_global_att(ncfile, string("lon_pin"), data.lon_pin);
 data.lon_pin *= -1.0;
 
    // X pin
- get_global_att(ncfile, string("x_pin"), data.x_pin);
+get_global_att(ncfile, string("x_pin"), data.x_pin);
 
    // Y pin
- get_global_att(ncfile, string("y_pin"), data.y_pin);
+get_global_att(ncfile, string("y_pin"), data.y_pin);
 
    // Orientation longitude
- get_global_att(ncfile, string("lon_orient"), data.lon_orient);
+get_global_att(ncfile, string("lon_orient"), data.lon_orient);
 data.lon_orient *= -1.0;
 
    // Grid spacing in km
- get_global_att(ncfile, string("d_km"), data.d_km);
+get_global_att(ncfile, string("d_km"), data.d_km);
 
    // Radius of the earth
- get_global_att(ncfile, string("r_km"), data.r_km);
+get_global_att(ncfile, string("r_km"), data.r_km);
 
    // Number of points in the x-direction
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
    // Number of points in the y-direction
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
 data.dump();
 
@@ -459,24 +469,24 @@ void get_mercator_data_v3(NcFile * ncfile, MercatorData & data)
 data.name = mercator_proj_type;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("lat_ll"), data.lat_ll);
+get_global_att(ncfile, string("lat_ll"), data.lat_ll);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ll"), data.lon_ll);
+get_global_att(ncfile, string("lon_ll"), data.lon_ll);
 data.lon_ll *= -1.0;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("lat_ur"), data.lat_ur);
+get_global_att(ncfile, string("lat_ur"), data.lat_ur);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ur"), data.lon_ur);
+get_global_att(ncfile, string("lon_ur"), data.lon_ur);
 data.lon_ur *= -1.0;
 
    // Number of points in the Latitudinal (y) direction
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
    // Number of points in the Longitudinal (x) direction
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
 data.dump();
 
@@ -500,23 +510,23 @@ void get_latlon_data_v2(NcFile * ncfile, LatLonData & data)
 data.name = latlon_proj_type;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("lat_ll_deg"), data.lat_ll);
+get_global_att(ncfile, string("lat_ll_deg"), data.lat_ll);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ll_deg"), data.lon_ll);
+get_global_att(ncfile, string("lon_ll_deg"), data.lon_ll);
 data.lon_ll *= -1.0;
 
    // Latitude increment
- get_global_att(ncfile, string("delta_lat_deg"), data.delta_lat);
+get_global_att(ncfile, string("delta_lat_deg"), data.delta_lat);
 
    // Longitude increment
- get_global_att(ncfile, string("delta_lon_deg"), data.delta_lon);
+get_global_att(ncfile, string("delta_lon_deg"), data.delta_lon);
 
    // Number of points in the Latitude (y) direction
- get_global_att(ncfile, string("Nlat"), data.Nlat);
+get_global_att(ncfile, string("Nlat"), data.Nlat);
 
    // Number of points in the Longitudinal (x) direction
- get_global_att(ncfile, string("Nlon"), data.Nlon);
+get_global_att(ncfile, string("Nlon"), data.Nlon);
 
 data.dump();
 
@@ -540,16 +550,16 @@ void get_lambert_data_v2(NcFile * ncfile, LambertData & data)
 data.name = lambert_proj_type;
 
    // First scale latitude
- get_global_att(ncfile, string("p1_deg"), data.scale_lat_1);
+get_global_att(ncfile, string("p1_deg"), data.scale_lat_1);
 
    // Second scale latitude
- get_global_att(ncfile, string("p2_deg"), data.scale_lat_2);
+get_global_att(ncfile, string("p2_deg"), data.scale_lat_2);
 
    // Latitude pin
- get_global_att(ncfile, string("p0_deg"), data.lat_pin);
+get_global_att(ncfile, string("p0_deg"), data.lat_pin);
 
    // Longitude pin
- get_global_att(ncfile, string("l0_deg"), data.lon_pin);
+get_global_att(ncfile, string("l0_deg"), data.lon_pin);
 data.lon_pin *= -1.0;
 
    // X pin
@@ -559,20 +569,20 @@ data.x_pin = 0.0;
 data.y_pin = 0.0;
 
    // Orientation longitude
- get_global_att(ncfile, string("lcen_deg"), data.lon_orient);
+get_global_att(ncfile, string("lcen_deg"), data.lon_orient);
 data.lon_orient *= -1.0;
 
    // Grid spacing in km
- get_global_att(ncfile, string("d_km"), data.d_km);
+get_global_att(ncfile, string("d_km"), data.d_km);
 
    // Radius of the earth
- get_global_att(ncfile, string("r_km"), data.r_km);
+get_global_att(ncfile, string("r_km"), data.r_km);
 
    // Number of points in the x-direction
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
    // Number of points in the y-direction
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
    // Rotation angle
 data.so2_angle = 0.0;
@@ -602,13 +612,13 @@ data.name = stereographic_proj_type;
 data.hemisphere = 'N';
 
    // Scale latitude
- get_global_att(ncfile, string("p1_deg"), data.scale_lat);
+get_global_att(ncfile, string("p1_deg"), data.scale_lat);
 
    // Latitude pin
- get_global_att(ncfile, string("p0_deg"), data.lat_pin);
+get_global_att(ncfile, string("p0_deg"), data.lat_pin);
 
    // Longitude pin
- get_global_att(ncfile, string("l0_deg"), data.lon_pin);
+get_global_att(ncfile, string("l0_deg"), data.lon_pin);
 data.lon_pin *= -1.0;
 
    // X pin
@@ -618,20 +628,20 @@ data.x_pin = 0.0;
 data.y_pin = 0.0;
 
    // Orientation longitude
- get_global_att(ncfile, string("lcen_deg"), data.lon_orient);
+get_global_att(ncfile, string("lcen_deg"), data.lon_orient);
 data.lon_orient *= -1.0;
 
    // Grid spacing in km
- get_global_att(ncfile, string("d_km"), data.d_km);
+get_global_att(ncfile, string("d_km"), data.d_km);
 
    // Radius of the earth
- get_global_att(ncfile, string("r_km"), data.r_km);
+get_global_att(ncfile, string("r_km"), data.r_km);
 
    // Number of points in the x-direction
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
    // Number of points in the y-direction
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
 data.dump();
 
@@ -655,24 +665,24 @@ void get_mercator_data_v2(NcFile * ncfile, MercatorData & data)
 data.name = mercator_proj_type;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("lat_ll_deg"), data.lat_ll);
+get_global_att(ncfile, string("lat_ll_deg"), data.lat_ll);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ll_deg"), data.lon_ll);
+get_global_att(ncfile, string("lon_ll_deg"), data.lon_ll);
 data.lon_ll *= -1.0;
 
    // Latitude of the bottom left corner
- get_global_att(ncfile, string("lat_ur_deg"), data.lat_ur);
+get_global_att(ncfile, string("lat_ur_deg"), data.lat_ur);
 
    // Longitude of the bottom left corner
- get_global_att(ncfile, string("lon_ur_deg"), data.lon_ur);
+get_global_att(ncfile, string("lon_ur_deg"), data.lon_ur);
 data.lon_ur *= -1.0;
 
    // Number of points in the Latitudinal (y) direction
- get_global_att(ncfile, string("Nlat"), data.ny);
+get_global_att(ncfile, string("Nlat"), data.ny);
 
    // Number of points in the Longitudinal (x) direction
- get_global_att(ncfile, string("Nlon"), data.nx);
+get_global_att(ncfile, string("Nlon"), data.nx);
 
 data.dump();
 
@@ -699,25 +709,84 @@ data.name = gaussian_proj_type;
    //  Longitude for x = 0
    //
 
- get_global_att(ncfile, string("lon_zero"), data.lon_zero);
+get_global_att(ncfile, string("lon_zero"), data.lon_zero);
 
    //
    //  nx
    //
 
- get_global_att(ncfile, string("nx"), data.nx);
+get_global_att(ncfile, string("nx"), data.nx);
 
    //
    //  ny
    //
 
- get_global_att(ncfile, string("ny"), data.ny);
+get_global_att(ncfile, string("ny"), data.ny);
 
 data.dump();
 
    //
    //  done
    //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_semilatlon_data (NcFile * ncfile, SemiLatLonData & data)
+
+{
+
+
+data.name = semilatlon_proj_type;
+
+get_semilatlon_var(ncfile, "lat",   data.lats);
+
+get_semilatlon_var(ncfile, "lon",   data.lons);
+
+get_semilatlon_var(ncfile, "level", data.levels);
+
+get_semilatlon_var(ncfile, "time",  data.times);
+
+data.dump();
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_semilatlon_var(NcFile *ncfile, const char * var_name, NumArray &out_na)  {
+
+NcVar nc_var = get_var(ncfile, var_name);
+
+out_na.clear();
+
+   //
+   //  requested variable may or may not be present in the file
+   //
+
+if ( IS_INVALID_NC(nc_var) )  return;
+
+   //
+   //  store the requested data in the specified NumArray object
+   //
+
+long count = get_data_size(&nc_var);
+double * data_values = new double[ count ];
+get_nc_data(&nc_var, data_values);
+for(int i=0; i<count; i++)  out_na.add(data_values[i]);
+if(data_values) { delete data_values; data_values = (double *) 0; }
 
 return;
 

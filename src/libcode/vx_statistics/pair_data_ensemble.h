@@ -24,7 +24,6 @@
 #include "vx_data2d_grib.h"
 #include "vx_gsl_prob.h"
 
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -40,10 +39,10 @@ struct ens_ssvar_pt {
    double w;
 };
 
-typedef deque<ens_ssvar_pt>        ssvar_pt_list;
-typedef map<string,ssvar_pt_list>  ssvar_bin_map;  // Indexed by bin min
-typedef CRC_Array<bool>            BoolArray;
-typedef CRC_Array<ObsErrorEntry *> ObsErrorEntryPtrArray;
+typedef std::deque<ens_ssvar_pt>             ssvar_pt_list;
+typedef std::map<std::string,ssvar_pt_list>  ssvar_bin_map;  // Indexed by bin min
+typedef CRC_Array<bool>                      BoolArray;
+typedef CRC_Array<ObsErrorEntry *>           ObsErrorEntryPtrArray;
 
 // Number of SSVAR bins to produce a warning
 static const int n_warn_ssvar_bins = 1000;
@@ -79,8 +78,9 @@ class PairDataEnsemble : public PairBase {
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
 
-      NumArray   crps_emp_na;     // Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   crpscl_emp_na;   // Empirical climatological CRPS [n_obs]
+      NumArray   crps_emp_na;       // Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   crps_emp_fair_na;  // Empirical Continuous Ranked Probability Score [n_obs], adjusted with the mean absolute difference of the ensmble members
+      NumArray   crpscl_emp_na;     // Empirical climatological CRPS [n_obs]
 
       NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
       NumArray   crpscl_gaus_na;  // Gaussian climatological CRPS [n_obs]

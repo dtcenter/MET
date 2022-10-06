@@ -60,10 +60,10 @@ class MetNcPointObsOut : public MetNcPointObs {
 
       void init_buffer();
       void init_obs_vars(bool using_var_id, int deflate_level, bool attr_agl=false);
-      bool init_netcdf(int obs_count, int hdr_count, string program_name);
+      bool init_netcdf(int obs_count, int hdr_count, std::string program_name);
 
       void reset_header_buffer(int buf_size, bool reset_all);
-      void set_nc_out_data(vector<Observation> observations,
+      void set_nc_out_data(std::vector<Observation> observations,
                            SummaryObs *summary_obs, TimeSummaryInfo summary_info,
                            int processed_hdr_cnt=0);
       void set_using_var_id(bool using_var_id);
@@ -75,7 +75,7 @@ class MetNcPointObsOut : public MetNcPointObs {
       void write_observation();
       void write_observation(const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
       void write_obs_data();
-      int  write_obs_data(const vector< Observation > observations,
+      int  write_obs_data(const std::vector< Observation > observations,
                           const bool do_header = true);
       bool write_to_netcdf(StringArray obs_names, StringArray obs_units,
                            StringArray obs_descs);

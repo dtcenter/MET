@@ -15,6 +15,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +31,9 @@ using namespace std;
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_util.h"
@@ -251,11 +255,9 @@ void setup_nc_file() {
    write_netcdf_global(nc_out, out_file.text(), program_name.c_str(), "Climatology", "NA");
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
-   // Add dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    // The number of CDF values is one less than the number of bins

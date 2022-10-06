@@ -121,6 +121,8 @@ enum STATLineType {
    stat_pjc,
    stat_prc,
    stat_mpr,
+   stat_seeps,
+   stat_seeps_mpr,
    stat_nbrctc,
    stat_nbrcts,
    stat_nbrcnt,
@@ -150,41 +152,43 @@ enum STATLineType {
 // Corresponding line type strings
 //
 
-static const char stat_sl1l2_str[]  = "SL1L2";
-static const char stat_sal1l2_str[] = "SAL1L2";
-static const char stat_vl1l2_str[]  = "VL1L2";
-static const char stat_val1l2_str[] = "VAL1L2";
-static const char stat_vcnt_str[]   = "VCNT";
-static const char stat_fho_str[]    = "FHO";
-static const char stat_ctc_str[]    = "CTC";
-static const char stat_cts_str[]    = "CTS";
-static const char stat_mctc_str[]   = "MCTC";
-static const char stat_mcts_str[]   = "MCTS";
-static const char stat_cnt_str[]    = "CNT";
-static const char stat_pct_str[]    = "PCT";
-static const char stat_pstd_str[]   = "PSTD";
-static const char stat_pjc_str[]    = "PJC";
-static const char stat_prc_str[]    = "PRC";
-static const char stat_eclv_str[]   = "ECLV";
-static const char stat_mpr_str[]    = "MPR";
-static const char stat_nbrctc_str[] = "NBRCTC";
-static const char stat_nbrcts_str[] = "NBRCTS";
-static const char stat_nbrcnt_str[] = "NBRCNT";
-static const char stat_grad_str[]   = "GRAD";
-static const char stat_dmap_str[]   = "DMAP";
-static const char stat_isc_str[]    = "ISC";
-static const char stat_wdir_str[]   = "WDIR";
-static const char stat_ecnt_str[]   = "ECNT";
-static const char stat_rps_str[]    = "RPS";
-static const char stat_rhist_str[]  = "RHIST";
-static const char stat_phist_str[]  = "PHIST";
-static const char stat_orank_str[]  = "ORANK";
-static const char stat_ssvar_str[]  = "SSVAR";
-static const char stat_relp_str[]   = "RELP";
-static const char stat_genmpr_str[] = "GENMPR";
-static const char stat_ssidx_str[]  = "SSIDX";
-static const char stat_header_str[] = "LINE_TYPE";
-static const char stat_na_str[]     = "NA";
+static const char stat_sl1l2_str[]     = "SL1L2";
+static const char stat_sal1l2_str[]    = "SAL1L2";
+static const char stat_vl1l2_str[]     = "VL1L2";
+static const char stat_val1l2_str[]    = "VAL1L2";
+static const char stat_vcnt_str[]      = "VCNT";
+static const char stat_fho_str[]       = "FHO";
+static const char stat_ctc_str[]       = "CTC";
+static const char stat_cts_str[]       = "CTS";
+static const char stat_mctc_str[]      = "MCTC";
+static const char stat_mcts_str[]      = "MCTS";
+static const char stat_cnt_str[]       = "CNT";
+static const char stat_pct_str[]       = "PCT";
+static const char stat_pstd_str[]      = "PSTD";
+static const char stat_pjc_str[]       = "PJC";
+static const char stat_prc_str[]       = "PRC";
+static const char stat_eclv_str[]      = "ECLV";
+static const char stat_mpr_str[]       = "MPR";
+static const char stat_seeps_str[]     = "SEEPS";
+static const char stat_seeps_mpr_str[] = "SEEPS_MPR";
+static const char stat_nbrctc_str[]    = "NBRCTC";
+static const char stat_nbrcts_str[]    = "NBRCTS";
+static const char stat_nbrcnt_str[]    = "NBRCNT";
+static const char stat_grad_str[]      = "GRAD";
+static const char stat_dmap_str[]      = "DMAP";
+static const char stat_isc_str[]       = "ISC";
+static const char stat_wdir_str[]      = "WDIR";
+static const char stat_ecnt_str[]      = "ECNT";
+static const char stat_rps_str[]       = "RPS";
+static const char stat_rhist_str[]     = "RHIST";
+static const char stat_phist_str[]     = "PHIST";
+static const char stat_orank_str[]     = "ORANK";
+static const char stat_ssvar_str[]     = "SSVAR";
+static const char stat_relp_str[]      = "RELP";
+static const char stat_genmpr_str[]    = "GENMPR";
+static const char stat_ssidx_str[]     = "SSIDX";
+static const char stat_header_str[]    = "LINE_TYPE";
+static const char stat_na_str[]        = "NA";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -727,29 +731,17 @@ static const char conf_key_wvlt_plot[]         = "wvlt_plot";
 // Ensemble-Stat specific parameter key names
 //
 
-static const char conf_key_ens[]              = "ens";
-static const char conf_key_ens_field[]        = "ens.field";
-static const char conf_key_ens_ens_thresh[]   = "ens.ens_thresh";
-static const char conf_key_ens_vld_thresh[]   = "ens.vld_thresh";
+static const char conf_key_fcst_ens_thresh[]  = "fcst.ens_thresh";
+static const char conf_key_fcst_vld_thresh[]  = "fcst.vld_thresh";
 static const char conf_key_nc_var_str[]       = "nc_var_str";
 static const char conf_key_nbrhd_prob[]       = "nbrhd_prob";
 static const char conf_key_nmep_smooth[]      = "nmep_smooth";
 static const char conf_key_skip_const[]       = "skip_const";
 static const char conf_key_rng_type[]         = "rng.type";
 static const char conf_key_rng_seed[]         = "rng.seed";
-static const char conf_key_ensemble_flag[]    = "ensemble_flag";
-static const char conf_key_mean_flag[]        = "mean";
-static const char conf_key_stdev_flag[]       = "stdev";
-static const char conf_key_minus_flag[]       = "minus";
-static const char conf_key_plus_flag[]        = "plus";
-static const char conf_key_min_flag[]         = "min";
-static const char conf_key_max_flag[]         = "max";
-static const char conf_key_range_flag[]       = "range";
-static const char conf_key_vld_count_flag[]   = "vld_count";
-static const char conf_key_frequency_flag[]   = "frequency";
-static const char conf_key_nep_flag[]         = "nep";
-static const char conf_key_nmep_flag[]        = "nmep";
+static const char conf_key_nc_orank_flag[]    = "nc_orank_flag";
 static const char conf_key_rank_flag[]        = "rank";
+static const char conf_key_pit_flag[]         = "pit";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
 static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
@@ -764,7 +756,23 @@ static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
 // Gen-Ens-Prod specific parameter key names
 //
 
-static const char conf_key_normalize[]   = "normalize";
+static const char conf_key_ens[]            = "ens";
+static const char conf_key_ens_field[]      = "ens.field";
+static const char conf_key_ens_ens_thresh[] = "ens.ens_thresh";
+static const char conf_key_ens_vld_thresh[] = "ens.vld_thresh";
+static const char conf_key_normalize[]      = "normalize";
+static const char conf_key_ensemble_flag[]  = "ensemble_flag";
+static const char conf_key_mean_flag[]      = "mean";
+static const char conf_key_stdev_flag[]     = "stdev";
+static const char conf_key_minus_flag[]     = "minus";
+static const char conf_key_plus_flag[]      = "plus";
+static const char conf_key_min_flag[]       = "min";
+static const char conf_key_max_flag[]       = "max";
+static const char conf_key_range_flag[]     = "range";
+static const char conf_key_vld_count_flag[] = "vld_count";
+static const char conf_key_frequency_flag[] = "frequency";
+static const char conf_key_nep_flag[]       = "nep";
+static const char conf_key_nmep_flag[]      = "nmep";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";

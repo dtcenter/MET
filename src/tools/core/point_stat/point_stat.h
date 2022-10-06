@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
+//
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -24,8 +26,6 @@
 #define  __POINT_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -39,9 +39,6 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#include <netcdf>
-using namespace netCDF;
 
 #include "point_stat_conf_info.h"
 
@@ -71,7 +68,8 @@ static const char **txt_columns[n_txt] = {
    val1l2_columns, pct_columns,    pstd_columns,
    pjc_columns,    prc_columns,    ecnt_columns,
    orank_columns,  rps_columns,    eclv_columns,
-   mpr_columns,    vcnt_columns
+   mpr_columns,    vcnt_columns,   seeps_mpr_columns,
+   seeps_columns
 };
 
 // Length of header columns
@@ -82,7 +80,8 @@ static const int n_txt_columns[n_txt] = {
    n_val1l2_columns, n_pct_columns,    n_pstd_columns,
    n_pjc_columns,    n_prc_columns,    n_ecnt_columns,
    n_orank_columns,  n_rps_columns,    n_eclv_columns,
-   n_mpr_columns,    n_vcnt_columns
+   n_mpr_columns,    n_vcnt_columns,   n_seeps_mpr_columns,
+   n_seeps_columns
 };
 
 // Text file abbreviations
@@ -93,7 +92,8 @@ static const char *txt_file_abbr[n_txt] = {
    "val1l2", "pct",    "pstd",
    "pjc",    "prc",    "ecnt",
    "orank",  "rps",    "eclv",
-   "mpr",    "vcnt"
+   "mpr",    "vcnt",   "seeps_mpr",
+   "seeps"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -126,16 +126,16 @@ static unixtime fcst_valid_ut = (unixtime) 0;
 static int      fcst_lead_sec = bad_data_int;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString     txt_file[n_txt];
+static std::ofstream    *txt_out[n_txt];
+static AsciiTable       txt_at[n_txt];
+static int              i_txt_row[n_txt];
 
 ////////////////////////////////////////////////////////////////////////
 //

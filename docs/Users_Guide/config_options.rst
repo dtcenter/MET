@@ -212,6 +212,44 @@ MET tool stating the location of the parsing error.
 Runtime Environment Variables
 -----------------------------
 
+.. _config_env_vars:
+
+User-Specified Environment Variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When editing configuration files, environment variables may be used for setting
+the configurable parameters if convenient. The configuration file parser expands
+environment variables to their full value before proceeding. Within the configuration
+file, environment variables must be specified in the form **${VAR_NAME}**.
+
+For example, using an environment variable to set the message_type (see below)
+parameter to use ADPUPA and ADPSFC message types might consist of the following.
+
+Setting the environment variable in a Bash Shell:
+
+.. code :: bash
+
+  export MSG_TYP='"ADPUPA", "ADPSFC"'
+
+Referencing that environment variable inside a MET configuration file:
+
+.. code ::
+
+  message_type = [ ${MSG_TYP} ];
+
+In addition to supporting user-specified environment variables within configuration
+files, the environment variables listed below have special meaning if set at runtime.
+
+MET_AIRNOW_STATIONS
+^^^^^^^^^^^^^^^^^^^
+
+The MET_AIRNOW_STATIONS environment variable can be used to specify a file that
+will override the default file. If set, it should be the full path to the file.
+The default table can be found in the installed
+*share/met/table_files/airnow_monitoring_site_locations_v2.dat*. This file contains
+ascii column data that allows lookups of latitude, longitude, and elevation for all
+airnow stations based on stationId and/or AqSid.
+
 MET_BASE
 ^^^^^^^^
 

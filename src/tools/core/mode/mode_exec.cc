@@ -17,6 +17,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"
@@ -891,11 +894,7 @@ if ( info.all_false() )  return;
                        engine.conf_info.desc.c_str());
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    fcst_thresh_dim = add_dim(f_out, "fcst_thresh_length", fcst_thresh.length());
     obs_thresh_dim = add_dim(f_out,  "obs_thresh_length",  obs_thresh.length());
