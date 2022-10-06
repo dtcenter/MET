@@ -297,7 +297,11 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.bdeck()[i].speed());
    at.set_entry(r, c++, systemsdepth_to_string(p.adeck()[i].depth()));
    at.set_entry(r, c++, systemsdepth_to_string(p.bdeck()[i].depth()));
-
+   
+   at.set_entry(r, c++, p.adeck()[i].spread());
+   at.set_entry(r, c++, p.adeck()[i].mslp_stdev());
+   at.set_entry(r, c++, p.adeck()[i].v_max_stdev());
+   
    return;
 }
 
