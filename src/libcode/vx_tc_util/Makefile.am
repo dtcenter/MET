@@ -28,6 +28,7 @@ libvx_tc_util_a_SOURCES = \
               pair_data_genesis.cc pair_data_genesis.h \
               tc_hdr_columns.cc tc_hdr_columns.h \
               tc_columns.cc tc_columns.h \
+              tc_diag.cc tc_diag.h \
               tc_stat_line.cc tc_stat_line.h \
               vx_tc_nc_util.h vx_tc_nc_util.cc \
               vx_tc_util.h

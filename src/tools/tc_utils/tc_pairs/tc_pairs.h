@@ -17,6 +17,7 @@
 //   000    03/14/12  Halley Gotway   New
 //   001    03/09/17  Halley Gotway   Define BEST track time step.
 //   002    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   003    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +74,8 @@ static const int best_track_time_step = 21600;
 static StringArray     adeck_source, adeck_model_suffix;
 static StringArray     edeck_source, edeck_model_suffix;
 static StringArray     bdeck_source, bdeck_model_suffix;
+static StringArray     tcdiag_source, tcdiag_model_name;
+static StringArray     lsdiag_source, lsdiag_model_name;
 static ConcatString    config_file;
 static TCPairsConfInfo conf_info;
 

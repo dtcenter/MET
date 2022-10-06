@@ -35,6 +35,7 @@
 //                    the gen_vx_mask tool.
 //   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   013    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   014    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +124,7 @@ static void   process_prob_files   (const StringArray &,
 static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
-static void   process_diag_files   (TrackInfoArray &);
+static void   process_diags        (TrackInfoArray &);
 
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
@@ -150,6 +151,10 @@ static void   set_adeck            (const StringArray &);
 static void   set_edeck            (const StringArray &);
 static void   set_bdeck            (const StringArray &);
 static void   set_atcf_source      (const StringArray &,
+                                    StringArray &, StringArray &);
+static void   set_tcdiag           (const StringArray &);
+static void   set_lsdiag           (const StringArray &);
+static void   set_diag_source      (const StringArray &,
                                     StringArray &, StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
@@ -196,20 +201,20 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add function calls for the arguments
-   cline.add(set_adeck,  "-adeck", -1);
-   cline.add(set_edeck,  "-edeck", -1);
-   cline.add(set_bdeck,  "-bdeck", -1);
-   cline.add(set_config, "-config", 1);
-   cline.add(set_out,    "-out",    1);
+   cline.add(set_adeck,  "-adeck",  -1);
+   cline.add(set_edeck,  "-edeck",  -1);
+   cline.add(set_bdeck,  "-bdeck",  -1);
+   cline.add(set_bdeck,  "-tcdiag", -1);
+   cline.add(set_bdeck,  "-lsdiag", -1);
+   cline.add(set_config, "-config",  1);
+   cline.add(set_out,    "-out",     1);
 
    // Parse the command line
    cline.parse();
 
    // Check for the minimum number of arguments
-   if((adeck_source.n() == 0 &&
-       edeck_source.n() == 0) ||
-      bdeck_source.n()  == 0  ||
-      config_file.length()       == 0) {
+   if((adeck_source.n() == 0 && edeck_source.n() == 0) ||
+      bdeck_source.n()  == 0 || config_file.length() == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
            << "You must specify at least one source of ADECK or EDECK "
@@ -241,6 +246,22 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << bdeck_source.n()
            << "] BDECK Source: " << bdeck_source[i] << ", Model Suffix: "
            << bdeck_model_suffix[i] << "\n";
+   }
+
+   // List the input TCDIAG files
+   for(i=0; i<tcdiag_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << tcdiag_source.n()
+           << "] TCDIAG Source: " << tcdiag_source[i] << ", Model Name: "
+           << tcdiag_model_name[i] << "\n";
+   }
+
+   // List the input LSDIAG files
+   for(i=0; i<lsdiag_source.n(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << lsdiag_source.n()
+           << "] LSDIAG Source: " << lsdiag_source[i] << ", Model Name: "
+           << lsdiag_model_name[i] << "\n";
    }
 
    // Create the default config file name
@@ -367,7 +388,7 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    filter_tracks(adeck_tracks);
 
    // Append diagnostic data to the tracks
-   process_diag_files(adeck_tracks);
+   process_diags(adeck_tracks);
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
@@ -1002,7 +1023,7 @@ void filter_probs(ProbInfoArray &probs) {
 
 // JHG: Add logic to actually process this data
 // For now just add the names of the requested diagnostics
-void process_diag_files(TrackInfoArray &tracks) {
+void process_diags(TrackInfoArray &tracks) {
    tracks.set_diag_name(conf_info.DiagName);
 }
 
@@ -2147,6 +2168,8 @@ void usage() {
         << "\t-adeck source and/or -edeck source\n"
         << "\t-bdeck source\n"
         << "\t-config file\n"
+        << "\t[-tcdiag source]\n"
+        << "\t[-lsdiag source]\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -2181,32 +2204,36 @@ void usage() {
 
         << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
         << "may include \"suffix=string\" to modify the model names "
-        << "from that source.\n\n";
+        << "from that source.\n\n"
+
+        << "\tNote: The \"-tcdiag\" and \"-lsdiag\" options may include "
+        << "\"model=string\" to override the model name of the tracks to "
+        << "which those diagnostics correspond.\n\n";
 
    exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adeck(const StringArray & a) {
+void set_adeck(const StringArray &a) {
    set_atcf_source(a, adeck_source, adeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_edeck(const StringArray & a) {
+void set_edeck(const StringArray &a) {
    set_atcf_source(a, edeck_source, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_bdeck(const StringArray & a) {
+void set_bdeck(const StringArray &a) {
    set_atcf_source(a, bdeck_source, bdeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_atcf_source(const StringArray & a,
+void set_atcf_source(const StringArray &a,
                      StringArray &source, StringArray &model_suffix) {
    int i;
    StringArray sa;
@@ -2243,13 +2270,62 @@ void set_atcf_source(const StringArray & a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+void set_tcdiag(const StringArray &a) {
+   set_diag_source(a, tcdiag_source, tcdiag_model_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_lsdiag(const StringArray &a) {
+   set_diag_source(a, lsdiag_source, lsdiag_model_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_diag_source(const StringArray &a,
+                     StringArray &source, StringArray &model_name) {
+   int i;
+   StringArray sa;
+   ConcatString cs, name;
+
+   // Check for optional model sub-argument
+   for(i=0; i<a.n(); i++) {
+      cs = a[i];
+      if(cs.startswith("model")) {
+         sa = cs.split("=");
+         if(sa.n() != 2) {
+            mlog << Error
+                 << "\nset_diag_source() -> "
+                 << "the model name must be specified as "
+                 << "\"model=string\".\n\n";
+            usage();
+         }
+         else {
+            name = sa[1];
+         }
+      }
+   }
+
+   // Parse the remaining sources
+   for(i=0; i<a.n(); i++) {
+      cs = a[i];
+      if(cs.startswith("model")) continue;
+      source.add(a[i]);
+      model_name.add(name);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray &a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray & a) {
+void set_out(const StringArray &a) {
    out_base = a[0];
 }
 
