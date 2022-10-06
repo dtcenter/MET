@@ -1001,13 +1001,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Compute track spread
       track_spread = compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon);
       cout << "track_spread = " << track_spread << endl;
+      pavg.set_spread(track_spread);
       
       // Compute wind-speed (v_max) and pressure (mslp) standard deviation
       vmax_stdev = pvmax.stdev();
       mslp_stdev = pmslp.stdev();
-      
       cout << "vmax_stdev =  " << vmax_stdev << " mslp_stdev =  " << mslp_stdev << endl << endl;
-      
+      pavg.set_v_max_stdev(vmax_stdev);
+      pavg.set_mslp_stdev(mslp_stdev);
+ 
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
