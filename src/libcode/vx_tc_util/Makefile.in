@@ -110,6 +110,7 @@ libvx_tc_util_a_LIBADD =
 am_libvx_tc_util_a_OBJECTS = libvx_tc_util_a-atcf_line_base.$(OBJEXT) \
 	libvx_tc_util_a-atcf_track_line.$(OBJEXT) \
 	libvx_tc_util_a-atcf_prob_line.$(OBJEXT) \
+	libvx_tc_util_a-diag_file.$(OBJEXT) \
 	libvx_tc_util_a-track_point.$(OBJEXT) \
 	libvx_tc_util_a-track_info.$(OBJEXT) \
 	libvx_tc_util_a-track_pair_info.$(OBJEXT) \
@@ -123,7 +124,6 @@ am_libvx_tc_util_a_OBJECTS = libvx_tc_util_a-atcf_line_base.$(OBJEXT) \
 	libvx_tc_util_a-pair_data_genesis.$(OBJEXT) \
 	libvx_tc_util_a-tc_hdr_columns.$(OBJEXT) \
 	libvx_tc_util_a-tc_columns.$(OBJEXT) \
-	libvx_tc_util_a-tc_diag.$(OBJEXT) \
 	libvx_tc_util_a-tc_stat_line.$(OBJEXT) \
 	libvx_tc_util_a-vx_tc_nc_util.$(OBJEXT)
 libvx_tc_util_a_OBJECTS = $(am_libvx_tc_util_a_OBJECTS)
@@ -145,6 +145,7 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libvx_tc_util_a-atcf_line_base.Po \
 	./$(DEPDIR)/libvx_tc_util_a-atcf_prob_line.Po \
 	./$(DEPDIR)/libvx_tc_util_a-atcf_track_line.Po \
+	./$(DEPDIR)/libvx_tc_util_a-diag_file.Po \
 	./$(DEPDIR)/libvx_tc_util_a-gen_shape_info.Po \
 	./$(DEPDIR)/libvx_tc_util_a-genesis_info.Po \
 	./$(DEPDIR)/libvx_tc_util_a-pair_data_genesis.Po \
@@ -154,7 +155,6 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_tc_util_a-atcf_line_base.Po \
 	./$(DEPDIR)/libvx_tc_util_a-prob_rirw_info.Po \
 	./$(DEPDIR)/libvx_tc_util_a-prob_rirw_pair_info.Po \
 	./$(DEPDIR)/libvx_tc_util_a-tc_columns.Po \
-	./$(DEPDIR)/libvx_tc_util_a-tc_diag.Po \
 	./$(DEPDIR)/libvx_tc_util_a-tc_hdr_columns.Po \
 	./$(DEPDIR)/libvx_tc_util_a-tc_stat_line.Po \
 	./$(DEPDIR)/libvx_tc_util_a-track_info.Po \
@@ -371,6 +371,7 @@ libvx_tc_util_a_SOURCES = \
               atcf_line_base.cc atcf_line_base.h atcf_offsets.h \
               atcf_track_line.cc atcf_track_line.h \
               atcf_prob_line.cc atcf_prob_line.h \
+              diag_file.cc diag_file.h \
               track_point.cc track_point.h \
               track_info.cc track_info.h \
               track_pair_info.cc track_pair_info.h \
@@ -384,7 +385,6 @@ libvx_tc_util_a_SOURCES = \
               pair_data_genesis.cc pair_data_genesis.h \
               tc_hdr_columns.cc tc_hdr_columns.h \
               tc_columns.cc tc_columns.h \
-              tc_diag.cc tc_diag.h \
               tc_stat_line.cc tc_stat_line.h \
               vx_tc_nc_util.h vx_tc_nc_util.cc \
               vx_tc_util.h
@@ -441,6 +441,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-atcf_line_base.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-atcf_prob_line.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-atcf_track_line.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-diag_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-gen_shape_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-genesis_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-pair_data_genesis.Po@am__quote@ # am--include-marker
@@ -450,7 +451,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-prob_rirw_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-prob_rirw_pair_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-tc_columns.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-tc_diag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-tc_hdr_columns.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-tc_stat_line.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_tc_util_a-track_info.Po@am__quote@ # am--include-marker
@@ -519,6 +519,20 @@ libvx_tc_util_a-atcf_prob_line.obj: atcf_prob_line.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='atcf_prob_line.cc' object='libvx_tc_util_a-atcf_prob_line.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-atcf_prob_line.obj `if test -f 'atcf_prob_line.cc'; then $(CYGPATH_W) 'atcf_prob_line.cc'; else $(CYGPATH_W) '$(srcdir)/atcf_prob_line.cc'; fi`
+
+libvx_tc_util_a-diag_file.o: diag_file.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-diag_file.o -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-diag_file.Tpo -c -o libvx_tc_util_a-diag_file.o `test -f 'diag_file.cc' || echo '$(srcdir)/'`diag_file.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_tc_util_a-diag_file.Tpo $(DEPDIR)/libvx_tc_util_a-diag_file.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='diag_file.cc' object='libvx_tc_util_a-diag_file.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-diag_file.o `test -f 'diag_file.cc' || echo '$(srcdir)/'`diag_file.cc
+
+libvx_tc_util_a-diag_file.obj: diag_file.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-diag_file.obj -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-diag_file.Tpo -c -o libvx_tc_util_a-diag_file.obj `if test -f 'diag_file.cc'; then $(CYGPATH_W) 'diag_file.cc'; else $(CYGPATH_W) '$(srcdir)/diag_file.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_tc_util_a-diag_file.Tpo $(DEPDIR)/libvx_tc_util_a-diag_file.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='diag_file.cc' object='libvx_tc_util_a-diag_file.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-diag_file.obj `if test -f 'diag_file.cc'; then $(CYGPATH_W) 'diag_file.cc'; else $(CYGPATH_W) '$(srcdir)/diag_file.cc'; fi`
 
 libvx_tc_util_a-track_point.o: track_point.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-track_point.o -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-track_point.Tpo -c -o libvx_tc_util_a-track_point.o `test -f 'track_point.cc' || echo '$(srcdir)/'`track_point.cc
@@ -702,20 +716,6 @@ libvx_tc_util_a-tc_columns.obj: tc_columns.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-tc_columns.obj `if test -f 'tc_columns.cc'; then $(CYGPATH_W) 'tc_columns.cc'; else $(CYGPATH_W) '$(srcdir)/tc_columns.cc'; fi`
 
-libvx_tc_util_a-tc_diag.o: tc_diag.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-tc_diag.o -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-tc_diag.Tpo -c -o libvx_tc_util_a-tc_diag.o `test -f 'tc_diag.cc' || echo '$(srcdir)/'`tc_diag.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_tc_util_a-tc_diag.Tpo $(DEPDIR)/libvx_tc_util_a-tc_diag.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_diag.cc' object='libvx_tc_util_a-tc_diag.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-tc_diag.o `test -f 'tc_diag.cc' || echo '$(srcdir)/'`tc_diag.cc
-
-libvx_tc_util_a-tc_diag.obj: tc_diag.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-tc_diag.obj -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-tc_diag.Tpo -c -o libvx_tc_util_a-tc_diag.obj `if test -f 'tc_diag.cc'; then $(CYGPATH_W) 'tc_diag.cc'; else $(CYGPATH_W) '$(srcdir)/tc_diag.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_tc_util_a-tc_diag.Tpo $(DEPDIR)/libvx_tc_util_a-tc_diag.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_diag.cc' object='libvx_tc_util_a-tc_diag.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_tc_util_a-tc_diag.obj `if test -f 'tc_diag.cc'; then $(CYGPATH_W) 'tc_diag.cc'; else $(CYGPATH_W) '$(srcdir)/tc_diag.cc'; fi`
-
 libvx_tc_util_a-tc_stat_line.o: tc_stat_line.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_tc_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_tc_util_a-tc_stat_line.o -MD -MP -MF $(DEPDIR)/libvx_tc_util_a-tc_stat_line.Tpo -c -o libvx_tc_util_a-tc_stat_line.o `test -f 'tc_stat_line.cc' || echo '$(srcdir)/'`tc_stat_line.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_tc_util_a-tc_stat_line.Tpo $(DEPDIR)/libvx_tc_util_a-tc_stat_line.Po
@@ -872,6 +872,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_line_base.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_prob_line.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_track_line.Po
+	-rm -f ./$(DEPDIR)/libvx_tc_util_a-diag_file.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-gen_shape_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-genesis_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-pair_data_genesis.Po
@@ -881,7 +882,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-prob_rirw_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-prob_rirw_pair_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_columns.Po
-	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_diag.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_hdr_columns.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_stat_line.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-track_info.Po
@@ -936,6 +936,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_line_base.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_prob_line.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-atcf_track_line.Po
+	-rm -f ./$(DEPDIR)/libvx_tc_util_a-diag_file.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-gen_shape_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-genesis_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-pair_data_genesis.Po
@@ -945,7 +946,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-prob_rirw_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-prob_rirw_pair_info.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_columns.Po
-	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_diag.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_hdr_columns.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-tc_stat_line.Po
 	-rm -f ./$(DEPDIR)/libvx_tc_util_a-track_info.Po
