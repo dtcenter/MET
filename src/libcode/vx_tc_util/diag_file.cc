@@ -65,7 +65,7 @@ DiagFile & DiagFile::operator=(const DiagFile &) {
 void DiagFile::init_from_scratch() {
 
    // Initialize values
-   StormID.clear();
+   StormId.clear();
    Basin.clear();
    Cyclone.clear();
    Technique.clear();
