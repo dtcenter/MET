@@ -85,13 +85,18 @@ bool NdbcLocations::initialize(const string &fName)
       // assume not a line we want
       continue;
     }
-    if (!_parseLineForDouble(sline, latKey, lat) && _parseLineForDouble(sline, lonKey, lon)) {
+    if (!_parseLineForDouble(sline, latKey, lat)) {
       mlog << Warning << method_name << "-> "
-	   << "parsing out lat/lon from line '" << sline << "'\n"
+	   << "parsing out lat from line '" << sline << "'\n"
 	   << "in file \"" << fileName << "\n\n";
       continue;
     }
-
+    if (!_parseLineForDouble(sline, lonKey, lon)) {
+      mlog << Warning << method_name << "-> "
+	   << "parsing out lon from line '" << sline << "'\n"
+	   << "in file \"" << fileName << "\n\n";
+      continue;
+    }      
     if (!_parseLineForDouble(sline, elevKey, elev)) {
       // elev can be missing
       elev = bad_data_double;

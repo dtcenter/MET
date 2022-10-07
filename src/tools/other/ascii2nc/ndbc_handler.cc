@@ -94,6 +94,8 @@ NdbcHandler::NdbcHandler(const string &program_name) :
   
   //
   // store column info for all the data columns (column names)
+  // NOTE these will be used as index values in the observations
+  // 0 = wind dir, 1 = wind speed, etc.
   //
   column.push_back(Column(hdr_wind_dir));
   column.push_back(Column(hdr_wind_speed));
@@ -109,6 +111,8 @@ NdbcHandler::NdbcHandler(const string &program_name) :
   column.push_back(Column(hdr_visibility));
   column.push_back(Column(hdr_pressure_tendency));
   column.push_back(Column(hdr_tide));
+
+  numMissingStations = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,6 +120,8 @@ NdbcHandler::NdbcHandler(const string &program_name) :
 
 NdbcHandler::~NdbcHandler()
 {
+  mlog << Debug(1) << "Number of NDBC skipped files due to no lookup " <<  numMissingStations
+       << "\n";
 }
 
 
@@ -184,7 +190,8 @@ bool NdbcHandler::_readObservations(LineDataFile &ascii_file)
   string fname = ascii_file.filename();
   // parse this name to set the station id, and use that to set up the lat/lon/elev
   if (!_setStationInfo(fname)) {
-    return false;
+    numMissingStations++;
+    return true;
   }
 
   //
@@ -254,6 +261,7 @@ bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
     value = _extractDouble(data_line, column[i].ptr);
     // here could check for missing and not output that variable?
     name = column[i].name;
+    grib_code = i;  // it's not actually grib code, its obs_vid, according to howard
     _addObservations(Observation(header_type, stationId, valid_time,
 				 stationLat, stationLon, stationAlt,
 				 quality_flag, grib_code, pressure_level_hpa,

@@ -115,6 +115,9 @@ protected:
   // the lookup object
   NdbcLocations locations;
 
+  // a count of how many stations were not in the lookup file
+  int numMissingStations;
+
   ///////////////////////
   // Protected methods //
   ///////////////////////
