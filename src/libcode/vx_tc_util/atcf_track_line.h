@@ -146,7 +146,7 @@ class ATCFTrackLine : public ATCFLineBase {
       ATCFTrackLine(const ATCFTrackLine &);
       ATCFTrackLine & operator= (const ATCFTrackLine &);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       int read_line(LineDataFile *);
 

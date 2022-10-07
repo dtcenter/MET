@@ -16,6 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
 //   001    01/26/16  Halley Gotway   Add -no_check_dup option.
+//   002    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -23,8 +24,6 @@
 #define  __GSID2MPR_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <map>
 

@@ -65,6 +65,7 @@ void EnsembleStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   grib_codes_set = false;
    obtype.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
@@ -116,7 +117,6 @@ void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
                                           bool grid_vx, bool point_vx,
-                                          bool use_var_id,
                                           StringArray * ens_files,
                                           bool use_ctrl) {
    int i, j, n_ens_files;
@@ -276,8 +276,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Process the options for this verification task
       vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
-                               rng_ptr, grid_vx, point_vx,
-                               use_var_id, ens_member_ids,
+                               rng_ptr, grid_vx, point_vx, ens_member_ids,
                                ens_files, use_ctrl, control_id);
 
       // For no point verification, store obtype as the message type
@@ -300,6 +299,32 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Summarize output flags across all verification tasks
    process_flags();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatConfInfo::process_grib_codes() {
+
+   // Only needs to be set once
+   if(grib_codes_set) return;
+
+   mlog << Debug(3) << "Processing each \"" << conf_key_obs_field
+        << "\" name as a GRIB code abbreviation since the point "
+        << "observations are specified as GRIB codes.\n";
+
+   Dictionary *odict = conf.lookup_array(conf_key_obs_field);
+   Dictionary i_odict;
+
+   // Add the GRIB code by parsing each observation dictionary
+   for(int i=0; i<n_vx; i++) {
+      i_odict = parse_conf_i_vx_dict(odict, i);
+      vx_opt[i].vx_pd.obs_info->add_grib_code(i_odict);
+   }
+
+   // Flag to prevent processing more than once
+   grib_codes_set = true;
 
    return;
 }
@@ -609,8 +634,7 @@ void EnsembleStatVxOpt::clear() {
 
 void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
-                                       gsl_rng *rng_ptr, bool grid_vx,
-                                       bool point_vx, bool use_var_id,
+                                       gsl_rng *rng_ptr, bool grid_vx, bool point_vx,
                                        StringArray ens_member_ids,
                                        StringArray * ens_files,
                                        bool use_ctrl, ConcatString control_id) {
@@ -678,9 +702,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);
-
-   // Set the GRIB code for point observations
-   if(point_vx && !use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {

@@ -23,9 +23,6 @@
 
 #include <ostream>
 
-#include <netcdf>
-using namespace netCDF;
-
 #include "vx_grid.h"
 #include "data_plane.h"
 #include "long_array.h"
@@ -53,7 +50,7 @@ class InsituNcFile {
 
       void close();
 
-      NcFile * _ncFile;      //  allocated
+      netCDF::NcFile * _ncFile;      //  allocated
 
       long _numRecords;
       long _currRecord;

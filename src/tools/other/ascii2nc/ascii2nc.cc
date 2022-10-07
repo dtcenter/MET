@@ -47,9 +47,12 @@
 //                                   ascii.
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   020    08/26/22  Dave Albo      Add AirNow observations.
-//   021    09/28/22  Dave Albo      Add NDBC Buoy data
+//   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
+//   022    10/07/22  Dave Albo      Add NDBC Buoy data
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

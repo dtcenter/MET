@@ -19,6 +19,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "grid_output.h"
 #include "vx_log.h"
 #include "nc_utils.h"

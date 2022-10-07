@@ -26,8 +26,11 @@
 //   003    01/24/13  Halley Gotway   Add -dotsize.
 //   004    11/10/20  Halley Gotway   Add -config and -plot_grid.
 //   005    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_mai
+//   006    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

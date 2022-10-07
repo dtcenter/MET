@@ -20,6 +20,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "nc_utils_local.h"
 #include "nc_grid.h"
 

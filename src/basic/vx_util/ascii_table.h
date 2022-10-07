@@ -357,7 +357,7 @@ inline bool AsciiTable::decimal_points_aligned() const { return ( DecimalPointsA
    //  externs
    //
 
-extern ostream & operator<<(ostream &, AsciiTable &);
+extern std::ostream & operator<<(std::ostream &, AsciiTable &);
 
 extern void justified_item(const char * text, const int field_width, const char pad, const AsciiTableJust just, char * out);
 

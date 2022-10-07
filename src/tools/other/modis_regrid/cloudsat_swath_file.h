@@ -52,7 +52,7 @@ class SatDimension {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -125,7 +125,7 @@ class SatAttribute {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -213,7 +213,7 @@ class SwathDataField {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -307,7 +307,7 @@ class CloudsatSwath {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -417,7 +417,7 @@ class CloudsatSwathFile {
 
       void close();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff

@@ -15,6 +15,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +31,9 @@ using namespace std;
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_util.h"

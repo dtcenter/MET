@@ -20,6 +20,7 @@
 //   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None.
 //   004    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
 //   005    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
+//   006    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,8 +28,6 @@
 #define  __GEN_VX_MASK_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include "vx_util.h"
 #include "vx_cal.h"

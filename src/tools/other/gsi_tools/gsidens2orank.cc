@@ -16,8 +16,11 @@
 //   ----   ----      ----            -----------
 //   000    07/09/15  Halley Gotway   New
 //   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   002    10/03/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <fstream>
 #include <unistd.h>

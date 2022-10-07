@@ -21,6 +21,9 @@ using namespace std;
 #include <cmath>
 #include <ctime>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"

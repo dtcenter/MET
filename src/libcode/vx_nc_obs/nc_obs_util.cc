@@ -18,6 +18,9 @@ using namespace std;
 
 #include <iostream>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_nc_util.h"
 
 #include "nc_obs_util.h"
@@ -1249,7 +1252,7 @@ bool is_using_var_id(const char * nc_name) {
    return use_var_id;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 bool is_using_var_id(NcFile *nc_file) {
    bool use_var_id = false;

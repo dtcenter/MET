@@ -203,7 +203,9 @@ In the example, the Wavelet-Stat tool will verify the model data in the **sample
 wavelet_stat configuration file
 -------------------------------
 
-The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
+The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
+
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 _______________________
 

@@ -45,7 +45,7 @@ class ATCFProbLine : public ATCFLineBase {
       ATCFProbLine(const ATCFProbLine &);
       ATCFProbLine & operator= (const ATCFProbLine &);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void clear();
 

@@ -18,9 +18,12 @@
 //   ----   ----      ----           -----------
 //   000    08-19-14  Rehak          New
 //   001    04-27-154 Halley Gotway  List and format output files
-//   002    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>

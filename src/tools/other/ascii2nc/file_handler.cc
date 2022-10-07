@@ -15,6 +15,9 @@ using namespace std;
 #include <algorithm>
 #include <iostream>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_nc_util.h"
 
