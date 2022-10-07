@@ -383,14 +383,13 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    else                                             Eye   += p.eye();
    if(is_bad_data(Speed) || is_bad_data(p.speed())) Speed  = bad_data_double;
    else                                             Speed += p.speed();
-
-   if(is_bad_data(Spread)  || is_bad_data(p.spread())) Spread   = bad_data_double;
-   else                                                Spread  += p.spread();
-   if(is_bad_data(VmaxStdev)  || is_bad_data(p.v_max_stdev())) VmaxStdev   = bad_data_double;
-   else                                                        VmaxStdev  += p.v_max_stdev();
-   if(is_bad_data(MSLPStdev)  || is_bad_data(p.mslp_stdev()))  MSLPStdev   = bad_data_double;
-   else                                                        MSLPStdev  += p.mslp_stdev();
    
+   // Set spread variables to missing
+   Spread    = bad_data_double;
+   VmaxStdev = bad_data_double;
+   MSLPStdev = bad_data_double;
+   
+   // Increment wind quadrants
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 
    return(*this);
@@ -429,10 +428,10 @@ void TrackPoint::clear() {
    Depth     = NoSystemsDepth;
    WarmCore  = false;
    WatchWarn = NoWatchWarnType;
-
-   Spread    = bad_data_int;
-   VmaxStdev = bad_data_int;
-   MSLPStdev = bad_data_int;
+   
+   Spread    = bad_data_double;
+   VmaxStdev = bad_data_double;
+   MSLPStdev = bad_data_double;
    
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
