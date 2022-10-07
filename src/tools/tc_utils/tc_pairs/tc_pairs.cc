@@ -1025,47 +1025,41 @@ void filter_probs(ProbInfoArray &probs) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_diags(TrackInfoArray &tracks) {
-   StringArray tcdiag_files, tcdiag_files_model_name;
-   StringArray lsdiag_files, lsdiag_files_model_name;
    StringArray files, files_model_name;
-   DiagFile dfile;
+   DiagFile diag_file;
+   int i;
 
    // Process TCDIAG inputs
    if(tcdiag_source.n() > 0) {
-     get_atcf_files(tcdiag_source, tcdiag_model_name,
-                    tcdiag_files, tcdiag_files_model_name);
+      get_atcf_files(tcdiag_source, tcdiag_model_name,
+                     files, files_model_name);
 
-     mlog << Debug(2)
-          << "Processing " << tcdiag_files.n()
-          << " TCDIAG diagnostic file(s).\n";
+      mlog << Debug(2)
+           << "Processing " << files.n()
+           << " TCDIAG diagnostic file(s).\n";
+
+      // Loop over the input files
+      for(i=0; i<files.n(); i++) {
+         diag_file.open_tcdiag(files[i], files_model_name[i]);
+         tracks.add_diag_data(diag_file, conf_info.DiagName);
+      }
    }
 
    // Process LSDIAG inputs
    if(lsdiag_source.n() > 0) {
-     get_atcf_files(lsdiag_source, lsdiag_model_name,
-                    lsdiag_files, lsdiag_files_model_name);
+      get_atcf_files(lsdiag_source, lsdiag_model_name,
+                     files, files_model_name);
 
-     mlog << Debug(2)
-          << "Processing " << lsdiag_files.n()
-          << " LSDIAG diagnostic file(s).\n";
+      mlog << Debug(2)
+           << "Processing " << files.n()
+           << " LSDIAG diagnostic file(s).\n";
+
+      // Loop over the input files
+      for(i=0; i<files.n(); i++) {
+         diag_file.open_lsdiag(files[i], files_model_name[i]);
+         tracks.add_diag_data(diag_file, conf_info.DiagName);
+      }
    }
-
-   // Append them to loop once
-   files = tcdiag_files;
-   files.add(lsdiag_files);
-   files_model_name = tcdiag_files_model_name;
-   files_model_name.add(lsdiag_model_name);
-
-   // Loop over the input files
-   for(int i=0; i<files.n(); i++) {
-
-      // Open the diagnostics file
-      if(i<tcdiag_files.n()) dfile.open_tcdiag(files[i], files_model_name[i]);
-      else                   dfile.open_lsdiag(files[i], files_model_name[i]);
-
-      // JHG, call tracks.add_diag(dfile);
-
-   } // end for i
 
    return;
 }

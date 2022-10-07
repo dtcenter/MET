@@ -36,6 +36,9 @@ static const int lsdiag_wdth[] = {
 };
 static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
 
+static const int tcdiag_fill_value = 9999;
+static const int lsdiag_fill_value = 9999;
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class DiagFile
@@ -304,6 +307,135 @@ bool DiagFile::open_lsdiag(const std::string &path, const std::string &model_nam
         << " LS diagnostics file: " << path << "\n";
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool DiagFile::read_diag_data(ConcatString &name, NumArray &data) {
+   bool status = false;
+
+   if(FileType == TCDiagFileType) {
+      status = read_tcdiag_data(name, data);
+   }
+   else if(FileType == LSDiagFileType) {
+      status = read_lsdiag_data(name, data);
+   }
+   else {
+      mlog << Error << "\nDiagFile::read_diag_data() -> "
+           << "unexpected file type!\n\n";
+      exit(1);
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool DiagFile::read_tcdiag_data(ConcatString &name, NumArray &data) {
+   DataLine dl;
+   ConcatString cs;
+   int i;
+
+   // Initialize
+   name.clear();
+   data.erase();
+   bool status = false;
+
+   // Read until a finding a line of data to parse
+   while(dl.read_line(this)) {
+
+      // Skip empty lines
+      if(dl.n_items() == 0) continue;
+
+      // Quit reading at the COMMENTS section
+      if((cs = dl[1]) == "COMMENTS") {
+         status = false;
+         break;
+      }
+
+      // Set name from the first column
+      name = dl[0];
+
+      // Skip certain lines
+      if(name.startswith("----") || name.startswith("TIME") ||
+         name.startswith("NLEV") || name.startswith("NVAR")) continue;
+
+      // Parse the data values
+      for(i=2; i<dl.n_items(); i++) {
+         data.add(atoi(dl[i]) == tcdiag_fill_value ?
+                  bad_data_double : atof(dl[i]));
+      }
+
+      // Check for the expected number of items
+      if(NTime != data.n()) {
+         mlog << Error << "\nDiagFile::read_tcdiag_data() -> "
+              << "the number of \"" << name << "\" diagnostic values ("
+              << data.n() << ") does not match the expected number ("
+              << NTime << ")!\n\n";
+         exit(1);
+      }
+      else {
+
+         // Break out after reading a good line of data
+         status = true;
+         break;
+      }
+
+   } // end while
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool DiagFile::read_lsdiag_data(ConcatString &name, NumArray &data) {
+   DataLine dl;
+   int i;
+
+   // Initialize
+   name.clear();
+   data.erase();
+   bool status = false;
+
+   // Read until a finding a line of data to parse
+   while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
+
+      // Skip empty lines
+      if(dl.n_items() == 0) continue;
+
+      // Set name from column 24
+      name = dl[24];
+
+      // Quit reading at the LAST line
+      if(name == "LAST") {
+         status = false;
+         break;
+      }
+
+      // Parse the data values
+      for(i=2; i<23; i++) {
+         data.add(atoi(dl[i]) == lsdiag_fill_value ?
+                  bad_data_double : atof(dl[i]));
+      }
+
+      // Check for the expected number of items
+      if(NTime != data.n()) {
+         mlog << Error << "\nDiagFile::read_lsdiag_data() -> "
+              << "the number of \"" << name << "\" diagnostic values ("
+              << data.n() << ") does not match the expected number ("
+              << NTime << ")!\n\n";
+         exit(1);
+      }
+      else {
+
+         // Break out after reading a good line of data
+         status = true;
+         break;
+      }
+
+   } // end while
+
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////

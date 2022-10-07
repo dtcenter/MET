@@ -109,6 +109,9 @@ class DiagFile : public LineDataFile {
       bool open_tcdiag(const std::string &, const std::string &);
       bool open_lsdiag(const std::string &, const std::string &);
 
+      bool read_diag_data  (ConcatString &, NumArray &);
+      bool read_tcdiag_data(ConcatString &, NumArray &);
+      bool read_lsdiag_data(ConcatString &, NumArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////
