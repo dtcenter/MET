@@ -268,8 +268,7 @@ if ( mlog.verbosity_level() > 5 )  {
 
    s << "Composites ...\n";
 
-   int tmp_len = comp_to_eq.n();
-   for (j=0; j<tmp_len; ++j)  {
+   for (j=0; j<index_list.n(); ++j)  {
 
       s << ' ' << comp_to_eq[j];
 
