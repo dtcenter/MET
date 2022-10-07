@@ -69,7 +69,7 @@ static const char * tc_mpr_cols [] = {
    "ADIR",        "BDIR",
    "ASPEED",      "BSPEED",
    "ADEPTH",      "BDEPTH",
-   "LOCATION_SPREAD",
+   "TRACK_SPREAD",
    "MSLP_SPREAD",
    "MAX_WIND_SPREAD"
 };
