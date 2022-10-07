@@ -407,6 +407,13 @@ void TrackPairInfo::add(const TCStatLine &l) {
       tp->set_eye(string_to_systemsdepth(l.get_item(cs.c_str())));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
+      cs << cs_erase << deck[i] << "TRACK_SPREAD";
+      tp->set_spread(atof(l.get_item(cs.c_str())));
+      cs << cs_erase << deck[i] << "MAX_WIND_SPREAD";
+      tp->set_v_max_stdev(atof(l.get_item(cs.c_str())));
+      cs << cs_erase << deck[i] << "MSLP_SPREAD";
+      tp->set_mslp_stdev(atof(l.get_item(cs.c_str())));
+      
       // Loop over the winds
       for(j=0; j<NWinds; j++) {
 
