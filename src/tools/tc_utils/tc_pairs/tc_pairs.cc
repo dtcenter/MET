@@ -125,6 +125,9 @@ static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
 static void   process_diags        (TrackInfoArray &);
+static void   get_diag_files       (const StringArray &,
+                                    const StringArray &,
+                                    StringArray &, StringArray &);
 
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
@@ -204,8 +207,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_adeck,  "-adeck",  -1);
    cline.add(set_edeck,  "-edeck",  -1);
    cline.add(set_bdeck,  "-bdeck",  -1);
-   cline.add(set_bdeck,  "-tcdiag", -1);
-   cline.add(set_bdeck,  "-lsdiag", -1);
+   cline.add(set_tcdiag, "-tcdiag", -1);
+   cline.add(set_lsdiag, "-lsdiag", -1);
    cline.add(set_config, "-config",  1);
    cline.add(set_out,    "-out",     1);
 
@@ -1021,10 +1024,50 @@ void filter_probs(ProbInfoArray &probs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-// JHG: Add logic to actually process this data
-// For now just add the names of the requested diagnostics
 void process_diags(TrackInfoArray &tracks) {
-   tracks.set_diag_name(conf_info.DiagName);
+   StringArray tcdiag_files, tcdiag_files_model_name;
+   StringArray lsdiag_files, lsdiag_files_model_name;
+   StringArray files, files_model_name;
+   DiagFile dfile;
+
+   // Process TCDIAG inputs
+   if(tcdiag_source.n() > 0) {
+     get_atcf_files(tcdiag_source, tcdiag_model_name,
+                    tcdiag_files, tcdiag_files_model_name);
+
+     mlog << Debug(2)
+          << "Processing " << tcdiag_files.n()
+          << " TCDIAG diagnostic file(s).\n";
+   }
+
+   // Process LSDIAG inputs
+   if(lsdiag_source.n() > 0) {
+     get_atcf_files(lsdiag_source, lsdiag_model_name,
+                    lsdiag_files, lsdiag_files_model_name);
+
+     mlog << Debug(2)
+          << "Processing " << lsdiag_files.n()
+          << " LSDIAG diagnostic file(s).\n";
+   }
+
+   // Append them to loop once
+   files = tcdiag_files;
+   files.add(lsdiag_files);
+   files_model_name = tcdiag_files_model_name;
+   files_model_name.add(lsdiag_model_name);
+
+   // Loop over the input files
+   for(int i=0; i<files.n(); i++) {
+
+      // Open the diagnostics file
+      if(i<tcdiag_files.n()) dfile.open_tcdiag(files[i], files_model_name[i]);
+      else                   dfile.open_lsdiag(files[i], files_model_name[i]);
+
+      // JHG, call tracks.add_diag(dfile);
+
+   } // end for i
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1034,7 +1077,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
    double grid_x, grid_y;
 
    //
-   // Check polyline masking.
+   // Check polyline masking
    //
    if(mask_poly.n_points() > 0) {
       if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
@@ -1043,7 +1086,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
    }
 
    //
-   // Check grid masking.
+   // Check grid masking
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
       mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
@@ -1053,7 +1096,7 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
       }
 
       //
-      // Check area mask.
+      // Check area mask
       //
       if(mask_area.nx() > 0 || mask_area.ny() > 0) {
          if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {

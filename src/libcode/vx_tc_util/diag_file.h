@@ -16,7 +16,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "vx_cal.h"
 #include "data_line.h"
+
+////////////////////////////////////////////////////////////////////////
+
+enum DiagFileType {
+   DiagFileType_None, // Default
+   LSDiagFileType,    // Large Scale Diagnostics
+   TCDiagFileType     // Tropical Cyclone Diagnostics
+};
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -52,12 +61,20 @@ class DiagFile : public LineDataFile {
 
       void init_from_scratch();
 
+      // Diagnostics file type
+      DiagFileType FileType;
+
       // Storm and model identification
       ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
       ConcatString Technique;
       unixtime     InitTime;
+
+      int          NTime;
+      IntArray     LeadTime;
+      NumArray     Lat;
+      NumArray     Lon;
 
    public:
 
@@ -79,12 +96,18 @@ class DiagFile : public LineDataFile {
       const ConcatString & initials()  const;
       unixtime             init()      const;
 
+      int                  n_time()    const;
+      int                  lead(int)   const;
+      unixtime             valid(int)  const;
+      double               lat(int)    const;
+      double               lon(int)    const;
+
          //
          //  do stuff
          //
 
-      bool open_tcdiag(const char *path, const char *model_name);
-      bool open_lsdiag(const char *path, const char *model_name);
+      bool open_tcdiag(const std::string &, const std::string &);
+      bool open_lsdiag(const std::string &, const std::string &);
 
 };
 
@@ -95,6 +118,7 @@ inline const ConcatString & DiagFile::basin()     const { return(Basin);     }
 inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);   }
 inline const ConcatString & DiagFile::technique() const { return(Technique); }
 inline unixtime             DiagFile::init()      const { return(InitTime);  }
+inline int                  DiagFile::n_time()    const { return(NTime);     }
 
 ////////////////////////////////////////////////////////////////////////
 
