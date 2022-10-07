@@ -90,24 +90,73 @@ void increase_one_month(int &year, int &month) {
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime add_to_unixtime(unixtime base_unixtime,
-    int sec_per_unit, double time_value, bool no_leap) {
+#define SEC_MONTH (86400*30)
+#define SEC_YEAR  (86400*30*12)
+#define DAY_EPSILON 0.00002
+
+unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
+                         double time_value, bool no_leap) {
   unixtime ut;
+  int month, day, year, hour, minute, second;
   unixtime time_value_ut = (unixtime)time_value;
   double time_fraction = time_value - time_value_ut;
-  if (!no_leap || sec_per_unit != 86400) {
+  const char *method_name = "add_to_unixtime() -->";
+
+  if (sec_per_unit == SEC_MONTH || sec_per_unit == SEC_YEAR) {
+    if (time_value < 0) {
+      mlog << Error << "\n" << method_name
+           << " the negative offset (" << time_value
+           << ") is not supported for unit months and years\n\n";
+      exit(-1);
+    }
+
+    unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
+
+    bool day_adjusted = false;
+    int day_org, day_offset, month_offset;
+    day_org = day;
+    if (sec_per_unit == SEC_YEAR) {
+      time_fraction *= 12;  // 12 months/year
+      month_offset = (unixtime)time_fraction;
+      time_fraction -= month_offset;
+    }
+    else month_offset = time_value_ut;
+    // Add 0.00002 for the precisiton - 0.3 becomes 0.299988
+    day += ((abs(time_fraction-0.5) < DAY_EPSILON))
+           ? 14 : (int)((time_fraction+DAY_EPSILON) * 30);
+
+    for (int idx=0; idx<month_offset; idx++) {
+      increase_one_month(year, month);
+    }
+    int max_day = monthly_days[month-1];
+    if (day > max_day) {
+      day = max_day;
+      day_adjusted = true;
+      if (month == 2 && is_leap_year(year)) {
+        if (day_org == 29) day_adjusted = false;
+        day = 29;
+      }
+    }
+    ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    if (day_adjusted) {
+      mlog << Debug(2) << method_name << "adjusted day " << day_org
+           << " to " << day << " for " << year << "-" << month << "\n";
+    }
+  }
+  else if (!no_leap || sec_per_unit != 86400) {
+    // seconds, minute, hours, and day unit with leap year
     bool use_ut = true;
+    // For the precision: case 1: 1.9999 to 2
+    //                    case 2: 2.0001 to 2
+    // Other cases are as floating number
     if ((1.0 - time_fraction) < TIME_EPSILON) time_value_ut += 1;
     else if (time_fraction > TIME_EPSILON) use_ut = false;
     if (use_ut) ut = (unixtime)(base_unixtime + sec_per_unit * time_value_ut);
     else ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
   }
-  else {
-    int day_offset;
-    int month, day, year, hour, minute, second;
-    
+  else {    //  no_leap year && unit = day
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
-    day_offset = day + (int)time_value;
+    int day_offset = day + (int)time_value;
     if (day_offset < 0) {
       while (day_offset < 0) {
         decrease_one_month(year, month);
@@ -125,11 +174,11 @@ unixtime add_to_unixtime(unixtime base_unixtime,
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
     if (time_fraction > (1-TIME_EPSILON) ) ut += sec_per_unit;
     else if (time_fraction > TIME_EPSILON) ut += (time_fraction * sec_per_unit);
-    mlog << Debug(5) << "add_to_unixtime() -> "
-         << unix_to_yyyymmdd_hhmmss(base_unixtime)
-         << " plus " << time_value << " days = "
-         << unix_to_yyyymmdd_hhmmss(ut) << "\n";
   }
+  mlog << Debug(5) <<  method_name
+       << unix_to_yyyymmdd_hhmmss(base_unixtime)
+       << " plus " << time_value << " days = "
+       << unix_to_yyyymmdd_hhmmss(ut) << "\n";
   
   return ut;
 }
