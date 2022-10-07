@@ -21,6 +21,7 @@
 
 #include "atcf_track_line.h"
 #include "track_point.h"
+#include "diag_file.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,7 +112,6 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
-      void set_diag_name(const StringArray &);
 
          //
          //  get stuff
@@ -154,6 +154,7 @@ class TrackInfo {
       void add(const TrackPoint &);
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
+      bool add_diag_data(DiagFile &, const StringArray &);
 
       bool has(const ATCFTrackLine &) const;
 
@@ -179,7 +180,6 @@ inline void TrackInfo::set_initials(const char *s)     { Initials = s;        }
 inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
-inline void TrackInfo::set_diag_name(const StringArray &sa) { DiagName = sa;  }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
@@ -238,7 +238,7 @@ class TrackInfoArray {
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       bool has(const ATCFTrackLine &) const;
       bool erase_storm_id(const ConcatString &);
-      void set_diag_name(const StringArray &);
+      bool add_diag_data(DiagFile &, const StringArray &);
 
          //
          //  get stuff

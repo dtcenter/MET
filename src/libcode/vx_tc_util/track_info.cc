@@ -535,6 +535,28 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+
+   // Check for a match
+   if(StormId   != diag_file.storm_id()  ||
+      Technique != diag_file.technique() ||
+      InitTime  != diag_file.init()) return(false);
+
+   // Store the requested diagnostic names
+   if(DiagName.n() == 0) DiagName = diag_name;
+
+   // Read the diagnostics from the file
+   ConcatString cur_name;
+   NumArray cur_data;
+   while(diag_file.read_diag_data(cur_name, cur_data)) {
+      cout << "JHG for " << cur_name << ", read " << cur_data.n() << " values\n";
+   } // end while
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool TrackInfo::has(const ATCFTrackLine &l) const {
    return(TrackLines.has(l.get_line()));
 }
@@ -864,12 +886,18 @@ bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfoArray::set_diag_name(const StringArray &sa) {
+bool TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+   bool match = false;
 
    // Set the names for each track
-   for(int i=0; i<Track.size(); i++) Track[i].set_diag_name(sa);
+   for(int i=0; i<Track.size(); i++) {
+      if(add_diag_data(diag_file, diag_name)) {
+         match = true;
+         break;
+      }
+   }
 
-   return;
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
