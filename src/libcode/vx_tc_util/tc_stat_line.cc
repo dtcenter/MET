@@ -200,6 +200,8 @@ const char * TCStatLine::get_item(const char *col_str, bool check_na) const {
    //
    offset = HdrLine->col_offset(col_str, dim);
 
+   cout << "dim: " << dim << " col_str: " << col_str << " offset: " << offset << endl;
+   
    //
    // If not found, check extra header columns
    //
