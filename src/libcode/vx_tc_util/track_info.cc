@@ -92,7 +92,6 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
-   DiagName.clear();
    TrackLines.clear();
 
    clear_points();
@@ -134,7 +133,6 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
-   out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NTrackLines     = " << TrackLines.n() << "\n";
 
    for(i=0; i<NPoints; i++) {
@@ -172,7 +170,6 @@ ConcatString TrackInfo::serialize() const {
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
-     << ", NDiag = " << DiagName.n()
      << ", NTrackLines = " << TrackLines.n();
 
    return(s);
@@ -220,7 +217,6 @@ void TrackInfo::assign(const TrackInfo &t) {
    MaxValidTime    = t.MaxValidTime;
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
-   DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
@@ -410,20 +406,6 @@ int TrackInfo::valid_inc() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TrackInfo::diag_name(int i) const {
-
-   // Check range
-   if(i < 0 || i >= DiagName.n()) {
-      mlog << Error << "\nTrackInfo::diag_name(int) -> "
-           << "range check error for index value " << i << "\n\n";
-      exit(1);
-   }
-
-   return(DiagName[i].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void TrackInfo::add(const TrackPoint &p) {
 
    extend(NPoints + 1, false);
@@ -536,20 +518,33 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+   int i, i_pnt;
 
    // Check for a match
    if(StormId   != diag_file.storm_id()  ||
       Technique != diag_file.technique() ||
       InitTime  != diag_file.init()) return(false);
 
-   // Store the requested diagnostic names
-   if(DiagName.n() == 0) DiagName = diag_name;
-
    // Read the diagnostics from the file
    ConcatString cur_name;
    NumArray cur_data;
    while(diag_file.read_diag_data(cur_name, cur_data)) {
-      cout << "JHG for " << cur_name << ", read " << cur_data.n() << " values\n";
+
+      // Only add requested diagnostics
+      if(diag_name.has(cur_name)) {
+
+         // Add diagnostic values to the TrackPoints
+         for(i=0; i<diag_file.n_time(); i++) {
+
+            // Get the index of the TrackPoint for this lead time
+            if((i_pnt = lead_index(nint(diag_file.lead(i)))) < 0) continue;
+
+            // Store this diagnostic value for the TrackPoint
+            Point[i_pnt].add_diag_data(diag_file.lat(i), diag_file.lon(i),
+                                       cur_name, cur_data[i]);
+
+         } // end for i
+      } // end if
    } // end while
 
    return(true);
@@ -891,7 +886,7 @@ bool TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_
 
    // Set the names for each track
    for(int i=0; i<Track.size(); i++) {
-      if(add_diag_data(diag_file, diag_name)) {
+      if(Track[i].add_diag_data(diag_file, diag_name)) {
          match = true;
          break;
       }
