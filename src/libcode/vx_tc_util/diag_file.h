@@ -85,6 +85,8 @@ class DiagFile : public LineDataFile {
          //  set stuff
          //
 
+      void set_technique(const std::string &);
+
          //
          //  get stuff
          //

@@ -154,13 +154,27 @@ void DiagFile::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void DiagFile::set_technique(const string &str) {
+
+   Technique = str;
+
+   // Replace instances of AVN with GFS
+   if(strstr(Technique.c_str(), "AVN") != NULL) {
+      Technique.replace("AVN", "GFS");
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool DiagFile::open_tcdiag(const std::string &path, const std::string &model_name) {
    int i;
 
    FileType = TCDiagFileType;
 
    // Initialize the technique name
-   Technique = model_name;
+   set_technique(model_name);
 
    // Open the file
    open(path.c_str());
@@ -180,7 +194,7 @@ bool DiagFile::open_tcdiag(const std::string &path, const std::string &model_nam
 
          // First header line: Technique InitTime (ATCFID YYYMMDDHH)
          if(InitTime == 0) {
-            if(Technique.empty()) Technique = dl[1];
+            if(Technique.empty()) set_technique(dl[1]);
             InitTime = timestring_to_unix(dl[2]);
          }
          // Second header line: Basin Cyclone Number (BBCC)
@@ -242,8 +256,8 @@ bool DiagFile::open_lsdiag(const std::string &path, const std::string &model_nam
    FileType = LSDiagFileType;
 
    // Store the default lsdiag technique, unless otherwise specified
-   if(model_name.size() > 0) Technique = model_name;
-   else                      Technique = default_lsdiag_technique;
+   if(model_name.size() > 0) set_technique(model_name);
+   else                      set_technique(default_lsdiag_technique);
 
    // Open the file
    open(path.c_str());
