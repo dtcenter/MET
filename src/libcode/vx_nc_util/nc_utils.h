@@ -161,7 +161,7 @@ extern bool      get_att_value(const netCDF::NcAtt *, int    &value);
 extern bool      get_att_value(const netCDF::NcAtt *, float  &value);
 extern bool      get_att_value(const netCDF::NcAtt *, double &value);
 
-extern bool      get_att_value_chars  (const netCDF::NcAtt *, ConcatString &);
+extern bool      get_att_value_chars  (const netCDF::NcAtt *, ConcatString &, int nc_id=0, int var_id=0);
 extern int       get_att_value_int    (const netCDF::NcAtt *);
 extern long long get_att_value_llong  (const netCDF::NcAtt *);
 extern double    get_att_value_double (const netCDF::NcAtt *);
@@ -186,7 +186,8 @@ extern bool get_nc_att_value(const netCDF::NcVarAtt *, std::string &);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, int          &, bool exit_on_error = true);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, float        &, bool exit_on_error = true);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, double       &, bool exit_on_error = true);
-extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
+extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, ConcatString &,
+                             int nc_id=0, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, double       &, bool exit_on_error = false);
@@ -216,7 +217,8 @@ extern void add_att(netCDF::NcVar  *, const std::string &, const int   );
 extern void add_att(netCDF::NcVar  *, const std::string &, const float );
 extern void add_att(netCDF::NcVar  *, const std::string &, const double);
 
-extern int    get_var_names(netCDF::NcFile *, StringArray *varNames);
+extern int    get_var_names(netCDF::NcFile *, StringArray *var_names);
+extern int    get_var_names(netCDF::NcFile *, StringArray *var_names, StringArray &group_names);
 
 extern bool   get_var_att_float (const netCDF::NcVar *, const ConcatString &, float  &);
 extern bool   get_var_att_double(const netCDF::NcVar *, const ConcatString &, double &);
@@ -229,7 +231,7 @@ extern bool   get_var_grid_mapping_name(const netCDF::NcVar *var, ConcatString &
 extern bool   get_var_long_name(const netCDF::NcVar *, ConcatString &);
 extern double get_var_missing_value(const netCDF::NcVar *);
 extern bool   get_var_standard_name(const netCDF::NcVar *, ConcatString &);
-extern bool   get_var_units(const netCDF::NcVar *, ConcatString &);
+extern bool   get_var_units(const netCDF::NcVar *, ConcatString &, int nc_id=0);
 
 extern bool   args_ok(const LongArray &);
 
@@ -315,8 +317,22 @@ extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const int
 extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
-extern netCDF::NcVar    get_var(netCDF::NcFile *, const char * var_name);   // exit if not exists
-extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const char * var_name, bool log_as_error=false);   // continue even though not exists
+extern netCDF::NcGroup  get_nc_group(netCDF::NcFile *, const char *group_name);   // do not exit if not exists
+
+extern netCDF::NcVar    get_var(netCDF::NcFile *, const char *var_name);   // exit if not exists
+//extern netCDF::NcVar    get_var(netCDF::NcFile *, const ConcatString &var_name);   // exit if not exists
+extern netCDF::NcVar    get_var(netCDF::NcFile *, const char *var_name,
+                                const char *group_name);    // exit if not exists
+//extern netCDF::NcVar    get_var(netCDF::NcFile *, const ConcatString &var_name,
+//                                const char *group_name);    // exit if not exists
+extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const char *var_name,
+                                bool log_as_error=false);   // continue even though not exists
+//extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const ConcatString &var_name,
+//                                bool log_as_error=false);   // continue even though not exists
+extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const char *var_name,
+                                const char *group_name, bool log_as_error=false);   // continue even though not exists
+//extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const ConcatString &var_name,
+//                                const char *group_name, bool log_as_error=false);   // continue even though not exists
 
 extern netCDF::NcVar *copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(netCDF::NcFile *, netCDF::NcVar *, const ConcatString attr_name);
@@ -325,7 +341,11 @@ extern void  copy_nc_atts(netCDF::NcFile *, netCDF::NcFile *, const bool all_att
 extern void  copy_nc_atts( netCDF::NcVar *,  netCDF::NcVar *, const bool all_attrs=true);
 extern void copy_nc_var_data(netCDF::NcVar *, netCDF::NcVar *);
 
-extern bool has_var(netCDF::NcFile *, const char * var_name);
+extern bool has_nc_group(netCDF::NcFile *, const char *group_name);
+extern bool has_var(netCDF::NcFile *, const char *var_name);
+//extern bool has_var(netCDF::NcFile *, const ConcatString &var_name);
+extern bool has_var(netCDF::NcFile *, const char *var_name, const char *group_name);
+//extern bool has_var(netCDF::NcFile *, const ConcatString &var_name, const char *group_name);
 
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const netCDF::NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
