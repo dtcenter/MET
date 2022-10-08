@@ -422,6 +422,8 @@ void TrackPoint::clear() {
    Depth     = NoSystemsDepth;
    WarmCore  = false;
    WatchWarn = NoWatchWarnType;
+   DiagName.clear();
+   DiagVal.clear();
 
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
@@ -455,6 +457,10 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Depth     = " << systemsdepth_to_string(Depth) << "\n";
    out << prefix << "WarmCore  = " << bool_to_string(WarmCore) << "\n";
 
+   for(i=0; i<DiagName.n(); i++) {
+      out << prefix << "Diag[" << i+1 << "] " << DiagName[i] << " = " << DiagVal[i];
+   }
+
    for(i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
       Wind[i].dump(out, indent_depth+1);
@@ -487,7 +493,8 @@ ConcatString TrackPoint::serialize() const {
      << ", Speed = " << Speed
      << ", Depth = " << systemsdepth_to_string(Depth)
      << ", WarmCore = " << bool_to_string(WarmCore)
-     << ", WatchWarn = " << watchwarntype_to_string(WatchWarn);
+     << ", WatchWarn = " << watchwarntype_to_string(WatchWarn)
+     << ", NDiag = " << DiagName.n();
 
    return(s);
 }
@@ -533,6 +540,8 @@ void TrackPoint::assign(const TrackPoint &t) {
    Depth     = t.Depth;
    WarmCore  = t.WarmCore;
    WatchWarn = t.WatchWarn;
+   DiagName  = t.DiagName;
+   DiagVal   = t.DiagVal;
 
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
 
@@ -592,8 +601,20 @@ void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackPoint::n_diag() const {
+   return(DiagName.n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * TrackPoint::diag_name(int i) const {
+   return(i>=0 && i<DiagName.n() ? DiagName[i].c_str() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double TrackPoint::diag_val(int i) const {
-   return(i<DiagVal.n() ? DiagVal[i] : bad_data_double);
+   return(i>=0 && i<DiagVal.n() ? DiagVal[i] : bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -644,6 +665,26 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
       match = false;
 
    return(match);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPoint::add_diag_data(double diag_lat, double diag_lon,
+                               const ConcatString &name, double val) {
+
+   // Check for consistent location
+   if(!is_eq(diag_lat, Lat) || !is_eq(diag_lon, Lon)) {
+      mlog << Warning << "\nTrackPoint::add_diag_data() -> "
+           << "the diagnostic location (" << diag_lat << ", " << diag_lon
+           << ") does not match the track location (" << Lat << ", " << Lon
+           << ")\n";
+   }
+
+   // Store the diagnostic
+   DiagName.add(name);
+   DiagVal.add(val);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

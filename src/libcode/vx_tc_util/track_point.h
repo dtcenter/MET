@@ -167,7 +167,8 @@ class TrackPoint {
       // Wind Radii
       QuadInfo      Wind[NWinds];
 
-      // Diagnostic Values
+      // Diagnostic names and values
+      StringArray   DiagName;
       NumArray      DiagVal;
 
    public:
@@ -232,6 +233,8 @@ class TrackPoint {
       SystemsDepth     depth()         const;
       bool             warm_core()     const;
       WatchWarnType    watch_warn()    const;
+      int              n_diag()        const;
+      const char *     diag_name(int)  const;
       double           diag_val(int)   const;
 
          //
@@ -241,6 +244,7 @@ class TrackPoint {
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFTrackLine &);
       bool is_match(const ATCFTrackLine &) const;
+      void add_diag_data(double, double, const ConcatString &, double);
 
 };
 
