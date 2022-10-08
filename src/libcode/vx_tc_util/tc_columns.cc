@@ -172,10 +172,9 @@ void write_prob_rirw_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
                            AsciiTable &at, int &i_row) {
-   int i;
 
    // Loop through the TrackPairInfo points
-   for(i=0; i<p.n_points(); i++) {
+   for(int i=0; i<p.n_points(); i++) {
 
       // TCMPR line type
       hdr.set_line_type((string) TCStatLineType_TCMPR_Str);
@@ -202,7 +201,7 @@ void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
       i_row++;
 
       // Write diagnostics line
-      if(p.adeck().n_diag() > 0) {
+      if(p.adeck()[i].n_diag() > 0) {
 
          // TCDIAG line type
          hdr.set_line_type((string) TCStatLineType_TCDIAG_Str);
@@ -355,10 +354,10 @@ void write_tc_diag_cols(const TrackPairInfo &p, int i,
    // Write TCDIAG columns
    at.set_entry(r, c++, p.n_points());
    at.set_entry(r, c++, i+1);
-   at.set_entry(r, c++, p.adeck().n_diag());
+   at.set_entry(r, c++, p.adeck()[i].n_diag());
 
-   for(j=0; j<p.adeck().n_diag(); j++) {
-      at.set_entry(r, c++, p.adeck().diag_name(j));
+   for(j=0; j<p.adeck()[i].n_diag(); j++) {
+      at.set_entry(r, c++, p.adeck()[i].diag_name(j));
       at.set_entry(r, c++, p.adeck()[i].diag_val(j));
    }
 

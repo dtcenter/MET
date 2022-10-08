@@ -1027,7 +1027,7 @@ void filter_probs(ProbInfoArray &probs) {
 void process_diags(TrackInfoArray &tracks) {
    StringArray files, files_model_name;
    DiagFile diag_file;
-   int i;
+   int i, n;
 
    // Process TCDIAG inputs
    if(tcdiag_source.n() > 0) {
@@ -1039,10 +1039,14 @@ void process_diags(TrackInfoArray &tracks) {
            << " TCDIAG diagnostic file(s).\n";
 
       // Loop over the input files
-      for(i=0; i<files.n(); i++) {
+      for(i=0,n=0; i<files.n(); i++) {
          diag_file.open_tcdiag(files[i], files_model_name[i]);
-         tracks.add_diag_data(diag_file, conf_info.DiagName);
+         if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
+
+      mlog << Debug(3)
+           << "Added diagnostics information to " << n
+           << " tracks.\n";
    }
 
    // Process LSDIAG inputs
@@ -1055,10 +1059,14 @@ void process_diags(TrackInfoArray &tracks) {
            << " LSDIAG diagnostic file(s).\n";
 
       // Loop over the input files
-      for(i=0; i<files.n(); i++) {
+      for(i=0,n=0; i<files.n(); i++) {
          diag_file.open_lsdiag(files[i], files_model_name[i]);
-         tracks.add_diag_data(diag_file, conf_info.DiagName);
+         if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
+
+      mlog << Debug(3)
+           << "Added diagnostics information to " << n
+           << " tracks.\n";
    }
 
    return;
