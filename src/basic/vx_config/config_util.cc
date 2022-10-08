@@ -1100,6 +1100,13 @@ map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_to_qc_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_obs_to_qc_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void BootInfo::clear() {
    interval = BootIntervalType_None;
    rep_prop = bad_data_double;

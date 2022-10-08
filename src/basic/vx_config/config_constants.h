@@ -637,6 +637,7 @@ static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
+static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
