@@ -166,9 +166,8 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value, int nc_id, int v
    if (IS_VALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
       if (attType == NC_CHAR) {
-cout << method_name << " DEBUG HS " << " attType=NC_CHAR\n";
          try {
-            char att_value[1024*8];
+            char att_value[8096];
             att->getValues(att_value);
             value = att_value;
          }
@@ -183,15 +182,13 @@ cout << method_name << " DEBUG HS " << " attType=NC_CHAR\n";
          }
       }
       else if (attType == NC_STRING) {
-         size_t att_len = att->getAttLength();
+         try {
+size_t att_len = att->getAttLength();
 NcGroup p_group =  att->getParentGroup();
 cout << method_name << " DEBUG HS " << " attType=NC_STRING att_name="<< att->getName() << "\n";
 cout << method_name << " DEBUG HS " << " att_len=" << att_len << "\n";
 cout << method_name << " DEBUG HS " << " p_group name=" << p_group.getName() << " id=" << p_group.getId() << "\n";
-
-         try {
-            //string att_value;
-            char att_value[1024*8];
+            string att_value;
             att->getValues(att_value);
             value = att_value;
          }
@@ -2159,7 +2156,7 @@ bool args_ok(const LongArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Exit if variable does not exists
+// Continue even though not exists
 
 NcGroup get_nc_group(NcFile *nc, const char *group_name) {
    NcGroup nc_group;
@@ -2170,7 +2167,7 @@ NcGroup get_nc_group(NcFile *nc, const char *group_name) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Exit if variable does not exists
+// Exit if exists but invalid
 
 NcVar get_var(NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
@@ -2182,26 +2179,20 @@ NcVar get_var(NcFile *nc, const char *var_name) {
    NcVar var;
    multimap<string,NcVar> var_map = GET_NC_VARS_P(nc);
    multimap<string,NcVar>::iterator it = var_map.find(new_var_name);
-   if (it != var_map.end()) var = it->second;
-
-   if(IS_INVALID_NC(var)) {
-      mlog << Error << "\nget_var(var_name) -> "
-           << "can't read \"" << new_var_name << "\" variable.\n\n";
-      exit(1);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name) -> "
+              << "can't read \"" << new_var_name << "\" variable.\n\n";
+         exit(1);
+      }
    }
 
    return(var);
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Exit if variable does not exists
-
-NcVar get_var(NcFile *nc, const ConcatString var_name) {
-   return get_var(nc, var_name.c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-// Exit if variable does not exists
+// Exit if exists but invalid
 
 NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
    string nc_var_name;
@@ -2218,32 +2209,25 @@ NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
       nc_var_name = new_var_name;
       var_map = nc_group.getVars();
    }
-   else {
-      // This is for IODA data format 1.0
+   else {   // This is for IODA data format 1.0
       nc_var_name = new_var_name + "@" + group_name;
       var_map = GET_NC_VARS_P(nc);
    }
    multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
-   if (it != var_map.end()) var = it->second;
-
-   if(IS_INVALID_NC(var)) {
-      mlog << Error << "\nget_var(var_name, group_name) -> "
-           << "can't read \"" << new_var_name << "\" variable.\n\n";
-      exit(1);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name, group_name) -> "
+              << "can't read \"" << new_var_name << "\" variable.\n\n";
+         exit(1);
+      }
    }
 
    return(var);
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Exit if variable does not exists
-
-NcVar get_var(NcFile *nc, const ConcatString var_name, const char *group_name) {
-   return get_var(nc, var_name.c_str(), group_name);
-}
-
-////////////////////////////////////////////////////////////////////////
-// Do not exit if variable does not exists
+// Continue even though not exists
 
 NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
@@ -2267,14 +2251,14 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Do not exit if variable does not exists
+// Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const ConcatString var_name, bool log_as_error) {
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, bool log_as_error) {
    return get_nc_var(nc, var_name.c_str(), log_as_error);
 }
 
-///////////////////////////
-// Do not exit if variable does not exists
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
 
 NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
                  bool log_as_error) {
@@ -2292,8 +2276,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
       nc_var_name = new_var_name;
       var_map = nc_group.getVars();
    }
-   else {
-      // This is for IODA data format 1.0
+   else {   // This is for IODA data format 1.0
       nc_var_name = new_var_name + "@" + group_name;
       var_map = GET_NC_VARS_P(nc);
    }
@@ -2313,10 +2296,10 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
    return(var);
 }
 
-///////////////////////////
-// Do not exit if variable does not exists
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const ConcatString var_name, const char *group_name,
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, const char *group_name,
                  bool log_as_error) {
    return get_nc_var(nc, var_name.c_str(), group_name, log_as_error);
 }
