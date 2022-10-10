@@ -197,50 +197,6 @@ cout << method_name << " DEBUG HS " << " p_group name=" << p_group.getName() << 
          }
          catch (exceptions::NcChar ex) {
             value = "";
-try {
-  int status, stat;
-  size_t attlen = 0;
-
-  stat = nc_inq_attlen(nc_id, var_id, att->getName().c_str(), &attlen);
-cout << method_name << " DEBUG HS ===================== S =============================\n";
-cout << method_name << " DEBUG HS 0 " << " attlen=" << attlen << "\n";
-
-  attlen = 1024;
-  char *title;
-  char **string_attr = (char**)malloc(attlen * sizeof(char*));
-  memset(string_attr, 0, attlen * sizeof(char*));
-//cout << " DEBUG HS 1 " << method_name << " attlen=" << attlen << ", string_attr[0]=" << string_attr[0] << "\n";
-//cout << " DEBUG HS 1 " << method_name << " attlen=" << attlen << ", string_attr[0]=" << string_attr[0] << "\n";
-//cout << method_name << " DEBUG HS 2 attlen=" << attlen << "\n";
- 
-//  stat = nc_get_att_string(nc_id, var_id, att->getName().c_str(), string_attr);
- 
-title = (char *) malloc(attlen + 1);
-cout << method_name << " DEBUG HS 3\n";
-memset(title, 0, attlen * sizeof(char));
-cout << method_name << " DEBUG HS 4\n";
-
-status = nc_get_att_text(nc_id, var_id, att->getName().c_str(), title);
-cout << method_name << " DEBUG HS " << " nc_id=" << nc_id << ", var_id=" << var_id << " attr_name=" << att->getName() << "\n";
-cout << method_name << " DEBUG HS " << " attlen=" << attlen << ", title=" << title << "\n";
-//cout << method_name << " DEBUG HS " << " attlen=" << attlen << ", string_attr=" << string_attr << "\n";
-//cout << method_name << " DEBUG HS " << " attlen=" << attlen << ", string_attr[0]=" << string_attr[0] << "\n";
-//cout << method_name << " DEBUG HS " << " attlen=" << attlen << ", string_attr[0][0]=" << string_attr[0][0] << "\n";
-cout << method_name << " DEBUG HS ===================== E ============================\n";
-  value = title;
-
-  delete [] string_attr ;
-  delete [] title ;
-}
-catch (exceptions::NcException ex) {
-            mlog << Warning << "\n" << method_name
-                 << " NNNNNNN Exception: " << ex.what() << "\n"
-                 << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
-                 << GET_NC_TYPE_NAME_P(att) << " type).\n"
-                 << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
-}
- 
-            
             // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
             mlog << Warning << "\n" << method_name
                  << "Exception: " << ex.what() << "\n"
