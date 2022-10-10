@@ -923,8 +923,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    // Loop through the lead times and construct a TrackPoint for each
    for(i=0, skip=false; i<lead_list.n_elements(); i++) {
 
-      cout << "Working on lead-time index: " << i << endl;
-      
       // Initialize TrackPoint
       pavg.clear();
       psum.clear();
@@ -954,10 +952,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         // Store the track point latitude, longitude v_max and mslp values
-
-         cout << "Track Point: lat: " << tracks.Track[j][i_pnt].lat() << " lon: " << tracks.Track[j][i_pnt].lon() << " v_max: " << tracks.Track[j][i_pnt].v_max() << " mslp: " << tracks.Track[j][i_pnt].mslp() << endl;
-         
+         // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
          plat.add(tracks.Track[j][i_pnt].lat());
          pvmax.add(tracks.Track[j][i_pnt].v_max());
@@ -965,13 +960,8 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       }
       
       // Check for missing required member and the minimum number of points
-      //if(skip == true || pcnt < req) continue;
+      if(skip == true || pcnt < req) continue;
 
-      if(skip == true || pcnt < req) {
-         cout << "pcnt: " << pcnt << " is less than req: " << req << " skipping computations (continuing)" << endl << endl;
-         continue;
-      }
-      
       // Compute the average point
       pavg = psum;
       if(!is_bad_data(pavg.v_max())) pavg.set_v_max(psum.v_max()/pcnt);
@@ -998,18 +988,19 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
       if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
 
-      // Compute track spread
+      // Compute track spread, convert to nautical-miles 
       track_spread = compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon);
-      cout << "track_spread = " << track_spread << endl;
-      pavg.set_spread(track_spread);
+      if(!is_bad_data(track_spread)) {
+         track_spread *= tc_nautical_miles_per_km;
+         pavg.set_spread(track_spread);
+      }
       
       // Compute wind-speed (v_max) and pressure (mslp) standard deviation
       vmax_stdev = pvmax.stdev();
       mslp_stdev = pmslp.stdev();
-      cout << "vmax_stdev =  " << vmax_stdev << " mslp_stdev =  " << mslp_stdev << endl << endl;
-      pavg.set_v_max_stdev(vmax_stdev);
-      pavg.set_mslp_stdev(mslp_stdev);
- 
+      if(!is_bad_data(vmax_stdev)) pavg.set_v_max_stdev(vmax_stdev);
+      if(!is_bad_data(mslp_stdev)) pavg.set_mslp_stdev(mslp_stdev);
+      
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
@@ -1043,18 +1034,12 @@ double compute_gc_dist_stdev(const double lat, const double lon, const NumArray 
 
    int i, j, count;
    double spread;
-
    NumArray dist_na;
    double dist;
 
    // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
    for(i=0, count=0; i<lats.n_elements(); i++) {
-      //cout << "member lats[ " << i << "]: " << lats[i] << " member lons[" << i << "]: " << lons[i] << " consensus lat: " << lat << " consensus lon: " << lon << endl; 
-      
       if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
-      
-      //cout << "  gc_dist: " << gc_dist(lats[i], lons[i], lat, lon) << endl;
-      
       // Save great circle distance values in num-array object
       dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
       count++;
