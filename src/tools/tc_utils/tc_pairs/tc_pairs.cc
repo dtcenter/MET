@@ -1040,7 +1040,7 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.open_tcdiag(files[i], files_model_name[i]);
+         diag_file.read_tcdiag(files[i], files_model_name[i]);
          if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
 
@@ -1060,7 +1060,7 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.open_lsdiag(files[i], files_model_name[i]);
+         diag_file.read_lsdiag(files[i], files_model_name[i]);
          if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
 
@@ -2034,7 +2034,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_tracks(const TrackPairInfoArray &p) {
-   int i_row, i, n_row, n_col;
+   int i_row, i, n_row, n_col, n_diag;
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
@@ -2052,9 +2052,9 @@ void write_tracks(const TrackPairInfoArray &p) {
    n_col = n_tc_mpr_cols;
 
    // Update rows and columns for diagnosics output
-   if(conf_info.DiagName.n() > 0) {
+   if((n_diag = p.max_n_diag()) > 0) {
       n_row += p.n_points();
-      n_col = max(n_col, get_n_tc_diag_cols(conf_info.DiagName.n()));
+      n_col = max(n_col, get_n_tc_diag_cols(n_diag));
    }
 
    // Initialize the output AsciiTable

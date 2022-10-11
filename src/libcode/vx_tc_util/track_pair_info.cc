@@ -1005,6 +1005,18 @@ int TrackPairInfoArray::n_points() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackPairInfoArray::max_n_diag() const {
+   int i, n;
+
+   for(i=0,n=0; i<NPairs; i++) {
+      if(Pair[i].adeck().n_diag() > n) n = Pair[i].adeck().n_diag();
+   }
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TrackPairInfoArray::add(const TrackPairInfo &p) {
 
    extend(NPairs + 1, false);

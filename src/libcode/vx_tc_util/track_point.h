@@ -167,9 +167,8 @@ class TrackPoint {
       // Wind Radii
       QuadInfo      Wind[NWinds];
 
-      // Diagnostic names and values
-      StringArray   DiagName;
-      NumArray      DiagVal;
+      // Diagnostic values
+      NumArray DiagVal;
 
    public:
 
@@ -234,7 +233,6 @@ class TrackPoint {
       bool             warm_core()     const;
       WatchWarnType    watch_warn()    const;
       int              n_diag()        const;
-      const char *     diag_name(int)  const;
       double           diag_val(int)   const;
 
          //
@@ -244,7 +242,7 @@ class TrackPoint {
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFTrackLine &);
       bool is_match(const ATCFTrackLine &) const;
-      void add_diag_data(double, double, const ConcatString &, double);
+      void add_diag_data(double, double, double);
 
 };
 
@@ -268,24 +266,25 @@ inline void TrackPoint::set_depth(SystemsDepth t)       { Depth     = t; }
 inline void TrackPoint::set_warm_core(bool v)           { WarmCore  = v; }
 inline void TrackPoint::set_watch_warn(WatchWarnType t) { WatchWarn = t; }
 
-inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
+inline unixtime      TrackPoint::valid()      const { return(ValidTime);   }
 inline int           TrackPoint::valid_hour() const { return(unix_to_sec_of_day(ValidTime)); }
-inline int           TrackPoint::lead()       const { return(LeadTime);  }
-inline double        TrackPoint::lat()        const { return(Lat);       }
-inline double        TrackPoint::lon()        const { return(Lon);       }
-inline double        TrackPoint::v_max()      const { return(Vmax);      }
-inline double        TrackPoint::mslp()       const { return(MSLP);      }
-inline CycloneLevel  TrackPoint::level()      const { return(Level);     }
-inline double        TrackPoint::radp()       const { return(RadP);      }
-inline double        TrackPoint::rrp()        const { return(RRP);       }
-inline double        TrackPoint::mrd()        const { return(MRD);       }
-inline double        TrackPoint::gusts()      const { return(Gusts);     }
-inline double        TrackPoint::eye()        const { return(Eye);       }
-inline double        TrackPoint::direction()  const { return(Direction); }
-inline double        TrackPoint::speed()      const { return(Speed);     }
-inline SystemsDepth  TrackPoint::depth()      const { return(Depth);     }
-inline bool          TrackPoint::warm_core()  const { return(WarmCore);  }
-inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn); }
+inline int           TrackPoint::lead()       const { return(LeadTime);    }
+inline double        TrackPoint::lat()        const { return(Lat);         }
+inline double        TrackPoint::lon()        const { return(Lon);         }
+inline double        TrackPoint::v_max()      const { return(Vmax);        }
+inline double        TrackPoint::mslp()       const { return(MSLP);        }
+inline CycloneLevel  TrackPoint::level()      const { return(Level);       }
+inline double        TrackPoint::radp()       const { return(RadP);        }
+inline double        TrackPoint::rrp()        const { return(RRP);         }
+inline double        TrackPoint::mrd()        const { return(MRD);         }
+inline double        TrackPoint::gusts()      const { return(Gusts);       }
+inline double        TrackPoint::eye()        const { return(Eye);         }
+inline double        TrackPoint::direction()  const { return(Direction);   }
+inline double        TrackPoint::speed()      const { return(Speed);       }
+inline SystemsDepth  TrackPoint::depth()      const { return(Depth);       }
+inline bool          TrackPoint::warm_core()  const { return(WarmCore);    }
+inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn);   }
+inline int           TrackPoint::n_diag()     const { return(DiagVal.n()); }
 
 ////////////////////////////////////////////////////////////////////////
 

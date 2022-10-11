@@ -15,6 +15,7 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <map>
 
 #include "vx_cal.h"
 #include "data_line.h"
@@ -76,6 +77,9 @@ class DiagFile : public LineDataFile {
       NumArray     Lat;
       NumArray     Lon;
 
+      // Diagnostic values
+      std::map<string,NumArray> DiagMap;
+
    public:
 
       DiagFile();
@@ -104,26 +108,29 @@ class DiagFile : public LineDataFile {
       double               lat(int)    const;
       double               lon(int)    const;
 
+      int                  n_diag()                      const;
+      bool                 has_diag(const std::string &) const;
+      const NumArray &     get_diag(const std::string &) const;
+      void                 get_diag_name(StringArray &)  const;
+
          //
          //  do stuff
          //
 
-      bool open_tcdiag(const std::string &, const std::string &);
-      bool open_lsdiag(const std::string &, const std::string &);
+      void read_tcdiag(const std::string &, const std::string &);
+      void read_lsdiag(const std::string &, const std::string &);
 
-      bool read_diag_data  (ConcatString &, NumArray &);
-      bool read_tcdiag_data(ConcatString &, NumArray &);
-      bool read_lsdiag_data(ConcatString &, NumArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & DiagFile::storm_id()  const { return(StormId);   }
-inline const ConcatString & DiagFile::basin()     const { return(Basin);     }
-inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);   }
-inline const ConcatString & DiagFile::technique() const { return(Technique); }
-inline unixtime             DiagFile::init()      const { return(InitTime);  }
-inline int                  DiagFile::n_time()    const { return(NTime);     }
+inline const ConcatString & DiagFile::storm_id()  const { return(StormId);        }
+inline const ConcatString & DiagFile::basin()     const { return(Basin);          }
+inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);        }
+inline const ConcatString & DiagFile::technique() const { return(Technique);      }
+inline unixtime             DiagFile::init()      const { return(InitTime);       }
+inline int                  DiagFile::n_time()    const { return(NTime);          }
+inline int                  DiagFile::n_diag()    const { return(DiagMap.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 

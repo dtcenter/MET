@@ -36,8 +36,7 @@ void open_tc_txt_file(ofstream *&out, const char *file_name) {
    out->open(file_name);
 
    if(!(*out)) {
-      mlog << Error
-           << "\nopen_tc_txt_file()-> "
+      mlog << Error << "\nopen_tc_txt_file()-> "
            << "can't open the output file \"" << file_name
            << "\" for writing!\n\n";
       exit(1);
@@ -356,8 +355,17 @@ void write_tc_diag_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, i+1);
    at.set_entry(r, c++, p.adeck()[i].n_diag());
 
+   // Check the number of names and values match
+   if(p.adeck().n_diag() != p.adeck()[i].n_diag()) {
+      mlog << Error << "\nwrite_tc_diag_cols()-> "
+           << "the number of diagnostic names (" << p.adeck().n_diag()
+           << ") and values (" << p.adeck()[i].n_diag()
+           << ") do not match!\n\n";
+      exit(1);
+   }
+
    for(j=0; j<p.adeck()[i].n_diag(); j++) {
-      at.set_entry(r, c++, p.adeck()[i].diag_name(j));
+      at.set_entry(r, c++, p.adeck().diag_name(j));
       at.set_entry(r, c++, p.adeck()[i].diag_val(j));
    }
 

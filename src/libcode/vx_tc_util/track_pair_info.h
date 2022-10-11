@@ -206,8 +206,9 @@ class TrackPairInfoArray {
          //
 
       const TrackPairInfo & operator[](int) const;
-      int n_pairs()  const;
-      int n_points() const;
+      int n_pairs()    const;
+      int n_points()   const;
+      int max_n_diag() const;
 
          //
          //  do stuff

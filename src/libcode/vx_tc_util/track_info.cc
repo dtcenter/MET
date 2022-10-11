@@ -92,6 +92,7 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
+   DiagName.clear();
    TrackLines.clear();
 
    clear_points();
@@ -131,6 +132,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
    out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
+   out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
    out << prefix << "NTrackLines     = " << TrackLines.n() << "\n";
@@ -168,6 +170,7 @@ ConcatString TrackInfo::serialize() const {
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
      << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
+     << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
      << ", NTrackLines = " << TrackLines.n();
@@ -217,6 +220,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    MaxValidTime    = t.MaxValidTime;
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
+   DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
@@ -392,6 +396,12 @@ int TrackInfo::warm_core_dur() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const char * TrackInfo::diag_name(int i) const {
+   return(i>=0 && i<DiagName.n() ? DiagName[i].c_str() : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -518,34 +528,36 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
-   int i, i_pnt;
 
    // Check for a match
    if(StormId   != diag_file.storm_id()  ||
       Technique != diag_file.technique() ||
       InitTime  != diag_file.init()) return(false);
 
-   // Read the diagnostics from the file
-   ConcatString cur_name;
-   NumArray cur_data;
-   while(diag_file.read_diag_data(cur_name, cur_data)) {
+   // If empty, store all diagnostics
+   if(diag_name.n() > 0) DiagName = diag_name;
+   else                  diag_file.get_diag_name(DiagName);
 
-      // Only add requested diagnostics
-      if(diag_name.has(cur_name)) {
+   int i_name, i_time, i_pnt;
 
-         // Add diagnostic values to the TrackPoints
-         for(i=0; i<diag_file.n_time(); i++) {
+   // Retrieve data for each diagnostic
+   for(i_name=0; i_name<DiagName.n(); i_name++) {
 
-            // Get the index of the TrackPoint for this lead time
-            if((i_pnt = lead_index(nint(diag_file.lead(i)))) < 0) continue;
+      NumArray diag_val = diag_file.get_diag(DiagName[i_name]);
 
-            // Store this diagnostic value for the TrackPoint
-            Point[i_pnt].add_diag_data(diag_file.lat(i), diag_file.lon(i),
-                                       cur_name, cur_data[i]);
+      // Add diagnostic values to the TrackPoints
+      for(i_time=0; i_time<diag_file.n_time(); i_time++) {
 
-         } // end for i
-      } // end if
-   } // end while
+         // Get the index of the TrackPoint for this lead time
+         if((i_pnt = lead_index(nint(diag_file.lead(i_time)))) < 0) continue;
+
+         // Store this diagnostic value in the TrackPoint
+         Point[i_pnt].add_diag_data(diag_file.lat(i_time),
+                                    diag_file.lon(i_time),
+                                    diag_val[i_time]);
+
+      } // end for i_time
+   } // end for i_name
 
    return(true);
 }

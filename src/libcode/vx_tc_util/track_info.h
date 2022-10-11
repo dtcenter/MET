@@ -69,6 +69,9 @@ class TrackInfo {
       unixtime     MinWarmCore;
       unixtime     MaxWarmCore;
 
+      // Diagnostic names
+      StringArray DiagName;
+
       // TrackPoints
       TrackPoint  *Point;
       int          NPoints;
@@ -139,6 +142,8 @@ class TrackInfo {
       int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
+      int                  n_diag()           const;
+      const char *         diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
@@ -190,6 +195,7 @@ inline unixtime             TrackInfo::valid_max()        const { return(MaxVali
 inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
 inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
+inline int                  TrackInfo::n_diag()           const { return(DiagName.n());                 }
 inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
 
 ////////////////////////////////////////////////////////////////////////
