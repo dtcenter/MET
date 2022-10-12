@@ -119,34 +119,34 @@ void LaeaGrid::calc_aff()
 
 {
 
-double u_LL, v_LL;
-double u_LR, v_LR;
-double u_UL, v_UL;
+double u_ll, v_ll;
+double u_lr, v_lr;
+double u_ul, v_ul;
 
-double x_LL, y_LL;
-double x_LR, y_LR;
-double x_UL, y_UL;
-
-
-snyder_latlon_to_xy(Data.lat_LL, Data.lon_LL, u_LL, v_LL);
-snyder_latlon_to_xy(Data.lat_LR, Data.lon_LR, u_LR, v_LR);
-snyder_latlon_to_xy(Data.lat_UL, Data.lon_UL, u_UL, v_UL);
+double x_ll, y_ll;
+double x_lr, y_lr;
+double x_ul, y_ul;
 
 
-x_LL = 0.0;
-y_LL = 0.0;
+snyder_latlon_to_xy(Data.lat_ll, Data.lon_ll, u_ll, v_ll);
+snyder_latlon_to_xy(Data.lat_lr, Data.lon_lr, u_lr, v_lr);
+snyder_latlon_to_xy(Data.lat_ul, Data.lon_ul, u_ul, v_ul);
 
-x_LR = Data.nx - 1.0;
-y_LR = 0.0;
 
-x_UL = 0.0;
-y_UL = Data.ny  - 1.0;
+x_ll = 0.0;
+y_ll = 0.0;
+
+x_lr = Data.nx - 1.0;
+y_lr = 0.0;
+
+x_ul = 0.0;
+y_ul = Data.ny  - 1.0;
 
 aff.set_three_points(
 
-   u_LL, v_LL, u_LR, v_LR, u_UL, v_UL, 
+   u_ll, v_ll, u_lr, v_lr, u_ul, v_ul,
 
-   x_LL, y_LL, x_LR, y_LR, x_UL, y_UL
+   x_ll, y_ll, x_lr, y_lr, x_ul, y_ul
 
 );
 
@@ -490,32 +490,31 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ConcatString LaeaGrid::serialize() const
+ConcatString LaeaGrid::serialize(const char *sep) const
 
 {
 
 ConcatString a;
 char junk[256];
 
-a << "Projection: Lambert Azimuthal Equal Area";
+a << "Projection: Lambert Azimuthal Equal Area" << sep;
 
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
+a << "Nx: " << Nx << sep;
+a << "Ny: " << Ny << sep;
 
-a << " geoid: " << Data.geoid;
+a << "geoid: " << Data.geoid << sep;
 
-snprintf(junk, sizeof(junk), " lat_ll: %.3f", Data.lat_LL);   a << junk;
-snprintf(junk, sizeof(junk), " lon_ll: %.3f", Data.lon_LL);   a << junk;
+snprintf(junk, sizeof(junk), "lat_ll: %.3f", Data.lat_ll);   a << junk << sep;
+snprintf(junk, sizeof(junk), "lon_ll: %.3f", Data.lon_ll);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " lat_ul: %.3f", Data.lat_UL);   a << junk;
-snprintf(junk, sizeof(junk), " lon_ul: %.3f", Data.lon_UL);   a << junk;
+snprintf(junk, sizeof(junk), "lat_ul: %.3f", Data.lat_ul);   a << junk << sep;
+snprintf(junk, sizeof(junk), "lon_ul: %.3f", Data.lon_ul);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " lat_lr: %.3f", Data.lat_LR);   a << junk;
-snprintf(junk, sizeof(junk), " lon_lr: %.3f", Data.lon_LR);   a << junk;
+snprintf(junk, sizeof(junk), "lat_lr: %.3f", Data.lat_lr);   a << junk << sep;
+snprintf(junk, sizeof(junk), "lon_lr: %.3f", Data.lon_lr);   a << junk << sep;
 
-snprintf(junk, sizeof(junk), " lat_pole: %.3f", Data.lat_pole);   a << junk;
-snprintf(junk, sizeof(junk), " lon_pole: %.3f", Data.lon_pole);   a << junk;
+snprintf(junk, sizeof(junk), "lat_pole: %.3f", Data.lat_pole);   a << junk << sep;
+snprintf(junk, sizeof(junk), "lon_pole: %.3f", Data.lon_pole);   a << junk << sep;
 
    //
    //  done
@@ -571,6 +570,18 @@ double LaeaGrid::rot_grid_to_earth(int x, int y) const
    //
 
 return ( 0.0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool LaeaGrid::wrap_lon() const
+
+{
+
+return ( false );
 
 }
 

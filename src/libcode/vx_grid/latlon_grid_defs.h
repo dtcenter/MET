@@ -36,7 +36,7 @@ struct LatLonData {
    int Nlat;
    int Nlon;
 
-   void dump();
+   void dump() const;
 
 };
 

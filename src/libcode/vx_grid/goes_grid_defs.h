@@ -59,7 +59,7 @@ struct GoesImagerData {
    double *x_values; //radian
    double *y_values; //radian
    
-   void dump();
+   void dump() const;
    void compute_lat_lon();
    void copy(const GoesImagerData *from);
    void reset();

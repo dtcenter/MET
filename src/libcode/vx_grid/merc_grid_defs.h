@@ -30,7 +30,7 @@ struct MercatorData {
    int nx;
    int ny;
 
-   void dump();
+   void dump() const;
 };
 
 

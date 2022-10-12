@@ -40,7 +40,7 @@ struct StereographicData {
    int nx;
    int ny;
 
-   void dump();
+   void dump() const;
 };
 
 

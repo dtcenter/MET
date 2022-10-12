@@ -535,7 +535,7 @@ void GoesImagerData::copy(const GoesImagerData *from)
 
 ////////////////////////////////////////////////////////////////////////
 
-void GoesImagerData::dump()
+void GoesImagerData::dump() const
 {
 
 mlog << Debug(4)

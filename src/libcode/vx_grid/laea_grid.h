@@ -89,15 +89,17 @@ class LaeaGrid : public GridRep {
 
       const char * projection_name() const;
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
-      ConcatString serialize() const;
+      ConcatString serialize(const char *sep=" ") const;
 
       void deserialize(const StringArray &);
 
       GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
+
+      bool wrap_lon() const;
 
       GridRep * copy() const;
 

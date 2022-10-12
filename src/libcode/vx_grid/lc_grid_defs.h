@@ -44,7 +44,7 @@ struct LambertData {
 
    // LambertData() { so2_angle = 0.0; };
 
-   void dump();
+   void dump() const;
 
 };
 

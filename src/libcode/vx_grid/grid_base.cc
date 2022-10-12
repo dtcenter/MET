@@ -54,7 +54,7 @@ static int ll_func(double x_center, int N);
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonData::dump()
+void LatLonData::dump() const
 
 {
 
@@ -136,7 +136,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorData::dump()
+void MercatorData::dump() const
 
 {
 
@@ -155,7 +155,7 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertData::dump()
+void LambertData::dump() const
 
 {
 
@@ -180,7 +180,7 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void StereographicData::dump()
+void StereographicData::dump() const
 
 {
 
@@ -204,7 +204,7 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void GaussianData::dump()
+void GaussianData::dump() const
 
 {
 
@@ -220,12 +220,12 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void LaeaData::dump()
+void LaeaData::dump() const
 
 {
 
 mlog << Debug(grid_debug_level)
-     << "\Laea Grid Data:\n"
+     << "\nLaea Grid Data:\n"
      << "    geoid: " << geoid << "\n"
      << "   lat_ll: " << lat_ll << "\n"
      << "   lon_ll: " << lon_ll << "\n"
@@ -244,7 +244,7 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void SemiLatLonData::dump()
+void SemiLatLonData::dump() const
 
 {
 
