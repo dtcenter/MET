@@ -109,6 +109,8 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
       "minutes since YYYY-MM-DD HH:MM:SS",
       "hours since YYYY-MM-DD HH:MM:SS",
       "days since YYYY-MM-DD HH:MM:SS",
+      "months since YYYY-MM-DD HH:MM:SS",
+      "years since YYYY-MM-DD HH:MM:SS",
       Accepts "Y", "YY", "YYY", "M", "D", "HH", and "HH:MM".
       "HH:MM:SS" is optional
     - "degrees_north",
