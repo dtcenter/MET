@@ -112,22 +112,40 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
 
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
 
-    bool day_adjusted = false;
-    int day_org, day_offset, month_offset;
-    day_org = day;
+    int month_offset;
+    double day_offset;
     if (sec_per_unit == SEC_YEAR) {
-      time_fraction *= 12;  // 12 months/year
+      year += time_value_ut;
+      time_fraction *= 12;      // 12 months/year
       month_offset = (unixtime)time_fraction;
       time_fraction -= month_offset;
     }
     else month_offset = time_value_ut;
-    // Add 0.00002 for the precisiton - 0.3 becomes 0.299988
-    day += ((abs(time_fraction-0.5) < DAY_EPSILON))
-           ? 14 : (int)((time_fraction+DAY_EPSILON) * 30);
 
     for (int idx=0; idx<month_offset; idx++) {
       increase_one_month(year, month);
     }
+    if (day == 1) {
+      if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
+      else {
+        day_offset = time_fraction * 30;
+        day += (int)day_offset;
+        if (day_offset - (int)day_offset > 0.5) day++;
+      }
+    }
+    else {
+      day_offset = time_fraction * 30;
+      time_value_ut = (int)day_offset;
+      day += time_value_ut;
+      if (day_offset - time_value_ut > 0.5) day++;
+      if (day > 30) {
+         day -= 30;
+         increase_one_month(year, month);
+      }
+    }
+
+    int day_org = day;
+    bool day_adjusted = false;
     int max_day = monthly_days[month-1];
     if (day > max_day) {
       day = max_day;
