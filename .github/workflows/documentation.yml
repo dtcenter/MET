@@ -17,8 +17,8 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.6'
       - name: Install dependencies
@@ -27,12 +27,12 @@ jobs:
           sphinx-gallery Pillow sphinx_rtd_theme sphinx-panels
       - name: Build docs
         run: ./.github/jobs/build_documentation.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: documentation
           path: artifact/documentation
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: documentation_warnings.log
