@@ -407,17 +407,6 @@ void TrackPairInfo::add(const TCStatLine &l) {
       tp->set_eye(string_to_systemsdepth(l.get_item(cs.c_str())));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
-      cs << cs_erase << deck[i] << "NUM_MEMBERS";
-      tp->set_num_members(atoi(l.get_item(cs.c_str())));
-      cs << cs_erase << deck[i] << "TRACK_SPREAD";
-      tp->set_spread(atof(l.get_item(cs.c_str())));
-      cs << cs_erase << deck[i] << "DIST_MEAN";
-      tp->set_dist_mean(atof(l.get_item(cs.c_str())));
-      cs << cs_erase << deck[i] << "MAX_WIND_SPREAD";
-      tp->set_v_max_stdev(atof(l.get_item(cs.c_str())));
-      cs << cs_erase << deck[i] << "MSLP_SPREAD";
-      tp->set_mslp_stdev(atof(l.get_item(cs.c_str())));
-      
       // Loop over the winds
       for(j=0; j<NWinds; j++) {
 
@@ -444,6 +433,13 @@ void TrackPairInfo::add(const TCStatLine &l) {
       } // end for j
    } // end for i
 
+   // Set the consensus track variables
+   tp->set_num_members(atoi(l.get_item("NUM_MEMBERS")));
+   tp->set_spread(atof(l.get_item("TRACK_SPREAD")));
+   tp->set_dist_mean(atof(l.get_item("DIST_MEAN")));
+   tp->set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
+   tp->set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
+   
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
    BDeck.add(bpoint);
