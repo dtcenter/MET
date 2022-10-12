@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="ioda2nc_mask_sid_list">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>   <value>"KEKA"</value></pair>
+      <pair><name>MASK_GRID</name>    <value></value></pair>
+      <pair><name>MASK_POLY</name>    <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
+      &OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.mask_sid.nc \
+      -config &CONFIG_DIR;/IODA2NCConfig_mask \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.mask_sid.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ioda2nc_var_all">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ioda/odb_sonde_16019.nc4 \
+      &OUTPUT_DIR;/ioda2nc/odb_sonde_16019_all.nc \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/odb_sonde_16019_all.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ioda2nc_summary">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
+      &OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.summary.nc \
+      -config &CONFIG_DIR;/IODA2NCConfig_summary \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.summary.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ioda2nc_same_input">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>   <value>"KEKA"</value></pair>
+      <pair><name>MASK_GRID</name>    <value></value></pair>
+      <pair><name>MASK_POLY</name>    <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
+      &OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.same_input.nc \
+      -config &CONFIG_DIR;/IODA2NCConfig_mask \
+      -iodafile &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/ioda.NC001007.2020031012.same_input.nc</point_nc>
+    </output>
+  </test>
+
+</met_test>

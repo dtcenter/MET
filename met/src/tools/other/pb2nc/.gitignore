@@ -1,8 +1,0 @@
-pb2nc
-*.o
-*.a
-.deps
-.dirstamp
-Makefile
-Makefile.in
-*.dSYM

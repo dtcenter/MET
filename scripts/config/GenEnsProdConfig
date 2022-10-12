@@ -1,0 +1,163 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Gen-Ens-Prod configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+// May be set separately in each "field" entry
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+nc_var_str    = "";
+
+//
+// Ensemble fields to be processed
+//
+ens = {
+   ens_thresh = 1.0;
+   vld_thresh = 1.0;
+
+   field = [
+      {
+         name       = "APCP";
+         level      = [ "A24" ];
+         cat_thresh = [ >0.0, >=10.0 ];
+         ensemble_flag = TRUE;
+      },
+      {
+         name       = "REFC";
+         level      = [ "L0" ];
+         cat_thresh = [ >=35.0 ];
+         GRIB1_ptv  = 129;
+      },
+      {
+         name       = "UGRD";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      },
+      {
+         name       = "VGRD";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      },
+      {
+         name       = "WIND";
+         level      = [ "Z10" ];
+         cat_thresh = [ >=5.0 ];
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble product output types
+// May be set separately in each "ens.field" entry
+//
+ensemble_flag = {
+   latlon    = TRUE;
+   mean      = TRUE;
+   stdev     = TRUE;
+   minus     = FALSE;
+   plus      = FALSE;
+   min       = FALSE;
+   max       = FALSE;
+   range     = FALSE;
+   vld_count = FALSE;
+   frequency = TRUE;
+   nep       = FALSE;
+   nmep      = FALSE;
+   climo     = FALSE;
+   climo_cdp = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

@@ -7,17 +7,17 @@ version: 2
 
 # Build all formats (htmlzip, pdf, epub)
 #formats: all
-formats: []
+formats: [pdf]
 
 # Optionally set the version of Python and requirements required to build your
 # docs
 python:
    version: 3.7
    install:
-   - requirements: met/docs/requirements.txt
+   - requirements: docs/requirements.txt
 
 # Configuration for Sphinx documentation (this is the default documentation
 # type)
 sphinx:
   builder: html
-  configuration: met/docs/conf.py
+  configuration: docs/conf.py

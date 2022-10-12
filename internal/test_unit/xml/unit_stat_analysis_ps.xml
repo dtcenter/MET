@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: unit_point_stat.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="stat_analysis_CONFIG_POINT_STAT">
+    <env>
+      <pair><name>CONFIG_DIR</name> <value>&CONFIG_DIR;</value></pair>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_point_stat \
+      -out &OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_filter_mpr_sid.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_SUMMARY">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS,FCST-OBS,ABS(FCST-OBS)' \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SUMMARY.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SUMMARY.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_SUMMARY_UNION">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS' -column_union true \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SUMMARY_UNION.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SUMMARY_UNION.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_FILTER_OBS_SID">
+    <exec>touch &OUTPUT_DIR;/stat_analysis_ps/EmptyConfigFile; \
+          &MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -config &OUTPUT_DIR;/stat_analysis_ps/EmptyConfigFile \
+      -job filter -line_type MPR -fcst_var TMP -fcst_lev Z2 -vx_mask DTC165 \
+      -column_str     OBS_SID KDLN,KDHT,KDEN,KDLS,KDMA,KDMN,KDVT,KDEW \
+      -column_str_exc OBS_SID KDLN,KDHT \
+      -dump_row &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_FILTER_OBS_SID.stat \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_FILTER_OBS_SID.stat</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_FILTER_TIMES">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_filter_times \
+      -out &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_FILTER_TIMES.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_FILTER_TIMES.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_RAMPS">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_MODEL;/time_series_met_6.0/*.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_ramps \
+      -out &OUTPUT_DIR;/stat_analysis_ps/RAMPS.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/RAMPS.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/RAMPS_100_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/RAMPS_25_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/RAMPS_25_100_30min.stat</stat>
+    </output>
+  </test>
+
+</met_test>

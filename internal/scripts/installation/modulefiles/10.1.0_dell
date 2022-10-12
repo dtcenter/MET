@@ -1,0 +1,31 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.1.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+# The intel compiler is required to run MET
+
+module load ips/18.0.1.163
+module load python/3.6.3
+module load bufr/11.3.0
+module load NetCDF/4.5.0
+module load HDF5-serial/1.8.20
+module load jasper/1.900.1
+module load libpng/1.2.59
+module load zlib/1.2.11
+module load gsl/2.1
+module load g2c/1.6.3
+
+set base /gpfs/dell2/emc/verification/noscrub/emc.metplus/met/10.1.0
+set ver  10.1.0
+set share $base/share/met
+set lib_base $base
+
+prepend-path PATH $base/exec
+
+setenv METversion V$ver
+setenv MET_ROOT $base

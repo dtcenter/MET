@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: unit_ref_config_lead_00.xml unit_ref_config_lead_12.xml unit_ref_config_lead_24.xml unit_ref_config_lead_36.xml unit_ref_config_lead_48.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--                                                                  -->
+  <!-- Run STAT-Analysis once to compute the GO Index                   -->
+  <!--                                                                  -->
+
+  <test name="stat_analysis_GO_Index">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv3.3 \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -job go_index -fcst_init_beg 2011090200 -fcst_init_end 2011090200 \
+      -model AFWAv3.4_Noahv3.3 -model AFWAv3.4_Noahv2.7.1 \
+      -vx_mask FULL -interp_mthd BILIN \
+      -out &OUTPUT_DIR;/ref_config/stat_analysis/go_index.out \
+      -v 1
+    </param>   
+    <output>
+      <exist>&OUTPUT_DIR;/ref_config/stat_analysis/go_index.out</exist>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Run STAT-Analysis GO Index and write .stat output                -->
+  <!--                                                                  -->
+
+  <test name="stat_analysis_GO_Index_out_stat">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv3.3 \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -job go_index \
+      -by FCST_INIT_BEG,VX_MASK,OBTYPE -set_hdr DESC Noahv3.3_vs_v2.7.1 \
+      -model AFWAv3.4_Noahv3.3,AFWAv3.4_Noahv2.7.1 -ss_index_vld_thresh 0.5 \
+      -out_stat &OUTPUT_DIR;/ref_config/stat_analysis/go_index_by_option.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config/stat_analysis/go_index_by_option.stat</stat>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Run a custom STAT-Analysis SS Index job and write .stat output   -->
+  <!--                                                                  -->
+
+  <test name="stat_analysis_SFC_SS_Index_out">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv3.3 \
+      -lookin &OUTPUT_DIR;/ref_config_lead_*/point_stat/AFWAv3.4_Noahv2.7.1 \
+      -job ss_index -config &CONFIG_DIR;/STATAnalysisConfig_SFC_SS_Index \
+      -by FCST_INIT_BEG,VX_MASK,OBTYPE \
+      -out_stat &OUTPUT_DIR;/ref_config/stat_analysis/sfc_ss_index_by_option.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ref_config/stat_analysis/sfc_ss_index_by_option.stat</stat>
+    </output>
+  </test>
+
+</met_test>

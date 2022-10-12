@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_pb2nc.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="climatology_POINT_STAT_WMO_1.5DEG">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>WMO_CLIMO_1.5DEG</value></pair>
+      <pair><name>CLIMO_DIR</name>     <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_climo_WMO \
+      -outdir &OUTPUT_DIR;/climatology_1.5deg -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_rps.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_vcnt.txt</stat>
+    </output>
+  </test>
+  
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_MPR_AGG_STAT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type CTC -fcst_lev P850 -interp_mthd NEAREST -by FCST_VAR -out_thresh '>CDP90' \
+      -out_stat &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_VAL1L2_AGG_STAT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type VAL1L2 -out_line_type VCNT -by FCST_LEV \
+      -out_stat &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_VAL1L2_to_VCNT_out.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_VAL1L2_to_VCNT_out.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_FILTER">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job filter -line_type MPR -column_thresh CLIMO_CDF 'lt0.1||gt0.9' \
+      -dump_row &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_GRID_STAT_WMO_1.5DEG">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>WMO_CLIMO_1.5DEG</value></pair>
+      <pair><name>CLIMO_DIR</name>     <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_climo_WMO \
+      -outdir &OUTPUT_DIR;/climatology_1.5deg -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_1.5deg/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology_1.5deg/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

@@ -1,0 +1,225 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ensemble-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
+// Output observation type to be written
+//
+obtype = "ANALYS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = [];
+control_id = "";
+
+//
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+nc_var_str  = "";
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   ens_thresh   = 0.75;
+   vld_thresh   = 1.0;
+   message_type = [ "ADPSFC" ];
+
+   field = [
+      {
+         name          = "APCP";
+         level         = "A24";
+         censor_thresh = [ ${CENSOR_THRESH} ];
+         censor_val    = [ ${CENSOR_VAL} ];
+      }
+   ];
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
+
+//
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   flag             = FALSE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+   min              = NA;
+   max              = NA;
+}
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [];
+   poly  = [];
+   sid   = [ "${CONFIG_DIR}/SID_MESOWEST_OR.txt" ];
+   llpnt = { name       = "LATLONBOX";
+             lat_thresh = >=42.5&&<=43.5;
+             lon_thresh = >=-122&&<=-120; }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+// May be set separately in each "obs.field" entry
+//
+output_flag = {
+   ecnt  = STAT;
+   rps   = NONE;
+   rhist = STAT;
+   phist = STAT;
+   orank = BOTH;
+   ssvar = STAT;
+   relp  = STAT;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gridded verification output types
+// May be set separately in each "obs.field" entry
+//
+nc_orank_flag = {
+   latlon    = TRUE;
+   mean      = TRUE;
+   raw       = FALSE;
+   rank      = FALSE;
+   pit       = FALSE;
+   vld_count = FALSE;
+   weight    = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Random number generator
+//
+rng = {
+   type = "mt19937";
+   seed = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag = NONE;
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

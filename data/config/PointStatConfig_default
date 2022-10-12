@@ -1,0 +1,299 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+// May be set separately in each "field" entry
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "field" entry
+//
+censor_thresh  = [];
+censor_val     = [];
+mpr_column     = [];
+mpr_thresh     = [];
+cat_thresh     = [ NA ];
+cnt_thresh     = [ NA ];
+cnt_logic      = UNION;
+wind_thresh    = [ NA ];
+wind_logic     = UNION;
+eclv_points    = 0.05;
+hss_ec_value   = NA;
+rank_corr_flag = FALSE;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   field = [
+      {
+        name       = "SPFH";
+        level      = [ "P500" ];
+        cat_thresh = [ >80.0 ];
+      },
+
+      {
+        name       = "TMP";
+        level      = [ "P500" ];
+        cat_thresh = [ >273.0 ];
+      },
+
+      {
+        name       = "HGT";
+        level      = [ "P500" ];
+        cat_thresh = [ >0.0 ];
+      },
+
+      {
+        name       = "UGRD";
+        level      = [ "P500" ];
+        cat_thresh = [ >5.0 ];
+      },
+
+      {
+        name       = "VGRD";
+        level      = [ "P500" ];
+        cat_thresh = [ >5.0 ];
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type   = [ "ADPUPA" ];
+sid_inc        = [];
+sid_exc        = [];
+obs_quality_inc  = [];
+obs_quality_exc  = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_perc_value = 50;
+
+//
+// Mapping of message type group name to comma-separated list of values.
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
+   { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
+   { key = "WATERSF"; val = "SFCSHP";                             }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology data
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+   direct_prob = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Land/Sea mask
+// For LANDSF message types, only use forecast grid points where land = TRUE.
+// For WATERSF message types, only use forecast grid points where land = FALSE.
+// land_mask.flag may be set separately in each "obs.field" entry.
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// Topography
+// For SURFACE message types, only use observations where the topo - station
+// elevation difference meets the use_obs_thresh threshold.
+// For the observations kept, when interpolating forecast data to the
+// observation location, only use forecast grid points where the topo - station
+// difference meets the interp_fcst_thresh threshold.
+// topo_mask.flag may be set separately in each "obs.field" entry.
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [];
+   field              = { name = "TOPO"; level = "L0"; }
+   regrid             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+// May be set separately in each "obs.field" entry
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+// May be set separately in each "obs.field" entry
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+// May be set separately in each "obs.field" entry
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+// May be set separately in each "obs.field" entry
+//
+interp = {
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+// May be set separately in each "obs.field" entry
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+// May be set separately in each "obs.field" entry
+//
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE; // Only for HiRA.
+   orank  = NONE; // Only for HiRA.
+   rps    = NONE; // Only for HiRA.
+   eclv   = NONE;
+   mpr    = NONE;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir        = "/tmp";
+output_prefix  = "";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

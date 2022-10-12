@@ -2,7 +2,7 @@
 name: Sub-Issue
 about: Break an issue down into smaller parts
 title: ''
-labels: 'type: sub-issue'
+labels: 'alert: NEED ACCOUNT KEY, alert: NEED MORE DEFINITION, alert: NEED PROJECT ASSIGNMENT, type: sub-issue'
 assignees: ''
 
 ---
@@ -28,5 +28,5 @@ This is a sub-issue of #*List the parent issue number here*.
 - [ ] Select **requestor(s)**
 
 ### Projects and Milestone ###
-- [ ] Review **projects** and select relevant **Repository** and **Organization** ones or add "alert:NEED PROJECT ASSIGNMENT" label
-- [ ] Select **milestone** to next major version milestone or "Future Versions"
+- [ ] Select **Repository** and/or **Organization** level **Project(s)** or add **alert: NEED PROJECT ASSIGNMENT** label
+- [ ] Select **Milestone** as the next official version or **Future Versions**

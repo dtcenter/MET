@@ -1,7 +1,0 @@
-mode_analysis
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

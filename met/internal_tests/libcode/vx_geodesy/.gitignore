@@ -1,7 +1,0 @@
-test_spheroid
-*.o
-*.a
-.deps
-Makefile
-Makefile.in
-*.dSYM

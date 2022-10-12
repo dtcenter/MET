@@ -1,0 +1,224 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+duplicate_flag = UNIQUE;
+obs_summary    = NONE;
+obs_perc_value = 50;
+eclv_points    = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   message_type = [ "ADPSFC" ];
+   sid_inc      = [];
+   sid_exc      = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = NONE;
+        desc = "Obs_Summary:None";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = NEAREST;
+        desc = "Obs_Summary:Nearest";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = MIN;
+        desc = "Obs_Summary:Minimum";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = MAX;
+        desc = "Obs_Summary:Maximum";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = UW_MEAN;
+        desc = "Obs_Summary:Unweighted_Mean";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = DW_MEAN;
+        desc = "Obs_Summary:Time_Weighted_Mean";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = MEDIAN;
+        desc = "Obs_Summary:Median";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = PERC;
+        obs_perc_value = 75;
+        desc = "Obs_Summary:75th_Percentile";
+      },
+      {
+        name       = "TMP";
+        level      = [ "Z2" ];
+        cat_thresh = [ <=273, >273 ];
+        duplicate_flag = UNIQUE;
+        obs_summary = PERC;
+        obs_perc_value = 25;
+        desc = "Obs_Summary:25th_Percentile";
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = STAT;
+   ctc    = STAT;
+   cts    = STAT;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = STAT;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE;
+   orank  = NONE;
+   rps    = NONE;
+   eclv   = STAT;
+   mpr    = BOTH;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V11.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

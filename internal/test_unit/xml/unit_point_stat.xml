@@ -1,0 +1,511 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_ascii2nc.xml unit_pb2nc.xml -->
+
+<met_test>
+
+  <!--                                    -->
+  <!--  point_stat                        -->
+  <!--                                    -->
+
+  <test name="point_stat_GRIB1_NAM_GDAS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib {name=\"LAND\";level=\"L0\";}</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_PHYS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_vcnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_GDAS_WINDS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_WINDS</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_WINDS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_WINDS_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_GDAS_MASK_SID">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_MASK_SID</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_MASK_SID \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_vcnt.txt</stat> 
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB2_NAM_NDAS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 {name=\"LAND\";level=\"L0\";}</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_NAM_NDAS</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012_gNam.grib2"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_PHYS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vcnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB2_SREF_GDAS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 {name=\"TMP\";level=\"Z2\";} &lt;280</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_SREF_GDAS</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_PHYS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_vcnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_TRMM">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>1800</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
+      <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>GRIB1_NAM_TRMM</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB2_SREF_TRMM">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>1800</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
+      <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>GRIB2_SREF_TRMM</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_NCMET_NAM_HMTGAGE">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>1800</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "APCP"; level = "A24"; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_HMTGAGE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_NCMET_NAM_NDAS_SEEPS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>1800</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "TP24"; level = "L0"; is_precipitation = TRUE; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>BOTH</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_NDAS_SEEPS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
+      &OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_seeps.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V_seeps_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_NCPINT_TRMM">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>150000000</value></pair>
+      <pair><name>FCST_FIELD_NAME</name>  <value>RAINNC</value></pair>
+      <pair><name>FCST_FIELD_LEVEL</name> <value>(0,*,*)</value></pair>
+      <pair><name>OBS_DICT</name>         <value>{ field = [ { name = "APCP"; level = "A3"; } ]; }</value></pair>
+      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NCPINT_TRMM</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_NCPINT_NDAS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>           <value>-1800</value></pair>
+      <pair><name>END_DS</name>           <value>150000000</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NCPINT_NDAS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_PHYS_pint \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB2_SREF_TRMM_prob">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_SREF_TRMM_prob</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      &CONFIG_DIR;/PointStatConfig_prob \
+      -outdir &OUTPUT_DIR;/point_stat -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_prob_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_prob_150000L_20120409_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_prob_150000L_20120409_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_prob_150000L_20120409_120000V_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_prob_150000L_20120409_120000V_prc.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GTG_lc">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-5400</value></pair>
+      <pair><name>END_DS</name>         <value>5400</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GTG_lc</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130827.i12.f03.nc \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc \
+      &CONFIG_DIR;/PointStatConfig_GTG_lc \
+      -outdir &OUTPUT_DIR;/point_stat -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_lc_030000L_20130827_150000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GTG_latlon">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-5400</value></pair>
+      <pair><name>END_DS</name>         <value>5400</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GTG_latlon</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc \
+      &CONFIG_DIR;/PointStatConfig_GTG_latlon \
+      -outdir &OUTPUT_DIR;/point_stat -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GTG_latlon_060000L_20130827_180000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_SID_INC_EXC">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>CENSOR_THRESH</name>  <value></value></pair>
+      <pair><name>CENSOR_VAL</name>     <value></value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SID_INC_EXC</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_sid_inc_exc \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_SID_INC_EXC_CENSOR">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>CENSOR_THRESH</name>  <value>lt-3.0, gt3.0</value></pair>
+      <pair><name>CENSOR_VAL</name>     <value>  -3.0,   3.0</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>SID_INC_EXC_CENSOR</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_sid_inc_exc \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_CENSOR_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_INC_EXC_CENSOR_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_GDAS_INTERP_OPTS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_INTERP_OPTS</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_INTERP_OPTS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_name">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_INTERP_OPTS_name</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc \
+      &CONFIG_DIR;/PointStatConfig_INTERP_OPTS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_name_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_LAND_TOPO_MASK">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>GEOG_FILE</name>      <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>LAND_TOPO_MASK</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_LAND_TOPO_MASK \
+      -outdir &OUTPUT_DIR;/point_stat -v 2 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_MPR_THRESH">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>MPR_THRESH</value></pair>
+      <pair><name>DAY_INTERVAL</name>  <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590409"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590409"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_mpr_thresh \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_MPR_THRESH_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+</met_test>

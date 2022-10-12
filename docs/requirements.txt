@@ -1,0 +1,3 @@
+sphinx-gallery
+sphinxcontrib-bibtex
+sphinx-panels
