@@ -14,7 +14,6 @@ Scientific and statistical aspects of the Grid-Stat tool are briefly described i
 Scientific and statistical aspects
 ==================================
 
-
 Statistical measures
 --------------------
 
