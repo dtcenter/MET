@@ -11,5 +11,5 @@ fi
 
 branch_name=${branch_name#"refs/heads/"}
 
-echo ::set-output name=branch_name::$branch_name
+echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 echo branch_name: $branch_name
