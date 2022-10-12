@@ -434,11 +434,11 @@ void TrackPairInfo::add(const TCStatLine &l) {
    } // end for i
 
    // Set the consensus track variables
-   tp->set_num_members(atoi(l.get_item("NUM_MEMBERS")));
-   tp->set_spread(atof(l.get_item("TRACK_SPREAD")));
-   tp->set_dist_mean(atof(l.get_item("DIST_MEAN")));
-   tp->set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
-   tp->set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
+   apoint.set_num_members(atoi(l.get_item("NUM_MEMBERS")));
+   apoint.set_spread(atof(l.get_item("TRACK_SPREAD")));
+   apoint.set_dist_mean(atof(l.get_item("DIST_MEAN")));
+   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
+   apoint.set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
    
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
