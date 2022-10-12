@@ -18,7 +18,6 @@ using namespace std;
 #include <cmath>
 
 #include "math_constants.h"
-
 #include "track_info.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -923,8 +922,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    // Loop through the lead times and construct a TrackPoint for each
    for(i=0, skip=false; i<lead_list.n_elements(); i++) {
 
-      cout << "Working on lead-time index: " << i << endl;
-      
       // Initialize TrackPoint
       pavg.clear();
       psum.clear();
@@ -954,8 +951,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         cout << "Track Point lat: " << tracks.Track[j][i_pnt].lat() << " lon: " << tracks.Track[j][i_pnt].lon() << " v_max: " << tracks.Track[j][i_pnt].v_max() << " mslp: " << tracks.Track[j][i_pnt].mslp() << endl;
-         
          // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
          plat.add(tracks.Track[j][i_pnt].lat());
@@ -964,13 +959,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       }
       
       // Check for missing required member and the minimum number of points
-      //if(skip == true || pcnt < req) continue;
-
-      // Check for missing required member and the minimum number of points
-      if(skip == true || pcnt < req) {
-         cout << "pcnt: " << pcnt << " is less than req: " << req << " skipping computations (continuing)" << endl << endl;
-         continue;
-      }
+      if(skip == true || pcnt < req) continue;
       
       // Compute the average point
       pavg = psum;
@@ -1021,8 +1010,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(vmax_stdev)) pavg.set_v_max_stdev(vmax_stdev);
       if(!is_bad_data(mslp_stdev)) pavg.set_mslp_stdev(mslp_stdev);
 
-      cout << "num_members (pcnt): " << pcnt << " track_spread: " << track_spread << " dist_mean: " << dist_mean << " vmax_stdev: " << vmax_stdev << " mslp_stdev: " << mslp_stdev << endl << endl;
-      
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
@@ -1051,6 +1038,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    return(tavg);
 }
 
+////////////////////////////////////////////////////////////////////////
 
 void compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons, double &spread, double &mean) {
 
@@ -1077,30 +1065,6 @@ void compute_gc_dist_stdev(const double lat, const double lon, const NumArray &l
    
    return;
 }
-
-/*
-double compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons) {
-
-   int i, j, count;
-   double spread;
-   NumArray dist_na;
-   double dist;
-
-   // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
-   for(i=0, count=0; i<lats.n_elements(); i++) {
-      if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
-      // Save great circle distance values in num-array object
-      dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
-      count++;
-   }
-   
-   // Compute spread (standard-deviation of the distances)
-   if(count == 0) spread = bad_data_double;
-   else           spread = dist_na.stdev();
-   
-   return(spread);
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 //
