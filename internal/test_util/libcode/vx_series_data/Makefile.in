@@ -322,7 +322,8 @@ test_series_data_LDADD = -lvx_config \
 	-lvx_nc_util \
 	-lvx_log \
 	-lvx_data2d \
-	-lvx_grid  \
+	-lvx_grid \
+	-lvx_geodesy  \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_math \
