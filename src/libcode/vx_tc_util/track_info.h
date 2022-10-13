@@ -112,6 +112,7 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
+      void set_diag_name(const StringArray &);
 
          //
          //  get stuff
@@ -143,6 +144,7 @@ class TrackInfo {
       int                  valid_inc()        const;
       int                  n_points()         const;
       int                  n_diag()           const;
+      const StringArray &  diag_name()        const;
       const char *         diag_name(int)     const;
 
       StringArray          track_lines()      const;
@@ -155,6 +157,7 @@ class TrackInfo {
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       bool add_diag_data(DiagFile &, const StringArray &);
+      void add_diag_value(int, double);
 
       bool has(const ATCFTrackLine &) const;
 
@@ -167,19 +170,20 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool TrackInfo::is_best_track() const           { return(IsBestTrack); }
-inline bool TrackInfo::is_oper_track() const           { return(IsOperTrack); }
-inline bool TrackInfo::is_anly_track() const           { return(IsAnlyTrack); }
-inline void TrackInfo::set_storm_id(const char *s)     { StormId = s;         }
-inline void TrackInfo::set_basin(const char *s)        { Basin = s;           }
-inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         }
-inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       }
-inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; }
-inline void TrackInfo::set_technique(const char *s)    { Technique = s;       }
-inline void TrackInfo::set_initials(const char *s)     { Initials = s;        }
-inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
-inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
-inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
+inline bool TrackInfo::is_best_track() const               { return(IsBestTrack); }
+inline bool TrackInfo::is_oper_track() const               { return(IsOperTrack); }
+inline bool TrackInfo::is_anly_track() const               { return(IsAnlyTrack); }
+inline void TrackInfo::set_storm_id(const char *s)         { StormId = s;         }
+inline void TrackInfo::set_basin(const char *s)            { Basin = s;           }
+inline void TrackInfo::set_cyclone(const char *s)          { Cyclone = s;         }
+inline void TrackInfo::set_storm_name(const char *s)       { StormName = s;       }
+inline void TrackInfo::set_technique_number(int i)         { TechniqueNumber = i; }
+inline void TrackInfo::set_technique(const char *s)        { Technique = s;       }
+inline void TrackInfo::set_initials(const char *s)         { Initials = s;        }
+inline void TrackInfo::set_init(const unixtime u)          { InitTime = u;        }
+inline void TrackInfo::set_valid_min(const unixtime u)     { MinValidTime = u;    }
+inline void TrackInfo::set_valid_max(const unixtime u)     { MaxValidTime = u;    }
+inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
@@ -196,6 +200,7 @@ inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarm
 inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
 inline int                  TrackInfo::n_diag()           const { return(DiagName.n());                 }
+inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);                     }
 inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
 
 ////////////////////////////////////////////////////////////////////////

@@ -187,7 +187,7 @@ void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
 
       // Set the description
       if(p.n_lines() > i) {
-         hdr.set_desc((string)p.line(i)->get_item("DESC", false));
+         hdr.set_desc((string)p.tcmpr_line(i)->get_item("DESC", false));
       }
 
       // Write the header columns

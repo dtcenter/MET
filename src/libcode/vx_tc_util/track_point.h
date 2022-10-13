@@ -242,7 +242,7 @@ class TrackPoint {
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFTrackLine &);
       bool is_match(const ATCFTrackLine &) const;
-      void add_diag_data(double, double, double);
+      void add_diag_value(double, double, double);
 
 };
 

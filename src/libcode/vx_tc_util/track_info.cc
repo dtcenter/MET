@@ -552,14 +552,32 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
          if((i_pnt = lead_index(nint(diag_file.lead(i_time)))) < 0) continue;
 
          // Store this diagnostic value in the TrackPoint
-         Point[i_pnt].add_diag_data(diag_file.lat(i_time),
-                                    diag_file.lon(i_time),
-                                    diag_val[i_time]);
+         Point[i_pnt].add_diag_value(diag_file.lat(i_time),
+                                     diag_file.lon(i_time),
+                                     diag_val[i_time]);
 
       } // end for i_time
    } // end for i_name
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackInfo::add_diag_value(int i_pnt, double val) {
+
+   // Range check
+   if(i_pnt < 0 || i_pnt >= NPoints) {
+      mlog << Error << "\nTrackInfo::add_diag_value() -> "
+           << "range check error for point " << i_pnt << "\n\n";
+      exit(1);
+   }
+
+   Point[i_pnt].add_diag_value(Point[i_pnt].lat(),
+                               Point[i_pnt].lon(),
+                               val);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
