@@ -1,3 +1,7 @@
+***********************
+MET Release Information
+***********************
+
 MET Release Notes
 =================
 
@@ -83,3 +87,8 @@ MET Version 11.0.0-beta1 release notes (20220622)
    * Enhance Gen-Vx-Mask by adding a new poly_xy masking type option (`#2152 <https://github.com/dtcenter/MET/issues/2152>`_).
    * Add M_to_KFT and KM_to_KFT functions to ConfigConstants (`#2180 <https://github.com/dtcenter/MET/issues/2180>`_).
    * MET: Replace fixed length character arrays with strings (`dtcenter/METplus-Internal#14 <https://github.com/dtcenter/METplus-Internal/issues/14>`_).
+
+MET Upgrade Instructions
+========================
+
+Upgrade instructions will be listed here if they are applicable for this release.
