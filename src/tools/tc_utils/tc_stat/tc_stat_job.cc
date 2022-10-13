@@ -934,34 +934,45 @@ bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
                                  const TrackPoint &point,
                                  TCLineCounts &n) const {
    bool keep = true;
-   int i_diag;
+   double v_dbl;
    map<ConcatString,ThreshArray>::const_iterator thr_it;
 
-   // Check ColumnThreshMap
+   // Check DiagThreshMap
 
    // Loop through the numeric diagnostic thresholds
    for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
 
-      // Check whether the diagnostic name exists
-      if(!diag_name.has(thr_it->first, i_diag)) {
-         keep = false;
-         break;
-      }
+      // Get the numeric diagnostic value
+      v_dbl = get_diag_double(diag_name, point, thr_it->first);
 
-      // Check that diagnostic value
-      if(!thr_it->second.check_dbl(point.diag_val(i_diag))) {
+      // Check the diagnostic threshold
+      if(!thr_it->second.check_dbl(v_dbl)) {
          keep = false;
+         n.RejDiagThresh++;
          break;
       }
    }
 
    // Update counts
-   if(!keep) {
-      n.RejDiagThresh++;
-      n.NKeep -= 1;
-   }
+   if(!keep) n.NKeep -= 1;
 
    return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCStatJob::get_diag_double(const StringArray &diag_name,
+                                  const TrackPoint &point,
+                                  const ConcatString &diag_cs) const {
+   double v = bad_data_double;
+   int i_diag;
+
+   // Check whether the diagnostic name exists
+   if(diag_name.has(diag_cs, i_diag)) {
+      v = point.diag_val(i_diag);
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1473,11 +1484,11 @@ void TCStatJob::event_equalize_tracks() {
       if(skip) continue;
 
       // Add event equalization information for each track point
-      for(i=0; i<pair.n_lines(); i++) {
+      for(i=0; i<pair.n_points(); i++) {
 
          // Store the current map key and value
-         key = pair.adeck().technique(); // ADECK model name
-         val = pair.tcmpr_line(i)->header();   // Track line header
+         key = pair.adeck().technique();     // ADECK model name
+         val = pair.tcmpr_line(i)->header(); // Track line header
 
          // Add a new map entry, if necessary
          if(case_map.count(key) == 0) {
@@ -2101,8 +2112,11 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Apply logic based on the LineType
    //
 
-   // If not specified, assume TCMPR by adding it to the LineType
-   if(LineType.n() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+   // If not specified, assume TCMPR/TCDIAG by adding them to the LineType
+   if(LineType.n() == 0) {
+      LineType.add(TCStatLineType_TCMPR_Str);
+      LineType.add(TCStatLineType_TCDIAG_Str);
+   }
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -2235,8 +2249,8 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
    // Initialize the map
    cur_map.clear();
 
-   // Loop over TCStatLines and construct a summary map
-   for(i=0; i<pair.n_lines(); i++) {
+   // Loop over track points and construct a summary map
+   for(i=0; i<pair.n_points(); i++) {
 
       // Add summary info to the current map
       for(j=0; j<Column.n(); j++) {
@@ -2245,8 +2259,18 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
          // For -column_union, put all columns in the same key
          if(ColumnUnion) prefix = write_css(ReqColumn);
          else            prefix = Column[j];
+
          key = build_map_key(prefix.c_str(), *pair.tcmpr_line(i), ByColumn);
-         val = get_column_double(*pair.tcmpr_line(i), Column[j]);
+
+         // Parse TCDIAG values
+         if(pair.adeck().diag_name().has(Column[j])) {
+            val = get_diag_double(pair.adeck().diag_name(),
+                                  pair.adeck()[i], Column[j]);
+         }
+         // Parse TCMPR values
+         else {
+            val = get_column_double(*pair.tcmpr_line(i), Column[j]);
+         }
 
          // Add map entry for this key, if necessary
          if(cur_map.count(key) == 0) cur_map[key] = data;
@@ -3743,7 +3767,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::close_dump_file() {
-   const char *method_name = "TCStatJobProbRIRW::do_job() -> ";
+   const char *method_name = "TCStatJobProbRIRW::close_dump_file() -> ";
 
    // Close the current output dump file stream
    if(DumpOut) {
@@ -3840,7 +3864,7 @@ ConcatString TCStatJobProbRIRW::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::do_job(const StringArray &file_list,
-                             TCLineCounts &n) {
+                               TCLineCounts &n) {
    ProbRIRWPairInfo pair;
 
    // Check that -probrirw_thresh has been supplied

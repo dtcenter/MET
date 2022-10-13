@@ -274,6 +274,10 @@ void TrackPairInfo::set_keep(int i, int val) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Add derived TrackPoint pairs such as for consensus tracks
+//
+////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
                         double adland, double bdland,
@@ -298,8 +302,6 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
    ADeckPrvInt.add(bad_data_double);
    BDeckPrvInt.add(bad_data_double);
    Keep.add(1);
-
-   // JHG what about diags here?
 
    return;
 }
@@ -816,7 +818,7 @@ TrackPairInfo TrackPairInfo::keep_subset() const {
       if(Keep[i] == 0) continue;
 
       // Add from TC-Stat line data
-      if(NLines == NPoints) {
+      if(TCMPRLine.size() > 0) {
          tpi.add_tcmpr_line(TCMPRLine[i]);
          tpi.add_tcdiag_line(TCDIAGLine[i]);
       }

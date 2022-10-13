@@ -169,11 +169,11 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       // Add the current point
       pair.add(line);
 
-// JHG need to work on this logic!
-
       // Break out of the loop at the end of the track
       if(atoi(line.get_item("TOTAL")) ==
          atoi(line.get_item("INDEX"))) break;
+
+// JHG need to work on this logic! We'll exit after reading the last TCMPR line but before reading the last TCDIAG line!
 
    } // end while
 

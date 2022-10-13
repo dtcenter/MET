@@ -215,6 +215,8 @@ class TCStatJob {
 
       bool is_keeper_tcdiag(const StringArray &, const TrackPoint &, TCLineCounts &) const;
 
+      double get_diag_double(const StringArray &, const TrackPoint &, const ConcatString &) const;
+
       //////////////////////////////////////////////////////////////////
 
       virtual StringArray parse_job_command(const char *);
