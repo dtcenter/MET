@@ -167,7 +167,7 @@ void process_jobs() {
    TCStatJob *cur_job = (TCStatJob *) 0;
    ConcatString jobstring;
    int i, n_jobs;
-   TCLineCounts n;
+   TCPointCounts n;
    const char *method_name = "process_jobs() -> ";
 
    // Open the output file
@@ -210,14 +210,14 @@ void process_jobs() {
               << cur_job->serialize() << "\n";
 
          // Initialize counts
-         memset(&n, 0, sizeof(TCLineCounts));
+         memset(&n, 0, sizeof(TCPointCounts));
 
          // Do the job
          cur_job->do_job(tcst_files, n);
 
          mlog << Debug(2) << method_name
               << "Job " << i+1 << " used " << n.NKeep << " out of "
-              << n.NRead << " lines read.\n";
+              << n.NRead << " track points read.\n";
       }
       else mlog << Debug(1) << method_name << "job is missing\n";
 

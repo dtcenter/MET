@@ -523,7 +523,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
-                                TCLineCounts &n) const {
+                                TCPointCounts &n) const {
    bool keep = true;
    int i, i_init;
    double v_dbl;
@@ -710,7 +710,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
-                               TCLineCounts &n) const {
+                               TCPointCounts &n) const {
 
    // Does not apply to TCDIAG lines
    if(line.type() == TCStatLineType_TCDIAG) return(true);
@@ -932,7 +932,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
                                  const TrackPoint &point,
-                                 TCLineCounts &n) const {
+                                 TCPointCounts &n) const {
    bool keep = true;
    double v_dbl;
    map<ConcatString,ThreshArray>::const_iterator thr_it;
@@ -1431,7 +1431,7 @@ ConcatString TCStatJob::serialize() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
+void TCStatJob::do_job(const StringArray &file_list, TCPointCounts &n) {
 
    mlog << Error << "\nTCStatJob::do_job() -> "
         << "the do_job() base class function should never be called!\n\n";
@@ -1448,7 +1448,7 @@ void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
 
 void TCStatJob::event_equalize_tracks() {
    TrackPairInfo pair;
-   TCLineCounts n;
+   TCPointCounts n;
    ConcatString key, val;
    StringArray case_list;
    ConcatString models;
@@ -1536,7 +1536,7 @@ void TCStatJob::event_equalize_tracks() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::event_equalize_lines() {
-   TCLineCounts n;
+   TCPointCounts n;
    TCStatLine line;
    ConcatString key, val;
    StringArray case_list;
@@ -1606,7 +1606,7 @@ void TCStatJob::event_equalize_lines() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
+void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCPointCounts &n) {
    int i, n_rej;
 
    // Check for no points
@@ -1752,7 +1752,7 @@ void TCStatJobFilter::assign(const TCStatJobFilter & j) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobFilter::do_job(const StringArray &file_list,
-                             TCLineCounts &n) {
+                             TCPointCounts &n) {
    int i;
 
    // Check that the -dump_row option has been supplied
@@ -1813,7 +1813,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
+void TCStatJobFilter::filter_tracks(TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
@@ -1852,7 +1852,7 @@ void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobFilter::filter_lines(TCLineCounts &n) {
+void TCStatJobFilter::filter_lines(TCPointCounts &n) {
    TCStatLine line;
 
    // Apply the event equalization logic to build a list of common cases
@@ -2095,7 +2095,7 @@ ConcatString TCStatJobSummary::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
-                              TCLineCounts &n) {
+                              TCPointCounts &n) {
    TrackPairInfo pair;
    int i;
 
@@ -2157,7 +2157,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
+void TCStatJobSummary::summarize_tracks(TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
@@ -2199,7 +2199,7 @@ void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
+void TCStatJobSummary::summarize_lines(TCPointCounts &n) {
    TCStatLine line;
 
    // Apply the event equalization logic to build a list of common cases
@@ -3115,7 +3115,7 @@ ConcatString TCStatJobRIRW::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::do_job(const StringArray &file_list,
-                           TCLineCounts &n) {
+                           TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Add the input file list
@@ -3864,7 +3864,7 @@ ConcatString TCStatJobProbRIRW::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::do_job(const StringArray &file_list,
-                               TCLineCounts &n) {
+                               TCPointCounts &n) {
    ProbRIRWPairInfo pair;
 
    // Check that -probrirw_thresh has been supplied
@@ -4115,7 +4115,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-TCLineCounts::TCLineCounts() {
+TCPointCounts::TCPointCounts() {
 
    // Read and keep counts
    NRead = 0;
