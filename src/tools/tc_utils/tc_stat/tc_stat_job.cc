@@ -224,6 +224,8 @@ void TCStatJob::clear() {
    InitThreshMap.clear();
    InitStrIncMap.clear();
    InitStrExcMap.clear();
+   DiagThreshMap.clear();
+   InitDiagThreshMap.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -307,6 +309,8 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitThreshMap = j.InitThreshMap;
    InitStrIncMap = j.InitStrIncMap;
    InitStrExcMap = j.InitStrExcMap;
+   DiagThreshMap = j.DiagThreshMap;
+   InitDiagThreshMap = j.InitDiagThreshMap;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -456,6 +460,18 @@ void TCStatJob::dump(ostream & out, int depth) const {
       str_it->second.dump(out, depth + 1);
    }
 
+   out << prefix << "DiagThreshMap ...\n";
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
+
+   out << prefix << "InitDiagThreshMap ...\n";
+   for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
+
    out << prefix << "WaterOnly = " << bool_to_string(WaterOnly) << "\n";
 
    out << prefix << "RIRWTrack = " << tracktype_to_string(RIRWTrack) << "\n";
@@ -546,7 +562,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    if(!keep) n.RejTrackWatchWarn += pair.n_points();
 
    // Get the index of the track initialization point
-   i_init=pair.i_init();
+   i_init = pair.i_init();
 
    // Check for bad track initialization point
    if(is_bad_data(i_init)) {
@@ -561,6 +577,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       else if(InitStrExcMap.size() > 0) {
          keep = false;
          n.RejInitStr += pair.n_points();
+      }
+      else if(InitDiagThreshMap.size() > 0) {
+         keep = false;
+         n.RejInitDiagThresh += pair.n_points();
       }
       else if(OutInitMaskName.nonempty()) {
          keep = false;
@@ -620,6 +640,31 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       }
    }
 
+   // Check InitDiagThreshMap
+   if(keep == true) {
+
+      int i_diag;
+
+      // Loop through the numeric diagnostic thresholds
+      for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+
+         // Check whether the diagnostic name exists
+         if(!pair.adeck().diag_name().has(thr_it->first, i_diag)) {
+            keep = false;
+            break;
+         }
+
+         // Check that diagnostic value
+         if(!thr_it->second.check_dbl(pair.adeck()[i_init].diag_val(i_diag))) {
+            keep = false;
+            break;
+         }
+      }
+
+      // Update counts
+      if(!keep) n.RejInitDiagThresh += pair.n_points();
+   }
+
    // Check OutInitMask
    if(keep == true) {
 
@@ -666,6 +711,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCLineCounts &n) const {
+
+   // Does not apply to TCDIAG lines
+   if(line.type() == TCStatLineType_TCDIAG) return(true);
+
    bool keep = true;
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
@@ -881,6 +930,42 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
+                                 const TrackPoint &point,
+                                 TCLineCounts &n) const {
+   bool keep = true;
+   int i_diag;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+
+   // Check ColumnThreshMap
+
+   // Loop through the numeric diagnostic thresholds
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+
+      // Check whether the diagnostic name exists
+      if(!diag_name.has(thr_it->first, i_diag)) {
+         keep = false;
+         break;
+      }
+
+      // Check that diagnostic value
+      if(!thr_it->second.check_dbl(point.diag_val(i_diag))) {
+         keep = false;
+         break;
+      }
+   }
+
+   // Update counts
+   if(!keep) {
+      n.RejDiagThresh++;
+      n.NKeep -= 1;
+   }
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 StringArray TCStatJob::parse_job_command(const char *jobstring) {
    StringArray a, b;
    string c;
@@ -939,6 +1024,10 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrIncMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-init_str_exc"      ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrExcMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-diag_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), DiagThreshMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-init_diag_thresh"  ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitDiagThreshMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
       else if(c.compare("-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
@@ -1263,6 +1352,18 @@ ConcatString TCStatJob::serialize() const {
            << str_it->second[i] << " ";
       }
    }
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n(); i++) {
+         s << "-diag_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
+   for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n(); i++) {
+         s << "-init_diag_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
    if(WaterOnly != default_water_only)
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
    if(RIRWTrack != default_rirw_track) {
@@ -1501,8 +1602,8 @@ void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
    if(pair.n_points() == 0) return;
 
    // Increment the read and keep counts
-   n.NRead += pair.n_lines();
-   n.NKeep += pair.n_lines();
+   n.NRead += pair.n_points();
+   n.NKeep += pair.n_points();
 
    // Determine if the whole track can be discarded
    if(!is_keeper_track(pair, n)) {
@@ -1549,12 +1650,17 @@ void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
    // Loop over the track points to check line by line
    for(i=0; i<pair.n_points(); i++) {
 
-      // Skip marked lines
-      if(!pair.keep(i)) continue;
-
-      // Check if this point should be discarded
-      // JHG, check diag vals too!
-      if(!is_keeper_line(*pair.tcmpr_line(i), n)) pair.set_keep(i, 0);
+      // Check if this TCMPR line should be discarded
+      if(pair.keep(i) &&
+         !is_keeper_line(*pair.tcmpr_line(i), n)) {
+         pair.set_keep(i, 0);
+      }
+      // Check if this TCDIAG line should be discarded
+      else if(pair.keep(i) &&
+              !is_keeper_tcdiag(pair.adeck().diag_name(),
+                                pair.adeck()[i], n)) {
+         pair.set_keep(i, 0);
+      }
    }
 
    // Subset the points marked for retention
@@ -1737,7 +1843,7 @@ void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
 
 void TCStatJobFilter::filter_lines(TCLineCounts &n) {
    TCStatLine line;
-cout << "JHGa\n";
+
    // Apply the event equalization logic to build a list of common cases
    if(EventEqual == true) event_equalize_lines();
 
@@ -1758,7 +1864,7 @@ cout << "JHGa\n";
          // Increment the read and keep counts
          n.NRead++;
          n.NKeep++;
-cout << "JHG read/keep = " << n.NRead << "/" << n.NKeep << "\n";
+
          // Check if this line should be kept
          if(!is_keeper_line(line, n)) continue;
 
@@ -3995,6 +4101,7 @@ TCLineCounts::TCLineCounts() {
    RejTrackWatchWarn = 0;
    RejInitThresh = 0;
    RejInitStr = 0;
+   RejInitDiagThresh = 0;
 
    // Filtering on track attributes
    RejRIRW = 0;
@@ -4019,6 +4126,7 @@ TCLineCounts::TCLineCounts() {
    RejWaterOnly = 0;
    RejColumnThresh = 0;
    RejColumnStr = 0;
+   RejDiagThresh = 0;
    RejMatchPoints = 0;
    RejEventEqual = 0;
    RejOutInitMask = 0;

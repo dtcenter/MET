@@ -129,6 +129,7 @@ struct TCLineCounts {
    int RejTrackWatchWarn;
    int RejInitThresh;
    int RejInitStr;
+   int RejInitDiagThresh;
 
    // Filtering on track attributes
    int RejRIRW;
@@ -153,6 +154,7 @@ struct TCLineCounts {
    int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
+   int RejDiagThresh;
    int RejMatchPoints;
    int RejEventEqual;
    int RejOutInitMask;
@@ -210,6 +212,8 @@ class TCStatJob {
       bool is_keeper_line(const TCStatLine &, TCLineCounts &) const;
 
       double get_column_double(const TCStatLine &, const ConcatString &) const;
+
+      bool is_keeper_tcdiag(const StringArray &, const TrackPoint &, TCLineCounts &) const;
 
       //////////////////////////////////////////////////////////////////
 
@@ -297,6 +301,10 @@ class TCStatJob {
       // ASCII column string matching
       std::map<ConcatString,StringArray> InitStrIncMap;
       std::map<ConcatString,StringArray> InitStrExcMap;
+
+      // Numeric diagnostic thresholds
+      std::map<ConcatString,ThreshArray> DiagThreshMap;
+      std::map<ConcatString,ThreshArray> InitDiagThreshMap;
 
       // Variables to the store the analysis job specification
       ConcatString DumpFile;             // Dump TrackPairInfo used to a file

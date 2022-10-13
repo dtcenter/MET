@@ -222,11 +222,12 @@ void process_jobs() {
       else mlog << Debug(1) << method_name << "job is missing\n";
 
       mlog << Debug(3)
-           << "Total lines read                 = " << n.NRead             << "\n"
-           << "Total lines kept                 = " << n.NKeep             << "\n"
+           << "Total track points read          = " << n.NRead             << "\n"
+           << "Total track points kept          = " << n.NKeep             << "\n"
            << "Rejected for track watch/warn    = " << n.RejTrackWatchWarn << "\n"
            << "Rejected for init threshold      = " << n.RejInitThresh     << "\n"
            << "Rejected for init string         = " << n.RejInitStr        << "\n"
+           << "Rejected for init diag threshold = " << n.RejInitDiagThresh << "\n"
            << "Rejected for out init mask       = " << n.RejOutInitMask    << "\n"
            << "Rejected for water only          = " << n.RejWaterOnly      << "\n"
            << "Rejected for rapid inten         = " << n.RejRIRW           << "\n"
@@ -249,6 +250,7 @@ void process_jobs() {
            << "Rejected for line type           = " << n.RejLineType       << "\n"
            << "Rejected for numeric threshold   = " << n.RejColumnThresh   << "\n"
            << "Rejected for string matching     = " << n.RejColumnStr      << "\n"
+           << "Rejected for diag threshold      = " << n.RejDiagThresh     << "\n"
            << "Rejected for match points        = " << n.RejMatchPoints    << "\n"
            << "Rejected for event equal         = " << n.RejEventEqual     << "\n"
            << "Rejected for out init mask       = " << n.RejOutInitMask    << "\n"
