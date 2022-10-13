@@ -161,11 +161,15 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
    // Read lines to the end of the track or file
    while(CurLDF >> line) {
 
-      // Skip header and non-TCMPR lines
-      if(line.is_header() || line.type() != TCStatLineType_TCMPR) continue;
+      // Skip header and non-TCMPR/TCDIAG lines
+      if(line.is_header() ||
+         (line.type() != TCStatLineType_TCMPR &&
+          line.type() != TCStatLineType_TCDIAG)) continue;
 
       // Add the current point
       pair.add(line);
+
+// JHG need to work on this logic!
 
       // Break out of the loop at the end of the track
       if(atoi(line.get_item("TOTAL")) ==
@@ -224,7 +228,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 
       break;
 
-   } //end while
+   } // end while
 
    return(status);
 }
@@ -270,7 +274,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
 
       break;
 
-   } //end while
+   } // end while
 
    return(status);
 }
