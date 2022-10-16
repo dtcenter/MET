@@ -957,10 +957,10 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          pvmax.add(tracks.Track[j][i_pnt].v_max());
          pmslp.add(tracks.Track[j][i_pnt].mslp());
       }
-      
+
       // Check for missing required member and the minimum number of points
       if(skip == true || pcnt < req) continue;
-      
+
       // Compute the average point
       pavg = psum;
       if(!is_bad_data(pavg.v_max())) pavg.set_v_max(psum.v_max()/pcnt);

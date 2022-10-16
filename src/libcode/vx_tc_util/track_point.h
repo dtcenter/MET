@@ -130,12 +130,12 @@ class TrackPoint {
       // Location
       double        Lat;        //  degrees, + north, - south
       double        Lon;        //  degrees, + west, - east
-      
+
       // Intensity
       double        Vmax;       //  knots
       double        MSLP;       //  millibars
       CycloneLevel  Level;
-      
+
       // Pressure of the last closed isobar (900 - 1050 mb)
       double        RadP;
 
