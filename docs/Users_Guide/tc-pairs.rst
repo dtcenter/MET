@@ -474,13 +474,13 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - system depth, D-deep, M-medium, S-shallow, X-unknown
   * - 80
     - NUM_MEMBERS
-    - consensus variable: number of models (or ensemble members) that were used to build the consesus track data
+    - consensus variable: number of models (or ensemble members) that were used to build the consensus track
   * - 81
     - TRACK_SPREAD
-    - consensus variable: the standard deviation of the distance from each member track location to the location of the consensus track (nm)
+    - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
   * - 82
     - DIST_MEAN
-    - consensus variable: the mean of the distances from each member track location to the consensus track location (nm)
+    - consensus variable: the mean of the distances from the member location to the consensus track location (nm)
   * - 83
     - MSLP_SPREAD
     - consensus variable: the standard deviation of the member's mean sea level pressure values 
