@@ -93,7 +93,7 @@ metadata_map = [
    { key = "pressure";     val = "air_pressure,pressure"; },
    { key = "height";       val = "height,height_above_mean_sea_level"; },
    { key = "datetime";     val = "datetime,dateTime"; },
-   { key = "elevation";    val = ""; }
+   { key = "elevation";    val = "elevation,station_elevation"; }
 ];
 
 //
