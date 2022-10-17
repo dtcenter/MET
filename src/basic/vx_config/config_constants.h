@@ -885,6 +885,7 @@ static const char conf_key_do_polylines_flag   [] = "do_polylines";
 // PB2NC specific parameter key names
 //
 
+static const char conf_key_datetime[]              = "datetime";
 static const char conf_key_station_id[]            = "station_id";
 static const char conf_key_elevation_range[]       = "elevation_range";
 static const char conf_key_pb_report_type[]        = "pb_report_type";
