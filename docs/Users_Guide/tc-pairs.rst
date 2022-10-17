@@ -156,7 +156,7 @@ ____________________
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
+The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. If a consensus model is indicated in the configuration file there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, DIST_MEAN, MSLP_SPREAD, MAX_WIND_SPREAD). See the TCMPR line type definitions below.
 
 ____________________
 
@@ -472,7 +472,22 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 78, 79
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
-
+  * - 80
+    - NUM_MEMBERS
+    - consensus variable: number of models (or ensemble members) that were used to build the consensus track
+  * - 81
+    - TRACK_SPREAD
+    - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
+  * - 82
+    - DIST_MEAN
+    - consensus variable: the mean of the distances from the member location to the consensus track location (nm)
+  * - 83
+    - MSLP_SPREAD
+    - consensus variable: the standard deviation of the member's mean sea level pressure values 
+  * - 84
+    - MAX_WIND_SPREAD
+    - consensus variable: the standard deviation of the member's maximum wind speed values 
+  
 .. _PROBRIRW Line Type:
 
 .. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification/Weakening) output line type.
