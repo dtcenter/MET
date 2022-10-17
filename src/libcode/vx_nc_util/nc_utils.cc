@@ -160,7 +160,7 @@ char get_att_value_char(const NcAtt *att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_att_value_chars(const NcAtt *att, ConcatString &value, int nc_id, int var_id) {
+bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    bool status = false;
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
@@ -183,23 +183,29 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value, int nc_id, int v
       }
       else if (attType == NC_STRING) {
          try {
-size_t att_len = att->getAttLength();
-NcGroup p_group =  att->getParentGroup();
-cout << method_name << " DEBUG HS " << " attType=NC_STRING att_name="<< att->getName() << "\n";
-cout << method_name << " DEBUG HS " << " att_len=" << att_len << "\n";
-cout << method_name << " DEBUG HS " << " p_group name=" << p_group.getName() << " id=" << p_group.getId() << "\n";
             string att_value;
             att->getValues(att_value);
             value = att_value;
          }
          catch (exceptions::NcChar ex) {
-            value = "";
-            // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
-            mlog << Warning << "\n" << method_name
-                 << "Exception: " << ex.what() << "\n"
-                 << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
-                 << GET_NC_TYPE_NAME_P(att) << " type).\n"
-                 << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+            int num_elements_sub = 8096;
+            int num_elements = att->getAttLength();;
+            char *att_value[num_elements];
+            for (int i = 0; i < num_elements; i++ ) {
+               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
+            }
+            try {
+               att->getValues(att_value);
+               value = att_value[0];
+            }
+            catch (exceptions::NcException ex) {
+               mlog << Warning << "\n" << method_name
+                    << "Exception: " << ex.what() << "\n"
+                    << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
+                    << GET_NC_TYPE_NAME_P(att) << " type).\n"
+                    << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+            }
+            for (int i = 0; i < num_elements; i++ ) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -359,6 +365,23 @@ bool    get_att_no_leap_year(const NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_cf_conventions(const netCDF::NcFile *nc, ConcatString& conventions_value) {
+   bool has_attr = false;
+   multimap<string,NcGroupAtt>::iterator it_att;
+   multimap<string,NcGroupAtt> map_attrs = nc->getAtts();
+   for (it_att = map_attrs.begin(); it_att != map_attrs.end(); it_att++) {
+      if (to_lower(it_att->first) == to_lower(cf_att_name)) {
+         NcGroupAtt cf_att = it_att->second;
+         if (IS_VALID_NC(cf_att))
+            has_attr = get_att_value_chars(&cf_att, conventions_value);
+      }
+   }
+   return has_attr;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString get_log_msg_for_att(const NcVarAtt *att) {
    ConcatString log_msg("can't read attribute");
    if(IS_INVALID_NC_P(att)) {
@@ -375,7 +398,7 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
-                             const ConcatString att_name) {
+                                 const ConcatString att_name) {
    ConcatString log_msg;
    log_msg << "can't read attribute" << " \""
            << ((att_name.length() > 0) ? att_name.c_str() : GET_SAFE_NC_NAME_P(att))
@@ -466,7 +489,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
-                      ConcatString &att_val, int nc_id, bool exit_on_error) {
+                      ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
    NcVarAtt *att = (NcVarAtt *) 0;
 
@@ -476,7 +499,7 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
    att = get_nc_att(var, att_name);
 
    // Look for a match
-   status = get_att_value_chars(att, att_val, nc_id, var->getId());
+   status = get_att_value_chars(att, att_val);
    if (att) delete att;
 
    return(status);
@@ -860,9 +883,9 @@ int get_var_names(NcFile *nc, StringArray *var_names) {
    int i = 0;
    int var_count = nc->getVarCount();
 
-   multimap<string,NcVar>::iterator it_var;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
-   for (it_var = mapVar.begin(); it_var != mapVar.end(); ++it_var) {
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
       var = (*it_var).second;
       var_names->add(var.getName());
       i++;
@@ -889,7 +912,7 @@ int get_var_names(NcFile *nc, StringArray *var_names, StringArray &group_names) 
    for (int idx=0; idx<group_names.n(); idx++) {
       nc_group = get_nc_group(nc, group_names[idx].c_str());
       if (IS_VALID_NC(nc_group)) {
-         var_map = nc_group.getVars();
+         var_map = GET_NC_VARS(nc_group);
          for (it_var = var_map.begin(); it_var != var_map.end(); it_var++) {
             var_names->add(it_var->first);
             var_count++;
@@ -1001,9 +1024,9 @@ bool get_var_standard_name(const NcVar *var, ConcatString &att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_units(const NcVar *var, ConcatString &att_val, int nc_id) {
+bool get_var_units(const NcVar *var, ConcatString &att_val) {
 
-   return(get_nc_att_value(var, units_att_name, att_val, nc_id, var->getId()));
+   return(get_nc_att_value(var, units_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1699,6 +1722,14 @@ bool get_nc_data(NcVar *var, char *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data(NcVar *var, char **data) {
+   bool return_status = get_nc_data_t(var, data);
+
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data(NcVar *var, uchar *data) {
    bool return_status = false;
    int data_type = GET_NC_TYPE_ID_P(var);
@@ -2207,7 +2238,7 @@ NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
    NcGroup nc_group = get_nc_group(nc, group_name);
    if (IS_VALID_NC(nc_group)) {
       nc_var_name = new_var_name;
-      var_map = nc_group.getVars();
+      var_map = GET_NC_VARS(nc_group);
    }
    else {   // This is for IODA data format 1.0
       nc_var_name = new_var_name + "@" + group_name;
@@ -2274,7 +2305,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
    NcGroup nc_group = get_nc_group(nc, group_name);
    if (IS_VALID_NC(nc_group)) {
       nc_var_name = new_var_name;
-      var_map = nc_group.getVars();
+      var_map = GET_NC_VARS(nc_group);
    }
    else {   // This is for IODA data format 1.0
       nc_var_name = new_var_name + "@" + group_name;
@@ -2648,8 +2679,8 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
    for (multimap<string,NcGroupAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
       if (all_attrs ||
-            (  (itr->first != "Conventions")
-            && (itr->first != "missing_value") ) ) {
+            (  (itr->first != cf_att_name)
+            && (itr->first != missing_value_att_name) ) ) {
          NcGroupAtt *from_att = &(itr->second);
          int dataType = GET_NC_TYPE_ID_P(from_att);
          switch (dataType) {
@@ -2875,17 +2906,13 @@ bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
    multimap<string,NcVar> var_map;
    NcGroup nc_group = get_nc_group(nc, group_name);
    if (IS_VALID_NC(nc_group)) {
-cout << " DEBUG HS  has_var() found group " << group_name << "\n";
       nc_var_name = new_var_name;
-      var_map = nc_group.getVars();
+      var_map = GET_NC_VARS(nc_group);
    }
-   else {
-cout << " DEBUG HS  has_var() found no group " << group_name << "\n";
-      // This is for IODA data format 1.0
+   else {   // This is for IODA data format 1.0
       nc_var_name = new_var_name + "@" + group_name;
       var_map = GET_NC_VARS_P(nc);
    }
-cout << " DEBUG HS  has_var() nc_var_name = " << nc_var_name << "\n";
    multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
 
    return (it != var_map.end());

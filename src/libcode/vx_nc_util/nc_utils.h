@@ -133,6 +133,7 @@ static const std::string axis_att_name                 = "axis";
 static const std::string bounds_att_name               = "bounds";
 static const std::string coordinates_att_name          = "coordinates";
 static const std::string coordinate_axis_type_att_name = "_CoordinateAxisType";
+static const std::string cf_att_name                   = "Conventions";
 static const std::string description_att_name          = "description";
 static const std::string fill_value_att_name           = "_FillValue";
 static const std::string grid_mapping_att_name         = "grid_mapping";
@@ -161,7 +162,7 @@ extern bool      get_att_value(const netCDF::NcAtt *, int    &value);
 extern bool      get_att_value(const netCDF::NcAtt *, float  &value);
 extern bool      get_att_value(const netCDF::NcAtt *, double &value);
 
-extern bool      get_att_value_chars  (const netCDF::NcAtt *, ConcatString &, int nc_id=0, int var_id=0);
+extern bool      get_att_value_chars  (const netCDF::NcAtt *, ConcatString &);
 extern int       get_att_value_int    (const netCDF::NcAtt *);
 extern long long get_att_value_llong  (const netCDF::NcAtt *);
 extern double    get_att_value_double (const netCDF::NcAtt *);
@@ -179,8 +180,10 @@ extern long long get_att_value_llong (const netCDF::NcFile *, const ConcatString
 extern double    get_att_value_double(const netCDF::NcFile *, const ConcatString& );
 extern bool      get_att_no_leap_year(const netCDF::NcVar *);
 
-extern netCDF::NcVarAtt    *get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
-extern netCDF::NcGroupAtt  *get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
+extern bool      get_cf_conventions(const netCDF::NcFile *, ConcatString&);
+
+extern netCDF::NcVarAtt   *get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
+extern netCDF::NcGroupAtt *get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
 
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, std::string &);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, int          &, bool exit_on_error = true);
@@ -231,7 +234,7 @@ extern bool   get_var_grid_mapping_name(const netCDF::NcVar *var, ConcatString &
 extern bool   get_var_long_name(const netCDF::NcVar *, ConcatString &);
 extern double get_var_missing_value(const netCDF::NcVar *);
 extern bool   get_var_standard_name(const netCDF::NcVar *, ConcatString &);
-extern bool   get_var_units(const netCDF::NcVar *, ConcatString &, int nc_id=0);
+extern bool   get_var_units(const netCDF::NcVar *, ConcatString &);
 
 extern bool   args_ok(const LongArray &);
 
@@ -252,6 +255,7 @@ extern ConcatString* get_string_val(netCDF::NcVar *var, const int index, const i
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data);
 extern bool get_nc_data(netCDF::NcVar *, char   *data);
+extern bool get_nc_data(netCDF::NcVar *, char  **data);
 extern bool get_nc_data(netCDF::NcVar *, uchar  *data);
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
