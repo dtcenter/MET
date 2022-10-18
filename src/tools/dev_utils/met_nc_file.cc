@@ -104,13 +104,13 @@ bool MetNcFile::readFile(const int desired_grib_code,
   _nhdrDim   = &nhdrDim;
   _nobsDim   = &nobsDim;
   _strlDim   = &strlDim;
-  
+
   hdrArrVar  = get_nc_var(_ncFile, "hdr_arr");
   hdrTypeVar = get_nc_var(_ncFile, "hdr_typ");
   hdrSidVar  = get_nc_var(_ncFile, "hdr_sid");
   hdrVldVar  = get_nc_var(_ncFile, "hdr_vld");
   obsArrVar  = get_nc_var(_ncFile, "obs_arr");
-  
+
   _hdrArrVar  = &hdrArrVar ;
   _hdrTypeVar = &hdrTypeVar;
   _hdrSidVar  = &hdrSidVar ;
@@ -164,16 +164,16 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Loop through the observations, saving the ones that we are
   // interested in
 
-  
+
 
   //int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
   int buf_size = obs_count;
   int hdr_buf_size = hdr_count;
-  
+
   //
   // Allocate space to store the data
   //
-  
+
   char hdr_typ_str_full[hdr_buf_size][typ_len];
   char hdr_sid_str_full[hdr_buf_size][sid_len];
   char hdr_vld_str_full[hdr_buf_size][vld_len];
@@ -185,7 +185,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   long offsets[2] = { 0, 0 };
   long lengths[2] = { 1, 1 };
-  
+
   lengths[0] = hdr_buf_size;
 
   //
@@ -227,10 +227,10 @@ bool MetNcFile::readFile(const int desired_grib_code,
         << "trouble getting hdr_arr\n\n";
     exit(1);
   }
-  
+
   //for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
   //   buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
-     
+
   offsets[0] = 0;
   lengths[0] = buf_size;
   lengths[1] = obs_arr_len;
@@ -246,81 +246,82 @@ bool MetNcFile::readFile(const int desired_grib_code,
   //   mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
   //   exit(1);
   //}
-      
-  for (unsigned int i = 0; i < GET_NC_SIZE_P(_nobsDim); ++i)
-  {
-      
-    // Copy the current observation message
-    for (int k=0; k < obs_arr_len; k++)
-       obs_arr[k] = obs_arr_block[i][k];
 
-    if (obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10)
-      break;
+  if (OBS_ARRAY_LEN == obs_arr_len) {
+    for (unsigned int i = 0; i < GET_NC_SIZE_P(_nobsDim); ++i)
+    {
 
-    // Read the current observation quality flag
+      // Copy the current observation message
+      for (int k=0; k < obs_arr_len; k++)
+         obs_arr[k] = obs_arr_block[i][k];
 
-    // Get the header index and variable type for this observation.
+      if (obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10)
+        break;
 
-    int hdr_index = nint(obs_arr[0]);
-    int grib_code = nint(obs_arr[1]);
+      // Read the current observation quality flag
 
-    // Check if we want to plot this variable type.
+      // Get the header index and variable type for this observation.
 
-    if (grib_code != desired_grib_code)
-      continue;
+      int hdr_index = nint(obs_arr[0]);
+      int grib_code = nint(obs_arr[1]);
 
-    // Get the corresponding header message type
-    // Read the corresponding header array for this observation
-    for (int k=0; k < obs_arr_len; k++)
-       hdr_arr[k] = hdr_arr_full[hdr_index][k];
-   
-    int  str_length;
-    char message_type_buffer[max_str_len];
-    char station_id_buffer[max_str_len];
-    char hdr_vld_buffer[max_str_len];
-    // Read the corresponding header type for this observation
-    str_length = m_strlen(hdr_typ_str_full[hdr_index]);
-    if (str_length > typ_len) str_length = typ_len;
-    m_strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length,
-              method_name.c_str(), "message_type_buffer");
-    message_type_buffer[str_length] = bad_data_char;
+      // Check if we want to plot this variable type.
 
-    // Read the corresponding header Station ID for this observation
-    str_length = m_strlen(hdr_sid_str_full[hdr_index]);
-    if (str_length > sid_len) str_length = sid_len;
-    m_strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length,
-              method_name.c_str(), "station_id_buffer");
-    station_id_buffer[str_length] = bad_data_char;
+      if (grib_code != desired_grib_code)
+        continue;
 
-    // Read the corresponding valid time for this observation
-    str_length = m_strlen(hdr_vld_str_full[hdr_index]);
-    if (str_length > vld_len) str_length = vld_len;
-    m_strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length,
-              method_name.c_str(), "hdr_vld_buffer");
-    hdr_vld_buffer[str_length] = bad_data_char;
-    
+      // Get the corresponding header message type
+      // Read the corresponding header array for this observation
+      for (int k=0; k < hdr_arr_len; k++)
+         hdr_arr[k] = hdr_arr_full[hdr_index][k];
 
-    string message_type = message_type_buffer;
+      int  str_length;
+      char message_type_buffer[max_str_len];
+      char station_id_buffer[max_str_len];
+      char hdr_vld_buffer[max_str_len];
+      // Read the corresponding header type for this observation
+      str_length = m_strlen(hdr_typ_str_full[hdr_index]);
+      if (str_length > typ_len) str_length = typ_len;
+      m_strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length,
+                method_name.c_str(), "message_type_buffer");
+      message_type_buffer[str_length] = bad_data_char;
 
-    if (message_type != desired_message_type)
-      continue;
+      // Read the corresponding header Station ID for this observation
+      str_length = m_strlen(hdr_sid_str_full[hdr_index]);
+      if (str_length > sid_len) str_length = sid_len;
+      m_strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length,
+                method_name.c_str(), "station_id_buffer");
+      station_id_buffer[str_length] = bad_data_char;
 
-    // Get the corresponding header station id
-    string station_id = station_id_buffer;
-
-    if (station_id != desired_station_id)
-      continue;
-
-    // Get the corresponding header valid time
+      // Read the corresponding valid time for this observation
+      str_length = m_strlen(hdr_vld_str_full[hdr_index]);
+      if (str_length > vld_len) str_length = vld_len;
+      m_strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length,
+                method_name.c_str(), "hdr_vld_buffer");
+      hdr_vld_buffer[str_length] = bad_data_char;
 
 
-    // If we get here, this is an observation that we want to use
+      string message_type = message_type_buffer;
 
-    SDObservation obs(hdr_vld_buffer, obs_arr[4]);
+      if (message_type != desired_message_type)
+        continue;
 
-    observations.push_back(obs);
-   } // end for i
+      // Get the corresponding header station id
+      string station_id = station_id_buffer;
 
+      if (station_id != desired_station_id)
+        continue;
+
+      // Get the corresponding header valid time
+
+
+      // If we get here, this is an observation that we want to use
+
+      SDObservation obs(hdr_vld_buffer, obs_arr[4]);
+
+      observations.push_back(obs);
+    } // end for i
+  }
   // Cleanup
 
   if (obs_arr) { delete [] obs_arr; obs_arr = (float *) 0; }

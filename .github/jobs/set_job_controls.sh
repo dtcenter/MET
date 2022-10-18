@@ -108,15 +108,15 @@ if [ "$run_unit_tests" == "true" ]; then
 
 fi
 
-echo ::set-output name=run_compile::$run_compile
-echo ::set-output name=run_push::$run_push
-echo ::set-output name=run_unit_tests::$run_unit_tests
-echo ::set-output name=run_diff::$run_diff
-echo ::set-output name=run_update_truth::$run_update_truth
-echo ::set-output name=met_base_repo::$met_base_repo
-echo ::set-output name=met_base_tag::$met_base_tag
-echo ::set-output name=input_data_version::$input_data_version
-echo ::set-output name=truth_data_version::$truth_data_version
+echo "run_compile=${run_compile}" >> $GITHUB_OUTPUT
+echo "run_push=${run_push}" >> $GITHUB_OUTPUT
+echo "run_unit_tests=${run_unit_tests}" >> $GITHUB_OUTPUT
+echo "run_diff=${run_diff}" >> $GITHUB_OUTPUT
+echo "run_update_truth=${run_update_truth}" >> $GITHUB_OUTPUT
+echo "met_base_repo=${met_base_repo}" >> $GITHUB_OUTPUT
+echo "met_base_tag=${met_base_tag}" >> $GITHUB_OUTPUT
+echo "input_data_version=${input_data_version}" >> $GITHUB_OUTPUT
+echo "truth_data_version=${truth_data_version}" >> $GITHUB_OUTPUT
 
 echo run_compile: $run_compile
 echo run_push: $run_push
