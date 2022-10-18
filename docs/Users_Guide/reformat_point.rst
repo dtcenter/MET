@@ -416,7 +416,7 @@ This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used t
 
 While initial versions of the ASCII2NC tool only supported a simple 11 column ASCII point observation format, support for several additional formats has been added. It currently supports point observation data in the following formats:
 
-• default 11 column format, as described in :numref:`table_reformat-point_ascii2nc_format`
+• Default 11 column MET point observation format, as described in :numref:`table_reformat-point_ascii2nc_format`
 
 • `little_r format <https://www2.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/Help/littler.html>`_
 
@@ -430,7 +430,7 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
-• Python embedding of point observations as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
+• Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
 The default ASCII point observation format consists of one row of data per observation value. Each row of data consists of 11 columns as shown in :numref:`table_reformat-point_ascii2nc_format`.
 
