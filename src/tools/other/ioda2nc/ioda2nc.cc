@@ -138,7 +138,6 @@ static void initialize();
 static void process_command_line(int, char **);
 static void open_netcdf();
 static void process_ioda_file(int);
-static void process_ioda_file(NcFile *nc);
 static void write_netcdf_hdr_data();
 static void clean_up();
 

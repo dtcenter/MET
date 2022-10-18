@@ -345,9 +345,7 @@ extern void copy_nc_var_data(netCDF::NcVar *, netCDF::NcVar *);
 
 extern bool has_nc_group(netCDF::NcFile *, const char *group_name);
 extern bool has_var(netCDF::NcFile *, const char *var_name);
-//extern bool has_var(netCDF::NcFile *, const ConcatString &var_name);
 extern bool has_var(netCDF::NcFile *, const char *var_name, const char *group_name);
-//extern bool has_var(netCDF::NcFile *, const ConcatString &var_name, const char *group_name);
 
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const netCDF::NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
