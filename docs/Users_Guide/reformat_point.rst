@@ -969,6 +969,17 @@ This entry is an array of dictionaries, each containing a **key** string and **v
 _____________________
 
 .. code-block:: none
+		
+		obs_to_qc_map  = [
+		{ key = "wind_from_direction"; val = "eastward_wind,northward_wind"; },
+		{ key = "wind_speed";          val = "eastward_wind,northward_wind"; }
+		];
+
+This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of QC variable name for IODA data files.
+
+_____________________
+
+.. code-block:: none
 
 		missing_thresh = [ <=-1e9, >=1e9, ==-9999 ];
 
