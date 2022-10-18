@@ -18,7 +18,6 @@ using namespace std;
 #include <cmath>
 
 #include "math_constants.h"
-
 #include "track_info.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -943,9 +942,10 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    int        pcnt;
    TrackPoint pavg, psum;
    QuadInfo   wavg;
-   NumArray   plon;
+   NumArray   plon, plat, pvmax, pmslp;
    double     lon_range, lon_shift, lon_avg;
-
+   double     track_spread, vmax_stdev, mslp_stdev;
+   
    // Check for at least one track
    if(tracks.n() == 0) {
       mlog << Error
@@ -1007,6 +1007,9 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       pavg.clear();
       psum.clear();
       plon.clear();
+      plat.clear();
+      pvmax.clear();
+      pmslp.clear();
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
@@ -1029,8 +1032,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         // Store the longitude values
+         // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
+         plat.add(tracks.Track[j][i_pnt].lat());
+         pvmax.add(tracks.Track[j][i_pnt].v_max());
+         pmslp.add(tracks.Track[j][i_pnt].mslp());
       }
 
       // Check for missing required member and the minimum number of points
@@ -1062,6 +1068,29 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
       if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
 
+      // Save the number of members that went into the consensus
+      if(pcnt > 0) pavg.set_num_members(pcnt);
+      
+      // Compute track spread and distance mean, convert to nautical-miles
+      double track_spread, dist_mean;
+      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, dist_mean);
+
+      if(!is_bad_data(track_spread)) {
+         track_spread *= tc_nautical_miles_per_km;
+         pavg.set_spread(track_spread);
+      }
+
+      if(!is_bad_data(dist_mean)) {
+         dist_mean *= tc_nautical_miles_per_km;
+         pavg.set_dist_mean(dist_mean);
+      }
+      
+      // Compute wind-speed (v_max) and pressure (mslp) standard deviation
+      vmax_stdev = pvmax.stdev();
+      mslp_stdev = pmslp.stdev();
+      if(!is_bad_data(vmax_stdev)) pavg.set_v_max_stdev(vmax_stdev);
+      if(!is_bad_data(mslp_stdev)) pavg.set_mslp_stdev(mslp_stdev);
+
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
@@ -1088,6 +1117,34 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
    // Return the consensus track
    return(tavg);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons, double &spread, double &mean) {
+
+   int i, count;
+   NumArray dist_na;
+   
+   // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
+   for(i=0, count=0; i<lats.n_elements(); i++) {
+      if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
+      dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
+      count++;
+   }
+   
+   // Compute spread (standard-deviation of the distances)
+   // and the mean of the distnaces
+   if(count == 0) {
+      spread = bad_data_double;
+      mean = bad_data_double;
+   }
+   else {
+      spread = dist_na.stdev();
+      mean = dist_na.mean();
+   }
+   
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

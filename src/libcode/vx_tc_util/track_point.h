@@ -167,8 +167,15 @@ class TrackPoint {
       // Wind Radii
       QuadInfo      Wind[NWinds];
 
+      // Consensus track variables
+      int           NumMembers; 
+      double        Spread;     // nautical miles
+      double        DistMean;   // nautical miles
+      double        VmaxStdev;  //  knots
+      double        MSLPStdev;  //  millibars
+
       // Diagnostic values
-      NumArray DiagVal;
+      NumArray      DiagVal;
 
    public:
 
@@ -209,6 +216,12 @@ class TrackPoint {
       void set_watch_warn(WatchWarnType);
       void set_watch_warn(WatchWarnType, unixtime);
 
+      void set_num_members(const int);
+      void set_spread(const double);
+      void set_dist_mean(const double);
+      void set_v_max_stdev(const double);
+      void set_mslp_stdev(const double);
+   
          //
          //  get stuff
          //
@@ -232,9 +245,16 @@ class TrackPoint {
       SystemsDepth     depth()         const;
       bool             warm_core()     const;
       WatchWarnType    watch_warn()    const;
+
+      int              num_members()   const;
+      double           spread()        const;
+      double           dist_mean()     const;
+      double           v_max_stdev()   const;
+      double           mslp_stdev()    const;
+
       int              n_diag()        const;
       double           diag_val(int)   const;
-
+   
          //
          //  do stuff
          //
@@ -266,6 +286,12 @@ inline void TrackPoint::set_depth(SystemsDepth t)       { Depth     = t; }
 inline void TrackPoint::set_warm_core(bool v)           { WarmCore  = v; }
 inline void TrackPoint::set_watch_warn(WatchWarnType t) { WatchWarn = t; }
 
+inline void TrackPoint::set_num_members(const int s)    { NumMembers = s; }
+inline void TrackPoint::set_spread(const double v)      { Spread     = v; }
+inline void TrackPoint::set_dist_mean(const double v)   { DistMean   = v; }
+inline void TrackPoint::set_v_max_stdev(const double v) { VmaxStdev  = v; }
+inline void TrackPoint::set_mslp_stdev(const double v)  { MSLPStdev  = v; }
+
 inline unixtime      TrackPoint::valid()      const { return(ValidTime);   }
 inline int           TrackPoint::valid_hour() const { return(unix_to_sec_of_day(ValidTime)); }
 inline int           TrackPoint::lead()       const { return(LeadTime);    }
@@ -284,7 +310,13 @@ inline double        TrackPoint::speed()      const { return(Speed);       }
 inline SystemsDepth  TrackPoint::depth()      const { return(Depth);       }
 inline bool          TrackPoint::warm_core()  const { return(WarmCore);    }
 inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn);   }
-inline int           TrackPoint::n_diag()     const { return(DiagVal.n()); }
+
+inline int           TrackPoint::num_members() const { return(NumMembers);  }
+inline double        TrackPoint::spread()      const { return(Spread);      }
+inline double        TrackPoint::dist_mean()   const { return(DistMean);    }
+inline double        TrackPoint::v_max_stdev() const { return(VmaxStdev);   }
+inline double        TrackPoint::mslp_stdev()  const { return(MSLPStdev);   }
+inline int           TrackPoint::n_diag()      const { return(DiagVal.n()); }
 
 ////////////////////////////////////////////////////////////////////////
 
