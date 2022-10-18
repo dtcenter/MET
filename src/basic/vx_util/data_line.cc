@@ -334,7 +334,7 @@ if ( ! read_single_text_line(ldf) )  { clear();  return ( 0 ); }
 
 size_t len, tpos = std::string::npos;
 
-if (!Line.find_first_not_of(Delimiter)) { // no leading delimiter
+if (0 == Line.find_first_not_of(Delimiter)) { // no leading delimiter
     ++count;
     Offset.push_back(pos);
     Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
