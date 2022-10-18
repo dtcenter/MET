@@ -414,9 +414,23 @@ ASCII2NC tool
 
 This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used to reformat ASCII point observations into the NetCDF format expected by the Point-Stat tool. For those users wishing to verify against point observations that are not available in PrepBUFR format, the ASCII2NC tool provides a way of incorporating those observations into MET. If the ASCII2NC tool is used to perform a reformatting step, no configuration file is needed. However, for more complex processing, such as summarizing time series observations, a configuration file may be specified. For details on the configuration file options, see :numref:`config_options` and example configuration files distributed with the MET code.
 
-Initial versions of the ASCII2NC tool supported only a simple 11 column ASCII point observation format. It currently supports point observation data in the following formats: the default 11 column format, little_r format, `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats, the Western Wind and Solar Integration Study (WWSIS) format, the `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats. <https://www.epa.gov/outdoor-air-quality-data>`_, the `National Data Buoy (NDBC) Standard Meteorlogical Data format. <https://www.ndbc.noaa.gov/measdes.shtml>`_ and the `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format. <http://aeronet.gsfc.nasa.gov/>`_  WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
+While initial versions of the ASCII2NC tool only supported a simple 11 column ASCII point observation format, support for several additional formats has been added. It currently supports point observation data in the following formats:
 
-MET version 9.0 adds support for the passing observations to ascii2nc using a Python script with the "-format python" option. An example of running ASCII2NC with Python embedding is included below.
+• default 11 column format, as described below
+
+• little_r format
+
+• `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
+
+• Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO. 
+
+• `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_
+
+• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_
+
+• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
+
+• Python embedding of point observations as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
 The default ASCII point observation format consists of one row of data per observation value. Each row of data consists of 11 columns as shown in :numref:`table_reform-point_ascii2nc_format`.
 

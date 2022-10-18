@@ -46,9 +46,9 @@
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   020    08/26/22  Dave Albo      Add AirNow observations.
+//   020    08/26/22  Dave Albo      MET #2142 Add AirNow observations
 //   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
-//   022    10/07/22  Dave Albo      Add NDBC Buoy data
+//   022    10/07/22  Dave Albo      MET #2276 Add NDBC Buoy data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -506,7 +506,7 @@ void usage() {
         << AirnowHandler::getFormatStringDailyV2() << "\", \""
         << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
         << AirnowHandler::getFormatStringHourly() << "\", \""
-	<< NdbcHandler::getFormatStringStandard() << "\", \""
+        << NdbcHandler::getFormatStringStandard() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";

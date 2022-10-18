@@ -258,8 +258,8 @@ The MET_NDBC_STATIONS environment variable can be used to specify a file that
 will override the default file. If set it should be a full path to the file.
 The default table can be found in the installed
 *share/met/table_files/ndbc_stations.xml*. This file contains
-XML content for all stations that allows lookups of latitude,longitude,
-and in some cases elevation for all stations based on stationId
+XML content for all stations that allows lookups of latitude, longitude,
+and, in some cases, elevation for all stations based on stationId.
 
 MET_BASE
 ^^^^^^^^

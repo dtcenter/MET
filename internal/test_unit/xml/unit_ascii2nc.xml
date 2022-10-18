@@ -153,6 +153,7 @@
   <test name="ascii2nc_ndbc">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
+    -format ndbc_standard  \
     &DATA_DIR_OBS;/ndbc/13001.txt  \
     &DATA_DIR_OBS;/ndbc/13002.txt \
     &DATA_DIR_OBS;/ndbc/13008.txt \
