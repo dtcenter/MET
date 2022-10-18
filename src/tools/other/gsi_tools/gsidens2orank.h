@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    07/09/15  Halley Gotway   New
+//   001    09/29/22  Prestopnik      MET #2227 Removing namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __GSIDENS2ORANK_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <vector>
 

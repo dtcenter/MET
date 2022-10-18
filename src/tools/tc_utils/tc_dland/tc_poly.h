@@ -32,7 +32,7 @@ class TCPoly {
    
    friend class TCPolyArray;
    
-   friend bool operator>>(istream &, TCPoly &);
+   friend bool operator>>(std::istream &, TCPoly &);
 
    private:
 
@@ -69,7 +69,7 @@ inline ConcatString TCPoly::name() const { return(Name); }
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool operator>>(istream &, TCPoly &);
+extern bool operator>>(std::istream &, TCPoly &);
 
 ////////////////////////////////////////////////////////////////////////
 

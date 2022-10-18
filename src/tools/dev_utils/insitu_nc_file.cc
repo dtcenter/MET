@@ -20,6 +20,9 @@ using namespace std;
 #include <cmath>
 #include <string>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"

@@ -25,10 +25,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern const char *  string_att           (const NcFile &, const char * name);
-extern int           string_att_as_int    (const NcFile &, const char * name);
-extern long long     string_att_as_ll     (const NcFile &, const char * name);
-extern double        string_att_as_double (const NcFile &, const char * name);
+extern const char *  string_att           (const netCDF::NcFile &, const char * name);
+extern int           string_att_as_int    (const netCDF::NcFile &, const char * name);
+extern long long     string_att_as_ll     (const netCDF::NcFile &, const char * name);
+extern double        string_att_as_double (const netCDF::NcFile &, const char * name);
 
 
 ////////////////////////////////////////////////////////////////////////

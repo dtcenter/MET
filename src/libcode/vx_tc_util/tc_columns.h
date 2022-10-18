@@ -68,7 +68,12 @@ static const char * tc_mpr_cols [] = {
    "AEYE",        "BEYE",
    "ADIR",        "BDIR",
    "ASPEED",      "BSPEED",
-   "ADEPTH",      "BDEPTH"
+   "ADEPTH",      "BDEPTH",
+   "NUM_MEMBERS",
+   "TRACK_SPREAD",
+   "DIST_MEAN",
+   "MSLP_SPREAD",
+   "MAX_WIND_SPREAD"
 };
 
 static const int n_tc_mpr_cols = sizeof(tc_mpr_cols)/sizeof(*tc_mpr_cols);
@@ -136,8 +141,8 @@ inline int get_n_prob_rirw_cols (int n) { return(n_prob_rirw_cols + (2*n)); } //
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void open_tc_txt_file (ofstream *&,  const char *);
-extern void close_tc_txt_file(ofstream *&,  const char *);
+extern void open_tc_txt_file (std::ofstream *&,  const char *);
+extern void close_tc_txt_file(std::ofstream *&,  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

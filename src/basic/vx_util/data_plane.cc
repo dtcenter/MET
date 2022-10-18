@@ -16,6 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-01-11  Halley Gotway
+//   001    22-09-29  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -663,7 +664,7 @@ if ( N == 0 )  return;   //  no shift, so do nothing
 
 int x, y, x_new;
 int index_old, index_new;
-std::vector<double> new_data(Nxy);
+vector<double> new_data(Nxy);
 
 for (x=0; x<Nx; ++x)  {
 

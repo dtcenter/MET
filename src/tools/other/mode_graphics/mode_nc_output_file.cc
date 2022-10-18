@@ -19,6 +19,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mode_nc_output_file.h"
 #include "nc_var_info.h"
 #include "nc_utils.h"

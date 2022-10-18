@@ -18,6 +18,7 @@
 //   ----   ----      ----           -----------
 //   000    03-22-17  Bullock        New
 //   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,6 +28,7 @@ static const char hdr_typ_string[] = "calipso";
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -41,6 +43,7 @@ static const char hdr_typ_string[] = "calipso";
 #include <vector>
 
 #include <netcdf>
+using namespace netCDF;
 
 #include "hdf.h"
 #include "mfhdf.h"

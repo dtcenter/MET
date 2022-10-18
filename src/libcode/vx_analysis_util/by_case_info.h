@@ -45,7 +45,7 @@ class ByCaseInfo {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void add(const ModeLine &);
 

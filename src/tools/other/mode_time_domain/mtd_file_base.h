@@ -21,7 +21,6 @@
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_util.h"
 #include "vx_cal.h"
@@ -77,8 +76,8 @@ class MtdFileBase {
 
       void base_assign(const MtdFileBase &);
 
-      virtual void read  (NcFile &);
-      virtual void write (NcFile &) const;
+      virtual void read  (netCDF::NcFile &);
+      virtual void write (netCDF::NcFile &) const;
 
 
       Grid * G;        //  allocated

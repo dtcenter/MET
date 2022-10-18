@@ -80,7 +80,8 @@ plot_point_obs configuration file
 
 The default configuration file for the Plot-Point-Obs tool named **PlotPointObsConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+
 ________________________
 
 .. code-block:: none

@@ -144,7 +144,7 @@ class EnsembleStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
-                          gsl_rng *, bool, bool, bool,
+                          gsl_rng *, bool, bool,
                           StringArray, StringArray *,
                           bool, ConcatString);
       void parse_nc_info(Dictionary &);
@@ -213,6 +213,7 @@ class EnsembleStatConfInfo {
       ConcatString         control_id;      // Control ID
 
       EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
+      bool                 grib_codes_set;
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point
@@ -242,8 +243,9 @@ class EnsembleStatConfInfo {
       void clear();
 
       void read_config   (const ConcatString , const ConcatString);
-      void process_config(GrdFileType, GrdFileType, bool, bool, bool,
+      void process_config(GrdFileType, GrdFileType, bool, bool,
                           StringArray *, bool);
+      void process_grib_codes();
       void process_flags ();
       void process_masks (const Grid &);
       void set_vx_pd     (const IntArray &, int);

@@ -87,7 +87,7 @@ class TrackPairInfo {
 
       void clear();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString case_info()               const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
@@ -193,7 +193,7 @@ class TrackPairInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 

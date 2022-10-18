@@ -103,7 +103,7 @@ class PlotPointObsOpt {
 
       // Unique collection of locations
       int n_obs;
-      vector<LocationInfo> locations;
+      std::vector<LocationInfo> locations;
 
       // Flags
       bool store_obs_val;
@@ -150,7 +150,7 @@ class PlotPointObsConfInfo {
       UserFunc_1Arg const_dotsize_fx;
 
       // Options for plotting point data
-      vector<PlotPointObsOpt> point_opts;
+      std::vector<PlotPointObsOpt> point_opts;
 
       ConcatString tmp_dir; // Directory for temporary files
       ConcatString version; // Config file version

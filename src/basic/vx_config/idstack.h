@@ -24,8 +24,6 @@
 
 #include "indent.h"
 
-using namespace std;
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -50,13 +48,13 @@ class Identifier {
       Identifier(const Identifier &);
       Identifier & operator=(const Identifier &);
 
-      string name;
+      std::string name;
 
       void clear();
 
       void set(const char *);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 };
 
@@ -143,7 +141,7 @@ class IdentifierArray {
 
       void add(const Identifier &);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       bool has(const char *) const;
 

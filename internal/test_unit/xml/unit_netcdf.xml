@@ -111,4 +111,60 @@
     </output>
   </test>
 
+  <test name="netcdf_months_units">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_376p5.nc \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_376p5.nc \
+      &OUTPUT_DIR;/netcdf/regrid_data_plane_months_units.nc \
+      -field 'name="t_an"; level="(0,0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/netcdf/regrid_data_plane_months_units.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="netcdf_months_units_from_day2">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_376p5_day2.nc \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_376p5_day2.nc \
+      &OUTPUT_DIR;/netcdf/regrid_data_plane_months_units_day2.nc \
+      -field 'name="t_an"; level="(0,0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/netcdf/regrid_data_plane_months_units_day2.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="netcdf_months_units_to_next_month">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_d25_3p66.nc \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_month_d25_3p66.nc\
+      &OUTPUT_DIR;/netcdf/regrid_data_plane_months_units_to_next_month.nc \
+      -field 'name="t_an"; level="(0,0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/netcdf/regrid_data_plane_months_units_to_next_month.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="netcdf_years_units">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_year_3p66.nc \
+      &DATA_DIR_MODEL;/nccf/woa18_decav_t05_04_small_year_3p66.nc \
+      &OUTPUT_DIR;/netcdf/regrid_data_plane_years_units.nc \
+      -field 'name="t_an"; level="(0,0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/netcdf/regrid_data_plane_years_units.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

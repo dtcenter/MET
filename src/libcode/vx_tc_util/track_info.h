@@ -18,6 +18,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_util.h"
+#include "nav.h"
 
 #include "atcf_track_line.h"
 #include "track_point.h"
@@ -86,7 +87,7 @@ class TrackInfo {
       void clear();
       void clear_points();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
 
@@ -206,7 +207,7 @@ class TrackInfoArray {
       void init_from_scratch();
       void assign(const TrackInfoArray &);
 
-      vector<TrackInfo> Track;
+      std::vector<TrackInfo> Track;
 
    public:
 
@@ -217,7 +218,7 @@ class TrackInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 
@@ -247,6 +248,9 @@ inline int TrackInfoArray::n() const { return(Track.size()); }
 ////////////////////////////////////////////////////////////////////////
 
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
+extern void compute_gc_dist_stdev(const double lat, const double lon,
+                                  const NumArray &lats, const NumArray &lons,
+                                  double &spread, double &mean);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
 extern void latlon_to_xytk_err(double alat, double alon,

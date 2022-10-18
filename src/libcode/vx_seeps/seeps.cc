@@ -13,6 +13,9 @@ using namespace std;
 #include <cmath>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "file_exists.h"
 
 #include "string_fxns.h"
@@ -121,11 +124,11 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 ////////////////////////////////////////////////////////////////////////
 
 SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
-   SeepsRecord *record = 0;
+   SeepsRecord *record = NULL;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
    if (seeps_ready) {
-      SeepsClimoRecord *climo_record = 0;
+      SeepsClimoRecord *climo_record = NULL;
       map<int,SeepsClimoRecord *>::iterator it;
       if (hour < 6 || hour >= 18) {
          it = seeps_score_00_map.find(sid);
@@ -199,12 +202,13 @@ float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
    float score = (float)bad_data_double;
    SeepsRecord *record = get_record(sid, month, hour);
 
-   if (record) {
+   if (NULL != record) {
       // Determine location in contingency table
       int ic = (p_obs>record->t1)+(p_obs>record->t2);
       int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
 
       score = record->scores[(jc*3)+ic];
+      delete record;
    }
 
    return score;
@@ -214,10 +218,10 @@ float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
 
 SeepsScore *SeepsClimo::get_seeps_score(int sid, float p_fcst,
                                         float p_obs, int month, int hour) {
-   SeepsScore *score = 0;
+   SeepsScore *score = NULL;
    SeepsRecord *record = get_record(sid, month, hour);
 
-   if (record) {
+   if (NULL != record) {
       score = new SeepsScore();
       score->p1 = record->p1;
       score->p2 = record->p1;
@@ -227,6 +231,7 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, float p_fcst,
       score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
       score->model_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
       score->score = record->scores[(score->model_cat*3)+score->obs_cat];
+      delete record;
    }
 
    return score;

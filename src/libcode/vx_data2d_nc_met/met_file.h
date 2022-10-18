@@ -57,9 +57,9 @@ class MetNcFile {
 
       void close();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
-      NcFile * Nc;      //  allocated
+      netCDF::NcFile * Nc;      //  allocated
 
          //
          //  dimensions
@@ -67,12 +67,12 @@ class MetNcFile {
 
       int Ndims;
 
-      NcDim ** Dim;   //  allocated
+      netCDF::NcDim ** Dim;   //  allocated
 
       StringArray DimNames;
 
-      NcDim * Xdim;   //  not allocated
-      NcDim * Ydim;   //  not allocated
+      netCDF::NcDim * Xdim;   //  not allocated
+      netCDF::NcDim * Ydim;   //  not allocated
 
          //
          //  variables
@@ -92,9 +92,9 @@ class MetNcFile {
          //  data
          //
 
-      double data(NcVar *, const LongArray &) const;
+      double data(netCDF::NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, DataPlane &) const;
+      bool data(netCDF::NcVar *, const LongArray &, DataPlane &) const;
 
       bool data(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 

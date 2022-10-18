@@ -46,9 +46,13 @@
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   020    08/26/22  Dave Albo      Add AirNow observations.
+//   020    08/26/22  Dave Albo      MET #2142 Add AirNow observations
+//   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
+//   022    10/07/22  Dave Albo      MET #2276 Add NDBC Buoy data
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -81,6 +85,7 @@
 #include "wwsis_handler.h"
 #include "aeronet_handler.h"
 #include "airnow_handler.h"
+#include "ndbc_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -107,6 +112,7 @@ enum ASCIIFormat {
    ASCIIFormat_Airnow_dailyv2,
    ASCIIFormat_Airnow_hourlyaqobs,
    ASCIIFormat_Airnow_hourly,
+   ASCIIFormat_NDBC_standard,
    ASCIIFormat_Aeronet_v2,
    ASCIIFormat_Aeronet_v3, 
    ASCIIFormat_Python, 
@@ -149,6 +155,7 @@ static void setup_wrapper_path();
 
 int met_main(int argc, char *argv[]) {
    CommandLine cline;
+
 
    //
    // Check for zero arguments
@@ -309,6 +316,12 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) handler);
       }
 
+      case ASCIIFormat_NDBC_standard: {
+         NdbcHandler *handler = new NdbcHandler(program_name);
+         handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
+         return((FileHandler *) handler);
+      }
+
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -435,6 +448,19 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete airnow_file;
 
    //
+   // See if this is an NDBC file.
+   //
+   f_in.rewind();
+   NdbcHandler *ndbc_file = new NdbcHandler(program_name);
+
+   if(ndbc_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) ndbc_file);
+   }
+
+   delete ndbc_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
 
@@ -480,6 +506,7 @@ void usage() {
         << AirnowHandler::getFormatStringDailyV2() << "\", \""
         << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
         << AirnowHandler::getFormatStringHourly() << "\", \""
+        << NdbcHandler::getFormatStringStandard() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -558,6 +585,9 @@ void set_format(const StringArray & a) {
    }
    else if(AirnowHandler::getFormatStringHourly() == a[0]) {
      ascii_format = ASCIIFormat_Airnow_hourly;
+   }
+   else if(NdbcHandler::getFormatStringStandard() == a[0]) {
+     ascii_format = ASCIIFormat_NDBC_standard;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {

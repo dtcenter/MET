@@ -19,9 +19,12 @@
 //   002    09/28/16  Halley Gotway   Add DESC output column.
 //   003    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
-//   020    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   005    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -307,7 +310,7 @@ void close_out_file() {
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+             << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
         << "\t-lookin source\n"

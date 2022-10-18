@@ -51,7 +51,7 @@ class AfmBBox {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       int L;
       int B;
@@ -82,7 +82,7 @@ class LigatureInfo {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 
       char * successor_name;
@@ -116,7 +116,7 @@ class AfmCharMetrics {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 
       int ascii_code;
@@ -154,7 +154,7 @@ class PCC {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       char * name;
 
@@ -184,7 +184,7 @@ class AfmCompositeInfo {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       char * name;
 
@@ -215,7 +215,7 @@ class KPX {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
 
       char * name1;
@@ -249,7 +249,7 @@ class Afm {
 
       void do_fontbbox(AfmLine &);
 
-      ifstream * in;      //  used for reading
+      std::ifstream * in;      //  used for reading
       int line_number;    //
 
       void patch_ligatures(LigatureInfo &);
@@ -263,7 +263,7 @@ class Afm {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       int read(const ConcatString&);
 

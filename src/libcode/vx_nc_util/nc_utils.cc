@@ -975,8 +975,8 @@ char get_char_val(NcFile * nc, const char * var_name, const int index) {
 
 char get_char_val(NcVar *var, const int index) {
    char k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
 
    //
    // Retrieve the character array value from the NetCDF variable.
@@ -1002,8 +1002,8 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 ConcatString* get_string_val(NcVar *var, const int index,
                              const int len, ConcatString &tmp_cs) {
    char tmp_str[len];
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_string_val() ";
 
    if (2 != get_dim_count(var)) {
@@ -1052,8 +1052,8 @@ int get_int_var(NcFile * nc, const char * var_name, const int index) {
 
 int get_int_var(NcVar * var, const int index) {
    int k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_int_var() ";
 
    k = bad_data_int;
@@ -1089,8 +1089,8 @@ int get_int_var(NcVar * var, const int index) {
 
 double get_nc_time(NcVar * var, const int index) {
    double k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_nc_time() -> ";
 
    k = bad_data_double;
@@ -1177,8 +1177,8 @@ float get_float_var(NcFile * nc, const char * var_name, const int index) {
 
 float get_float_var(NcVar * var, const int index) {
    float k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_float_var() -> ";
 
    k = bad_data_float;
@@ -2541,8 +2541,8 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
-   std::map<std::string,NcVarAtt> ncAttMap = var_from->getAtts();
-   for (std::map<std::string,NcVarAtt>::iterator itr = ncAttMap.begin();
+   map<string,NcVarAtt> ncAttMap = var_from->getAtts();
+   for (map<string,NcVarAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
       if (all_attrs ||
             (  (itr->first != "scale_factor")
@@ -2706,7 +2706,7 @@ bool has_var(NcFile *nc, const char * var_name) {
 ////////////////////////////////////////////////////////////////////////
 
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType, const int deflate_level) {
-   std::vector<NcDim> ncDimVector;
+   vector<NcDim> ncDimVector;
    string new_var_name = var_name;
    patch_nc_name(&new_var_name);
    NcVar var = nc->addVar(new_var_name, ncType, ncDimVector);
@@ -3226,7 +3226,7 @@ unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
 
    if (get_var_units(time_var, time_unit_str)) {
       parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
-      no_leap_year = (86400 == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
+      no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
    }
    else {
       sec_per_unit = 1;
@@ -3304,7 +3304,13 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
               tok.has("h"))      sec_per_unit = 3600;
       else if(tok.has("day")     ||
               tok.has("days")    ||
-              tok.has("d"))      sec_per_unit = 86400;
+              tok.has("d"))      sec_per_unit = sec_per_day;
+      else if(tok.has("month")   ||
+              tok.has("months")  ||
+              tok.has("m"))      sec_per_unit = sec_per_day * 30;
+      else if(tok.has("year")    ||
+              tok.has("years")   ||
+              tok.has("y"))      sec_per_unit = sec_per_day * 30 * 12;
       else {
          mlog << Warning << "\n" << method_name
               << "Unsupported time step in the CF convention time unit \""
