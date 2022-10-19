@@ -443,7 +443,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
 
    // Should have already parsed TCMPR
    if(NPoints == 0) {
-      mlog << Error << "\nadd_tcdiag_line() -> "
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
            << "each TCDIAG line must be preceded by the TCMPR line "
            << "to which it corresponds:\n"
            << "  " << l << "\n\n";
@@ -455,7 +455,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
       ADeck.technique()       != l.amodel()   ||
       ADeck.init()            != l.init()     ||
       ADeck[NPoints-1].lead() != l.lead()) {
-      mlog << Error << "\nadd_tcdiag_line() -> "
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
            << "the TCDIAG data does not match the TCMPR data:\n"
            << "   TCMPR Line: " << TCMPRLine[NPoints-1] << "\n"
            << "  TCDIAG Line: " << l << "\n\n";
@@ -489,7 +489,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    }
    // Make sure they do not change
    else if(ADeck.diag_name().n() != diag_name.n()) {
-      mlog << Error << "\nadd_tcdiag_line() -> "
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
            << "the number of TCDIAG diagnostics have changed ("
            << ADeck.diag_name().n() << " != " << diag_name.n()
            << ")!\n\n";
@@ -610,7 +610,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    if(!exact_adeck &&
       st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
       st_adeck.get_type() != thresh_gt && st_adeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rirw() -> "
+      mlog << Error << "\nTrackPairInfo::check_rirw() -> "
            << "for non-exact intensity differences the RI/RW threshold ("
            << st_adeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
@@ -620,7 +620,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    if(!exact_bdeck &&
       st_bdeck.get_type() != thresh_lt && st_bdeck.get_type() != thresh_le &&
       st_bdeck.get_type() != thresh_gt && st_bdeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rirw() -> "
+      mlog << Error << "\nTrackPairInfo::check_rirw() -> "
            << "for non-exact intensity differences the RI/RW threshold ("
            << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
@@ -999,7 +999,7 @@ void TrackPairInfoArray::extend(int n, bool exact) {
    new_info = new TrackPairInfo [n];
 
    if(!new_info) {
-      mlog << Error << "\nvoid TrackPairInfoArray::extend(int, bool) -> "
+      mlog << Error << "\nTrackPairInfoArray::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
