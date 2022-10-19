@@ -96,7 +96,6 @@ bool AirnowLocations::initialize(const string &fileName)
     string aqsid = data_line[aqsidPtr];
     string fullaqsid = data_line[fullaqsidPtr];
     string stationid = data_line[sidPtr];
-    }
     double lat = atof(data_line[latPtr]);
     double lon = atof(data_line[lonPtr]);
     double elev = atof(data_line[elevPtr]);
