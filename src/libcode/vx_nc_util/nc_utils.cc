@@ -167,7 +167,8 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
       if (attType == NC_CHAR) {
          try {
-            char att_value[8096];
+            char att_value[tmp_buf_size];
+            memset(att_value, 0, tmp_buf_size);
             att->getValues(att_value);
             value = att_value;
          }
