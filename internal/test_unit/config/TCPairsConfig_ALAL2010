@@ -14,7 +14,7 @@
 //
 // Models
 //
-model = [];
+model = [ "GFSO" ];
 
 //
 // Description
@@ -24,17 +24,17 @@ desc = "NA";
 //
 // Storm identifiers
 //
-storm_id = [ "ALAL2010" ];
+storm_id = [];
 
 //
 // Basins
 //
-basin = [];
+basin = [ "AL" ];
 
 //
 // Cyclone numbers
 //
-cyclone = [];
+cyclone = [ "09" ];
 
 //
 // Storm names
@@ -127,6 +127,11 @@ watch_warn = {
    file_name   = "MET_BASE/tc_data/wwpts_us.txt";
    time_offset = -14400;
 }
+
+//
+// Diagnostics to be extracted
+//
+diag_name = [];
 
 //
 // Modify basin names to make them consistent across ATCF input files.
