@@ -2238,6 +2238,16 @@ void usage() {
         << "TCPairsConfig file containing the desired configuration "
         << "settings (required).\n"
 
+        << "\t\t\"-tcdiag source\" is used one or more times to "
+        << "specify a file or top-level directory containing tropical "
+        << "cyclone diagnostics \"" << atcf_suffix
+        << "\" data to process (optional).\n"
+
+        << "\t\t\"-lsdiag source\" is used one or more times to "
+        << "specify a file or top-level directory containing large "
+        << "scale diagnostics \"" << atcf_suffix
+        << "\" data to process (optional).\n"
+
         << "\t\t\"-out base\" overrides the default output file base "
         << "(" << out_base << ") (optional).\n"
 

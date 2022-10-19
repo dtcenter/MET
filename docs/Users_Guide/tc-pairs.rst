@@ -9,6 +9,16 @@ Introduction
 
 The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`. 
 
+Scientific and statistical aspects
+==================================
+
+.. _TC-Pairs_Diagnostics:
+
+Storm Diagnostics
+-----------------
+
+TODO: Add a paragraph about storm diagnostics, describing what they are, why they are important, and how they can be generated.
+
 .. _TC-Pairs_Practical-information:
 
 Practical information
@@ -27,6 +37,8 @@ The usage statement for tc_pairs is shown below:
          -adeck source and/or -edeck source
          -bdeck source
          -config file
+         [-tcdiag source]
+         [-lsdiag source]
          [-out base]
          [-log file]
          [-v level]
@@ -47,13 +59,17 @@ Required arguments for tc_pairs
 Optional arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
+5. The **-tcdiag source** argument indicates the TC-Pairs acceptable format data source containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. This argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
 
-6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+6. The **-lsdiag source** argument indicates the TC-Pairs acceptable format data source containing the large scale diagnostics dataset corresponding to the adeck tracks. This argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
 
-7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
 
-This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases. At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names.
+8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+
+9. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases. At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names. The **-tcdiag** and **-lsdiag** options may optionally be followed with **model=string** to override the model name of the tracks to which those diagnostics correspond.
 
 An example of the tc_pairs calling sequence is shown below:
 
@@ -234,6 +250,18 @@ ____________________
   }
 
 The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in effect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed *share/met/tc_data/* directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_ in order to obtain the most recent watch/warning file if the static file does not contain storms of interest.
+
+____________________
+
+.. code-block:: none
+
+ diag_name = [];
+
+The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. This applies when the **-tcdiag** and/or **-lsdiag** command line options have been used to provide storm diagnostics data. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
+
+A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is deteremined by diagnostic names requrested in the **diag_name** entry.
+
+____________________
 
 .. code-block:: none
 
@@ -487,7 +515,38 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 84
     - MAX_WIND_SPREAD
     - consensus variable: the standard deviation of the member's maximum wind speed values 
-  
+
+.. _TCDIAG Line Type:
+
+.. list-table:: Format information for TCDIAG (Tropical Cyclone Diagnostics) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * -
+    -
+    - TCDIAG OUTPUT FORMAT
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 13
+    - TCDIAG
+    - Tropical Cyclone Diagnostics line type
+  * - 14
+    - TOTAL
+    - Total number of pairs in track
+  * - 15
+    - INDEX
+    - Index of the current track pair
+  * - 16
+    - N_DIAG
+    - Number of storm diagnostic name and value columns to follow
+  * - 17
+    - DIAG_i
+    - Name of the of the ith storm diagnostic (repeated)
+  * - 18
+    - VALUE_i
+    - Value of the ith storm diagnostic (repeated)
+
 .. _PROBRIRW Line Type:
 
 .. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification/Weakening) output line type.
