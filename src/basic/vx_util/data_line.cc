@@ -816,6 +816,34 @@ return ( 1 );
 
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  Read the next line but do not move the read pointer
+//
+////////////////////////////////////////////////////////////////////////
+
+
+int LineDataFile::peek_line(DataLine & a)
+
+{
+
+int status = 0;
+
+if ( ok() ) {
+
+   int cur_pos = in->tellg();
+
+   status = a.read_line(this);
+
+   in->seekg(cur_pos);
+
+}
+
+return ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 void LineDataFile::set_header(DataLine & a)
