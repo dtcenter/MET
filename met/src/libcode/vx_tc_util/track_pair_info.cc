@@ -404,7 +404,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
       cs << cs_erase << deck[i] << "SPEED";
       tp->set_speed(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "DEPTH";
-      tp->set_eye(string_to_systemsdepth(l.get_item(cs.c_str())));
+      tp->set_depth(string_to_systemsdepth(l.get_item(cs.c_str())));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
       // Loop over the winds
