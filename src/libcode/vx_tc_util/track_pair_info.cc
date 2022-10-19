@@ -441,11 +441,14 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    // Check the line type
    if(l.type() != TCStatLineType_TCDIAG) return;
 
-   // Update the TCDIAGLine for this TrackPoint
-   TCDIAGLine[NPoints-1] = l;
-
-   // Increment the line count
-   NLines++;
+   // Should have already parsed TCMPR
+   if(NPoints == 0) {
+      mlog << Error << "\nadd_tcdiag_line() -> "
+           << "each TCDIAG line must be preceded by the TCMPR line "
+           << "to which it corresponds:\n"
+           << "  " << l << "\n\n";
+      exit(1);
+   }
 
    // Check for a match
    if(ADeck.storm_id()        != l.storm_id() ||
@@ -453,9 +456,17 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
       ADeck.init()            != l.init()     ||
       ADeck[NPoints-1].lead() != l.lead()) {
       mlog << Error << "\nadd_tcdiag_line() -> "
-           << "the TCDIAG data does not match the track data!\n\n";
+           << "the TCDIAG data does not match the TCMPR data:\n"
+           << "   TCMPR Line: " << TCMPRLine[NPoints-1] << "\n"
+           << "  TCDIAG Line: " << l << "\n\n";
       exit(1);
    }
+
+   // Update the TCDIAGLine for this TrackPoint
+   TCDIAGLine[NPoints-1] = l;
+
+   // Increment the line count
+   NLines++;
 
    // Name of diagnostics read
    StringArray diag_name;
