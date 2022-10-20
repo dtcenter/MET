@@ -182,4 +182,46 @@
     </output>
   </test>
 
+  <test name="tc_pairs_LSDIAG">
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>STORM_ID</name> <value>"AL072022"</value></pair>
+      <pair><name>INIT_INC</name> <value>"20220916_18"</value></pair>
+      <pair><name>DIAG_NAME</name> <value></value></pair>
+    </env>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal072022_OFCL_AVNO.dat \
+      -bdeck &DATA_DIR;/bdeck/bal072022.dat \
+      -lsdiag &DATA_DIR;/lsdiag/22091618AL0722_lsdiag.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_DIAGNOSTICS \
+      -out &OUTPUT_DIR;/tc_pairs/al072022_LSDIAG \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_LSDIAG.log \
+      -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al072022_LSDIAG.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_pairs_TCDIAG">
+  <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>STORM_ID</name> <value>"AL092021"</value></pair>
+      <pair><name>INIT_INC</name> <value>"20210827_12"</value></pair>
+      <pair><name>DIAG_NAME</name> <value></value></pair>
+    </env>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal092021_OFCL_AVNO.dat \
+      -bdeck &DATA_DIR;/bdeck/bal092021.dat \
+      -tcdiag &DATA_DIR;/tcdiag/sal092021_avno_doper_2021082712_diag.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_DIAGNOSTICS \
+      -out &OUTPUT_DIR;/tc_pairs/al092021_TCDIAG \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_TCDIAG.log \
+      -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al092021_TCDIAG.tcst</stat>
+    </output>
+  </test>
+
 </met_test>
