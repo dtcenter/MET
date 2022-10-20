@@ -265,10 +265,6 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
       exit(1);
    }
 
-   mlog << Debug(4) << "Parsing " << StormId << " "
-        << Technique << " " << unix_to_yyyymmddhh(InitTime)
-        << " TC diagnostics file: " << path << "\n";
-
    // Store the diagnostics data
    while(dl.read_line(this)) {
 
@@ -305,6 +301,10 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
          DiagMap[cs] = data;
       }
    } // end while
+
+   mlog << Debug(4) << "Parsed " << DiagMap.size() << " diagnostic values for "
+        << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+        << " TC diagnostics file: " << path << "\n";
 
    // Close the input file
    close();
@@ -358,6 +358,9 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
       // Fixed width column 24 has the data name
       cs = dl[23];
 
+      // Strip any whitespace from the fixed-width column
+      cs.ws_strip();
+
       if(cs == "TIME") {
          for(i=2; i<23; i++) {
             LeadTime.add(atoi(dl[i])*sec_per_hour);
@@ -381,18 +384,14 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
       }
    } // end while
 
-   mlog << Debug(4) << "Parsing " << StormId << " "
-        << Technique << " " << unix_to_yyyymmddhh(InitTime)
-        << " LS diagnostics file: " << path << "\n";
-
    // Store the diagnostics data
    while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
 
       // Skip empty lines
       if(dl.n_items() == 0) continue;
 
-      // Check the 25th column
-      cs = dl[24];
+      // Check the 24th column
+      cs = dl[23];
 
       // Quit reading at the LAST line
       if(cs == "LAST") break;
@@ -417,6 +416,10 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
          DiagMap[cs] = data;
       }
    } // end while
+
+   mlog << Debug(4) << "Parsed " << DiagMap.size() << " diagnostic values for "
+        << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+        << " LS diagnostics file: " << path << "\n";
 
    // Close the input file
    close();
