@@ -61,7 +61,7 @@ int DiagFile::lead(int i) const {
 
    // Check range
    if(i < 0 || i >= LeadTime.n()) {
-      mlog << Error << "\nTrackInfo::lead(int) -> "
+      mlog << Error << "\nDiagFile::lead(int) -> "
            << "range check error for index value " << i << "\n\n";
       exit(1);
    }
@@ -75,7 +75,7 @@ unixtime DiagFile::valid(int i) const {
 
    // Check range
    if(i < 0 || i >= LeadTime.n()) {
-      mlog << Error << "\nTrackInfo::valid(int) -> "
+      mlog << Error << "\nDiagFile::valid(int) -> "
            << "range check error for index value " << i << "\n\n";
       exit(1);
    }
@@ -90,7 +90,7 @@ double DiagFile::lat(int i) const {
 
    // Check range
    if(i < 0 || i >= Lat.n()) {
-      mlog << Error << "\nTrackInfo::lat(int) -> "
+      mlog << Error << "\nDiagFile::lat(int) -> "
            << "range check error for index value " << i << "\n\n";
       exit(1);
    }
@@ -104,7 +104,7 @@ double DiagFile::lon(int i) const {
 
    // Check range
    if(i < 0 || i >= Lon.n()) {
-      mlog << Error << "\nTrackInfo::lon(int) -> "
+      mlog << Error << "\nDiagFile::lon(int) -> "
            << "range check error for index value " << i << "\n\n";
       exit(1);
    }
@@ -115,22 +115,22 @@ double DiagFile::lon(int i) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool DiagFile::has_diag(const string &str) const {
-   return(DiagMap.count(str) > 0);
+   return(DiagName.has(str));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const NumArray & DiagFile::get_diag(const string &str) const {
-   return(DiagMap.at(str));
-}
+const NumArray & DiagFile::diag_val(const string &str) const {
+   int i;
 
-////////////////////////////////////////////////////////////////////////
+   // Find the index of the name
+   if(!DiagName.has(str, i)) {
+      mlog << Error << "\nDiagFile::diag_val() -> "
+           << "requested diagnostic name \"" << str << "\" not found!\n\n";
+      exit(1);
+   }
 
-void DiagFile::get_diag_name(StringArray &diag_name) const {
-   diag_name.clear();
-   for(map<string,NumArray>::const_iterator it = DiagMap.begin();
-       it != DiagMap.end(); it++) diag_name.add(it->first);
-   return;
+   return(DiagVal[i]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,8 @@ void DiagFile::init_from_scratch() {
    LeadTime.clear();
    Lat.clear();
    Lon.clear();
-   DiagMap.clear();
+   DiagName.clear();
+   DiagVal.clear();
 
    close();
 
@@ -296,13 +297,14 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
               << NTime << ")!\n\n";
          exit(1);
       }
-      // Store the data in the map
+      // Store the name and values
       else {
-         DiagMap[cs] = data;
+         DiagName.add(cs);
+         DiagVal.push_back(data);
       }
    } // end while
 
-   mlog << Debug(4) << "Parsed " << DiagMap.size() << " diagnostic values for "
+   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values for "
         << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
         << " TC diagnostics file: " << path << "\n";
 
@@ -411,13 +413,14 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
               << NTime << ")!\n\n";
          exit(1);
       }
-      // Store the data in the map
+      // Store the name and values
       else {
-         DiagMap[cs] = data;
+         DiagName.add(cs);
+         DiagVal.push_back(data);
       }
    } // end while
 
-   mlog << Debug(4) << "Parsed " << DiagMap.size() << " diagnostic values for "
+   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values for "
         << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
         << " LS diagnostics file: " << path << "\n";
 

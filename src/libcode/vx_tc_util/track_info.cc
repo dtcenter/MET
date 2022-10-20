@@ -535,14 +535,14 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
 
    // If empty, store all diagnostics
    if(diag_name.n() > 0) DiagName = diag_name;
-   else                  diag_file.get_diag_name(DiagName);
+   else                  DiagName = diag_file.diag_name();
 
    int i_name, i_time, i_pnt;
 
    // Retrieve data for each diagnostic
    for(i_name=0; i_name<DiagName.n(); i_name++) {
 
-      NumArray diag_val = diag_file.get_diag(DiagName[i_name]);
+      NumArray diag_val = diag_file.diag_val(DiagName[i_name]);
 
       // Add diagnostic values to the TrackPoints
       for(i_time=0; i_time<diag_file.n_time(); i_time++) {
