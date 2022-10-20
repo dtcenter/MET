@@ -304,7 +304,7 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
       }
    } // end while
 
-   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values for "
+   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values from "
         << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
         << " TC diagnostics file: " << path << "\n";
 
@@ -420,7 +420,7 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
       }
    } // end while
 
-   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values for "
+   mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values from "
         << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
         << " LS diagnostics file: " << path << "\n";
 
