@@ -226,6 +226,7 @@ void TCStatJob::clear() {
    InitStrExcMap.clear();
    DiagThreshMap.clear();
    InitDiagThreshMap.clear();
+   PrintDiagWarning.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -311,6 +312,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitStrExcMap = j.InitStrExcMap;
    DiagThreshMap = j.DiagThreshMap;
    InitDiagThreshMap = j.InitDiagThreshMap;
+   PrintDiagWarning = j.PrintDiagWarning;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -523,7 +525,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
-                                TCPointCounts &n) const {
+                                TCPointCounts &n) {
    bool keep = true;
    int i, i_init;
    double v_dbl;
@@ -648,21 +650,17 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       // Loop through the numeric diagnostic thresholds
       for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
 
-         // Check whether the diagnostic name exists
-         if(!pair.adeck().diag_name().has(thr_it->first, i_diag)) {
-            keep = false;
-            break;
-         }
+         // Get the numeric diagnostic value
+         v_dbl = get_diag_double(pair.adeck().diag_name(),
+                                 pair.adeck()[i_init], thr_it->first);
 
          // Check the diagnostic value threshold
-         if(!thr_it->second.check_dbl(pair.adeck()[i_init].diag_val(i_diag))) {
+         if(!thr_it->second.check_dbl(v_dbl)) {
             keep = false;
+            n.RejInitDiagThresh += pair.n_points();
             break;
          }
       }
-
-      // Update counts
-      if(!keep) n.RejInitDiagThresh += pair.n_points();
    }
 
    // Check OutInitMask
@@ -932,7 +930,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
                                  const TrackPoint &point,
-                                 TCPointCounts &n) const {
+                                 TCPointCounts &n) {
    bool keep = true;
    double v_dbl;
    map<ConcatString,ThreshArray>::const_iterator thr_it;
@@ -963,13 +961,22 @@ bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
 
 double TCStatJob::get_diag_double(const StringArray &diag_name,
                                   const TrackPoint &point,
-                                  const ConcatString &diag_cs) const {
+                                  const ConcatString &diag_cs) {
    double v = bad_data_double;
    int i_diag;
 
    // Check whether the diagnostic name exists
    if(diag_name.has(diag_cs, i_diag)) {
       v = point.diag_val(i_diag);
+   }
+   // Print a single warning message if diagnostics are present
+   // but not the requested one
+   else if(diag_name.n() > 0 &&
+           !PrintDiagWarning.has(diag_cs)) {
+      mlog << Warning << "\nTCStatJob::get_diag_double() -> "
+           << "diagnostic \"" << diag_cs
+           << "\" not defined for TrackPoint.\n\n";
+      PrintDiagWarning.add(diag_cs);
    }
 
    return(v);

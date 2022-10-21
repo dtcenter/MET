@@ -207,15 +207,15 @@ class TCStatJob {
 
       //////////////////////////////////////////////////////////////////
 
-      bool is_keeper_track(const TrackPairInfo &, TCPointCounts &) const;
+      bool is_keeper_track(const TrackPairInfo &, TCPointCounts &);
 
       bool is_keeper_line(const TCStatLine &, TCPointCounts &) const;
 
       double get_column_double(const TCStatLine &, const ConcatString &) const;
 
-      bool is_keeper_tcdiag(const StringArray &, const TrackPoint &, TCPointCounts &) const;
+      bool is_keeper_tcdiag(const StringArray &, const TrackPoint &, TCPointCounts &);
 
-      double get_diag_double(const StringArray &, const TrackPoint &, const ConcatString &) const;
+      double get_diag_double(const StringArray &, const TrackPoint &, const ConcatString &);
 
       //////////////////////////////////////////////////////////////////
 
@@ -307,6 +307,7 @@ class TCStatJob {
       // Numeric diagnostic thresholds
       std::map<ConcatString,ThreshArray> DiagThreshMap;
       std::map<ConcatString,ThreshArray> InitDiagThreshMap;
+      StringArray                        PrintDiagWarning;
 
       // Variables to the store the analysis job specification
       ConcatString DumpFile;             // Dump TrackPairInfo used to a file
