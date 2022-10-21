@@ -685,15 +685,7 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPoint::add_diag_value(double diag_lat, double diag_lon, double val) {
-
-   // Check for consistent location
-   if(!is_eq(diag_lat, Lat) || !is_eq(diag_lon, Lon)) {
-      mlog << Warning << "\nTrackPoint::add_diag_value() -> "
-           << "the diagnostic location (" << diag_lat << ", " << diag_lon
-           << ") does not match the track location (" << Lat << ", " << Lon
-           << ")\n";
-   }
+void TrackPoint::add_diag_value(double val) {
 
    // Store the diagnostic value
    DiagVal.add(val);

@@ -550,10 +550,19 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
          // Get the index of the TrackPoint for this lead time
          if((i_pnt = lead_index(nint(diag_file.lead(i_time)))) < 0) continue;
 
+         // Check for consistent location, but only once
+         if(i_name == 0) {
+            if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
+               !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
+               mlog << Warning << "\nTrackInfo::add_diag_data() -> "
+                    << "the diagnostic location (" << diag_file.lat(i_time) << ", "
+                    << diag_file.lon(i_time) << ") does not match the track location ("
+                    << Point[i_pnt].lat() << ", " << Point[i_pnt].lon() << ")\n";
+            }
+         }
+
          // Store this diagnostic value in the TrackPoint
-         Point[i_pnt].add_diag_value(diag_file.lat(i_time),
-                                     diag_file.lon(i_time),
-                                     diag_val[i_time]);
+         Point[i_pnt].add_diag_value(diag_val[i_time]);
 
       } // end for i_time
    } // end for i_name
@@ -572,9 +581,7 @@ void TrackInfo::add_diag_value(int i_pnt, double val) {
       exit(1);
    }
 
-   Point[i_pnt].add_diag_value(Point[i_pnt].lat(),
-                               Point[i_pnt].lon(),
-                               val);
+   Point[i_pnt].add_diag_value(val);
 
    return;
 }
