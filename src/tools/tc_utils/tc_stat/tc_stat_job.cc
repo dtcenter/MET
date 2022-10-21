@@ -654,7 +654,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
             break;
          }
 
-         // Check that diagnostic value
+         // Check the diagnostic value threshold
          if(!thr_it->second.check_dbl(pair.adeck()[i_init].diag_val(i_diag))) {
             keep = false;
             break;
@@ -945,7 +945,7 @@ bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
       // Get the numeric diagnostic value
       v_dbl = get_diag_double(diag_name, point, thr_it->first);
 
-      // Check the diagnostic threshold
+      // Check the diagnostic value threshold
       if(!thr_it->second.check_dbl(v_dbl)) {
          keep = false;
          n.RejDiagThresh++;
