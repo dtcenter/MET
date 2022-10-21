@@ -255,7 +255,7 @@ void process_command_line(int argc, char **argv) {
    for(i=0; i<tcdiag_source.n(); i++) {
       mlog << Debug(1)
            << "[Source " << i+1 << " of " << tcdiag_source.n()
-           << "] TCDIAG Source: " << tcdiag_source[i] << ", Model Name: "
+           << "] TCDIAG Source: " << tcdiag_source[i] << ", Model Name(s): "
            << tcdiag_model_name[i] << "\n";
    }
 
@@ -263,7 +263,7 @@ void process_command_line(int argc, char **argv) {
    for(i=0; i<lsdiag_source.n(); i++) {
       mlog << Debug(1)
            << "[Source " << i+1 << " of " << lsdiag_source.n()
-           << "] LSDIAG Source: " << lsdiag_source[i] << ", Model Name: "
+           << "] LSDIAG Source: " << lsdiag_source[i] << ", Model Name(s): "
            << lsdiag_model_name[i] << "\n";
    }
 
@@ -1025,7 +1025,7 @@ void filter_probs(ProbInfoArray &probs) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_diags(TrackInfoArray &tracks) {
-   StringArray files, files_model_name;
+   StringArray files, files_model_name, model_names;
    DiagFile diag_file;
    int i, n;
 
@@ -1040,9 +1040,10 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.read_tcdiag(files[i], files_model_name[i],
+         model_names.parse_css(files_model_name[i]);
+         diag_file.read_tcdiag(files[i], model_names,
                                conf_info.TCDiagConvertFxMap);
-         if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
+         n += tracks.add_diag_data(diag_file, conf_info.DiagName);
       }
 
       mlog << Debug(3)
@@ -1061,9 +1062,10 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.read_lsdiag(files[i], files_model_name[i],
+         model_names.parse_css(files_model_name[i]);
+         diag_file.read_lsdiag(files[i], model_names,
                                conf_info.LSDiagConvertFxMap);
-         if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
+         n += tracks.add_diag_data(diag_file, conf_info.DiagName);
       }
 
       mlog << Debug(3)

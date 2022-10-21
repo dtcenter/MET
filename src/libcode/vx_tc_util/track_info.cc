@@ -253,8 +253,7 @@ void TrackInfo::extend(int n, bool exact) {
    new_line = new TrackPoint [n];
 
    if(!new_line) {
-      mlog << Error
-           << "\nvoid TrackInfo::extend(int, bool) -> "
+      mlog << Error << "\nvoid TrackInfo::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -313,8 +312,7 @@ void TrackInfo::set_point(int n, const TrackPoint &p) {
 
    // Check range
    if((n < 0) || (n >= NPoints)) {
-      mlog << Error
-           << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
+      mlog << Error << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -360,8 +358,7 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= NPoints)) {
-      mlog << Error
-           << "\nTrackInfo::operator[](int) -> "
+      mlog << Error << "\nTrackInfo::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -529,9 +526,9 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
 
    // Check for a match
-   if(StormId   != diag_file.storm_id()  ||
-      Technique != diag_file.technique() ||
-      InitTime  != diag_file.init()) return(false);
+   if(StormId  != diag_file.storm_id() ||
+      InitTime != diag_file.init()     ||
+      !diag_file.technique().has(Technique)) return(false);
 
    // If empty, store all diagnostics
    if(diag_name.n() > 0) DiagName = diag_name;
@@ -555,9 +552,11 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
             if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
                !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
                mlog << Warning << "\nTrackInfo::add_diag_data() -> "
-                    << "the diagnostic location (" << diag_file.lat(i_time) << ", "
-                    << diag_file.lon(i_time) << ") does not match the track location ("
-                    << Point[i_pnt].lat() << ", " << Point[i_pnt].lon() << ")\n";
+                    << "the " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+                    << " lead time " << sec_to_timestring(diag_file.lead(i_time))
+                    << " track location (" << Point[i_pnt].lat() << ", "
+                    << Point[i_pnt].lon() << ") does not match the diagnostic location ("
+                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")\n";
             }
          }
 
@@ -806,8 +805,7 @@ const TrackInfo & TrackInfoArray::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= Track.size())) {
-      mlog << Error
-           << "\nTrackInfoArray::operator[](int) -> "
+      mlog << Error << "\nTrackInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -830,8 +828,7 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
    // Check range
    if((n < 0) || (n >= Track.size())) {
-      mlog << Error
-           << "\nTrackInfoArray::set(int, const TrackInfo &) -> "
+      mlog << Error << "\nTrackInfoArray::set(int, const TrackInfo &) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -917,18 +914,15 @@ bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
-   bool match = false;
+int TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+   int n_match = 0;
 
    // Set the names for each track
    for(int i=0; i<Track.size(); i++) {
-      if(Track[i].add_diag_data(diag_file, diag_name)) {
-         match = true;
-         break;
-      }
+      if(Track[i].add_diag_data(diag_file, diag_name)) n_match++;
    }
 
-   return(match);
+   return(n_match);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -955,8 +949,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    
    // Check for at least one track
    if(tracks.n() == 0) {
-      mlog << Error
-           << "\nTrackInfoArray::consensus() -> "
+      mlog << Error << "\nTrackInfoArray::consensus() -> "
            << "cannot compute a consensus for zero tracks!\n\n";
       exit(1);
    }
@@ -977,8 +970,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(tavg.basin()   != tracks[i].basin()   ||
          tavg.cyclone() != tracks[i].cyclone() ||
          tavg.init()    != tracks[i].init()) {
-         mlog << Error
-              << "\nTrackInfoArray::consensus() -> "
+         mlog << Error << "\nTrackInfoArray::consensus() -> "
               << "the basin, cyclone number, and init time must "
               << "remain constant.\n\n";
          exit(1);

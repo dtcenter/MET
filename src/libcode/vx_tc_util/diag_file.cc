@@ -179,13 +179,17 @@ void DiagFile::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::set_technique(const string &str) {
+void DiagFile::set_technique(const StringArray &sa) {
 
-   Technique = str;
+   Technique = sa;
 
    // Replace instances of AVN with GFS
-   if(strstr(Technique.c_str(), "AVN") != NULL) {
-      Technique.replace("AVN", "GFS");
+   for(int i=0; i<Technique.n(); i++) {
+      if(strstr(Technique[i].c_str(), "AVN") != NULL) {
+         ConcatString cs = Technique[i];
+         cs.replace("AVN", "GFS");
+         Technique.set(i, cs);
+      }
    }
 
    return;
@@ -193,8 +197,8 @@ void DiagFile::set_technique(const string &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_tcdiag(const std::string &path, const std::string &model_name,
-                           const std::map<ConcatString,UserFunc_1Arg> &convert_map) {
+void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_names,
+                           const map<ConcatString,UserFunc_1Arg> &convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -207,8 +211,8 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
    // Store the file type
    FileType = TCDiagFileType;
 
-   // Initialize the technique name
-   set_technique(model_name);
+   // Store user-specified model names or read it from the file below
+   if(model_names.n() > 0) set_technique(model_names);
 
    // Open the file
    open(path.c_str());
@@ -229,7 +233,7 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
 
          // First header line: Technique InitTime (ATCFID YYYMMDDHH)
          if(InitTime == 0) {
-            if(Technique.empty()) set_technique(dl[1]);
+            if(Technique.n() == 0) Technique.add(dl[1]);
             InitTime = timestring_to_unix(dl[2]);
          }
          // Second header line: Basin Cyclone Number (BBCC)
@@ -327,7 +331,7 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
    } // end while
 
    mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values from "
-        << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+        << StormId << " " << write_css(Technique) << " " << unix_to_yyyymmddhh(InitTime)
         << " TC diagnostics file: " << path << "\n";
 
    // Close the input file
@@ -338,8 +342,8 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_lsdiag(const std::string &path, const std::string &model_name,
-                           const std::map<ConcatString,UserFunc_1Arg> &convert_map) {
+void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_names,
+                           const map<ConcatString,UserFunc_1Arg> &convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -348,9 +352,9 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
    // Store the file type
    FileType = LSDiagFileType;
 
-   // Store the default lsdiag technique, unless otherwise specified
-   if(model_name.size() > 0) set_technique(model_name);
-   else                      set_technique(default_lsdiag_technique);
+   // Store user-specified model names or the default one
+   if(model_names.n() > 0) set_technique(model_names);
+   else                    Technique.add(default_lsdiag_technique);
 
    // Open the file
    open(path.c_str());
@@ -461,7 +465,7 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
    } // end while
 
    mlog << Debug(4) << "Parsed " << DiagName.n() << " diagnostic values from "
-        << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+        << StormId << " " << write_css(Technique) << " " << unix_to_yyyymmddhh(InitTime)
         << " LS diagnostics file: " << path << "\n";
 
    // Close the input file

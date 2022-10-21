@@ -69,7 +69,7 @@ class DiagFile : public LineDataFile {
       ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
-      ConcatString Technique;
+      StringArray  Technique;
       unixtime     InitTime;
 
       int          NTime;
@@ -90,7 +90,7 @@ class DiagFile : public LineDataFile {
          //  set stuff
          //
 
-      void set_technique(const std::string &);
+      void set_technique(const StringArray &);
 
          //
          //  get stuff
@@ -99,7 +99,7 @@ class DiagFile : public LineDataFile {
       const ConcatString & storm_id()  const;
       const ConcatString & basin()     const;
       const ConcatString & cyclone()   const;
-      const ConcatString & technique() const;
+      const StringArray  & technique() const;
       const ConcatString & initials()  const;
       unixtime             init()      const;
 
@@ -118,9 +118,9 @@ class DiagFile : public LineDataFile {
          //  do stuff
          //
 
-      void read_tcdiag(const std::string &, const std::string &,
+      void read_tcdiag(const ConcatString &, const StringArray &,
                        const std::map<ConcatString,UserFunc_1Arg> &);
-      void read_lsdiag(const std::string &, const std::string &,
+      void read_lsdiag(const ConcatString &, const StringArray &,
                        const std::map<ConcatString,UserFunc_1Arg> &);
 
 };
@@ -130,7 +130,7 @@ class DiagFile : public LineDataFile {
 inline const ConcatString & DiagFile::storm_id()  const { return(StormId);      }
 inline const ConcatString & DiagFile::basin()     const { return(Basin);        }
 inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);      }
-inline const ConcatString & DiagFile::technique() const { return(Technique);    }
+inline const StringArray  & DiagFile::technique() const { return(Technique);    }
 inline unixtime             DiagFile::init()      const { return(InitTime);     }
 inline int                  DiagFile::n_time()    const { return(NTime);        }
 inline int                  DiagFile::n_diag()    const { return(DiagName.n()); }
