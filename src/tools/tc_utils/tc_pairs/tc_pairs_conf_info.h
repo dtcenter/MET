@@ -114,6 +114,10 @@ class TCPairsConfInfo {
       // Diagnostics to be extracted
       StringArray DiagName;
 
+      // Diagnostic conversion maps
+      std::map<ConcatString,UserFunc_1Arg> TCDiagConvertFxMap;
+      std::map<ConcatString,UserFunc_1Arg> LSDiagConvertFxMap;
+
       // Basin Map
       std::map<ConcatString,ConcatString> BasinMap;
 

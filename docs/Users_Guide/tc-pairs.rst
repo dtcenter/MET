@@ -265,6 +265,17 @@ ____________________
 
 .. code-block:: none
 
+  tcdiag_convert_map = [];
+  lsdiag_convert_map = [];
+
+The **tcdiag_convert_map** and **lsdiag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-tcdiag** and **-lsdiag** command line options, respectively. Each array element is a dictionary consisting of a **key** and **convert(x)** entry. The **key** is an array of strings listing diagnostic names. **convert(x)** is a function which defines how the diagnostic data should be converted after being read. The defined function is applied to any diagnostic value who name appears in the **key**.
+
+Note that unit conversions are generally handled automatically for **-tcdiag** inputs based on the units defined in the input file. The conversion function **convert(x) = x / 10;** is automatically applied to any diagnostic with units of 10C, 10M/S, or 10KT. However, conversion functions defined in **tcdiag_convert_map** take precedence over that default behavior.
+
+____________________
+
+.. code-block:: none
+
   basin_map = [
      { key = "SI"; val = "SH"; },
      { key = "SP"; val = "SH"; },

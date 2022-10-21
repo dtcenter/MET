@@ -118,8 +118,10 @@ class DiagFile : public LineDataFile {
          //  do stuff
          //
 
-      void read_tcdiag(const std::string &, const std::string &);
-      void read_lsdiag(const std::string &, const std::string &);
+      void read_tcdiag(const std::string &, const std::string &,
+                       const std::map<ConcatString,UserFunc_1Arg> &);
+      void read_lsdiag(const std::string &, const std::string &,
+                       const std::map<ConcatString,UserFunc_1Arg> &);
 
 };
 

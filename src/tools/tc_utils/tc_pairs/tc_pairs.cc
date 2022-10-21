@@ -1040,7 +1040,8 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.read_tcdiag(files[i], files_model_name[i]);
+         diag_file.read_tcdiag(files[i], files_model_name[i],
+                               conf_info.TCDiagConvertFxMap);
          if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
 
@@ -1060,7 +1061,8 @@ void process_diags(TrackInfoArray &tracks) {
 
       // Loop over the input files
       for(i=0,n=0; i<files.n(); i++) {
-         diag_file.read_lsdiag(files[i], files_model_name[i]);
+         diag_file.read_lsdiag(files[i], files_model_name[i],
+                               conf_info.LSDiagConvertFxMap);
          if(tracks.add_diag_data(diag_file, conf_info.DiagName)) n++;
       }
 

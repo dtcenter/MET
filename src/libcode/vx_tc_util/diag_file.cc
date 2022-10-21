@@ -39,6 +39,8 @@ static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
 static const int tcdiag_fill_value = 9999;
 static const int lsdiag_fill_value = 9999;
 
+static const char tcdiag_div10_units_str[] = "(10C),(10KT),(10M/S)";
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class DiagFile
@@ -191,10 +193,18 @@ void DiagFile::set_technique(const string &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_tcdiag(const std::string &path, const std::string &model_name) {
-   int i;
+void DiagFile::read_tcdiag(const std::string &path, const std::string &model_name,
+                           const std::map<ConcatString,UserFunc_1Arg> &convert_map) {
+   int i, v_int;
+   double v_dbl;
    NumArray data;
+   const UserFunc_1Arg *fx_ptr = 0;
 
+   // Units whose values should be divided by 10
+   StringArray div10_units;
+   div10_units.parse_css(tcdiag_div10_units_str);
+
+   // Store the file type
    FileType = TCDiagFileType;
 
    // Initialize the technique name
@@ -275,18 +285,30 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
       // Quit reading at the COMMENTS section
       if((cs = dl[1]) == "COMMENTS") break;
 
-      // first column contains the name
+      // First column contains the name
       cs = dl[0];
 
       // Skip certain lines
       if(cs.startswith("----") || cs.startswith("TIME") ||
          cs.startswith("NLEV") || cs.startswith("NVAR")) continue;
 
+      // Check for a conversion function
+      fx_ptr = (convert_map.count(cs) > 0 ? &convert_map.at(cs) : (UserFunc_1Arg *) 0);
+
       // Parse the data values
       data.erase();
       for(i=2; i<dl.n_items(); i++) {
-         data.add(atoi(dl[i]) == tcdiag_fill_value ?
-                  bad_data_double : atof(dl[i]));
+
+         v_int = atoi(dl[i]);
+
+         // Check for bad data and apply conversions
+         if(v_int == tcdiag_fill_value)  v_dbl = bad_data_double;
+         else if(fx_ptr)                 v_dbl = (*fx_ptr)(v_int);
+         else if(div10_units.has(dl[1])) v_dbl = v_int / 10.0;
+         else                            v_dbl = (double) v_int;
+
+         // Store the value
+         data.add(v_dbl);
       }
 
       // Check for the expected number of items
@@ -316,10 +338,14 @@ void DiagFile::read_tcdiag(const std::string &path, const std::string &model_nam
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_lsdiag(const std::string &path, const std::string &model_name) {
-   int i;
+void DiagFile::read_lsdiag(const std::string &path, const std::string &model_name,
+                           const std::map<ConcatString,UserFunc_1Arg> &convert_map) {
+   int i, v_int;
+   double v_dbl;
    NumArray data;
+   const UserFunc_1Arg *fx_ptr = 0;
 
+   // Store the file type
    FileType = LSDiagFileType;
 
    // Store the default lsdiag technique, unless otherwise specified
@@ -395,14 +421,28 @@ void DiagFile::read_lsdiag(const std::string &path, const std::string &model_nam
       // Check the 24th column
       cs = dl[23];
 
+      // Strip any whitespace from the fixed-width column
+      cs.ws_strip();
+
       // Quit reading at the LAST line
       if(cs == "LAST") break;
+
+      // Check for a conversion function
+      fx_ptr = (convert_map.count(cs) > 0 ? &convert_map.at(cs) : (UserFunc_1Arg *) 0);
 
       // Parse the data values
       data.erase();
       for(i=2; i<23; i++) {
-         data.add(atoi(dl[i]) == lsdiag_fill_value ?
-                  bad_data_double : atof(dl[i]));
+
+         v_int = atoi(dl[i]);
+
+         // Check for bad data and apply conversions
+         if(v_int == lsdiag_fill_value)  v_dbl = bad_data_double;
+         else if(fx_ptr)                 v_dbl = (*fx_ptr)(v_int);
+         else                            v_dbl = (double) v_int;
+
+         // Store the value
+         data.add(v_dbl);
       }
 
       // Check for the expected number of items

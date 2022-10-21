@@ -97,6 +97,8 @@ void TCPairsConfInfo::clear() {
    WatchWarnFile.clear();
    WatchWarnOffset = bad_data_int;
    DiagName.clear();
+   TCDiagConvertFxMap.clear();
+   LSDiagConvertFxMap.clear();
    BasinMap.clear();
    Version.clear();
 
@@ -308,6 +310,12 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: DiagName
    DiagName = dict->lookup_string_array(conf_key_diag_name);
+
+   // Conf: TCDiagConvertFxMap
+   TCDiagConvertFxMap = parse_conf_key_convert_map(dict, conf_key_tcdiag_convert_map);
+
+   // Conf: LSDiagConvertFxMap
+   LSDiagConvertFxMap = parse_conf_key_convert_map(dict, conf_key_lsdiag_convert_map);
 
    // Conf: BasinMap
    BasinMap = parse_conf_key_value_map(dict, conf_key_basin_map);

@@ -977,7 +977,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    ConcatString key, val;
    int i;
 
@@ -988,14 +988,14 @@ void parse_add_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs)var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m->count(key) >= 1) {
          (*m)[key] = val;
@@ -1011,10 +1011,9 @@ void parse_add_conf_key_value_map(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    int i;
@@ -1026,14 +1025,14 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs_var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m.count(key) >= 1) {
          mlog << Warning << "\n" << method_name
@@ -1096,6 +1095,62 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
+      Dictionary *dict, const char *conf_key_map_name, const char *caller) {
+   Dictionary *map_dict = (Dictionary *) 0;
+   int i, j;
+   StringArray sa;
+   ConcatString key;
+   UserFunc_1Arg fx;
+   map<ConcatString,UserFunc_1Arg> m;
+   const char *method_name = (0 != caller) ? caller : "parse_conf_key_convert_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: tcdiag_convert_map, lsdiag_convert_map, etc
+   map_dict = dict->lookup_array(conf_key_map_name);
+
+   // Loop through the array entries
+   for(i=0; i<map_dict->n_entries(); i++) {
+
+      // Lookup the key and convert function
+      sa =   (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
+      fx.clear();
+      fx.set((*map_dict)[i]->dict_value()->lookup(conf_key_convert));
+
+      // Check the function
+      if(!fx.is_set()) {
+         mlog << Error << "\n" << method_name
+              << "lookup for \"" << conf_key_convert << "\" failed in the \""
+              << conf_key_map_name << "\" map!\n\n";
+         exit(1);
+      }
+
+      // Add map entry for each string
+      for(j=0; j<sa.n(); j++) {
+
+         key = sa[j];
+
+         if(m.count(key) >= 1) {
+            mlog << Warning << "\n" << method_name
+                 << "found multiple entries for key \"" << key << "\" in the \""
+                 << conf_key_map_name << "\" map!\n\n";
+         }
+
+         // Add entry to the map
+         m.insert(pair<ConcatString,UserFunc_1Arg>(key,fx));
+
+      } // end for j
+   } // end for i
+
+   return(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
