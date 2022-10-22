@@ -148,7 +148,7 @@ diag_name = [];
 
 tcdiag_convert_map = [
    { key = [ "(10C)", "(10KT)", "(10M/S)" ]; convert(x) = x / 10; }
-]
+];
 
 lsdiag_convert_map = [
    { key = [ "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
