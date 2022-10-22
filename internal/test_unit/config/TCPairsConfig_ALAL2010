@@ -14,7 +14,7 @@
 //
 // Models
 //
-model = [ "GFSO" ];
+model = [];
 
 //
 // Description
@@ -24,17 +24,17 @@ desc = "NA";
 //
 // Storm identifiers
 //
-storm_id = [];
+storm_id = [ "ALAL2010" ];
 
 //
 // Basins
 //
-basin = [ "AL" ];
+basin = [];
 
 //
 // Cyclone numbers
 //
-cyclone = [ "09" ];
+cyclone = [];
 
 //
 // Storm names
