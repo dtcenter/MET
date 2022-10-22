@@ -155,7 +155,9 @@ lsdiag_convert_map = [
              "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
              "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
              "V500", "V300", "PENC", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS",
-             "SHRG", "PENV", "HE07", "HE05"]; convert(x) = x / 10; },
+             "SHRG", "PENV", "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06",
+             "PW07", "PW08", "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16",
+             "PW17", "PW18", "PW20", "PW21" ]; convert(x) = x / 10; },
    { key = [ "VVAV", "VMFX", "VVAC" ]; convert(x) = x / 100; }
 ];
 
@@ -182,22 +184,23 @@ lsdiag_convert_map = [
 //   "TIME", "DELV",  "DTL", "CD20", "CD26", "COHC", "XOHC", "NDTX", "NDML", "ND30",
 //   "ND28", "ND26", "ND24", "ND22", "ND20", "ND18", "ND16", "NDFR", "NOHC", "NO20",
 //   "RHLO", "RHMD", "RHHI", "Z850", "D200", "REFC", "PEFC", "R000", "Z000", "TGRD",
-//   "TADV", "SDDC", "DIVC", "SHTD", "SHTS", "VMPI", "O500", "O700", "CFLX"
+//   "TADV", "SDDC", "DIVC", "SHTD", "SHTS", "VMPI", "O500", "O700", "CFLX", "PW19"
 //
 // Divide by 10:
 //    "LAT",  "LON", "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
 //   "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
 //   "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
 //   "V500", "V300", "PENC", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS",
-//   "SHRG", "PENV", "HE07", "HE05"
+//   "SHRG", "PENV", "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06",
+//   "PW07", "PW08", "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16",
+//   "PW17", "PW18", "PW20", "PW21"
 //
 // Divide by 100:
 //   "VVAV", "VMFX", "VVAC"
-// 
-// Special logic required:
-//   "IR00", "IRM1", "IRM3", "PC00", "PCM1", "PCM3", "PSLV", "MTPW", "PW01", "PW02",
-//   "PW03", "PW04", "PW05", "PW06", "PW07", "PW08", "PW09", "PW10", "PW11", "PW12",
-//   "PW13", "PW14", "PW15", "PW16", "PW17", "PW18", "PW19", "PW20", "PW21", "IRXX"
+//
+// Ignore for now but could add special logic:
+//   "MTPW" - Because the same data is provided in PW01-PW21
+//   "IR00", "IRM1", "IRM3", "PC00", "PCM1", "PCM3", "PSLV", "IRXX"
 
 //
 // Modify basin names to make them consistent across ATCF input files.

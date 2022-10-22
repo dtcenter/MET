@@ -39,6 +39,8 @@ static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
 static const int tcdiag_fill_value = 9999;
 static const int lsdiag_fill_value = 9999;
 
+static const char lsdiag_skip_str[] = "MTPW,IR00,IRM1,IRM3,PC00,PCM1,PCM3,PSLV,IRXX";
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class DiagFile
@@ -354,6 +356,10 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
    // Open the file
    open(path.c_str());
 
+   // Diagnostic names to ignore
+   StringArray skip_sa;
+   skip_sa.parse_css(lsdiag_skip_str);
+
    // Parse the header information from the first line
    DataLine dl;
    ConcatString cs;
@@ -423,6 +429,9 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
       // Strip any whitespace from the fixed-width column
       cs.ws_strip();
 
+      // Check for diagnostic names to skip
+      if(skip_sa.has(cs)) continue;
+
       // Quit reading at the LAST line
       if(cs == "LAST") break;
 
@@ -436,9 +445,9 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
          v_int = atoi(dl[i]);
 
          // Check for bad data and apply conversions
-         if(v_int == lsdiag_fill_value)  v_dbl = bad_data_double;
-         else if(fx_ptr)                 v_dbl = (*fx_ptr)(v_int);
-         else                            v_dbl = (double) v_int;
+         if(v_int == lsdiag_fill_value) v_dbl = bad_data_double;
+         else if(fx_ptr)                v_dbl = (*fx_ptr)(v_int);
+         else                           v_dbl = (double) v_int;
 
          // Store the value
          data.add(v_dbl);
