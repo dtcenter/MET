@@ -213,7 +213,7 @@
     <param> \
       -adeck &DATA_DIR;/adeck/aal072022_OFCL_SHIP_AVNO.dat \
       -bdeck &DATA_DIR;/bdeck/bal072022.dat \
-      -lsdiag &DATA_DIR;/lsdiag/22091618AL0722_lsdiag.dat \
+      -lsdiag &DATA_DIR;/lsdiag/22091618AL0722_lsdiag.dat model=OFCL,SHIP \
       -config &CONFIG_DIR;/TCPairsConfig_DIAGNOSTICS \
       -out &OUTPUT_DIR;/tc_pairs/al072022_LSDIAG \
       -log &OUTPUT_DIR;/tc_pairs/tc_pairs_LSDIAG.log \
