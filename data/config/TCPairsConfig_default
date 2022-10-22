@@ -145,7 +145,11 @@ diag_name = [];
 //
 // Unit conversions to be applied to diagnostic values
 //
-tcdiag_convert_map = [];
+
+tcdiag_convert_map = [
+   { key = [ "(10C)", "(10KT)", "(10M/S)" ]; convert(x) = x / 10; }
+]
+
 lsdiag_convert_map = [
    { key = [ "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
              "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",

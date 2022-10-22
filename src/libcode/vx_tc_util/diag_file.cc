@@ -39,8 +39,6 @@ static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
 static const int tcdiag_fill_value = 9999;
 static const int lsdiag_fill_value = 9999;
 
-static const char tcdiag_div10_units_str[] = "(10C),(10KT),(10M/S)";
-
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class DiagFile
@@ -204,10 +202,6 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
    NumArray data;
    const UserFunc_1Arg *fx_ptr = 0;
 
-   // Units whose values should be divided by 10
-   StringArray div10_units;
-   div10_units.parse_css(tcdiag_div10_units_str);
-
    // Store the file type
    FileType = TCDiagFileType;
 
@@ -296,8 +290,10 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
       if(cs.startswith("----") || cs.startswith("TIME") ||
          cs.startswith("NLEV") || cs.startswith("NVAR")) continue;
 
-      // Check for a conversion function
-      fx_ptr = (convert_map.count(cs) > 0 ? &convert_map.at(cs) : (UserFunc_1Arg *) 0);
+      // Check for a conversion function based on the diagnostic name or units
+           if(convert_map.count(cs) > 0)    fx_ptr = &convert_map.at(cs);
+      else if(convert_map.count(dl[1]) > 0) fx_ptr = &convert_map.at(dl[1]);
+      else                                  fx_ptr = (UserFunc_1Arg *) 0;
 
       // Parse the data values
       data.erase();
@@ -306,10 +302,9 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
          v_int = atoi(dl[i]);
 
          // Check for bad data and apply conversions
-         if(v_int == tcdiag_fill_value)  v_dbl = bad_data_double;
-         else if(fx_ptr)                 v_dbl = (*fx_ptr)(v_int);
-         else if(div10_units.has(dl[1])) v_dbl = v_int / 10.0;
-         else                            v_dbl = (double) v_int;
+         if(v_int == tcdiag_fill_value) v_dbl = bad_data_double;
+         else if(fx_ptr)                v_dbl = (*fx_ptr)(v_int);
+         else                           v_dbl = (double) v_int;
 
          // Store the value
          data.add(v_dbl);
