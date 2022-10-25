@@ -44,9 +44,9 @@ storm_name = [];
 //
 // Model initialization time windows to include or exclude
 //
-init_beg = "";
-init_end = "";
-init_inc = [ ${INIT_INC} ];
+init_beg = ${INIT_BEG};
+init_end = ${INIT_END};
+init_inc = [];
 init_exc = [];
 
 //
