@@ -86,11 +86,14 @@ class DiagFile : public LineDataFile {
       DiagFile();
      ~DiagFile();
 
+      void clear();
+
          //
          //  set stuff
          //
 
       void set_technique(const StringArray &);
+      void add_technique(const std::string &);
 
          //
          //  get stuff

@@ -157,6 +157,15 @@ DiagFile & DiagFile::operator=(const DiagFile &) {
 
 void DiagFile::init_from_scratch() {
 
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DiagFile::clear() {
+
    // Initialize values
    FileType = DiagFileType_None;
    StormId.clear();
@@ -181,16 +190,19 @@ void DiagFile::init_from_scratch() {
 
 void DiagFile::set_technique(const StringArray &sa) {
 
-   Technique = sa;
+   for(int i=0; i<sa.n(); i++) add_technique(sa[i]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DiagFile::add_technique(const string &str) {
 
    // Replace instances of AVN with GFS
-   for(int i=0; i<Technique.n(); i++) {
-      if(strstr(Technique[i].c_str(), "AVN") != NULL) {
-         ConcatString cs = Technique[i];
-         cs.replace("AVN", "GFS");
-         Technique.set(i, cs);
-      }
-   }
+   ConcatString cs(str);
+   cs.replace("AVN", "GFS");
+   Technique.add(cs);
 
    return;
 }
@@ -203,6 +215,9 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
    double v_dbl;
    NumArray data;
    const UserFunc_1Arg *fx_ptr = 0;
+
+   // Initialize
+   clear();
 
    // Store the file type
    FileType = TCDiagFileType;
@@ -229,7 +244,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
          // First header line: Technique InitTime (ATCFID YYYMMDDHH)
          if(InitTime == 0) {
-            if(Technique.n() == 0) Technique.add(dl[1]);
+            if(Technique.n() == 0) add_technique(dl[1]);
             InitTime = timestring_to_unix(dl[2]);
          }
          // Second header line: Basin Cyclone Number (BBCC)
@@ -272,7 +287,8 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
            << "the NTIME value (" << NTime
            << ") does not match the actual number of times ("
            << LeadTime.n() << "), latitudes (" << Lat.n()
-           << "), or longitudes (" << Lon.n() << ")!\n\n";
+           << "), or longitudes (" << Lon.n() << "): "
+           << path << "\n\n";
       exit(1);
    }
 
@@ -317,7 +333,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
          mlog << Error << "\nDiagFile::read_tcdiag() -> "
               << "the number of \"" << cs << "\" diagnostic values ("
               << data.n() << ") does not match the expected number ("
-              << NTime << ")!\n\n";
+              << NTime << "): " << path << "\n\n";
          exit(1);
       }
       // Store the name and values
@@ -346,12 +362,15 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
    NumArray data;
    const UserFunc_1Arg *fx_ptr = 0;
 
+   // Initialize
+   clear();
+
    // Store the file type
    FileType = LSDiagFileType;
 
    // Store user-specified model names or the default one
    if(model_names.n() > 0) set_technique(model_names);
-   else                    Technique.add(default_lsdiag_technique);
+   else                    add_technique(default_lsdiag_technique);
 
    // Open the file
    open(path.c_str());
@@ -368,7 +387,7 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
    // Check for the expected number of items
    if(dl.n_items() != 9 || strncasecmp(dl[8], "HEAD", strlen("HEAD") != 0)) {
       mlog << Error << "\nDiagFile::open_lsdiag() -> "
-           << "unexpected header line in file: " << path << "\n\n";
+           << "unexpected header line: " << path << "\n\n";
       exit(1);
    }
 
