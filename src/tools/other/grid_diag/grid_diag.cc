@@ -162,6 +162,8 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file.c_str(),
                          config_file.c_str());
 
+   cout << "CHECK1" << endl;
+   
    // Determine the number of data fields
    conf_info.set_n_data();
 
@@ -179,6 +181,8 @@ void process_command_line(int argc, char **argv) {
    // Process the input data file lists
    for(int i=0; i<data_files.size(); i++) {
 
+      cout << "CHECK2, inside loop over data files" << endl;
+      
       // Parse the data file list
       data_files[i] = parse_file_list(data_files[i]);
 
@@ -210,10 +214,14 @@ void process_command_line(int argc, char **argv) {
       }
 
    } // end for i
-
+   
+   cout << "CHECK3" << endl;
+   
    // Process the configuration
    conf_info.process_config(file_types);
 
+   cout << "CHECK4" << endl;
+   
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
                         &data_grid, &data_grid);
@@ -443,8 +451,14 @@ void setup_histograms(void) {
 	      << "Initializing " << data_info->magic_str_attr()
 	      << " histogram with " << n_bins << " bins from "
 	      << min << " to " << max << ".\n";
+      
       histograms[i_var_str] = vector<long long>();
       init_pdf(n_bins, histograms[i_var_str]);
+
+      // Keep track of unique output variable names
+      if(nc_var_sa.has( data_info->magic_str_attr() )) unique_variable_names = false;
+      nc_var_sa.add(data_info->magic_str_attr());
+      
    } // for i_var
 }
 
@@ -529,11 +543,20 @@ void setup_nc_file(void) {
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
+
+      // This is the section we need to fix SL
+      
+      cout << "multiple_data_sources = " << multiple_data_sources << endl;
+      cout << "unique_variable_names = " << unique_variable_names << endl;
+      
       // Set variable NetCDF name
       ConcatString var_name = data_info->name_attr();
+      cout << "Initial var_name = " << var_name << endl;
       var_name.add("_");
       var_name.add(data_info->level_attr());
+      cout << "Output var_name = " << var_name << endl;
 
+      
       // Define histogram dimensions
       NcDim var_dim = add_dim(nc_out, var_name,
                               (long) data_info->n_bins());
@@ -816,6 +839,7 @@ void usage() {
 
 void set_data_files(const StringArray & a) {
    data_files.push_back(a);
+   if(data_files.size() > 0) multiple_data_sources = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
