@@ -122,8 +122,8 @@ static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
 ////////////////////////////////////////////////////////////////////////
 
 static const char * tc_diag_cols [] = {
-      "TOTAL", "INDEX", "N_DIAG",
-      "DIAG_", "VALUE_"
+      "TOTAL",  "INDEX", "SOURCE",
+      "N_DIAG", "DIAG_", "VALUE_"
 };
 
 static const int n_tc_diag_cols = sizeof(tc_diag_cols)/sizeof(*tc_diag_cols);

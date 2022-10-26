@@ -471,6 +471,22 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    // Name of diagnostics read
    StringArray diag_name;
 
+   // Diagnostic source type
+   DiagType t = string_to_diagtype(l.get_item("SOURCE"));
+
+   // Make sure the source type does not change
+   if(ADeck.diag_source() != DiagType_None &&
+      ADeck.diag_source() != t) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the diagnostic source type has changed ("
+           << diagtype_to_string(ADeck.diag_source()) << " != "
+           << diagtype_to_string(t) << ")!\n\n";
+      exit(1);
+   }
+
+   // Store the source type
+   ADeck.set_diag_source(t);
+
    // Number of diagnostics
    n_diag = atoi(l.get_item("N_DIAG"));
 
