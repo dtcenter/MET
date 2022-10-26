@@ -188,7 +188,7 @@
       <pair><name>STORM_ID</name> <value>"AL092022"</value></pair>
       <pair><name>INIT_BEG</name> <value>"20220926_00"</value></pair>
       <pair><name>INIT_END</name> <value>"20220926_18"</value></pair>
-      <pair><name>DIAG_NAME</name> <value></value></pair>
+      <pair><name>DIAG_NAME</name> <value>"DTL", "PW01", "SHRD", "TPW", "LAND", "SHR_MAG", "STM_SPD"</value></pair>
     </env>
     <param> \
       -adeck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \

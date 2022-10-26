@@ -527,7 +527,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_name) {
 
    // Check for a match
    if(StormId  != diag_file.storm_id() ||
@@ -538,15 +538,20 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
    DiagSource = diag_file.source();
 
    // If empty, store all diagnostics
-   if(diag_name.n() > 0) DiagName = diag_name;
-   else                  DiagName = diag_file.diag_name();
+   bool store_all_diag = (req_diag_name.n() == 0 ? true : false);
 
    int i_name, i_time, i_pnt;
 
-   // Retrieve data for each diagnostic
-   for(i_name=0; i_name<DiagName.n(); i_name++) {
+   // Loop over the diagnostics in the file
+   for(i_name=0; i_name<diag_file.n_diag(); i_name++) {
 
-      NumArray diag_val = diag_file.diag_val(DiagName[i_name]);
+      // Skip diagnostics not requested
+      if(!store_all_diag &&
+         !req_diag_name.has(diag_file.diag_name()[i_name])) continue;
+
+      // Store the diagnostic name
+      DiagName.add(diag_file.diag_name()[i_name]);
+      NumArray diag_val = diag_file.diag_val(diag_file.diag_name()[i_name]);
 
       // Add diagnostic values to the TrackPoints
       for(i_time=0; i_time<diag_file.n_time(); i_time++) {
