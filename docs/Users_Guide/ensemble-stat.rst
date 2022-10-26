@@ -623,6 +623,9 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
   * - 41 
     - CRPS_EMP_FAIR
     - The Continuous Ranked Probability Skill Score (empirical distribution) adjusted by subtracting 1/2(m) times the mean absolute difference of the ensemble members (m is the ensemble size)
+  * - 42
+    - BIAS_RATIO
+    - Bias Ratio
 
 .. _table_ES_header_info_es_out_RPS:
       

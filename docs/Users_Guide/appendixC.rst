@@ -1003,6 +1003,17 @@ The continuous ranked probability skill score (CRPSS) is similar to the MSESS an
 
 For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
 
+Bias Ratio
+----------
+
+Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value divided by the mean absolute error (MAE) of ensemble member values less than the observation value.
+
+.. math:: \text{BIAS_RATIO} = \frac{ \frac{ \sum_{f_i >= o_i} f_i - o_i }{ \text{count}(f_i >= o_i) } }{ \frac{ \sum_{f_i < o_i}|f_i - o_i| }{ \text{count}(f_i < o_i) } }
+
+TODO: Define the perfect score and advice on interpretation.
+
 IGN
 ---
 
