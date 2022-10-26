@@ -86,6 +86,19 @@ enum TrackType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for tropical cyclone diagnostic types
+//
+
+enum DiagType {
+   DiagType_None, // Default
+   TCDiagType,    // Tropical Cyclone Diagnostics
+   LSDiagRTType,  // Realtime Large Scale Diagnostics
+   LSDiagDevType  // Development Large Scale Diagnostics
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for 12-hour interpolation logic
 //
 
@@ -1067,8 +1080,8 @@ static const char conf_key_basin_file[]               = "basin_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
 static const char conf_key_watch_warn[]               = "watch_warn";
 static const char conf_key_diag_name[]                = "diag_name";
-static const char conf_key_tcdiag_convert_map[]       = "tcdiag_convert_map";
-static const char conf_key_lsdiag_convert_map[]       = "lsdiag_convert_map";
+static const char conf_key_diag_convert_map[]         = "diag_convert_map";
+static const char conf_key_source[]                   = "source";
 static const char conf_key_basin_map[]                = "basin_map";
 static const char conf_key_time_offset[]              = "time_offset";
 static const char conf_key_amodel[]                   = "amodel";

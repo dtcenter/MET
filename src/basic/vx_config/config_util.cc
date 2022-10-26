@@ -2740,6 +2740,45 @@ ConcatString tracktype_to_string(TrackType type) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DiagType string_to_diagtype(const char *s) {
+   DiagType t = DiagType_None;
+
+   // Convert string to enumerated DiagType
+        if(strcasecmp(s, conf_val_none)  == 0) t = DiagType_None;
+   else if(strcasecmp(s, "TCDIAG")       == 0) t = TCDiagType;
+   else if(strcasecmp(s, "LSDIAG_RT")    == 0) t = LSDiagRTType;
+   else if(strcasecmp(s, "LSDIAG_DEV")   == 0) t = LSDiagDevType;
+   else {
+      mlog << Error << "\nstring_to_diagtype() -> "
+           << "Unexpected DiagType string \"" << s << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString diagtype_to_string(DiagType type) {
+   ConcatString s;
+
+   // Convert enumerated DiagType to string
+   switch(type) {
+      case(DiagType_None):  s = conf_val_none; break;
+      case(TCDiagType):     s = "TCDIAG";      break;
+      case(LSDiagRTType):   s = "LSDIAG_RT";   break;
+      case(LSDiagDevType):  s = "LSDIAG_DEV";  break;
+      default:
+         mlog << Error << "\ndiagtype_to_string() -> "
+              << "Unexpected DiagType value of " << type << ".\n\n";
+         exit(1);
+   }
+
+   return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Interp12Type int_to_interp12type(int v) {
    Interp12Type t = Interp12Type_None;
 
