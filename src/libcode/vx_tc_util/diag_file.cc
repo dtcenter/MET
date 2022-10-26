@@ -167,7 +167,7 @@ void DiagFile::init_from_scratch() {
 void DiagFile::clear() {
 
    // Initialize values
-   FileType = DiagFileType_None;
+   SourceType = DiagType_None;
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -209,8 +209,31 @@ void DiagFile::add_technique(const string &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void DiagFile::read(const DiagType source,
+                    const ConcatString &path, const StringArray &model_names,
+                          const std::map<ConcatString,UserFunc_1Arg> *convert_map) {
+
+   // Read diagnostics baesd on the source type
+   if(source == TCDiagType) {
+      read_tcdiag(path, model_names, convert_map);
+   }
+   else if(source == LSDiagRTType) {
+      read_lsdiagrt(path, model_names, convert_map);
+   }
+   else {
+      mlog << Error << "\nDiagFile::read() -> "
+           << "diagnostics of type " << diagtype_to_string(source)
+           << " are not currently supported!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_names,
-                           const map<ConcatString,UserFunc_1Arg> &convert_map) {
+                           const map<ConcatString,UserFunc_1Arg> *convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -220,7 +243,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
    clear();
 
    // Store the file type
-   FileType = TCDiagFileType;
+   SourceType = TCDiagType;
 
    // Store user-specified model names or read it from the file below
    if(model_names.n() > 0) set_technique(model_names);
@@ -309,9 +332,14 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
          cs.startswith("NLEV") || cs.startswith("NVAR")) continue;
 
       // Check for a conversion function based on the diagnostic name or units
-           if(convert_map.count(cs) > 0)    fx_ptr = &convert_map.at(cs);
-      else if(convert_map.count(dl[1]) > 0) fx_ptr = &convert_map.at(dl[1]);
-      else                                  fx_ptr = (UserFunc_1Arg *) 0;
+      if(convert_map) {
+              if(convert_map->count(cs) > 0)    fx_ptr = &convert_map->at(cs);
+         else if(convert_map->count(dl[1]) > 0) fx_ptr = &convert_map->at(dl[1]);
+         else                                   fx_ptr = (UserFunc_1Arg *) 0;
+      }
+      else {
+         fx_ptr = (UserFunc_1Arg *) 0;
+      }
 
       // Parse the data values
       data.erase();
@@ -355,8 +383,8 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_names,
-                           const map<ConcatString,UserFunc_1Arg> &convert_map) {
+void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_names,
+                             const map<ConcatString,UserFunc_1Arg> *convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -366,7 +394,7 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
    clear();
 
    // Store the file type
-   FileType = LSDiagFileType;
+   SourceType = LSDiagRTType;
 
    // Store user-specified model names or the default one
    if(model_names.n() > 0) set_technique(model_names);
@@ -455,7 +483,13 @@ void DiagFile::read_lsdiag(const ConcatString &path, const StringArray &model_na
       if(cs == "LAST") break;
 
       // Check for a conversion function
-      fx_ptr = (convert_map.count(cs) > 0 ? &convert_map.at(cs) : (UserFunc_1Arg *) 0);
+      if(convert_map) {
+         if(convert_map->count(cs) > 0) fx_ptr = &convert_map->at(cs);
+         else                           fx_ptr = (UserFunc_1Arg *) 0;
+      }
+      else {
+         fx_ptr = (UserFunc_1Arg *) 0;
+      }
 
       // Parse the data values
       data.erase();

@@ -17,16 +17,9 @@
 #include <unistd.h>
 #include <map>
 
+#include "vx_config.h"
 #include "vx_cal.h"
 #include "data_line.h"
-
-////////////////////////////////////////////////////////////////////////
-
-enum DiagFileType {
-   DiagFileType_None, // Default
-   LSDiagFileType,    // Large Scale Diagnostics
-   TCDiagFileType     // Tropical Cyclone Diagnostics
-};
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -63,7 +56,7 @@ class DiagFile : public LineDataFile {
       void init_from_scratch();
 
       // Diagnostics file type
-      DiagFileType FileType;
+      DiagType SourceType;
 
       // Storm and model identification
       ConcatString StormId;
@@ -121,10 +114,13 @@ class DiagFile : public LineDataFile {
          //  do stuff
          //
 
-      void read_tcdiag(const ConcatString &, const StringArray &,
-                       const std::map<ConcatString,UserFunc_1Arg> &);
-      void read_lsdiag(const ConcatString &, const StringArray &,
-                       const std::map<ConcatString,UserFunc_1Arg> &);
+      void read          (const DiagType,
+                          const ConcatString &, const StringArray &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_tcdiag   (const ConcatString &, const StringArray &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_lsdiagrt (const ConcatString &, const StringArray &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
 
 };
 
