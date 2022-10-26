@@ -105,6 +105,7 @@ class DiagFile : public LineDataFile {
       double               lat(int)    const;
       double               lon(int)    const;
 
+      DiagType             source()                      const;
       int                  n_diag()                      const;
       const StringArray &  diag_name()                   const;
       bool                 has_diag(const std::string &) const;
@@ -132,6 +133,7 @@ inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);      
 inline const StringArray  & DiagFile::technique() const { return(Technique);    }
 inline unixtime             DiagFile::init()      const { return(InitTime);     }
 inline int                  DiagFile::n_time()    const { return(NTime);        }
+inline DiagType             DiagFile::source()    const { return(SourceType);   }
 inline int                  DiagFile::n_diag()    const { return(DiagName.n()); }
 inline const StringArray &  DiagFile::diag_name() const { return(DiagName);     }
 

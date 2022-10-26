@@ -91,6 +91,7 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
+   DiagSource      = DiagType_None;
    DiagName.clear();
    TrackLines.clear();
 
@@ -131,6 +132,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
    out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
+   out << prefix << "DiagSource      = " << diagtype_to_string(DiagSource) << "\n";
    out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
@@ -169,6 +171,7 @@ ConcatString TrackInfo::serialize() const {
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
      << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
+     << ", DiagSource = " << diagtype_to_string(DiagSource)
      << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
@@ -219,6 +222,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    MaxValidTime    = t.MaxValidTime;
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
+   DiagSource      = t.DiagSource;
    DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
@@ -529,6 +533,9 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &diag_name)
    if(StormId  != diag_file.storm_id() ||
       InitTime != diag_file.init()     ||
       !diag_file.technique().has(Technique)) return(false);
+
+   // Store the diagnostic source
+   DiagSource = diag_file.source();
 
    // If empty, store all diagnostics
    if(diag_name.n() > 0) DiagName = diag_name;

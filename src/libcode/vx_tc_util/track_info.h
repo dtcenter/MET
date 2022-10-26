@@ -70,7 +70,8 @@ class TrackInfo {
       unixtime     MinWarmCore;
       unixtime     MaxWarmCore;
 
-      // Diagnostic names
+      // Diagnostic source and names
+      DiagType    DiagSource;
       StringArray DiagName;
 
       // TrackPoints
@@ -113,6 +114,7 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
+      void set_diag_source(DiagType);
       void set_diag_name(const StringArray &);
 
          //
@@ -144,6 +146,8 @@ class TrackInfo {
       int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
+   
+      DiagType             diag_source()      const;
       int                  n_diag()           const;
       const StringArray &  diag_name()        const;
       const char *         diag_name(int)     const;
@@ -184,6 +188,7 @@ inline void TrackInfo::set_initials(const char *s)         { Initials = s;      
 inline void TrackInfo::set_init(const unixtime u)          { InitTime = u;        }
 inline void TrackInfo::set_valid_min(const unixtime u)     { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u)     { MaxValidTime = u;    }
+inline void TrackInfo::set_diag_source(DiagType t)         { DiagSource = t;      }
 inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
@@ -200,9 +205,12 @@ inline unixtime             TrackInfo::valid_max()        const { return(MaxVali
 inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
 inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
-inline int                  TrackInfo::n_diag()           const { return(DiagName.n());                 }
-inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);                     }
-inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
+
+inline DiagType             TrackInfo::diag_source()      const { return(DiagSource);   }
+inline int                  TrackInfo::n_diag()           const { return(DiagName.n()); }
+inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);     }
+
+inline StringArray          TrackInfo::track_lines()      const { return(TrackLines); }
 
 ////////////////////////////////////////////////////////////////////////
 //
